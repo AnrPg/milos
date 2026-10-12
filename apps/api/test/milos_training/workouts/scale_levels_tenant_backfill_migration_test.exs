@@ -1,6 +1,6 @@
 defmodule MilosTraining.Workouts.ScaleLevelsTenantBackfillMigrationTest do
   @moduledoc """
-  ADR-110 / TD-048: the 20261012160000 migration turns the global
+  ADR-118 / TD-056: the 20261012160000 migration turns the global
   `scale_levels` table into per-organization copies and repoints every
   variation at its own organization's copy.
 

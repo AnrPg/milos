@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.FinanceRefundReceipt do
   @moduledoc """
-  Immutable refund receipt issued for a payment reversal fact (ADR-108).
+  Immutable refund receipt issued for a payment reversal fact (ADR-116).
 
   There is deliberately no update changeset: the table rejects changes to
   every accounting column (`finance_refund_receipts_immutable` trigger).

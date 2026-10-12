@@ -10,7 +10,7 @@ import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { accountingErrorKey, formatMinorUnits } from "@/lib/finance-accounting";
 
-/** ADR-108: the signed-in member's own refund receipts on the billing page. */
+/** ADR-116: the signed-in member's own refund receipts on the billing page. */
 export function MyRefundReceipts() {
   const t = useTranslations("FinanceAccounting");
   const locale = useUiLocale();

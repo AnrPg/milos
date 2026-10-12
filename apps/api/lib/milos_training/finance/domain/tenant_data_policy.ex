@@ -17,7 +17,7 @@ defmodule MilosTraining.Finance.Domain.TenantDataPolicy do
               "Invoices, payments, reversals, refund receipts, reconciliation records, accounting-export runs and the ledgers behind them are accounting records with a statutory retention period; they are archived with their uploaded documents and purged from the live database.",
             retained_object_prefixes: ["invoices/"],
             tables: [
-              # ADR-108: refund receipts and reconciliation records reference
+              # ADR-116: refund receipts and reconciliation records reference
               # reversals and payments, so they are deleted first.
               %{table: "finance_reconciliation_records"},
               %{table: "finance_refund_receipts"},

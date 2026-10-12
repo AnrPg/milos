@@ -1,5 +1,5 @@
 defmodule MilosTrainingWeb.FinanceAccountingControllerTest do
-  @moduledoc "ADR-108 HTTP contract, run as the RLS-enforcing runtime role (ConnCase default)."
+  @moduledoc "ADR-116 HTTP contract, run as the RLS-enforcing runtime role (ConnCase default)."
 
   use MilosTrainingWeb.ConnCase, async: false
 

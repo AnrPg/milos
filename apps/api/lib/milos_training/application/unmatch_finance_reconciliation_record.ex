@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.UnmatchFinanceReconciliationRecord do
-  @moduledoc "Clears a statement line's match so it can be matched again (ADR-108)."
+  @moduledoc "Clears a statement line's match so it can be matched again (ADR-116)."
 
   alias MilosTraining.Finance
 

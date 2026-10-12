@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.ListFinanceRefundReceipts do
   @moduledoc """
-  Lists refund receipts (ADR-108). Staff see the tenant's receipts (with
+  Lists refund receipts (ADR-116). Staff see the tenant's receipts (with
   optional `user_id`, `q`, `from`, `to`, `limit` filters); a member sees only
   their own, whatever filters they send.
   """

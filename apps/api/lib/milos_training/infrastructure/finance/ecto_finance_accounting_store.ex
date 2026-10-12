@@ -1,6 +1,6 @@
 defmodule MilosTraining.Infrastructure.Finance.EctoFinanceAccountingStore do
   @moduledoc """
-  Ecto adapter for ADR-108 refund receipts, reconciliation records and
+  Ecto adapter for ADR-116 refund receipts, reconciliation records and
   accounting-export runs. Every query is pinned to the session's
   `app.organization_id` (and to forced RLS underneath); without a tenant
   session reads return nothing and writes fail closed.

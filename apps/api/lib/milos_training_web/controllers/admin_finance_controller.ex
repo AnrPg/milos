@@ -995,7 +995,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
              current_user_id(conn),
              body_params(conn, params)
            ) do
-      # ADR-108: the refund receipt (nil for waiver reversals) is issued with
+      # ADR-116: the refund receipt (nil for waiver reversals) is issued with
       # the reversal fact and returned alongside it.
       conn
       |> put_status(:created)

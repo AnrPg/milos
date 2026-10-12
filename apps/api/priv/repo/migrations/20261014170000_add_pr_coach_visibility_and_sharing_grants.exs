@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
   use Ecto.Migration
 
-  # ADR-111 / TD-062: Pantheon PRs stay user-owned (ADR-055), but become
+  # ADR-119 / TD-070: Pantheon PRs stay user-owned (ADR-055), but become
   # readable by
   #   (a) every coach of the gym the PR was recorded in (organization
   #       provenance), while the owner holds an active membership there and has
@@ -16,7 +16,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
   # user a coach of org X". Under today's single-role memberships that is
   # `om.role = 'coach'`. Once memberships carry a role set, only that one
   # predicate line changes (to `'coach' = ANY (om.roles)`); coach_scope and
-  # coaching relationships must NOT narrow PR visibility (ADR-111).
+  # coaching relationships must NOT narrow PR visibility (ADR-119).
   def up do
     create table(:user_pr_sharing_preferences, primary_key: false) do
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all),

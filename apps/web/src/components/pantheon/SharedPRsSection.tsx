@@ -12,7 +12,7 @@ import { semanticLabel } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-/** ADR-111: read-only PRs other accounts explicitly shared with me. */
+/** ADR-119: read-only PRs other accounts explicitly shared with me. */
 export function SharedPRsSection() {
   const t = useTranslations("PrSharing");
   const { tokens } = useSession();

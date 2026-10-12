@@ -1,4 +1,4 @@
-# ADR-108: Refund Receipts, Provider Reconciliation and Accounting Exports
+# ADR-116: Refund Receipts, Provider Reconciliation and Accounting Exports
 Date: 2026-10-12
 Status: Accepted
 
@@ -10,8 +10,8 @@ manual-payment first: there is no provider API integration and no server-side
 PDF library (invoice PDFs are rendered in the browser with jsPDF, ADR-072;
 uploaded invoice documents live in MinIO under `organizations/<id>/invoices/`).
 Any new artifact must attach to the existing facts without changing core
-columns, stay tenant-isolated under forced RLS (ADR-091/ADR-101) and be covered
-by the ADR-099 retention/purge policy.
+columns, stay tenant-isolated under forced RLS (ADR-091/ADR-109) and be covered
+by the ADR-107 retention/purge policy.
 
 ## Decision
 Add three additive, Finance-owned artifacts on top of the reversal facts:
@@ -72,7 +72,7 @@ ADR-019's append-only guarantee.
 A single checksummed ZIP gives accountants one artifact with one integrity
 value while still exposing plain CSV files; a stable, versioned column schema
 lets downstream imports rely on it. Storing it under the tenant prefix reuses
-ADR-099's prefix-pinned inventory, purge and signed-link machinery.
+ADR-107's prefix-pinned inventory, purge and signed-link machinery.
 
 ## Alternatives Considered
 - **Receipt as a separate post-commit step or Oban job**: rejected; a crash
@@ -102,7 +102,7 @@ ADR-099's prefix-pinned inventory, purge and signed-link machinery.
 - Receipts are immutable; a wrong receipt is corrected by a new reversal fact
   (and its own receipt), never by editing. Receipts of soft-deleted reversals
   (ADR-084) leave normal views but their rows remain.
-- Exports are built in memory, like the ADR-099 tenant export.
+- Exports are built in memory, like the ADR-107 tenant export.
 - Provider integrations must write `finance_reconciliation_records` through the
   Finance API; they must not alter payment or reversal rows.
 

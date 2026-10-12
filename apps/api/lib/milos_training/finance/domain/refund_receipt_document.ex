@@ -1,7 +1,7 @@
 defmodule MilosTraining.Finance.Domain.RefundReceiptDocument do
   @moduledoc """
   Deterministic, printable HTML rendering of a refund receipt snapshot
-  (ADR-108). There is no PDF library in the stack, so the receipt document is
+  (ADR-116). There is no PDF library in the stack, so the receipt document is
   a self-contained HTML page (inline print stylesheet, no scripts, no
   external resources) that browsers print or save as PDF.
 

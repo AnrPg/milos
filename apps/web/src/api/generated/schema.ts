@@ -108,6 +108,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/unmatch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Clear a statement line's match */
+        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.unmatch_reconciliation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships/redeem": {
         parameters: {
             query?: never;
@@ -171,6 +188,26 @@ export interface paths {
         put?: never;
         /** Create a class type */
         post: operations["MilosTrainingWeb.AdminClassTypeController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/refund-receipts/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Printable HTML refund receipt
+         * @description Deterministic, self-contained HTML (no scripts or external resources) rendered from the immutable snapshot. Print or save as PDF from the browser.
+         */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt_document"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -972,6 +1009,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/refund-receipts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one refund receipt with its immutable snapshot */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/theme": {
         parameters: {
             query?: never;
@@ -1146,6 +1200,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ranked internal payments or reversals that could match a statement line */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions/{id}/modifications": {
         parameters: {
             query?: never;
@@ -1228,6 +1299,27 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminUserController.messages"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/accounting-exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Accounting export run history */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.exports"];
+        put?: never;
+        /**
+         * Export payments, allocations, reversals, credits and refund receipts
+         * @description Ranges up to 31 days are built immediately (201, status `completed`); longer ranges are queued for background processing (202, status `queued`). The ZIP holds one CSV and one JSON file per dataset plus a checksummed manifest (schema_version 1).
+         */
+        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.request_export"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1526,6 +1618,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Match a statement line to an internal payment or reversal
+         * @description The record becomes `matched`, or `mismatched` with the discrepancies found (amount, currency, date tolerance, settlement, type). An internal fact can be linked to one statement line only (409 `reconciliation_target_already_matched`).
+         */
+        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.match_reconciliation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/referral-programs/{id}": {
         parameters: {
             query?: never;
@@ -1728,6 +1840,27 @@ export interface paths {
         put?: never;
         /** Revoke a personal allowance extension with a compensating ledger entry */
         post: operations["MilosTrainingWeb.AdminUserController.revoke_allowance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List payment-provider reconciliation records */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_records"];
+        put?: never;
+        /**
+         * Record an external provider statement line
+         * @description Idempotent on (organization, provider, external_reference): an identical replay returns the existing record with 200 and `idempotent_replay: true`; a replay with a different type, amount, currency or date returns 409 `reconciliation_reference_conflict`.
+         */
+        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.record_reconciliation_line"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2167,6 +2300,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/refund-receipts/{id}/document": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Printable HTML version of one of the current member's refund receipts */
+        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipt_document"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/training-log/sources": {
         parameters: {
             query?: never;
@@ -2297,6 +2447,23 @@ export interface paths {
         put?: never;
         /** Parse and canonically format Quick Text workout source */
         post: operations["MilosTrainingWeb.AdminWorkoutDslController.parse"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/refund-receipts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get one of the current member's refund receipts */
+        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipt"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2499,6 +2666,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/refund-receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the organization's refund receipts, newest number first */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/lifecycle": {
         parameters: {
             query?: never;
@@ -2646,6 +2830,23 @@ export interface paths {
         };
         /** Get timer sequence for a workout */
         get: operations["MilosTrainingWeb.ExecutionController.timer_sequence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/refund-receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the current member's refund receipts */
+        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2916,6 +3117,23 @@ export interface paths {
         post?: never;
         /** Withdraw a pending or approved booking */
         delete: operations["MilosTrainingWeb.ScheduleController.delete_booking"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/accounting-exports/{id}/download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Short-lived signed download link for a completed accounting export */
+        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.export_download"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -3569,6 +3787,68 @@ export interface components {
                 workout_type?: string | null;
             }[];
         };
+        /** FinanceReconciliationCandidates */
+        FinanceReconciliationCandidates: {
+            candidates: {
+                amount_cents: number;
+                currency: string;
+                evaluation: {
+                    discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                    /** @enum {string} */
+                    status: "matched" | "mismatched";
+                };
+                invoice_number?: string | null;
+                member_name?: string | null;
+                /** Format: uuid */
+                member_user_id?: string | null;
+                /** Format: date */
+                occurred_on: string;
+                payment_method?: string | null;
+                status?: string | null;
+                /** Format: uuid */
+                target_id: string;
+                /** @enum {string} */
+                target_type: "payment" | "reversal";
+            }[];
+            /** FinanceReconciliationRecord */
+            reconciliation_record: {
+                discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                discrepancy_notes?: string | null;
+                external_reference: string;
+                /** @enum {string} */
+                external_status: "settled" | "pending" | "failed";
+                /** @enum {string} */
+                external_type: "payment" | "refund";
+                /** Format: uuid */
+                finance_payment_reversal_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: date-time */
+                matched_at?: string | null;
+                /** Format: uuid */
+                matched_by_id?: string | null;
+                /** Format: uuid */
+                membership_payment_id?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                provider: string;
+                /** Format: uuid */
+                recorded_by_id?: string | null;
+                statement_amount_cents: number;
+                statement_currency: string;
+                statement_description?: string | null;
+                /** Format: date */
+                statement_occurred_on: string;
+                /** @enum {string} */
+                status: "unmatched" | "matched" | "mismatched";
+                /** @enum {string|null} */
+                target_type?: "payment" | "reversal" | null;
+                /** Format: date-time */
+                updated_at?: string;
+            };
+        };
         /** OrganizationBrandingResponse */
         OrganizationBrandingResponse: {
             /** OrganizationBranding */
@@ -3585,6 +3865,52 @@ export interface components {
         /** OrganizationLogoFinalizeRequest */
         OrganizationLogoFinalizeRequest: {
             logo_key: string;
+        };
+        /** FinanceRefundReceipt */
+        FinanceRefundReceipt: {
+            amount_cents: number;
+            currency: string;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            /** Format: uuid */
+            finance_payment_reversal_id: string;
+            /** Format: uuid */
+            id: string;
+            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+            integrity_verified: boolean;
+            invoice_number?: string | null;
+            /** Format: date-time */
+            issued_at: string;
+            /** Format: uuid */
+            issued_by_id?: string | null;
+            member_display_name?: string | null;
+            /** Format: uuid */
+            membership_id?: string;
+            /** Format: uuid */
+            membership_payment_id: string;
+            /** Format: uuid */
+            organization_id?: string;
+            reason?: string | null;
+            /** @description Gapless per-organization number, e.g. RFD-000001 */
+            receipt_number: string;
+            /** Format: date-time */
+            reversal_occurred_at?: string;
+            /** @enum {string} */
+            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+            schema_version?: number;
+            sequence: number;
+            /** @description SHA-256 of the canonical snapshot */
+            snapshot_sha256: string;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** FinanceReconciliationMatchRequest */
+        FinanceReconciliationMatchRequest: {
+            notes?: string | null;
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "payment" | "reversal";
         };
         /** TrainingLogVoidRequest */
         TrainingLogVoidRequest: {
@@ -3633,6 +3959,46 @@ export interface components {
         WorkoutDslParseRequest: {
             source: string;
         };
+        /** FinanceRefundReceiptCollection */
+        FinanceRefundReceiptCollection: {
+            refund_receipts: {
+                amount_cents: number;
+                currency: string;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                /** Format: uuid */
+                finance_payment_reversal_id: string;
+                /** Format: uuid */
+                id: string;
+                /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                integrity_verified: boolean;
+                invoice_number?: string | null;
+                /** Format: date-time */
+                issued_at: string;
+                /** Format: uuid */
+                issued_by_id?: string | null;
+                member_display_name?: string | null;
+                /** Format: uuid */
+                membership_id?: string;
+                /** Format: uuid */
+                membership_payment_id: string;
+                /** Format: uuid */
+                organization_id?: string;
+                reason?: string | null;
+                /** @description Gapless per-organization number, e.g. RFD-000001 */
+                receipt_number: string;
+                /** Format: date-time */
+                reversal_occurred_at?: string;
+                /** @enum {string} */
+                reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                schema_version?: number;
+                sequence: number;
+                /** @description SHA-256 of the canonical snapshot */
+                snapshot_sha256: string;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+        };
         /** AthleteInjuryWarningsRequest */
         AthleteInjuryWarningsRequest: {
             /** Format: uuid */
@@ -3642,6 +4008,49 @@ export interface components {
             user_ids: string[];
             /** Format: uuid */
             workout_id: string;
+        };
+        /** FinanceAccountingExportResponse */
+        FinanceAccountingExportResponse: {
+            /** FinanceAccountingExport */
+            accounting_export: {
+                byte_size?: number | null;
+                /** Format: date-time */
+                completed_at?: string | null;
+                error_reason?: string | null;
+                /** @enum {string} */
+                execution_mode: "inline" | "background";
+                files: {
+                    byte_size: number;
+                    name: string;
+                    rows: number;
+                    sha256: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                object_key?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                /** Format: date */
+                range_end: string;
+                /** Format: date */
+                range_start: string;
+                /** Format: uuid */
+                requested_by_id?: string | null;
+                row_counts: {
+                    [key: string]: number;
+                };
+                schema_version: number;
+                /** @description SHA-256 of the stored ZIP */
+                sha256?: string | null;
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "queued" | "running" | "completed" | "failed";
+                /** Format: date-time */
+                updated_at?: string;
+            };
         };
         /** WorkoutDslDiagnosticResponse */
         WorkoutDslDiagnosticResponse: {
@@ -3676,6 +4085,32 @@ export interface components {
             brand_primary_color?: string | null;
             /** Format: uuid */
             organization_id: string;
+        };
+        /** FinanceReconciliationUnmatchRequest */
+        FinanceReconciliationUnmatchRequest: {
+            notes?: string | null;
+        };
+        /** FinanceReconciliationCandidate */
+        FinanceReconciliationCandidate: {
+            amount_cents: number;
+            currency: string;
+            evaluation: {
+                discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                /** @enum {string} */
+                status: "matched" | "mismatched";
+            };
+            invoice_number?: string | null;
+            member_name?: string | null;
+            /** Format: uuid */
+            member_user_id?: string | null;
+            /** Format: date */
+            occurred_on: string;
+            payment_method?: string | null;
+            status?: string | null;
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "payment" | "reversal";
         };
         /** TrainingLogUpdateRequest */
         TrainingLogUpdateRequest: {
@@ -3728,6 +4163,48 @@ export interface components {
             timezone?: string | null;
             title?: string | null;
         };
+        /** FinanceReconciliationRecordResponse */
+        FinanceReconciliationRecordResponse: {
+            idempotent_replay?: boolean;
+            /** FinanceReconciliationRecord */
+            reconciliation_record: {
+                discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                discrepancy_notes?: string | null;
+                external_reference: string;
+                /** @enum {string} */
+                external_status: "settled" | "pending" | "failed";
+                /** @enum {string} */
+                external_type: "payment" | "refund";
+                /** Format: uuid */
+                finance_payment_reversal_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: date-time */
+                matched_at?: string | null;
+                /** Format: uuid */
+                matched_by_id?: string | null;
+                /** Format: uuid */
+                membership_payment_id?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                provider: string;
+                /** Format: uuid */
+                recorded_by_id?: string | null;
+                statement_amount_cents: number;
+                statement_currency: string;
+                statement_description?: string | null;
+                /** Format: date */
+                statement_occurred_on: string;
+                /** @enum {string} */
+                status: "unmatched" | "matched" | "mismatched";
+                /** @enum {string|null} */
+                target_type?: "payment" | "reversal" | null;
+                /** Format: date-time */
+                updated_at?: string;
+            };
+        };
         /** WorkoutDslParseResponse */
         WorkoutDslParseResponse: {
             diagnostics: {
@@ -3774,6 +4251,14 @@ export interface components {
             workout: {
                 [key: string]: unknown;
             };
+        };
+        /** FinanceAccountingExportDownload */
+        FinanceAccountingExportDownload: {
+            byte_size?: number | null;
+            download_url: string;
+            expires_in_seconds: number;
+            file_name: string;
+            sha256?: string | null;
         };
         /** TrainingLogEntry */
         TrainingLogEntry: {
@@ -3850,6 +4335,44 @@ export interface components {
             /** Format: date-time */
             voided_at?: string | null;
             workout_type?: string | null;
+        };
+        /** FinanceReconciliationRecord */
+        FinanceReconciliationRecord: {
+            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+            discrepancy_notes?: string | null;
+            external_reference: string;
+            /** @enum {string} */
+            external_status: "settled" | "pending" | "failed";
+            /** @enum {string} */
+            external_type: "payment" | "refund";
+            /** Format: uuid */
+            finance_payment_reversal_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            /** Format: date-time */
+            matched_at?: string | null;
+            /** Format: uuid */
+            matched_by_id?: string | null;
+            /** Format: uuid */
+            membership_payment_id?: string | null;
+            /** Format: uuid */
+            organization_id?: string;
+            provider: string;
+            /** Format: uuid */
+            recorded_by_id?: string | null;
+            statement_amount_cents: number;
+            statement_currency: string;
+            statement_description?: string | null;
+            /** Format: date */
+            statement_occurred_on: string;
+            /** @enum {string} */
+            status: "unmatched" | "matched" | "mismatched";
+            /** @enum {string|null} */
+            target_type?: "payment" | "reversal" | null;
+            /** Format: date-time */
+            updated_at?: string;
         };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
@@ -3964,6 +4487,46 @@ export interface components {
             /** @enum {integer} */
             version: 1;
         };
+        /** FinanceAccountingExport */
+        FinanceAccountingExport: {
+            byte_size?: number | null;
+            /** Format: date-time */
+            completed_at?: string | null;
+            error_reason?: string | null;
+            /** @enum {string} */
+            execution_mode: "inline" | "background";
+            files: {
+                byte_size: number;
+                name: string;
+                rows: number;
+                sha256: string;
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            object_key?: string | null;
+            /** Format: uuid */
+            organization_id?: string;
+            /** Format: date */
+            range_end: string;
+            /** Format: date */
+            range_start: string;
+            /** Format: uuid */
+            requested_by_id?: string | null;
+            row_counts: {
+                [key: string]: number;
+            };
+            schema_version: number;
+            /** @description SHA-256 of the stored ZIP */
+            sha256?: string | null;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** @enum {string} */
+            status: "queued" | "running" | "completed" | "failed";
+            /** Format: date-time */
+            updated_at?: string;
+        };
         /** WorkoutDslPublishRequest */
         WorkoutDslPublishRequest: {
             /** @default false */
@@ -3973,6 +4536,48 @@ export interface components {
             } | null;
             expected_source_revision: number;
             source: string;
+        };
+        /** FinanceAccountingExportCollection */
+        FinanceAccountingExportCollection: {
+            accounting_exports: {
+                byte_size?: number | null;
+                /** Format: date-time */
+                completed_at?: string | null;
+                error_reason?: string | null;
+                /** @enum {string} */
+                execution_mode: "inline" | "background";
+                files: {
+                    byte_size: number;
+                    name: string;
+                    rows: number;
+                    sha256: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                object_key?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                /** Format: date */
+                range_end: string;
+                /** Format: date */
+                range_start: string;
+                /** Format: uuid */
+                requested_by_id?: string | null;
+                row_counts: {
+                    [key: string]: number;
+                };
+                schema_version: number;
+                /** @description SHA-256 of the stored ZIP */
+                sha256?: string | null;
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "queued" | "running" | "completed" | "failed";
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
         };
         /** WorkoutDslManualResponse */
         WorkoutDslManualResponse: {
@@ -4089,6 +4694,70 @@ export interface components {
             /** Format: uuid */
             workout_id: string;
         };
+        /** FinanceAccountingExportRequest */
+        FinanceAccountingExportRequest: {
+            /** Format: date */
+            range_end: string;
+            /** Format: date */
+            range_start: string;
+        };
+        /** FinanceReconciliationLineRequest */
+        FinanceReconciliationLineRequest: {
+            external_reference: string;
+            /** @enum {string} */
+            external_status?: "settled" | "pending" | "failed";
+            /** @enum {string} */
+            external_type: "payment" | "refund";
+            /** @description Provider key, e.g. stripe, viva_wallet, bank_transfer */
+            provider: string;
+            statement_amount_cents: number;
+            statement_currency?: string;
+            statement_description?: string | null;
+            /** Format: date */
+            statement_occurred_on: string;
+        };
+        /** FinanceRefundReceiptDetail */
+        FinanceRefundReceiptDetail: {
+            amount_cents: number;
+            currency: string;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            /** Format: uuid */
+            finance_payment_reversal_id: string;
+            /** Format: uuid */
+            id: string;
+            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+            integrity_verified: boolean;
+            invoice_number?: string | null;
+            /** Format: date-time */
+            issued_at: string;
+            /** Format: uuid */
+            issued_by_id?: string | null;
+            member_display_name?: string | null;
+            /** Format: uuid */
+            membership_id?: string;
+            /** Format: uuid */
+            membership_payment_id: string;
+            /** Format: uuid */
+            organization_id?: string;
+            reason?: string | null;
+            /** @description Gapless per-organization number, e.g. RFD-000001 */
+            receipt_number: string;
+            /** Format: date-time */
+            reversal_occurred_at?: string;
+            /** @enum {string} */
+            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+            schema_version?: number;
+            sequence: number;
+            /** @description Immutable receipt snapshot captured at issue time (schema_version 1) */
+            snapshot: {
+                [key: string]: unknown;
+            };
+            /** @description SHA-256 of the canonical snapshot */
+            snapshot_sha256: string;
+            /** Format: uuid */
+            user_id: string;
+        };
         /** TrainingLogSources */
         TrainingLogSources: {
             assignments: {
@@ -4132,6 +4801,46 @@ export interface components {
                 workout_type?: string | null;
             }[];
         };
+        /** FinanceReconciliationRecordCollection */
+        FinanceReconciliationRecordCollection: {
+            reconciliation_records: {
+                discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                discrepancy_notes?: string | null;
+                external_reference: string;
+                /** @enum {string} */
+                external_status: "settled" | "pending" | "failed";
+                /** @enum {string} */
+                external_type: "payment" | "refund";
+                /** Format: uuid */
+                finance_payment_reversal_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: date-time */
+                matched_at?: string | null;
+                /** Format: uuid */
+                matched_by_id?: string | null;
+                /** Format: uuid */
+                membership_payment_id?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                provider: string;
+                /** Format: uuid */
+                recorded_by_id?: string | null;
+                statement_amount_cents: number;
+                statement_currency: string;
+                statement_description?: string | null;
+                /** Format: date */
+                statement_occurred_on: string;
+                /** @enum {string} */
+                status: "unmatched" | "matched" | "mismatched";
+                /** @enum {string|null} */
+                target_type?: "payment" | "reversal" | null;
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
+        };
         /** AthleteInjuryWarningsAcknowledged */
         AthleteInjuryWarningsAcknowledged: {
             acknowledged_count: number;
@@ -4141,6 +4850,51 @@ export interface components {
             /** @enum {string} */
             level: "none" | "caution" | "avoid";
             warning_count: number;
+        };
+        /** FinanceRefundReceiptResponse */
+        FinanceRefundReceiptResponse: {
+            /** FinanceRefundReceiptDetail */
+            refund_receipt: {
+                amount_cents: number;
+                currency: string;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                /** Format: uuid */
+                finance_payment_reversal_id: string;
+                /** Format: uuid */
+                id: string;
+                /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                integrity_verified: boolean;
+                invoice_number?: string | null;
+                /** Format: date-time */
+                issued_at: string;
+                /** Format: uuid */
+                issued_by_id?: string | null;
+                member_display_name?: string | null;
+                /** Format: uuid */
+                membership_id?: string;
+                /** Format: uuid */
+                membership_payment_id: string;
+                /** Format: uuid */
+                organization_id?: string;
+                reason?: string | null;
+                /** @description Gapless per-organization number, e.g. RFD-000001 */
+                receipt_number: string;
+                /** Format: date-time */
+                reversal_occurred_at?: string;
+                /** @enum {string} */
+                reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                schema_version?: number;
+                sequence: number;
+                /** @description Immutable receipt snapshot captured at issue time (schema_version 1) */
+                snapshot: {
+                    [key: string]: unknown;
+                };
+                /** @description SHA-256 of the canonical snapshot */
+                snapshot_sha256: string;
+                /** Format: uuid */
+                user_id: string;
+            };
         };
     };
     responses: never;
@@ -4523,6 +5277,83 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceAccountingController.unmatch_reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    notes?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Unmatched record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        idempotent_replay?: boolean;
+                        /** FinanceReconciliationRecord */
+                        reconciliation_record: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.redeem": {
         parameters: {
             query?: never;
@@ -4723,6 +5554,39 @@ export interface operations {
                             updated_at?: string;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt_document": {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Receipt document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -7943,6 +8807,80 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund receipt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FinanceRefundReceiptDetail */
+                        refund_receipt: {
+                            amount_cents: number;
+                            currency: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            /** Format: uuid */
+                            finance_payment_reversal_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                            integrity_verified: boolean;
+                            invoice_number?: string | null;
+                            /** Format: date-time */
+                            issued_at: string;
+                            /** Format: uuid */
+                            issued_by_id?: string | null;
+                            member_display_name?: string | null;
+                            /** Format: uuid */
+                            membership_id?: string;
+                            /** Format: uuid */
+                            membership_payment_id: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            reason?: string | null;
+                            /** @description Gapless per-organization number, e.g. RFD-000001 */
+                            receipt_number: string;
+                            /** Format: date-time */
+                            reversal_occurred_at?: string;
+                            /** @enum {string} */
+                            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                            schema_version?: number;
+                            sequence: number;
+                            /** @description Immutable receipt snapshot captured at issue time (schema_version 1) */
+                            snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @description SHA-256 of the canonical snapshot */
+                            snapshot_sha256: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ThemeController.show": {
         parameters: {
             query?: never;
@@ -8153,7 +9091,7 @@ export interface operations {
                         /** Format: uuid */
                         user_id: string;
                         /**
-                         * @description ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.
+                         * @description ADR-119: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.
                          * @enum {string}
                          */
                         visibility: "coach" | "coach_role_required";
@@ -8712,6 +9650,97 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Match candidates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        candidates: {
+                            amount_cents: number;
+                            currency: string;
+                            evaluation: {
+                                discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                                /** @enum {string} */
+                                status: "matched" | "mismatched";
+                            };
+                            invoice_number?: string | null;
+                            member_name?: string | null;
+                            /** Format: uuid */
+                            member_user_id?: string | null;
+                            /** Format: date */
+                            occurred_on: string;
+                            payment_method?: string | null;
+                            status?: string | null;
+                            /** Format: uuid */
+                            target_id: string;
+                            /** @enum {string} */
+                            target_type: "payment" | "reversal";
+                        }[];
+                        /** FinanceReconciliationRecord */
+                        reconciliation_record: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.add_modifications": {
         parameters: {
             query?: never;
@@ -8903,6 +9932,206 @@ export interface operations {
                         /** Format: uuid */
                         user_id: string;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.exports": {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Accounting export runs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        accounting_exports: {
+                            byte_size?: number | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            error_reason?: string | null;
+                            /** @enum {string} */
+                            execution_mode: "inline" | "background";
+                            files: {
+                                byte_size: number;
+                                name: string;
+                                rows: number;
+                                sha256: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            object_key?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date */
+                            range_end: string;
+                            /** Format: date */
+                            range_start: string;
+                            /** Format: uuid */
+                            requested_by_id?: string | null;
+                            row_counts: {
+                                [key: string]: number;
+                            };
+                            schema_version: number;
+                            /** @description SHA-256 of the stored ZIP */
+                            sha256?: string | null;
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "running" | "completed" | "failed";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.request_export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    range_end: string;
+                    /** Format: date */
+                    range_start: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Completed export */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FinanceAccountingExport */
+                        accounting_export: {
+                            byte_size?: number | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            error_reason?: string | null;
+                            /** @enum {string} */
+                            execution_mode: "inline" | "background";
+                            files: {
+                                byte_size: number;
+                                name: string;
+                                rows: number;
+                                sha256: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            object_key?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date */
+                            range_end: string;
+                            /** Format: date */
+                            range_start: string;
+                            /** Format: uuid */
+                            requested_by_id?: string | null;
+                            row_counts: {
+                                [key: string]: number;
+                            };
+                            schema_version: number;
+                            /** @description SHA-256 of the stored ZIP */
+                            sha256?: string | null;
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "running" | "completed" | "failed";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Queued export */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FinanceAccountingExport */
+                        accounting_export: {
+                            byte_size?: number | null;
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            error_reason?: string | null;
+                            /** @enum {string} */
+                            execution_mode: "inline" | "background";
+                            files: {
+                                byte_size: number;
+                                name: string;
+                                rows: number;
+                                sha256: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            object_key?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date */
+                            range_end: string;
+                            /** Format: date */
+                            range_start: string;
+                            /** Format: uuid */
+                            requested_by_id?: string | null;
+                            row_counts: {
+                                [key: string]: number;
+                            };
+                            schema_version: number;
+                            /** @description SHA-256 of the stored ZIP */
+                            sha256?: string | null;
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "queued" | "running" | "completed" | "failed";
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -11803,6 +13032,105 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceAccountingController.match_reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notes?: string | null;
+                    /** Format: uuid */
+                    target_id: string;
+                    /** @enum {string} */
+                    target_type: "payment" | "reversal";
+                };
+            };
+        };
+        responses: {
+            /** @description Matched record */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        idempotent_replay?: boolean;
+                        /** FinanceReconciliationRecord */
+                        reconciliation_record: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.update_referral_program": {
         parameters: {
             query?: never;
@@ -12507,6 +13835,212 @@ export interface operations {
                     "application/json": {
                         [key: string]: unknown;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_records": {
+        parameters: {
+            query?: {
+                status?: "unmatched" | "matched" | "mismatched";
+                provider?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reconciliation records */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reconciliation_records: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.record_reconciliation_line": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    external_reference: string;
+                    /** @enum {string} */
+                    external_status?: "settled" | "pending" | "failed";
+                    /** @enum {string} */
+                    external_type: "payment" | "refund";
+                    /** @description Provider key, e.g. stripe, viva_wallet, bank_transfer */
+                    provider: string;
+                    statement_amount_cents: number;
+                    statement_currency?: string;
+                    statement_description?: string | null;
+                    /** Format: date */
+                    statement_occurred_on: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Replayed statement line */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        idempotent_replay?: boolean;
+                        /** FinanceReconciliationRecord */
+                        reconciliation_record: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Recorded statement line */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        idempotent_replay?: boolean;
+                        /** FinanceReconciliationRecord */
+                        reconciliation_record: {
+                            discrepancies: ("type_mismatch" | "amount_mismatch" | "currency_mismatch" | "date_out_of_tolerance" | "provider_not_settled" | "internal_not_settled")[];
+                            discrepancy_notes?: string | null;
+                            external_reference: string;
+                            /** @enum {string} */
+                            external_status: "settled" | "pending" | "failed";
+                            /** @enum {string} */
+                            external_type: "payment" | "refund";
+                            /** Format: uuid */
+                            finance_payment_reversal_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            matched_at?: string | null;
+                            /** Format: uuid */
+                            matched_by_id?: string | null;
+                            /** Format: uuid */
+                            membership_payment_id?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            provider: string;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            statement_amount_cents: number;
+                            statement_currency: string;
+                            statement_description?: string | null;
+                            /** Format: date */
+                            statement_occurred_on: string;
+                            /** @enum {string} */
+                            status: "unmatched" | "matched" | "mismatched";
+                            /** @enum {string|null} */
+                            target_type?: "payment" | "reversal" | null;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Error */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -13446,7 +14980,7 @@ export interface operations {
                     higher_is_better?: boolean;
                     name: string;
                     notes?: string;
-                    /** @description Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
+                    /** @description Gym the PR was achieved in (ADR-119). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
                     organization_slug?: string | null;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
@@ -14032,6 +15566,39 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyFinanceController.refund_receipt_document": {
+        parameters: {
+            query?: {
+                locale?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Receipt document */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.TrainingLogController.sources": {
         parameters: {
             query?: never;
@@ -14393,6 +15960,80 @@ export interface operations {
                             severity: "error" | "warning";
                         }[];
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyFinanceController.refund_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund receipt */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FinanceRefundReceiptDetail */
+                        refund_receipt: {
+                            amount_cents: number;
+                            currency: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            /** Format: uuid */
+                            finance_payment_reversal_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                            integrity_verified: boolean;
+                            invoice_number?: string | null;
+                            /** Format: date-time */
+                            issued_at: string;
+                            /** Format: uuid */
+                            issued_by_id?: string | null;
+                            member_display_name?: string | null;
+                            /** Format: uuid */
+                            membership_id?: string;
+                            /** Format: uuid */
+                            membership_payment_id: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            reason?: string | null;
+                            /** @description Gapless per-organization number, e.g. RFD-000001 */
+                            receipt_number: string;
+                            /** Format: date-time */
+                            reversal_occurred_at?: string;
+                            /** @enum {string} */
+                            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                            schema_version?: number;
+                            sequence: number;
+                            /** @description Immutable receipt snapshot captured at issue time (schema_version 1) */
+                            snapshot: {
+                                [key: string]: unknown;
+                            };
+                            /** @description SHA-256 of the canonical snapshot */
+                            snapshot_sha256: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -15274,6 +16915,70 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipts": {
+        parameters: {
+            query?: {
+                q?: string;
+                user_id?: string;
+                from?: string;
+                to?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund receipts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund_receipts: {
+                            amount_cents: number;
+                            currency: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            /** Format: uuid */
+                            finance_payment_reversal_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                            integrity_verified: boolean;
+                            invoice_number?: string | null;
+                            /** Format: date-time */
+                            issued_at: string;
+                            /** Format: uuid */
+                            issued_by_id?: string | null;
+                            member_display_name?: string | null;
+                            /** Format: uuid */
+                            membership_id?: string;
+                            /** Format: uuid */
+                            membership_payment_id: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            reason?: string | null;
+                            /** @description Gapless per-organization number, e.g. RFD-000001 */
+                            receipt_number: string;
+                            /** Format: date-time */
+                            reversal_occurred_at?: string;
+                            /** @enum {string} */
+                            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                            schema_version?: number;
+                            sequence: number;
+                            /** @description SHA-256 of the canonical snapshot */
+                            snapshot_sha256: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationController.lifecycle": {
         parameters: {
             query?: never;
@@ -15620,6 +17325,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyFinanceController.refund_receipts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Refund receipts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        refund_receipts: {
+                            amount_cents: number;
+                            currency: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            /** Format: uuid */
+                            finance_payment_reversal_id: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description True when the stored snapshot still hashes to snapshot_sha256 */
+                            integrity_verified: boolean;
+                            invoice_number?: string | null;
+                            /** Format: date-time */
+                            issued_at: string;
+                            /** Format: uuid */
+                            issued_by_id?: string | null;
+                            member_display_name?: string | null;
+                            /** Format: uuid */
+                            membership_id?: string;
+                            /** Format: uuid */
+                            membership_payment_id: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            reason?: string | null;
+                            /** @description Gapless per-organization number, e.g. RFD-000001 */
+                            receipt_number: string;
+                            /** Format: date-time */
+                            reversal_occurred_at?: string;
+                            /** @enum {string} */
+                            reversal_type: "refund" | "payment_reversal" | "waiver_reversal";
+                            schema_version?: number;
+                            sequence: number;
+                            /** @description SHA-256 of the canonical snapshot */
+                            snapshot_sha256: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
                 };
             };
         };
@@ -16662,6 +18425,52 @@ export interface operations {
             };
             /** @description Not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFinanceAccountingController.export_download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Download link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        byte_size?: number | null;
+                        download_url: string;
+                        expires_in_seconds: number;
+                        file_name: string;
+                        sha256?: string | null;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Error */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

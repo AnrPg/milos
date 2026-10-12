@@ -20,7 +20,7 @@ type Candidate = { id: string; nickname: string };
 export const PR_SHARING_QUERY_KEY = ["pr-sharing"] as const;
 
 /**
- * ADR-111: the owner's PR sharing settings - the coach-visibility opt-out
+ * ADR-119: the owner's PR sharing settings - the coach-visibility opt-out
  * (all gyms) and explicit read-only grants to chosen accounts.
  */
 export function PRSharingSettings() {

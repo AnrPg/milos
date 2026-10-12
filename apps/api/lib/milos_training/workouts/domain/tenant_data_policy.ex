@@ -22,7 +22,7 @@ defmodule MilosTraining.Workouts.Domain.TenantDataPolicy do
               %{table: "workout_sections"},
               %{table: "master_workouts"},
               %{table: "workout_folders"},
-              # ADR-110: after exercise_variations, which reference it.
+              # ADR-118: after exercise_variations, which reference it.
               %{table: "scale_levels"}
             ]
           })

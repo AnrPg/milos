@@ -199,7 +199,7 @@ defmodule MilosTraining.Workouts.CreateWorkoutTest do
     admin
   end
 
-  # ADR-110: scale levels are tenant-owned; these tests author in the legacy
+  # ADR-118: scale levels are tenant-owned; these tests author in the legacy
   # organization, so its set is the one they configure.
   defp legacy_scope! do
     {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()

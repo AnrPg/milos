@@ -32,7 +32,7 @@ import {
   type ReconciliationForm,
 } from "@/lib/finance-accounting";
 
-// ADR-108: refund receipts, manual provider reconciliation and accounting exports.
+// ADR-116: refund receipts, manual provider reconciliation and accounting exports.
 
 const panelStyle = { background: "var(--panel)", border: "1px solid var(--border)" };
 const inputClass = "w-full rounded-xl px-3 py-2 text-sm";

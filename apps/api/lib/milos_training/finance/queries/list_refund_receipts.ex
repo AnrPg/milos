@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance.Queries.ListRefundReceipts do
-  @moduledoc "Refund receipts of the tenant, newest number first (ADR-108)."
+  @moduledoc "Refund receipts of the tenant, newest number first (ADR-116)."
 
   alias MilosTraining.Finance.FinanceAccountingStore
 

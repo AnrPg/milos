@@ -1,6 +1,6 @@
 defmodule MilosTraining.Pantheon.Commands.GrantPRAccess do
   @moduledoc """
-  Grants another account read access to all of the owner's PRs (ADR-111).
+  Grants another account read access to all of the owner's PRs (ADR-119).
   Idempotent: an already-active grant is returned unchanged. Must run in the
   owner's scope.
   """

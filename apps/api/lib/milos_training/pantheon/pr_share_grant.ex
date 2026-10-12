@@ -1,7 +1,7 @@
 defmodule MilosTraining.Pantheon.PRShareGrant do
   @moduledoc """
   An explicit, user-owned grant letting `grantee_user_id` read every PR of
-  `user_id` (ADR-055 personal grant, ADR-111). Grants are global personal data:
+  `user_id` (ADR-055 personal grant, ADR-119). Grants are global personal data:
   they carry no organization and are revoked by stamping `revoked_at`.
   """
 

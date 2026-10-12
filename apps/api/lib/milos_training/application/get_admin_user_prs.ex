@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetAdminUserPRs do
   @moduledoc """
-  Staff dossier PR tab (ADR-111).
+  Staff dossier PR tab (ADR-119).
 
   Only coaches of the tenant may read members' PRs, and only PRs recorded in
   this tenant, of members with an active membership here who have not opted

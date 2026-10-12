@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.ScopeScaleLevelsToOrganizations do
   use Ecto.Migration
 
-  # ADR-110 / TD-048: scale levels become tenant-owned.
+  # ADR-118 / TD-056: scale levels become tenant-owned.
   #
   # `scale_levels` was a single global table, so `PUT /admin/scale-levels` in
   # any gym rewrote every gym's scaling vocabulary. This migration expands,
@@ -9,7 +9,7 @@ defmodule MilosTraining.Repo.Migrations.ScopeScaleLevelsToOrganizations do
   #
   # 1. expand   - nullable `organization_id` (FK organizations, ON DELETE
   #               CASCADE like every sibling tenant table) and drop the global
-  #               slug / sort_order unique indexes (owner-approved for TD-048).
+  #               slug / sort_order unique indexes (owner-approved for TD-056).
   # 2. backfill - copy every global row into every existing organization with a
   #               fresh id, repoint `exercise_variations.scale_level_id` to the
   #               copy in the variation's own organization (matched by slug,
@@ -119,7 +119,9 @@ defmodule MilosTraining.Repo.Migrations.ScopeScaleLevelsToOrganizations do
       DROP CONSTRAINT exercise_variations_scale_level_id_fkey
     """)
 
-    drop index(:scale_levels, [:organization_id, :id], name: :scale_levels_organization_id_id_index)
+    drop index(:scale_levels, [:organization_id, :id],
+           name: :scale_levels_organization_id_id_index
+         )
 
     drop index(:scale_levels, [:organization_id, :sort_order],
            name: :scale_levels_organization_id_sort_order_index

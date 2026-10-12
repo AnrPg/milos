@@ -68,7 +68,7 @@ if existing_count == 0 do
   IO.puts("Seeded #{length(quotes)} training quotes.")
 end
 
-# Scale levels are tenant-owned (ADR-110): each organization gets the default
+# Scale levels are tenant-owned (ADR-118): each organization gets the default
 # set when it is provisioned, and existing organizations were backfilled by
 # the 20261012160000 migration. Re-assert the defaults for any organization
 # that has none (idempotent).

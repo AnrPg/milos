@@ -87,7 +87,7 @@ defmodule MilosTraining.Organizations do
     do: ResolveTenantContext.call(account, slug, request_metadata)
 
   @doc """
-  ADR-111: whether the tenant context's acting member is a coach of the
+  ADR-119: whether the tenant context's acting member is a coach of the
   tenant. The application-level mirror of `milos_acting_user_coaches/1`.
   """
   def acting_user_coaches?(context), do: TenantAuthorization.coaches?(context)

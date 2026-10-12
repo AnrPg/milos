@@ -346,7 +346,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
-  # Scale levels are tenant-owned (ADR-110). Every query is filtered to the
+  # Scale levels are tenant-owned (ADR-118). Every query is filtered to the
   # session's organization on top of RLS, and writes fail closed without one.
   @impl true
   def list_scale_levels do

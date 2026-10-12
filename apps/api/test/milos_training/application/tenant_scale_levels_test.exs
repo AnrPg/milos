@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.TenantScaleLevelsTest do
   @moduledoc """
-  ADR-110 / TD-048: scale levels are owned per organization. Replacing one
+  ADR-118 / TD-056: scale levels are owned per organization. Replacing one
   tenant's set must never touch, reveal or depend on another tenant's.
   """
 

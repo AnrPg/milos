@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetFinanceRefundReceipt do
   @moduledoc """
-  Reads one refund receipt (ADR-108) for `:staff` or for `{:member, user_id}`.
+  Reads one refund receipt (ADR-116) for `:staff` or for `{:member, user_id}`.
   A member asking for someone else's receipt gets `:not_found`, so receipt
   ids cannot be probed.
   """

@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
   use Ecto.Migration
 
-  # ADR-108 / TD-022: immutable refund receipts attached to the append-only
+  # ADR-116 / TD-022: immutable refund receipts attached to the append-only
   # `finance_payment_reversals` facts (ADR-019), numbered from a per-tenant
   # counter row that is locked in the issuing transaction so the sequence has
   # no gaps. Additive only: no existing column is touched.

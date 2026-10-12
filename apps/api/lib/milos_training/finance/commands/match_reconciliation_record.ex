@@ -1,7 +1,7 @@
 defmodule MilosTraining.Finance.Commands.MatchReconciliationRecord do
   @moduledoc """
   Links a statement line to one internal payment or reversal fact and records
-  the discrepancies the domain rules find (ADR-108).
+  the discrepancies the domain rules find (ADR-116).
   """
 
   alias MilosTraining.Finance.Domain.ReconciliationMatching

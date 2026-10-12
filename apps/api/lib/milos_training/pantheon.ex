@@ -37,7 +37,7 @@ defmodule MilosTraining.Pantheon do
     to: MilosTraining.Pantheon.PRStore,
     as: :list_pr_history
 
-  # Every Pantheon read/write is RLS-protected (ADR-111): personal operations
+  # Every Pantheon read/write is RLS-protected (ADR-119): personal operations
   # run in the acting user's scope, coach reads in the coach's tenant scope.
   def with_user_context(context, fun) when is_function(fun, 0),
     do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
@@ -45,7 +45,7 @@ defmodule MilosTraining.Pantheon do
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
 
-  # ADR-111 sharing: coach-visibility opt-out and explicit grants.
+  # ADR-119 sharing: coach-visibility opt-out and explicit grants.
   defdelegate get_sharing_preference(user_id),
     to: MilosTraining.Pantheon.PRStore
 

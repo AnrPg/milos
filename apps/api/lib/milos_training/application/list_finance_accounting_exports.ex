@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ListFinanceAccountingExports do
-  @moduledoc "Accounting export run history (ADR-108), newest first."
+  @moduledoc "Accounting export run history (ADR-116), newest first."
 
   alias MilosTraining.Finance
 

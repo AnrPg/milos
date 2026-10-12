@@ -1147,6 +1147,234 @@
         "title": "TrainingLogEntryCollection",
         "type": "object"
       },
+      "FinanceReconciliationCandidates": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "evaluation": {
+                  "properties": {
+                    "discrepancies": {
+                      "items": {
+                        "enum": [
+                          "type_mismatch",
+                          "amount_mismatch",
+                          "currency_mismatch",
+                          "date_out_of_tolerance",
+                          "provider_not_settled",
+                          "internal_not_settled"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "status": {
+                      "enum": [
+                        "matched",
+                        "mismatched"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "discrepancies"
+                  ],
+                  "type": "object"
+                },
+                "invoice_number": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "member_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "member_user_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "occurred_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "payment_method": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "target_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "target_type": {
+                  "enum": [
+                    "payment",
+                    "reversal"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "target_type",
+                "target_id",
+                "amount_cents",
+                "currency",
+                "occurred_on",
+                "evaluation"
+              ],
+              "title": "FinanceReconciliationCandidate",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reconciliation_record": {
+            "properties": {
+              "discrepancies": {
+                "items": {
+                  "enum": [
+                    "type_mismatch",
+                    "amount_mismatch",
+                    "currency_mismatch",
+                    "date_out_of_tolerance",
+                    "provider_not_settled",
+                    "internal_not_settled"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "discrepancy_notes": {
+                "nullable": true,
+                "type": "string"
+              },
+              "external_reference": {
+                "type": "string"
+              },
+              "external_status": {
+                "enum": [
+                  "settled",
+                  "pending",
+                  "failed"
+                ],
+                "type": "string"
+              },
+              "external_type": {
+                "enum": [
+                  "payment",
+                  "refund"
+                ],
+                "type": "string"
+              },
+              "finance_payment_reversal_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "matched_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "matched_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "membership_payment_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "recorded_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "statement_amount_cents": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "statement_currency": {
+                "type": "string"
+              },
+              "statement_description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "statement_occurred_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "unmatched",
+                  "matched",
+                  "mismatched"
+                ],
+                "type": "string"
+              },
+              "target_type": {
+                "enum": [
+                  "payment",
+                  "reversal"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "provider",
+              "external_reference",
+              "external_type",
+              "external_status",
+              "statement_amount_cents",
+              "statement_currency",
+              "statement_occurred_on",
+              "status",
+              "discrepancies"
+            ],
+            "title": "FinanceReconciliationRecord",
+            "type": "object"
+          }
+        },
+        "required": [
+          "reconciliation_record",
+          "candidates"
+        ],
+        "title": "FinanceReconciliationCandidates",
+        "type": "object"
+      },
       "OrganizationBrandingResponse": {
         "properties": {
           "branding": {
@@ -1199,6 +1427,140 @@
           "logo_key"
         ],
         "title": "OrganizationLogoFinalizeRequest",
+        "type": "object"
+      },
+      "FinanceRefundReceipt": {
+        "properties": {
+          "amount_cents": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "finance_invoice_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "finance_payment_reversal_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "integrity_verified": {
+            "description": "True when the stored snapshot still hashes to snapshot_sha256",
+            "type": "boolean"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issued_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "member_display_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_payment_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "receipt_number": {
+            "description": "Gapless per-organization number, e.g. RFD-000001",
+            "type": "string"
+          },
+          "reversal_occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reversal_type": {
+            "enum": [
+              "refund",
+              "payment_reversal",
+              "waiver_reversal"
+            ],
+            "type": "string"
+          },
+          "schema_version": {
+            "type": "integer"
+          },
+          "sequence": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "snapshot_sha256": {
+            "description": "SHA-256 of the canonical snapshot",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "receipt_number",
+          "sequence",
+          "finance_payment_reversal_id",
+          "membership_payment_id",
+          "user_id",
+          "reversal_type",
+          "amount_cents",
+          "currency",
+          "issued_at",
+          "snapshot_sha256",
+          "integrity_verified"
+        ],
+        "title": "FinanceRefundReceipt",
+        "type": "object"
+      },
+      "FinanceReconciliationMatchRequest": {
+        "properties": {
+          "notes": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "payment",
+              "reversal"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id"
+        ],
+        "title": "FinanceReconciliationMatchRequest",
         "type": "object"
       },
       "TrainingLogVoidRequest": {
@@ -1392,6 +1754,126 @@
         "title": "WorkoutDslParseRequest",
         "type": "object"
       },
+      "FinanceRefundReceiptCollection": {
+        "properties": {
+          "refund_receipts": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "finance_invoice_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "finance_payment_reversal_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "integrity_verified": {
+                  "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                  "type": "boolean"
+                },
+                "invoice_number": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "issued_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "issued_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "member_display_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "membership_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "membership_payment_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "receipt_number": {
+                  "description": "Gapless per-organization number, e.g. RFD-000001",
+                  "type": "string"
+                },
+                "reversal_occurred_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "reversal_type": {
+                  "enum": [
+                    "refund",
+                    "payment_reversal",
+                    "waiver_reversal"
+                  ],
+                  "type": "string"
+                },
+                "schema_version": {
+                  "type": "integer"
+                },
+                "sequence": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "snapshot_sha256": {
+                  "description": "SHA-256 of the canonical snapshot",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "receipt_number",
+                "sequence",
+                "finance_payment_reversal_id",
+                "membership_payment_id",
+                "user_id",
+                "reversal_type",
+                "amount_cents",
+                "currency",
+                "issued_at",
+                "snapshot_sha256",
+                "integrity_verified"
+              ],
+              "title": "FinanceRefundReceipt",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "refund_receipts"
+        ],
+        "title": "FinanceRefundReceiptCollection",
+        "type": "object"
+      },
       "AthleteInjuryWarningsRequest": {
         "additionalProperties": false,
         "properties": {
@@ -1427,6 +1909,138 @@
           "user_ids"
         ],
         "title": "AthleteInjuryWarningsRequest",
+        "type": "object"
+      },
+      "FinanceAccountingExportResponse": {
+        "properties": {
+          "accounting_export": {
+            "properties": {
+              "byte_size": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "completed_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "error_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "execution_mode": {
+                "enum": [
+                  "inline",
+                  "background"
+                ],
+                "type": "string"
+              },
+              "files": {
+                "items": {
+                  "properties": {
+                    "byte_size": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "rows": {
+                      "type": "integer"
+                    },
+                    "sha256": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sha256",
+                    "byte_size",
+                    "rows"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "object_key": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "range_end": {
+                "format": "date",
+                "type": "string"
+              },
+              "range_start": {
+                "format": "date",
+                "type": "string"
+              },
+              "requested_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "row_counts": {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              "schema_version": {
+                "type": "integer"
+              },
+              "sha256": {
+                "description": "SHA-256 of the stored ZIP",
+                "nullable": true,
+                "type": "string"
+              },
+              "started_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "queued",
+                  "running",
+                  "completed",
+                  "failed"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "range_start",
+              "range_end",
+              "status",
+              "execution_mode",
+              "schema_version",
+              "row_counts",
+              "files"
+            ],
+            "title": "FinanceAccountingExport",
+            "type": "object"
+          }
+        },
+        "required": [
+          "accounting_export"
+        ],
+        "title": "FinanceAccountingExportResponse",
         "type": "object"
       },
       "WorkoutDslDiagnosticResponse": {
@@ -1543,6 +2157,103 @@
           "brand_logo_uploaded"
         ],
         "title": "OrganizationBranding",
+        "type": "object"
+      },
+      "FinanceReconciliationUnmatchRequest": {
+        "properties": {
+          "notes": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "FinanceReconciliationUnmatchRequest",
+        "type": "object"
+      },
+      "FinanceReconciliationCandidate": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "evaluation": {
+            "properties": {
+              "discrepancies": {
+                "items": {
+                  "enum": [
+                    "type_mismatch",
+                    "amount_mismatch",
+                    "currency_mismatch",
+                    "date_out_of_tolerance",
+                    "provider_not_settled",
+                    "internal_not_settled"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "status": {
+                "enum": [
+                  "matched",
+                  "mismatched"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "status",
+              "discrepancies"
+            ],
+            "type": "object"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "member_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "member_user_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "occurred_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "payment_method": {
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "nullable": true,
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "payment",
+              "reversal"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id",
+          "amount_cents",
+          "currency",
+          "occurred_on",
+          "evaluation"
+        ],
+        "title": "FinanceReconciliationCandidate",
         "type": "object"
       },
       "TrainingLogUpdateRequest": {
@@ -1791,6 +2502,147 @@
         "title": "TrainingLogUpdateRequest",
         "type": "object"
       },
+      "FinanceReconciliationRecordResponse": {
+        "properties": {
+          "idempotent_replay": {
+            "type": "boolean"
+          },
+          "reconciliation_record": {
+            "properties": {
+              "discrepancies": {
+                "items": {
+                  "enum": [
+                    "type_mismatch",
+                    "amount_mismatch",
+                    "currency_mismatch",
+                    "date_out_of_tolerance",
+                    "provider_not_settled",
+                    "internal_not_settled"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "discrepancy_notes": {
+                "nullable": true,
+                "type": "string"
+              },
+              "external_reference": {
+                "type": "string"
+              },
+              "external_status": {
+                "enum": [
+                  "settled",
+                  "pending",
+                  "failed"
+                ],
+                "type": "string"
+              },
+              "external_type": {
+                "enum": [
+                  "payment",
+                  "refund"
+                ],
+                "type": "string"
+              },
+              "finance_payment_reversal_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "matched_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "matched_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "membership_payment_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "provider": {
+                "type": "string"
+              },
+              "recorded_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "statement_amount_cents": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "statement_currency": {
+                "type": "string"
+              },
+              "statement_description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "statement_occurred_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "unmatched",
+                  "matched",
+                  "mismatched"
+                ],
+                "type": "string"
+              },
+              "target_type": {
+                "enum": [
+                  "payment",
+                  "reversal"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "provider",
+              "external_reference",
+              "external_type",
+              "external_status",
+              "statement_amount_cents",
+              "statement_currency",
+              "statement_occurred_on",
+              "status",
+              "discrepancies"
+            ],
+            "title": "FinanceReconciliationRecord",
+            "type": "object"
+          }
+        },
+        "required": [
+          "reconciliation_record"
+        ],
+        "title": "FinanceReconciliationRecordResponse",
+        "type": "object"
+      },
       "WorkoutDslParseResponse": {
         "additionalProperties": false,
         "properties": {
@@ -1978,6 +2830,34 @@
           "diagnostics"
         ],
         "title": "WorkoutDslParseResponse",
+        "type": "object"
+      },
+      "FinanceAccountingExportDownload": {
+        "properties": {
+          "byte_size": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "download_url": {
+            "type": "string"
+          },
+          "expires_in_seconds": {
+            "type": "integer"
+          },
+          "file_name": {
+            "type": "string"
+          },
+          "sha256": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "download_url",
+          "file_name",
+          "expires_in_seconds"
+        ],
+        "title": "FinanceAccountingExportDownload",
         "type": "object"
       },
       "TrainingLogEntry": {
@@ -2290,6 +3170,135 @@
           "performed_exercises"
         ],
         "title": "TrainingLogEntry",
+        "type": "object"
+      },
+      "FinanceReconciliationRecord": {
+        "properties": {
+          "discrepancies": {
+            "items": {
+              "enum": [
+                "type_mismatch",
+                "amount_mismatch",
+                "currency_mismatch",
+                "date_out_of_tolerance",
+                "provider_not_settled",
+                "internal_not_settled"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "discrepancy_notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "external_reference": {
+            "type": "string"
+          },
+          "external_status": {
+            "enum": [
+              "settled",
+              "pending",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "external_type": {
+            "enum": [
+              "payment",
+              "refund"
+            ],
+            "type": "string"
+          },
+          "finance_payment_reversal_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "matched_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "matched_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "membership_payment_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "recorded_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "statement_amount_cents": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "statement_currency": {
+            "type": "string"
+          },
+          "statement_description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "statement_occurred_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "unmatched",
+              "matched",
+              "mismatched"
+            ],
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "payment",
+              "reversal"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "external_reference",
+          "external_type",
+          "external_status",
+          "statement_amount_cents",
+          "statement_currency",
+          "statement_occurred_on",
+          "status",
+          "discrepancies"
+        ],
+        "title": "FinanceReconciliationRecord",
         "type": "object"
       },
       "SemanticError": {
@@ -2734,6 +3743,129 @@
         "title": "WorkoutDslAuthoringResponse",
         "type": "object"
       },
+      "FinanceAccountingExport": {
+        "properties": {
+          "byte_size": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "completed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "error_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "execution_mode": {
+            "enum": [
+              "inline",
+              "background"
+            ],
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "properties": {
+                "byte_size": {
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "rows": {
+                  "type": "integer"
+                },
+                "sha256": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "sha256",
+                "byte_size",
+                "rows"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "object_key": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "range_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "range_start": {
+            "format": "date",
+            "type": "string"
+          },
+          "requested_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "row_counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "schema_version": {
+            "type": "integer"
+          },
+          "sha256": {
+            "description": "SHA-256 of the stored ZIP",
+            "nullable": true,
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "running",
+              "completed",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "range_start",
+          "range_end",
+          "status",
+          "execution_mode",
+          "schema_version",
+          "row_counts",
+          "files"
+        ],
+        "title": "FinanceAccountingExport",
+        "type": "object"
+      },
       "WorkoutDslPublishRequest": {
         "additionalProperties": false,
         "properties": {
@@ -2761,6 +3893,141 @@
           "expected_source_revision"
         ],
         "title": "WorkoutDslPublishRequest",
+        "type": "object"
+      },
+      "FinanceAccountingExportCollection": {
+        "properties": {
+          "accounting_exports": {
+            "items": {
+              "properties": {
+                "byte_size": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "completed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "error_reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "execution_mode": {
+                  "enum": [
+                    "inline",
+                    "background"
+                  ],
+                  "type": "string"
+                },
+                "files": {
+                  "items": {
+                    "properties": {
+                      "byte_size": {
+                        "type": "integer"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "rows": {
+                        "type": "integer"
+                      },
+                      "sha256": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "sha256",
+                      "byte_size",
+                      "rows"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "object_key": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "range_end": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "range_start": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "requested_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "row_counts": {
+                  "additionalProperties": {
+                    "type": "integer"
+                  },
+                  "type": "object"
+                },
+                "schema_version": {
+                  "type": "integer"
+                },
+                "sha256": {
+                  "description": "SHA-256 of the stored ZIP",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "queued",
+                    "running",
+                    "completed",
+                    "failed"
+                  ],
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "range_start",
+                "range_end",
+                "status",
+                "execution_mode",
+                "schema_version",
+                "row_counts",
+                "files"
+              ],
+              "title": "FinanceAccountingExport",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "accounting_exports"
+        ],
+        "title": "FinanceAccountingExportCollection",
         "type": "object"
       },
       "WorkoutDslManualResponse": {
@@ -3265,6 +4532,195 @@
         "title": "AthleteInjuryWarnings",
         "type": "object"
       },
+      "FinanceAccountingExportRequest": {
+        "properties": {
+          "range_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "range_start": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "range_start",
+          "range_end"
+        ],
+        "title": "FinanceAccountingExportRequest",
+        "type": "object"
+      },
+      "FinanceReconciliationLineRequest": {
+        "properties": {
+          "external_reference": {
+            "maxLength": 120,
+            "minLength": 1,
+            "type": "string"
+          },
+          "external_status": {
+            "enum": [
+              "settled",
+              "pending",
+              "failed"
+            ],
+            "type": "string"
+          },
+          "external_type": {
+            "enum": [
+              "payment",
+              "refund"
+            ],
+            "type": "string"
+          },
+          "provider": {
+            "description": "Provider key, e.g. stripe, viva_wallet, bank_transfer",
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string"
+          },
+          "statement_amount_cents": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "statement_currency": {
+            "maxLength": 3,
+            "minLength": 3,
+            "type": "string"
+          },
+          "statement_description": {
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          },
+          "statement_occurred_on": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "provider",
+          "external_reference",
+          "external_type",
+          "statement_amount_cents",
+          "statement_occurred_on"
+        ],
+        "title": "FinanceReconciliationLineRequest",
+        "type": "object"
+      },
+      "FinanceRefundReceiptDetail": {
+        "properties": {
+          "amount_cents": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "finance_invoice_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "finance_payment_reversal_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "integrity_verified": {
+            "description": "True when the stored snapshot still hashes to snapshot_sha256",
+            "type": "boolean"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "issued_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "member_display_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_payment_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "receipt_number": {
+            "description": "Gapless per-organization number, e.g. RFD-000001",
+            "type": "string"
+          },
+          "reversal_occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "reversal_type": {
+            "enum": [
+              "refund",
+              "payment_reversal",
+              "waiver_reversal"
+            ],
+            "type": "string"
+          },
+          "schema_version": {
+            "type": "integer"
+          },
+          "sequence": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "snapshot": {
+            "additionalProperties": true,
+            "description": "Immutable receipt snapshot captured at issue time (schema_version 1)",
+            "type": "object"
+          },
+          "snapshot_sha256": {
+            "description": "SHA-256 of the canonical snapshot",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "snapshot",
+          "id",
+          "receipt_number",
+          "sequence",
+          "finance_payment_reversal_id",
+          "membership_payment_id",
+          "user_id",
+          "reversal_type",
+          "amount_cents",
+          "currency",
+          "issued_at",
+          "snapshot_sha256",
+          "integrity_verified"
+        ],
+        "title": "FinanceRefundReceiptDetail",
+        "type": "object"
+      },
       "TrainingLogSources": {
         "properties": {
           "assignments": {
@@ -3424,6 +4880,147 @@
         "title": "TrainingLogSources",
         "type": "object"
       },
+      "FinanceReconciliationRecordCollection": {
+        "properties": {
+          "reconciliation_records": {
+            "items": {
+              "properties": {
+                "discrepancies": {
+                  "items": {
+                    "enum": [
+                      "type_mismatch",
+                      "amount_mismatch",
+                      "currency_mismatch",
+                      "date_out_of_tolerance",
+                      "provider_not_settled",
+                      "internal_not_settled"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "discrepancy_notes": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "external_reference": {
+                  "type": "string"
+                },
+                "external_status": {
+                  "enum": [
+                    "settled",
+                    "pending",
+                    "failed"
+                  ],
+                  "type": "string"
+                },
+                "external_type": {
+                  "enum": [
+                    "payment",
+                    "refund"
+                  ],
+                  "type": "string"
+                },
+                "finance_payment_reversal_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "matched_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "matched_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "membership_payment_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "recorded_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "statement_amount_cents": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "statement_currency": {
+                  "type": "string"
+                },
+                "statement_description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "statement_occurred_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "unmatched",
+                    "matched",
+                    "mismatched"
+                  ],
+                  "type": "string"
+                },
+                "target_type": {
+                  "enum": [
+                    "payment",
+                    "reversal"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "external_reference",
+                "external_type",
+                "external_status",
+                "statement_amount_cents",
+                "statement_currency",
+                "statement_occurred_on",
+                "status",
+                "discrepancies"
+              ],
+              "title": "FinanceReconciliationRecord",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "reconciliation_records"
+        ],
+        "title": "FinanceReconciliationRecordCollection",
+        "type": "object"
+      },
       "AthleteInjuryWarningsAcknowledged": {
         "additionalProperties": false,
         "properties": {
@@ -3459,6 +5056,129 @@
           "warning_count"
         ],
         "title": "MyInjuryWarningsAcknowledged",
+        "type": "object"
+      },
+      "FinanceRefundReceiptResponse": {
+        "properties": {
+          "refund_receipt": {
+            "properties": {
+              "amount_cents": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "finance_invoice_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "finance_payment_reversal_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "integrity_verified": {
+                "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                "type": "boolean"
+              },
+              "invoice_number": {
+                "nullable": true,
+                "type": "string"
+              },
+              "issued_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "issued_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "member_display_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "membership_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "membership_payment_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "receipt_number": {
+                "description": "Gapless per-organization number, e.g. RFD-000001",
+                "type": "string"
+              },
+              "reversal_occurred_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "reversal_type": {
+                "enum": [
+                  "refund",
+                  "payment_reversal",
+                  "waiver_reversal"
+                ],
+                "type": "string"
+              },
+              "schema_version": {
+                "type": "integer"
+              },
+              "sequence": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "snapshot": {
+                "additionalProperties": true,
+                "description": "Immutable receipt snapshot captured at issue time (schema_version 1)",
+                "type": "object"
+              },
+              "snapshot_sha256": {
+                "description": "SHA-256 of the canonical snapshot",
+                "type": "string"
+              },
+              "user_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "snapshot",
+              "id",
+              "receipt_number",
+              "sequence",
+              "finance_payment_reversal_id",
+              "membership_payment_id",
+              "user_id",
+              "reversal_type",
+              "amount_cents",
+              "currency",
+              "issued_at",
+              "snapshot_sha256",
+              "integrity_verified"
+            ],
+            "title": "FinanceRefundReceiptDetail",
+            "type": "object"
+          }
+        },
+        "required": [
+          "refund_receipt"
+        ],
+        "title": "FinanceRefundReceiptResponse",
         "type": "object"
       }
     },
@@ -4264,6 +5984,210 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/unmatch": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.unmatch_reconciliation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notes": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "FinanceReconciliationUnmatchRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "idempotent_replay": {
+                      "type": "boolean"
+                    },
+                    "reconciliation_record": {
+                      "properties": {
+                        "discrepancies": {
+                          "items": {
+                            "enum": [
+                              "type_mismatch",
+                              "amount_mismatch",
+                              "currency_mismatch",
+                              "date_out_of_tolerance",
+                              "provider_not_settled",
+                              "internal_not_settled"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "discrepancy_notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "external_reference": {
+                          "type": "string"
+                        },
+                        "external_status": {
+                          "enum": [
+                            "settled",
+                            "pending",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "external_type": {
+                          "enum": [
+                            "payment",
+                            "refund"
+                          ],
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "matched_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "matched_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "statement_currency": {
+                          "type": "string"
+                        },
+                        "statement_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "unmatched",
+                            "matched",
+                            "mismatched"
+                          ],
+                          "type": "string"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "payment",
+                            "reversal"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "external_reference",
+                        "external_type",
+                        "external_status",
+                        "statement_amount_cents",
+                        "statement_currency",
+                        "statement_occurred_on",
+                        "status",
+                        "discrepancies"
+                      ],
+                      "title": "FinanceReconciliationRecord",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_record"
+                  ],
+                  "title": "FinanceReconciliationRecordResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unmatched record"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Clear a statement line's match",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      }
+    },
     "/api/memberships/redeem": {
       "post": {
         "callbacks": {},
@@ -4742,6 +6666,62 @@
         "summary": "Create a class type",
         "tags": [
           "Admin Class Types"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/refund-receipts/{id}/document": {
+      "get": {
+        "callbacks": {},
+        "description": "Deterministic, self-contained HTML (no scripts or external resources) rendered from the immutable snapshot. Print or save as PDF from the browser.",
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Receipt document"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Printable HTML refund receipt",
+        "tags": [
+          "Admin Finance Accounting"
         ]
       }
     },
@@ -12758,6 +14738,174 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/refund-receipts/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund_receipt": {
+                      "properties": {
+                        "amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "finance_invoice_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "integrity_verified": {
+                          "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                          "type": "boolean"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "member_display_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "receipt_number": {
+                          "description": "Gapless per-organization number, e.g. RFD-000001",
+                          "type": "string"
+                        },
+                        "reversal_occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "reversal_type": {
+                          "enum": [
+                            "refund",
+                            "payment_reversal",
+                            "waiver_reversal"
+                          ],
+                          "type": "string"
+                        },
+                        "schema_version": {
+                          "type": "integer"
+                        },
+                        "sequence": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "snapshot": {
+                          "additionalProperties": true,
+                          "description": "Immutable receipt snapshot captured at issue time (schema_version 1)",
+                          "type": "object"
+                        },
+                        "snapshot_sha256": {
+                          "description": "SHA-256 of the canonical snapshot",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "snapshot",
+                        "id",
+                        "receipt_number",
+                        "sequence",
+                        "finance_payment_reversal_id",
+                        "membership_payment_id",
+                        "user_id",
+                        "reversal_type",
+                        "amount_cents",
+                        "currency",
+                        "issued_at",
+                        "snapshot_sha256",
+                        "integrity_verified"
+                      ],
+                      "title": "FinanceRefundReceiptDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "refund_receipt"
+                  ],
+                  "title": "FinanceRefundReceiptResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Refund receipt"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get one refund receipt with its immutable snapshot",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      }
+    },
     "/api/theme": {
       "get": {
         "callbacks": {},
@@ -13183,7 +15331,7 @@
                       "type": "string"
                     },
                     "visibility": {
-                      "description": "ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.",
+                      "description": "ADR-119: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned.",
                       "enum": [
                         "coach",
                         "coach_role_required"
@@ -14705,6 +16853,279 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/candidates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_candidates",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "candidates": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "evaluation": {
+                            "properties": {
+                              "discrepancies": {
+                                "items": {
+                                  "enum": [
+                                    "type_mismatch",
+                                    "amount_mismatch",
+                                    "currency_mismatch",
+                                    "date_out_of_tolerance",
+                                    "provider_not_settled",
+                                    "internal_not_settled"
+                                  ],
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "status": {
+                                "enum": [
+                                  "matched",
+                                  "mismatched"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status",
+                              "discrepancies"
+                            ],
+                            "type": "object"
+                          },
+                          "invoice_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "member_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "member_user_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "occurred_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "payment_method": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "payment",
+                              "reversal"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "target_type",
+                          "target_id",
+                          "amount_cents",
+                          "currency",
+                          "occurred_on",
+                          "evaluation"
+                        ],
+                        "title": "FinanceReconciliationCandidate",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "reconciliation_record": {
+                      "properties": {
+                        "discrepancies": {
+                          "items": {
+                            "enum": [
+                              "type_mismatch",
+                              "amount_mismatch",
+                              "currency_mismatch",
+                              "date_out_of_tolerance",
+                              "provider_not_settled",
+                              "internal_not_settled"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "discrepancy_notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "external_reference": {
+                          "type": "string"
+                        },
+                        "external_status": {
+                          "enum": [
+                            "settled",
+                            "pending",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "external_type": {
+                          "enum": [
+                            "payment",
+                            "refund"
+                          ],
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "matched_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "matched_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "statement_currency": {
+                          "type": "string"
+                        },
+                        "statement_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "unmatched",
+                            "matched",
+                            "mismatched"
+                          ],
+                          "type": "string"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "payment",
+                            "reversal"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "external_reference",
+                        "external_type",
+                        "external_status",
+                        "statement_amount_cents",
+                        "statement_currency",
+                        "statement_occurred_on",
+                        "status",
+                        "discrepancies"
+                      ],
+                      "title": "FinanceReconciliationRecord",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_record",
+                    "candidates"
+                  ],
+                  "title": "FinanceReconciliationCandidates",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Match candidates"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ranked internal payments or reversals that could match a statement line",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      }
+    },
     "/api/executions/{id}/modifications": {
       "post": {
         "callbacks": {},
@@ -15143,6 +17564,516 @@
         "summary": "Get a user's communication thread summary",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/accounting-exports": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.exports",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "accounting_exports": {
+                      "items": {
+                        "properties": {
+                          "byte_size": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "completed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "error_reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "execution_mode": {
+                            "enum": [
+                              "inline",
+                              "background"
+                            ],
+                            "type": "string"
+                          },
+                          "files": {
+                            "items": {
+                              "properties": {
+                                "byte_size": {
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "type": "string"
+                                },
+                                "rows": {
+                                  "type": "integer"
+                                },
+                                "sha256": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "sha256",
+                                "byte_size",
+                                "rows"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "object_key": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "range_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "range_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "requested_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "row_counts": {
+                            "additionalProperties": {
+                              "type": "integer"
+                            },
+                            "type": "object"
+                          },
+                          "schema_version": {
+                            "type": "integer"
+                          },
+                          "sha256": {
+                            "description": "SHA-256 of the stored ZIP",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "queued",
+                              "running",
+                              "completed",
+                              "failed"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "range_start",
+                          "range_end",
+                          "status",
+                          "execution_mode",
+                          "schema_version",
+                          "row_counts",
+                          "files"
+                        ],
+                        "title": "FinanceAccountingExport",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "accounting_exports"
+                  ],
+                  "title": "FinanceAccountingExportCollection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Accounting export runs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accounting export run history",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Ranges up to 31 days are built immediately (201, status `completed`); longer ranges are queued for background processing (202, status `queued`). The ZIP holds one CSV and one JSON file per dataset plus a checksummed manifest (schema_version 1).",
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.request_export",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "range_end": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "range_start": {
+                    "format": "date",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "range_start",
+                  "range_end"
+                ],
+                "title": "FinanceAccountingExportRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "accounting_export": {
+                      "properties": {
+                        "byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "error_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "execution_mode": {
+                          "enum": [
+                            "inline",
+                            "background"
+                          ],
+                          "type": "string"
+                        },
+                        "files": {
+                          "items": {
+                            "properties": {
+                              "byte_size": {
+                                "type": "integer"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "rows": {
+                                "type": "integer"
+                              },
+                              "sha256": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "sha256",
+                              "byte_size",
+                              "rows"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "object_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "range_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "range_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "requested_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_counts": {
+                          "additionalProperties": {
+                            "type": "integer"
+                          },
+                          "type": "object"
+                        },
+                        "schema_version": {
+                          "type": "integer"
+                        },
+                        "sha256": {
+                          "description": "SHA-256 of the stored ZIP",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "running",
+                            "completed",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "range_start",
+                        "range_end",
+                        "status",
+                        "execution_mode",
+                        "schema_version",
+                        "row_counts",
+                        "files"
+                      ],
+                      "title": "FinanceAccountingExport",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "accounting_export"
+                  ],
+                  "title": "FinanceAccountingExportResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Completed export"
+          },
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "accounting_export": {
+                      "properties": {
+                        "byte_size": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "error_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "execution_mode": {
+                          "enum": [
+                            "inline",
+                            "background"
+                          ],
+                          "type": "string"
+                        },
+                        "files": {
+                          "items": {
+                            "properties": {
+                              "byte_size": {
+                                "type": "integer"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "rows": {
+                                "type": "integer"
+                              },
+                              "sha256": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "sha256",
+                              "byte_size",
+                              "rows"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "object_key": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "range_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "range_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "requested_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "row_counts": {
+                          "additionalProperties": {
+                            "type": "integer"
+                          },
+                          "type": "object"
+                        },
+                        "schema_version": {
+                          "type": "integer"
+                        },
+                        "sha256": {
+                          "description": "SHA-256 of the stored ZIP",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "queued",
+                            "running",
+                            "completed",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "range_start",
+                        "range_end",
+                        "status",
+                        "execution_mode",
+                        "schema_version",
+                        "row_counts",
+                        "files"
+                      ],
+                      "title": "FinanceAccountingExport",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "accounting_export"
+                  ],
+                  "title": "FinanceAccountingExportResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Queued export"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Export payments, allocations, reversals, credits and refund receipts",
+        "tags": [
+          "Admin Finance Accounting"
         ]
       }
     },
@@ -24699,6 +27630,246 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records/{id}/match": {
+      "post": {
+        "callbacks": {},
+        "description": "The record becomes `matched`, or `mismatched` with the discrepancies found (amount, currency, date tolerance, settlement, type). An internal fact can be linked to one statement line only (409 `reconciliation_target_already_matched`).",
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.match_reconciliation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notes": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "target_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "target_type": {
+                    "enum": [
+                      "payment",
+                      "reversal"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "target_type",
+                  "target_id"
+                ],
+                "title": "FinanceReconciliationMatchRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "idempotent_replay": {
+                      "type": "boolean"
+                    },
+                    "reconciliation_record": {
+                      "properties": {
+                        "discrepancies": {
+                          "items": {
+                            "enum": [
+                              "type_mismatch",
+                              "amount_mismatch",
+                              "currency_mismatch",
+                              "date_out_of_tolerance",
+                              "provider_not_settled",
+                              "internal_not_settled"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "discrepancy_notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "external_reference": {
+                          "type": "string"
+                        },
+                        "external_status": {
+                          "enum": [
+                            "settled",
+                            "pending",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "external_type": {
+                          "enum": [
+                            "payment",
+                            "refund"
+                          ],
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "matched_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "matched_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "statement_currency": {
+                          "type": "string"
+                        },
+                        "statement_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "unmatched",
+                            "matched",
+                            "mismatched"
+                          ],
+                          "type": "string"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "payment",
+                            "reversal"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "external_reference",
+                        "external_type",
+                        "external_status",
+                        "statement_amount_cents",
+                        "statement_currency",
+                        "statement_occurred_on",
+                        "status",
+                        "discrepancies"
+                      ],
+                      "title": "FinanceReconciliationRecord",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_record"
+                  ],
+                  "title": "FinanceReconciliationRecordResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Matched record"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Match a statement line to an internal payment or reversal",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/referral-programs/{id}": {
       "patch": {
         "callbacks": {},
@@ -26327,6 +29498,598 @@
         "summary": "Revoke a personal allowance extension with a compensating ledger entry",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/reconciliation-records": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_records",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "unmatched",
+                "matched",
+                "mismatched"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "provider",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "reconciliation_records": {
+                      "items": {
+                        "properties": {
+                          "discrepancies": {
+                            "items": {
+                              "enum": [
+                                "type_mismatch",
+                                "amount_mismatch",
+                                "currency_mismatch",
+                                "date_out_of_tolerance",
+                                "provider_not_settled",
+                                "internal_not_settled"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "discrepancy_notes": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "external_reference": {
+                            "type": "string"
+                          },
+                          "external_status": {
+                            "enum": [
+                              "settled",
+                              "pending",
+                              "failed"
+                            ],
+                            "type": "string"
+                          },
+                          "external_type": {
+                            "enum": [
+                              "payment",
+                              "refund"
+                            ],
+                            "type": "string"
+                          },
+                          "finance_payment_reversal_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "matched_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "matched_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "membership_payment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "recorded_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "statement_amount_cents": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "statement_currency": {
+                            "type": "string"
+                          },
+                          "statement_description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "statement_occurred_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "unmatched",
+                              "matched",
+                              "mismatched"
+                            ],
+                            "type": "string"
+                          },
+                          "target_type": {
+                            "enum": [
+                              "payment",
+                              "reversal"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "provider",
+                          "external_reference",
+                          "external_type",
+                          "external_status",
+                          "statement_amount_cents",
+                          "statement_currency",
+                          "statement_occurred_on",
+                          "status",
+                          "discrepancies"
+                        ],
+                        "title": "FinanceReconciliationRecord",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_records"
+                  ],
+                  "title": "FinanceReconciliationRecordCollection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reconciliation records"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List payment-provider reconciliation records",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "description": "Idempotent on (organization, provider, external_reference): an identical replay returns the existing record with 200 and `idempotent_replay: true`; a replay with a different type, amount, currency or date returns 409 `reconciliation_reference_conflict`.",
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.record_reconciliation_line",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "external_reference": {
+                    "maxLength": 120,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "external_status": {
+                    "enum": [
+                      "settled",
+                      "pending",
+                      "failed"
+                    ],
+                    "type": "string"
+                  },
+                  "external_type": {
+                    "enum": [
+                      "payment",
+                      "refund"
+                    ],
+                    "type": "string"
+                  },
+                  "provider": {
+                    "description": "Provider key, e.g. stripe, viva_wallet, bank_transfer",
+                    "maxLength": 40,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "statement_amount_cents": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "statement_currency": {
+                    "maxLength": 3,
+                    "minLength": 3,
+                    "type": "string"
+                  },
+                  "statement_description": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "statement_occurred_on": {
+                    "format": "date",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider",
+                  "external_reference",
+                  "external_type",
+                  "statement_amount_cents",
+                  "statement_occurred_on"
+                ],
+                "title": "FinanceReconciliationLineRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "idempotent_replay": {
+                      "type": "boolean"
+                    },
+                    "reconciliation_record": {
+                      "properties": {
+                        "discrepancies": {
+                          "items": {
+                            "enum": [
+                              "type_mismatch",
+                              "amount_mismatch",
+                              "currency_mismatch",
+                              "date_out_of_tolerance",
+                              "provider_not_settled",
+                              "internal_not_settled"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "discrepancy_notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "external_reference": {
+                          "type": "string"
+                        },
+                        "external_status": {
+                          "enum": [
+                            "settled",
+                            "pending",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "external_type": {
+                          "enum": [
+                            "payment",
+                            "refund"
+                          ],
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "matched_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "matched_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "statement_currency": {
+                          "type": "string"
+                        },
+                        "statement_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "unmatched",
+                            "matched",
+                            "mismatched"
+                          ],
+                          "type": "string"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "payment",
+                            "reversal"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "external_reference",
+                        "external_type",
+                        "external_status",
+                        "statement_amount_cents",
+                        "statement_currency",
+                        "statement_occurred_on",
+                        "status",
+                        "discrepancies"
+                      ],
+                      "title": "FinanceReconciliationRecord",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_record"
+                  ],
+                  "title": "FinanceReconciliationRecordResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Replayed statement line"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "idempotent_replay": {
+                      "type": "boolean"
+                    },
+                    "reconciliation_record": {
+                      "properties": {
+                        "discrepancies": {
+                          "items": {
+                            "enum": [
+                              "type_mismatch",
+                              "amount_mismatch",
+                              "currency_mismatch",
+                              "date_out_of_tolerance",
+                              "provider_not_settled",
+                              "internal_not_settled"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "discrepancy_notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "external_reference": {
+                          "type": "string"
+                        },
+                        "external_status": {
+                          "enum": [
+                            "settled",
+                            "pending",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "external_type": {
+                          "enum": [
+                            "payment",
+                            "refund"
+                          ],
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "matched_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "matched_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "provider": {
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "statement_currency": {
+                          "type": "string"
+                        },
+                        "statement_description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "statement_occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "unmatched",
+                            "matched",
+                            "mismatched"
+                          ],
+                          "type": "string"
+                        },
+                        "target_type": {
+                          "enum": [
+                            "payment",
+                            "reversal"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "external_reference",
+                        "external_type",
+                        "external_status",
+                        "statement_amount_cents",
+                        "statement_currency",
+                        "statement_occurred_on",
+                        "status",
+                        "discrepancies"
+                      ],
+                      "title": "FinanceReconciliationRecord",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "reconciliation_record"
+                  ],
+                  "title": "FinanceReconciliationRecordResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Recorded statement line"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record an external provider statement line",
+        "tags": [
+          "Admin Finance Accounting"
         ]
       }
     },
@@ -29067,7 +32830,7 @@
                     "type": "string"
                   },
                   "organization_slug": {
-                    "description": "Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR.",
+                    "description": "Gym the PR was achieved in (ADR-119). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR.",
                     "nullable": true,
                     "type": "string"
                   },
@@ -30336,6 +34099,61 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/refund-receipts/{id}/document": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.refund_receipt_document",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Receipt document"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Printable HTML version of one of the current member's refund receipts",
+        "tags": [
+          "Member Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/training-log/sources": {
       "get": {
         "callbacks": {},
@@ -31223,6 +35041,174 @@
         "summary": "Parse and canonically format Quick Text workout source",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/refund-receipts/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.refund_receipt",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund_receipt": {
+                      "properties": {
+                        "amount_cents": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "finance_invoice_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "finance_payment_reversal_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "integrity_verified": {
+                          "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                          "type": "boolean"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "issued_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "member_display_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "membership_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_payment_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "receipt_number": {
+                          "description": "Gapless per-organization number, e.g. RFD-000001",
+                          "type": "string"
+                        },
+                        "reversal_occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "reversal_type": {
+                          "enum": [
+                            "refund",
+                            "payment_reversal",
+                            "waiver_reversal"
+                          ],
+                          "type": "string"
+                        },
+                        "schema_version": {
+                          "type": "integer"
+                        },
+                        "sequence": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "snapshot": {
+                          "additionalProperties": true,
+                          "description": "Immutable receipt snapshot captured at issue time (schema_version 1)",
+                          "type": "object"
+                        },
+                        "snapshot_sha256": {
+                          "description": "SHA-256 of the canonical snapshot",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "snapshot",
+                        "id",
+                        "receipt_number",
+                        "sequence",
+                        "finance_payment_reversal_id",
+                        "membership_payment_id",
+                        "user_id",
+                        "reversal_type",
+                        "amount_cents",
+                        "currency",
+                        "issued_at",
+                        "snapshot_sha256",
+                        "integrity_verified"
+                      ],
+                      "title": "FinanceRefundReceiptDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "refund_receipt"
+                  ],
+                  "title": "FinanceRefundReceiptResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Refund receipt"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get one of the current member's refund receipts",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
@@ -33677,6 +37663,192 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/refund-receipts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipts",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 500,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund_receipts": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "finance_invoice_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "finance_payment_reversal_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "integrity_verified": {
+                            "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                            "type": "boolean"
+                          },
+                          "invoice_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "issued_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "issued_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "member_display_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "membership_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "membership_payment_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "receipt_number": {
+                            "description": "Gapless per-organization number, e.g. RFD-000001",
+                            "type": "string"
+                          },
+                          "reversal_occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "reversal_type": {
+                            "enum": [
+                              "refund",
+                              "payment_reversal",
+                              "waiver_reversal"
+                            ],
+                            "type": "string"
+                          },
+                          "schema_version": {
+                            "type": "integer"
+                          },
+                          "sequence": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "snapshot_sha256": {
+                            "description": "SHA-256 of the canonical snapshot",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "receipt_number",
+                          "sequence",
+                          "finance_payment_reversal_id",
+                          "membership_payment_id",
+                          "user_id",
+                          "reversal_type",
+                          "amount_cents",
+                          "currency",
+                          "issued_at",
+                          "snapshot_sha256",
+                          "integrity_verified"
+                        ],
+                        "title": "FinanceRefundReceipt",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "refund_receipts"
+                  ],
+                  "title": "FinanceRefundReceiptCollection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Refund receipts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List the organization's refund receipts, newest number first",
+        "tags": [
+          "Admin Finance Accounting"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/lifecycle": {
       "patch": {
         "callbacks": {},
@@ -34367,6 +38539,151 @@
         "summary": "Get timer sequence for a workout",
         "tags": [
           "Execution"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/refund-receipts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyFinanceController.refund_receipts",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "refund_receipts": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "finance_invoice_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "finance_payment_reversal_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "integrity_verified": {
+                            "description": "True when the stored snapshot still hashes to snapshot_sha256",
+                            "type": "boolean"
+                          },
+                          "invoice_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "issued_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "issued_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "member_display_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "membership_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "membership_payment_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "receipt_number": {
+                            "description": "Gapless per-organization number, e.g. RFD-000001",
+                            "type": "string"
+                          },
+                          "reversal_occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "reversal_type": {
+                            "enum": [
+                              "refund",
+                              "payment_reversal",
+                              "waiver_reversal"
+                            ],
+                            "type": "string"
+                          },
+                          "schema_version": {
+                            "type": "integer"
+                          },
+                          "sequence": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "snapshot_sha256": {
+                            "description": "SHA-256 of the canonical snapshot",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "receipt_number",
+                          "sequence",
+                          "finance_payment_reversal_id",
+                          "membership_payment_id",
+                          "user_id",
+                          "reversal_type",
+                          "amount_cents",
+                          "currency",
+                          "issued_at",
+                          "snapshot_sha256",
+                          "integrity_verified"
+                        ],
+                        "title": "FinanceRefundReceipt",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "refund_receipts"
+                  ],
+                  "title": "FinanceRefundReceiptCollection",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Refund receipts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List the current member's refund receipts",
+        "tags": [
+          "Member Finance"
         ]
       }
     },
@@ -37009,6 +41326,89 @@
         "summary": "Withdraw a pending or approved booking",
         "tags": [
           "Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/accounting-exports/{id}/download": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceAccountingController.export_download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "byte_size": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "download_url": {
+                      "type": "string"
+                    },
+                    "expires_in_seconds": {
+                      "type": "integer"
+                    },
+                    "file_name": {
+                      "type": "string"
+                    },
+                    "sha256": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "download_url",
+                    "file_name",
+                    "expires_in_seconds"
+                  ],
+                  "title": "FinanceAccountingExportDownload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Download link"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Short-lived signed download link for a completed accounting export",
+        "tags": [
+          "Admin Finance Accounting"
         ]
       }
     },

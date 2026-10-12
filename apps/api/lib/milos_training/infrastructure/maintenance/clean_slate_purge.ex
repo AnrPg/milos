@@ -17,7 +17,7 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
 
   @confirmation "PURGE_ALL_TENANT_DATA_KEEP_SAAS_OWNER"
   @finch MilosTraining.MaintenanceFinch
-  # scale_levels is tenant data since ADR-110 (and TRUNCATE ... CASCADE on
+  # scale_levels is tenant data since ADR-118 (and TRUNCATE ... CASCADE on
   # organizations would empty it anyway), so it is no longer preserved.
   @preserved_tables ~w(schema_migrations users vendors training_quotes)
 

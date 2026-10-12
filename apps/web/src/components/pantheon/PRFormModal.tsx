@@ -119,7 +119,7 @@ function timeFieldsToSeconds(t: TimeFields): number {
   return h * 3600 + m * 60 + s + ms / 1000;
 }
 
-/** A new PR, offering the caller's gyms as its provenance (ADR-111). */
+/** A new PR, offering the caller's gyms as its provenance (ADR-119). */
 export function NewPRFormModal({ onClose }: { onClose: () => void }) {
   const { gyms, defaultGymSlug } = usePRGymOptions();
   return <PRFormModal pr={null} gyms={gyms} defaultGymSlug={defaultGymSlug} onClose={onClose} />;

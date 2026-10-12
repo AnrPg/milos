@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.GrantPRAccess do
   @moduledoc """
   Shares the owner's whole PR table, read-only, with another account
-  (ADR-111). Any existing account may be picked; grants are global and not
+  (ADR-119). Any existing account may be picked; grants are global and not
   tied to a gym.
   """
 

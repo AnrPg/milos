@@ -1467,7 +1467,7 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
-  # ADR-108 refund receipts, reconciliation and accounting exports.
+  # ADR-116 refund receipts, reconciliation and accounting exports.
   def call(conn, {:error, :reconciliation_reference_conflict}) do
     conn
     |> put_status(:conflict)

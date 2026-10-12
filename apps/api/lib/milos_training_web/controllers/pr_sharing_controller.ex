@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.PRSharingController do
   @moduledoc """
-  ADR-111 personal PR sharing: the coach-visibility opt-out, explicit
+  ADR-119 personal PR sharing: the coach-visibility opt-out, explicit
   read-only grants to other accounts, and the grantee's "Shared with me" view.
   User-scoped (not tenant-scoped): grants and the opt-out are global personal
   data that apply across every gym.

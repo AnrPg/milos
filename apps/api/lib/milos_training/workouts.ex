@@ -179,7 +179,7 @@ defmodule MilosTraining.Workouts do
 
   # Materializes an already tenant-fetched workout. Scale levels come from the
   # workout's own variations, so they are always the workout's organization's
-  # set (ADR-110).
+  # set (ADR-118).
   def materialize_for_scale(workout, scale_slug),
     do: MilosTraining.Workouts.Domain.WorkoutMaterializer.materialize(workout, scale_slug)
 

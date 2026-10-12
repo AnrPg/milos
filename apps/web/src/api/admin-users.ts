@@ -171,7 +171,7 @@ export function programAdminUserWorkout(
 }
 
 export function fetchAdminUserPRs(token: string, userId: string) {
-  // ADR-111: only the gym's coaches read members' PRs; other staff receive
+  // ADR-119: only the gym's coaches read members' PRs; other staff receive
   // `coach_role_required` and no records.
   return apiRequest<{ user_id: string; visibility: AdminUserPRVisibility; prs: AdminUserPR[] }>(
     `/admin/users/${userId}/prs`,

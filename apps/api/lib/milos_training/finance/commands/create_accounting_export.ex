@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance.Commands.CreateAccountingExport do
-  @moduledoc "Records a requested accounting export run (ADR-108)."
+  @moduledoc "Records a requested accounting export run (ADR-116)."
 
   alias MilosTraining.Finance.FinanceAccountingStore
 

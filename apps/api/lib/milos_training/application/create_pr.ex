@@ -3,7 +3,7 @@ defmodule MilosTraining.Application.CreatePR do
   alias MilosTraining.{Gamification, Organizations, Pantheon}
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
-  # ADR-111: a PR may record the gym it was achieved in (`organization_slug`).
+  # ADR-119: a PR may record the gym it was achieved in (`organization_slug`).
   # The slug must resolve to an active membership of the acting user; the PR's
   # organization provenance is what makes it visible to that gym's coaches.
   # Without a slug the PR is personal. Everything runs in the owner's scope.

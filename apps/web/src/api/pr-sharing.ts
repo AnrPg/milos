@@ -1,7 +1,7 @@
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 
-// ADR-111: personal PR sharing - coach-visibility opt-out, explicit read-only
+// ADR-119: personal PR sharing - coach-visibility opt-out, explicit read-only
 // grants to other accounts, and the grantee's "Shared with me" view.
 
 export type PRSharingSettings =

@@ -96,7 +96,7 @@ defmodule MilosTrainingWeb.AdminUserController do
         type: :string,
         enum: ["coach", "coach_role_required"],
         description:
-          "ADR-111: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned."
+          "ADR-119: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned."
       },
       prs: %Schema{
         type: :array,

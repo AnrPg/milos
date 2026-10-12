@@ -112,3 +112,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-112 | Organization name and slug editing | Accepted |
 | ADR-113 | Comprehensive analytics instrumentation | Accepted |
 | ADR-117 | Web dependency security refresh and patched OpenAPI generator chain | Accepted |
+| ADR-114 | Injury-aware workout safety warnings | Accepted |
+| ADR-115 | Personalized member programming | Accepted |
+| ADR-116 | Refund receipts, provider reconciliation and accounting exports | Accepted |
+| ADR-118 | Tenant-owned scale levels | Accepted |
+| ADR-119 | PR visibility for gym coaches and explicit sharing grants | Accepted |

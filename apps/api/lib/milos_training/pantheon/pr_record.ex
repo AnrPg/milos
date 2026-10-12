@@ -41,7 +41,7 @@ defmodule MilosTraining.Pantheon.PRRecord do
   end
 
   @doc """
-  Creation also records the PR's organization provenance (ADR-111): the gym
+  Creation also records the PR's organization provenance (ADR-119): the gym
   the owner recorded it in, or `nil` for a personal PR. Provenance is fixed at
   creation; updates and corrections never change it.
   """

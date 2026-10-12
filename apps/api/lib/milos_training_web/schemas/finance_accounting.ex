@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.Schemas.FinanceAccounting do
   @moduledoc """
-  OpenAPI schemas for ADR-108 refund receipts, payment-provider
+  OpenAPI schemas for ADR-116 refund receipts, payment-provider
   reconciliation records and accounting exports.
   """
 

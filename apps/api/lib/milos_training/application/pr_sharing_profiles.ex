@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.PRSharingProfiles do
   @moduledoc """
-  Public account identity (ADR-111) for the people on either side of a PR
+  Public account identity (ADR-119) for the people on either side of a PR
   sharing grant: just enough to recognise them, never contact details.
   """
 

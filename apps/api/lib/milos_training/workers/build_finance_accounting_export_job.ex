@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workers.BuildFinanceAccountingExportJob do
-  @moduledoc "ADR-108: builds a large-range accounting export in the background."
+  @moduledoc "ADR-116: builds a large-range accounting export in the background."
 
   use Oban.Worker,
     queue: :default,

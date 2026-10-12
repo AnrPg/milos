@@ -327,7 +327,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
   end
 
-  # ADR-111: members' PRs are readable by the gym's coaches, so the dossier PR
+  # ADR-119: members' PRs are readable by the gym's coaches, so the dossier PR
   # tab admits coaches as well as owners/admins. Owners/admins who are not
   # coaches get a role-safe empty state; the database enforces the rest.
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
@@ -488,7 +488,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/finance/invoices/:id/download-url", AdminFinanceController, :invoice_download_url)
 
-    # ADR-108 refund receipts, provider reconciliation and accounting exports.
+    # ADR-116 refund receipts, provider reconciliation and accounting exports.
     get("/finance/refund-receipts", AdminFinanceAccountingController, :refund_receipts)
     get("/finance/refund-receipts/:id", AdminFinanceAccountingController, :refund_receipt)
 
@@ -748,7 +748,7 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/share", PRController, :share)
   end
 
-  # ADR-111: personal PR sharing (global, not tenant-scoped).
+  # ADR-119: personal PR sharing (global, not tenant-scoped).
   scope "/api/pr-sharing", MilosTrainingWeb do
     pipe_through([
       :api,

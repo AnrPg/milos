@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance.FinanceAccountingStore do
-  @moduledoc "Tenant-scoped facade over the configured ADR-108 accounting store adapter."
+  @moduledoc "Tenant-scoped facade over the configured ADR-116 accounting store adapter."
 
   @behaviour MilosTraining.Finance.Ports.FinanceAccountingStore
 

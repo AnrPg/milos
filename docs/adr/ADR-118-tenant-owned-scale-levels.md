@@ -1,4 +1,4 @@
-# ADR-110: Tenant-Owned Scale Levels
+# ADR-118: Tenant-Owned Scale Levels
 Date: 2026-10-12
 Status: Accepted
 
@@ -9,7 +9,7 @@ The schema predates multi-tenancy: `scale_levels` had no `organization_id`, no
 RLS, and globally unique `slug` and active `sort_order` indexes. Because
 `PUT /api/org/:slug/admin/scale-levels` (`ReplaceScaleLevels`) replaced that
 single table, any gym's admin could rename, reorder or delete every other
-gym's scale levels (TD-048, found during TD-044 / ADR-096). The DSL preflight
+gym's scale levels (TD-056, found during TD-044 / ADR-104). The DSL preflight
 and the workout authoring path also resolved slugs against the global set.
 
 The owner approved the schema change, including replacing the global unique
@@ -42,7 +42,7 @@ context:
 ## Rationale
 Per-organization rows are the model the product already assumed (admins
 configure "their" levels) and match every other tenant table, so the existing
-RLS harness, purge/export policy (ADR-099) and tenancy audit cover them with
+RLS harness, purge/export policy (ADR-107) and tenancy audit cover them with
 no special cases. Executions and training-log entries store the *slug*, which
 each organization's copy keeps, so historical rows need no rewrite and keep
 materializing correctly.

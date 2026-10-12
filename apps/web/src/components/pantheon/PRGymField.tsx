@@ -9,7 +9,7 @@ export const PERSONAL_PR_GYM = "";
 export type PRGymOption = { slug: string; name: string };
 
 /**
- * ADR-111: the gyms a new PR can be recorded in and the default choice (the
+ * ADR-119: the gyms a new PR can be recorded in and the default choice (the
  * selected gym when the caller belongs to it, else "personal").
  */
 export function usePRGymOptions(): { gyms: PRGymOption[]; defaultGymSlug: string } {

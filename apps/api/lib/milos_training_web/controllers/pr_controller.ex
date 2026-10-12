@@ -75,7 +75,7 @@ defmodule MilosTrainingWeb.PRController do
              type: :string,
              nullable: true,
              description:
-               "Gym the PR was achieved in (ADR-111). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR."
+               "Gym the PR was achieved in (ADR-119). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR."
            })
        }},
     responses: [

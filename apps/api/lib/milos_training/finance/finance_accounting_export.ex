@@ -1,6 +1,6 @@
 defmodule MilosTraining.Finance.FinanceAccountingExport do
   @moduledoc """
-  Audit record of one accounting export run (ADR-108): requester, range,
+  Audit record of one accounting export run (ADR-116): requester, range,
   execution mode, status and the stored artifact's key, size and SHA-256.
   """
 

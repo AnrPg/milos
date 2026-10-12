@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RequestFinanceAccountingExport do
   @moduledoc """
-  Starts an accounting export for an inclusive date range (ADR-108).
+  Starts an accounting export for an inclusive date range (ADR-116).
 
   The run is recorded first (who, when, range, mode) so every attempt is
   auditable. Ranges up to #{MilosTraining.Finance.Domain.AccountingExport.inline_max_days()}

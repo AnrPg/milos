@@ -170,7 +170,7 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
     put_bearer_token(conn, athlete)
   end
 
-  # ADR-110: scale levels are tenant-owned; these workouts live in the legacy
+  # ADR-118: scale levels are tenant-owned; these workouts live in the legacy
   # organization, so its set is the one configured.
   defp legacy_scope! do
     {:ok, organization} = MilosTraining.Organizations.ensure_legacy_organization_for_migration()

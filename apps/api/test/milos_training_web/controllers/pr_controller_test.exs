@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.PRControllerTest do
   @moduledoc """
   Pantheon PR endpoints under the RLS-enforcing runtime role (ConnCase
-  default). Before ADR-111 these ran without any ownership scope, so every
+  default). Before ADR-119 these ran without any ownership scope, so every
   write was rejected by `user_pr_records_owner_policy` in production.
   """
 

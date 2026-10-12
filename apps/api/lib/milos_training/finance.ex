@@ -385,7 +385,7 @@ defmodule MilosTraining.Finance do
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
 
-  # ADR-108 refund receipts, payment-provider reconciliation and accounting
+  # ADR-116 refund receipts, payment-provider reconciliation and accounting
   # exports. All of them attach to the append-only payment/reversal facts.
   defdelegate list_refund_receipts(filters), to: Queries.ListRefundReceipts, as: :call
 

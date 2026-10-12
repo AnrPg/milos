@@ -541,7 +541,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
                  scoped_finance_key("payment_reversal:#{payment.id}", membership.id, params),
                "params" => reversal_params(params, payment.id)
              }),
-           # ADR-108: the refund receipt is issued in the same transaction as
+           # ADR-116: the refund receipt is issued in the same transaction as
            # the reversal fact, so a receipt number is never consumed for a
            # reversal that rolled back (and replays return the same receipt).
            {:ok, _receipt} <-

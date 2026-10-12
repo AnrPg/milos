@@ -1,6 +1,6 @@
 defmodule MilosTrainingWeb.AdminFinanceAccountingController do
   @moduledoc """
-  Staff endpoints for ADR-108: refund receipts, manual payment-provider
+  Staff endpoints for ADR-116: refund receipts, manual payment-provider
   reconciliation and accounting exports. Tenant-scoped through
   `conn.assigns.tenant_context`; the admin pipeline restricts them to
   organization owners and admins.
