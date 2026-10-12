@@ -4,6 +4,7 @@
 
 
 
+import { AssigneeRoleBadge } from "@/components/workouts/AssigneeRoleBadge";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeAdminAssignmentError, localizeError } from "@/i18n/presentation";
 import { useEffect, useState } from "react";
@@ -76,7 +77,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
     let cancelled = false;
 
     const timeoutId = window.setTimeout(() => {
-      void listAthletes(tokens.access_token!, query)
+      void listAthletes(tokens.access_token!, query, { includeMembers: true })
         .then((nextAthletes) => {
           if (!cancelled) setAthletes(nextAthletes);
         })
@@ -307,7 +308,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                         }
                         type="button"
                       >
-                        <span className="font-semibold">{athlete.nickname}</span>
+                        <span className="font-semibold">{athlete.nickname}<AssigneeRoleBadge role={athlete.role} /></span>
                         <span className="text-xs uppercase tracking-[0.18em]">
                           {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
                         </span>

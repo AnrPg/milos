@@ -4,6 +4,7 @@
 
 
 
+import { AssigneeRoleBadge } from "@/components/workouts/AssigneeRoleBadge";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useEffect, useId, useState } from "react";
@@ -75,7 +76,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
 
     let cancelled = false;
     const timer = window.setTimeout(() => {
-      void listAthletes(accessToken, athleteQuery)
+      void listAthletes(accessToken, athleteQuery, { includeMembers: true })
         .then((result) => { if (!cancelled) setAthletes(result); })
         .catch(() => { if (!cancelled) setAthletes([]); });
     }, 150);
@@ -306,6 +307,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                             type="button"
                           >
                             <span className="truncate font-semibold">{athlete.nickname}</span>
+                            <AssigneeRoleBadge role={athlete.role} />
                             <span className="text-[11px] uppercase tracking-[0.18em]">
                               {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
                             </span>
