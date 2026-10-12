@@ -2,17 +2,32 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import type { ChatMessage } from "@/api/messaging";
+import { OutboxFailureControls } from "@/components/outbox/OutboxFailureControls";
 import type { DisplayChatMessage } from "@/lib/offline-message-outbox";
 
 interface MessageBubbleProps {
   message: ChatMessage | DisplayChatMessage;
   isOwnMessage: boolean;
   senderNickname?: string;
+  /** Re-enqueue a failed message with its original operation id (ADR-102). */
+  onRetry?: (operationId: string) => void | Promise<void>;
+  /** Drop a failed message from the device outbox after confirmation. */
+  onDiscard?: (operationId: string) => void | Promise<void>;
 }
 
-export function MessageBubble({ message, isOwnMessage, senderNickname }: MessageBubbleProps) {
+export function MessageBubble({
+  message,
+  isOwnMessage,
+  senderNickname,
+  onRetry,
+  onDiscard,
+}: MessageBubbleProps) {
   const i18n = useUiTranslations();
   const isCoachingNote = message.message_type === "coaching_note";
+  const failedOperationId =
+    "delivery_status" in message && message.delivery_status === "failed"
+      ? (message.client_operation_id ?? null)
+      : null;
   const time = new Date(message.inserted_at).toLocaleTimeString([], {
     hour: "2-digit",
     minute: "2-digit",
@@ -55,6 +70,17 @@ export function MessageBubble({ message, isOwnMessage, senderNickname }: Message
           ? ` · ${i18n("messageCouldNotBeSent7aa3b0a")}`
           : ""}
       </span>
+      {isOwnMessage && failedOperationId && onRetry && onDiscard ? (
+        <div className="px-1" role="status">
+          <OutboxFailureControls
+            align="end"
+            failure={"delivery_failure" in message ? message.delivery_failure : undefined}
+            confirmKey="outboxDiscardMessageConfirm"
+            onRetry={() => onRetry(failedOperationId)}
+            onDiscard={() => onDiscard(failedOperationId)}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }

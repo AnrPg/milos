@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { type ChatMessage, fetchThreadMessages, markThreadRead } from "@/api/messaging";
 import {
   deliverQueuedMessage,
+  discardQueuedMessageOperation,
   type DisplayChatMessage,
   listQueuedMessageOperations,
   mergeMessagesWithPending,
@@ -16,6 +17,7 @@ import {
   queueMessageOperation,
   recordMessageDeliveryFailure,
   removeQueuedMessageOperation,
+  retryQueuedMessageOperation,
   type QueuedMessageOperation,
 } from "@/lib/offline-message-outbox";
 import { joinChannelWithPush, organizationTopic } from "@/lib/realtime";
@@ -36,6 +38,10 @@ interface UseChatReturn {
   typingUsers: TypingUser[];
   isLoading: boolean;
   sendMessage: (body: string, messageType?: string) => Promise<DisplayChatMessage>;
+  /** Re-enqueues a failed message with its original operation id (ADR-102). */
+  retryMessage: (operationId: string) => Promise<void>;
+  /** Removes a failed message from the device outbox; it is never sent. */
+  discardMessage: (operationId: string) => Promise<void>;
   sendTypingStart: () => void;
   sendTypingStop: () => void;
 }
@@ -159,21 +165,9 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
     };
   }, [threadId, tokenReady, currentUserId, invalidateUnreadCount]);
 
-  const sendMessage = useCallback(
-    async (body: string, messageType = "chat") => {
-      if (!threadId || !accessToken || !currentUserId) {
-        throw new Error(i18n("chatDisconnectedError"));
-      }
-
-      const operation = await queueMessageOperation(
-        currentUserId,
-        threadId,
-        body,
-        messageType as QueuedMessageOperation["messageType"],
-      );
-      setQueuedMessages((previous) => [...previous, operation]);
-
-      if (!navigator.onLine) return operationToDisplayMessage(operation);
+  const deliverOperation = useCallback(
+    async (operation: QueuedMessageOperation): Promise<DisplayChatMessage> => {
+      if (!accessToken || !navigator.onLine) return operationToDisplayMessage(operation);
 
       try {
         const delivered = await deliverQueuedMessage(accessToken, operation);
@@ -192,7 +186,45 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
         return operationToDisplayMessage(updated);
       }
     },
-    [accessToken, currentUserId, i18n, threadId],
+    [accessToken],
+  );
+
+  const retryMessage = useCallback(
+    async (operationId: string) => {
+      const operation = queuedMessages.find((item) => item.operationId === operationId);
+      if (!operation) return;
+
+      const retried = await retryQueuedMessageOperation(operation);
+      setQueuedMessages((previous) =>
+        previous.map((item) => (item.operationId === operationId ? retried : item)),
+      );
+      await deliverOperation(retried);
+    },
+    [deliverOperation, queuedMessages],
+  );
+
+  const discardMessage = useCallback(async (operationId: string) => {
+    await discardQueuedMessageOperation(operationId);
+    setQueuedMessages((previous) => previous.filter((item) => item.operationId !== operationId));
+  }, []);
+
+  const sendMessage = useCallback(
+    async (body: string, messageType = "chat") => {
+      if (!threadId || !accessToken || !currentUserId) {
+        throw new Error(i18n("chatDisconnectedError"));
+      }
+
+      const operation = await queueMessageOperation(
+        currentUserId,
+        threadId,
+        body,
+        messageType as QueuedMessageOperation["messageType"],
+      );
+      setQueuedMessages((previous) => [...previous, operation]);
+
+      return deliverOperation(operation);
+    },
+    [accessToken, currentUserId, deliverOperation, i18n, threadId],
   );
 
   const sendTypingStart = useCallback(() => {
@@ -203,7 +235,16 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
     void channelRef.current?.push<{ typing: boolean }>("typing_stop", {}).catch(() => undefined);
   }, []);
 
-  return { messages, typingUsers, isLoading, sendMessage, sendTypingStart, sendTypingStop };
+  return {
+    messages,
+    typingUsers,
+    isLoading,
+    sendMessage,
+    retryMessage,
+    discardMessage,
+    sendTypingStart,
+    sendTypingStop,
+  };
 }
 
 function upsertServerMessage(messages: ChatMessage[], incoming: ChatMessage) {

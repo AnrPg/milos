@@ -68,8 +68,16 @@ export function ChatSection({
     };
   }, [isExpanded, accessToken, contextType, contextId, thread]);
 
-  const { messages, typingUsers, isLoading, sendMessage, sendTypingStart, sendTypingStop } =
-    useChat({
+  const {
+    messages,
+    typingUsers,
+    isLoading,
+    sendMessage,
+    retryMessage,
+    discardMessage,
+    sendTypingStart,
+    sendTypingStop,
+  } = useChat({
       threadId: isExpanded ? (thread?.id ?? null) : null,
       accessToken,
       currentUserId,
@@ -129,6 +137,8 @@ export function ChatSection({
                 message={msg}
                 isOwnMessage={msg.sender_id === currentUserId}
                 senderNickname={participantNicknames[msg.sender_id]}
+                onRetry={retryMessage}
+                onDiscard={discardMessage}
               />
             ))}
             <TypingIndicator typingUsers={typingUsers} />
