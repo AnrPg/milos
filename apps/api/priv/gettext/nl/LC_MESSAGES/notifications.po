@@ -171,3 +171,15 @@ msgstr "Je voedingsplan is bijgewerkt"
 
 msgid "Open it to see what changed."
 msgstr "Open het om te zien wat er is veranderd."
+
+msgid "New appointment booked"
+msgstr "Nieuwe afspraak geboekt"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} heeft een sessie geboekt voor %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Afspraak geannuleerd"
+
+msgid "The session on %{time} was cancelled."
+msgstr "De sessie van %{time} is geannuleerd."

@@ -1353,7 +1353,16 @@ defmodule MilosTrainingWeb.FallbackController do
     location_not_found: {:not_found, "Location not found"},
     location_archived: {:unprocessable_entity, "The location is archived"},
     # ADR-098
-    form_review_closed: {:conflict, "The form review is already closed"}
+    form_review_closed: {:conflict, "The form review is already closed"},
+    appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},
+    appointment_slot_in_past: {:unprocessable_entity, "The appointment has already started"},
+    appointment_slot_full: {:conflict, "The appointment is full"},
+    appointment_format_not_included:
+      {:forbidden, "This session format is not included in the package"},
+    appointment_coach_not_included: {:forbidden, "This coach is not included in the package"},
+    appointment_not_active: {:conflict, "The appointment is no longer active"},
+    appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
+    invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

@@ -84,5 +84,6 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback cancel_freeze(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_freezes(binary()) :: [map()]
   @callback booking_terms(binary(), Date.t()) :: map()
+  @callback allowance_terms(binary(), atom(), Date.t()) :: map() | nil
   @callback subscriptions_due_for_expiry_reminder(Date.t()) :: [map()]
 end

@@ -171,3 +171,15 @@ msgstr "Il tuo piano alimentare è stato aggiornato"
 
 msgid "Open it to see what changed."
 msgstr "Aprilo per vedere cosa è cambiato."
+
+msgid "New appointment booked"
+msgstr "Nuovo appuntamento prenotato"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} ha prenotato una sessione per %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Appuntamento annullato"
+
+msgid "The session on %{time} was cancelled."
+msgstr "La sessione del %{time} è stata annullata."

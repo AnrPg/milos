@@ -74,6 +74,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     coaching/form_review_store
     facility/facility_store
     content/content_store
+    appointments/appointment_store
     nutrition/nutrition_store
   )
 

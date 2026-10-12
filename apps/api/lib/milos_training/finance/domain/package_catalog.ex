@@ -19,6 +19,9 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
   @released_ahead ~w[
     content.on_demand_video content.advanced_analytics
     online_coaching.form_reviews online_coaching.response_sla_hours online_coaching.nutrition_plan
+    personal_training.included personal_training.sessions personal_training.format
+    personal_training.group_size personal_training.session_minutes personal_training.coach_id
+    personal_training.assessments
   ]
 
   @quota_periods ["calendar_week", "calendar_month", "subscription_period"]

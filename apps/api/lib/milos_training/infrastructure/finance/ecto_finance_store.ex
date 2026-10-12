@@ -1280,6 +1280,26 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   end
 
   @impl true
+  def allowance_terms(user_id, allowance, occurred_on) do
+    with %Membership{} = membership <-
+           tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      membership.id
+      |> effective_subscriptions(occurred_on)
+      |> Enum.find_value(fn subscription ->
+        case EntitlementPlan.parse(subscription.params_snapshot || %{}) do
+          {:ok, %{allowances: allowances} = plan} when is_map_key(allowances, allowance) ->
+            plan.terms
+
+          _other ->
+            nil
+        end
+      end)
+    else
+      _missing -> nil
+    end
+  end
+
+  @impl true
   def booking_terms(user_id, occurred_on) do
     with %Membership{} = membership <-
            tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one(),

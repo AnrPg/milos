@@ -103,16 +103,16 @@ defmodule MilosTraining.Finance.PackageTypesTest do
                  }
                })
 
-      assert {:error, {:entitlement_not_available, "personal_training.assessments"}} =
+      assert {:error, {:entitlement_not_available, "content.workout_library"}} =
                Finance.create_package(%{
                  name: "Annual",
                  package_type: "membership",
                  billing_period: "annual",
-                 fields: %{"personal_training.assessments" => 2}
+                 fields: %{"content.workout_library" => true}
                })
 
       assert {:error, :package_type_not_available} =
-               Finance.create_package(%{name: "PT", package_type: "pt_pack"})
+               Finance.create_package(%{name: "Corporate", package_type: "corporate"})
     end
 
     test "records changed fields and blocks type changes once the package is sold" do

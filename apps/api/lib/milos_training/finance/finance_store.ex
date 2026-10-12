@@ -213,6 +213,10 @@ defmodule MilosTraining.Finance.FinanceStore do
   def booking_terms(user_id, occurred_on), do: adapter().booking_terms(user_id, occurred_on)
 
   @impl true
+  def allowance_terms(user_id, allowance, occurred_on),
+    do: adapter().allowance_terms(user_id, allowance, occurred_on)
+
+  @impl true
   def subscriptions_due_for_expiry_reminder(today),
     do: adapter().subscriptions_due_for_expiry_reminder(today)
 end

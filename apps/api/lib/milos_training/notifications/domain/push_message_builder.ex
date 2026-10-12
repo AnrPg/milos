@@ -263,6 +263,27 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("appointment_booked", payload, localize) do
+    %{
+      title: localize.("New appointment booked", %{}),
+      body:
+        localize.("%{client} booked a session for %{time}.", %{
+          client: payload["client_nickname"] || "",
+          time: payload["starts_at"] || ""
+        }),
+      url: payload["url"] || "/staff/appointments"
+    }
+  end
+
+  def build("appointment_cancelled", payload, localize) do
+    %{
+      title: localize.("Appointment cancelled", %{}),
+      body:
+        localize.("The session on %{time} was cancelled.", %{time: payload["starts_at"] || ""}),
+      url: payload["url"] || "/account/coaching"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

@@ -68,6 +68,13 @@ config :milos_training,
 
 config :milos_training, :content_store, MilosTraining.Infrastructure.Content.EctoContentStore
 
+# Stores the API spec once instead of once per first-seen action (literal area).
+config :open_api_spex, :cache_adapter, MilosTrainingWeb.ApiSpecCache
+
+config :milos_training,
+       :appointment_store,
+       MilosTraining.Infrastructure.Appointments.EctoAppointmentStore
+
 config :milos_training,
        :coaching_form_review_store,
        MilosTraining.Infrastructure.Coaching.EctoFormReviewStore

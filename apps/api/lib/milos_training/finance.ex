@@ -414,6 +414,13 @@ defmodule MilosTraining.Finance do
   def booking_terms(context, user_id, occurred_on),
     do: scoped(context, fn -> booking_terms(user_id, occurred_on) end)
 
+  @doc """
+  Terms of the package that would pay for `allowance` on that day (ADR-098),
+  or nil when no held package includes it.
+  """
+  def allowance_terms(context, user_id, allowance, occurred_on),
+    do: scoped(context, fn -> FinanceStore.allowance_terms(user_id, allowance, occurred_on) end)
+
   def subscriptions_due_for_expiry_reminder(context, today),
     do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

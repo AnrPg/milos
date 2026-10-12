@@ -154,21 +154,21 @@ defmodule MilosTraining.Finance.Domain.PackageContractTest do
     end
 
     test "unimplemented fields cannot deviate from the preset" do
-      assert {:error, {:entitlement_not_available, "personal_training.assessments"}} =
+      assert {:error, {:entitlement_not_available, "content.workout_library"}} =
                PackageContract.normalize(%{
                  "package_type" => "membership",
-                 "fields" => %{"personal_training.assessments" => 3}
+                 "fields" => %{"content.workout_library" => true}
                })
 
       assert {:ok, _} =
                PackageContract.normalize(%{
                  "package_type" => "membership",
-                 "fields" => %{"personal_training.assessments" => 0}
+                 "fields" => %{"content.workout_library" => false}
                })
     end
 
     test "unimplemented types cannot be created" do
-      for type <- ["pt_pack", "add_on", "shared", "corporate"] do
+      for type <- ["add_on", "shared", "corporate"] do
         assert {:error, :package_type_not_available} =
                  PackageContract.normalize(%{"package_type" => type})
       end

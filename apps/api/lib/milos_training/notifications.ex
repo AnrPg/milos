@@ -204,6 +204,25 @@ defmodule MilosTraining.Notifications do
         url: "/account/coaching"
       })
 
+  def process_event("appointment_booked", payload),
+    do:
+      enqueue_simple(:appointment_booked, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        client_nickname: field(payload, :client_nickname),
+        url: "/staff/appointments"
+      })
+
+  def process_event("appointment_cancelled", payload),
+    do:
+      enqueue_simple(:appointment_cancelled, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        url: "/account/coaching"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),

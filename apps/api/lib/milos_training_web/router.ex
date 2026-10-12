@@ -207,6 +207,10 @@ defmodule MilosTrainingWeb.Router do
     post("/form-reviews", CoachingExtrasController, :submit_form_review)
     post("/form-reviews/:id/withdraw", CoachingExtrasController, :withdraw_form_review)
     get("/nutrition-plan", CoachingExtrasController, :my_nutrition_plan)
+    get("/appointments/slots", AppointmentsController, :offered_slots)
+    get("/appointments", AppointmentsController, :my_appointments)
+    post("/appointments", AppointmentsController, :book)
+    post("/appointments/:id/cancel", AppointmentsController, :cancel)
     get("/progress", MyContentController, :progress)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     get("/reviews", ReviewController, :index)
@@ -273,6 +277,12 @@ defmodule MilosTrainingWeb.Router do
     get("/reply-queue", CoachingExtrasController, :reply_queue)
     get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
     put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
+    get("/appointment-slots", AppointmentsController, :slots)
+    post("/appointment-slots", AppointmentsController, :create_slot)
+    post("/appointment-slots/:id/cancel", AppointmentsController, :cancel_slot)
+    post("/appointment-slots/:id/bookings", AppointmentsController, :book_for_client)
+    post("/appointments/:id/attendance", AppointmentsController, :attendance)
+    post("/appointments/:id/cancel", AppointmentsController, :cancel)
   end
 
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do

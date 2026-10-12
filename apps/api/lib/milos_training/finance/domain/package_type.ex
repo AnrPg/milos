@@ -44,7 +44,7 @@ defmodule MilosTraining.Finance.Domain.PackageType do
   def fetch(_), do: {:error, :invalid_package_type}
 
   # Types and modules released ahead of their phase (ADR-098 rollout).
-  @released_ahead ~w[digital_content]
+  @released_ahead ~w[digital_content pt_pack personal_training]
 
   def available?(%{key: key, phase: phase}),
     do:

@@ -171,3 +171,15 @@ msgstr "Ваш план питания обновлён"
 
 msgid "Open it to see what changed."
 msgstr "Откройте, чтобы увидеть изменения."
+
+msgid "New appointment booked"
+msgstr "Новая запись на сессию"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} записался(-ась) на сессию на %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Сессия отменена"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Сессия %{time} отменена."

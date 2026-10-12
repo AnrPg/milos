@@ -171,3 +171,15 @@ msgstr "תוכנית התזונה שלך עודכנה"
 
 msgid "Open it to see what changed."
 msgstr "פתח/י כדי לראות מה השתנה."
+
+msgid "New appointment booked"
+msgstr "נקבעה פגישה חדשה"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} קבע/ה מפגש ל-%{time}."
+
+msgid "Appointment cancelled"
+msgstr "הפגישה בוטלה"
+
+msgid "The session on %{time} was cancelled."
+msgstr "המפגש ב-%{time} בוטל."

@@ -171,3 +171,15 @@ msgstr "Хранителният ви план е обновен"
 
 msgid "Open it to see what changed."
 msgstr "Отворете го, за да видите промените."
+
+msgid "New appointment booked"
+msgstr "Нов записан час"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} запази сесия за %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Часът е отменен"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Сесията на %{time} е отменена."

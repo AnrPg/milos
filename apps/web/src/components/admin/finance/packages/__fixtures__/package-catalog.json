@@ -24,7 +24,7 @@
     {
       "enabled": false,
       "key": "personal_training",
-      "available": false
+      "available": true
     },
     {
       "enabled": false,
@@ -276,14 +276,14 @@
       "key": "personal_training.included",
       "kind": "boolean",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
       "key": "personal_training.sessions",
       "kind": "quota",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
@@ -294,7 +294,7 @@
       "key": "personal_training.format",
       "kind": "enum",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
@@ -303,7 +303,7 @@
       "key": "personal_training.group_size",
       "kind": "integer",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
@@ -316,14 +316,14 @@
       "key": "personal_training.session_minutes",
       "kind": "integer_option",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
       "key": "personal_training.coach_id",
       "kind": "uuid_or_null",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
@@ -332,7 +332,7 @@
       "key": "personal_training.assessments",
       "kind": "integer",
       "phase": "c",
-      "available": false,
+      "available": true,
       "section": "personal_training"
     },
     {
@@ -1032,7 +1032,7 @@
     {
       "enabled": false,
       "key": "pt_pack",
-      "available": false,
+      "available": true,
       "preset": {
         "facility.amenities_note": null,
         "perks.guest_passes": {

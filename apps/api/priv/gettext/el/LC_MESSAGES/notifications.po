@@ -171,3 +171,15 @@ msgstr "Το διατροφικό σου πλάνο ενημερώθηκε"
 
 msgid "Open it to see what changed."
 msgstr "Άνοιξέ το για να δεις τι άλλαξε."
+
+msgid "New appointment booked"
+msgstr "Νέο ραντεβού"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "Ο/Η %{client} έκλεισε συνεδρία για %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Το ραντεβού ακυρώθηκε"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Η συνεδρία της %{time} ακυρώθηκε."
