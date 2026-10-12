@@ -13,6 +13,11 @@ defmodule MilosTraining.Messaging do
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: ThreadStore.with_tenant_context(context, fun)
 
+  # ADR-105 staff response latency facts.
+  defdelegate first_staff_response_facts(messages, new_message, staff_ids),
+    to: MilosTraining.Messaging.Domain.ResponseLatency,
+    as: :first_staff_response
+
   defdelegate get_or_create_thread(params), to: GetOrCreateThread, as: :call
   defdelegate send_message(params), to: SendMessage, as: :call
   defdelegate send_message(params, delivery), to: SendMessage, as: :call
