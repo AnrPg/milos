@@ -12,7 +12,7 @@ defmodule MilosTraining.Finance.Domain.PackageCatalog do
   owning phase ships enforcement and product surfaces.
   """
 
-  @implemented_phases [:a]
+  @implemented_phases [:a, :b]
 
   @quota_periods ["calendar_week", "calendar_month", "subscription_period"]
   @duration_units ["day", "week", "month"]

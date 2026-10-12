@@ -230,6 +230,9 @@ defmodule MilosTraining.Finance.Domain.PackageContract do
       {invalid_group_size?(fields), :group_size_matches_format, "personal_training.group_size"},
       {limits_outside_scope?(fields), :class_type_limit_outside_scope,
        "group_classes.class_type_limits"},
+      {fields["perks.member_discount_percent"] > 0 and
+         fields["perks.member_discount_scope"] == [], :discount_scope_required,
+       "perks.member_discount_scope"},
       {is_binary(fields["terms.conversion_package_id"]) and type_key != "trial",
        :conversion_only_for_trials, "terms.conversion_package_id"}
     ]

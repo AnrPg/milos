@@ -66,7 +66,7 @@ defmodule MilosTraining.Finance.Domain.PackagePresets do
     "perks.member_discount_percent" => 0,
     "perks.member_discount_scope" => [],
     "perks.events" => false,
-    "perks.event_visits" => %{"limit" => 0, "period" => "calendar_month"}
+    "perks.event_visits" => %{"limit" => "unlimited", "period" => "calendar_month"}
   }
 
   @whole_validity "subscription_period"

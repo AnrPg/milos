@@ -16,4 +16,17 @@ defmodule MilosTraining.Finance.Domain.AllowancePeriod do
     ends_on = Map.get(subscription, :ends_on) || Map.get(subscription, "ends_on") || date
     {starts_on, ends_on}
   end
+
+  @doc "Bounds of the period immediately before the one containing `date` (calendar periods only)."
+  def previous_bounds(:calendar_week, %Date{} = date) do
+    {start_date, _} = bounds(:calendar_week, date, %{})
+    bounds(:calendar_week, Date.add(start_date, -1), %{})
+  end
+
+  def previous_bounds(:calendar_month, %Date{} = date) do
+    {start_date, _} = bounds(:calendar_month, date, %{})
+    bounds(:calendar_month, Date.add(start_date, -1), %{})
+  end
+
+  def previous_bounds(_period, _date), do: nil
 end

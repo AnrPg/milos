@@ -6,12 +6,13 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
   input. Package family and tags deliberately have no authorization meaning.
   """
 
-  @channels ~w[in_person workout_library personal_programming coach_messaging]a
+  @channels ~w[in_person workout_library personal_programming coach_messaging events facility]a
   @capabilities ~w[
     book_classes execute_class_workouts execute_library_workouts
     execute_assigned_workouts receive_coaching_touchpoints
+    book_events bring_guests open_gym
   ]a
-  @allowances ~w[class_visits coaching_touchpoints]a
+  @allowances ~w[class_visits coaching_touchpoints event_visits guest_passes open_gym_visits]a
   @periods ~w[calendar_week calendar_month subscription_period]a
 
   @class_type_allowance_prefix "class_visits:"
@@ -21,7 +22,10 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
             channels: MapSet.new(),
             capabilities: MapSet.new(),
             allowances: %{},
-            class_type_scope: :all
+            class_type_scope: :all,
+            location_scope: :all,
+            time_windows: [],
+            terms: %{}
 
   def parse(%__MODULE__{} = plan), do: {:ok, plan}
 
@@ -85,24 +89,35 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
       coaching? = fields["online_coaching.included"] == true
       programming? = coaching? and fields["online_coaching.assigned_programming"] == true
       messaging? = coaching? and fields["online_coaching.messaging"] == true
+      events? = fields["perks.events"] == true
+      open_gym? = fields["facility.open_gym"] == true
+      guests? = classes? and quota_granted?(fields["perks.guest_passes"])
 
       channels =
         []
         |> add_if(classes?, :in_person)
         |> add_if(programming?, :personal_programming)
         |> add_if(messaging?, :coach_messaging)
+        |> add_if(events?, :events)
+        |> add_if(open_gym?, :facility)
 
       capabilities =
         []
         |> add_if(classes?, [:book_classes, :execute_class_workouts])
         |> add_if(programming?, :execute_assigned_workouts)
         |> add_if(coaching?, :receive_coaching_touchpoints)
+        |> add_if(events?, [:book_events, :execute_class_workouts])
+        |> add_if(guests?, :bring_guests)
+        |> add_if(open_gym?, :open_gym)
 
       allowances =
         %{}
         |> put_quota_if(classes?, :class_visits, fields["group_classes.visits"])
         |> put_quota_if(coaching?, :coaching_touchpoints, fields["online_coaching.touchpoints"])
         |> put_class_type_quotas(classes?, fields["group_classes.class_type_limits"])
+        |> put_quota_if(events?, :event_visits, fields["perks.event_visits"])
+        |> put_quota_if(guests?, :guest_passes, fields["perks.guest_passes"])
+        |> put_quota_if(open_gym?, :open_gym_visits, fields["facility.open_gym_visits"])
 
       {:ok,
        %__MODULE__{
@@ -111,7 +126,10 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
          channels: MapSet.new(channels),
          capabilities: MapSet.new(capabilities),
          allowances: allowances,
-         class_type_scope: class_type_scope(fields["group_classes.class_types"])
+         class_type_scope: class_type_scope(fields["group_classes.class_types"]),
+         location_scope: class_type_scope(fields["facility.location_ids"]),
+         time_windows: fields["group_classes.time_windows"] || [],
+         terms: terms(fields)
        }}
     end
   end
@@ -154,6 +172,47 @@ defmodule MilosTraining.Finance.Domain.EntitlementPlan do
       counted_kinds: []
     }
   end
+
+  defp quota_granted?(%{"limit" => 0}), do: false
+  defp quota_granted?(%{"limit" => _}), do: true
+  defp quota_granted?(_), do: false
+
+  # Contract terms read by enforcement outside the allowance ledger (ADR-097).
+  defp terms(fields) do
+    %{
+      booking_window_days: fields["booking.window_days"],
+      cancellation_cutoff_hours: fields["booking.cancellation_cutoff_hours"],
+      waitlist_priority: fields["booking.waitlist_priority"] || "normal",
+      no_show_penalty_waived: fields["booking.no_show_penalty_waived"] == true,
+      rollover_max: fields["group_classes.rollover_max"] || 0,
+      freeze_days_per_year: fields["perks.freeze_days_per_year"] || 0,
+      member_discount_percent: fields["perks.member_discount_percent"] || 0,
+      member_discount_scope: fields["perks.member_discount_scope"] || [],
+      minimum_commitment_months: fields["terms.minimum_commitment_months"] || 0,
+      joining_fee_cents: fields["terms.joining_fee_cents"] || 0,
+      validity_starts: fields["terms.validity_starts"] || "purchase",
+      expiry_reminder_days: fields["terms.expiry_reminder_days"] || 0,
+      validity: fields["terms.validity"]
+    }
+  end
+
+  @doc "Whether a local weekday (1 = Monday) and time fall inside the plan's allowed windows."
+  def within_time_windows?(%__MODULE__{time_windows: []}, _weekday, _time), do: true
+  def within_time_windows?(_plan, nil, _time), do: true
+
+  def within_time_windows?(%__MODULE__{time_windows: windows}, weekday, %Time{} = time) do
+    Enum.any?(windows, fn %{"days" => days, "from" => from, "to" => to} ->
+      weekday in days and
+        Time.compare(time, Time.from_iso8601!(from <> ":00")) != :lt and
+        Time.compare(time, Time.from_iso8601!(to <> ":00")) == :lt
+    end)
+  end
+
+  def location_included?(%__MODULE__{location_scope: :all}, _location_id), do: true
+  def location_included?(_plan, nil), do: true
+
+  def location_included?(%__MODULE__{location_scope: scope}, location_id),
+    do: MapSet.member?(scope, location_id)
 
   defp class_type_scope("all"), do: :all
   defp class_type_scope(ids) when is_list(ids), do: MapSet.new(ids)

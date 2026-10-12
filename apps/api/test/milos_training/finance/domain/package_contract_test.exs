@@ -154,20 +154,16 @@ defmodule MilosTraining.Finance.Domain.PackageContractTest do
     end
 
     test "unimplemented fields cannot deviate from the preset" do
-      assert {:error, {:entitlement_not_available, "perks.guest_passes"}} =
+      assert {:error, {:entitlement_not_available, "personal_training.assessments"}} =
                PackageContract.normalize(%{
                  "package_type" => "membership",
-                 "fields" => %{
-                   "perks.guest_passes" => %{"limit" => 2, "period" => "calendar_month"}
-                 }
+                 "fields" => %{"personal_training.assessments" => 3}
                })
 
       assert {:ok, _} =
                PackageContract.normalize(%{
                  "package_type" => "membership",
-                 "fields" => %{
-                   "perks.guest_passes" => %{"limit" => 0, "period" => "calendar_month"}
-                 }
+                 "fields" => %{"personal_training.assessments" => 0}
                })
     end
 

@@ -14,12 +14,12 @@
     {
       "enabled": false,
       "key": "open_gym",
-      "available": false
+      "available": true
     },
     {
       "enabled": false,
       "key": "events",
-      "available": false
+      "available": true
     },
     {
       "enabled": false,
@@ -87,7 +87,7 @@
       "key": "terms.minimum_commitment_months",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -96,7 +96,7 @@
       "key": "terms.joining_fee_cents",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -107,7 +107,7 @@
       "key": "terms.validity_starts",
       "kind": "enum",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -116,7 +116,7 @@
       "key": "terms.expiry_reminder_days",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "terms"
     },
     {
@@ -226,14 +226,14 @@
       "key": "group_classes.rollover_max",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "group_classes"
     },
     {
       "key": "group_classes.time_windows",
       "kind": "time_windows",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "group_classes"
     },
     {
@@ -242,7 +242,7 @@
       "key": "booking.window_days",
       "kind": "gym_default_integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "booking"
     },
     {
@@ -253,7 +253,7 @@
       "key": "booking.waitlist_priority",
       "kind": "enum",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "booking"
     },
     {
@@ -262,14 +262,14 @@
       "key": "booking.cancellation_cutoff_hours",
       "kind": "gym_default_integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "booking"
     },
     {
       "key": "booking.no_show_penalty_waived",
       "kind": "boolean",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "booking"
     },
     {
@@ -414,21 +414,21 @@
       "key": "facility.open_gym",
       "kind": "boolean",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "facility"
     },
     {
       "key": "facility.open_gym_visits",
       "kind": "quota",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "facility"
     },
     {
       "key": "facility.location_ids",
       "kind": "scope_ids",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "facility"
     },
     {
@@ -457,7 +457,7 @@
       "key": "perks.guest_passes",
       "kind": "quota",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     },
     {
@@ -466,7 +466,7 @@
       "key": "perks.freeze_days_per_year",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     },
     {
@@ -475,7 +475,7 @@
       "key": "perks.member_discount_percent",
       "kind": "integer",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     },
     {
@@ -487,21 +487,21 @@
       "key": "perks.member_discount_scope",
       "kind": "enum_list",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     },
     {
       "key": "perks.events",
       "kind": "boolean",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     },
     {
       "key": "perks.event_visits",
       "kind": "quota",
       "phase": "b",
-      "available": false,
+      "available": true,
       "section": "perks"
     }
   ],
@@ -519,7 +519,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -643,7 +643,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -762,7 +762,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -905,7 +905,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -1042,7 +1042,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -1161,7 +1161,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -1295,7 +1295,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -1419,7 +1419,7 @@
         "booking.cancellation_cutoff_hours": null,
         "content.workout_library": false,
         "perks.event_visits": {
-          "limit": 0,
+          "limit": "unlimited",
           "period": "calendar_month"
         },
         "terms.joining_fee_cents": 0,
@@ -1516,7 +1516,8 @@
     }
   ],
   "implemented_phases": [
-    "a"
+    "a",
+    "b"
   ],
   "sections": [
     "terms",

@@ -103,12 +103,12 @@ defmodule MilosTraining.Finance.PackageTypesTest do
                  }
                })
 
-      assert {:error, {:entitlement_not_available, "perks.freeze_days_per_year"}} =
+      assert {:error, {:entitlement_not_available, "personal_training.assessments"}} =
                Finance.create_package(%{
                  name: "Annual",
                  package_type: "membership",
                  billing_period: "annual",
-                 fields: %{"perks.freeze_days_per_year" => 10}
+                 fields: %{"personal_training.assessments" => 2}
                })
 
       assert {:error, :package_type_not_available} =
