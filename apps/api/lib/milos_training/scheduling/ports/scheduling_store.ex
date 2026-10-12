@@ -48,6 +48,34 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
               map() | nil
   @callback create_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), pos_integer()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback create_booking(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              Ecto.UUID.t(),
+              pos_integer(),
+              keyword()
+            ) ::
+              {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @callback get_booking_by_client_operation(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
+              map() | nil
+  @callback resolve_booking_operation(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              %{
+                required(:status) => :approved | :rejected,
+                required(:admin_message) => String.t() | nil,
+                required(:resolution_operation_id) => Ecto.UUID.t() | nil
+              },
+              map() | nil
+            ) ::
+              {:ok, map(), :resolved | :replayed}
+              | {:error, Ecto.Changeset.t()}
+              | {:error,
+                 :not_found | :booking_not_pending | :slot_full | :idempotency_key_conflict}
+  @callback create_approved_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), keyword()) ::
+              {:ok, map()}
+              | {:error, Ecto.Changeset.t()}
+              | {:error, :not_found | :slot_full}
   @callback create_approved_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()}
               | {:error, Ecto.Changeset.t()}

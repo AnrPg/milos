@@ -12,6 +12,7 @@ defmodule MilosTraining.Scheduling do
     DeleteSlot,
     RecordAttendance,
     RejectBooking,
+    ResolveBookingOperation,
     SubmitBooking,
     SubmitAutoApprovedBooking,
     TimeoutBooking,
@@ -23,6 +24,7 @@ defmodule MilosTraining.Scheduling do
 
   alias MilosTraining.Scheduling.Queries.{
     GetBooking,
+    GetBookingByClientOperation,
     GetCalendarWeek,
     GetAttendance,
     GetApprovedBookingForClass,
@@ -133,8 +135,30 @@ defmodule MilosTraining.Scheduling do
 
   defdelegate submit_booking(user_id, slot_id, timeout_minutes), to: SubmitBooking, as: :call
 
+  @doc "ADR-102: `opts` may carry `client_operation_id:` for replay dedupe."
+  defdelegate submit_booking(context, user_id, slot_id, timeout_minutes, opts),
+    to: SubmitBooking,
+    as: :call
+
   defdelegate submit_auto_approved_booking(context, user_id, slot_id),
     to: SubmitAutoApprovedBooking,
+    as: :call
+
+  defdelegate submit_auto_approved_booking(context, user_id, slot_id, opts),
+    to: SubmitAutoApprovedBooking,
+    as: :call
+
+  defdelegate get_booking_by_client_operation(context, user_id, client_operation_id),
+    to: GetBookingByClientOperation,
+    as: :call
+
+  @doc """
+  ADR-102 idempotent admin resolution. `params` holds `:status`
+  (`:approved | :rejected`), `:admin_message`, and `:resolution_operation_id`.
+  Returns `{:ok, booking, :resolved | :replayed}`.
+  """
+  defdelegate resolve_booking_operation(context, id, params, reconciliation),
+    to: ResolveBookingOperation,
     as: :call
 
   defdelegate submit_auto_approved_booking(user_id, slot_id),
