@@ -2688,7 +2688,10 @@
     "editNotApplied": "„{text}“ steht nicht mehr im Text, daher wurde die Korrektur nicht übernommen. Prüfe erneut, um die Vorschläge zu aktualisieren.",
     "intervalSlot": "Intervall {slot}",
     "oddIntervals": "Ungerade Intervalle",
-    "evenIntervals": "Gerade Intervalle"
+    "evenIntervals": "Gerade Intervalle",
+    "severityAssumption": "Angenommen",
+    "keepAssumption": "Behalten",
+    "rejectAssumptionHint": "Ablehnen entfernt diesen Wert; der Text bleibt unverändert."
   },
   "Invites": {
     "inviteClients": "Kunden einladen",

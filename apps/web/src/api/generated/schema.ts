@@ -2885,7 +2885,7 @@ export interface components {
         /** FreeTextWorkoutAnalysis */
         FreeTextWorkoutAnalysis: {
             issues: {
-                /** @description assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                 code: string;
                 current_value?: unknown;
                 id: string;
@@ -10672,7 +10672,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         issues: {
-                            /** @description assistant | text_correction | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                            /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                             code: string;
                             current_value?: unknown;
                             id: string;

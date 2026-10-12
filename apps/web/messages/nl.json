@@ -2688,7 +2688,10 @@
     "editNotApplied": "‘{text}’ staat niet meer in de tekst, dus deze correctie is niet toegepast. Controleer opnieuw om de suggesties te vernieuwen.",
     "intervalSlot": "Interval {slot}",
     "oddIntervals": "Oneven intervallen",
-    "evenIntervals": "Even intervallen"
+    "evenIntervals": "Even intervallen",
+    "severityAssumption": "Aangenomen",
+    "keepAssumption": "Behouden",
+    "rejectAssumptionHint": "Afwijzen wist deze waarde; de tekst blijft zoals geschreven."
   },
   "Invites": {
     "inviteClients": "Klanten uitnodigen",

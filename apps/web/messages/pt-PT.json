@@ -2688,7 +2688,10 @@
     "editNotApplied": "«{text}» já não está no texto, por isso a correção não foi aplicada. Verifica novamente para atualizar as sugestões.",
     "intervalSlot": "Intervalo {slot}",
     "oddIntervals": "Intervalos ímpares",
-    "evenIntervals": "Intervalos pares"
+    "evenIntervals": "Intervalos pares",
+    "severityAssumption": "Pressuposto",
+    "keepAssumption": "Manter",
+    "rejectAssumptionHint": "Rejeitar apaga este valor; o texto fica como está."
   },
   "Invites": {
     "inviteClients": "Convidar clientes",

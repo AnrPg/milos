@@ -2688,7 +2688,10 @@
     "editNotApplied": "«{text}» больше нет в тексте, поэтому исправление не применено. Проверьте снова, чтобы обновить подсказки.",
     "intervalSlot": "Интервал {slot}",
     "oddIntervals": "Нечётные интервалы",
-    "evenIntervals": "Чётные интервалы"
+    "evenIntervals": "Чётные интервалы",
+    "severityAssumption": "Предположение",
+    "keepAssumption": "Оставить",
+    "rejectAssumptionHint": "Отклонение удаляет это значение; текст остаётся без изменений."
   },
   "Invites": {
     "inviteClients": "Пригласить клиентов",

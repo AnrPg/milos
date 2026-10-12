@@ -2688,7 +2688,10 @@
     "editNotApplied": "Το «{text}» δεν υπάρχει πια στο κείμενο, οπότε η διόρθωση δεν εφαρμόστηκε. Κάνε νέο έλεγχο για ανανέωση των προτάσεων.",
     "intervalSlot": "Διάστημα {slot}",
     "oddIntervals": "Μονά διαστήματα",
-    "evenIntervals": "Ζυγά διαστήματα"
+    "evenIntervals": "Ζυγά διαστήματα",
+    "severityAssumption": "Υπόθεση",
+    "keepAssumption": "Διατήρηση",
+    "rejectAssumptionHint": "Η απόρριψη αφαιρεί αυτή την τιμή· το κείμενο μένει όπως γράφτηκε."
   },
   "Invites": {
     "inviteClients": "Πρόσκληση πελατών",

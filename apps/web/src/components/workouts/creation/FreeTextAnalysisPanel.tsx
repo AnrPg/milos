@@ -8,6 +8,7 @@ import {
   fieldOf,
   formatFieldValue,
   getAtPath,
+  isAssumptionIssue,
   isTextCorrection,
   openIssues,
   openSuggestions,
@@ -187,6 +188,8 @@ function IssueCard({
   const suggestion = issue.suggestion;
   const hasSuggestedValue = suggestion?.value !== null && suggestion?.value !== undefined;
   const isError = issue.severity === "error";
+  // A value the assistant inferred rather than read: Keep or Reject (clear).
+  const isAssumption = isAssumptionIssue(issue);
 
   function applyTyped() {
     const value = parseFieldInput(issue.path, draft);
@@ -202,7 +205,11 @@ function IssueCard({
     <article
       className="rounded-2xl border p-4"
       style={{
-        borderColor: isError ? "var(--danger, #dc2626)" : "color-mix(in srgb, var(--warning, #d97706) 55%, var(--dim))",
+        borderColor: isError
+          ? "var(--danger, #dc2626)"
+          : isAssumption
+            ? "var(--dim)"
+            : "color-mix(in srgb, var(--warning, #d97706) 55%, var(--dim))",
         background: "var(--card)",
       }}
     >
@@ -210,11 +217,15 @@ function IssueCard({
         <span
           className="rounded-full px-2 py-0.5 text-[11px] font-black uppercase tracking-wide"
           style={{
-            background: isError ? "color-mix(in srgb, var(--danger, #dc2626) 16%, transparent)" : "color-mix(in srgb, var(--warning, #d97706) 16%, transparent)",
-            color: isError ? "var(--danger, #dc2626)" : "var(--warning, #d97706)",
+            background: isError
+              ? "color-mix(in srgb, var(--danger, #dc2626) 16%, transparent)"
+              : isAssumption
+                ? "var(--bg)"
+                : "color-mix(in srgb, var(--warning, #d97706) 16%, transparent)",
+            color: isError ? "var(--danger, #dc2626)" : isAssumption ? "var(--primary)" : "var(--warning, #d97706)",
           }}
         >
-          {isError ? t("severityError") : t("severityWarning")}
+          {isError ? t("severityError") : isAssumption ? t("severityAssumption") : t("severityWarning")}
         </span>
         {issue.required ? (
           <span className="text-[11px] font-bold uppercase" style={{ color: "var(--muted)" }}>{t("requiredBadge")}</span>
@@ -259,7 +270,11 @@ function IssueCard({
           className="rounded-xl px-3 py-2 text-sm font-black"
           style={{ background: "var(--text)", color: "var(--bg)" }}
         >
-          {hasSuggestedValue || suggestion?.text_edit ? suggestion?.label || t("accept") : t("apply")}
+          {isAssumption
+            ? t("keepAssumption")
+            : hasSuggestedValue || suggestion?.text_edit
+              ? suggestion?.label || t("accept")
+              : t("apply")}
         </button>
         <button
           type="button"
@@ -479,6 +494,7 @@ function issueMessage(t: Translate, issue: AnalysisIssue) {
 
 function rejectHint(t: Translate, issue: AnalysisIssue) {
   if (isTextCorrection(issue)) return t("rejectTextHint");
+  if (isAssumptionIssue(issue) && !issue.required) return t("rejectAssumptionHint");
   return issue.required ? t("rejectRequiredHint") : t("rejectOptionalHint");
 }
 

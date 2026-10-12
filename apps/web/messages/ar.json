@@ -2688,7 +2688,10 @@
     "editNotApplied": "لم يعد «{text}» موجودًا في النص، لذا لم يُطبَّق هذا الإصلاح. تحقّق مرة أخرى لتحديث الاقتراحات.",
     "intervalSlot": "الفاصل {slot}",
     "oddIntervals": "الفواصل الفردية",
-    "evenIntervals": "الفواصل الزوجية"
+    "evenIntervals": "الفواصل الزوجية",
+    "severityAssumption": "افتراض",
+    "keepAssumption": "إبقاء",
+    "rejectAssumptionHint": "الرفض يحذف هذه القيمة؛ ويبقى النص كما كُتب."
   },
   "Invites": {
     "inviteClients": "دعوة العملاء",

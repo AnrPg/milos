@@ -2688,7 +2688,10 @@
     "editNotApplied": "“{text}” is no longer in the text, so this fix was not applied. Check again to refresh the suggestions.",
     "intervalSlot": "Interval {slot}",
     "oddIntervals": "Odd intervals",
-    "evenIntervals": "Even intervals"
+    "evenIntervals": "Even intervals",
+    "severityAssumption": "Assumed",
+    "keepAssumption": "Keep",
+    "rejectAssumptionHint": "Reject clears this value; the coach's text stays as written."
   },
   "Invites": {
     "inviteClients": "Invite clients",

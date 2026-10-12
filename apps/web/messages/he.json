@@ -2688,7 +2688,10 @@
     "editNotApplied": "„{text}” כבר לא מופיע בטקסט, ולכן התיקון לא הוחל. בדקו שוב כדי לרענן את ההצעות.",
     "intervalSlot": "מקטע {slot}",
     "oddIntervals": "מקטעים אי־זוגיים",
-    "evenIntervals": "מקטעים זוגיים"
+    "evenIntervals": "מקטעים זוגיים",
+    "severityAssumption": "הנחה",
+    "keepAssumption": "להשאיר",
+    "rejectAssumptionHint": "דחייה מוחקת את הערך; הטקסט נשאר כפי שנכתב."
   },
   "Invites": {
     "inviteClients": "הזמנת לקוחות",

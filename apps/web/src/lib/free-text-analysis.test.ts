@@ -7,6 +7,7 @@ import {
   blockingProblems,
   createReviewState,
   describePath,
+  isAssumptionIssue,
   parseFieldInput,
   publishFields,
   rejectIssue,
@@ -171,5 +172,31 @@ describe("helpers", () => {
   it("replaces only verbatim text", () => {
     expect(replaceFirst("10 pul ups", "pul ups", "pull ups")).toBe("10 pull ups");
     expect(replaceFirst("10 pull ups", "pul  ups", "x")).toBeNull();
+  });
+});
+
+describe("assumptions", () => {
+  const assumption = {
+    id: "issue-9",
+    path: "sections.0.timer_config",
+    code: "assumption",
+    severity: "info" as const,
+    required: false,
+    params: {},
+    message: "Read 5 rounds as for time.",
+    current_value: { type: "for_time", rounds: 5 },
+    suggestion: { label: null, value: { type: "for_time", rounds: 5 }, text_edit: null },
+  };
+
+  it("keeps the inferred value on accept and clears it on reject", () => {
+    const state = createReviewState({ ...analysis(), issues: [assumption] }, "text");
+    expect(isAssumptionIssue(assumption)).toBe(true);
+
+    const kept = acceptIssue(state, assumption);
+    expect(kept.workout.sections[0]?.timer_config).toEqual({ type: "for_time", rounds: 5 });
+
+    const rejected = rejectIssue(state, assumption);
+    expect(rejected.workout.sections[0]?.timer_config).toBeNull();
+    expect(rejected.issues["issue-9"]).toBe("rejected");
   });
 });

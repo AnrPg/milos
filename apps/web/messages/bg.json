@@ -2688,7 +2688,10 @@
     "editNotApplied": "„{text}“ вече го няма в текста, затова поправката не е приложена. Провери отново, за да обновиш предложенията.",
     "intervalSlot": "Интервал {slot}",
     "oddIntervals": "Нечетни интервали",
-    "evenIntervals": "Четни интервали"
+    "evenIntervals": "Четни интервали",
+    "severityAssumption": "Предположение",
+    "keepAssumption": "Запази",
+    "rejectAssumptionHint": "Отхвърлянето изчиства стойността; текстът остава както е написан."
   },
   "Invites": {
     "inviteClients": "Покани клиенти",

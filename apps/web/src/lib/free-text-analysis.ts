@@ -154,6 +154,11 @@ export function isTextCorrection(issue: AnalysisIssue) {
   return issue.code === "text_correction" || issue.path === "text";
 }
 
+/** A value the assistant inferred (convention, computed value, implied format). */
+export function isAssumptionIssue(issue: AnalysisIssue) {
+  return issue.code === "assumption";
+}
+
 export function rejectIssue(state: ReviewState, issue: AnalysisIssue): ReviewState {
   if (isTextCorrection(issue)) return { ...state, issues: { ...state.issues, [issue.id]: "rejected" } };
 
