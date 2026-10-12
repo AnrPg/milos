@@ -95,4 +95,51 @@ two notification types are added across the database constraint, enum, push
 builder, inbox presentation and locales (TD-023 still applies).
 
 ## Implementation Notes
-To be completed when Phase B is finished.
+- **Catalog**: `PackageCatalog.implemented_phases/0` is `[:a, :b]`; Phase B fields are
+  authorable and the `open_gym` and `events` modules can be enabled in settings.
+  `EntitlementPlan` compiles the `events` and `facility` channels, the
+  `book_events`, `bring_guests` and `open_gym` capabilities, the `event_visits`,
+  `guest_passes` and `open_gym_visits` allowances, location scope, time windows
+  and a `terms` map. The ledger accepts the three new allowance keys.
+- **Finance terms** (`Finance.Domain.SubscriptionTerms`, migration
+  `20261012170000`): commitment end dates guard cancellation (override with
+  `commitment_override_reason`), first-use packages activate on the first
+  reservation, freezes live in `finance_subscription_freezes` (calendar-year
+  allowance, dated packages extended, unused days returned on cancel), rollover
+  is added at the period boundary, the joining fee is a manual charge on the
+  member's first invoice for the package, and the member discount raises the
+  discount of manual-charge lines whose `charge_category` is in scope.
+  `PackageExpiryReminderJob` runs daily and sends `package_expiring`.
+- **Scheduling** (migration `20261012180000`): class types carry `credit_cost`
+  and `kind`; events reserve `event_visits` on the `events` channel. Scheduling
+  settings hold the gym defaults for the booking window and cancellation cutoff,
+  and `Application.BookingTerms` merges them with the package terms. Bookings
+  gain `waitlisted` status, `waitlist_priority`, `waitlisted_at`, `guest_name` and
+  `entitlement_allowance`. `JoinClassWaitlist` checks eligibility without
+  reserving; `PromoteClassWaitlist` runs after withdraw, reject, timeout and
+  capacity changes, reserves through the booking saga and notifies
+  `booking_waitlist_promoted`. Late withdrawals finalize the visit; waived
+  no-shows release it. `SubmitGuestBooking` allows one named guest per member and
+  class on `guest_passes`.
+- **Facility** (new context, migration `20261012190000`): `facility_locations`
+  and `facility_check_ins` with RLS; classes and series reference a location
+  through same-organization foreign keys, so package location scopes apply to
+  bookings. `Application.CheckInOpenGym` reserves and finalizes one
+  `open_gym_visits` unit per member and local day (idempotent), for self or staff
+  check-in.
+- **API**: member `POST /bookings/waitlist`, `POST /bookings/guests`,
+  `GET /locations`, `POST /check-ins`; withdraw returns `late_cancellation`;
+  the schedule payload adds locations, waitlist size and the member's position.
+  Admin locations CRUD/archive, check-in desk, member freezes, class type credit
+  and kind, scheduling defaults, slot and series `location_id`, invoice line
+  `charge_category`. Every denial has a stable code in `FallbackController`.
+- **Web**: the package wizard adds Open gym and Events service cards and
+  advanced controls for every Phase B kind (gym-default numbers, enums, chip
+  lists, location scope, time windows). The member summary lists only advanced
+  values that differ from the preset and names class types without restrictive
+  wording. Member and admin surfaces cover waitlists, guests, check-ins,
+  freezes, locations and the new notifications.
+- **Tests**: `finance/domain/package_phase_b_test.exs`,
+  `finance/package_phase_b_test.exs`, `application/phase_b_booking_test.exs`,
+  `application/facility_test.exs`, `controllers/phase_b_controller_test.exs`.
+- **Deferred**: Phase C (TD-049) and the follow-ups in TD-053.
