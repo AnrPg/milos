@@ -468,4 +468,54 @@ defmodule MilosTraining.Application.TrainingLogEntryTest do
       assert {:error, :organization_context_required} = ListTrainingLogEntries.call(%{}, member)
     end
   end
+
+  describe "offline replay (ADR-102)" do
+    test "replays an accepted class log even after the source stopped authorizing" do
+      owner = TestFixtures.admin_fixture()
+      {organization, owner_context} = organization_fixture(owner)
+      {member, context} = member_context(organization)
+      workout = workout_fixture(owner_context, owner)
+      {slot, booking} = past_class_fixture(owner_context, workout, member)
+
+      class_params = %{
+        "source_type" => "class",
+        "source_reference_id" => slot.id,
+        "performed_at" => yesterday_iso(),
+        "idempotency_key" => key()
+      }
+
+      assert {:ok, entry, :created} = LogTrainingEntry.call(context, member, class_params)
+
+      Repo.update_all(from(b in MilosTraining.Scheduling.Booking, where: b.id == ^booking.id),
+        set: [status: :rejected]
+      )
+
+      # A fresh submission is re-authorized and refused...
+      assert {:error, :training_log_source_forbidden} =
+               LogTrainingEntry.call(context, member, %{class_params | "idempotency_key" => key()})
+
+      # ...but the acknowledged-yet-unconfirmed original converges on its entry.
+      assert {:ok, replay, :replayed} = LogTrainingEntry.call(context, member, class_params)
+      assert replay.id == entry.id
+    end
+
+    test "reusing a key for a different source is a deterministic conflict" do
+      owner = TestFixtures.admin_fixture()
+      {organization, owner_context} = organization_fixture(owner)
+      {member, context} = member_context(organization)
+      workout = workout_fixture(owner_context, owner)
+      {slot, _booking} = past_class_fixture(owner_context, workout, member)
+      params = freeform_params()
+
+      assert {:ok, _entry, :created} = LogTrainingEntry.call(context, member, params)
+
+      assert {:error, :idempotency_key_conflict} =
+               LogTrainingEntry.call(context, member, %{
+                 "source_type" => "class",
+                 "source_reference_id" => slot.id,
+                 "performed_at" => yesterday_iso(),
+                 "idempotency_key" => params["idempotency_key"]
+               })
+    end
+  end
 end

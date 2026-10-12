@@ -11,6 +11,24 @@ defmodule MilosTraining.Execution.Queries.GetTrainingLogEntries do
     end
   end
 
+  @doc """
+  ADR-102: looks up a prior submission of the request's `idempotency_key`.
+  Returns `:none` when there is none (or the key is unusable; the command
+  validates it), `{:ok, entry}` for a matching replay, or
+  `{:error, :idempotency_key_conflict}` when the key names another source.
+  """
+  def replay_for_request(user_id, params) when is_map(params) do
+    with key when is_binary(key) <- params["idempotency_key"] || params[:idempotency_key],
+         %{} = entry <- TrainingLogStore.get_entry_by_idempotency_key(user_id, key) do
+      case TrainingLogPolicy.replay_decision(entry, params) do
+        :replay -> {:ok, entry}
+        {:error, reason} -> {:error, reason}
+      end
+    else
+      _none -> :none
+    end
+  end
+
   def for_user(user_id, opts \\ []), do: TrainingLogStore.list_entries_for_user(user_id, opts)
 
   def live_source_reference_ids(user_id, source_type),

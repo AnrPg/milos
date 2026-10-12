@@ -20,28 +20,40 @@ defmodule MilosTraining.Application.LogTrainingEntry do
     now = DateTime.utc_now()
 
     Execution.with_training_log_context(context, fn ->
-      with {:ok, source} <-
-             AuthorizeTrainingLogSource.call(
-               context,
-               user_id,
-               params["source_type"] || params[:source_type],
-               params["source_reference_id"] || params[:source_reference_id],
-               now
-             ),
-           {:ok, entry, outcome} <-
-             Execution.log_training_entry(user_id, Map.delete(source, :workout), params,
-               now: now,
-               allowed_section_ids: allowed_section_ids(source),
-               completed_executions: Execution.list_executions_for_user(user_id),
-               job_builder: job_builder()
-             ),
-           :ok <- process_inline_if_needed(entry, outcome) do
-        {:ok, entry, outcome}
+      # ADR-102: an offline replay of an already accepted submission returns
+      # the original entry before source authorization is re-evaluated, so a
+      # source that has since closed (class over, assignment rejected, entry
+      # already logged) cannot turn an acknowledged write into a failure.
+      case Execution.find_training_log_replay(user_id, params) do
+        {:ok, entry} -> {:ok, entry, :replayed}
+        {:error, reason} -> {:error, reason}
+        :none -> log_new(context, user_id, params, now)
       end
     end)
   end
 
   def call(_context, _actor, _params), do: {:error, :organization_context_required}
+
+  defp log_new(context, user_id, params, now) do
+    with {:ok, source} <-
+           AuthorizeTrainingLogSource.call(
+             context,
+             user_id,
+             params["source_type"] || params[:source_type],
+             params["source_reference_id"] || params[:source_reference_id],
+             now
+           ),
+         {:ok, entry, outcome} <-
+           Execution.log_training_entry(user_id, Map.delete(source, :workout), params,
+             now: now,
+             allowed_section_ids: allowed_section_ids(source),
+             completed_executions: Execution.list_executions_for_user(user_id),
+             job_builder: job_builder()
+           ),
+         :ok <- process_inline_if_needed(entry, outcome) do
+      {:ok, entry, outcome}
+    end
+  end
 
   defp allowed_section_ids(source) do
     source

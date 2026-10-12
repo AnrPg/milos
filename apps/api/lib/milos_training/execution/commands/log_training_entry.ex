@@ -22,8 +22,14 @@ defmodule MilosTraining.Execution.Commands.LogTrainingEntry do
   def call(user_id, source, params, opts) do
     with {:ok, key} <- idempotency_key(params) do
       case TrainingLogStore.get_entry_by_idempotency_key(user_id, key) do
-        nil -> create(source, key, params, opts)
-        existing -> {:ok, existing, :replayed}
+        nil ->
+          create(source, key, params, opts)
+
+        existing ->
+          case TrainingLogPolicy.replay_decision(existing, source) do
+            :replay -> {:ok, existing, :replayed}
+            {:error, reason} -> {:error, reason}
+          end
       end
     end
   end

@@ -297,4 +297,45 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicyTest do
              ]
     end
   end
+
+  describe "replay_decision/2 (ADR-102)" do
+    test "replays when raw params or a server source name the same source" do
+      entry = %{source_type: "class", source_reference_id: "slot-1"}
+
+      assert :replay =
+               TrainingLogPolicy.replay_decision(entry, %{
+                 "source_type" => "class",
+                 "source_reference_id" => "slot-1"
+               })
+
+      assert :replay =
+               TrainingLogPolicy.replay_decision(entry, %{
+                 source_type: :class,
+                 source_reference_id: "slot-1"
+               })
+    end
+
+    test "treats blank freeform references as equal" do
+      entry = %{source_type: "freeform", source_reference_id: nil}
+
+      assert :replay =
+               TrainingLogPolicy.replay_decision(entry, %{
+                 "source_type" => "freeform",
+                 "source_reference_id" => ""
+               })
+    end
+
+    test "conflicts when the key names a different source" do
+      entry = %{source_type: "class", source_reference_id: "slot-1"}
+
+      assert {:error, :idempotency_key_conflict} =
+               TrainingLogPolicy.replay_decision(entry, %{
+                 "source_type" => "class",
+                 "source_reference_id" => "slot-2"
+               })
+
+      assert {:error, :idempotency_key_conflict} =
+               TrainingLogPolicy.replay_decision(entry, %{"source_type" => "freeform"})
+    end
+  end
 end

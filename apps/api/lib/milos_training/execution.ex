@@ -55,6 +55,10 @@ defmodule MilosTraining.Execution do
     to: GetTrainingLogEntries,
     as: :by_id_for_user
 
+  defdelegate find_training_log_replay(user_id, params),
+    to: GetTrainingLogEntries,
+    as: :replay_for_request
+
   defdelegate list_training_log_entries_for_user(user_id, opts),
     to: GetTrainingLogEntries,
     as: :for_user

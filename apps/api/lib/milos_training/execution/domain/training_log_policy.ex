@@ -98,6 +98,33 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   end
 
   @doc """
+  ADR-102 replay rule for a reused `idempotency_key`.
+
+  A replay converges on the original entry only when it names the same source
+  (type and reference). Reusing a key for a different source is a
+  deterministic `:idempotency_key_conflict` instead of silently returning an
+  unrelated entry. `request` may be raw client params (string or atom keys)
+  or a server-derived source map.
+  """
+  def replay_decision(entry, request) when is_map(entry) and is_map(request) do
+    requested_type = request_value(request, :source_type)
+    requested_reference = request_value(request, :source_reference_id)
+
+    if to_string(entry.source_type) == requested_type and
+         blank_to_nil(entry.source_reference_id) == requested_reference,
+       do: :replay,
+       else: {:error, :idempotency_key_conflict}
+  end
+
+  defp request_value(request, key) do
+    value = Map.get(request, key, Map.get(request, Atom.to_string(key)))
+    value |> blank_to_nil() |> then(&(&1 && to_string(&1)))
+  end
+
+  defp blank_to_nil(value) when value in [nil, ""], do: nil
+  defp blank_to_nil(value), do: value
+
+  @doc """
   Whether logging `source` would double count a completed execution.
 
   Class and assignment sources are counted once per relationship. A library
