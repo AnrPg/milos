@@ -21,4 +21,11 @@ defmodule MilosTraining.Identity do
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore
   defdelegate supported_locales(), to: Locale, as: :supported
+
+  @doc "Secret-free account records for a tenant export (ADR-099)."
+  def export_accounts(user_ids) when is_list(user_ids) do
+    user_ids
+    |> list_by_ids()
+    |> Enum.map(&MilosTraining.Identity.Domain.AccountExport.to_export/1)
+  end
 end
