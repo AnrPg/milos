@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.GetAdminSettings do
     {:ok,
      %{
        gamification: Gamification.get_settings(),
-       finance: Finance.get_finance_settings(),
+       finance: Finance.get_finance_settings(context),
        notifications: Notifications.get_push_settings(),
        scheduling: Scheduling.get_settings(context)
      }}
