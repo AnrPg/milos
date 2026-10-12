@@ -22,6 +22,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
   """
 
   alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutType}
+  alias MilosTraining.Workouts.Domain.WorkoutAssistant.Proofreading
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary
 
   @difficulties ~w(beginner intermediate advanced all-levels)
@@ -62,7 +63,9 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
 
   Returns `%{workout: map, issues: list, suggestions: list, summary: map}`.
   """
-  def normalize(raw, source) when is_map(raw) and is_binary(source) do
+  def normalize(raw, source, corrections \\ [])
+
+  def normalize(raw, source, corrections) when is_map(raw) and is_binary(source) do
     raw_workout = map_value(raw, "workout")
     raw_sections = raw |> list_value("sections") |> Enum.take(@max_sections)
 
@@ -75,9 +78,20 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
       |> list_value("issues")
       |> Enum.flat_map(&normalize_assistant_issue(&1, workout, source))
 
+    covered_edits =
+      assistant_issues
+      |> Enum.map(&get_in(&1, ["suggestion", "text_edit", "find"]))
+      |> Enum.filter(&is_binary/1)
+
+    # The parser already proposed a fix for the same words: keep one CTA.
+    correction_issues =
+      corrections
+      |> Proofreading.to_issues(workout)
+      |> Enum.reject(&overlaps?(get_in(&1, ["suggestion", "text_edit", "find"]), covered_edits))
+
     issues =
-      (workout_issues ++ section_issues ++ assistant_issues)
-      |> dedupe_by_path()
+      (workout_issues ++ section_issues ++ assistant_issues ++ correction_issues)
+      |> dedupe_issues()
       |> Enum.take(@max_issues)
       |> Enum.with_index(1)
       |> Enum.map(fn {issue, index} -> Map.put(issue, "id", "issue-#{index}") end)
@@ -103,7 +117,8 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
     }
   end
 
-  def normalize(_raw, source) when is_binary(source), do: normalize(%{}, source)
+  def normalize(_raw, source, corrections) when is_binary(source),
+    do: normalize(%{}, source, corrections)
 
   @doc "Coerces a raw value for a canonical path. Returns `{:ok, value}` or `:error`."
   def coerce(path, value) when is_binary(path) do
@@ -697,6 +712,20 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
   end
 
   defp mark_required(issue), do: Map.put(issue, "required", true)
+
+  defp overlaps?(find, covered) do
+    Enum.any?(covered, &(String.contains?(&1, find) or String.contains?(find, &1)))
+  end
+
+  # Several text-only corrections can coexist; field issues stay one per path.
+  defp dedupe_issues(issues) do
+    issues
+    |> Enum.uniq_by(fn issue ->
+      if issue["path"] == "text",
+        do: {"text", get_in(issue, ["suggestion", "text_edit", "find"])},
+        else: issue["path"]
+    end)
+  end
 
   # Deterministic issues come first; an assistant issue on the same path only
   # survives when it is the sole report for that field.
