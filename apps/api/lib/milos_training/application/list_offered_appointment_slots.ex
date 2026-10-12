@@ -4,12 +4,25 @@ defmodule MilosTraining.Application.ListOfferedAppointmentSlots do
   the format, coach and session length of a package they hold for that kind.
   """
 
-  alias MilosTraining.{Appointments, Finance}
+  alias MilosTraining.{Appointments, Finance, Identity}
   alias MilosTraining.Appointments.Domain.AppointmentPolicy
 
   @horizon_days 60
 
   def call(context, %{id: user_id}, now \\ DateTime.utc_now()) do
+    slots = offered(context, user_id, now)
+
+    coaches =
+      slots
+      |> Enum.map(& &1.coach_id)
+      |> Enum.uniq()
+      |> Identity.list_by_ids()
+      |> Map.new(&{&1.id, &1.nickname})
+
+    Enum.map(slots, &Map.put(&1, :coach_nickname, Map.get(coaches, &1.coach_id)))
+  end
+
+  defp offered(context, user_id, now) do
     context
     |> Appointments.list_slots(%{
       from: now,

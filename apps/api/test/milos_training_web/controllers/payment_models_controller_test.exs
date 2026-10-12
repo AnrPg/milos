@@ -6,6 +6,10 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
   alias MilosTraining.{Finance, Organizations, Repo}
 
   import MilosTraining.TestFixtures
+  import Swoosh.TestAssertions
+
+  alias MilosTraining.Application.CorporateInvoicing
+  alias MilosTraining.Organizations.OrganizationStore
 
   setup %{conn: conn} do
     {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
@@ -291,14 +295,49 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
            )
            |> json_response(422)
 
-    assert %{"invoice" => %{"status" => "paid"}} =
+    assert invoice["invoice_number"] =~ ~r/^INV-\d{6}-CORP-/
+    assert invoice["due_on"] == Date.to_iso8601(Date.add(Date.utc_today(), 14))
+    invoice_path = "#{base}/admin/finance/corporate-invoices/#{invoice["id"]}"
+
+    pay = fn amount ->
+      send_json(admin_conn, :post, "#{invoice_path}/payments", %{
+        amount_cents: amount,
+        payment_method: "bank_transfer",
+        reference: "ACME-#{amount}"
+      })
+    end
+
+    assert %{"invoice" => %{"status" => "issued", "balance_cents" => 4000}} =
+             pay.(2000) |> json_response(201)
+
+    assert %{"code" => "payment_exceeds_balance"} = pay.(4001) |> json_response(422)
+
+    assert %{"code" => "corporate_invoice_has_payments"} =
              admin_conn
-             |> send_json(
-               :post,
-               "#{base}/admin/finance/corporate-invoices/#{invoice["id"]}/status",
-               %{status: "paid"}
-             )
+             |> send_json(:post, "#{invoice_path}/status", %{status: "void"})
+             |> json_response(409)
+
+    paid = pay.(4000) |> json_response(201) |> Map.fetch!("invoice")
+    assert %{"status" => "paid", "balance_cents" => 0, "paid_cents" => 6000} = paid
+
+    [first | _] = paid["payments"]
+
+    assert %{"invoice" => %{"status" => "issued", "balance_cents" => 2000}} =
+             admin_conn
+             |> send_json(:post, "#{invoice_path}/payments/#{first["id"]}/reverse", %{
+               reason: "Bounced"
+             })
              |> json_response(200)
+
+    document = admin_conn |> recycle() |> get(invoice_path) |> json_response(200)
+
+    assert %{"client" => %{"company_name" => "Acme"}, "issuer" => %{"name" => _}} =
+             document["invoice"]
+
+    assert %{"invoice" => %{"status" => "issued"}} =
+             admin_conn |> send_json(:post, "#{invoice_path}/send", %{}) |> json_response(200)
+
+    assert_email_sent(to: [{"", "billing@acme.test"}])
 
     admin_conn
     |> send_json(
@@ -316,5 +355,52 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
 
     assert Enum.count(seats["seats"], &(&1["status"] == "active")) == 1
     assert Enum.any?(seats["seats"], &(&1["nickname"] == employee.nickname))
+  end
+
+  test "the daily run issues, marks overdue and reminds once per interval" do
+    corporate =
+      package(
+        "corporate",
+        %{"terms.seats" => 3, "terms.seat_billing" => "agreed"},
+        %{base_price_cents: 2000}
+      )
+
+    {:ok, organization} = Organizations.ensure_legacy_organization_for_migration()
+    context = %{organization_id: organization.id}
+
+    {:ok, client} =
+      Finance.create_corporate_client(context, %{
+        membership_package_id: corporate.id,
+        company_name: "Initech",
+        billing_email: "ap@initech.test",
+        payment_terms_days: 10
+      })
+
+    tenant = %{
+      organization: organization,
+      settings: OrganizationStore.get_organization_settings(organization.id)
+    }
+
+    # A day early in next month's period, so the period starts after the client.
+    issue_day =
+      Date.utc_today() |> Date.beginning_of_month() |> Date.shift(month: 1) |> Date.add(2)
+
+    assert %{issued: 1, reminded: 0} = CorporateInvoicing.run(tenant, issue_day)
+    assert_email_sent(fn email -> String.starts_with?(email.subject, "Invoice ") end)
+
+    assert [%{total_cents: 6000, status: "issued", due_on: due_on}] =
+             Finance.list_corporate_invoices(context, client.id)
+
+    assert due_on == Date.add(issue_day, 10)
+    assert %{issued: 0} = CorporateInvoicing.run(tenant, issue_day)
+
+    late = Date.add(due_on, 1)
+    assert %{overdue: 1, reminded: 1} = CorporateInvoicing.run(tenant, late)
+    assert_email_sent(fn email -> String.starts_with?(email.subject, "Reminder: invoice ") end)
+    assert %{reminded: 0} = CorporateInvoicing.run(tenant, Date.add(late, 3))
+    assert %{reminded: 1} = CorporateInvoicing.run(tenant, Date.add(late, 7))
+
+    assert [%{status: "overdue", reminder_count: 2}] =
+             Finance.list_corporate_invoices(context, client.id)
   end
 end

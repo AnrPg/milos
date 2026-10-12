@@ -8,6 +8,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   alias MilosTraining.Finance.{
     FinanceCorporateClient,
     FinanceCorporateInvoice,
+    FinanceCorporatePayment,
     FinanceSubscriptionBeneficiary
   }
 
@@ -32,6 +33,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   alias MilosTraining.Finance.Domain.{
     AllowancePeriod,
+    CorporateInvoicePolicy,
     CreditLedger,
     EntitlementPlan,
     EntitlementPolicy,
@@ -1643,69 +1645,309 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     Repo.transaction(fn ->
       client = fetch_corporate_client(client_id) || Repo.rollback(:not_found)
       package = Repo.get!(MembershipPackage, client.membership_package_id)
-      terms = package_terms(package.params)
+      period = PaymentModelPolicy.corporate_period(package.billing_period, on)
 
-      {period_start, period_end} =
-        PaymentModelPolicy.corporate_period(package.billing_period, on)
+      case insert_corporate_invoice(client, package, period, Date.utc_today()) do
+        {:ok, invoice} -> invoice_with_payments(invoice)
+        {:error, changeset} -> Repo.rollback(changeset)
+      end
+    end)
+  end
 
-      seat_billing = terms[:seat_billing] || "agreed"
-      used = used_corporate_seats(client.id, period_start, period_end)
-      seats = PaymentModelPolicy.seats_billed(seat_billing, terms[:seats], used)
+  # ADR-098: the daily run issues each auto-invoicing client's due period once;
+  # the unique period index makes a repeated run a no-op.
+  @impl true
+  def issue_due_corporate_invoices(%Date{} = today) do
+    FinanceCorporateClient
+    |> tenant_scope()
+    |> where([client], client.status == "active" and client.auto_invoice)
+    |> Repo.all()
+    |> Enum.flat_map(fn client ->
+      package = Repo.get!(MembershipPackage, client.membership_package_id)
+      seat_billing = package_terms(package.params)[:seat_billing] || "agreed"
+      client_since = DateTime.to_date(client.inserted_at)
 
-      %{
-        corporate_client_id: client.id,
-        period_start: period_start,
-        period_end: period_end,
-        seat_billing: seat_billing,
-        seats_billed: seats,
-        unit_price_cents: package.base_price_cents,
-        total_cents: seats * package.base_price_cents,
-        issued_on: Date.utc_today()
-      }
-      |> FinanceCorporateInvoice.changeset()
-      |> Repo.insert()
+      with {:ok, {period_start, _end} = period} <-
+             CorporateInvoicePolicy.period_to_invoice(
+               package.billing_period,
+               seat_billing,
+               client_since,
+               today
+             ),
+           false <- corporate_period_invoiced?(client.id, period_start),
+           {:ok, invoice} <-
+             Repo.transaction(fn ->
+               case insert_corporate_invoice(client, package, period, today) do
+                 {:ok, invoice} -> invoice
+                 {:error, changeset} -> Repo.rollback(changeset)
+               end
+             end) do
+        [
+          invoice
+          |> invoice_with_payments()
+          |> Map.put(:client, normalize_corporate_client(client))
+        ]
+      else
+        _skip -> []
+      end
+    end)
+  end
+
+  defp corporate_period_invoiced?(client_id, period_start) do
+    FinanceCorporateInvoice
+    |> tenant_scope()
+    |> where([i], i.corporate_client_id == ^client_id and i.period_start == ^period_start)
+    |> Repo.exists?()
+  end
+
+  defp insert_corporate_invoice(client, package, {period_start, period_end}, issued_on) do
+    terms = package_terms(package.params)
+    seat_billing = terms[:seat_billing] || "agreed"
+    used = used_corporate_seats(client.id, period_start, period_end)
+    seats = PaymentModelPolicy.seats_billed(seat_billing, terms[:seats], used)
+
+    %{
+      corporate_client_id: client.id,
+      invoice_number: InvoiceNumber.format(next_invoice_sequence(), DateTime.utc_now(), "CORP"),
+      period_start: period_start,
+      period_end: period_end,
+      seat_billing: seat_billing,
+      seats_billed: seats,
+      unit_price_cents: package.base_price_cents,
+      total_cents: seats * package.base_price_cents,
+      issued_on: issued_on,
+      due_on: CorporateInvoicePolicy.due_on(issued_on, client.payment_terms_days)
+    }
+    |> FinanceCorporateInvoice.changeset()
+    |> Repo.insert()
+  end
+
+  @impl true
+  def list_corporate_invoices(client_id) do
+    invoices =
+      FinanceCorporateInvoice
+      |> tenant_scope()
+      |> where([invoice], invoice.corporate_client_id == ^client_id)
+      |> order_by([invoice], desc: invoice.period_start)
+      |> Repo.all()
+
+    payments = corporate_payments_by_invoice(Enum.map(invoices, & &1.id))
+    Enum.map(invoices, &normalize_corporate_invoice(&1, Map.get(payments, &1.id, [])))
+  end
+
+  @impl true
+  def get_corporate_invoice(invoice_id) do
+    case fetch_corporate_invoice(invoice_id) do
+      nil ->
+        nil
+
+      invoice ->
+        client = fetch_corporate_client(invoice.corporate_client_id)
+
+        invoice
+        |> invoice_with_payments()
+        |> Map.put(:client, client && normalize_corporate_client(client))
+    end
+  end
+
+  @impl true
+  def record_corporate_payment(invoice_id, admin_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      invoice = locked_corporate_invoice!(invoice_id)
+      paid = corporate_paid_cents(invoice.id)
+      amount = parse_integer(params["amount_cents"], 0)
+
+      with :ok <-
+             CorporateInvoicePolicy.can_record_payment?(
+               invoice,
+               amount,
+               invoice.total_cents - paid
+             ),
+           {:ok, _payment} <-
+             %{
+               corporate_invoice_id: invoice.id,
+               amount_cents: amount,
+               payment_method: params["payment_method"],
+               paid_on: parse_date(params["paid_on"], Date.utc_today()),
+               reference: params["reference"],
+               notes: params["notes"],
+               recorded_by_id: admin_id
+             }
+             |> FinanceCorporatePayment.changeset()
+             |> Repo.insert() do
+        settle_corporate_invoice!(invoice)
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def reverse_corporate_payment(invoice_id, payment_id, admin_id, params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      invoice = locked_corporate_invoice!(invoice_id)
+
+      payment =
+        FinanceCorporatePayment
+        |> tenant_scope()
+        |> where([p], p.id == ^payment_id and p.corporate_invoice_id == ^invoice.id)
+        |> where([p], is_nil(p.reversed_at))
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      if invoice.status == "void", do: Repo.rollback(:corporate_invoice_closed)
+
+      payment
+      |> FinanceCorporatePayment.reverse_changeset(
+        admin_id,
+        params["reason"],
+        DateTime.utc_now()
+      )
+      |> Repo.update()
       |> case do
-        {:ok, invoice} -> normalize_corporate_invoice(invoice)
+        {:ok, _payment} -> settle_corporate_invoice!(invoice)
         {:error, changeset} -> Repo.rollback(changeset)
       end
     end)
   end
 
   @impl true
-  def list_corporate_invoices(client_id) do
-    FinanceCorporateInvoice
-    |> tenant_scope()
-    |> where([invoice], invoice.corporate_client_id == ^client_id)
-    |> order_by([invoice], desc: invoice.period_start)
-    |> Repo.all()
-    |> Enum.map(&normalize_corporate_invoice/1)
-  end
+  def set_corporate_invoice_status(invoice_id, "void") do
+    Repo.transaction(fn ->
+      invoice = locked_corporate_invoice!(invoice_id)
 
-  @impl true
-  def set_corporate_invoice_status(invoice_id, status) when status in ["paid", "void"] do
-    case tenant_scope(FinanceCorporateInvoice)
-         |> where([invoice], invoice.id == ^invoice_id)
-         |> Repo.one() do
-      nil ->
-        {:error, :not_found}
+      case CorporateInvoicePolicy.can_void?(invoice, corporate_paid_cents(invoice.id)) do
+        :ok ->
+          invoice
+          |> FinanceCorporateInvoice.status_changeset("void", nil)
+          |> Repo.update!()
+          |> invoice_with_payments()
 
-      %{status: "issued"} = invoice ->
-        paid_on = if status == "paid", do: Date.utc_today()
-
-        invoice
-        |> FinanceCorporateInvoice.status_changeset(status, paid_on)
-        |> Repo.update()
-        |> case do
-          {:ok, invoice} -> {:ok, normalize_corporate_invoice(invoice)}
-          error -> error
-        end
-
-      _closed ->
-        {:error, :corporate_invoice_closed}
-    end
+        {:error, reason} ->
+          Repo.rollback(reason)
+      end
+    end)
   end
 
   def set_corporate_invoice_status(_invoice_id, _status), do: {:error, :invalid_invoice_status}
+
+  @impl true
+  def mark_overdue_corporate_invoices(%Date{} = today) do
+    {count, _} =
+      FinanceCorporateInvoice
+      |> tenant_scope()
+      |> where([i], i.status == "issued" and i.due_on < ^today)
+      |> Repo.update_all(set: [status: "overdue", updated_at: DateTime.utc_now()])
+
+    count
+  end
+
+  @impl true
+  def corporate_invoices_needing_reminder(%Date{} = today, interval_days) do
+    FinanceCorporateInvoice
+    |> tenant_scope()
+    |> where([i], i.status == "overdue")
+    |> Repo.all()
+    |> Enum.filter(&CorporateInvoicePolicy.reminder_due?(&1, today, interval_days))
+    |> Enum.map(fn invoice ->
+      client = fetch_corporate_client(invoice.corporate_client_id)
+
+      invoice
+      |> invoice_with_payments()
+      |> Map.put(:client, client && normalize_corporate_client(client))
+    end)
+  end
+
+  @impl true
+  def mark_corporate_invoice_reminded(invoice_id, %Date{} = on) do
+    case fetch_corporate_invoice(invoice_id) do
+      nil ->
+        {:error, :not_found}
+
+      invoice ->
+        invoice
+        |> FinanceCorporateInvoice.reminded_changeset(on)
+        |> Repo.update()
+        |> case do
+          {:ok, invoice} -> {:ok, invoice_with_payments(invoice)}
+          error -> error
+        end
+    end
+  end
+
+  defp fetch_corporate_invoice(id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} -> tenant_scope(FinanceCorporateInvoice) |> where([i], i.id == ^id) |> Repo.one()
+      :error -> nil
+    end
+  end
+
+  defp locked_corporate_invoice!(id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} ->
+        FinanceCorporateInvoice
+        |> tenant_scope()
+        |> where([i], i.id == ^id)
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      :error ->
+        Repo.rollback(:not_found)
+    end
+  end
+
+  # Recomputes the status from the payments still standing and returns the
+  # invoice in its API shape.
+  defp settle_corporate_invoice!(invoice) do
+    paid = corporate_paid_cents(invoice.id)
+    today = Date.utc_today()
+    status = CorporateInvoicePolicy.status_after_payments(invoice, paid, today)
+
+    paid_on =
+      if status == "paid",
+        do: last_corporate_payment_date(invoice.id) || today
+
+    invoice
+    |> FinanceCorporateInvoice.status_changeset(status, paid_on)
+    |> Repo.update!()
+    |> invoice_with_payments()
+  end
+
+  defp corporate_paid_cents(invoice_id) do
+    FinanceCorporatePayment
+    |> tenant_scope()
+    |> where([p], p.corporate_invoice_id == ^invoice_id and is_nil(p.reversed_at))
+    |> select([p], coalesce(sum(p.amount_cents), 0))
+    |> Repo.one()
+    |> to_integer_cents()
+  end
+
+  defp last_corporate_payment_date(invoice_id) do
+    FinanceCorporatePayment
+    |> tenant_scope()
+    |> where([p], p.corporate_invoice_id == ^invoice_id and is_nil(p.reversed_at))
+    |> select([p], max(p.paid_on))
+    |> Repo.one()
+  end
+
+  defp corporate_payments_by_invoice([]), do: %{}
+
+  defp corporate_payments_by_invoice(invoice_ids) do
+    FinanceCorporatePayment
+    |> tenant_scope()
+    |> where([p], p.corporate_invoice_id in ^invoice_ids)
+    |> order_by([p], asc: p.paid_on, asc: p.inserted_at)
+    |> Repo.all()
+    |> Enum.group_by(& &1.corporate_invoice_id)
+  end
+
+  defp invoice_with_payments(invoice) do
+    payments = Map.get(corporate_payments_by_invoice([invoice.id]), invoice.id, [])
+    normalize_corporate_invoice(invoice, payments)
+  end
 
   defp fetch_corporate_client(id) do
     case Ecto.UUID.cast(id) do
@@ -1737,14 +1979,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       seats: terms[:seats],
       seat_billing: terms[:seat_billing] || "agreed",
       active_seats: length(active_corporate_seats(client.id, Date.utc_today())),
+      payment_terms_days: client.payment_terms_days,
+      auto_invoice: client.auto_invoice,
       status: client.status
     }
   end
 
-  defp normalize_corporate_invoice(invoice) do
-    Map.take(invoice, [
+  defp normalize_corporate_invoice(invoice, payments) do
+    paid = payments |> Enum.reject(& &1.reversed_at) |> Enum.map(& &1.amount_cents) |> Enum.sum()
+
+    invoice
+    |> Map.take([
       :id,
       :corporate_client_id,
+      :invoice_number,
       :period_start,
       :period_end,
       :seat_billing,
@@ -1753,7 +2001,30 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       :total_cents,
       :status,
       :issued_on,
-      :paid_on
+      :due_on,
+      :paid_on,
+      :last_reminded_on,
+      :reminder_count
+    ])
+    |> Map.merge(%{
+      paid_cents: paid,
+      balance_cents: if(invoice.status == "void", do: 0, else: invoice.total_cents - paid),
+      payments: Enum.map(payments, &normalize_corporate_payment/1)
+    })
+  end
+
+  defp normalize_corporate_payment(payment) do
+    Map.take(payment, [
+      :id,
+      :amount_cents,
+      :payment_method,
+      :paid_on,
+      :reference,
+      :notes,
+      :recorded_by_id,
+      :reversed_at,
+      :reversal_reason,
+      :inserted_at
     ])
   end
 

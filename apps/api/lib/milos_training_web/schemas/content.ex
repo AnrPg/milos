@@ -97,9 +97,28 @@ defmodule MilosTrainingWeb.Schemas.Content do
             },
             required: [:workout_id, :points]
           }
+        },
+        pr_timeline: %Schema{
+          type: :array,
+          items: %Schema{
+            title: "PRTimelineEntry",
+            type: :object,
+            properties: %{
+              id: %Schema{type: :string, format: :uuid},
+              pr_record_id: %Schema{type: :string, format: :uuid},
+              name: %Schema{type: :string},
+              unit: %Schema{type: :string},
+              higher_is_better: %Schema{type: :boolean},
+              beaten_on: %Schema{type: :string, format: :date},
+              score: %Schema{type: :number},
+              previous_score: %Schema{type: :number, nullable: true},
+              change: %Schema{type: :number, nullable: true}
+            },
+            required: [:id, :pr_record_id, :name, :unit, :beaten_on, :score]
+          }
         }
       },
-      required: [:totals, :weekly, :consistency, :sources, :score_history]
+      required: [:totals, :weekly, :consistency, :sources, :score_history, :pr_timeline]
     }
   end
 end

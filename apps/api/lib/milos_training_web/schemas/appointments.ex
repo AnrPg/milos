@@ -33,6 +33,7 @@ defmodule MilosTrainingWeb.Schemas.Appointments do
       properties: %{
         id: @uuid,
         coach_id: @uuid,
+        coach_nickname: %Schema{type: :string, nullable: true},
         kind: %Schema{type: :string, enum: ["pt_session", "assessment"]},
         format: %Schema{type: :string, enum: ["one_to_one", "semi_private"]},
         starts_at: @date_time,

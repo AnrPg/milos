@@ -138,6 +138,10 @@
             "format": "uuid",
             "type": "string"
           },
+          "coach_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
           "duration_minutes": {
             "type": "integer"
           },
@@ -242,6 +246,9 @@
           "active_seats": {
             "type": "integer"
           },
+          "auto_invoice": {
+            "type": "boolean"
+          },
           "billing_email": {
             "nullable": true,
             "type": "string"
@@ -279,6 +286,9 @@
             "nullable": true,
             "type": "string"
           },
+          "payment_terms_days": {
+            "type": "integer"
+          },
           "seat_billing": {
             "enum": [
               "agreed",
@@ -311,22 +321,98 @@
       },
       "CorporateInvoice": {
         "properties": {
+          "balance_cents": {
+            "type": "integer"
+          },
           "corporate_client_id": {
             "format": "uuid",
+            "type": "string"
+          },
+          "due_on": {
+            "format": "date",
             "type": "string"
           },
           "id": {
             "format": "uuid",
             "type": "string"
           },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
           "issued_on": {
             "format": "date",
             "type": "string"
+          },
+          "last_reminded_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "paid_cents": {
+            "type": "integer"
           },
           "paid_on": {
             "format": "date",
             "nullable": true,
             "type": "string"
+          },
+          "payments": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "notes": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "paid_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "payment_method": {
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_manual",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "recorded_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reference": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversal_reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "amount_cents",
+                "payment_method",
+                "paid_on"
+              ],
+              "title": "CorporatePayment",
+              "type": "object"
+            },
+            "type": "array"
           },
           "period_end": {
             "format": "date",
@@ -335,6 +421,9 @@
           "period_start": {
             "format": "date",
             "type": "string"
+          },
+          "reminder_count": {
+            "type": "integer"
           },
           "seat_billing": {
             "type": "string"
@@ -345,6 +434,7 @@
           "status": {
             "enum": [
               "issued",
+              "overdue",
               "paid",
               "void"
             ],
@@ -363,9 +453,301 @@
           "period_end",
           "seats_billed",
           "total_cents",
-          "status"
+          "status",
+          "due_on",
+          "paid_cents",
+          "balance_cents",
+          "payments"
         ],
         "title": "CorporateInvoice",
+        "type": "object"
+      },
+      "CorporateInvoiceDocument": {
+        "properties": {
+          "balance_cents": {
+            "type": "integer"
+          },
+          "client": {
+            "properties": {
+              "active_seats": {
+                "type": "integer"
+              },
+              "auto_invoice": {
+                "type": "boolean"
+              },
+              "billing_email": {
+                "nullable": true,
+                "type": "string"
+              },
+              "company_name": {
+                "type": "string"
+              },
+              "contact_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "enrollment": {
+                "enum": [
+                  "invite_code",
+                  "email_domain"
+                ],
+                "type": "string"
+              },
+              "enrollment_code": {
+                "type": "string"
+              },
+              "enrollment_domain": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "membership_package_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "package_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "payment_terms_days": {
+                "type": "integer"
+              },
+              "seat_billing": {
+                "enum": [
+                  "agreed",
+                  "used"
+                ],
+                "type": "string"
+              },
+              "seats": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "active",
+                  "archived"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "membership_package_id",
+              "company_name",
+              "enrollment_code",
+              "active_seats",
+              "status"
+            ],
+            "title": "CorporateClient",
+            "type": "object"
+          },
+          "corporate_client_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "due_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "issuer": {
+            "properties": {
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "name"
+            ],
+            "type": "object"
+          },
+          "last_reminded_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "paid_cents": {
+            "type": "integer"
+          },
+          "paid_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "payments": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "notes": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "paid_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "payment_method": {
+                  "enum": [
+                    "cash",
+                    "bank_transfer",
+                    "card_manual",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "recorded_by_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reference": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversal_reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reversed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "amount_cents",
+                "payment_method",
+                "paid_on"
+              ],
+              "title": "CorporatePayment",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "period_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "type": "string"
+          },
+          "reminder_count": {
+            "type": "integer"
+          },
+          "seat_billing": {
+            "type": "string"
+          },
+          "seats_billed": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "issued",
+              "overdue",
+              "paid",
+              "void"
+            ],
+            "type": "string"
+          },
+          "total_cents": {
+            "type": "integer"
+          },
+          "unit_price_cents": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "period_start",
+          "period_end",
+          "seats_billed",
+          "total_cents",
+          "status",
+          "due_on",
+          "paid_cents",
+          "balance_cents",
+          "payments",
+          "client",
+          "issuer"
+        ],
+        "title": "CorporateInvoiceDocument",
+        "type": "object"
+      },
+      "CorporatePayment": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "paid_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "payment_method": {
+            "enum": [
+              "cash",
+              "bank_transfer",
+              "card_manual",
+              "other"
+            ],
+            "type": "string"
+          },
+          "recorded_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "reference": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reversal_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reversed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "amount_cents",
+          "payment_method",
+          "paid_on"
+        ],
+        "title": "CorporatePayment",
         "type": "object"
       },
       "CorporateSeat": {
@@ -616,6 +998,52 @@
         "title": "NutritionPlan",
         "type": "object"
       },
+      "PRTimelineEntry": {
+        "properties": {
+          "beaten_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "change": {
+            "nullable": true,
+            "type": "number"
+          },
+          "higher_is_better": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "pr_record_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "previous_score": {
+            "nullable": true,
+            "type": "number"
+          },
+          "score": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "pr_record_id",
+          "name",
+          "unit",
+          "beaten_on",
+          "score"
+        ],
+        "title": "PRTimelineEntry",
+        "type": "object"
+      },
       "ProgressStats": {
         "properties": {
           "consistency": {
@@ -640,6 +1068,55 @@
               "current_streak_weeks"
             ],
             "type": "object"
+          },
+          "pr_timeline": {
+            "items": {
+              "properties": {
+                "beaten_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "change": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "higher_is_better": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "pr_record_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "previous_score": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "score": {
+                  "type": "number"
+                },
+                "unit": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "pr_record_id",
+                "name",
+                "unit",
+                "beaten_on",
+                "score"
+              ],
+              "title": "PRTimelineEntry",
+              "type": "object"
+            },
+            "type": "array"
           },
           "score_history": {
             "items": {
@@ -758,7 +1235,8 @@
           "weekly",
           "consistency",
           "sources",
-          "score_history"
+          "score_history",
+          "pr_timeline"
         ],
         "title": "ProgressStats",
         "type": "object"
@@ -783,6 +1261,32 @@
         ],
         "type": "object"
       },
+      "StaffMember": {
+        "properties": {
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "owner",
+              "admin",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "role"
+        ],
+        "title": "StaffMember",
+        "type": "object"
+      },
       "SubscriptionBeneficiary": {
         "properties": {
           "id": {
@@ -794,6 +1298,10 @@
           },
           "membership_id": {
             "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
             "type": "string"
           },
           "removed_at": {
@@ -2146,6 +2654,55 @@
                           ],
                           "type": "object"
                         },
+                        "pr_timeline": {
+                          "items": {
+                            "properties": {
+                              "beaten_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "change": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "higher_is_better": {
+                                "type": "boolean"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "pr_record_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "previous_score": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "score": {
+                                "type": "number"
+                              },
+                              "unit": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "pr_record_id",
+                              "name",
+                              "unit",
+                              "beaten_on",
+                              "score"
+                            ],
+                            "title": "PRTimelineEntry",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "score_history": {
                           "items": {
                             "properties": {
@@ -2263,7 +2820,8 @@
                         "weekly",
                         "consistency",
                         "sources",
-                        "score_history"
+                        "score_history",
+                        "pr_timeline"
                       ],
                       "title": "ProgressStats",
                       "type": "object"
@@ -3348,6 +3906,10 @@
                           "format": "uuid",
                           "type": "string"
                         },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "removed_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -3598,22 +4160,98 @@
                     "invoices": {
                       "items": {
                         "properties": {
+                          "balance_cents": {
+                            "type": "integer"
+                          },
                           "corporate_client_id": {
                             "format": "uuid",
+                            "type": "string"
+                          },
+                          "due_on": {
+                            "format": "date",
                             "type": "string"
                           },
                           "id": {
                             "format": "uuid",
                             "type": "string"
                           },
+                          "invoice_number": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "issued_on": {
                             "format": "date",
                             "type": "string"
+                          },
+                          "last_reminded_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "paid_cents": {
+                            "type": "integer"
                           },
                           "paid_on": {
                             "format": "date",
                             "nullable": true,
                             "type": "string"
+                          },
+                          "payments": {
+                            "items": {
+                              "properties": {
+                                "amount_cents": {
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "notes": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "paid_on": {
+                                  "format": "date",
+                                  "type": "string"
+                                },
+                                "payment_method": {
+                                  "enum": [
+                                    "cash",
+                                    "bank_transfer",
+                                    "card_manual",
+                                    "other"
+                                  ],
+                                  "type": "string"
+                                },
+                                "recorded_by_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reference": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reversal_reason": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reversed_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "amount_cents",
+                                "payment_method",
+                                "paid_on"
+                              ],
+                              "title": "CorporatePayment",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "period_end": {
                             "format": "date",
@@ -3622,6 +4260,9 @@
                           "period_start": {
                             "format": "date",
                             "type": "string"
+                          },
+                          "reminder_count": {
+                            "type": "integer"
                           },
                           "seat_billing": {
                             "type": "string"
@@ -3632,6 +4273,7 @@
                           "status": {
                             "enum": [
                               "issued",
+                              "overdue",
                               "paid",
                               "void"
                             ],
@@ -3650,7 +4292,11 @@
                           "period_end",
                           "seats_billed",
                           "total_cents",
-                          "status"
+                          "status",
+                          "due_on",
+                          "paid_cents",
+                          "balance_cents",
+                          "payments"
                         ],
                         "title": "CorporateInvoice",
                         "type": "object"
@@ -3717,22 +4363,98 @@
                   "properties": {
                     "invoice": {
                       "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
                         "corporate_client_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
                           "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "issued_on": {
                           "format": "date",
                           "type": "string"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
                         },
                         "paid_on": {
                           "format": "date",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "period_end": {
                           "format": "date",
@@ -3741,6 +4463,9 @@
                         "period_start": {
                           "format": "date",
                           "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
                         },
                         "seat_billing": {
                           "type": "string"
@@ -3751,6 +4476,7 @@
                         "status": {
                           "enum": [
                             "issued",
+                            "overdue",
                             "paid",
                             "void"
                           ],
@@ -3769,7 +4495,11 @@
                         "period_end",
                         "seats_billed",
                         "total_cents",
-                        "status"
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments"
                       ],
                       "title": "CorporateInvoice",
                       "type": "object"
@@ -5811,6 +6541,68 @@
         "summary": "Create a promotion campaign",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/members": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.StaffController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "staff": {
+                      "items": {
+                        "properties": {
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "owner",
+                              "admin",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "user_id",
+                          "role"
+                        ],
+                        "title": "StaffMember",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "staff"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Staff"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Owners, admins and coaches of this gym",
+        "tags": [
+          "Staff"
         ]
       }
     },
@@ -10773,6 +11565,259 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/payments": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.record_payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "amount_cents": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "notes": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "paid_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "payment_method": {
+                    "enum": [
+                      "cash",
+                      "bank_transfer",
+                      "card_manual",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "reference": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "amount_cents",
+                  "payment_method"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "overdue",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments"
+                      ],
+                      "title": "CorporateInvoice",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice closed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid payment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record a (partial) payment against a corporate invoice",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
       "post": {
         "callbacks": {},
@@ -11385,6 +12430,218 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/payments/{payment_id}/reverse": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.reverse_payment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "payment_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "overdue",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments"
+                      ],
+                      "title": "CorporateInvoice",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reverse a mistaken corporate payment",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/settings": {
       "get": {
         "callbacks": {},
@@ -11945,6 +13202,203 @@
         "summary": "Update global admin settings",
         "tags": [
           "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/send": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.send_invoice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "overdue",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments"
+                      ],
+                      "title": "CorporateInvoice",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No billing email"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Email a corporate invoice (a reminder when overdue) to the billing contact",
+        "tags": [
+          "Payment models"
         ]
       }
     },
@@ -14772,6 +16226,294 @@
         "summary": "Return the authenticated user",
         "tags": [
           "Authentication"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.invoice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
+                        "client": {
+                          "properties": {
+                            "active_seats": {
+                              "type": "integer"
+                            },
+                            "auto_invoice": {
+                              "type": "boolean"
+                            },
+                            "billing_email": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "company_name": {
+                              "type": "string"
+                            },
+                            "contact_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "enrollment": {
+                              "enum": [
+                                "invite_code",
+                                "email_domain"
+                              ],
+                              "type": "string"
+                            },
+                            "enrollment_code": {
+                              "type": "string"
+                            },
+                            "enrollment_domain": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "membership_package_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "package_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "payment_terms_days": {
+                              "type": "integer"
+                            },
+                            "seat_billing": {
+                              "enum": [
+                                "agreed",
+                                "used"
+                              ],
+                              "type": "string"
+                            },
+                            "seats": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "status": {
+                              "enum": [
+                                "active",
+                                "archived"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "membership_package_id",
+                            "company_name",
+                            "enrollment_code",
+                            "active_seats",
+                            "status"
+                          ],
+                          "title": "CorporateClient",
+                          "type": "object"
+                        },
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "issuer": {
+                          "properties": {
+                            "name": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "name"
+                          ],
+                          "type": "object"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "overdue",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments",
+                        "client",
+                        "issuer"
+                      ],
+                      "title": "CorporateInvoiceDocument",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A corporate invoice with its payments, client and issuer, for the document",
+        "tags": [
+          "Payment models"
         ]
       }
     },
@@ -24019,7 +25761,6 @@
                 "properties": {
                   "status": {
                     "enum": [
-                      "paid",
                       "void"
                     ],
                     "type": "string"
@@ -24042,22 +25783,98 @@
                   "properties": {
                     "invoice": {
                       "properties": {
+                        "balance_cents": {
+                          "type": "integer"
+                        },
                         "corporate_client_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "due_on": {
+                          "format": "date",
                           "type": "string"
                         },
                         "id": {
                           "format": "uuid",
                           "type": "string"
                         },
+                        "invoice_number": {
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "issued_on": {
                           "format": "date",
                           "type": "string"
+                        },
+                        "last_reminded_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "paid_cents": {
+                          "type": "integer"
                         },
                         "paid_on": {
                           "format": "date",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "payments": {
+                          "items": {
+                            "properties": {
+                              "amount_cents": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "notes": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "paid_on": {
+                                "format": "date",
+                                "type": "string"
+                              },
+                              "payment_method": {
+                                "enum": [
+                                  "cash",
+                                  "bank_transfer",
+                                  "card_manual",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "recorded_by_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reference": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversal_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reversed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "amount_cents",
+                              "payment_method",
+                              "paid_on"
+                            ],
+                            "title": "CorporatePayment",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "period_end": {
                           "format": "date",
@@ -24066,6 +25883,9 @@
                         "period_start": {
                           "format": "date",
                           "type": "string"
+                        },
+                        "reminder_count": {
+                          "type": "integer"
                         },
                         "seat_billing": {
                           "type": "string"
@@ -24076,6 +25896,7 @@
                         "status": {
                           "enum": [
                             "issued",
+                            "overdue",
                             "paid",
                             "void"
                           ],
@@ -24094,7 +25915,11 @@
                         "period_end",
                         "seats_billed",
                         "total_cents",
-                        "status"
+                        "status",
+                        "due_on",
+                        "paid_cents",
+                        "balance_cents",
+                        "payments"
                       ],
                       "title": "CorporateInvoice",
                       "type": "object"
@@ -24108,6 +25933,17 @@
               }
             },
             "description": "Invoice"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice closed or has payments"
           }
         },
         "security": [
@@ -24115,7 +25951,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Mark a corporate invoice paid or void",
+        "summary": "Void a corporate invoice that has no payments",
         "tags": [
           "Payment models"
         ]
@@ -25535,6 +27371,10 @@
                             "format": "uuid",
                             "type": "string"
                           },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "removed_at": {
                             "format": "date-time",
                             "nullable": true,
@@ -25634,6 +27474,10 @@
                         },
                         "membership_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "removed_at": {
@@ -26282,6 +28126,10 @@
                         },
                         "coach_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "duration_minutes": {
@@ -28993,6 +30841,10 @@
                             "format": "uuid",
                             "type": "string"
                           },
+                          "coach_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "duration_minutes": {
                             "type": "integer"
                           },
@@ -29215,6 +31067,10 @@
                         },
                         "coach_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach_nickname": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "duration_minutes": {
@@ -35862,6 +37718,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "auto_invoice": {
+                    "type": "boolean"
+                  },
                   "billing_email": {
                     "maxLength": 200,
                     "nullable": true,
@@ -35876,6 +37735,11 @@
                     "maxLength": 120,
                     "nullable": true,
                     "type": "string"
+                  },
+                  "payment_terms_days": {
+                    "maximum": 120,
+                    "minimum": 0,
+                    "type": "integer"
                   },
                   "regenerate_code": {
                     "type": "boolean"
@@ -35904,6 +37768,9 @@
                       "properties": {
                         "active_seats": {
                           "type": "integer"
+                        },
+                        "auto_invoice": {
+                          "type": "boolean"
                         },
                         "billing_email": {
                           "nullable": true,
@@ -35941,6 +37808,9 @@
                         "package_name": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "payment_terms_days": {
+                          "type": "integer"
                         },
                         "seat_billing": {
                           "enum": [
@@ -36245,6 +38115,9 @@
                           "active_seats": {
                             "type": "integer"
                           },
+                          "auto_invoice": {
+                            "type": "boolean"
+                          },
                           "billing_email": {
                             "nullable": true,
                             "type": "string"
@@ -36281,6 +38154,9 @@
                           "package_name": {
                             "nullable": true,
                             "type": "string"
+                          },
+                          "payment_terms_days": {
+                            "type": "integer"
                           },
                           "seat_billing": {
                             "enum": [
@@ -36345,6 +38221,9 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "auto_invoice": {
+                    "type": "boolean"
+                  },
                   "billing_email": {
                     "maxLength": 200,
                     "nullable": true,
@@ -36363,6 +38242,11 @@
                   "membership_package_id": {
                     "format": "uuid",
                     "type": "string"
+                  },
+                  "payment_terms_days": {
+                    "maximum": 120,
+                    "minimum": 0,
+                    "type": "integer"
                   }
                 },
                 "required": [
@@ -36385,6 +38269,9 @@
                       "properties": {
                         "active_seats": {
                           "type": "integer"
+                        },
+                        "auto_invoice": {
+                          "type": "boolean"
                         },
                         "billing_email": {
                           "nullable": true,
@@ -36422,6 +38309,9 @@
                         "package_name": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "payment_terms_days": {
+                          "type": "integer"
                         },
                         "seat_billing": {
                           "enum": [
@@ -38901,6 +40791,10 @@
                           },
                           "coach_id": {
                             "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach_nickname": {
+                            "nullable": true,
                             "type": "string"
                           },
                           "duration_minutes": {

@@ -101,5 +101,15 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback generate_corporate_invoice(binary(), Date.t()) :: {:ok, map()} | {:error, term()}
   @callback list_corporate_invoices(binary()) :: [map()]
   @callback set_corporate_invoice_status(binary(), String.t()) :: {:ok, map()} | {:error, term()}
+  @callback get_corporate_invoice(String.t()) :: map() | nil
+  @callback record_corporate_payment(String.t(), String.t() | nil, map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback reverse_corporate_payment(String.t(), String.t(), String.t() | nil, map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback issue_due_corporate_invoices(Date.t()) :: [map()]
+  @callback mark_overdue_corporate_invoices(Date.t()) :: non_neg_integer()
+  @callback corporate_invoices_needing_reminder(Date.t(), pos_integer()) :: [map()]
+  @callback mark_corporate_invoice_reminded(String.t(), Date.t()) ::
+              {:ok, map()} | {:error, term()}
   @callback subscriptions_due_for_expiry_reminder(Date.t()) :: [map()]
 end

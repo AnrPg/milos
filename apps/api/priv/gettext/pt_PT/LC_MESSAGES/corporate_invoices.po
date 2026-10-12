@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: pt_PT\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "Número da fatura"
+
+msgid "Period"
+msgstr "Período"
+
+msgid "Seats"
+msgstr "Lugares"
+
+msgid "Price per seat"
+msgstr "Preço por lugar"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "Paid"
+msgstr "Pago"
+
+msgid "Balance due"
+msgstr "Valor em dívida"
+
+msgid "Due date"
+msgstr "Data de vencimento"
+
+msgid "Hello %{name},"
+msgstr "Olá %{name},"
+
+msgid "Thank you."
+msgstr "Obrigado."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "Fatura %{number} de %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "O %{gym} emitiu a fatura %{number} a %{company} relativa ao período %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "Por favor, pague até %{due} indicando o número da fatura."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "Lembrete: a fatura %{number} de %{gym} está vencida"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "A fatura %{number} a %{company} venceu em %{due} e continua por pagar."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "Se já efetuou o pagamento, ignore este lembrete."

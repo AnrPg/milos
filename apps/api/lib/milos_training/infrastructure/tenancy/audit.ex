@@ -15,6 +15,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
     appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
     finance_corporate_invoices
+    finance_corporate_payments
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

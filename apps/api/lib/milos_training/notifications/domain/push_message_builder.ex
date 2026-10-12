@@ -232,7 +232,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
         localize.("%{client} sent a video for feedback.", %{
           client: payload["client_nickname"] || ""
         }),
-      url: payload["url"] || "/admin/coaching/form-reviews"
+      url: payload["url"] || "/admin/coaching?tab=form-reviews"
     }
   end
 
@@ -240,7 +240,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your form review is ready", %{}),
       body: localize.("Your coach left feedback on your video.", %{}),
-      url: payload["url"] || "/account/coaching"
+      url: payload["url"] || "/coaching"
     }
   end
 
@@ -251,7 +251,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
         localize.("%{client} has been waiting longer than the promised reply time.", %{
           client: payload["client_nickname"] || ""
         }),
-      url: payload["url"] || "/account/activity/chats"
+      url: payload["url"] || "/admin/coaching?tab=replies"
     }
   end
 
@@ -259,7 +259,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Your nutrition plan was updated", %{}),
       body: localize.("Open it to see what changed.", %{}),
-      url: payload["url"] || "/account/coaching"
+      url: payload["url"] || "/coaching"
     }
   end
 
@@ -271,7 +271,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
           client: payload["client_nickname"] || "",
           time: payload["starts_at"] || ""
         }),
-      url: payload["url"] || "/staff/appointments"
+      url: payload["url"] || "/admin/appointments"
     }
   end
 
@@ -280,7 +280,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       title: localize.("Appointment cancelled", %{}),
       body:
         localize.("The session on %{time} was cancelled.", %{time: payload["starts_at"] || ""}),
-      url: payload["url"] || "/account/coaching"
+      url: payload["url"] || "/appointments"
     }
   end
 

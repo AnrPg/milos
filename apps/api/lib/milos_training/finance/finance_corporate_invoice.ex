@@ -19,6 +19,10 @@ defmodule MilosTraining.Finance.FinanceCorporateInvoice do
     field :status, :string, default: "issued"
     field :issued_on, :date
     field :paid_on, :date
+    field :invoice_number, :string
+    field :due_on, :date
+    field :last_reminded_on, :date
+    field :reminder_count, :integer, default: 0
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -33,7 +37,9 @@ defmodule MilosTraining.Finance.FinanceCorporateInvoice do
       :seats_billed,
       :unit_price_cents,
       :total_cents,
-      :issued_on
+      :issued_on,
+      :invoice_number,
+      :due_on
     ])
     |> validate_required([
       :corporate_client_id,
@@ -43,7 +49,8 @@ defmodule MilosTraining.Finance.FinanceCorporateInvoice do
       :seats_billed,
       :unit_price_cents,
       :total_cents,
-      :issued_on
+      :issued_on,
+      :due_on
     ])
     |> unique_constraint([:corporate_client_id, :period_start],
       name: :finance_corporate_invoices_period_index,
@@ -53,4 +60,7 @@ defmodule MilosTraining.Finance.FinanceCorporateInvoice do
 
   def status_changeset(invoice, status, paid_on),
     do: change(invoice, status: status, paid_on: paid_on)
+
+  def reminded_changeset(invoice, on),
+    do: change(invoice, last_reminded_on: on, reminder_count: invoice.reminder_count + 1)
 end

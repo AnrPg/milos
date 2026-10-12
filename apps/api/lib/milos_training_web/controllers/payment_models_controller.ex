@@ -8,8 +8,10 @@ defmodule MilosTrainingWeb.PaymentModelsController do
 
   alias MilosTraining.Application.{
     AddSubscriptionBeneficiary,
+    CorporateInvoicing,
     EnrollCorporateSeat,
-    ListCorporateSeats
+    ListCorporateSeats,
+    ListSubscriptionBeneficiaries
   }
 
   alias MilosTraining.Finance
@@ -44,7 +46,9 @@ defmodule MilosTrainingWeb.PaymentModelsController do
   )
 
   def beneficiaries(conn, %{id: id}) do
-    json(conn, %{beneficiaries: Finance.list_beneficiaries(conn.assigns.tenant_context, id)})
+    json(conn, %{
+      beneficiaries: ListSubscriptionBeneficiaries.call(conn.assigns.tenant_context, id)
+    })
   end
 
   operation(:add_beneficiary,
@@ -110,7 +114,9 @@ defmodule MilosTrainingWeb.PaymentModelsController do
           membership_package_id: @uuid,
           company_name: %Schema{type: :string, minLength: 2, maxLength: 120},
           billing_email: %Schema{type: :string, maxLength: 200, nullable: true},
-          contact_name: %Schema{type: :string, maxLength: 120, nullable: true}
+          contact_name: %Schema{type: :string, maxLength: 120, nullable: true},
+          payment_terms_days: %Schema{type: :integer, minimum: 0, maximum: 120},
+          auto_invoice: %Schema{type: :boolean}
         },
         required: [:membership_package_id, :company_name]
       }),
@@ -139,7 +145,9 @@ defmodule MilosTrainingWeb.PaymentModelsController do
           billing_email: %Schema{type: :string, maxLength: 200, nullable: true},
           contact_name: %Schema{type: :string, maxLength: 120, nullable: true},
           status: %Schema{type: :string, enum: ["active", "archived"]},
-          regenerate_code: %Schema{type: :boolean}
+          regenerate_code: %Schema{type: :boolean},
+          payment_terms_days: %Schema{type: :integer, minimum: 0, maximum: 120},
+          auto_invoice: %Schema{type: :boolean}
         }
       }),
     responses: [ok: {"Client", "application/json", @client_response}]
@@ -228,15 +236,18 @@ defmodule MilosTrainingWeb.PaymentModelsController do
   end
 
   operation(:invoice_status,
-    summary: "Mark a corporate invoice paid or void",
+    summary: "Void a corporate invoice that has no payments",
     parameters: [@id],
     request_body:
       S.body(%Schema{
         type: :object,
-        properties: %{status: %Schema{type: :string, enum: ["paid", "void"]}},
+        properties: %{status: %Schema{type: :string, enum: ["void"]}},
         required: [:status]
       }),
-    responses: [ok: {"Invoice", "application/json", @invoice_response}]
+    responses: [
+      ok: {"Invoice", "application/json", @invoice_response},
+      conflict: {"Invoice closed or has payments", "application/json", @error}
+    ]
   )
 
   def invoice_status(conn, %{id: id}) do
@@ -245,6 +256,93 @@ defmodule MilosTrainingWeb.PaymentModelsController do
     with {:ok, invoice} <-
            Finance.set_corporate_invoice_status(conn.assigns.tenant_context, id, status) do
       json(conn, %{invoice: invoice})
+    end
+  end
+
+  operation(:invoice,
+    summary: "A corporate invoice with its payments, client and issuer, for the document",
+    parameters: [@id],
+    responses: [
+      ok: {"Invoice", "application/json", S.wrap(:invoice, S.invoice_document_schema())},
+      not_found: {"Not found", "application/json", @error}
+    ]
+  )
+
+  def invoice(conn, %{id: id}) do
+    context = conn.assigns.tenant_context
+
+    case Finance.get_corporate_invoice(context, id) do
+      nil ->
+        {:error, :not_found}
+
+      invoice ->
+        json(conn, %{invoice: Map.put(invoice, :issuer, %{name: context.organization.name})})
+    end
+  end
+
+  operation(:record_payment,
+    summary: "Record a (partial) payment against a corporate invoice",
+    parameters: [@id],
+    request_body: S.body(S.payment_request_schema()),
+    responses: [
+      created: {"Invoice", "application/json", @invoice_response},
+      unprocessable_entity: {"Invalid payment", "application/json", @error},
+      conflict: {"Invoice closed", "application/json", @error}
+    ]
+  )
+
+  def record_payment(conn, %{id: id}) do
+    context = conn.assigns.tenant_context
+    admin_id = GuardianPlug.current_resource(conn).id
+
+    with {:ok, invoice} <-
+           Finance.record_corporate_payment(context, id, admin_id, conn.body_params) do
+      conn |> put_status(:created) |> json(%{invoice: invoice})
+    end
+  end
+
+  operation(:reverse_payment,
+    summary: "Reverse a mistaken corporate payment",
+    parameters: [
+      @id,
+      %Parameter{name: :payment_id, in: :path, required: true, schema: @uuid}
+    ],
+    request_body:
+      S.optional_body(%Schema{
+        type: :object,
+        properties: %{reason: %Schema{type: :string, maxLength: 500, nullable: true}}
+      }),
+    responses: [ok: {"Invoice", "application/json", @invoice_response}]
+  )
+
+  def reverse_payment(conn, %{id: id, payment_id: payment_id}) do
+    context = conn.assigns.tenant_context
+    admin_id = GuardianPlug.current_resource(conn).id
+
+    with {:ok, invoice} <-
+           Finance.reverse_corporate_payment(
+             context,
+             id,
+             payment_id,
+             admin_id,
+             conn.body_params || %{}
+           ) do
+      json(conn, %{invoice: invoice})
+    end
+  end
+
+  operation(:send_invoice,
+    summary: "Email a corporate invoice (a reminder when overdue) to the billing contact",
+    parameters: [@id],
+    responses: [
+      ok: {"Invoice", "application/json", @invoice_response},
+      unprocessable_entity: {"No billing email", "application/json", @error}
+    ]
+  )
+
+  def send_invoice(conn, %{id: id}) do
+    with {:ok, invoice} <- CorporateInvoicing.send_invoice(conn.assigns.tenant_context, id) do
+      json(conn, %{invoice: Map.delete(invoice, :client)})
     end
   end
 

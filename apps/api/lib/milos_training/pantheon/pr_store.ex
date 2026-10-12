@@ -33,5 +33,8 @@ defmodule MilosTraining.Pantheon.PRStore do
   def list_pr_history(pr_record_id), do: adapter().list_pr_history(pr_record_id)
 
   @impl true
+  def list_user_pr_history(user_id), do: adapter().list_user_pr_history(user_id)
+
+  @impl true
   def count_user_prs(user_id), do: adapter().count_user_prs(user_id)
 end

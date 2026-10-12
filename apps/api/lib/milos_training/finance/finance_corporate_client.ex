@@ -15,6 +15,8 @@ defmodule MilosTraining.Finance.FinanceCorporateClient do
     field :contact_name, :string
     field :enrollment_code, :string
     field :status, :string, default: "active"
+    field :payment_terms_days, :integer, default: 14
+    field :auto_invoice, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -26,7 +28,9 @@ defmodule MilosTraining.Finance.FinanceCorporateClient do
       :company_name,
       :billing_email,
       :contact_name,
-      :enrollment_code
+      :enrollment_code,
+      :payment_terms_days,
+      :auto_invoice
     ])
     |> validate_required([:membership_package_id, :company_name, :enrollment_code])
     |> validate_fields()
@@ -41,7 +45,15 @@ defmodule MilosTraining.Finance.FinanceCorporateClient do
 
   def update_changeset(client, params) do
     client
-    |> cast(params, [:company_name, :billing_email, :contact_name, :status, :enrollment_code])
+    |> cast(params, [
+      :company_name,
+      :billing_email,
+      :contact_name,
+      :status,
+      :enrollment_code,
+      :payment_terms_days,
+      :auto_invoice
+    ])
     |> validate_fields()
     |> validate_inclusion(:status, ["active", "archived"])
   end
@@ -51,5 +63,9 @@ defmodule MilosTraining.Finance.FinanceCorporateClient do
     |> validate_length(:company_name, min: 2, max: 120)
     |> validate_length(:contact_name, max: 120)
     |> validate_format(:billing_email, ~r/^[^\s@]+@[^\s@]+\.[^\s@]+$/)
+    |> validate_number(:payment_terms_days,
+      greater_than_or_equal_to: 0,
+      less_than_or_equal_to: 120
+    )
   end
 end

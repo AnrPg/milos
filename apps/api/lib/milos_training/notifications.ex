@@ -177,7 +177,7 @@ defmodule MilosTraining.Notifications do
         form_review_id: field(payload, :form_review_id),
         client_nickname: field(payload, :client_nickname),
         exercise_name: field(payload, :exercise_name),
-        url: "/admin/coaching/form-reviews"
+        url: "/admin/coaching?tab=form-reviews"
       })
 
   def process_event("form_review_completed", payload),
@@ -185,7 +185,7 @@ defmodule MilosTraining.Notifications do
       enqueue_simple(:form_review_completed, payload, %{
         form_review_id: field(payload, :form_review_id),
         exercise_name: field(payload, :exercise_name),
-        url: "/account/coaching"
+        url: "/coaching"
       })
 
   def process_event("coaching_reply_overdue", payload),
@@ -194,14 +194,14 @@ defmodule MilosTraining.Notifications do
         thread_id: field(payload, :thread_id),
         client_nickname: field(payload, :client_nickname),
         due_at: field(payload, :due_at),
-        url: "/account/activity/chats?thread=#{field(payload, :thread_id)}"
+        url: "/admin/coaching?tab=replies"
       })
 
   def process_event("nutrition_plan_updated", payload),
     do:
       enqueue_simple(:nutrition_plan_updated, payload, %{
         title: field(payload, :title),
-        url: "/account/coaching"
+        url: "/coaching"
       })
 
   def process_event("appointment_booked", payload),
@@ -211,7 +211,7 @@ defmodule MilosTraining.Notifications do
         kind: field(payload, :kind),
         starts_at: field(payload, :starts_at),
         client_nickname: field(payload, :client_nickname),
-        url: "/staff/appointments"
+        url: "/admin/appointments"
       })
 
   def process_event("appointment_cancelled", payload),
@@ -220,7 +220,7 @@ defmodule MilosTraining.Notifications do
         slot_id: field(payload, :slot_id),
         kind: field(payload, :kind),
         starts_at: field(payload, :starts_at),
-        url: "/account/coaching"
+        url: field(payload, :url) || "/appointments"
       })
 
   def process_event(_event, _payload), do: {:error, :bad_request}

@@ -108,7 +108,13 @@ defmodule MilosTrainingWeb.PhaseCContentControllerTest do
   test "advanced statistics need the package benefit", %{conn: conn, base: base} do
     analyst = client(conn, %{"content.advanced_analytics" => true})
 
-    assert %{"progress" => %{"weekly" => weekly, "totals" => %{"sessions" => 0}}} =
+    assert %{
+             "progress" => %{
+               "weekly" => weekly,
+               "totals" => %{"sessions" => 0},
+               "pr_timeline" => []
+             }
+           } =
              analyst |> recycle() |> get("#{base}/me/progress") |> json_response(200)
 
     assert length(weekly) == 12

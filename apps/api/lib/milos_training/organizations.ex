@@ -60,6 +60,16 @@ defmodule MilosTraining.Organizations do
   def list_staff_user_ids(organization_id),
     do: OrganizationStore.list_staff_user_ids(organization_id)
 
+  @doc "Active staff (owner, admin, coach) of a gym with their role there."
+  def list_staff(organization_id) do
+    staff_roles = admin_roles()
+
+    organization_id
+    |> OrganizationStore.list_organization_memberships()
+    |> Enum.filter(&(&1.status == :active and &1.role in staff_roles))
+    |> Enum.map(&%{user_id: &1.user_id, role: &1.role})
+  end
+
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
 

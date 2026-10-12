@@ -11,5 +11,6 @@ defmodule MilosTraining.Pantheon.Ports.PRStore do
   @callback delete_pr(id :: Ecto.UUID.t(), user_id :: Ecto.UUID.t()) ::
               :ok | {:error, :not_found}
   @callback list_pr_history(pr_record_id :: Ecto.UUID.t()) :: [map()]
+  @callback list_user_pr_history(user_id :: Ecto.UUID.t()) :: [map()]
   @callback count_user_prs(user_id :: Ecto.UUID.t()) :: non_neg_integer()
 end

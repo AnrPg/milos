@@ -124,6 +124,30 @@ report will narrow this later (TD-054).
 - The `add_on`, `shared` and `corporate` types and the `digital_content` and
   `corporate_clients` modules become available.
 
+### Corporate invoicing
+- A corporate client has payment terms (`payment_terms_days`, default 14) and
+  automatic invoicing (`auto_invoice`, default on). A daily job issues each
+  period's invoice: `agreed` billing at the start of the period (seats are known
+  in advance), `used` billing once the period has ended (seats are only known
+  then). Periods before the client was created are never invoiced, and the
+  unique period index keeps the job idempotent. Admins can still issue an
+  invoice by hand.
+- Corporate invoices take their number from the member invoice sequence
+  (`INV-000123-CORP-…`), so numbering stays continuous, and carry a due date
+  (`issued_on + payment_terms_days`).
+- Payments are recorded against an invoice (amount, method, date, reference);
+  partial payments are allowed and a mistaken payment can be reversed. The
+  invoice is `paid` when its balance reaches zero, and goes back to `issued` or
+  `overdue` when a reversal reopens it. Void is only allowed with no payments.
+- A daily job marks unpaid invoices past their due date `overdue` and emails the
+  client's billing contact a reminder, repeated every
+  `payment_reminder_interval_days` (the gym's finance setting) while overdue.
+  The billing contact also gets an email when an invoice is issued; emails use
+  the gym's default locale.
+- The invoice PDF is produced in the browser with the same jsPDF export the app
+  already uses for workout documents (DejaVu fonts, so Greek prints correctly);
+  emails carry the invoice details in their body rather than an attachment.
+
 ## Rationale
 Each service is enforced where its data lives and every metered use goes
 through the existing ledger, so balances, grants, freezes and reconciliation

@@ -273,6 +273,7 @@ defmodule MilosTrainingWeb.Router do
       :tenant_write_rate_limited
     ])
 
+    get("/members", StaffController, :index)
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
@@ -411,6 +412,16 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/corporate-clients/:id/invoices", PaymentModelsController, :invoices)
     post("/finance/corporate-clients/:id/invoices", PaymentModelsController, :create_invoice)
     post("/finance/corporate-invoices/:id/status", PaymentModelsController, :invoice_status)
+    get("/finance/corporate-invoices/:id", PaymentModelsController, :invoice)
+    post("/finance/corporate-invoices/:id/payments", PaymentModelsController, :record_payment)
+
+    post(
+      "/finance/corporate-invoices/:id/payments/:payment_id/reverse",
+      PaymentModelsController,
+      :reverse_payment
+    )
+
+    post("/finance/corporate-invoices/:id/send", PaymentModelsController, :send_invoice)
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)

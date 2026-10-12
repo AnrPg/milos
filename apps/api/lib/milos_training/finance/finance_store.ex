@@ -265,6 +265,31 @@ defmodule MilosTraining.Finance.FinanceStore do
     do: adapter().set_corporate_invoice_status(invoice_id, status)
 
   @impl true
+  def get_corporate_invoice(id), do: adapter().get_corporate_invoice(id)
+
+  @impl true
+  def record_corporate_payment(invoice_id, admin_id, params),
+    do: adapter().record_corporate_payment(invoice_id, admin_id, params)
+
+  @impl true
+  def reverse_corporate_payment(invoice_id, payment_id, admin_id, params),
+    do: adapter().reverse_corporate_payment(invoice_id, payment_id, admin_id, params)
+
+  @impl true
+  def issue_due_corporate_invoices(today), do: adapter().issue_due_corporate_invoices(today)
+
+  @impl true
+  def mark_overdue_corporate_invoices(today), do: adapter().mark_overdue_corporate_invoices(today)
+
+  @impl true
+  def corporate_invoices_needing_reminder(today, interval_days),
+    do: adapter().corporate_invoices_needing_reminder(today, interval_days)
+
+  @impl true
+  def mark_corporate_invoice_reminded(id, on),
+    do: adapter().mark_corporate_invoice_reminded(id, on)
+
+  @impl true
   def subscriptions_due_for_expiry_reminder(today),
     do: adapter().subscriptions_due_for_expiry_reminder(today)
 end

@@ -97,6 +97,39 @@ defmodule MilosTraining.Analytics.Domain.ProgressStats do
     end)
   end
 
+  @timeline_limit 50
+
+  @doc """
+  The client's PR improvements over time, newest first: each history entry
+  with the score it replaced (`nil` for a first record).
+  """
+  def pr_timeline(history_entries) do
+    history_entries
+    |> Enum.group_by(&value(&1, :pr_record_id))
+    |> Enum.flat_map(fn {_record_id, entries} ->
+      entries
+      |> Enum.sort_by(&{to_string(value(&1, :beaten_on)), to_string(value(&1, :inserted_at))})
+      |> Enum.map_reduce(nil, fn entry, previous ->
+        score = value(entry, :score)
+
+        {%{
+           id: value(entry, :id),
+           pr_record_id: value(entry, :pr_record_id),
+           name: value(entry, :name),
+           unit: value(entry, :unit),
+           higher_is_better: value(entry, :higher_is_better),
+           beaten_on: value(entry, :beaten_on),
+           score: score,
+           previous_score: previous,
+           change: previous && score - previous
+         }, score}
+      end)
+      |> elem(0)
+    end)
+    |> Enum.sort_by(&{to_string(&1.beaten_on), &1.name || ""}, :desc)
+    |> Enum.take(@timeline_limit)
+  end
+
   defp minutes(execution), do: div(value(execution, :total_elapsed_ms) || 0, 60_000)
 
   defp value(map, key) when is_map(map), do: Map.get(map, key, Map.get(map, to_string(key)))

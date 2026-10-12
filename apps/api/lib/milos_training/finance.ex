@@ -468,6 +468,36 @@ defmodule MilosTraining.Finance do
   def set_corporate_invoice_status(context, invoice_id, status),
     do: scoped(context, fn -> FinanceStore.set_corporate_invoice_status(invoice_id, status) end)
 
+  def get_corporate_invoice(context, invoice_id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_invoice(invoice_id) end)
+
+  def record_corporate_payment(context, invoice_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.record_corporate_payment(invoice_id, admin_id, params)
+      end)
+
+  def reverse_corporate_payment(context, invoice_id, payment_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.reverse_corporate_payment(invoice_id, payment_id, admin_id, params)
+      end)
+
+  def issue_due_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.issue_due_corporate_invoices(today) end)
+
+  def mark_overdue_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.mark_overdue_corporate_invoices(today) end)
+
+  def corporate_invoices_needing_reminder(context, today, interval_days),
+    do:
+      scoped(context, fn ->
+        FinanceStore.corporate_invoices_needing_reminder(today, interval_days)
+      end)
+
+  def mark_corporate_invoice_reminded(context, invoice_id, on),
+    do: scoped(context, fn -> FinanceStore.mark_corporate_invoice_reminded(invoice_id, on) end)
+
   def subscriptions_due_for_expiry_reminder(context, today),
     do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

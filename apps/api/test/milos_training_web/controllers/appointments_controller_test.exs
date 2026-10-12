@@ -97,6 +97,7 @@ defmodule MilosTrainingWeb.AppointmentsControllerTest do
       |> Map.fetch!("slots")
 
     assert Enum.map(offered, & &1["id"]) == [one["id"]]
+    assert Enum.all?(offered, &(&1["coach_nickname"] == coach.nickname))
 
     assert %{"code" => "appointment_format_not_included"} =
              client_conn
@@ -248,5 +249,24 @@ defmodule MilosTrainingWeb.AppointmentsControllerTest do
                duration_minutes: 60
              })
              |> json_response(422)
+  end
+
+  test "staff are listed by their role in this gym", %{
+    conn: conn,
+    coach: coach,
+    coach_conn: coach_conn,
+    base: base
+  } do
+    {_member, member_conn} = client(conn, %{})
+
+    staff = coach_conn |> recycle() |> get("#{base}/staff/members") |> json_response(200)
+
+    assert Enum.any?(
+             staff["staff"],
+             &(&1["user_id"] == coach.id and &1["role"] == "coach" and
+                 &1["nickname"] == coach.nickname)
+           )
+
+    assert member_conn |> recycle() |> get("#{base}/staff/members") |> json_response(403)
   end
 end

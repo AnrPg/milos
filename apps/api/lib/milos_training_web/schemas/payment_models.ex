@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.Schemas.PaymentModels do
         subscription_id: @uuid,
         membership_id: @uuid,
         user_id: @uuid,
+        nickname: @nullable_string,
         is_minor: %Schema{type: :boolean},
         removed_at: %Schema{type: :string, format: :"date-time", nullable: true}
       },
@@ -39,6 +40,8 @@ defmodule MilosTrainingWeb.Schemas.PaymentModels do
         seats: %Schema{type: :integer, nullable: true},
         seat_billing: %Schema{type: :string, enum: ["agreed", "used"]},
         active_seats: %Schema{type: :integer},
+        payment_terms_days: %Schema{type: :integer},
+        auto_invoice: %Schema{type: :boolean},
         status: %Schema{type: :string, enum: ["active", "archived"]}
       },
       required: [
@@ -65,13 +68,84 @@ defmodule MilosTrainingWeb.Schemas.PaymentModels do
         seats_billed: %Schema{type: :integer},
         unit_price_cents: %Schema{type: :integer},
         total_cents: %Schema{type: :integer},
-        status: %Schema{type: :string, enum: ["issued", "paid", "void"]},
+        status: %Schema{type: :string, enum: ["issued", "overdue", "paid", "void"]},
+        invoice_number: @nullable_string,
         issued_on: %Schema{type: :string, format: :date},
-        paid_on: %Schema{type: :string, format: :date, nullable: true}
+        due_on: %Schema{type: :string, format: :date},
+        paid_on: %Schema{type: :string, format: :date, nullable: true},
+        paid_cents: %Schema{type: :integer},
+        balance_cents: %Schema{type: :integer},
+        last_reminded_on: %Schema{type: :string, format: :date, nullable: true},
+        reminder_count: %Schema{type: :integer},
+        payments: %Schema{type: :array, items: payment_schema()}
       },
-      required: [:id, :period_start, :period_end, :seats_billed, :total_cents, :status]
+      required: [
+        :id,
+        :period_start,
+        :period_end,
+        :seats_billed,
+        :total_cents,
+        :status,
+        :due_on,
+        :paid_cents,
+        :balance_cents,
+        :payments
+      ]
     }
   end
+
+  def invoice_document_schema do
+    %Schema{
+      invoice_schema()
+      | title: "CorporateInvoiceDocument",
+        properties:
+          Map.merge(invoice_schema().properties, %{
+            client: client_schema(),
+            issuer: %Schema{
+              type: :object,
+              properties: %{name: %Schema{type: :string}},
+              required: [:name]
+            }
+          }),
+        required: invoice_schema().required ++ [:client, :issuer]
+    }
+  end
+
+  def payment_schema do
+    %Schema{
+      title: "CorporatePayment",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        amount_cents: %Schema{type: :integer},
+        payment_method: %Schema{type: :string, enum: payment_methods()},
+        paid_on: %Schema{type: :string, format: :date},
+        reference: @nullable_string,
+        notes: @nullable_string,
+        recorded_by_id: %Schema{type: :string, format: :uuid, nullable: true},
+        reversed_at: %Schema{type: :string, format: :"date-time", nullable: true},
+        reversal_reason: @nullable_string
+      },
+      required: [:id, :amount_cents, :payment_method, :paid_on]
+    }
+  end
+
+  def payment_request_schema do
+    %Schema{
+      type: :object,
+      additionalProperties: false,
+      properties: %{
+        amount_cents: %Schema{type: :integer, minimum: 1},
+        payment_method: %Schema{type: :string, enum: payment_methods()},
+        paid_on: %Schema{type: :string, format: :date, nullable: true},
+        reference: %Schema{type: :string, maxLength: 120, nullable: true},
+        notes: %Schema{type: :string, maxLength: 1000, nullable: true}
+      },
+      required: [:amount_cents, :payment_method]
+    }
+  end
+
+  defp payment_methods, do: ["cash", "bank_transfer", "card_manual", "other"]
 
   def seat_schema do
     %Schema{

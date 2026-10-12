@@ -524,6 +524,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Owners, admins and coaches of this gym */
+        get: operations["MilosTrainingWeb.StaffController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/logout": {
         parameters: {
             query?: never;
@@ -936,6 +953,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminFinanceController.update_package"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/payments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record a (partial) payment against a corporate invoice */
+        post: operations["MilosTrainingWeb.PaymentModelsController.record_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
         parameters: {
             query?: never;
@@ -1006,6 +1040,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminChallengeController.update"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/payments/{payment_id}/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reverse a mistaken corporate payment */
+        post: operations["MilosTrainingWeb.PaymentModelsController.reverse_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/settings": {
         parameters: {
             query?: never;
@@ -1022,6 +1073,23 @@ export interface paths {
         head?: never;
         /** Update global admin settings */
         patch: operations["MilosTrainingWeb.AdminSettingsController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Email a corporate invoice (a reminder when overdue) to the billing contact */
+        post: operations["MilosTrainingWeb.PaymentModelsController.send_invoice"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/me/avatar": {
@@ -1310,6 +1378,23 @@ export interface paths {
         };
         /** Return the authenticated user */
         get: operations["MilosTrainingWeb.AuthController.me"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A corporate invoice with its payments, client and issuer, for the document */
+        get: operations["MilosTrainingWeb.PaymentModelsController.invoice"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1636,7 +1721,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Mark a corporate invoice paid or void */
+        /** Void a corporate invoice that has no payments */
         post: operations["MilosTrainingWeb.PaymentModelsController.invoice_status"];
         delete?: never;
         options?: never;
@@ -3535,6 +3620,7 @@ export interface components {
             capacity: number;
             /** Format: uuid */
             coach_id: string;
+            coach_nickname?: string | null;
             duration_minutes: number;
             /** @enum {string} */
             format: "one_to_one" | "semi_private";
@@ -3566,6 +3652,7 @@ export interface components {
         /** CorporateClient */
         CorporateClient: {
             active_seats: number;
+            auto_invoice?: boolean;
             billing_email?: string | null;
             company_name: string;
             contact_name?: string | null;
@@ -3578,6 +3665,7 @@ export interface components {
             /** Format: uuid */
             membership_package_id: string;
             package_name?: string | null;
+            payment_terms_days?: number;
             /** @enum {string} */
             seat_billing?: "agreed" | "used";
             seats?: number | null;
@@ -3586,24 +3674,136 @@ export interface components {
         };
         /** CorporateInvoice */
         CorporateInvoice: {
+            balance_cents: number;
             /** Format: uuid */
             corporate_client_id?: string;
+            /** Format: date */
+            due_on: string;
             /** Format: uuid */
             id: string;
+            invoice_number?: string | null;
             /** Format: date */
             issued_on?: string;
             /** Format: date */
+            last_reminded_on?: string | null;
+            paid_cents: number;
+            /** Format: date */
             paid_on?: string | null;
+            payments: {
+                amount_cents: number;
+                /** Format: uuid */
+                id: string;
+                notes?: string | null;
+                /** Format: date */
+                paid_on: string;
+                /** @enum {string} */
+                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                /** Format: uuid */
+                recorded_by_id?: string | null;
+                reference?: string | null;
+                reversal_reason?: string | null;
+                /** Format: date-time */
+                reversed_at?: string | null;
+            }[];
             /** Format: date */
             period_end: string;
             /** Format: date */
             period_start: string;
+            reminder_count?: number;
             seat_billing?: string;
             seats_billed: number;
             /** @enum {string} */
-            status: "issued" | "paid" | "void";
+            status: "issued" | "overdue" | "paid" | "void";
             total_cents: number;
             unit_price_cents?: number;
+        };
+        /** CorporateInvoiceDocument */
+        CorporateInvoiceDocument: {
+            balance_cents: number;
+            /** CorporateClient */
+            client: {
+                active_seats: number;
+                auto_invoice?: boolean;
+                billing_email?: string | null;
+                company_name: string;
+                contact_name?: string | null;
+                /** @enum {string} */
+                enrollment?: "invite_code" | "email_domain";
+                enrollment_code: string;
+                enrollment_domain?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                membership_package_id: string;
+                package_name?: string | null;
+                payment_terms_days?: number;
+                /** @enum {string} */
+                seat_billing?: "agreed" | "used";
+                seats?: number | null;
+                /** @enum {string} */
+                status: "active" | "archived";
+            };
+            /** Format: uuid */
+            corporate_client_id?: string;
+            /** Format: date */
+            due_on: string;
+            /** Format: uuid */
+            id: string;
+            invoice_number?: string | null;
+            /** Format: date */
+            issued_on?: string;
+            issuer: {
+                name: string;
+            };
+            /** Format: date */
+            last_reminded_on?: string | null;
+            paid_cents: number;
+            /** Format: date */
+            paid_on?: string | null;
+            payments: {
+                amount_cents: number;
+                /** Format: uuid */
+                id: string;
+                notes?: string | null;
+                /** Format: date */
+                paid_on: string;
+                /** @enum {string} */
+                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                /** Format: uuid */
+                recorded_by_id?: string | null;
+                reference?: string | null;
+                reversal_reason?: string | null;
+                /** Format: date-time */
+                reversed_at?: string | null;
+            }[];
+            /** Format: date */
+            period_end: string;
+            /** Format: date */
+            period_start: string;
+            reminder_count?: number;
+            seat_billing?: string;
+            seats_billed: number;
+            /** @enum {string} */
+            status: "issued" | "overdue" | "paid" | "void";
+            total_cents: number;
+            unit_price_cents?: number;
+        };
+        /** CorporatePayment */
+        CorporatePayment: {
+            amount_cents: number;
+            /** Format: uuid */
+            id: string;
+            notes?: string | null;
+            /** Format: date */
+            paid_on: string;
+            /** @enum {string} */
+            payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+            /** Format: uuid */
+            recorded_by_id?: string | null;
+            reference?: string | null;
+            reversal_reason?: string | null;
+            /** Format: date-time */
+            reversed_at?: string | null;
         };
         /** CorporateSeat */
         CorporateSeat: {
@@ -3692,6 +3892,21 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         } | null;
+        /** PRTimelineEntry */
+        PRTimelineEntry: {
+            /** Format: date */
+            beaten_on: string;
+            change?: number | null;
+            higher_is_better?: boolean;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: uuid */
+            pr_record_id: string;
+            previous_score?: number | null;
+            score: number;
+            unit: string;
+        };
         /** ProgressStats */
         ProgressStats: {
             consistency: {
@@ -3700,6 +3915,20 @@ export interface components {
                 percent: number;
                 weeks: number;
             };
+            pr_timeline: {
+                /** Format: date */
+                beaten_on: string;
+                change?: number | null;
+                higher_is_better?: boolean;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** Format: uuid */
+                pr_record_id: string;
+                previous_score?: number | null;
+                score: number;
+                unit: string;
+            }[];
             score_history: {
                 points: {
                     /** Format: date */
@@ -3738,6 +3967,14 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** StaffMember */
+        StaffMember: {
+            nickname?: string | null;
+            /** @enum {string} */
+            role: "owner" | "admin" | "coach";
+            /** Format: uuid */
+            user_id: string;
+        };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
             /** Format: uuid */
@@ -3745,6 +3982,7 @@ export interface components {
             is_minor: boolean;
             /** Format: uuid */
             membership_id?: string;
+            nickname?: string | null;
             /** Format: date-time */
             removed_at?: string | null;
             /** Format: uuid */
@@ -4224,6 +4462,20 @@ export interface operations {
                                 percent: number;
                                 weeks: number;
                             };
+                            pr_timeline: {
+                                /** Format: date */
+                                beaten_on: string;
+                                change?: number | null;
+                                higher_is_better?: boolean;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                /** Format: uuid */
+                                pr_record_id: string;
+                                previous_score?: number | null;
+                                score: number;
+                                unit: string;
+                            }[];
                             score_history: {
                                 points: {
                                     /** Format: date */
@@ -4747,6 +4999,7 @@ export interface operations {
                             is_minor: boolean;
                             /** Format: uuid */
                             membership_id?: string;
+                            nickname?: string | null;
                             /** Format: date-time */
                             removed_at?: string | null;
                             /** Format: uuid */
@@ -4867,22 +5120,46 @@ export interface operations {
                 content: {
                     "application/json": {
                         invoices: {
+                            balance_cents: number;
                             /** Format: uuid */
                             corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
                             /** Format: uuid */
                             id: string;
+                            invoice_number?: string | null;
                             /** Format: date */
                             issued_on?: string;
                             /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
                             paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
                             /** Format: date */
                             period_end: string;
                             /** Format: date */
                             period_start: string;
+                            reminder_count?: number;
                             seat_billing?: string;
                             seats_billed: number;
                             /** @enum {string} */
-                            status: "issued" | "paid" | "void";
+                            status: "issued" | "overdue" | "paid" | "void";
                             total_cents: number;
                             unit_price_cents?: number;
                         }[];
@@ -4918,22 +5195,46 @@ export interface operations {
                     "application/json": {
                         /** CorporateInvoice */
                         invoice: {
+                            balance_cents: number;
                             /** Format: uuid */
                             corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
                             /** Format: uuid */
                             id: string;
+                            invoice_number?: string | null;
                             /** Format: date */
                             issued_on?: string;
                             /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
                             paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
                             /** Format: date */
                             period_end: string;
                             /** Format: date */
                             period_start: string;
+                            reminder_count?: number;
                             seat_billing?: string;
                             seats_billed: number;
                             /** @enum {string} */
-                            status: "issued" | "paid" | "void";
+                            status: "issued" | "overdue" | "paid" | "void";
                             total_cents: number;
                             unit_price_cents?: number;
                         };
@@ -5829,6 +6130,34 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.StaffController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Staff */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        staff: {
+                            nickname?: string | null;
+                            /** @enum {string} */
+                            role: "owner" | "admin" | "coach";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
                     };
                 };
             };
@@ -7689,6 +8018,108 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PaymentModelsController.record_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    amount_cents: number;
+                    notes?: string | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                    reference?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Invoice */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CorporateInvoice */
+                        invoice: {
+                            balance_cents: number;
+                            /** Format: uuid */
+                            corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            invoice_number?: string | null;
+                            /** Format: date */
+                            issued_on?: string;
+                            /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
+                            paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            reminder_count?: number;
+                            seat_billing?: string;
+                            seats_billed: number;
+                            /** @enum {string} */
+                            status: "issued" | "overdue" | "paid" | "void";
+                            total_cents: number;
+                            unit_price_cents?: number;
+                        };
+                    };
+                };
+            };
+            /** @description Invoice closed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid payment */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.create_manual_credit": {
         parameters: {
             query?: never;
@@ -7988,6 +8419,81 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PaymentModelsController.reverse_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                payment_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Invoice */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CorporateInvoice */
+                        invoice: {
+                            balance_cents: number;
+                            /** Format: uuid */
+                            corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            invoice_number?: string | null;
+                            /** Format: date */
+                            issued_on?: string;
+                            /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
+                            paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            reminder_count?: number;
+                            seat_billing?: string;
+                            seats_billed: number;
+                            /** @enum {string} */
+                            status: "issued" | "overdue" | "paid" | "void";
+                            total_cents: number;
+                            unit_price_cents?: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminSettingsController.show": {
         parameters: {
             query?: never;
@@ -8157,6 +8663,85 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PaymentModelsController.send_invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invoice */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CorporateInvoice */
+                        invoice: {
+                            balance_cents: number;
+                            /** Format: uuid */
+                            corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            invoice_number?: string | null;
+                            /** Format: date */
+                            issued_on?: string;
+                            /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
+                            paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            reminder_count?: number;
+                            seat_billing?: string;
+                            seats_billed: number;
+                            /** @enum {string} */
+                            status: "issued" | "overdue" | "paid" | "void";
+                            total_cents: number;
+                            unit_price_cents?: number;
+                        };
+                    };
+                };
+            };
+            /** @description No billing email */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -9329,6 +9914,111 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PaymentModelsController.invoice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invoice */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CorporateInvoiceDocument */
+                        invoice: {
+                            balance_cents: number;
+                            /** CorporateClient */
+                            client: {
+                                active_seats: number;
+                                auto_invoice?: boolean;
+                                billing_email?: string | null;
+                                company_name: string;
+                                contact_name?: string | null;
+                                /** @enum {string} */
+                                enrollment?: "invite_code" | "email_domain";
+                                enrollment_code: string;
+                                enrollment_domain?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                membership_package_id: string;
+                                package_name?: string | null;
+                                payment_terms_days?: number;
+                                /** @enum {string} */
+                                seat_billing?: "agreed" | "used";
+                                seats?: number | null;
+                                /** @enum {string} */
+                                status: "active" | "archived";
+                            };
+                            /** Format: uuid */
+                            corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            invoice_number?: string | null;
+                            /** Format: date */
+                            issued_on?: string;
+                            issuer: {
+                                name: string;
+                            };
+                            /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
+                            paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            reminder_count?: number;
+                            seat_billing?: string;
+                            seats_billed: number;
+                            /** @enum {string} */
+                            status: "issued" | "overdue" | "paid" | "void";
+                            total_cents: number;
+                            unit_price_cents?: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -12207,7 +12897,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    status: "paid" | "void";
+                    status: "void";
                 };
             };
         };
@@ -12221,25 +12911,60 @@ export interface operations {
                     "application/json": {
                         /** CorporateInvoice */
                         invoice: {
+                            balance_cents: number;
                             /** Format: uuid */
                             corporate_client_id?: string;
+                            /** Format: date */
+                            due_on: string;
                             /** Format: uuid */
                             id: string;
+                            invoice_number?: string | null;
                             /** Format: date */
                             issued_on?: string;
                             /** Format: date */
+                            last_reminded_on?: string | null;
+                            paid_cents: number;
+                            /** Format: date */
                             paid_on?: string | null;
+                            payments: {
+                                amount_cents: number;
+                                /** Format: uuid */
+                                id: string;
+                                notes?: string | null;
+                                /** Format: date */
+                                paid_on: string;
+                                /** @enum {string} */
+                                payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                                /** Format: uuid */
+                                recorded_by_id?: string | null;
+                                reference?: string | null;
+                                reversal_reason?: string | null;
+                                /** Format: date-time */
+                                reversed_at?: string | null;
+                            }[];
                             /** Format: date */
                             period_end: string;
                             /** Format: date */
                             period_start: string;
+                            reminder_count?: number;
                             seat_billing?: string;
                             seats_billed: number;
                             /** @enum {string} */
-                            status: "issued" | "paid" | "void";
+                            status: "issued" | "overdue" | "paid" | "void";
                             total_cents: number;
                             unit_price_cents?: number;
                         };
+                    };
+                };
+            };
+            /** @description Invoice closed or has payments */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -12797,6 +13522,7 @@ export interface operations {
                             is_minor: boolean;
                             /** Format: uuid */
                             membership_id?: string;
+                            nickname?: string | null;
                             /** Format: date-time */
                             removed_at?: string | null;
                             /** Format: uuid */
@@ -12842,6 +13568,7 @@ export interface operations {
                             is_minor: boolean;
                             /** Format: uuid */
                             membership_id?: string;
+                            nickname?: string | null;
                             /** Format: date-time */
                             removed_at?: string | null;
                             /** Format: uuid */
@@ -13142,6 +13869,7 @@ export interface operations {
                             capacity: number;
                             /** Format: uuid */
                             coach_id: string;
+                            coach_nickname?: string | null;
                             duration_minutes: number;
                             /** @enum {string} */
                             format: "one_to_one" | "semi_private";
@@ -14030,6 +14758,7 @@ export interface operations {
                             capacity: number;
                             /** Format: uuid */
                             coach_id: string;
+                            coach_nickname?: string | null;
                             duration_minutes: number;
                             /** @enum {string} */
                             format: "one_to_one" | "semi_private";
@@ -14110,6 +14839,7 @@ export interface operations {
                             capacity: number;
                             /** Format: uuid */
                             coach_id: string;
+                            coach_nickname?: string | null;
                             duration_minutes: number;
                             /** @enum {string} */
                             format: "one_to_one" | "semi_private";
@@ -17288,9 +18018,11 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    auto_invoice?: boolean;
                     billing_email?: string | null;
                     company_name?: string;
                     contact_name?: string | null;
+                    payment_terms_days?: number;
                     regenerate_code?: boolean;
                     /** @enum {string} */
                     status?: "active" | "archived";
@@ -17308,6 +18040,7 @@ export interface operations {
                         /** CorporateClient */
                         client: {
                             active_seats: number;
+                            auto_invoice?: boolean;
                             billing_email?: string | null;
                             company_name: string;
                             contact_name?: string | null;
@@ -17320,6 +18053,7 @@ export interface operations {
                             /** Format: uuid */
                             membership_package_id: string;
                             package_name?: string | null;
+                            payment_terms_days?: number;
                             /** @enum {string} */
                             seat_billing?: "agreed" | "used";
                             seats?: number | null;
@@ -17425,6 +18159,7 @@ export interface operations {
                     "application/json": {
                         clients: {
                             active_seats: number;
+                            auto_invoice?: boolean;
                             billing_email?: string | null;
                             company_name: string;
                             contact_name?: string | null;
@@ -17437,6 +18172,7 @@ export interface operations {
                             /** Format: uuid */
                             membership_package_id: string;
                             package_name?: string | null;
+                            payment_terms_days?: number;
                             /** @enum {string} */
                             seat_billing?: "agreed" | "used";
                             seats?: number | null;
@@ -17458,11 +18194,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    auto_invoice?: boolean;
                     billing_email?: string | null;
                     company_name: string;
                     contact_name?: string | null;
                     /** Format: uuid */
                     membership_package_id: string;
+                    payment_terms_days?: number;
                 };
             };
         };
@@ -17477,6 +18215,7 @@ export interface operations {
                         /** CorporateClient */
                         client: {
                             active_seats: number;
+                            auto_invoice?: boolean;
                             billing_email?: string | null;
                             company_name: string;
                             contact_name?: string | null;
@@ -17489,6 +18228,7 @@ export interface operations {
                             /** Format: uuid */
                             membership_package_id: string;
                             package_name?: string | null;
+                            payment_terms_days?: number;
                             /** @enum {string} */
                             seat_billing?: "agreed" | "used";
                             seats?: number | null;
@@ -18290,6 +19030,7 @@ export interface operations {
                             capacity: number;
                             /** Format: uuid */
                             coach_id: string;
+                            coach_nickname?: string | null;
                             duration_minutes: number;
                             /** @enum {string} */
                             format: "one_to_one" | "semi_private";
