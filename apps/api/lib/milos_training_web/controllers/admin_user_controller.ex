@@ -19,6 +19,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     RevokeUserAllowance
   }
 
+  alias MilosTraining.Finance
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -145,7 +146,15 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:update_role, :grant_allowance, :revoke_allowance, :program_workout]
+       when action in [
+              :update_role,
+              :grant_allowance,
+              :revoke_allowance,
+              :program_workout,
+              :freezes,
+              :create_freeze,
+              :cancel_freeze
+            ]
 
   @allowance_grant_body %RequestBody{
     required: true,
@@ -159,9 +168,9 @@ defmodule MilosTrainingWeb.AdminUserController do
             allowance: %Schema{
               type: :string,
               description:
-                "class_visits, coaching_touchpoints, or class_visits:<class type id> for a per-class-type limit (ADR-096)",
+                "class_visits, coaching_touchpoints, event_visits, guest_passes, open_gym_visits, or class_visits:<class type id> for a per-class-type limit (ADR-096, ADR-097)",
               pattern:
-                "^(class_visits|coaching_touchpoints|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
+                "^(class_visits|coaching_touchpoints|event_visits|guest_passes|open_gym_visits|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
             },
             quantity: %Schema{type: :integer, minimum: 1, maximum: 10_000},
             period: %Schema{
@@ -492,6 +501,130 @@ defmodule MilosTrainingWeb.AdminUserController do
       conn
       |> put_status(:created)
       |> json(result)
+    end
+  end
+
+  @freeze_schema %Schema{
+    title: "SubscriptionFreeze",
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      starts_on: %Schema{type: :string, format: :date},
+      ends_on: %Schema{type: :string, format: :date},
+      extension_days: %Schema{type: :integer},
+      reason: %Schema{type: :string},
+      admin_id: %Schema{type: :string, format: :uuid, nullable: true},
+      cancelled_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      cancel_reason: %Schema{type: :string, nullable: true}
+    },
+    required: [:id, :starts_on, :ends_on, :extension_days, :reason, :cancelled_at]
+  }
+
+  @freeze_response %Schema{
+    type: :object,
+    properties: %{freeze: @freeze_schema},
+    required: [:freeze]
+  }
+
+  operation(:freezes,
+    summary: "List a member's package freezes (ADR-097)",
+    parameters: [@id_parameter],
+    responses: [
+      ok:
+        {"Freezes", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{freezes: %Schema{type: :array, items: @freeze_schema}},
+           required: [:freezes]
+         }}
+    ]
+  )
+
+  def freezes(conn, %{id: user_id}) do
+    json(conn, %{freezes: Finance.list_freezes(conn.assigns.tenant_context, user_id)})
+  end
+
+  operation(:create_freeze,
+    summary: "Freeze a member's package for a date range; the package end moves out",
+    parameters: [@id_parameter],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            required: [:starts_on, :ends_on, :reason],
+            properties: %{
+              starts_on: %Schema{type: :string, format: :date},
+              ends_on: %Schema{type: :string, format: :date},
+              reason: %Schema{type: :string, minLength: 3, maxLength: 500}
+            }
+          }
+        }
+      }
+    },
+    responses: [
+      created: {"Freeze", "application/json", @freeze_response},
+      unprocessable_entity: {"Invalid freeze", "application/json", @summary_object},
+      conflict: {"Overlapping freeze", "application/json", @summary_object}
+    ]
+  )
+
+  def create_freeze(conn, %{id: user_id}) do
+    admin = Guardian.Plug.current_resource(conn)
+
+    with {:ok, freeze} <-
+           Finance.create_freeze(
+             conn.assigns.tenant_context,
+             user_id,
+             admin.id,
+             conn.body_params
+           ) do
+      conn
+      |> put_status(:created)
+      |> json(%{freeze: freeze})
+    end
+  end
+
+  operation(:cancel_freeze,
+    summary: "Cancel a freeze; unused days are given back",
+    parameters: [
+      @id_parameter,
+      %Parameter{
+        name: :freeze_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: false,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{reason: %Schema{type: :string, maxLength: 500, nullable: true}}
+          }
+        }
+      }
+    },
+    responses: [
+      ok: {"Freeze", "application/json", @freeze_response},
+      not_found: {"Freeze not found", "application/json", @summary_object},
+      conflict: {"Freeze already cancelled", "application/json", @summary_object}
+    ]
+  )
+
+  def cancel_freeze(conn, %{id: user_id, freeze_id: freeze_id}) do
+    with {:ok, freeze} <-
+           Finance.cancel_freeze(
+             conn.assigns.tenant_context,
+             user_id,
+             freeze_id,
+             conn.body_params || %{}
+           ) do
+      json(conn, %{freeze: freeze})
     end
   end
 

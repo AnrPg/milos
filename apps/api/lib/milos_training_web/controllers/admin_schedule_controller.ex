@@ -33,6 +33,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     properties: %{
       master_workout_id: %Schema{type: :string, format: :uuid},
       class_type_id: %Schema{type: :string, format: :uuid},
+      location_id: %Schema{type: :string, format: :uuid, nullable: true},
       name: %Schema{type: :string, minLength: 1, maxLength: 120},
       duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
       scheduled_at: %Schema{type: :string, format: :"date-time"},
@@ -91,6 +92,7 @@ defmodule MilosTrainingWeb.AdminScheduleController do
             additionalProperties: false,
             properties: %{
               class_type_id: %Schema{type: :string, format: :uuid},
+              location_id: %Schema{type: :string, format: :uuid, nullable: true},
               master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
               name: %Schema{type: :string, minLength: 1, maxLength: 120},
               duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},

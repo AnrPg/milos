@@ -1334,6 +1334,66 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-097 Phase B: booking rules, perks, freezes and facility.
+  @phase_b_errors %{
+    finance_membership_frozen: {:forbidden, "The membership is frozen"},
+    finance_time_window_not_included: {:forbidden, "This time is outside the package's hours"},
+    finance_location_not_included: {:forbidden, "This location is not included in the package"},
+    invalid_freeze_dates: {:unprocessable_entity, "The freeze dates are invalid"},
+    freeze_in_past: {:unprocessable_entity, "A freeze cannot start in the past"},
+    freeze_not_included: {:unprocessable_entity, "The package does not include freezes"},
+    freeze_overlaps: {:conflict, "The freeze overlaps another freeze"},
+    freeze_allowance_exceeded:
+      {:unprocessable_entity, "The freeze exceeds the yearly freeze days"},
+    freeze_already_cancelled: {:conflict, "The freeze is already cancelled"},
+    slot_not_full: {:conflict, "The class still has free spots"},
+    invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},
+    guest_already_booked: {:conflict, "A guest is already booked for this class"},
+    booking_not_waitlisted: {:conflict, "The booking is not on the waitlist"},
+    location_not_found: {:not_found, "Location not found"},
+    location_archived: {:unprocessable_entity, "The location is archived"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, %{})
+  end
+
+  def call(conn, {:error, reason, details}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, details)
+  end
+
+  def call(conn, {:error, :booking_window_closed, details}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "booking_window_closed",
+      "Booking for this class is not open yet",
+      details
+    )
+  end
+
+  def call(conn, {:error, {:package_commitment_active, details}}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      details
+    )
+  end
+
+  def call(conn, {:error, :package_commitment_active}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      %{}
+    )
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)

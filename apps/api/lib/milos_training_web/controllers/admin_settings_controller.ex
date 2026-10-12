@@ -64,6 +64,18 @@ defmodule MilosTrainingWeb.AdminSettingsController do
       default_capacity: %Schema{type: :integer, minimum: 1, maximum: 500},
       default_auto_approve: %Schema{type: :boolean},
       default_booking_timeout_minutes: %Schema{type: :integer, minimum: 1, maximum: 10_080},
+      default_booking_window_days: %Schema{
+        type: :integer,
+        minimum: 1,
+        maximum: 365,
+        nullable: true
+      },
+      default_cancellation_cutoff_hours: %Schema{
+        type: :integer,
+        minimum: 0,
+        maximum: 168,
+        nullable: true
+      },
       inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
     },
@@ -130,6 +142,20 @@ defmodule MilosTrainingWeb.AdminSettingsController do
             type: :integer,
             minimum: 1,
             maximum: 10_080
+          },
+          default_booking_window_days: %Schema{
+            type: :integer,
+            minimum: 1,
+            maximum: 365,
+            nullable: true,
+            description: "How many days ahead members may book when their package sets no window"
+          },
+          default_cancellation_cutoff_hours: %Schema{
+            type: :integer,
+            minimum: 0,
+            maximum: 168,
+            nullable: true,
+            description: "Withdrawals closer to the class than this use the visit"
           }
         },
         required: []

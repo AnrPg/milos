@@ -2,6 +2,103 @@
   "components": {
     "responses": {},
     "schemas": {
+      "FacilityCheckIn": {
+        "properties": {
+          "already_checked_in": {
+            "type": "boolean"
+          },
+          "checked_in_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "checked_in_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "location_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "recorded_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "source": {
+            "enum": [
+              "self",
+              "staff"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "checked_in_on",
+          "checked_in_at",
+          "source"
+        ],
+        "title": "FacilityCheckIn",
+        "type": "object"
+      },
+      "FacilityLocation": {
+        "properties": {
+          "address": {
+            "nullable": true,
+            "type": "string"
+          },
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "address",
+          "archived_at"
+        ],
+        "title": "FacilityLocation",
+        "type": "object"
+      },
       "SemanticError": {
         "description": "Stable machine-readable API failure with English compatibility copy.",
         "properties": {
@@ -20,6 +117,52 @@
           "code",
           "error"
         ],
+        "type": "object"
+      },
+      "SubscriptionFreeze": {
+        "properties": {
+          "admin_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "cancel_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "cancelled_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "extension_days": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "starts_on",
+          "ends_on",
+          "extension_days",
+          "reason",
+          "cancelled_at"
+        ],
+        "title": "SubscriptionFreeze",
         "type": "object"
       },
       "ValidationError": {
@@ -938,6 +1081,49 @@
                       "format": "date",
                       "type": "string"
                     },
+                    "locations": {
+                      "items": {
+                        "properties": {
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "address",
+                          "archived_at"
+                        ],
+                        "title": "FacilityLocation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "slots": {
                       "items": {
                         "additionalProperties": true,
@@ -1246,8 +1432,8 @@
                 "additionalProperties": false,
                 "properties": {
                   "allowance": {
-                    "description": "class_visits, coaching_touchpoints, or class_visits:<class type id> for a per-class-type limit (ADR-096)",
-                    "pattern": "^(class_visits|coaching_touchpoints|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$",
+                    "description": "class_visits, coaching_touchpoints, event_visits, guest_passes, open_gym_visits, or class_visits:<class type id> for a per-class-type limit (ADR-096, ADR-097)",
+                    "pattern": "^(class_visits|coaching_touchpoints|event_visits|guest_passes|open_gym_visits|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$",
                     "type": "string"
                   },
                   "idempotency_key": {
@@ -1702,6 +1888,11 @@
                     "minimum": 1,
                     "type": "integer"
                   },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "master_workout_id": {
                     "format": "uuid",
                     "type": "string"
@@ -1781,6 +1972,11 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "credit_cost": {
+                            "maximum": 10,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
                           "future_classes_reassigned": {
                             "type": "integer"
                           },
@@ -1790,6 +1986,13 @@
                           },
                           "inserted_at": {
                             "format": "date-time",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "event"
+                            ],
                             "type": "string"
                           },
                           "name": {
@@ -1811,6 +2014,8 @@
                           "name",
                           "slug",
                           "sort_order",
+                          "credit_cost",
+                          "kind",
                           "archived_at"
                         ],
                         "type": "object"
@@ -1847,6 +2052,20 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "credit_cost": {
+                    "description": "Visits one booking of this class type uses (ADR-097)",
+                    "maximum": 10,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "description": "Events draw on event visits instead of class visits (ADR-097)",
+                    "enum": [
+                      "class",
+                      "event"
+                    ],
+                    "type": "string"
+                  },
                   "name": {
                     "maxLength": 80,
                     "minLength": 2,
@@ -1880,6 +2099,11 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "credit_cost": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
                         "future_classes_reassigned": {
                           "type": "integer"
                         },
@@ -1889,6 +2113,13 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "event"
+                          ],
                           "type": "string"
                         },
                         "name": {
@@ -1910,6 +2141,8 @@
                         "name",
                         "slug",
                         "sort_order",
+                        "credit_cost",
+                        "kind",
                         "archived_at"
                       ],
                       "type": "object"
@@ -2359,6 +2592,555 @@
         "summary": "Get a role-specific user schedule",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/freezes": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.freezes",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "freezes": {
+                      "items": {
+                        "properties": {
+                          "admin_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "cancel_reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "cancelled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ends_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "extension_days": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reason": {
+                            "type": "string"
+                          },
+                          "starts_on": {
+                            "format": "date",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "starts_on",
+                          "ends_on",
+                          "extension_days",
+                          "reason",
+                          "cancelled_at"
+                        ],
+                        "title": "SubscriptionFreeze",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "freezes"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Freezes"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List a member's package freezes (ADR-097)",
+        "tags": [
+          "Admin Users"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.create_freeze",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "ends_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "reason": {
+                    "maxLength": 500,
+                    "minLength": 3,
+                    "type": "string"
+                  },
+                  "starts_on": {
+                    "format": "date",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "starts_on",
+                  "ends_on",
+                  "reason"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "freeze": {
+                      "properties": {
+                        "admin_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancel_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "extension_days": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "starts_on",
+                        "ends_on",
+                        "extension_days",
+                        "reason",
+                        "cancelled_at"
+                      ],
+                      "title": "SubscriptionFreeze",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "freeze"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Freeze"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Overlapping freeze"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid freeze"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Freeze a member's package for a date range; the package end moves out",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/freezes/{freeze_id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.cancel_freeze",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "freeze_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "reason": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "freeze": {
+                      "properties": {
+                        "admin_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancel_reason": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "extension_days": {
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reason": {
+                          "type": "string"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "starts_on",
+                        "ends_on",
+                        "extension_days",
+                        "reason",
+                        "cancelled_at"
+                      ],
+                      "title": "SubscriptionFreeze",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "freeze"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Freeze"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Freeze not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Freeze already cancelled"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel a freeze; unused days are given back",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/locations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.index_locations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locations": {
+                      "items": {
+                        "properties": {
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "address",
+                          "archived_at"
+                        ],
+                        "title": "FacilityLocation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "locations"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Locations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List locations, including archived ones",
+        "tags": [
+          "Admin Facility"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.create_location",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "address": {
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "location": {
+                      "properties": {
+                        "address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "address",
+                        "archived_at"
+                      ],
+                      "title": "FacilityLocation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "location"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Location"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a location",
+        "tags": [
+          "Admin Facility"
         ]
       }
     },
@@ -3365,6 +4147,241 @@
         "summary": "Get a user's health and injury incidents",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-ins": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.index_check_ins",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "user_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "check_ins": {
+                      "items": {
+                        "properties": {
+                          "already_checked_in": {
+                            "type": "boolean"
+                          },
+                          "checked_in_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "checked_in_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "recorded_by_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "source": {
+                            "enum": [
+                              "self",
+                              "staff"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "checked_in_on",
+                          "checked_in_at",
+                          "source"
+                        ],
+                        "title": "FacilityCheckIn",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "check_ins"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Check-ins"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List open-gym check-ins of a day or a member",
+        "tags": [
+          "Admin Facility"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.create_check_in",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "check_in": {
+                      "properties": {
+                        "already_checked_in": {
+                          "type": "boolean"
+                        },
+                        "checked_in_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "checked_in_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "self",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "checked_in_on",
+                        "checked_in_at",
+                        "source"
+                      ],
+                      "title": "FacilityCheckIn",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "check_in"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Check-in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance entitlement denied"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Check a member in to open gym from the desk",
+        "tags": [
+          "Admin Facility"
         ]
       }
     },
@@ -5915,6 +6932,100 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/locations/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.archive_location",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "location": {
+                      "properties": {
+                        "address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "address",
+                        "archived_at"
+                      ],
+                      "title": "FacilityLocation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "location"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Location"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Location not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive a location; its past classes keep the reference",
+        "tags": [
+          "Admin Facility"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/my-workouts/assignments/{id}/reschedule": {
       "patch": {
         "callbacks": {},
@@ -8304,6 +9415,18 @@
                           "minimum": 1,
                           "type": "integer"
                         },
+                        "default_booking_window_days": {
+                          "maximum": 365,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "default_cancellation_cutoff_hours": {
+                          "maximum": 168,
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
                         "default_capacity": {
                           "maximum": 500,
                           "minimum": 1,
@@ -8456,6 +9579,20 @@
                       "default_booking_timeout_minutes": {
                         "maximum": 10080,
                         "minimum": 1,
+                        "type": "integer"
+                      },
+                      "default_booking_window_days": {
+                        "description": "How many days ahead members may book when their package sets no window",
+                        "maximum": 365,
+                        "minimum": 1,
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "default_cancellation_cutoff_hours": {
+                        "description": "Withdrawals closer to the class than this use the visit",
+                        "maximum": 168,
+                        "minimum": 0,
+                        "nullable": true,
                         "type": "integer"
                       },
                       "default_capacity": {
@@ -8620,6 +9757,18 @@
                         "default_booking_timeout_minutes": {
                           "maximum": 10080,
                           "minimum": 1,
+                          "type": "integer"
+                        },
+                        "default_booking_window_days": {
+                          "maximum": 365,
+                          "minimum": 1,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "default_cancellation_cutoff_hours": {
+                          "maximum": 168,
+                          "minimum": 0,
+                          "nullable": true,
                           "type": "integer"
                         },
                         "default_capacity": {
@@ -9259,6 +10408,17 @@
                     "items": {
                       "additionalProperties": false,
                       "properties": {
+                        "charge_category": {
+                          "description": "Manual charges in the member's discount scope get the member discount",
+                          "enum": [
+                            "product",
+                            "personal_training",
+                            "event",
+                            "other"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "description": {
                           "type": "string"
                         },
@@ -9858,6 +11018,11 @@
                     "maximum": 1440,
                     "minimum": 1,
                     "type": "integer"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
                   },
                   "master_workout_id": {
                     "format": "uuid",
@@ -15540,6 +16705,82 @@
         "summary": "Update a tenant membership role from the platform console",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/locations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.locations",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locations": {
+                      "items": {
+                        "properties": {
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "address",
+                          "archived_at"
+                        ],
+                        "title": "FacilityLocation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "locations"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Locations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List the gym's locations",
+        "tags": [
+          "Schedule"
         ]
       }
     },
@@ -21323,6 +22564,123 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/check-ins": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.check_in",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "check_in": {
+                      "properties": {
+                        "already_checked_in": {
+                          "type": "boolean"
+                        },
+                        "checked_in_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "checked_in_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "location_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recorded_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "self",
+                            "staff"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "checked_in_on",
+                        "checked_in_at",
+                        "source"
+                      ],
+                      "title": "FacilityCheckIn",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "check_in"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Check-in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance entitlement denied"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Check in to open gym",
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/schedule/slots/series": {
       "post": {
         "callbacks": {},
@@ -21369,6 +22727,11 @@
                   },
                   "local_start_time": {
                     "format": "time",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "master_workout_id": {
@@ -24426,6 +25789,88 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/bookings/guests": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.create_guest_booking",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "guest_name": {
+                    "maxLength": 80,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slot_id",
+                  "guest_name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "booking": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "booking"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Guest booking"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance entitlement denied"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class full or guest already booked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Book a named guest into a class on a guest pass",
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/{id}/duplicate": {
       "post": {
         "callbacks": {},
@@ -25351,6 +26796,82 @@
         "summary": "Search visible users by nickname",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/bookings/waitlist": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.join_waitlist",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slot_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "booking": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "booking"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Waitlist entry"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Finance entitlement denied"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class not full or already booked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join the waitlist of a full class",
+        "tags": [
+          "Schedule"
         ]
       }
     },
@@ -26407,6 +27928,11 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "credit_cost": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
                         "future_classes_reassigned": {
                           "type": "integer"
                         },
@@ -26416,6 +27942,13 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "event"
+                          ],
                           "type": "string"
                         },
                         "name": {
@@ -26437,6 +27970,8 @@
                         "name",
                         "slug",
                         "sort_order",
+                        "credit_cost",
+                        "kind",
                         "archived_at"
                       ],
                       "type": "object"
@@ -26491,6 +28026,20 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "credit_cost": {
+                    "description": "Visits one booking of this class type uses (ADR-097)",
+                    "maximum": 10,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "kind": {
+                    "description": "Events draw on event visits instead of class visits (ADR-097)",
+                    "enum": [
+                      "class",
+                      "event"
+                    ],
+                    "type": "string"
+                  },
                   "name": {
                     "maxLength": 80,
                     "minLength": 2,
@@ -26524,6 +28073,11 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "credit_cost": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
                         "future_classes_reassigned": {
                           "type": "integer"
                         },
@@ -26533,6 +28087,13 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "event"
+                          ],
                           "type": "string"
                         },
                         "name": {
@@ -26554,6 +28115,8 @@
                         "name",
                         "slug",
                         "sort_order",
+                        "credit_cost",
+                        "kind",
                         "archived_at"
                       ],
                       "type": "object"
@@ -28324,6 +29887,133 @@
         "summary": "Get role-aware coaching context for a user",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/locations/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.update_location",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "address": {
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "location": {
+                      "properties": {
+                        "address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "address",
+                        "archived_at"
+                      ],
+                      "title": "FacilityLocation",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "location"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Location"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Location not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Rename a location or change its address",
+        "tags": [
+          "Admin Facility"
         ]
       }
     },

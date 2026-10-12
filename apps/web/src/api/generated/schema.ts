@@ -229,6 +229,59 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/{id}/freezes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List a member's package freezes (ADR-097) */
+        get: operations["MilosTrainingWeb.AdminUserController.freezes"];
+        put?: never;
+        /** Freeze a member's package for a date range; the package end moves out */
+        post: operations["MilosTrainingWeb.AdminUserController.create_freeze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/users/{id}/freezes/{freeze_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a freeze; unused days are given back */
+        post: operations["MilosTrainingWeb.AdminUserController.cancel_freeze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List locations, including archived ones */
+        get: operations["MilosTrainingWeb.AdminFacilityController.index_locations"];
+        put?: never;
+        /** Create a location */
+        post: operations["MilosTrainingWeb.AdminFacilityController.create_location"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/package-catalog": {
         parameters: {
             query?: never;
@@ -384,6 +437,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/check-ins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List open-gym check-ins of a day or a member */
+        get: operations["MilosTrainingWeb.AdminFacilityController.index_check_ins"];
+        put?: never;
+        /** Check a member in to open gym from the desk */
+        post: operations["MilosTrainingWeb.AdminFacilityController.create_check_in"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}": {
         parameters: {
             query?: never;
@@ -481,6 +552,23 @@ export interface paths {
         put?: never;
         /** Athlete requests a workout assignment for a specific date */
         post: operations["MilosTrainingWeb.MyWorkoutController.request_assignment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/locations/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a location; its past classes keep the reference */
+        post: operations["MilosTrainingWeb.AdminFacilityController.archive_location"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1143,6 +1231,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.PlatformOrganizationController.membership_role"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the gym's locations */
+        get: operations["MilosTrainingWeb.ScheduleController.locations"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs/{id}/share": {
         parameters: {
             query?: never;
@@ -1397,6 +1502,23 @@ export interface paths {
         put?: never;
         /** Provision an organization and one-time initial admin invitation */
         post: operations["MilosTrainingWeb.PlatformOrganizationController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/check-ins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check in to open gym */
+        post: operations["MilosTrainingWeb.ScheduleController.check_in"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1659,6 +1781,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/bookings/guests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Book a named guest into a class on a guest pass */
+        post: operations["MilosTrainingWeb.ScheduleController.create_guest_booking"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}/duplicate": {
         parameters: {
             query?: never;
@@ -1875,6 +2014,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MeController.search_users"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/bookings/waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join the waitlist of a full class */
+        post: operations["MilosTrainingWeb.ScheduleController.join_waitlist"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2413,6 +2569,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/locations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Rename a location or change its address */
+        patch: operations["MilosTrainingWeb.AdminFacilityController.update_location"];
+        trace?: never;
+    };
     "/api/auth/register-admin": {
         parameters: {
             query?: never;
@@ -2779,6 +2952,41 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** FacilityCheckIn */
+        FacilityCheckIn: {
+            already_checked_in?: boolean;
+            /** Format: date-time */
+            checked_in_at: string;
+            /** Format: date */
+            checked_in_on: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            location_name?: string | null;
+            nickname?: string | null;
+            /** Format: uuid */
+            recorded_by_id?: string | null;
+            /** @enum {string} */
+            source: "self" | "staff";
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** FacilityLocation */
+        FacilityLocation: {
+            address: string | null;
+            /** Format: date-time */
+            archived_at: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            name: string;
+            /** Format: uuid */
+            organization_id?: string;
+            /** Format: date-time */
+            updated_at?: string;
+        };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
             code: string;
@@ -2786,6 +2994,22 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** SubscriptionFreeze */
+        SubscriptionFreeze: {
+            /** Format: uuid */
+            admin_id?: string | null;
+            cancel_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at: string | null;
+            /** Format: date */
+            ends_on: string;
+            extension_days: number;
+            /** Format: uuid */
+            id: string;
+            reason: string;
+            /** Format: date */
+            starts_on: string;
         };
         ValidationError: {
             /** @enum {string} */
@@ -3064,6 +3288,20 @@ export interface operations {
                         days: number;
                         /** Format: date */
                         end_date: string;
+                        locations?: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
                         slots: {
                             [key: string]: unknown;
                         }[];
@@ -3217,7 +3455,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description class_visits, coaching_touchpoints, or class_visits:<class type id> for a per-class-type limit (ADR-096) */
+                    /** @description class_visits, coaching_touchpoints, event_visits, guest_passes, open_gym_visits, or class_visits:<class type id> for a per-class-type limit (ADR-096, ADR-097) */
                     allowance: string;
                     idempotency_key?: string | null;
                     /** Format: date */
@@ -3426,6 +3664,8 @@ export interface operations {
                     class_type_id: string;
                     duration_minutes?: number;
                     /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
                     master_workout_id: string;
                     name?: string;
                     /** Format: date-time */
@@ -3468,11 +3708,14 @@ export interface operations {
                         class_types: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "class" | "event";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -3494,6 +3737,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Visits one booking of this class type uses (ADR-097) */
+                    credit_cost?: number;
+                    /**
+                     * @description Events draw on event visits instead of class visits (ADR-097)
+                     * @enum {string}
+                     */
+                    kind?: "class" | "event";
                     name: string;
                     /** @default 0 */
                     sort_order?: number;
@@ -3511,11 +3761,14 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "class" | "event";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -3719,6 +3972,272 @@ export interface operations {
         responses: {
             /** @description User schedule */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.freezes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Freezes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        freezes: {
+                            /** Format: uuid */
+                            admin_id?: string | null;
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            extension_days: number;
+                            /** Format: uuid */
+                            id: string;
+                            reason: string;
+                            /** Format: date */
+                            starts_on: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.create_freeze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: date */
+                    ends_on: string;
+                    reason: string;
+                    /** Format: date */
+                    starts_on: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Freeze */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SubscriptionFreeze */
+                        freeze: {
+                            /** Format: uuid */
+                            admin_id?: string | null;
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            extension_days: number;
+                            /** Format: uuid */
+                            id: string;
+                            reason: string;
+                            /** Format: date */
+                            starts_on: string;
+                        };
+                    };
+                };
+            };
+            /** @description Overlapping freeze */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid freeze */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminUserController.cancel_freeze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                freeze_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Freeze */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SubscriptionFreeze */
+                        freeze: {
+                            /** Format: uuid */
+                            admin_id?: string | null;
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            extension_days: number;
+                            /** Format: uuid */
+                            id: string;
+                            reason: string;
+                            /** Format: date */
+                            starts_on: string;
+                        };
+                    };
+                };
+            };
+            /** @description Freeze not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Freeze already cancelled */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.index_locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Locations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        locations: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.create_location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Location */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FacilityLocation */
+                        location: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid location */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -4153,6 +4672,110 @@ export interface operations {
                         }[];
                         /** Format: uuid */
                         user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.index_check_ins": {
+        parameters: {
+            query?: {
+                date?: string;
+                user_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Check-ins */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        check_ins: {
+                            already_checked_in?: boolean;
+                            /** Format: date-time */
+                            checked_in_at: string;
+                            /** Format: date */
+                            checked_in_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            location_name?: string | null;
+                            nickname?: string | null;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            /** @enum {string} */
+                            source: "self" | "staff";
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.create_check_in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Check-in */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FacilityCheckIn */
+                        check_in: {
+                            already_checked_in?: boolean;
+                            /** Format: date-time */
+                            checked_in_at: string;
+                            /** Format: date */
+                            checked_in_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            location_name?: string | null;
+                            nickname?: string | null;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            /** @enum {string} */
+                            source: "self" | "staff";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Finance entitlement denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -5000,6 +5623,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.archive_location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Location */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FacilityLocation */
+                        location: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Location not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -5992,6 +6664,8 @@ export interface operations {
                         scheduling: {
                             default_auto_approve: boolean;
                             default_booking_timeout_minutes: number;
+                            default_booking_window_days?: number | null;
+                            default_cancellation_cutoff_hours?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -6036,6 +6710,10 @@ export interface operations {
                     scheduling?: {
                         default_auto_approve?: boolean;
                         default_booking_timeout_minutes?: number;
+                        /** @description How many days ahead members may book when their package sets no window */
+                        default_booking_window_days?: number | null;
+                        /** @description Withdrawals closer to the class than this use the visit */
+                        default_cancellation_cutoff_hours?: number | null;
                         default_capacity?: number;
                     };
                 };
@@ -6089,6 +6767,8 @@ export interface operations {
                         scheduling: {
                             default_auto_approve: boolean;
                             default_booking_timeout_minutes: number;
+                            default_booking_window_days?: number | null;
+                            default_cancellation_cutoff_hours?: number | null;
                             default_capacity: number;
                             /** Format: uuid */
                             id?: string | null;
@@ -6396,6 +7076,11 @@ export interface operations {
                     /** @enum {string|null} */
                     line_type?: "membership_package" | "manual_charge" | "discount" | "adjustment" | null;
                     lines?: {
+                        /**
+                         * @description Manual charges in the member's discount scope get the member discount
+                         * @enum {string|null}
+                         */
+                        charge_category?: "product" | "personal_training" | "event" | "other" | null;
                         description: string;
                         discount_cents?: number | null;
                         /** @enum {string|null} */
@@ -6637,6 +7322,8 @@ export interface operations {
                     /** Format: uuid */
                     class_type_id: string;
                     duration_minutes?: number;
+                    /** Format: uuid */
+                    location_id?: string | null;
                     /** Format: uuid */
                     master_workout_id: string;
                     name?: string;
@@ -8439,6 +9126,41 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScheduleController.locations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Locations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        locations: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
                     };
                 };
             };
@@ -10282,6 +11004,63 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ScheduleController.check_in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    location_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Check-in */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FacilityCheckIn */
+                        check_in: {
+                            already_checked_in?: boolean;
+                            /** Format: date-time */
+                            checked_in_at: string;
+                            /** Format: date */
+                            checked_in_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            location_name?: string | null;
+                            nickname?: string | null;
+                            /** Format: uuid */
+                            recorded_by_id?: string | null;
+                            /** @enum {string} */
+                            source: "self" | "staff";
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Finance entitlement denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminScheduleController.create_series": {
         parameters: {
             query?: never;
@@ -10303,6 +11082,8 @@ export interface operations {
                     excluded_dates?: string[];
                     /** Format: time */
                     local_start_time: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
                     /** Format: uuid */
                     master_workout_id?: string | null;
                     name: string;
@@ -11382,6 +12163,56 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ScheduleController.create_guest_booking": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    guest_name: string;
+                    /** Format: uuid */
+                    slot_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Guest booking */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        booking: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Finance entitlement denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Class full or guest already booked */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutController.duplicate": {
         parameters: {
             query?: never;
@@ -11863,6 +12694,55 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ScheduleController.join_waitlist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    slot_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Waitlist entry */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        booking: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Finance entitlement denied */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Class not full or already booked */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.show": {
         parameters: {
             query?: never;
@@ -12331,11 +13211,14 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "class" | "event";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -12368,6 +13251,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Visits one booking of this class type uses (ADR-097) */
+                    credit_cost?: number;
+                    /**
+                     * @description Events draw on event visits instead of class visits (ADR-097)
+                     * @enum {string}
+                     */
+                    kind?: "class" | "event";
                     name: string;
                     /** @default 0 */
                     sort_order?: number;
@@ -12385,11 +13275,14 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** @enum {string} */
+                            kind: "class" | "event";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -13241,6 +14134,73 @@ export interface operations {
                         } | null;
                         /** Format: uuid */
                         user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.update_location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Location */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** FacilityLocation */
+                        location: {
+                            address: string | null;
+                            /** Format: date-time */
+                            archived_at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+            /** @description Location not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid location */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

@@ -446,6 +446,12 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       quantity: %Schema{type: :integer, minimum: 1, nullable: true},
       unit_amount_cents: %Schema{type: :integer, minimum: 0},
       discount_cents: %Schema{type: :integer, minimum: 0, nullable: true},
+      charge_category: %Schema{
+        type: :string,
+        enum: ["product", "personal_training", "event", "other"],
+        nullable: true,
+        description: "Manual charges in the member's discount scope get the member discount"
+      },
       membership_package_subscription_id: %Schema{
         type: :string,
         format: :uuid,
