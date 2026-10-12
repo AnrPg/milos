@@ -1,6 +1,8 @@
 defmodule MilosTrainingWeb.PaymentModelsControllerTest do
   use MilosTrainingWeb.ConnCase, async: false
 
+  import Ecto.Query, only: [from: 2]
+
   alias MilosTraining.{Finance, Organizations, Repo}
 
   import MilosTraining.TestFixtures
@@ -75,7 +77,12 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
     })
   end
 
-  defp capabilities(user), do: Finance.get_effective_entitlement(user.id).plan.capabilities
+  defp capabilities(user) do
+    case Finance.get_effective_entitlement(user.id).plan do
+      %{capabilities: capabilities} -> capabilities
+      nil -> []
+    end
+  end
 
   test "add-ons attach to a compatible membership and add their benefits" do
     {user, membership} = member()
@@ -98,6 +105,21 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
     assert :book_classes in capabilities(user)
 
     assert {:error, :add_on_base_required} = Finance.assign_package(membership.id, picky.id, %{})
+
+    # Ending the base ends the add-on: its benefits go and it is not renewed.
+    Repo.update_all(
+      from(subscription in MilosTraining.Finance.MembershipPackageSubscription,
+        where: subscription.id == ^base_subscription.id
+      ),
+      set: [status: "cancelled"]
+    )
+
+    refute :receive_nutrition_plan in capabilities(user)
+
+    assert {:error, :add_on_base_ended} =
+             Finance.generate_renewal_invoice(membership.id, %{
+               "membership_package_subscription_id" => add_on_subscription.id
+             })
   end
 
   test "shared memberships give beneficiaries per-person or pooled quotas", %{

@@ -1378,7 +1378,8 @@ defmodule MilosTrainingWeb.FallbackController do
     corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
     invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
     corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
-    corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"}
+    corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
+    add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

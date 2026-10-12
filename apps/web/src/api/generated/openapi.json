@@ -2,6 +2,409 @@
   "components": {
     "responses": {},
     "schemas": {
+      "AppointmentBooking": {
+        "properties": {
+          "allowance": {
+            "enum": [
+              "pt_sessions",
+              "assessments"
+            ],
+            "type": "string"
+          },
+          "cancelled_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "late_cancellation": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "slot": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          },
+          "slot_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "booked",
+              "cancelled",
+              "attended",
+              "no_show"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slot_id",
+          "user_id",
+          "status",
+          "allowance"
+        ],
+        "title": "AppointmentBooking",
+        "type": "object"
+      },
+      "AppointmentSlot": {
+        "properties": {
+          "booked_by_me": {
+            "type": "boolean"
+          },
+          "bookings": {
+            "items": {
+              "properties": {
+                "allowance": {
+                  "enum": [
+                    "pt_sessions",
+                    "assessments"
+                  ],
+                  "type": "string"
+                },
+                "cancelled_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "late_cancellation": {
+                  "type": "boolean"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "slot": {
+                  "additionalProperties": true,
+                  "nullable": true,
+                  "type": "object"
+                },
+                "slot_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "booked",
+                    "cancelled",
+                    "attended",
+                    "no_show"
+                  ],
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "slot_id",
+                "user_id",
+                "status",
+                "allowance"
+              ],
+              "title": "AppointmentBooking",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "cancelled_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "capacity": {
+            "type": "integer"
+          },
+          "coach_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "duration_minutes": {
+            "type": "integer"
+          },
+          "format": {
+            "enum": [
+              "one_to_one",
+              "semi_private"
+            ],
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "pt_session",
+              "assessment"
+            ],
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "spots_remaining": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "coach_id",
+          "kind",
+          "format",
+          "starts_at",
+          "duration_minutes",
+          "capacity"
+        ],
+        "title": "AppointmentSlot",
+        "type": "object"
+      },
+      "ContentVideo": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "published_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "type": "string"
+          },
+          "video_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "video_url",
+          "tags",
+          "published_at",
+          "archived_at"
+        ],
+        "title": "ContentVideo",
+        "type": "object"
+      },
+      "CorporateClient": {
+        "properties": {
+          "active_seats": {
+            "type": "integer"
+          },
+          "billing_email": {
+            "nullable": true,
+            "type": "string"
+          },
+          "company_name": {
+            "type": "string"
+          },
+          "contact_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "enrollment": {
+            "enum": [
+              "invite_code",
+              "email_domain"
+            ],
+            "type": "string"
+          },
+          "enrollment_code": {
+            "type": "string"
+          },
+          "enrollment_domain": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "package_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "seat_billing": {
+            "enum": [
+              "agreed",
+              "used"
+            ],
+            "type": "string"
+          },
+          "seats": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "archived"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "membership_package_id",
+          "company_name",
+          "enrollment_code",
+          "active_seats",
+          "status"
+        ],
+        "title": "CorporateClient",
+        "type": "object"
+      },
+      "CorporateInvoice": {
+        "properties": {
+          "corporate_client_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "issued_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "paid_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "period_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "type": "string"
+          },
+          "seat_billing": {
+            "type": "string"
+          },
+          "seats_billed": {
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "issued",
+              "paid",
+              "void"
+            ],
+            "type": "string"
+          },
+          "total_cents": {
+            "type": "integer"
+          },
+          "unit_price_cents": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "period_start",
+          "period_end",
+          "seats_billed",
+          "total_cents",
+          "status"
+        ],
+        "title": "CorporateInvoice",
+        "type": "object"
+      },
+      "CorporateSeat": {
+        "additionalProperties": true,
+        "properties": {
+          "ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "status"
+        ],
+        "title": "CorporateSeat",
+        "type": "object"
+      },
       "FacilityCheckIn": {
         "properties": {
           "already_checked_in": {
@@ -99,6 +502,267 @@
         "title": "FacilityLocation",
         "type": "object"
       },
+      "FormReview": {
+        "properties": {
+          "execution_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "exercise_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "feedback": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reviewed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "reviewer_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "submitted",
+              "reviewed",
+              "withdrawn"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "video_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "video_url",
+          "status",
+          "inserted_at"
+        ],
+        "title": "FormReview",
+        "type": "object"
+      },
+      "NutritionPlan": {
+        "nullable": true,
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "carbs_grams": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "daily_calories": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "fat_grams": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "protein_grams": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "title",
+          "body"
+        ],
+        "title": "NutritionPlan",
+        "type": "object"
+      },
+      "ProgressStats": {
+        "properties": {
+          "consistency": {
+            "properties": {
+              "active_weeks": {
+                "type": "integer"
+              },
+              "current_streak_weeks": {
+                "type": "integer"
+              },
+              "percent": {
+                "type": "integer"
+              },
+              "weeks": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "weeks",
+              "active_weeks",
+              "percent",
+              "current_streak_weeks"
+            ],
+            "type": "object"
+          },
+          "score_history": {
+            "items": {
+              "properties": {
+                "points": {
+                  "items": {
+                    "properties": {
+                      "completed_on": {
+                        "format": "date",
+                        "type": "string"
+                      },
+                      "execution_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "value": {
+                        "oneOf": [
+                          {
+                            "type": "number"
+                          },
+                          {
+                            "type": "string"
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "execution_id",
+                      "completed_on",
+                      "value"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "section_id": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "section_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "workout_title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "workout_id",
+                "points"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sources": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          },
+          "totals": {
+            "properties": {
+              "minutes": {
+                "type": "integer"
+              },
+              "sessions": {
+                "type": "integer"
+              },
+              "workouts": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sessions",
+              "minutes",
+              "workouts"
+            ],
+            "type": "object"
+          },
+          "weekly": {
+            "items": {
+              "properties": {
+                "minutes": {
+                  "type": "integer"
+                },
+                "sessions": {
+                  "type": "integer"
+                },
+                "week_start": {
+                  "format": "date",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "week_start",
+                "sessions",
+                "minutes"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "totals",
+          "weekly",
+          "consistency",
+          "sources",
+          "score_history"
+        ],
+        "title": "ProgressStats",
+        "type": "object"
+      },
       "SemanticError": {
         "description": "Stable machine-readable API failure with English compatibility copy.",
         "properties": {
@@ -117,6 +781,42 @@
           "code",
           "error"
         ],
+        "type": "object"
+      },
+      "SubscriptionBeneficiary": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "is_minor": {
+            "type": "boolean"
+          },
+          "membership_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "removed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "subscription_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "subscription_id",
+          "user_id",
+          "is_minor"
+        ],
+        "title": "SubscriptionBeneficiary",
         "type": "object"
       },
       "SubscriptionFreeze": {
@@ -1410,6 +2110,197 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/progress": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyContentController.progress",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "progress": {
+                      "properties": {
+                        "consistency": {
+                          "properties": {
+                            "active_weeks": {
+                              "type": "integer"
+                            },
+                            "current_streak_weeks": {
+                              "type": "integer"
+                            },
+                            "percent": {
+                              "type": "integer"
+                            },
+                            "weeks": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "weeks",
+                            "active_weeks",
+                            "percent",
+                            "current_streak_weeks"
+                          ],
+                          "type": "object"
+                        },
+                        "score_history": {
+                          "items": {
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "properties": {
+                                    "completed_on": {
+                                      "format": "date",
+                                      "type": "string"
+                                    },
+                                    "execution_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "oneOf": [
+                                        {
+                                          "type": "number"
+                                        },
+                                        {
+                                          "type": "string"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "required": [
+                                    "execution_id",
+                                    "completed_on",
+                                    "value"
+                                  ],
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "section_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "unit": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "workout_title": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "workout_id",
+                              "points"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sources": {
+                          "additionalProperties": {
+                            "type": "integer"
+                          },
+                          "type": "object"
+                        },
+                        "totals": {
+                          "properties": {
+                            "minutes": {
+                              "type": "integer"
+                            },
+                            "sessions": {
+                              "type": "integer"
+                            },
+                            "workouts": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "sessions",
+                            "minutes",
+                            "workouts"
+                          ],
+                          "type": "object"
+                        },
+                        "weekly": {
+                          "items": {
+                            "properties": {
+                              "minutes": {
+                                "type": "integer"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              },
+                              "week_start": {
+                                "format": "date",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "week_start",
+                              "sessions",
+                              "minutes"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "totals",
+                        "weekly",
+                        "consistency",
+                        "sources",
+                        "score_history"
+                      ],
+                      "title": "ProgressStats",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "progress"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Progress"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included in the package"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Advanced statistics of my training in this gym",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/allowance-extensions": {
       "post": {
         "callbacks": {},
@@ -2414,6 +3305,94 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/subscriptions/{id}/beneficiaries/{beneficiary_id}/remove": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.remove_beneficiary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "beneficiary_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "beneficiary": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "is_minor": {
+                          "type": "boolean"
+                        },
+                        "membership_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "removed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subscription_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "subscription_id",
+                        "user_id",
+                        "is_minor"
+                      ],
+                      "title": "SubscriptionBeneficiary",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "beneficiary"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Beneficiary"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove a beneficiary from a shared membership",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/promotions/{id}/codes": {
       "get": {
         "callbacks": {},
@@ -2592,6 +3571,334 @@
         "summary": "Get a role-specific user schedule",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/corporate-clients/{id}/invoices": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.invoices",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoices": {
+                      "items": {
+                        "properties": {
+                          "corporate_client_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "issued_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "paid_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "period_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "period_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "seat_billing": {
+                            "type": "string"
+                          },
+                          "seats_billed": {
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "issued",
+                              "paid",
+                              "void"
+                            ],
+                            "type": "string"
+                          },
+                          "total_cents": {
+                            "type": "integer"
+                          },
+                          "unit_price_cents": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "period_start",
+                          "period_end",
+                          "seats_billed",
+                          "total_cents",
+                          "status"
+                        ],
+                        "title": "CorporateInvoice",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "invoices"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoices"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Invoices issued to a corporate client",
+        "tags": [
+          "Payment models"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.create_invoice",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status"
+                      ],
+                      "title": "CorporateInvoice",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already invoiced for the period"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Invoice a corporate client for the period containing a date (today by default)",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/videos": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyContentController.videos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "videos": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "published_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "video_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "video_url",
+                          "tags",
+                          "published_at",
+                          "archived_at"
+                        ],
+                        "title": "ContentVideo",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "videos"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Videos"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included in the package"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "On-demand videos included in my package",
+        "tags": [
+          "Me"
         ]
       }
     },
@@ -2827,6 +4134,221 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/videos": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminContentController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "videos": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "published_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "tags": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "video_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "video_url",
+                          "tags",
+                          "published_at",
+                          "archived_at"
+                        ],
+                        "title": "ContentVideo",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "videos"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Videos"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List on-demand videos, including drafts and archived ones",
+        "tags": [
+          "Admin Content"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminContentController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "duration_minutes": {
+                    "maximum": 600,
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "items": {
+                      "maxLength": 40,
+                      "type": "string"
+                    },
+                    "maxItems": 8,
+                    "type": "array"
+                  },
+                  "title": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "video_url": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "video": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "video_url",
+                        "tags",
+                        "published_at",
+                        "archived_at"
+                      ],
+                      "title": "ContentVideo",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "video"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Video"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid video"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add an on-demand video (draft until published)",
+        "tags": [
+          "Admin Content"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/freezes/{freeze_id}/cancel": {
       "post": {
         "callbacks": {},
@@ -2961,6 +4483,202 @@
         "summary": "Cancel a freeze; unused days are given back",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/nutrition-plan": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.my_nutrition_plan",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nutrition_plan": {
+                      "nullable": true,
+                      "properties": {
+                        "body": {
+                          "type": "string"
+                        },
+                        "carbs_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "daily_calories": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "fat_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "protein_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "title",
+                        "body"
+                      ],
+                      "title": "NutritionPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "nutrition_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Nutrition plan"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included in the package"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My nutrition plan",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
+    "/api/executions/vault": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ExecutionController.vault",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "workouts": {
+                      "items": {
+                        "properties": {
+                          "completed_count": {
+                            "type": "integer"
+                          },
+                          "entries": {
+                            "items": {
+                              "properties": {
+                                "completed_at_tz": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "completed_at_utc": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "scale_level_slug": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "source": {
+                                  "type": "string"
+                                },
+                                "started_at_utc": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "total_elapsed_ms": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "completed_at_utc",
+                                "source"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "last_completed_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workout_title": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout_type": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "master_workout_id",
+                          "completed_count",
+                          "last_completed_at",
+                          "entries"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "workouts"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Workout vault"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My completed workouts, each with its dated entries (ADR-098)",
+        "tags": [
+          "Execution"
         ]
       }
     },
@@ -3640,6 +5358,127 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/form-reviews/{id}/withdraw": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.withdraw_form_review",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "form_review": {
+                      "properties": {
+                        "execution_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "exercise_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "feedback": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewer_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "submitted",
+                            "reviewed",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "video_url",
+                        "status",
+                        "inserted_at"
+                      ],
+                      "title": "FormReview",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "form_review"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Form review"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already reviewed or withdrawn"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw an open form review; the review is given back",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/reviews": {
       "get": {
         "callbacks": {},
@@ -4069,6 +5908,137 @@
         "summary": "Record attendance for a user in a class slot",
         "tags": [
           "Admin Schedule"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/appointment-slots/{id}/bookings": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.book_for_client",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointment": {
+                      "properties": {
+                        "allowance": {
+                          "enum": [
+                            "pt_sessions",
+                            "assessments"
+                          ],
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "late_cancellation": {
+                          "type": "boolean"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slot": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "slot_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "booked",
+                            "cancelled",
+                            "attended",
+                            "no_show"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slot_id",
+                        "user_id",
+                        "status",
+                        "allowance"
+                      ],
+                      "title": "AppointmentBooking",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "appointment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointment"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included in the client's package"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Book a client into a slot on their package",
+        "tags": [
+          "Appointments"
         ]
       }
     },
@@ -7161,6 +9131,160 @@
         "summary": "Void a finance invoice",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/videos/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminContentController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "duration_minutes": {
+                    "maximum": 600,
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "tags": {
+                    "items": {
+                      "maxLength": 40,
+                      "type": "string"
+                    },
+                    "maxItems": 8,
+                    "type": "array"
+                  },
+                  "title": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "video_url": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "video": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "video_url",
+                        "tags",
+                        "published_at",
+                        "archived_at"
+                      ],
+                      "title": "ContentVideo",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "video"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Video"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid video"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit an on-demand video",
+        "tags": [
+          "Admin Content"
         ]
       }
     },
@@ -10530,6 +12654,115 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/corporate-enrollment": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.enroll",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "code": {
+                    "maxLength": 20,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "seat": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "ends_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "status"
+                      ],
+                      "title": "CorporateSeat",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "seat"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seat"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No matching plan"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No seats left or already enrolled"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join my company's corporate plan with its code, or by my email domain",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/prs": {
       "get": {
         "callbacks": {},
@@ -12341,6 +14574,118 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/appointments/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.cancel (2)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointment": {
+                      "properties": {
+                        "allowance": {
+                          "enum": [
+                            "pt_sessions",
+                            "assessments"
+                          ],
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "late_cancellation": {
+                          "type": "boolean"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slot": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "slot_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "booked",
+                            "cancelled",
+                            "attended",
+                            "no_show"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slot_id",
+                        "user_id",
+                        "status",
+                        "allowance"
+                      ],
+                      "title": "AppointmentBooking",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "appointment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No longer active"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel an appointment; inside the cancellation cutoff the session is used",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
     "/api/auth/me": {
       "get": {
         "callbacks": {},
@@ -12505,6 +14850,230 @@
         "summary": "Get a user's communication thread summary",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/appointments": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.my_appointments",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointments": {
+                      "items": {
+                        "properties": {
+                          "allowance": {
+                            "enum": [
+                              "pt_sessions",
+                              "assessments"
+                            ],
+                            "type": "string"
+                          },
+                          "cancelled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "late_cancellation": {
+                            "type": "boolean"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "slot": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "slot_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "booked",
+                              "cancelled",
+                              "attended",
+                              "no_show"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "slot_id",
+                          "user_id",
+                          "status",
+                          "allowance"
+                        ],
+                        "title": "AppointmentBooking",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "appointments"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointments"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My appointments",
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.book",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slot_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointment": {
+                      "properties": {
+                        "allowance": {
+                          "enum": [
+                            "pt_sessions",
+                            "assessments"
+                          ],
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "late_cancellation": {
+                          "type": "boolean"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slot": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "slot_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "booked",
+                            "cancelled",
+                            "attended",
+                            "no_show"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slot_id",
+                        "user_id",
+                        "status",
+                        "allowance"
+                      ],
+                      "title": "AppointmentBooking",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "appointment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointment"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included in the package"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Full, used up or already booked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Book an appointment slot",
+        "tags": [
+          "Appointments"
         ]
       }
     },
@@ -21428,6 +23997,130 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-invoices/{id}/status": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.invoice_status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "paid",
+                      "void"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "invoice": {
+                      "properties": {
+                        "corporate_client_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "issued_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "paid_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "period_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "period_start": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "seat_billing": {
+                          "type": "string"
+                        },
+                        "seats_billed": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "issued",
+                            "paid",
+                            "void"
+                          ],
+                          "type": "string"
+                        },
+                        "total_cents": {
+                          "type": "integer"
+                        },
+                        "unit_price_cents": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "period_start",
+                        "period_end",
+                        "seats_billed",
+                        "total_cents",
+                        "status"
+                      ],
+                      "title": "CorporateInvoice",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "invoice"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invoice"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark a corporate invoice paid or void",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/{id}/library": {
       "patch": {
         "callbacks": {},
@@ -21485,6 +24178,108 @@
         "summary": "Move a workout in the nested library",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/videos/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminContentController.archive",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "video": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "video_url",
+                        "tags",
+                        "published_at",
+                        "archived_at"
+                      ],
+                      "title": "ContentVideo",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "video"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Video"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Archive an on-demand video; members no longer see it",
+        "tags": [
+          "Admin Content"
         ]
       }
     },
@@ -22394,6 +25189,147 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/form-reviews/{id}/review": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.complete_form_review",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "feedback": {
+                    "maxLength": 5000,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "feedback"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "form_review": {
+                      "properties": {
+                        "execution_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "exercise_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "feedback": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewer_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "submitted",
+                            "reviewed",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "video_url",
+                        "status",
+                        "inserted_at"
+                      ],
+                      "title": "FormReview",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "form_review"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Form review"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already closed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Answer a form review",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/upload-url": {
       "post": {
         "callbacks": {},
@@ -22561,6 +25497,198 @@
         "summary": "Provision an organization and one-time initial admin invitation",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/subscriptions/{id}/beneficiaries": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.beneficiaries",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "beneficiaries": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "is_minor": {
+                            "type": "boolean"
+                          },
+                          "membership_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "removed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "subscription_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "subscription_id",
+                          "user_id",
+                          "is_minor"
+                        ],
+                        "title": "SubscriptionBeneficiary",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "beneficiaries"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Beneficiaries"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People sharing a membership",
+        "tags": [
+          "Payment models"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.add_beneficiary",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "is_minor": {
+                    "type": "boolean"
+                  },
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "beneficiary": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "is_minor": {
+                          "type": "boolean"
+                        },
+                        "membership_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "removed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subscription_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "subscription_id",
+                        "user_id",
+                        "is_minor"
+                      ],
+                      "title": "SubscriptionBeneficiary",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "beneficiary"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Beneficiary"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Limit reached or not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a gym member to a shared membership",
+        "tags": [
+          "Payment models"
         ]
       }
     },
@@ -23054,6 +26182,178 @@
         "summary": "Revoke a personal allowance extension with a compensating ledger entry",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/appointment-slots/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.cancel_slot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slot": {
+                      "properties": {
+                        "booked_by_me": {
+                          "type": "boolean"
+                        },
+                        "bookings": {
+                          "items": {
+                            "properties": {
+                              "allowance": {
+                                "enum": [
+                                  "pt_sessions",
+                                  "assessments"
+                                ],
+                                "type": "string"
+                              },
+                              "cancelled_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "late_cancellation": {
+                                "type": "boolean"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "slot": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
+                              "slot_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "booked",
+                                  "cancelled",
+                                  "attended",
+                                  "no_show"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "slot_id",
+                              "user_id",
+                              "status",
+                              "allowance"
+                            ],
+                            "title": "AppointmentBooking",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "coach_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "type": "integer"
+                        },
+                        "format": {
+                          "enum": [
+                            "one_to_one",
+                            "semi_private"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "pt_session",
+                            "assessment"
+                          ],
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "spots_remaining": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "starts_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_id",
+                        "kind",
+                        "format",
+                        "starts_at",
+                        "duration_minutes",
+                        "capacity"
+                      ],
+                      "title": "AppointmentSlot",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "slot"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slot"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel a slot; booked clients get their session back",
+        "tags": [
+          "Appointments"
         ]
       }
     },
@@ -25575,6 +28875,672 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/appointment-slots": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.slots",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coach_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slots": {
+                      "items": {
+                        "properties": {
+                          "booked_by_me": {
+                            "type": "boolean"
+                          },
+                          "bookings": {
+                            "items": {
+                              "properties": {
+                                "allowance": {
+                                  "enum": [
+                                    "pt_sessions",
+                                    "assessments"
+                                  ],
+                                  "type": "string"
+                                },
+                                "cancelled_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "late_cancellation": {
+                                  "type": "boolean"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "slot": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "slot_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "booked",
+                                    "cancelled",
+                                    "attended",
+                                    "no_show"
+                                  ],
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "slot_id",
+                                "user_id",
+                                "status",
+                                "allowance"
+                              ],
+                              "title": "AppointmentBooking",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "cancelled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "capacity": {
+                            "type": "integer"
+                          },
+                          "coach_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "type": "integer"
+                          },
+                          "format": {
+                            "enum": [
+                              "one_to_one",
+                              "semi_private"
+                            ],
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "pt_session",
+                              "assessment"
+                            ],
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "notes": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "coach_id",
+                          "kind",
+                          "format",
+                          "starts_at",
+                          "duration_minutes",
+                          "capacity"
+                        ],
+                        "title": "AppointmentSlot",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "slots"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slots"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Appointment slots in a date range, with their bookings",
+        "tags": [
+          "Appointments"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.create_slot",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "capacity": {
+                    "maximum": 4,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "coach_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "duration_minutes": {
+                    "maximum": 240,
+                    "minimum": 15,
+                    "type": "integer"
+                  },
+                  "format": {
+                    "enum": [
+                      "one_to_one",
+                      "semi_private"
+                    ],
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      "pt_session",
+                      "assessment"
+                    ],
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "notes": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "format",
+                  "starts_at",
+                  "duration_minutes"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slot": {
+                      "properties": {
+                        "booked_by_me": {
+                          "type": "boolean"
+                        },
+                        "bookings": {
+                          "items": {
+                            "properties": {
+                              "allowance": {
+                                "enum": [
+                                  "pt_sessions",
+                                  "assessments"
+                                ],
+                                "type": "string"
+                              },
+                              "cancelled_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "late_cancellation": {
+                                "type": "boolean"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "slot": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
+                              "slot_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "booked",
+                                  "cancelled",
+                                  "attended",
+                                  "no_show"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "slot_id",
+                              "user_id",
+                              "status",
+                              "allowance"
+                            ],
+                            "title": "AppointmentBooking",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "coach_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "type": "integer"
+                        },
+                        "format": {
+                          "enum": [
+                            "one_to_one",
+                            "semi_private"
+                          ],
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "pt_session",
+                            "assessment"
+                          ],
+                          "type": "string"
+                        },
+                        "location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "spots_remaining": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "starts_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "coach_id",
+                        "kind",
+                        "format",
+                        "starts_at",
+                        "duration_minutes",
+                        "capacity"
+                      ],
+                      "title": "AppointmentSlot",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "slot"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slot"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid slot"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Publish an appointment slot (for yourself or another coach)",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/nutrition-plan": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.nutrition_plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nutrition_plan": {
+                      "nullable": true,
+                      "properties": {
+                        "body": {
+                          "type": "string"
+                        },
+                        "carbs_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "daily_calories": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "fat_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "protein_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "title",
+                        "body"
+                      ],
+                      "title": "NutritionPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "nutrition_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Nutrition plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's nutrition plan",
+        "tags": [
+          "Coaching"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 20000,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "carbs_grams": {
+                    "maximum": 2000,
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "daily_calories": {
+                    "maximum": 10000,
+                    "minimum": 1,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "fat_grams": {
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "protein_grams": {
+                    "maximum": 1000,
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "title": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "body"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "nutrition_plan": {
+                      "nullable": true,
+                      "properties": {
+                        "body": {
+                          "type": "string"
+                        },
+                        "carbs_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "daily_calories": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "fat_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "protein_grams": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "title",
+                        "body"
+                      ],
+                      "title": "NutritionPlan",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "nutrition_plan"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Nutrition plan"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a client of this gym"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write a client's nutrition plan; the client is notified",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
     "/api/prs": {
       "get": {
         "callbacks": {},
@@ -26742,6 +30708,95 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-clients/{id}/seats/{subscription_id}/end": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.end_seat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "subscription_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "seat": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "ends_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "status"
+                      ],
+                      "title": "CorporateSeat",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "seat"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seat"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "End an employee's seat today",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/search/users": {
       "get": {
         "callbacks": {},
@@ -27074,6 +31129,126 @@
         "summary": "Apply available credit to a membership payment",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/videos/{id}/publish": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminContentController.publish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "published": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "published"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "video": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "video_url",
+                        "tags",
+                        "published_at",
+                        "archived_at"
+                      ],
+                      "title": "ContentVideo",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "video"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Video"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Publish or unpublish an on-demand video",
+        "tags": [
+          "Admin Content"
         ]
       }
     },
@@ -27543,7 +31718,8 @@
                     "enum": [
                       "class_booking",
                       "assigned",
-                      "self_selected"
+                      "self_selected",
+                      "repeat"
                     ],
                     "type": "string"
                   },
@@ -28140,6 +32316,197 @@
         "summary": "Rename or reorder an active class type",
         "tags": [
           "Admin Class Types"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/finance/corporate-clients/{id}/seats": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.seats",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "seats": {
+                      "items": {
+                        "additionalProperties": true,
+                        "properties": {
+                          "ends_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "starts_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "status"
+                        ],
+                        "title": "CorporateSeat",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "seats"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seats"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Seats of a corporate client",
+        "tags": [
+          "Payment models"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.add_seat",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "seat": {
+                      "additionalProperties": true,
+                      "properties": {
+                        "ends_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "status"
+                      ],
+                      "title": "CorporateSeat",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "seat"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seat"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No seats left or already enrolled"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give a gym member a seat on the corporate plan",
+        "tags": [
+          "Payment models"
         ]
       }
     },
@@ -28817,6 +33184,123 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/form-reviews": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.form_review_queue",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "submitted",
+                "reviewed",
+                "withdrawn"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "form_reviews": {
+                      "items": {
+                        "properties": {
+                          "execution_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "exercise_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "feedback": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reviewed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reviewer_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "submitted",
+                              "reviewed",
+                              "withdrawn"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "video_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "video_url",
+                          "status",
+                          "inserted_at"
+                        ],
+                        "title": "FormReview",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "form_reviews"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Form reviews"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Form reviews, open ones by default",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workout-folders/{id}": {
       "delete": {
         "callbacks": {},
@@ -28934,6 +33418,140 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/staff/appointments/{id}/attendance": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.attendance",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "attended",
+                      "no_show"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointment": {
+                      "properties": {
+                        "allowance": {
+                          "enum": [
+                            "pt_sessions",
+                            "assessments"
+                          ],
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "late_cancellation": {
+                          "type": "boolean"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slot": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "slot_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "booked",
+                            "cancelled",
+                            "attended",
+                            "no_show"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slot_id",
+                        "user_id",
+                        "status",
+                        "allowance"
+                      ],
+                      "title": "AppointmentBooking",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "appointment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No longer active"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark an appointment attended or missed",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
     "/api/workouts/{id}/timer-sequence": {
       "get": {
         "callbacks": {},
@@ -28966,7 +33584,8 @@
               "enum": [
                 "class_booking",
                 "assigned",
-                "self_selected"
+                "self_selected",
+                "repeat"
               ],
               "type": "string"
             }
@@ -30335,6 +34954,376 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/form-reviews": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.my_form_reviews",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "form_reviews": {
+                      "items": {
+                        "properties": {
+                          "execution_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "exercise_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "feedback": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reviewed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reviewer_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "submitted",
+                              "reviewed",
+                              "withdrawn"
+                            ],
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "video_url": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "video_url",
+                          "status",
+                          "inserted_at"
+                        ],
+                        "title": "FormReview",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "form_reviews"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Form reviews"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My form reviews",
+        "tags": [
+          "Coaching"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.submit_form_review",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "execution_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "exercise_name": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "video_url": {
+                    "maxLength": 2000,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "video_url"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "form_review": {
+                      "properties": {
+                        "execution_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "exercise_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "feedback": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "reviewer_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "submitted",
+                            "reviewed",
+                            "withdrawn"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "video_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "video_url",
+                        "status",
+                        "inserted_at"
+                      ],
+                      "title": "FormReview",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "form_review"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Form review"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not included or used up"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Used up"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask a coach for feedback on a video of my technique",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/appointments/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "appointment": {
+                      "properties": {
+                        "allowance": {
+                          "enum": [
+                            "pt_sessions",
+                            "assessments"
+                          ],
+                          "type": "string"
+                        },
+                        "cancelled_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "late_cancellation": {
+                          "type": "boolean"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slot": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "slot_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "booked",
+                            "cancelled",
+                            "attended",
+                            "no_show"
+                          ],
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slot_id",
+                        "user_id",
+                        "status",
+                        "allowance"
+                      ],
+                      "title": "AppointmentBooking",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "appointment"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Appointment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No longer active"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Cancel an appointment; inside the cancellation cutoff the session is used",
+        "tags": [
+          "Appointments"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/analytics/summary": {
       "get": {
         "callbacks": {},
@@ -30852,6 +35841,159 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-clients/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.update_client",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "billing_email": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "company_name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "contact_name": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "regenerate_code": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "archived"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "client": {
+                      "properties": {
+                        "active_seats": {
+                          "type": "integer"
+                        },
+                        "billing_email": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "company_name": {
+                          "type": "string"
+                        },
+                        "contact_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "enrollment": {
+                          "enum": [
+                            "invite_code",
+                            "email_domain"
+                          ],
+                          "type": "string"
+                        },
+                        "enrollment_code": {
+                          "type": "string"
+                        },
+                        "enrollment_domain": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "seat_billing": {
+                          "enum": [
+                            "agreed",
+                            "used"
+                          ],
+                          "type": "string"
+                        },
+                        "seats": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "membership_package_id",
+                        "company_name",
+                        "enrollment_code",
+                        "active_seats",
+                        "status"
+                      ],
+                      "title": "CorporateClient",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "client"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit a corporate client, archive it or issue a new enrollment code",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/reviews/{id}/status": {
       "patch": {
         "callbacks": {},
@@ -31086,6 +36228,264 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/corporate-clients": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.clients",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "clients": {
+                      "items": {
+                        "properties": {
+                          "active_seats": {
+                            "type": "integer"
+                          },
+                          "billing_email": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "company_name": {
+                            "type": "string"
+                          },
+                          "contact_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "enrollment": {
+                            "enum": [
+                              "invite_code",
+                              "email_domain"
+                            ],
+                            "type": "string"
+                          },
+                          "enrollment_code": {
+                            "type": "string"
+                          },
+                          "enrollment_domain": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "membership_package_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "package_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "seat_billing": {
+                            "enum": [
+                              "agreed",
+                              "used"
+                            ],
+                            "type": "string"
+                          },
+                          "seats": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "archived"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "membership_package_id",
+                          "company_name",
+                          "enrollment_code",
+                          "active_seats",
+                          "status"
+                        ],
+                        "title": "CorporateClient",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "clients"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Clients"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Corporate clients",
+        "tags": [
+          "Payment models"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.create_client",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "billing_email": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "company_name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "contact_name": {
+                    "maxLength": 120,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "membership_package_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "membership_package_id",
+                  "company_name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "client": {
+                      "properties": {
+                        "active_seats": {
+                          "type": "integer"
+                        },
+                        "billing_email": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "company_name": {
+                          "type": "string"
+                        },
+                        "contact_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "enrollment": {
+                          "enum": [
+                            "invite_code",
+                            "email_domain"
+                          ],
+                          "type": "string"
+                        },
+                        "enrollment_code": {
+                          "type": "string"
+                        },
+                        "enrollment_domain": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "package_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "seat_billing": {
+                          "enum": [
+                            "agreed",
+                            "used"
+                          ],
+                          "type": "string"
+                        },
+                        "seats": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "archived"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "membership_package_id",
+                        "company_name",
+                        "enrollment_code",
+                        "active_seats",
+                        "status"
+                      ],
+                      "title": "CorporateClient",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "client"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid client"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create the corporate client of a corporate package",
+        "tags": [
+          "Payment models"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/bookings": {
       "post": {
         "callbacks": {},
@@ -31253,6 +36653,86 @@
         "summary": "Correct the current PR result without adding history",
         "tags": [
           "Pantheon"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/reply-queue": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.reply_queue",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "replies": {
+                      "items": {
+                        "properties": {
+                          "client_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "client_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "due_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "message_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "overdue": {
+                            "type": "boolean"
+                          },
+                          "response_sla_hours": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "sent_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "thread_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "thread_id",
+                          "message_id",
+                          "client_id",
+                          "sent_at",
+                          "overdue"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "replies"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reply queue"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Client messages waiting for a staff reply, overdue first",
+        "tags": [
+          "Coaching"
         ]
       }
     },
@@ -33330,6 +38810,171 @@
         "summary": "Mark an injury report healed",
         "tags": [
           "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/appointments/slots": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AppointmentsController.offered_slots",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slots": {
+                      "items": {
+                        "properties": {
+                          "booked_by_me": {
+                            "type": "boolean"
+                          },
+                          "bookings": {
+                            "items": {
+                              "properties": {
+                                "allowance": {
+                                  "enum": [
+                                    "pt_sessions",
+                                    "assessments"
+                                  ],
+                                  "type": "string"
+                                },
+                                "cancelled_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "late_cancellation": {
+                                  "type": "boolean"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "slot": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                },
+                                "slot_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "booked",
+                                    "cancelled",
+                                    "attended",
+                                    "no_show"
+                                  ],
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "slot_id",
+                                "user_id",
+                                "status",
+                                "allowance"
+                              ],
+                              "title": "AppointmentBooking",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "cancelled_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "capacity": {
+                            "type": "integer"
+                          },
+                          "coach_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "type": "integer"
+                          },
+                          "format": {
+                            "enum": [
+                              "one_to_one",
+                              "semi_private"
+                            ],
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "pt_session",
+                              "assessment"
+                            ],
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "notes": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "coach_id",
+                          "kind",
+                          "format",
+                          "starts_at",
+                          "duration_minutes",
+                          "capacity"
+                        ],
+                        "title": "AppointmentSlot",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "slots"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slots"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Upcoming appointment slots I can book with my packages",
+        "tags": [
+          "Appointments"
         ]
       }
     },

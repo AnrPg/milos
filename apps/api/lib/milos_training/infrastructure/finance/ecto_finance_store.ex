@@ -877,6 +877,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
          %MembershipPackageSubscription{} = subscription <-
            renewal_subscription(membership.id, params["membership_package_subscription_id"]),
          :ok <- not_corporate_seat(subscription),
+         :ok <- add_on_base_active(subscription),
          :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) do
       period_start = parse_date(params["service_period_start"], Date.utc_today())
 
@@ -3427,6 +3428,23 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   # ADR-098: the company pays for corporate seats, never the member.
   defp not_corporate_seat(%{corporate_client_id: nil}), do: :ok
   defp not_corporate_seat(_subscription), do: {:error, :corporate_seat_billed_to_company}
+
+  # ADR-098: an add-on ends with its base, so it is not renewed without one.
+  defp add_on_base_active(%{base_subscription_id: nil}), do: :ok
+
+  defp add_on_base_active(%{base_subscription_id: base_id}) do
+    base = MembershipPackageSubscription |> tenant_scope() |> Repo.get(base_id)
+
+    if base &&
+         InvoiceLifecycle.subscription_active?(
+           base.status,
+           base.starts_on,
+           base.ends_on,
+           Date.utc_today()
+         ),
+       do: :ok,
+       else: {:error, :add_on_base_ended}
+  end
 
   defp joining_fee_lines(%{corporate_client_id: client_id}) when not is_nil(client_id), do: []
 
