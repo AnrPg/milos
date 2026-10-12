@@ -13,14 +13,17 @@ defmodule MilosTraining.Execution.Domain.TenantDataPolicy do
             purge_order: 30,
             disposition: :purge,
             basis:
-              "Workout execution logs are member training data with no retention obligation once the tenant is offboarded.",
+              "Workout execution and training-log entries are member training data with no retention obligation once the tenant is offboarded.",
             tables: [
               %{
                 table: "execution_progress_operations",
                 parent: {"workout_executions", "execution_id"},
                 rls: :user
               },
-              %{table: "workout_executions"}
+              %{table: "workout_executions"},
+              # ADR-100 standalone training-log entries; their RLS USING clause
+              # admits organization sessions, so purge runs per tenant.
+              %{table: "training_log_entries"}
             ]
           })
 
