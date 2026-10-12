@@ -71,7 +71,8 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
              request_value(request, :capability),
              :capability,
              mode
-           ) do
+           ),
+         :ok <- require_class_type(plan, request_value(request, :class_type_id)) do
       authorize_allowance(plan, request)
     else
       {:error, _reason} = error -> error
@@ -86,6 +87,12 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
     else
       missing_member_error(kind, mode)
     end
+  end
+
+  defp require_class_type(plan, class_type_id) do
+    if EntitlementPlan.class_type_included?(plan, class_type_id),
+      do: :ok,
+      else: {:error, :finance_class_type_not_included}
   end
 
   defp missing_member_error(kind, :observe), do: {:error, observed_error(kind)}
