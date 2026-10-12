@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.RescheduleAssignedWorkout do
   require Logger
 
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.{Identity, Notifications, Workouts}
 
   def call(context, assignment_id, athlete_id, new_date_str) do
@@ -14,6 +14,7 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
            Workouts.update_assignment_date(context, assignment_id, athlete_id, new_date) do
       notify_admins_workout_moved(assignment, updated, athlete_id)
       broadcast_assignment_refresh(context, assignment, athlete_id)
+      TrackAnalyticsEvent.call("workout_assignment_rescheduled", context, updated)
       {:ok, updated}
     else
       nil -> {:error, :not_found}

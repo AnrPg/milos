@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.PublishWorkout do
   require Logger
 
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.{Notifications, Organizations, Scheduling, Workouts}
 
   def call(%{organization_id: _} = context, id, params) do
@@ -18,6 +18,15 @@ defmodule MilosTraining.Application.PublishWorkout do
       Workouts.delete_superseded_drafts(context, id, workout.created_by_id)
       maybe_notify(is_republish, substitute_for, assignment_targets, booking_targets, workout)
       broadcast_admin_workout_refresh(context, workout.id)
+
+      track_publish(
+        context,
+        workout,
+        is_republish,
+        substitute_for,
+        assignment_targets,
+        booking_targets
+      )
 
       maybe_broadcast_view_refresh(
         is_republish,
@@ -211,6 +220,19 @@ defmodule MilosTraining.Application.PublishWorkout do
         Logger.error("workout_changed booking notification failed user_id=#{target.user_id}")
       end
     end)
+  end
+
+  defp track_publish(context, workout, is_republish, substitute_for, assignments, bookings) do
+    event =
+      if is_republish or substitute_for, do: "workout_republished", else: "workout_published"
+
+    TrackAnalyticsEvent.call(event, context, workout, %{
+      metadata: %{
+        affected_assignment_count: length(assignments),
+        affected_booking_count: length(bookings),
+        substitution: substitute_for && elem(substitute_for, 0)
+      }
+    })
   end
 
   defp maybe_put(map, _key, nil), do: map

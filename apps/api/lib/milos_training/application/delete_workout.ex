@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.DeleteWorkout do
   require Logger
 
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.{Scheduling, Workouts}
   alias MilosTraining.Notifications
 
@@ -19,6 +19,15 @@ defmodule MilosTraining.Application.DeleteWorkout do
       notify_booking_targets(booking_targets)
       broadcast_assignment_refresh(context, assignment_targets, id)
       broadcast_admin_workout_refresh(context, id)
+
+      TrackAnalyticsEvent.call("workout_deleted", context, workout, %{
+        metadata: %{
+          affected_assignment_count: length(assignment_targets),
+          affected_booking_count: length(booking_targets),
+          deleted_slot_count: length(deleted_slot_ids)
+        }
+      })
+
       :ok
     else
       nil -> {:error, :not_found}

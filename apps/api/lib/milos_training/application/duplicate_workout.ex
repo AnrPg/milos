@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.DuplicateWorkout do
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.Identity
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
@@ -19,6 +19,7 @@ defmodule MilosTraining.Application.DuplicateWorkout do
 
     with {:ok, draft} <- duplicate_workout(context, id, title_suffix, attrs) do
       broadcast_admin_refresh(context, draft, "workout_duplicated")
+      TrackAnalyticsEvent.call("workout_duplicated", context, draft, duplicate_facts(id, opts))
       {:ok, draft}
     end
   end
@@ -51,6 +52,17 @@ defmodule MilosTraining.Application.DuplicateWorkout do
       true ->
         "(copy)"
     end
+  end
+
+  defp duplicate_facts(source_id, opts) do
+    origin =
+      cond do
+        opts[:assignment_id] -> "assignment"
+        opts[:slot_id] -> "class_slot"
+        true -> "library"
+      end
+
+    %{metadata: %{source_workout_id: source_id, origin: origin}}
   end
 
   defp build_athlete_suffix([]), do: "(copy)"

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.RejectAssignedWorkout do
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.{Identity, Notifications, Workouts}
 
   def call(context, assignment_id, athlete_id) do
@@ -15,6 +15,11 @@ defmodule MilosTraining.Application.RejectAssignedWorkout do
       athlete = Identity.find_by_id(athlete_id)
       dispatch_rejected_notification(assignment, athlete)
       broadcast_assignment_refresh(context, assignment)
+
+      TrackAnalyticsEvent.call("workout_assignment_rejected", context, assignment, %{
+        user_id: athlete_id
+      })
+
       {:ok, assignment}
     end
   end

@@ -1,10 +1,11 @@
 defmodule MilosTraining.Application.CreateDraftWorkout do
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
   alias MilosTraining.Workouts
 
   def call(admin) do
     with {:ok, draft} <- Workouts.create_draft(admin) do
       broadcast_admin_refresh([draft], "draft_created", draft.id)
+      TrackAnalyticsEvent.call("workout_created", nil, draft, %{user_id: admin.id})
       {:ok, draft}
     end
   end
@@ -12,6 +13,7 @@ defmodule MilosTraining.Application.CreateDraftWorkout do
   def call(context, admin) do
     with {:ok, draft} <- Workouts.create_draft(context, admin) do
       broadcast_admin_refresh([context, draft], "draft_created", draft.id)
+      TrackAnalyticsEvent.call("workout_created", context, draft)
       {:ok, draft}
     end
   end
