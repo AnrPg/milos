@@ -17,6 +17,7 @@ import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import Link from "next/link";
 import {
   InjuryWarningBadge,
   MyInjuryWarningsPanel,
