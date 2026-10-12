@@ -33,6 +33,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
   @max_exercises 60
   @max_issues 40
   @max_suggestions 30
+  @max_assumptions 20
   @max_list_items 20
 
   @workout_fields ~w(title type subtitle description difficulty estimated_duration_seconds equipment tags)
@@ -89,8 +90,17 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
       |> Proofreading.to_issues(workout)
       |> Enum.reject(&overlaps?(get_in(&1, ["suggestion", "text_edit", "find"]), covered_edits))
 
+    # Inferred values come last: a real problem on the same field wins.
+    assumption_issues =
+      raw
+      |> list_value("assumptions")
+      |> Enum.take(@max_assumptions)
+      |> Enum.flat_map(&normalize_assumption(&1, workout))
+      |> merge_assumptions()
+
     issues =
-      (workout_issues ++ section_issues ++ assistant_issues ++ correction_issues)
+      (workout_issues ++
+         section_issues ++ assistant_issues ++ correction_issues ++ assumption_issues)
       |> dedupe_issues()
       |> Enum.take(@max_issues)
       |> Enum.with_index(1)
@@ -459,6 +469,44 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
 
   defp normalize_assistant_issue(_raw, _workout, _source), do: []
 
+  # An assumption is a value the assistant inferred (a convention, a computed
+  # number, an expanded abbreviation). Keep accepts the current value; Reject
+  # clears the field like any other rejection.
+  defp normalize_assumption(raw, workout) when is_map(raw) do
+    with path when is_binary(path) <- raw |> map_value_raw("path") |> canonical_path(),
+         true <- path_exists?(workout, path),
+         value when not is_nil(value) <- get_path(workout, path),
+         message when is_binary(message) <- raw |> map_value_raw("message") |> clean_text(500) do
+      [
+        %{
+          "path" => path,
+          "code" => "assumption",
+          "severity" => "info",
+          "required" => required_path?(path),
+          "message" => message,
+          "params" => %{},
+          "current_value" => value,
+          "suggestion" => %{"label" => nil, "value" => value, "text_edit" => nil}
+        }
+      ]
+    else
+      _ -> []
+    end
+  end
+
+  defp normalize_assumption(_raw, _workout), do: []
+
+  # Several inferred timer keys share one canonical field (timer_config): one
+  # card explains them all, so Keep/Reject acts on the whole timer once.
+  defp merge_assumptions(issues) do
+    issues
+    |> Enum.group_by(& &1["path"])
+    |> Enum.map(fn {_path, [first | _rest] = group} ->
+      %{first | "message" => Enum.map_join(group, " ", & &1["message"])}
+    end)
+    |> Enum.sort_by(fn issue -> Enum.find_index(issues, &(&1["path"] == issue["path"])) end)
+  end
+
   defp assistant_severity(raw) do
     severity = raw |> map_value_raw("severity") |> to_string() |> String.downcase()
     if severity in @severities, do: severity, else: "warning"
@@ -561,6 +609,10 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysis do
       ["sections", index, field] ->
         field = if field in ["format", "timer"], do: "timer_config", else: field
         if integer?(index) and field in @section_fields, do: "sections.#{index}.#{field}"
+
+      # A single timer key lives inside the section's timer config.
+      ["sections", index, "timer", _key] ->
+        if integer?(index), do: "sections.#{index}.timer_config"
 
       ["sections", index, "exercises", exercise_index, field] ->
         field = translate_exercise_field(field)

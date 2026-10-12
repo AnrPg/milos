@@ -242,4 +242,35 @@ defmodule MilosTraining.Workouts.Domain.FreeTextAnalysisTest do
     # A score the format does not allow is dropped.
     refute Map.has_key?(rest, "scoreable")
   end
+
+  test "assumptions become keep-or-reject cards, one per field" do
+    raw = %{
+      "workout" => %{"title" => "Death by", "type" => "crossfit"},
+      "sections" => [
+        %{
+          "name" => "Death by burpees",
+          "format" => "death_by",
+          "timer" => %{"start_reps" => 1, "step_reps" => 1},
+          "exercises" => [%{"name" => "Burpee"}]
+        }
+      ],
+      "assumptions" => [
+        %{"path" => "sections.0.timer.start_reps", "message" => "Starts at 1 rep."},
+        %{"path" => "sections.0.timer.step_reps", "message" => "Adds 1 rep a minute."},
+        %{"path" => "sections.0.exercises.0.name", "message" => "Read burpees as Burpee."},
+        %{"path" => "sections.4.name", "message" => "No such section."}
+      ]
+    }
+
+    %{"issues" => issues} = FreeTextAnalysis.normalize(raw, "Death by burpees")
+    assumptions = Enum.filter(issues, &(&1["code"] == "assumption"))
+
+    assert [timer, name] = assumptions
+    assert timer["path"] == "sections.0.timer_config"
+    assert timer["severity"] == "info"
+    assert timer["message"] == "Starts at 1 rep. Adds 1 rep a minute."
+    assert timer["suggestion"]["value"]["type"] == "death_by"
+    assert name["path"] == "sections.0.exercises.0.name"
+    assert name["required"] == true
+  end
 end

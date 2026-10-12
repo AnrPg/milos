@@ -158,7 +158,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Tools do
     }
 
     case Map.fetch(factors, {from, to}) do
-      {:ok, factor} -> {:ok, Float.round(value * factor, 2)}
+      {:ok, factor} -> {:ok, Float.round(value * factor * 1.0, 2)}
       :error when from == to -> {:ok, value}
       :error -> :error
     end

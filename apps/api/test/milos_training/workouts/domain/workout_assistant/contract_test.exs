@@ -212,4 +212,25 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.ContractTest do
   test "rejects non-objects" do
     assert [%{"problem" => "the answer must be one JSON object"}] = Contract.check([], @source)
   end
+
+  test "assumptions must explain a real field, timer keys included" do
+    raw =
+      valid()
+      |> put_in(["sections", Access.at(0), "timer"], %{"duration_seconds" => 720})
+      |> Map.put("assumptions", [
+        %{"path" => "sections.0.timer.duration_seconds", "message" => "AMRAP 12 is 12 minutes."},
+        %{"path" => "sections.0.exercises.0.name", "message" => "Read pul ups as pull-ups."}
+      ])
+
+    assert problems(raw) == []
+
+    raw =
+      Map.put(valid(), "assumptions", [
+        %{"path" => "sections.0.timer.interval_seconds", "message" => "x"},
+        %{"path" => "sections.0.name"}
+      ])
+
+    assert [{"assumptions.0.path", _}, {"assumptions.1.message", _}] = problems(raw)
+    assert [{"assumptions", _}] = problems(Map.put(valid(), "assumptions", "none"))
+  end
 end

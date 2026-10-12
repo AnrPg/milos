@@ -23,6 +23,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
   @load_keys ~w(load_kg load_percent_1rm bodyweight)
   @issue_keys ~w(path severity message suggestion_label suggested_value find_text replace_text)
   @missing_keys ~w(path reason suggested_value insert_text)
+  @assumption_keys ~w(path message)
   @max_violations 40
 
   @doc "Returns a list of `%{\"path\" => ..., \"problem\" => ...}` (empty when valid)."
@@ -31,7 +32,8 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
        workout(Map.get(raw, "workout")) ++
        sections(Map.get(raw, "sections")) ++
        issues(Map.get(raw, "issues"), raw, source) ++
-       missing_fields(Map.get(raw, "missing_fields")))
+       missing_fields(Map.get(raw, "missing_fields")) ++
+       assumptions(Map.get(raw, "assumptions"), raw))
     |> Enum.take(@max_violations)
   end
 
@@ -54,7 +56,14 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
           else: [violation(key, "is required and must be #{kind(key)}")]
       end)
 
-    missing ++ unknown_keys(raw, Map.keys(expected), "")
+    assumptions =
+      case Map.get(raw, "assumptions") do
+        nil -> []
+        list when is_list(list) -> []
+        _other -> [violation("assumptions", "must be an array (use [] when empty)")]
+      end
+
+    missing ++ assumptions ++ unknown_keys(raw, ["assumptions" | Map.keys(expected)], "")
   end
 
   defp kind("workout"), do: "an object"
@@ -338,6 +347,56 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.Contract do
   end
 
   defp missing_fields(_list), do: []
+
+  ## Assumptions
+  #
+  # Values the agent inferred rather than read (a convention such as Tabata
+  # 20/10 × 8, a computed duration, an expanded abbreviation). They are shown
+  # to the coach to keep or reject, so each must point at a real field.
+
+  defp assumptions(list, raw) when is_list(list) do
+    list
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {entry, index} ->
+      path = "assumptions.#{index}"
+
+      case entry do
+        %{} ->
+          unknown_keys(entry, @assumption_keys, path) ++
+            required_string(entry, "message", path) ++
+            assumption_path(Map.get(entry, "path"), raw, path)
+
+        _other ->
+          [violation(path, "must be an object")]
+      end
+    end)
+  end
+
+  defp assumptions(_list, _raw), do: []
+
+  defp assumption_path(target, raw, path) when is_binary(target) do
+    if resolves?(raw, target) or timer_key?(raw, target),
+      do: [],
+      else: [
+        violation(
+          "#{path}.path",
+          "\"#{target}\" does not point at a field of your workout, sections or section timers"
+        )
+      ]
+  end
+
+  defp assumption_path(_target, _raw, path), do: [violation("#{path}.path", "is required")]
+
+  defp timer_key?(raw, target) do
+    case String.split(target, ".", trim: true) do
+      ["sections", index, "timer", key] ->
+        timer = at(raw, ["sections", index, "timer"])
+        is_map(timer) and Map.has_key?(timer, key)
+
+      _other ->
+        false
+    end
+  end
 
   ## Helpers
 

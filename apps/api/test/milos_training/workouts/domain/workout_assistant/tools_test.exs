@@ -31,6 +31,11 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.ToolsTest do
              "value" => 180.0
            }
 
+    # Whole-number results used to crash Float.round/2 (live regression).
+    assert Tools.call("convert_units", %{"value" => 30, "from" => "min", "to" => "s"}) == %{
+             "value" => 1800.0
+           }
+
     assert Tools.call("convert_units", %{"value" => 1, "from" => "kg", "to" => "min"})["error"]
   end
 

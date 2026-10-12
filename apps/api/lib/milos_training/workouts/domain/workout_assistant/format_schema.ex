@@ -200,7 +200,18 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.FormatSchema do
           "items" => %{"oneOf" => Enum.map(formats, &%{"$ref" => "#/$defs/section_#{&1}"})}
         },
         "issues" => %{"type" => "array"},
-        "missing_fields" => %{"type" => "array"}
+        "missing_fields" => %{"type" => "array"},
+        "assumptions" => %{
+          "type" => "array",
+          "description" =>
+            "every value you inferred rather than read (conventions, computed values, expanded abbreviations)",
+          "items" => %{
+            "type" => "object",
+            "additionalProperties" => false,
+            "required" => ["path", "message"],
+            "properties" => %{"path" => %{"type" => "string"}, "message" => %{"type" => "string"}}
+          }
+        }
       },
       "$defs" => Map.new(formats, &{"section_#{&1}", build_section_schema(&1)})
     }
@@ -224,6 +235,12 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.FormatSchema do
             "properties" => %{
               "name" => %{"type" => "string", "minLength" => 1, "maxLength" => 160},
               "format" => %{"enum" => formats()},
+              "intent" => %{
+                "type" => "string",
+                "maxLength" => 300,
+                "description" =>
+                  "one sentence: what the coach means this block to be, including parameters written elsewhere in the text"
+              },
               "evidence" => %{
                 "type" => "string",
                 "description" => "the coach's words that show the format, copied verbatim"
@@ -247,7 +264,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAssistant.FormatSchema do
         Enum.map(sections, fn
           %{} = section ->
             section
-            |> Map.take(~w(name format evidence))
+            |> Map.take(~w(name format evidence intent))
             |> Map.update("format", nil, &(canonical(&1) || &1))
             |> then(fn section ->
               evidence = Map.get(section, "evidence")
