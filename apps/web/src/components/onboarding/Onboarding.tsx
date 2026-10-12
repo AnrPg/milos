@@ -7,6 +7,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import {
+  completeProductTour,
   fetchAdminOnboarding,
   updateAdminOnboarding,
   type AdminOnboardingChecklist,
@@ -18,7 +19,7 @@ import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { TOUR_STEPS, checklistLaterKey, readStorage, tourStorageKey, writeStorage, type TourAudience } from "@/lib/onboarding";
+import { TOUR_STEPS, checklistLaterKey, readStorage, writeStorage, type TourAudience } from "@/lib/onboarding";
 
 const OPEN_TOUR_EVENT = "milos:open-tour";
 const OPEN_CHECKLIST_EVENT = "milos:open-onboarding";
@@ -82,7 +83,7 @@ function useAdminOnboarding(enabled: boolean) {
  */
 export function OnboardingHost() {
   const pathname = usePathname();
-  const { status, currentUser } = useSession();
+  const { status, currentUser, tokens } = useSession();
   const { membershipRole, isLoading } = useSelectedMembershipRole();
   const ready = status === "authenticated" && Boolean(currentUser) && !currentUser?.vendor && !isLoading && Boolean(membershipRole);
   const isOwnerOrAdmin = membershipRole === "owner" || membershipRole === "admin";
@@ -92,7 +93,10 @@ export function OnboardingHost() {
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
   const laterKey = checklistLaterKey(slug ?? "");
-  const tourKey = tourStorageKey(currentUser?.id ?? "", audience);
+  // Completed tours live on the account (/auth/me), so a tour seen on one
+  // device is not shown again on another. `finishedNow` covers this session.
+  const [finishedNow, setFinishedNow] = useState<TourAudience[]>([]);
+  const tourDone = Boolean(currentUser?.completed_tours?.includes(audience)) || finishedNow.includes(audience);
   const hidden = HIDDEN_PATHS.test(pathname);
 
   // First visit: admins see the checklist popup, clients see the tour.
@@ -107,8 +111,8 @@ export function OnboardingHost() {
       return;
     }
 
-    if (!readStorage("local", tourKey)) queueMicrotask(() => setTourOpen(true));
-  }, [hidden, isOwnerOrAdmin, laterKey, query.data, ready, tourKey]);
+    if (!tourDone) queueMicrotask(() => setTourOpen(true));
+  }, [hidden, isOwnerOrAdmin, laterKey, query.data, ready, tourDone]);
 
   useEffect(() => {
     const openTour = () => setTourOpen(true);
@@ -127,7 +131,8 @@ export function OnboardingHost() {
   }, [laterKey]);
 
   function finishTour() {
-    writeStorage("local", tourKey, "1");
+    setFinishedNow((current) => [...current, audience]);
+    if (tokens?.access_token) void completeProductTour(tokens.access_token, audience).catch(() => undefined);
     setTourOpen(false);
     if (isOwnerOrAdmin) mutation.mutate({ action: "tour_completed" });
   }

@@ -27,7 +27,6 @@ export const TOUR_STEPS: Record<TourAudience, TourStep[]> = {
   ],
 };
 
-export const tourStorageKey = (userId: string, audience: TourAudience) => ["milos", "tour-done", userId, audience].join(":");
 export const checklistLaterKey = (slug: string) => ["milos", "onboarding-later", slug].join(":");
 
 type StorageKind = "local" | "session";

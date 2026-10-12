@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 
-import { TOUR_STEPS, checklistLaterKey, tourStorageKey } from "./onboarding";
+import { TOUR_STEPS, checklistLaterKey } from "./onboarding";
 
 const locales = ["en", "el", "ar", "ru", "de", "es", "pt-PT", "he", "it", "bg", "nl", "fr"];
 const CHECKLIST_STEPS = ["settings", "classes", "packages", "workout", "invite", "tour"];
@@ -28,7 +28,6 @@ describe("onboarding copy", () => {
   });
 
   it("builds namespaced storage keys", () => {
-    expect(tourStorageKey("u1", "member")).toBe("milos:tour-done:u1:member");
     expect(checklistLaterKey("acme")).toBe("milos:onboarding-later:acme");
   });
 });

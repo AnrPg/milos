@@ -16,3 +16,10 @@ export function updateAdminOnboarding(token: string, action: OnboardingAction, s
     body: step ? { action, step } : { action },
   });
 }
+
+export type TourAudience = "admin" | "member" | "athlete";
+
+/** Stores tour completion on the account so it follows the user across devices. */
+export function completeProductTour(token: string, audience: TourAudience) {
+  return apiRequest<{ completed_tours: string[] }>(`/me/tours/${audience}/complete`, { method: "POST", token });
+}
