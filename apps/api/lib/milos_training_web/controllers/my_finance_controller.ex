@@ -3,7 +3,16 @@ defmodule MilosTrainingWeb.MyFinanceController do
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.GetMyFinance
+
+  alias MilosTraining.Application.{
+    GetFinanceRefundReceipt,
+    GetMyFinance,
+    ListFinanceRefundReceipts,
+    RenderFinanceRefundReceipt
+  }
+
+  alias MilosTrainingWeb.Controllers.ReceiptDocumentResponse
+  alias MilosTrainingWeb.Schemas.FinanceAccounting
   alias MilosTraining.Finance
   alias MilosTraining.Application.DocumentStorage
   alias OpenApiSpex.Schema
@@ -97,6 +106,72 @@ defmodule MilosTrainingWeb.MyFinanceController do
       nil -> {:error, :not_found}
       {:error, :forbidden} -> {:error, :forbidden}
       err -> err
+    end
+  end
+
+  # ADR-108: a member's own refund receipts. Receipts of other members are
+  # reported as not found.
+  @receipt_id %OpenApiSpex.Parameter{
+    name: :id,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string, format: :uuid}
+  }
+
+  operation(:refund_receipts,
+    summary: "List the current member's refund receipts",
+    responses: [
+      ok: {"Refund receipts", "application/json", FinanceAccounting.refund_receipt_collection()}
+    ]
+  )
+
+  def refund_receipts(conn, _params) do
+    user = GuardianPlug.current_resource(conn)
+
+    with {:ok, context} <- tenant_context(conn),
+         {:ok, payload} <- ListFinanceRefundReceipts.call(context, {:member, user.id}, %{}) do
+      json(conn, payload)
+    end
+  end
+
+  operation(:refund_receipt,
+    summary: "Get one of the current member's refund receipts",
+    parameters: [@receipt_id],
+    responses: [
+      ok: {"Refund receipt", "application/json", FinanceAccounting.refund_receipt_response()},
+      not_found: {"Not found", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def refund_receipt(conn, %{"id" => id}) do
+    user = GuardianPlug.current_resource(conn)
+
+    with {:ok, context} <- tenant_context(conn),
+         {:ok, receipt} <- GetFinanceRefundReceipt.call(context, id, {:member, user.id}) do
+      json(conn, %{refund_receipt: receipt})
+    end
+  end
+
+  operation(:refund_receipt_document,
+    summary: "Printable HTML version of one of the current member's refund receipts",
+    parameters: [
+      @receipt_id,
+      %OpenApiSpex.Parameter{name: :locale, in: :query, schema: %Schema{type: :string}}
+    ],
+    responses: [
+      ok: {"Receipt document", "text/html", %Schema{type: :string}},
+      not_found: {"Not found", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def refund_receipt_document(conn, %{"id" => id} = params) do
+    user = GuardianPlug.current_resource(conn)
+    locale = ReceiptDocumentResponse.locale(conn, params)
+
+    with {:ok, context} <- tenant_context(conn),
+         {:ok, document} <-
+           RenderFinanceRefundReceipt.call(context, id, {:member, user.id}, locale) do
+      ReceiptDocumentResponse.send(conn, document)
     end
   end
 

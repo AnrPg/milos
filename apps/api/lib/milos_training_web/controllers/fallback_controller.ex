@@ -1467,6 +1467,73 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-108 refund receipts, reconciliation and accounting exports.
+  def call(conn, {:error, :reconciliation_reference_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "reconciliation_reference_conflict",
+      error: "This provider reference was already recorded with a different amount, date or type"
+    })
+  end
+
+  def call(conn, {:error, :reconciliation_target_already_matched}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "reconciliation_target_already_matched",
+      error: "This payment or reversal is already matched to another statement line"
+    })
+  end
+
+  def call(conn, {:error, :invalid_reconciliation_target}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_reconciliation_target",
+      error: "Choose a payment or reversal to match"
+    })
+  end
+
+  def call(conn, {:error, :invalid_export_range}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_export_range",
+      error: "Choose a start date that is not in the future and an end date on or after it"
+    })
+  end
+
+  def call(conn, {:error, :export_range_too_long}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "export_range_too_long", error: "Export at most five years at a time"})
+  end
+
+  def call(conn, {:error, :export_job_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "export_job_unavailable",
+      error: "Background processing is unavailable; try a shorter range or retry later"
+    })
+  end
+
+  def call(conn, {:error, :accounting_export_not_ready}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "accounting_export_not_ready", error: "This export has not completed"})
+  end
+
+  def call(conn, {:error, :accounting_export_failed}) do
+    conn
+    |> put_status(:internal_server_error)
+    |> json(%{
+      code: "accounting_export_failed",
+      error: "The accounting export could not be built"
+    })
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)

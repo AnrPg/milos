@@ -231,6 +231,9 @@ defmodule MilosTrainingWeb.Router do
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
+    get("/refund-receipts", MyFinanceController, :refund_receipts)
+    get("/refund-receipts/:id", MyFinanceController, :refund_receipt)
+    get("/refund-receipts/:id/document", MyFinanceController, :refund_receipt_document)
     get("/reviews", ReviewController, :index)
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
@@ -484,6 +487,55 @@ defmodule MilosTrainingWeb.Router do
     )
 
     get("/finance/invoices/:id/download-url", AdminFinanceController, :invoice_download_url)
+
+    # ADR-108 refund receipts, provider reconciliation and accounting exports.
+    get("/finance/refund-receipts", AdminFinanceAccountingController, :refund_receipts)
+    get("/finance/refund-receipts/:id", AdminFinanceAccountingController, :refund_receipt)
+
+    get(
+      "/finance/refund-receipts/:id/document",
+      AdminFinanceAccountingController,
+      :refund_receipt_document
+    )
+
+    get(
+      "/finance/reconciliation-records",
+      AdminFinanceAccountingController,
+      :reconciliation_records
+    )
+
+    post(
+      "/finance/reconciliation-records",
+      AdminFinanceAccountingController,
+      :record_reconciliation_line
+    )
+
+    get(
+      "/finance/reconciliation-records/:id/candidates",
+      AdminFinanceAccountingController,
+      :reconciliation_candidates
+    )
+
+    post(
+      "/finance/reconciliation-records/:id/match",
+      AdminFinanceAccountingController,
+      :match_reconciliation
+    )
+
+    post(
+      "/finance/reconciliation-records/:id/unmatch",
+      AdminFinanceAccountingController,
+      :unmatch_reconciliation
+    )
+
+    get("/finance/accounting-exports", AdminFinanceAccountingController, :exports)
+    post("/finance/accounting-exports", AdminFinanceAccountingController, :request_export)
+
+    get(
+      "/finance/accounting-exports/:id/download",
+      AdminFinanceAccountingController,
+      :export_download
+    )
 
     post("/finance/members/:id/promotion-redemptions", AdminFinanceController, :redeem_promotion)
     get("/finance/promotions", AdminFinanceController, :promotions)

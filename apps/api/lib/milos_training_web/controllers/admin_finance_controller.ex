@@ -989,14 +989,20 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   def reverse_payment(conn, params) do
     with {:ok, reversal} <-
            ReverseFinancePayment.call(
+             conn.assigns.tenant_context,
              param_id(params),
              params["payment_id"] || params[:payment_id],
              current_user_id(conn),
              body_params(conn, params)
            ) do
+      # ADR-108: the refund receipt (nil for waiver reversals) is issued with
+      # the reversal fact and returned alongside it.
       conn
       |> put_status(:created)
-      |> json(%{payment_reversal: reversal})
+      |> json(%{
+        payment_reversal: Map.delete(reversal, :refund_receipt),
+        refund_receipt: Map.get(reversal, :refund_receipt)
+      })
     end
   end
 
