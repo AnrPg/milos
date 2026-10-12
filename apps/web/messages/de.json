@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Dieser Kurs ist ausgebucht.",
     "apiErrorAlreadyBooked": "Du hast diesen Kurs bereits gebucht.",
     "apiErrorSlotInPast": "Dieser Kurs hat bereits begonnen.",
-    "apiErrorBookingNotPending": "Diese Buchung wurde bereits bearbeitet."
+    "apiErrorBookingNotPending": "Diese Buchung wurde bereits bearbeitet.",
+    "injuryWarningLevelCaution": "Vorsicht",
+    "injuryWarningLevelAvoid": "Vermeiden",
+    "injuryWarningStaffTitle": "Verletzungs-Sicherheitscheck",
+    "injuryWarningStaffIntro": "Aktive Verletzungen, die in deinem Studio erfasst sind. Warnungen dienen nur der Information und blockieren die Zuweisung nie.",
+    "injuryWarningRosterIntro": "Gebuchte Mitglieder mit erfassten aktiven Verletzungen. Warnungen dienen nur der Information.",
+    "injuryWarningSelfTitle": "Prüfe deine Verletzungen vor dem Start",
+    "injuryWarningSelfIntro": "Einige Bewegungen können eine verletzte Stelle belasten. Du kannst trotzdem starten – skaliere oder tausche bei Bedarf.",
+    "injuryWarningPersonal": "Persönlicher Eintrag",
+    "injuryWarningAvoidExercises": "Vermeiden: {names}",
+    "injuryWarningCautionExercises": "Mit Vorsicht: {names}",
+    "injuryWarningUnmappedArea": "Keine Bewegung passt zu diesem Körperbereich. Prüfe die Einschränkungen vor dem Training.",
+    "injuryWarningLimitations": "Einschränkungen: {text}",
+    "injuryWarningAcknowledge": "Verstanden",
+    "injuryWarningAcknowledged": "Bestätigt",
+    "injuryWarningLoadFailed": "Verletzungswarnungen konnten nicht geladen werden.",
+    "injuryWarningUnknownPerson": "Mitglied"
   }
 }

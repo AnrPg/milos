@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Deze les is vol.",
     "apiErrorAlreadyBooked": "Je hebt al een boeking voor deze les.",
     "apiErrorSlotInPast": "Deze les is al begonnen.",
-    "apiErrorBookingNotPending": "Deze boeking is al afgehandeld."
+    "apiErrorBookingNotPending": "Deze boeking is al afgehandeld.",
+    "injuryWarningLevelCaution": "Voorzichtig",
+    "injuryWarningLevelAvoid": "Vermijden",
+    "injuryWarningStaffTitle": "Veiligheidscheck blessures",
+    "injuryWarningStaffIntro": "Actieve blessures die bij je sportschool zijn geregistreerd. Waarschuwingen zijn informatief en blokkeren de toewijzing nooit.",
+    "injuryWarningRosterIntro": "Geboekte leden met geregistreerde actieve blessures. Waarschuwingen zijn alleen informatief.",
+    "injuryWarningSelfTitle": "Controleer je blessures voordat je begint",
+    "injuryWarningSelfIntro": "Sommige bewegingen kunnen een geblesseerde plek belasten. Je kunt toch beginnen — schaal of vervang waar nodig.",
+    "injuryWarningPersonal": "Persoonlijke registratie",
+    "injuryWarningAvoidExercises": "Vermijden: {names}",
+    "injuryWarningCautionExercises": "Voorzichtig: {names}",
+    "injuryWarningUnmappedArea": "Geen beweging komt overeen met dit lichaamsdeel. Bekijk de beperkingen voordat je traint.",
+    "injuryWarningLimitations": "Beperkingen: {text}",
+    "injuryWarningAcknowledge": "Begrepen",
+    "injuryWarningAcknowledged": "Bevestigd",
+    "injuryWarningLoadFailed": "Blessurewaarschuwingen konden niet worden geladen.",
+    "injuryWarningUnknownPerson": "Lid"
   }
 }

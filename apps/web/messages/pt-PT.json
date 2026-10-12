@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Esta aula está cheia.",
     "apiErrorAlreadyBooked": "Já tem uma reserva para esta aula.",
     "apiErrorSlotInPast": "Esta aula já começou.",
-    "apiErrorBookingNotPending": "Esta reserva já foi tratada."
+    "apiErrorBookingNotPending": "Esta reserva já foi tratada.",
+    "injuryWarningLevelCaution": "Cuidado",
+    "injuryWarningLevelAvoid": "Evitar",
+    "injuryWarningStaffTitle": "Verificação de segurança de lesões",
+    "injuryWarningStaffIntro": "Lesões ativas registadas no teu ginásio. Os avisos são informativos e nunca bloqueiam a atribuição.",
+    "injuryWarningRosterIntro": "Membros com reserva e lesões ativas registadas. Os avisos são apenas informativos.",
+    "injuryWarningSelfTitle": "Verifica as tuas lesões antes de começar",
+    "injuryWarningSelfIntro": "Alguns movimentos podem sobrecarregar uma zona lesionada. Podes começar na mesma — adapta ou substitui conforme necessário.",
+    "injuryWarningPersonal": "Registo pessoal",
+    "injuryWarningAvoidExercises": "Evitar: {names}",
+    "injuryWarningCautionExercises": "Com cuidado: {names}",
+    "injuryWarningUnmappedArea": "Nenhum movimento corresponde a esta zona do corpo. Revê as limitações antes de treinar.",
+    "injuryWarningLimitations": "Limitações: {text}",
+    "injuryWarningAcknowledge": "Entendido",
+    "injuryWarningAcknowledged": "Confirmado",
+    "injuryWarningLoadFailed": "Não foi possível carregar os avisos de lesões.",
+    "injuryWarningUnknownPerson": "Membro"
   }
 }

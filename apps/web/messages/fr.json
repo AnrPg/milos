@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Ce cours est complet.",
     "apiErrorAlreadyBooked": "Vous avez déjà une réservation pour ce cours.",
     "apiErrorSlotInPast": "Ce cours a déjà commencé.",
-    "apiErrorBookingNotPending": "Cette réservation a déjà été traitée."
+    "apiErrorBookingNotPending": "Cette réservation a déjà été traitée.",
+    "injuryWarningLevelCaution": "Prudence",
+    "injuryWarningLevelAvoid": "À éviter",
+    "injuryWarningStaffTitle": "Contrôle de sécurité des blessures",
+    "injuryWarningStaffIntro": "Blessures actives enregistrées dans votre salle. Les alertes sont informatives et ne bloquent jamais l'attribution.",
+    "injuryWarningRosterIntro": "Membres inscrits avec des blessures actives enregistrées. Les alertes sont uniquement informatives.",
+    "injuryWarningSelfTitle": "Vérifiez vos blessures avant de commencer",
+    "injuryWarningSelfIntro": "Certains mouvements peuvent solliciter une zone blessée. Vous pouvez quand même commencer : adaptez ou remplacez si besoin.",
+    "injuryWarningPersonal": "Dossier personnel",
+    "injuryWarningAvoidExercises": "À éviter : {names}",
+    "injuryWarningCautionExercises": "Avec prudence : {names}",
+    "injuryWarningUnmappedArea": "Aucun mouvement ne correspond à cette zone du corps. Consultez les limitations avant l'entraînement.",
+    "injuryWarningLimitations": "Limitations : {text}",
+    "injuryWarningAcknowledge": "Compris",
+    "injuryWarningAcknowledged": "Confirmé",
+    "injuryWarningLoadFailed": "Impossible de charger les alertes de blessure.",
+    "injuryWarningUnknownPerson": "Membre"
   }
 }

@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Questa lezione è al completo.",
     "apiErrorAlreadyBooked": "Hai già una prenotazione per questa lezione.",
     "apiErrorSlotInPast": "Questa lezione è già iniziata.",
-    "apiErrorBookingNotPending": "Questa prenotazione è già stata gestita."
+    "apiErrorBookingNotPending": "Questa prenotazione è già stata gestita.",
+    "injuryWarningLevelCaution": "Attenzione",
+    "injuryWarningLevelAvoid": "Evitare",
+    "injuryWarningStaffTitle": "Controllo sicurezza infortuni",
+    "injuryWarningStaffIntro": "Infortuni attivi registrati nella tua palestra. Gli avvisi sono informativi e non bloccano mai l'assegnazione.",
+    "injuryWarningRosterIntro": "Membri prenotati con infortuni attivi registrati. Gli avvisi sono solo informativi.",
+    "injuryWarningSelfTitle": "Controlla i tuoi infortuni prima di iniziare",
+    "injuryWarningSelfIntro": "Alcuni movimenti potrebbero sollecitare una zona infortunata. Puoi comunque iniziare: scala o sostituisci se necessario.",
+    "injuryWarningPersonal": "Registro personale",
+    "injuryWarningAvoidExercises": "Evitare: {names}",
+    "injuryWarningCautionExercises": "Con cautela: {names}",
+    "injuryWarningUnmappedArea": "Nessun movimento corrisponde a questa zona del corpo. Rivedi le limitazioni prima di allenarti.",
+    "injuryWarningLimitations": "Limitazioni: {text}",
+    "injuryWarningAcknowledge": "Ho capito",
+    "injuryWarningAcknowledged": "Confermato",
+    "injuryWarningLoadFailed": "Impossibile caricare gli avvisi sugli infortuni.",
+    "injuryWarningUnknownPerson": "Membro"
   }
 }

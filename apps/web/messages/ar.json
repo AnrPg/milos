@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "هذه الحصة ممتلئة.",
     "apiErrorAlreadyBooked": "لديك حجز بالفعل لهذه الحصة.",
     "apiErrorSlotInPast": "بدأت هذه الحصة بالفعل.",
-    "apiErrorBookingNotPending": "تمت معالجة هذا الحجز بالفعل."
+    "apiErrorBookingNotPending": "تمت معالجة هذا الحجز بالفعل.",
+    "injuryWarningLevelCaution": "حذر",
+    "injuryWarningLevelAvoid": "تجنّب",
+    "injuryWarningStaffTitle": "فحص السلامة من الإصابات",
+    "injuryWarningStaffIntro": "إصابات نشطة مسجلة لدى ناديك. التحذيرات للعلم فقط ولا تمنع التعيين أبدًا.",
+    "injuryWarningRosterIntro": "أعضاء محجوزون لديهم إصابات نشطة مسجلة. التحذيرات للعلم فقط.",
+    "injuryWarningSelfTitle": "راجع إصاباتك قبل أن تبدأ",
+    "injuryWarningSelfIntro": "قد تُجهد بعض الحركات منطقة مصابة. لا يزال بإمكانك البدء — عدّل أو استبدل حسب الحاجة.",
+    "injuryWarningPersonal": "سجل شخصي",
+    "injuryWarningAvoidExercises": "تجنّب: {names}",
+    "injuryWarningCautionExercises": "بحذر: {names}",
+    "injuryWarningUnmappedArea": "لا توجد حركة مطابقة لهذه المنطقة من الجسم. راجع القيود قبل التدريب.",
+    "injuryWarningLimitations": "القيود: {text}",
+    "injuryWarningAcknowledge": "فهمت",
+    "injuryWarningAcknowledged": "تم التأكيد",
+    "injuryWarningLoadFailed": "تعذر تحميل تحذيرات الإصابات.",
+    "injuryWarningUnknownPerson": "عضو"
   }
 }

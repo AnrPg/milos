@@ -22,6 +22,7 @@ import { workoutTypeColor } from "@/lib/workout-colors";
 import { downloadIcsEvent } from "@/lib/ics";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -441,6 +442,18 @@ export function AssignedWorkoutPanel({
               </div>
             ) : null}
           </section>
+
+          {/* ADR-106: the athlete's own injury warnings before starting; informational only. */}
+          {!isAdmin && activeSection === "details" ? (
+            <div className="px-5 pb-4">
+              <MyInjuryWarningsPanel
+                accessToken={accessToken}
+                workoutId={assignment.master_workout_id}
+                surface="assignment_detail"
+                sourceContextId={assignment.id}
+              />
+            </div>
+          ) : null}
 
           <ChatSection
             contextType="assignment"

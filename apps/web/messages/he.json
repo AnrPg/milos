@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "השיעור מלא.",
     "apiErrorAlreadyBooked": "כבר יש לכם הזמנה לשיעור הזה.",
     "apiErrorSlotInPast": "השיעור כבר התחיל.",
-    "apiErrorBookingNotPending": "ההזמנה כבר טופלה."
+    "apiErrorBookingNotPending": "ההזמנה כבר טופלה.",
+    "injuryWarningLevelCaution": "זהירות",
+    "injuryWarningLevelAvoid": "להימנע",
+    "injuryWarningStaffTitle": "בדיקת בטיחות פציעות",
+    "injuryWarningStaffIntro": "פציעות פעילות הרשומות במכון שלך. האזהרות הן לידיעה בלבד ולעולם אינן חוסמות את השיוך.",
+    "injuryWarningRosterIntro": "חברים רשומים עם פציעות פעילות מתועדות. האזהרות הן לידיעה בלבד.",
+    "injuryWarningSelfTitle": "בדוק את הפציעות שלך לפני שתתחיל",
+    "injuryWarningSelfIntro": "חלק מהתנועות עלולות להעמיס על אזור פצוע. עדיין אפשר להתחיל — התאם או החלף לפי הצורך.",
+    "injuryWarningPersonal": "רישום אישי",
+    "injuryWarningAvoidExercises": "להימנע: {names}",
+    "injuryWarningCautionExercises": "בזהירות: {names}",
+    "injuryWarningUnmappedArea": "אף תנועה לא הותאמה לאזור הגוף הזה. עיין במגבלות לפני האימון.",
+    "injuryWarningLimitations": "מגבלות: {text}",
+    "injuryWarningAcknowledge": "הבנתי",
+    "injuryWarningAcknowledged": "אושר",
+    "injuryWarningLoadFailed": "לא ניתן היה לטעון את אזהרות הפציעה.",
+    "injuryWarningUnknownPerson": "חבר"
   }
 }

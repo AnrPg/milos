@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Это занятие заполнено.",
     "apiErrorAlreadyBooked": "Вы уже записаны на это занятие.",
     "apiErrorSlotInPast": "Это занятие уже началось.",
-    "apiErrorBookingNotPending": "Эта запись уже обработана."
+    "apiErrorBookingNotPending": "Эта запись уже обработана.",
+    "injuryWarningLevelCaution": "Осторожно",
+    "injuryWarningLevelAvoid": "Избегать",
+    "injuryWarningStaffTitle": "Проверка безопасности при травмах",
+    "injuryWarningStaffIntro": "Активные травмы, зарегистрированные в вашем зале. Предупреждения носят информационный характер и никогда не блокируют назначение.",
+    "injuryWarningRosterIntro": "Записавшиеся участники с зарегистрированными активными травмами. Предупреждения носят только информационный характер.",
+    "injuryWarningSelfTitle": "Проверьте свои травмы перед началом",
+    "injuryWarningSelfIntro": "Некоторые движения могут нагружать травмированную область. Вы всё равно можете начать — адаптируйте или замените упражнения при необходимости.",
+    "injuryWarningPersonal": "Личная запись",
+    "injuryWarningAvoidExercises": "Избегать: {names}",
+    "injuryWarningCautionExercises": "С осторожностью: {names}",
+    "injuryWarningUnmappedArea": "Ни одно движение не сопоставлено с этой областью тела. Перед тренировкой ознакомьтесь с ограничениями.",
+    "injuryWarningLimitations": "Ограничения: {text}",
+    "injuryWarningAcknowledge": "Понятно",
+    "injuryWarningAcknowledged": "Подтверждено",
+    "injuryWarningLoadFailed": "Не удалось загрузить предупреждения о травмах.",
+    "injuryWarningUnknownPerson": "Участник"
   }
 }

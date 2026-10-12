@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Αυτό το μάθημα είναι πλήρες.",
     "apiErrorAlreadyBooked": "Έχετε ήδη κράτηση για αυτό το μάθημα.",
     "apiErrorSlotInPast": "Αυτό το μάθημα έχει ήδη ξεκινήσει.",
-    "apiErrorBookingNotPending": "Αυτή η κράτηση έχει ήδη διεκπεραιωθεί."
+    "apiErrorBookingNotPending": "Αυτή η κράτηση έχει ήδη διεκπεραιωθεί.",
+    "injuryWarningLevelCaution": "Προσοχή",
+    "injuryWarningLevelAvoid": "Αποφυγή",
+    "injuryWarningStaffTitle": "Έλεγχος ασφάλειας τραυματισμών",
+    "injuryWarningStaffIntro": "Ενεργοί τραυματισμοί καταγεγραμμένοι στο γυμναστήριό σας. Οι προειδοποιήσεις είναι ενημερωτικές και δεν μπλοκάρουν ποτέ την ανάθεση.",
+    "injuryWarningRosterIntro": "Κρατημένα μέλη με ενεργούς καταγεγραμμένους τραυματισμούς. Οι προειδοποιήσεις είναι μόνο ενημερωτικές.",
+    "injuryWarningSelfTitle": "Έλεγξε τους τραυματισμούς σου πριν ξεκινήσεις",
+    "injuryWarningSelfIntro": "Κάποιες κινήσεις μπορεί να επιβαρύνουν μια τραυματισμένη περιοχή. Μπορείς να ξεκινήσεις κανονικά — προσάρμοσε ή άλλαξε όπου χρειάζεται.",
+    "injuryWarningPersonal": "Προσωπική καταγραφή",
+    "injuryWarningAvoidExercises": "Αποφυγή: {names}",
+    "injuryWarningCautionExercises": "Με προσοχή: {names}",
+    "injuryWarningUnmappedArea": "Καμία κίνηση δεν αντιστοιχίστηκε σε αυτή την περιοχή. Έλεγξε τους περιορισμούς πριν προπονηθείς.",
+    "injuryWarningLimitations": "Περιορισμοί: {text}",
+    "injuryWarningAcknowledge": "Εντάξει",
+    "injuryWarningAcknowledged": "Επιβεβαιώθηκε",
+    "injuryWarningLoadFailed": "Δεν ήταν δυνατή η φόρτωση των προειδοποιήσεων τραυματισμών.",
+    "injuryWarningUnknownPerson": "Μέλος"
   }
 }

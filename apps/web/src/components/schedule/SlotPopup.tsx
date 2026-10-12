@@ -16,6 +16,13 @@ import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { SemanticLabel } from "@/components/semantic-label";
+import {
+  InjuryWarningBadge,
+  MyInjuryWarningsPanel,
+  RosterInjuryWarningsPanel,
+  useSlotInjuryWarnings,
+} from "@/components/wellbeing/InjuryWarnings";
+import { warningLevelFor, warningLevelsByUser } from "@/lib/injury-warnings";
 
 function formatDateTime(locale: string, isoString: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -81,6 +88,22 @@ export function SlotPopup({
   const [cancelError, setCancelError] = useState<string | null>(null);
   const [editWorkoutOpen, setEditWorkoutOpen] = useState(false);
   const [activeScale, setActiveScale] = useState<string | null>(null);
+  // ADR-106: informational injury warnings for booked members (staff) and
+  // for the member's own booking. Never blocks booking or attendance.
+  const hasBookedMembers = slot.bookings.some(
+    (booking) => booking.status === "approved" || booking.status === "pending",
+  );
+  const slotInjuryWarnings = useSlotInjuryWarnings(
+    accessToken,
+    slot.id,
+    isAdmin && Boolean(slot.workout) && hasBookedMembers,
+  );
+  const injuryLevels = warningLevelsByUser(slotInjuryWarnings.data?.athletes ?? []);
+  const bookingNames = new Map(
+    slot.bookings.map((booking) => [booking.user_id, booking.user_nickname ?? booking.user_id]),
+  );
+  const ownBookingActive =
+    slot.current_user_booking?.status === "approved" || slot.current_user_booking?.status === "pending";
 
   const allScales = (() => {
     const seen = new Map<string, { slug: string; label: string; sortOrder: number }>();
@@ -432,6 +455,17 @@ export function SlotPopup({
               </p>
             )}
 
+            {!isAdmin && slot.workout && ownBookingActive ? (
+              <div className="mt-5">
+                <MyInjuryWarningsPanel
+                  accessToken={accessToken}
+                  workoutId={slot.workout.id}
+                  surface="class_detail"
+                  sourceContextId={slot.id}
+                />
+              </div>
+            ) : null}
+
             {canBook ? (
               <button
                 className="mt-5 w-full rounded-full px-5 py-3 text-sm font-semibold"
@@ -523,6 +557,20 @@ export function SlotPopup({
                 {i18n("bookings135229c")}
               </h3>
               <div className="mt-4 space-y-3">
+                {slotInjuryWarnings.data ? (
+                  <RosterInjuryWarningsPanel
+                    accessToken={accessToken}
+                    slotId={slot.id}
+                    workoutId={slotInjuryWarnings.data.workout_id}
+                    athletes={slotInjuryWarnings.data.athletes}
+                    level={slotInjuryWarnings.data.level}
+                    nameFor={(userId) => bookingNames.get(userId) ?? i18n("injuryWarningUnknownPerson")}
+                  />
+                ) : slotInjuryWarnings.isError ? (
+                  <p className="text-xs" style={{ color: "var(--dim)" }}>
+                    {i18n("injuryWarningLoadFailed")}
+                  </p>
+                ) : null}
                 {slot.bookings.length === 0 ? (
                   <p className="text-sm" style={{ color: "var(--dim)" }}>
                     {i18n("noBookingsYetdb81e7a")}
@@ -536,8 +584,9 @@ export function SlotPopup({
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
+                        <p className="flex flex-wrap items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
                           {booking.user_nickname ?? booking.user_id}
+                          <InjuryWarningBadge level={warningLevelFor(injuryLevels, booking.user_id)} />
                         </p>
                         <p
                           className="mt-1 text-xs uppercase tracking-[0.18em]"

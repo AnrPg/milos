@@ -15,6 +15,7 @@ import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { SemanticLabel } from "@/components/semantic-label";
+import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 
 type Props = {
   accessToken: string;
@@ -35,6 +36,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
   const [athleteQuery, setAthleteQuery] = useState("");
   const [selectedAthleteIds, setSelectedAthleteIds] = useState<string[]>([]);
+  const [selectedAthleteNames, setSelectedAthleteNames] = useState<Record<string, string>>({});
   const [scheduledFor, setScheduledFor] = useState(defaultDate);
   const [athleteNotes, setAthleteNotes] = useState<Record<string, string>>({});
   const [openNoteAthleteIds, setOpenNoteAthleteIds] = useState<string[]>([]);
@@ -89,6 +91,9 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
     : allWorkouts;
 
   function toggleAthlete(athleteId: string) {
+    const athlete = athletes.find((item) => item.id === athleteId);
+    if (athlete) setSelectedAthleteNames((current) => ({ ...current, [athleteId]: athlete.nickname }));
+
     setSelectedAthleteIds((current) => {
       if (current.includes(athleteId)) {
         setOpenNoteAthleteIds((openIds) => openIds.filter((id) => id !== athleteId));
@@ -349,6 +354,17 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                     <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("noAthletesFound97fe277")}</p>
                   ) : null}
                 </div>
+
+                {/* ADR-106: informational only; assigning stays available. */}
+                {selectedWorkout && selectedAthleteIds.length > 0 ? (
+                  <AthleteInjuryWarningsPanel
+                    accessToken={accessToken}
+                    workoutId={selectedWorkout.id}
+                    userIds={selectedAthleteIds}
+                    surface="assign_dialog"
+                    nameFor={(userId) => selectedAthleteNames[userId] ?? i18n("injuryWarningUnknownPerson")}
+                  />
+                ) : null}
 
                 {error ? (
                   <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>

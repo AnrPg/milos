@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "This class is full.",
     "apiErrorAlreadyBooked": "You already have a booking for this class.",
     "apiErrorSlotInPast": "This class has already started.",
-    "apiErrorBookingNotPending": "This booking was already handled."
+    "apiErrorBookingNotPending": "This booking was already handled.",
+    "injuryWarningLevelCaution": "Caution",
+    "injuryWarningLevelAvoid": "Avoid",
+    "injuryWarningStaffTitle": "Injury safety check",
+    "injuryWarningStaffIntro": "Active injuries on record with your gym. Warnings are informational and never block the assignment.",
+    "injuryWarningRosterIntro": "Booked members with active injuries on record. Warnings are informational only.",
+    "injuryWarningSelfTitle": "Check your injuries before you start",
+    "injuryWarningSelfIntro": "Some movements may load an injured area. You can still start — scale or swap as needed.",
+    "injuryWarningPersonal": "Personal record",
+    "injuryWarningAvoidExercises": "Avoid: {names}",
+    "injuryWarningCautionExercises": "Take care: {names}",
+    "injuryWarningUnmappedArea": "No movement matched this body area. Review the limitations before training.",
+    "injuryWarningLimitations": "Limitations: {text}",
+    "injuryWarningAcknowledge": "Got it",
+    "injuryWarningAcknowledged": "Acknowledged",
+    "injuryWarningLoadFailed": "Injury warnings could not be loaded.",
+    "injuryWarningUnknownPerson": "Member"
   }
 }

@@ -2683,6 +2683,22 @@
     "apiErrorSlotFull": "Този клас е пълен.",
     "apiErrorAlreadyBooked": "Вече имате резервация за този клас.",
     "apiErrorSlotInPast": "Този клас вече е започнал.",
-    "apiErrorBookingNotPending": "Тази резервация вече е обработена."
+    "apiErrorBookingNotPending": "Тази резервация вече е обработена.",
+    "injuryWarningLevelCaution": "Внимание",
+    "injuryWarningLevelAvoid": "Избягвай",
+    "injuryWarningStaffTitle": "Проверка за безопасност при травми",
+    "injuryWarningStaffIntro": "Активни травми, регистрирани във вашата зала. Предупрежденията са информативни и никога не блокират възлагането.",
+    "injuryWarningRosterIntro": "Записани членове с регистрирани активни травми. Предупрежденията са само информативни.",
+    "injuryWarningSelfTitle": "Провери травмите си, преди да започнеш",
+    "injuryWarningSelfIntro": "Някои движения може да натоварят травмирана област. Можеш да започнеш въпреки това — адаптирай или замени при нужда.",
+    "injuryWarningPersonal": "Лична бележка",
+    "injuryWarningAvoidExercises": "Избягвай: {names}",
+    "injuryWarningCautionExercises": "Внимателно: {names}",
+    "injuryWarningUnmappedArea": "Няма движение, съответстващо на тази част от тялото. Прегледай ограниченията преди тренировка.",
+    "injuryWarningLimitations": "Ограничения: {text}",
+    "injuryWarningAcknowledge": "Разбрах",
+    "injuryWarningAcknowledged": "Потвърдено",
+    "injuryWarningLoadFailed": "Предупрежденията за травми не можаха да се заредят.",
+    "injuryWarningUnknownPerson": "Член"
   }
 }

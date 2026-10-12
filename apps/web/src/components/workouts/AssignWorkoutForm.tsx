@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SemanticLabel } from "@/components/semantic-label";
+import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 
 type AssignWorkoutFormProps = {
   workoutId: string;
@@ -31,6 +32,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
   const [athletes, setAthletes] = useState<AthleteOption[]>([]);
   const [query, setQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [selectedNames, setSelectedNames] = useState<Record<string, string>>({});
   const [scheduledFor, setScheduledFor] = useState(() => formatLocalDate(new Date()));
   const [adminNotes, setAdminNotes] = useState("");
   const [loading, setLoading] = useState(true);
@@ -259,13 +261,14 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                         ? { background: "var(--primary)", color: "var(--bg)" }
                         : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                     }
-                    onClick={() =>
+                    onClick={() => {
+                      setSelectedNames((current) => ({ ...current, [athlete.id]: athlete.nickname }));
                       setSelectedIds((current) =>
                         current.includes(athlete.id)
                           ? current.filter((value) => value !== athlete.id)
                           : [...current, athlete.id],
-                      )
-                    }
+                      );
+                    }}
                     type="button"
                   >
                     <span className="font-semibold">{athlete.nickname}</span>
@@ -292,6 +295,19 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                 value={adminNotes}
               />
             </label>
+
+            {/* ADR-106: informational injury warnings for the selection; never blocks assigning. */}
+            {tokens?.access_token && workout?.status === "published" && selectedIds.length > 0 ? (
+              <div className="mt-5">
+                <AthleteInjuryWarningsPanel
+                  accessToken={tokens.access_token}
+                  workoutId={workoutId}
+                  userIds={selectedIds}
+                  surface="assign_dialog"
+                  nameFor={(userId) => selectedNames[userId] ?? i18n("injuryWarningUnknownPerson")}
+                />
+              </div>
+            ) : null}
 
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <button
