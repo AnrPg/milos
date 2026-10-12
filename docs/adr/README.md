@@ -104,3 +104,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-096 | Package types and entitlement catalog v2 | Accepted |
 | ADR-097 | Package Phase B: booking rules, perks and facility | Accepted |
 | ADR-098 | Package Phase C: new services and payment models | Accepted |
+| ADR-099 | Role sets and capability authorization | Accepted |
+| ADR-100 | Coach client scope and head coaches | Accepted |
+| ADR-101 | Private coach notes and their access log | Accepted |
+| ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
