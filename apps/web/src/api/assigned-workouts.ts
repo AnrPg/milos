@@ -67,6 +67,10 @@ export type AssignedWorkoutRecord = {
   my_athlete_status?: "accepted" | "rejected" | null;
   execution_status?: "completed" | null;
   execution_scores?: SectionScore[];
+  /** ADR-107: a personal workout, or one member's version of a class. */
+  assignment_kind?: "personal" | "class_variant";
+  /** ADR-107: the class occurrence a class variant belongs to. */
+  source_slot_id?: string | null;
 };
 
 export type AssignedWorkoutWeek = {
@@ -77,9 +81,12 @@ export type AssignedWorkoutWeek = {
 
 export type AssignWorkoutPayload = {
   master_workout_id: string;
+  /** Assignee user ids: athletes or (ADR-107) entitled members. */
   athlete_ids: string[];
   scheduled_for: string;
   admin_notes?: string;
+  /** ADR-107: makes the assignment one member's version of this class. */
+  source_slot_id?: string;
 };
 
 export type UpdateAssignedWorkoutPayload = {
@@ -226,11 +233,20 @@ export async function sendAssignmentMessage(token: string, assignmentId: string,
   });
 }
 
-export async function listAthletes(token: string, query?: string) {
+export async function listAthletes(
+  token: string,
+  query?: string,
+  options: { includeMembers?: boolean } = {},
+) {
   const search = new URLSearchParams();
 
   if (query && query.trim()) {
     search.set("q", query.trim());
+  }
+
+  // ADR-107: members can receive personal programming when their package allows it.
+  if (options.includeMembers) {
+    search.set("include_members", "true");
   }
 
   const suffix = search.toString() ? `?${search.toString()}` : "";

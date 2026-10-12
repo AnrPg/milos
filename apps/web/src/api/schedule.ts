@@ -1,3 +1,4 @@
+import type { AssignedWorkoutPreview } from "@/api/assigned-workouts";
 import { apiRequest } from "@/api/client";
 import type { operations, paths } from "@/api/generated/schema";
 
@@ -99,6 +100,27 @@ export type ScheduleSlot = {
   workout: WorkoutPreview | null;
   current_user_booking?: ScheduleBooking | null;
   bookings: ScheduleBooking[];
+  /** ADR-107: the acting member's own version of this class (members only). */
+  my_version?: MemberClassVersion | null;
+  /** ADR-107: every member's version of this class (staff only). */
+  member_versions?: StaffMemberClassVersion[];
+};
+
+export type MemberClassVersion = {
+  assignment_id: string;
+  master_workout_id: string;
+  scheduled_for: string;
+  status?: "accepted" | null;
+  execution_status?: "completed" | null;
+  workout: AssignedWorkoutPreview;
+};
+
+export type StaffMemberClassVersion = {
+  assignment_id: string;
+  user_id: string;
+  user_nickname?: string | null;
+  master_workout_id: string;
+  workout_title?: string | null;
 };
 
 export type ScheduleWindow = {
