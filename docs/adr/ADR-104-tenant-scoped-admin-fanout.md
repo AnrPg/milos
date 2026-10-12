@@ -62,7 +62,8 @@ single place and makes regressions greppable.
   with the restricted-role test harness.
 - Scale levels remain a global table that any tenant admin can replace; the
   refresh is now scoped to the acting tenant, but the cross-tenant mutation
-  itself is logged as new debt (TD-056).
+  itself is logged as new debt (TD-056), resolved by ADR-118 (tenant-owned
+  scale levels).
 - Covered by `tenant_staff_recipients_test.exs` (resolver, fail-closed, and the
   grep guard) and `tenant_scoped_admin_fanout_test.exs` (two tenants plus a
   global admin across drafts, challenges, settings, scale levels, and
