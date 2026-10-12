@@ -217,11 +217,26 @@ export function publishFields(state: ReviewState | null) {
     estimated_duration_seconds: workout.estimated_duration_seconds ?? null,
     equipment: workout.equipment ?? [],
     tags: workout.tags ?? [],
+    workout_metadata: { timer_inference: timerInference(state) },
     sections: workout.sections.map((section) => ({
       ...compact(section),
       exercises: section.exercises.map((exercise) => compact(exercise)),
     })),
   };
+}
+
+const TIMER_ISSUE_CODES = new Set(["invalid_timer", "unknown_format"]);
+
+/**
+ * "incomplete" when a section timer the assistant could not infer is still
+ * unresolved; execution then falls back to the manual timer. Rejecting the
+ * timer issue means "no timer for this block", which is complete.
+ */
+export function timerInference(state: ReviewState): "complete" | "incomplete" {
+  const unresolved = state.analysis.issues.some(
+    (issue) => TIMER_ISSUE_CODES.has(issue.code) && state.issues[issue.id] !== "rejected",
+  );
+  return unresolved ? "incomplete" : "complete";
 }
 
 function compact<T extends Record<string, unknown>>(value: T) {

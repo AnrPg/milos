@@ -20,7 +20,8 @@ import {
 import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
-import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
 import { PageHeader } from "@/components/PageHeader";
@@ -278,7 +279,7 @@ function WorkoutsPageContent() {
     setError(null);
 
     try {
-      if (isFreeTextWorkout(selectedWorkout)) {
+      if (usesManualTimer(selectedWorkout)) {
         const execution = await startExecution(tokens.access_token, {
           master_workout_id: selectedWorkout.id,
           scale_level_slug: selectedScale,

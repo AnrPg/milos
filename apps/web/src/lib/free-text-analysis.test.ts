@@ -101,6 +101,27 @@ describe("free text review state", () => {
     expect(fields.sections[0].exercises[0]).not.toHaveProperty("load_value");
   });
 
+  it("marks timers incomplete until an uninferred timer issue is rejected", () => {
+    const base = analysis();
+    const timerIssue = {
+      id: "issue-3",
+      path: "sections.0.timer_config",
+      code: "invalid_timer",
+      severity: "warning",
+      required: false,
+      params: { format: "emom", missing: ["interval_seconds"] },
+      message: null,
+      current_value: null,
+      suggestion: null,
+    };
+    base.issues.push(timerIssue as (typeof base.issues)[number]);
+    const state = createReviewState(base, "text");
+    expect(publishFields(state).workout_metadata).toEqual({ timer_inference: "incomplete" });
+    const rejected = rejectIssue(state, base.issues[2]);
+    expect(publishFields(rejected).workout_metadata).toEqual({ timer_inference: "complete" });
+    expect(publishFields(createReviewState(analysis(), "text")).workout_metadata).toEqual({ timer_inference: "complete" });
+  });
+
   it("validates title and type without an analysis", () => {
     expect(blockingProblems(" ", "spinning", null)).toEqual([
       { path: "title", reason: "required" },
