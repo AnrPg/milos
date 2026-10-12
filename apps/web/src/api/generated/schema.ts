@@ -229,6 +229,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/finance/package-catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Describe package types, presets, locks and catalog fields */
+        get: operations["MilosTrainingWeb.AdminFinanceController.package_catalog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/queues": {
         parameters: {
             query?: never;
@@ -3713,6 +3730,28 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFinanceController.package_catalog": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Package catalog */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.operational_queues": {
         parameters: {
             query?: never;
@@ -5470,32 +5509,116 @@ export interface operations {
                     active?: boolean;
                     base_price_cents?: number;
                     /** @enum {string} */
-                    billing_period?: "monthly" | "quarterly" | "annual" | "custom";
+                    billing_period?: "monthly" | "quarterly" | "semiannual" | "annual" | "custom" | "one_off" | "with_base";
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
-                    family?: string;
-                    name?: string;
-                    params?: {
-                        allowances: {
-                            class_visits?: {
-                                counted_kinds?: string[];
-                                limit: number | "unlimited";
-                                /** @enum {string} */
-                                period: "calendar_week" | "calendar_month" | "subscription_period";
-                            };
-                            coaching_touchpoints?: {
-                                counted_kinds?: string[];
-                                limit: number | "unlimited";
-                                /** @enum {string} */
-                                period: "calendar_week" | "calendar_month" | "subscription_period";
-                            };
+                    /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
+                    fields?: {
+                        "facility.amenities_note"?: string | null;
+                        "perks.guest_passes"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
                         };
-                        capabilities: ("book_classes" | "execute_class_workouts" | "execute_library_workouts" | "execute_assigned_workouts" | "receive_coaching_touchpoints")[];
-                        channels: ("in_person" | "workout_library" | "personal_programming" | "coach_messaging")[];
-                        /** @enum {integer} */
-                        entitlement_version: 1;
+                        "booking.cancellation_cutoff_hours"?: number | null;
+                        "content.workout_library"?: boolean;
+                        "perks.event_visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.joining_fee_cents"?: number;
+                        "perks.member_discount_scope"?: string[];
+                        "personal_training.format"?: string;
+                        "personal_training.session_minutes"?: number;
+                        "facility.open_gym_visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.validity"?: {
+                            amount: number;
+                            /** @enum {string} */
+                            unit: "day" | "week" | "month";
+                        } | null;
+                        "terms.validity_starts"?: string;
+                        /** Format: uuid */
+                        "terms.conversion_package_id"?: string | null;
+                        "group_classes.time_windows"?: {
+                            days: number[];
+                            from: string;
+                            to: string;
+                        }[];
+                        "personal_training.sessions"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "booking.window_days"?: number | null;
+                        "online_coaching.response_sla_hours"?: number | null;
+                        "personal_training.assessments"?: number;
+                        "terms.seat_billing"?: string;
+                        "facility.open_gym"?: boolean;
+                        "facility.amenities"?: string[];
+                        "terms.quota_sharing"?: string;
+                        "terms.new_members_only"?: boolean;
+                        "booking.no_show_penalty_waived"?: boolean;
+                        "perks.member_discount_percent"?: number;
+                        "terms.seats"?: number;
+                        "group_classes.class_type_limits"?: {
+                            /** Format: uuid */
+                            id: string;
+                            limit: number;
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        }[];
+                        "group_classes.class_types"?: "all" | string[];
+                        "terms.enrollment"?: string;
+                        "group_classes.included"?: boolean;
+                        "terms.enrollment_domain"?: string | null;
+                        "terms.stacking"?: boolean;
+                        "terms.allow_minor_beneficiaries"?: boolean;
+                        "content.advanced_analytics"?: boolean;
+                        "terms.compatible_package_ids"?: "all" | string[];
+                        "online_coaching.assigned_programming"?: boolean;
+                        "online_coaching.nutrition_plan"?: boolean;
+                        "terms.minimum_commitment_months"?: number;
+                        "booking.waitlist_priority"?: string;
+                        "terms.once_per_person"?: boolean;
+                        "terms.auto_renew"?: boolean;
+                        "personal_training.group_size"?: number;
+                        "perks.freeze_days_per_year"?: number;
+                        "content.on_demand_video"?: boolean;
+                        "online_coaching.form_reviews"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "facility.location_ids"?: "all" | string[];
+                        "personal_training.included"?: boolean;
+                        "group_classes.rollover_max"?: number;
+                        "online_coaching.touchpoints"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "online_coaching.messaging"?: boolean;
+                        /** Format: uuid */
+                        "personal_training.coach_id"?: string | null;
+                        "perks.events"?: boolean;
+                        "online_coaching.included"?: boolean;
+                        "terms.expiry_reminder_days"?: number;
+                        "group_classes.visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.beneficiaries"?: number;
                     };
+                    name?: string;
+                    /** @enum {string} */
+                    package_type?: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
                     tags?: string[];
                 };
             };
@@ -5836,6 +5959,7 @@ export interface operations {
                             id?: string | null;
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            package_modules?: string[];
                             payment_reminder_interval_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
@@ -5894,6 +6018,7 @@ export interface operations {
                     finance?: {
                         /** @enum {string} */
                         document_mode?: "invoice" | "receipt";
+                        package_modules?: ("group_classes" | "online_coaching" | "open_gym" | "events" | "personal_training" | "digital_content" | "corporate_clients")[];
                         payment_reminder_interval_days?: number;
                     };
                     gamification?: {
@@ -5931,6 +6056,7 @@ export interface operations {
                             id?: string | null;
                             /** Format: date-time */
                             inserted_at?: string | null;
+                            package_modules?: string[];
                             payment_reminder_interval_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
@@ -9939,32 +10065,116 @@ export interface operations {
                     active?: boolean;
                     base_price_cents?: number;
                     /** @enum {string} */
-                    billing_period: "monthly" | "quarterly" | "annual" | "custom";
+                    billing_period?: "monthly" | "quarterly" | "semiannual" | "annual" | "custom" | "one_off" | "with_base";
                     code?: string | null;
                     currency?: string;
                     description?: string | null;
-                    family: string;
-                    name: string;
-                    params?: {
-                        allowances: {
-                            class_visits?: {
-                                counted_kinds?: string[];
-                                limit: number | "unlimited";
-                                /** @enum {string} */
-                                period: "calendar_week" | "calendar_month" | "subscription_period";
-                            };
-                            coaching_touchpoints?: {
-                                counted_kinds?: string[];
-                                limit: number | "unlimited";
-                                /** @enum {string} */
-                                period: "calendar_week" | "calendar_month" | "subscription_period";
-                            };
+                    /** @description Entitlement catalog v2 field values keyed by catalog field key (ADR-096) */
+                    fields?: {
+                        "facility.amenities_note"?: string | null;
+                        "perks.guest_passes"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
                         };
-                        capabilities: ("book_classes" | "execute_class_workouts" | "execute_library_workouts" | "execute_assigned_workouts" | "receive_coaching_touchpoints")[];
-                        channels: ("in_person" | "workout_library" | "personal_programming" | "coach_messaging")[];
-                        /** @enum {integer} */
-                        entitlement_version: 1;
+                        "booking.cancellation_cutoff_hours"?: number | null;
+                        "content.workout_library"?: boolean;
+                        "perks.event_visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.joining_fee_cents"?: number;
+                        "perks.member_discount_scope"?: string[];
+                        "personal_training.format"?: string;
+                        "personal_training.session_minutes"?: number;
+                        "facility.open_gym_visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.validity"?: {
+                            amount: number;
+                            /** @enum {string} */
+                            unit: "day" | "week" | "month";
+                        } | null;
+                        "terms.validity_starts"?: string;
+                        /** Format: uuid */
+                        "terms.conversion_package_id"?: string | null;
+                        "group_classes.time_windows"?: {
+                            days: number[];
+                            from: string;
+                            to: string;
+                        }[];
+                        "personal_training.sessions"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "booking.window_days"?: number | null;
+                        "online_coaching.response_sla_hours"?: number | null;
+                        "personal_training.assessments"?: number;
+                        "terms.seat_billing"?: string;
+                        "facility.open_gym"?: boolean;
+                        "facility.amenities"?: string[];
+                        "terms.quota_sharing"?: string;
+                        "terms.new_members_only"?: boolean;
+                        "booking.no_show_penalty_waived"?: boolean;
+                        "perks.member_discount_percent"?: number;
+                        "terms.seats"?: number;
+                        "group_classes.class_type_limits"?: {
+                            /** Format: uuid */
+                            id: string;
+                            limit: number;
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        }[];
+                        "group_classes.class_types"?: "all" | string[];
+                        "terms.enrollment"?: string;
+                        "group_classes.included"?: boolean;
+                        "terms.enrollment_domain"?: string | null;
+                        "terms.stacking"?: boolean;
+                        "terms.allow_minor_beneficiaries"?: boolean;
+                        "content.advanced_analytics"?: boolean;
+                        "terms.compatible_package_ids"?: "all" | string[];
+                        "online_coaching.assigned_programming"?: boolean;
+                        "online_coaching.nutrition_plan"?: boolean;
+                        "terms.minimum_commitment_months"?: number;
+                        "booking.waitlist_priority"?: string;
+                        "terms.once_per_person"?: boolean;
+                        "terms.auto_renew"?: boolean;
+                        "personal_training.group_size"?: number;
+                        "perks.freeze_days_per_year"?: number;
+                        "content.on_demand_video"?: boolean;
+                        "online_coaching.form_reviews"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "facility.location_ids"?: "all" | string[];
+                        "personal_training.included"?: boolean;
+                        "group_classes.rollover_max"?: number;
+                        "online_coaching.touchpoints"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "online_coaching.messaging"?: boolean;
+                        /** Format: uuid */
+                        "personal_training.coach_id"?: string | null;
+                        "perks.events"?: boolean;
+                        "online_coaching.included"?: boolean;
+                        "terms.expiry_reminder_days"?: number;
+                        "group_classes.visits"?: {
+                            limit: number | "unlimited";
+                            /** @enum {string} */
+                            period: "calendar_week" | "calendar_month" | "subscription_period";
+                        };
+                        "terms.beneficiaries"?: number;
                     };
+                    name: string;
+                    /** @enum {string} */
+                    package_type: "membership" | "class_pack" | "drop_in" | "trial" | "pt_pack" | "add_on" | "shared" | "corporate";
                     tags?: string[];
                 };
             };

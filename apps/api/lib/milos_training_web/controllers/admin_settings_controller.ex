@@ -3,6 +3,7 @@ defmodule MilosTrainingWeb.AdminSettingsController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{GetAdminSettings, UpdateAdminSettings}
+  alias MilosTraining.Finance
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -35,6 +36,7 @@ defmodule MilosTrainingWeb.AdminSettingsController do
       id: %Schema{type: :string, format: :uuid, nullable: true},
       payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
       document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]},
+      package_modules: %Schema{type: :array, items: %Schema{type: :string}},
       inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
     },
@@ -101,7 +103,12 @@ defmodule MilosTrainingWeb.AdminSettingsController do
         type: :object,
         properties: %{
           payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
-          document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]}
+          document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]},
+          package_modules: %Schema{
+            type: :array,
+            uniqueItems: true,
+            items: %Schema{type: :string, enum: Finance.package_module_keys()}
+          }
         },
         required: []
       },

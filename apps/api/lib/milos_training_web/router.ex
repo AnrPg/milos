@@ -327,6 +327,7 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
     get("/finance/packages", AdminFinanceController, :packages)
+    get("/finance/package-catalog", AdminFinanceController, :package_catalog)
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)

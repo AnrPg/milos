@@ -2364,6 +2364,35 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/finance/package-catalog": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFinanceController.package_catalog",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Package catalog"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Describe package types, presets, locks and catalog fields",
+        "tags": [
+          "Admin Finance"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/queues": {
       "get": {
         "callbacks": {},
@@ -6932,8 +6961,11 @@
                     "enum": [
                       "monthly",
                       "quarterly",
+                      "semiannual",
                       "annual",
-                      "custom"
+                      "custom",
+                      "one_off",
+                      "with_base"
                     ],
                     "type": "string"
                   },
@@ -6948,138 +6980,528 @@
                     "nullable": true,
                     "type": "string"
                   },
-                  "family": {
-                    "type": "string"
+                  "fields": {
+                    "additionalProperties": false,
+                    "description": "Entitlement catalog v2 field values keyed by catalog field key (ADR-096)",
+                    "properties": {
+                      "facility.amenities_note": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "perks.guest_passes": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "booking.cancellation_cutoff_hours": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "content.workout_library": {
+                        "type": "boolean"
+                      },
+                      "perks.event_visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.joining_fee_cents": {
+                        "type": "integer"
+                      },
+                      "perks.member_discount_scope": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "personal_training.format": {
+                        "type": "string"
+                      },
+                      "personal_training.session_minutes": {
+                        "type": "integer"
+                      },
+                      "facility.open_gym_visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.validity": {
+                        "additionalProperties": false,
+                        "nullable": true,
+                        "properties": {
+                          "amount": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "unit": {
+                            "enum": [
+                              "day",
+                              "week",
+                              "month"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "amount",
+                          "unit"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.validity_starts": {
+                        "type": "string"
+                      },
+                      "terms.conversion_package_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "group_classes.time_windows": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "days": {
+                              "items": {
+                                "maximum": 7,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "type": "array"
+                            },
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "days",
+                            "from",
+                            "to"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "personal_training.sessions": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "booking.window_days": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "online_coaching.response_sla_hours": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "personal_training.assessments": {
+                        "type": "integer"
+                      },
+                      "terms.seat_billing": {
+                        "type": "string"
+                      },
+                      "facility.open_gym": {
+                        "type": "boolean"
+                      },
+                      "facility.amenities": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "terms.quota_sharing": {
+                        "type": "string"
+                      },
+                      "terms.new_members_only": {
+                        "type": "boolean"
+                      },
+                      "booking.no_show_penalty_waived": {
+                        "type": "boolean"
+                      },
+                      "perks.member_discount_percent": {
+                        "type": "integer"
+                      },
+                      "terms.seats": {
+                        "type": "integer"
+                      },
+                      "group_classes.class_type_limits": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "limit": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "period": {
+                              "enum": [
+                                "calendar_week",
+                                "calendar_month",
+                                "subscription_period"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "limit",
+                            "period"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "group_classes.class_types": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "terms.enrollment": {
+                        "type": "string"
+                      },
+                      "group_classes.included": {
+                        "type": "boolean"
+                      },
+                      "terms.enrollment_domain": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "terms.stacking": {
+                        "type": "boolean"
+                      },
+                      "terms.allow_minor_beneficiaries": {
+                        "type": "boolean"
+                      },
+                      "content.advanced_analytics": {
+                        "type": "boolean"
+                      },
+                      "terms.compatible_package_ids": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "online_coaching.assigned_programming": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.nutrition_plan": {
+                        "type": "boolean"
+                      },
+                      "terms.minimum_commitment_months": {
+                        "type": "integer"
+                      },
+                      "booking.waitlist_priority": {
+                        "type": "string"
+                      },
+                      "terms.once_per_person": {
+                        "type": "boolean"
+                      },
+                      "terms.auto_renew": {
+                        "type": "boolean"
+                      },
+                      "personal_training.group_size": {
+                        "type": "integer"
+                      },
+                      "perks.freeze_days_per_year": {
+                        "type": "integer"
+                      },
+                      "content.on_demand_video": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.form_reviews": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "facility.location_ids": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "personal_training.included": {
+                        "type": "boolean"
+                      },
+                      "group_classes.rollover_max": {
+                        "type": "integer"
+                      },
+                      "online_coaching.touchpoints": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "online_coaching.messaging": {
+                        "type": "boolean"
+                      },
+                      "personal_training.coach_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "perks.events": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.included": {
+                        "type": "boolean"
+                      },
+                      "terms.expiry_reminder_days": {
+                        "type": "integer"
+                      },
+                      "group_classes.visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.beneficiaries": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
                   },
                   "name": {
                     "type": "string"
                   },
-                  "params": {
-                    "additionalProperties": false,
-                    "properties": {
-                      "allowances": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "class_visits": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "counted_kinds": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "limit": {
-                                "oneOf": [
-                                  {
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  {
-                                    "enum": [
-                                      "unlimited"
-                                    ],
-                                    "type": "string"
-                                  }
-                                ]
-                              },
-                              "period": {
-                                "enum": [
-                                  "calendar_week",
-                                  "calendar_month",
-                                  "subscription_period"
-                                ],
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "limit",
-                              "period"
-                            ],
-                            "type": "object"
-                          },
-                          "coaching_touchpoints": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "counted_kinds": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "limit": {
-                                "oneOf": [
-                                  {
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  {
-                                    "enum": [
-                                      "unlimited"
-                                    ],
-                                    "type": "string"
-                                  }
-                                ]
-                              },
-                              "period": {
-                                "enum": [
-                                  "calendar_week",
-                                  "calendar_month",
-                                  "subscription_period"
-                                ],
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "limit",
-                              "period"
-                            ],
-                            "type": "object"
-                          }
-                        },
-                        "type": "object"
-                      },
-                      "capabilities": {
-                        "items": {
-                          "enum": [
-                            "book_classes",
-                            "execute_class_workouts",
-                            "execute_library_workouts",
-                            "execute_assigned_workouts",
-                            "receive_coaching_touchpoints"
-                          ],
-                          "type": "string"
-                        },
-                        "type": "array",
-                        "uniqueItems": true
-                      },
-                      "channels": {
-                        "items": {
-                          "enum": [
-                            "in_person",
-                            "workout_library",
-                            "personal_programming",
-                            "coach_messaging"
-                          ],
-                          "type": "string"
-                        },
-                        "type": "array",
-                        "uniqueItems": true
-                      },
-                      "entitlement_version": {
-                        "enum": [
-                          1
-                        ],
-                        "type": "integer"
-                      }
-                    },
-                    "required": [
-                      "entitlement_version",
-                      "channels",
-                      "capabilities",
-                      "allowances"
+                  "package_type": {
+                    "enum": [
+                      "membership",
+                      "class_pack",
+                      "drop_in",
+                      "trial",
+                      "pt_pack",
+                      "add_on",
+                      "shared",
+                      "corporate"
                     ],
-                    "type": "object"
+                    "type": "string"
                   },
                   "tags": {
                     "items": {
@@ -7760,6 +8182,12 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "package_modules": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "payment_reminder_interval_days": {
                           "minimum": 1,
                           "type": "integer"
@@ -7948,6 +8376,22 @@
                         ],
                         "type": "string"
                       },
+                      "package_modules": {
+                        "items": {
+                          "enum": [
+                            "group_classes",
+                            "online_coaching",
+                            "open_gym",
+                            "events",
+                            "personal_training",
+                            "digital_content",
+                            "corporate_clients"
+                          ],
+                          "type": "string"
+                        },
+                        "type": "array",
+                        "uniqueItems": true
+                      },
                       "payment_reminder_interval_days": {
                         "minimum": 1,
                         "type": "integer"
@@ -8055,6 +8499,12 @@
                           "format": "date-time",
                           "nullable": true,
                           "type": "string"
+                        },
+                        "package_modules": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
                         },
                         "payment_reminder_interval_days": {
                           "minimum": 1,
@@ -20122,8 +20572,11 @@
                     "enum": [
                       "monthly",
                       "quarterly",
+                      "semiannual",
                       "annual",
-                      "custom"
+                      "custom",
+                      "one_off",
+                      "with_base"
                     ],
                     "type": "string"
                   },
@@ -20138,138 +20591,528 @@
                     "nullable": true,
                     "type": "string"
                   },
-                  "family": {
-                    "type": "string"
+                  "fields": {
+                    "additionalProperties": false,
+                    "description": "Entitlement catalog v2 field values keyed by catalog field key (ADR-096)",
+                    "properties": {
+                      "facility.amenities_note": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "perks.guest_passes": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "booking.cancellation_cutoff_hours": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "content.workout_library": {
+                        "type": "boolean"
+                      },
+                      "perks.event_visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.joining_fee_cents": {
+                        "type": "integer"
+                      },
+                      "perks.member_discount_scope": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "personal_training.format": {
+                        "type": "string"
+                      },
+                      "personal_training.session_minutes": {
+                        "type": "integer"
+                      },
+                      "facility.open_gym_visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.validity": {
+                        "additionalProperties": false,
+                        "nullable": true,
+                        "properties": {
+                          "amount": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "unit": {
+                            "enum": [
+                              "day",
+                              "week",
+                              "month"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "amount",
+                          "unit"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.validity_starts": {
+                        "type": "string"
+                      },
+                      "terms.conversion_package_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "group_classes.time_windows": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "days": {
+                              "items": {
+                                "maximum": 7,
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "type": "array"
+                            },
+                            "from": {
+                              "type": "string"
+                            },
+                            "to": {
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "days",
+                            "from",
+                            "to"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "personal_training.sessions": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "booking.window_days": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "online_coaching.response_sla_hours": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "personal_training.assessments": {
+                        "type": "integer"
+                      },
+                      "terms.seat_billing": {
+                        "type": "string"
+                      },
+                      "facility.open_gym": {
+                        "type": "boolean"
+                      },
+                      "facility.amenities": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "terms.quota_sharing": {
+                        "type": "string"
+                      },
+                      "terms.new_members_only": {
+                        "type": "boolean"
+                      },
+                      "booking.no_show_penalty_waived": {
+                        "type": "boolean"
+                      },
+                      "perks.member_discount_percent": {
+                        "type": "integer"
+                      },
+                      "terms.seats": {
+                        "type": "integer"
+                      },
+                      "group_classes.class_type_limits": {
+                        "items": {
+                          "additionalProperties": false,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "limit": {
+                              "minimum": 0,
+                              "type": "integer"
+                            },
+                            "period": {
+                              "enum": [
+                                "calendar_week",
+                                "calendar_month",
+                                "subscription_period"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "limit",
+                            "period"
+                          ],
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "group_classes.class_types": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "terms.enrollment": {
+                        "type": "string"
+                      },
+                      "group_classes.included": {
+                        "type": "boolean"
+                      },
+                      "terms.enrollment_domain": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "terms.stacking": {
+                        "type": "boolean"
+                      },
+                      "terms.allow_minor_beneficiaries": {
+                        "type": "boolean"
+                      },
+                      "content.advanced_analytics": {
+                        "type": "boolean"
+                      },
+                      "terms.compatible_package_ids": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "online_coaching.assigned_programming": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.nutrition_plan": {
+                        "type": "boolean"
+                      },
+                      "terms.minimum_commitment_months": {
+                        "type": "integer"
+                      },
+                      "booking.waitlist_priority": {
+                        "type": "string"
+                      },
+                      "terms.once_per_person": {
+                        "type": "boolean"
+                      },
+                      "terms.auto_renew": {
+                        "type": "boolean"
+                      },
+                      "personal_training.group_size": {
+                        "type": "integer"
+                      },
+                      "perks.freeze_days_per_year": {
+                        "type": "integer"
+                      },
+                      "content.on_demand_video": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.form_reviews": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "facility.location_ids": {
+                        "oneOf": [
+                          {
+                            "enum": [
+                              "all"
+                            ],
+                            "type": "string"
+                          },
+                          {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        ]
+                      },
+                      "personal_training.included": {
+                        "type": "boolean"
+                      },
+                      "group_classes.rollover_max": {
+                        "type": "integer"
+                      },
+                      "online_coaching.touchpoints": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "online_coaching.messaging": {
+                        "type": "boolean"
+                      },
+                      "personal_training.coach_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "perks.events": {
+                        "type": "boolean"
+                      },
+                      "online_coaching.included": {
+                        "type": "boolean"
+                      },
+                      "terms.expiry_reminder_days": {
+                        "type": "integer"
+                      },
+                      "group_classes.visits": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "limit": {
+                            "oneOf": [
+                              {
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              {
+                                "enum": [
+                                  "unlimited"
+                                ],
+                                "type": "string"
+                              }
+                            ]
+                          },
+                          "period": {
+                            "enum": [
+                              "calendar_week",
+                              "calendar_month",
+                              "subscription_period"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "limit",
+                          "period"
+                        ],
+                        "type": "object"
+                      },
+                      "terms.beneficiaries": {
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
                   },
                   "name": {
                     "type": "string"
                   },
-                  "params": {
-                    "additionalProperties": false,
-                    "properties": {
-                      "allowances": {
-                        "additionalProperties": false,
-                        "properties": {
-                          "class_visits": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "counted_kinds": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "limit": {
-                                "oneOf": [
-                                  {
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  {
-                                    "enum": [
-                                      "unlimited"
-                                    ],
-                                    "type": "string"
-                                  }
-                                ]
-                              },
-                              "period": {
-                                "enum": [
-                                  "calendar_week",
-                                  "calendar_month",
-                                  "subscription_period"
-                                ],
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "limit",
-                              "period"
-                            ],
-                            "type": "object"
-                          },
-                          "coaching_touchpoints": {
-                            "additionalProperties": false,
-                            "properties": {
-                              "counted_kinds": {
-                                "items": {
-                                  "type": "string"
-                                },
-                                "type": "array"
-                              },
-                              "limit": {
-                                "oneOf": [
-                                  {
-                                    "minimum": 0,
-                                    "type": "integer"
-                                  },
-                                  {
-                                    "enum": [
-                                      "unlimited"
-                                    ],
-                                    "type": "string"
-                                  }
-                                ]
-                              },
-                              "period": {
-                                "enum": [
-                                  "calendar_week",
-                                  "calendar_month",
-                                  "subscription_period"
-                                ],
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "limit",
-                              "period"
-                            ],
-                            "type": "object"
-                          }
-                        },
-                        "type": "object"
-                      },
-                      "capabilities": {
-                        "items": {
-                          "enum": [
-                            "book_classes",
-                            "execute_class_workouts",
-                            "execute_library_workouts",
-                            "execute_assigned_workouts",
-                            "receive_coaching_touchpoints"
-                          ],
-                          "type": "string"
-                        },
-                        "type": "array",
-                        "uniqueItems": true
-                      },
-                      "channels": {
-                        "items": {
-                          "enum": [
-                            "in_person",
-                            "workout_library",
-                            "personal_programming",
-                            "coach_messaging"
-                          ],
-                          "type": "string"
-                        },
-                        "type": "array",
-                        "uniqueItems": true
-                      },
-                      "entitlement_version": {
-                        "enum": [
-                          1
-                        ],
-                        "type": "integer"
-                      }
-                    },
-                    "required": [
-                      "entitlement_version",
-                      "channels",
-                      "capabilities",
-                      "allowances"
+                  "package_type": {
+                    "enum": [
+                      "membership",
+                      "class_pack",
+                      "drop_in",
+                      "trial",
+                      "pt_pack",
+                      "add_on",
+                      "shared",
+                      "corporate"
                     ],
-                    "type": "object"
+                    "type": "string"
                   },
                   "tags": {
                     "items": {
@@ -20280,8 +21123,7 @@
                 },
                 "required": [
                   "name",
-                  "family",
-                  "billing_period"
+                  "package_type"
                 ],
                 "type": "object"
               }

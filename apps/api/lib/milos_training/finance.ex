@@ -51,6 +51,7 @@ defmodule MilosTraining.Finance do
     GetEffectiveEntitlement,
     GetMemberProfile,
     GetPackage,
+    GetPackageCatalog,
     ListExpiringMemberships,
     ListPackages,
     ListPromotionCampaigns,
@@ -78,6 +79,15 @@ defmodule MilosTraining.Finance do
   defdelegate list_packages(), to: ListPackages, as: :call
   def list_packages(context), do: scoped(context, fn -> list_packages() end)
   defdelegate get_package(id), to: GetPackage, as: :call
+  defdelegate get_package_catalog(), to: GetPackageCatalog, as: :call
+
+  # Closed package vocabularies used by interface contracts (ADR-096).
+  def package_type_keys, do: MilosTraining.Finance.Domain.PackageType.keys()
+  def package_billing_periods, do: MilosTraining.Finance.Domain.PackageType.all_billing_periods()
+  def package_catalog_fields, do: MilosTraining.Finance.Domain.PackageCatalog.fields()
+  def package_module_keys, do: MilosTraining.Finance.Domain.PackageType.module_keys()
+  def package_quota_periods, do: MilosTraining.Finance.Domain.PackageCatalog.quota_periods()
+  def get_package_catalog(context), do: scoped(context, fn -> get_package_catalog() end)
   def get_package(context, id), do: scoped(context, fn -> get_package(id) end)
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 

@@ -496,6 +496,148 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-096 package contract errors. `params` carry the catalog field or lock
+  # path so clients can localize and focus the offending input.
+  def call(conn, {:error, {:package_type_invariant_violated, path}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_invariant_violated",
+      "This value is defined by the package type",
+      %{field: path}
+    )
+  end
+
+  def call(conn, {:error, {:entitlement_not_available, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "entitlement_not_available",
+      "This benefit is not available yet",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:invalid_package_field, field, reason}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package field value",
+      %{field: field, reason: to_string(reason)}
+    )
+  end
+
+  def call(conn, {:error, {:unknown_package_field, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "unknown_package_field",
+      "Unknown package field",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:package_rule_violated, rule, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_rule_violated",
+      "Package rule violated",
+      %{rule: to_string(rule), field: field}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_fields}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package fields",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_type}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_type",
+      "Invalid package type",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_not_available}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_not_available",
+      "This package type is not available yet",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_change_requires_copy}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_type_change_requires_copy",
+      "A sold package cannot change type; create a copy instead",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_already_used}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_already_used",
+      "This package can be used only once per person",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_new_members_only}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_new_members_only",
+      "This package is only for new members",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_not_renewable}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_not_renewable",
+      "This package does not renew",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included, details}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      details
+    )
+  end
+
   def call(conn, {:error, :package_inactive}) do
     conn
     |> put_status(:conflict)
@@ -1220,5 +1362,11 @@ defmodule MilosTrainingWeb.FallbackController do
       %{count: 1},
       %{context: "invoice", reason: reason}
     )
+  end
+
+  defp package_contract_error(conn, status, code, message, params) do
+    conn
+    |> put_status(status)
+    |> json(%{code: code, error: message, params: params})
   end
 end
