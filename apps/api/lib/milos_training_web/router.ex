@@ -209,6 +209,24 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
+  # ADR-100: standalone training log (class / offline workouts).
+  scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/entries", TrainingLogController, :index)
+    post("/entries", TrainingLogController, :create)
+    get("/entries/:id", TrainingLogController, :show)
+    patch("/entries/:id", TrainingLogController, :update)
+    post("/entries/:id/void", TrainingLogController, :void)
+    get("/sources", TrainingLogController, :sources)
+  end
+
   scope "/api/org/:organization_slug", MilosTrainingWeb do
     pipe_through([
       :api,

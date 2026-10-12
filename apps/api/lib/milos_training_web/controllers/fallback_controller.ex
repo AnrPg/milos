@@ -460,6 +460,69 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_training_log_source}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_training_log_source",
+      error: "Training log source type or reference is invalid"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "training_log_source_forbidden",
+      error: "You cannot log a workout for this source"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_not_started}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "training_log_source_not_started",
+      error: "This class has not started yet"
+    })
+  end
+
+  def call(conn, {:error, :training_log_already_counted}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_already_counted",
+      error: "A completed workout execution already counts this workout"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_already_logged}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_source_already_logged",
+      error: "This workout has already been logged"
+    })
+  end
+
+  def call(conn, {:error, :training_log_entry_voided}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_entry_voided",
+      error: "Voided training log entries cannot be changed"
+    })
+  end
+
+  def call(conn, {:error, :stale_training_log_entry}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "stale_training_log_entry",
+      error: "This entry changed elsewhere. Reload before saving."
+    })
+  end
+
   def call(conn, {:error, :promotion_code_inactive}) do
     conn
     |> put_status(:unprocessable_entity)
