@@ -12,10 +12,13 @@ import type { ResolvedPos } from "@tiptap/pm/model";
 import { Plugin } from "@tiptap/pm/state";
 import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 
+import { ApiError } from "@/api/client";
 import {
+  analyzeFreeTextWorkout,
   createDraftWorkout,
   fetchAdminWorkout,
   publishWorkoutDraft,
@@ -23,9 +26,27 @@ import {
 } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { useUiLocale } from "@/i18n/use-ui-locale";
+import {
+  acceptIssue,
+  addSuggestion,
+  blockingProblems,
+  createReviewState,
+  dismissSuggestion,
+  openIssues,
+  publishFields,
+  rejectIssue,
+  replaceFirst,
+  undoIssue,
+  type AnalysisIssue,
+  type AnalysisSuggestion,
+  type ReviewState,
+} from "@/lib/free-text-analysis";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-dsl-editor-data";
 import type { WorkoutType } from "@/types/workout";
+
+import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
 
 type Props = {
   draftId: string | null;
@@ -33,6 +54,7 @@ type Props = {
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
+type AsideTab = "assistant" | "preview";
 type RibbonKey = "overview" | "details" | "tools";
 
 const WORKOUT_TYPES: WorkoutType[] = [
@@ -46,17 +68,25 @@ const WORKOUT_TYPES: WorkoutType[] = [
 
 export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
   const i18n = useUiTranslations();
+  const assistantT = useTranslations("WorkoutAssistant");
+  const locale = useUiLocale();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const { tokens } = useSession();
   const accessToken = tokens?.access_token;
   const [title, setTitle] = useState("");
-  const [type, setType] = useState<WorkoutType>("crossfit");
+  const [type, setType] = useState<WorkoutType | "">("");
   const [body, setBody] = useState("");
   const [html, setHtml] = useState("");
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
   const [publishing, setPublishing] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(true);
+  const [asideTab, setAsideTab] = useState<AsideTab>("assistant");
+  const [review, setReview] = useState<ReviewState | null>(null);
+  const [analysisStatus, setAnalysisStatus] = useState<AnalysisStatus>("idle");
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [showBlocking, setShowBlocking] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   const [collapsedRibbons, setCollapsedRibbons] = useState<Record<RibbonKey, boolean>>({
     overview: false,
     details: false,
@@ -129,6 +159,11 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         if (WORKOUT_TYPES.includes(workout.type as WorkoutType)) {
           setType(workout.type as WorkoutType);
         }
+        const storedReview = (workout.draft_data as { free_text_review?: ReviewState } | null)?.free_text_review;
+        if (storedReview?.analysis && storedReview.workout) {
+          setReview(storedReview);
+          setAnalysisStatus("ready");
+        }
         const nextBody = workout.free_text_body ?? "";
         revisionRef.current = workout.dsl_source_revision ?? 0;
         setBody(nextBody);
@@ -152,13 +187,14 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
         body,
         document: editor.getJSON(),
         expectedSourceRevision: revisionRef.current,
+        review,
       }));
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       setSaveStatus("saved");
     } catch {
       setSaveStatus("error");
     }
-  }, [accessToken, body, draftId, editor, title, type]);
+  }, [accessToken, body, draftId, editor, review, title, type]);
 
   useEffect(() => {
     if (!draftId || loadedDraftRef.current !== draftId) return;
@@ -166,16 +202,134 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       void saveDraft();
     }, 1_000);
     return () => window.clearTimeout(timer);
-  }, [body, draftId, saveDraft, title, type]);
+  }, [body, draftId, review, saveDraft, title, type]);
 
-  const canPublish = Boolean(accessToken && draftId && editor && title.trim() && body.trim() && !publishing);
+  const stale = Boolean(review && review.analyzedText.trim() !== body.trim());
+  const blocking = blockingProblems(title, type, review);
+  const canPublish = Boolean(accessToken && draftId && editor && body.trim() && !publishing && analysisStatus !== "loading");
 
-  async function publish() {
-    if (!accessToken || !draftId || !editor || !title.trim() || !body.trim()) return;
-    setPublishing(true);
+  async function analyze(): Promise<ReviewState | null> {
+    if (!accessToken || !body.trim()) return null;
+    setAnalysisStatus("loading");
+    setAnalysisError(null);
+    setNotice(null);
+    setAsideTab("assistant");
+    setPreviewOpen(true);
 
     try {
-      const payload = buildPayload({ title, type, body, document: editor.getJSON(), expectedSourceRevision: revisionRef.current });
+      const analyzedText = body.trim();
+      const analysis = await analyzeFreeTextWorkout(accessToken, analyzedText, locale);
+      const next = createReviewState(analysis, analyzedText);
+      const proposed = next.workout;
+      // The coach's own title and type win; the assistant only fills blanks.
+      if (!title.trim() && proposed.title) setTitle(proposed.title);
+      if (!type && proposed.type && WORKOUT_TYPES.includes(proposed.type as WorkoutType)) setType(proposed.type as WorkoutType);
+      setReview(next);
+      setAnalysisStatus("ready");
+      return next;
+    } catch (error) {
+      setAnalysisStatus("error");
+      setAnalysisError(error instanceof ApiError ? error.payload?.code ?? "analyzer_unavailable" : "analyzer_unavailable");
+      return null;
+    }
+  }
+
+  function syncWorkoutField(path: string, value: unknown) {
+    if (path === "title") setTitle(typeof value === "string" ? value : "");
+    if (path === "type") setType(typeof value === "string" && WORKOUT_TYPES.includes(value as WorkoutType) ? (value as WorkoutType) : "");
+  }
+
+  function applyTextEdit(state: ReviewState, find: string, replace: string): ReviewState {
+    if (!editor || !replaceInEditor(editor, find, replace)) return state;
+    const analyzedText = replaceFirst(state.analyzedText, find, replace) ?? state.analyzedText;
+    return { ...state, analyzedText };
+  }
+
+  function handleAccept(issue: AnalysisIssue, value?: unknown) {
+    if (!review) return;
+    let next = acceptIssue(review, issue, value);
+    const edit = issue.suggestion?.text_edit;
+    if (edit && value === undefined) next = applyTextEdit(next, edit.find, edit.replace);
+    syncWorkoutField(issue.path, value !== undefined ? value : issue.suggestion?.value);
+    setReview(next);
+    setShowBlocking(false);
+  }
+
+  function handleReject(issue: AnalysisIssue) {
+    if (!review) return;
+    setReview(rejectIssue(review, issue));
+    syncWorkoutField(issue.path, null);
+    if (issue.required) setShowBlocking(true);
+  }
+
+  function handleUndo(issue: AnalysisIssue) {
+    if (!review) return;
+    const next = undoIssue(review, issue);
+    setReview(next);
+    if (issue.path === "title" || issue.path === "type") syncWorkoutField(issue.path, next.workout[issue.path]);
+  }
+
+  function handleAddSuggestion(suggestion: AnalysisSuggestion, value: unknown, alsoInText: boolean) {
+    if (!review) return;
+    let next = addSuggestion(review, suggestion, value);
+    if (alsoInText && suggestion.text_insert && editor) {
+      editor.chain().insertContentAt(editor.state.doc.content.size, { type: "paragraph", content: [{ type: "text", text: suggestion.text_insert }] }).run();
+      next = { ...next, analyzedText: `${next.analyzedText}\n${suggestion.text_insert}` };
+    }
+    setReview(next);
+  }
+
+  function handleInsertExample() {
+    if (!editor) return;
+    editor.commands.setContent(textToDocument(assistantT("exampleWorkout")));
+    setBody(editor.getText({ blockSeparator: "\n" }));
+    setHtml(editor.getHTML());
+    editor.commands.focus("end");
+  }
+
+  async function publish() {
+    if (!accessToken || !draftId || !editor || !body.trim()) return;
+    setNotice(null);
+
+    let current = review;
+    let freshlyAnalyzed = false;
+    if (!current || stale) {
+      current = await analyze();
+      freshlyAnalyzed = current !== null;
+    }
+
+    const effectiveTitle = title.trim() || current?.workout.title || "";
+    const proposedType = current?.workout.type ?? "";
+    const effectiveType = type || (WORKOUT_TYPES.includes(proposedType as WorkoutType) ? (proposedType as WorkoutType) : "");
+    const problems = blockingProblems(effectiveTitle, effectiveType, current);
+
+    if (problems.length > 0) {
+      setShowBlocking(true);
+      setAsideTab("assistant");
+      return;
+    }
+
+    // A fresh check that raised notes gets reviewed before anything is created.
+    if (freshlyAnalyzed && current && openIssues(current).length > 0) {
+      setNotice(assistantT("reviewBeforePublish"));
+      return;
+    }
+
+    if (current && openIssues(current).some((issue) => issue.severity === "error")) {
+      setNotice(assistantT("resolveErrorsFirst"));
+      return;
+    }
+
+    setPublishing(true);
+    try {
+      const payload = buildPayload({
+        title: effectiveTitle,
+        type: effectiveType,
+        body,
+        document: editor.getJSON(),
+        expectedSourceRevision: revisionRef.current,
+        review: current,
+      });
       const draft = await updateDraftWorkout(accessToken, draftId, payload);
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       await publishWorkoutDraft(accessToken, draftId, {
@@ -185,13 +339,14 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       router.push(adminHref("/admin/workouts", organizationSlug));
     } catch {
       setSaveStatus("error");
+      setNotice(assistantT("publishFailed"));
     } finally {
       setPublishing(false);
     }
   }
 
   return (
-    <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_24rem]" : "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_4rem]"}>
+    <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_26rem]" : "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_4rem]"}>
       <section className="flex min-h-0 min-w-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
         <CollapsibleRibbon
           label={i18n("freeTextTitle")}
@@ -231,6 +386,8 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
                 value={title}
                 onChange={(event) => setTitle(event.target.value)}
                 maxLength={160}
+                placeholder={assistantT("titlePlaceholder")}
+                aria-invalid={showBlocking && title.trim().length < 3}
               />
             </label>
             <label className="block">
@@ -242,7 +399,11 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
                 style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
                 value={type}
                 onChange={(event) => setType(event.target.value as WorkoutType)}
+                aria-invalid={showBlocking && !type}
               >
+                <option value="" disabled>
+                  {assistantT("chooseType")}
+                </option>
                 {WORKOUT_TYPES.map((item) => (
                   <option key={item} value={item}>
                     {item.replaceAll("_", " ")}
@@ -276,7 +437,13 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
             className="min-w-0 rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
             style={{ background: "var(--success, var(--primary))", color: "var(--bg)", boxShadow: "0 10px 24px color-mix(in srgb, var(--primary) 22%, transparent)" }}
           >
-            {publishing ? i18n("quickTextPublishing") : i18n("quickTextPublish")}
+            {publishing
+              ? i18n("quickTextPublishing")
+              : analysisStatus === "loading"
+                ? assistantT("analyzing")
+                : !review || stale
+                  ? assistantT("checkAndPublish")
+                  : i18n("quickTextPublish")}
           </button>
         </footer>
       </section>
@@ -284,9 +451,29 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
       <aside className="min-h-0 min-w-0 overflow-auto overflow-x-clip p-4" style={{ background: "var(--panel)" }}>
         <div className="flex items-center justify-between gap-3">
           {previewOpen ? (
-            <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
-              {i18n("quickTextCanonicalPreview")}
-            </h2>
+            <div className="flex gap-1 rounded-xl p-1" role="tablist" aria-label={assistantT("panelTabs")} style={{ background: "var(--bg)" }}>
+              {(["assistant", "preview"] as const).map((tab) => (
+                <button
+                  key={tab}
+                  type="button"
+                  role="tab"
+                  aria-selected={asideTab === tab}
+                  onClick={() => setAsideTab(tab)}
+                  className="rounded-lg px-3 py-1.5 text-xs font-black"
+                  style={{
+                    background: asideTab === tab ? "var(--card)" : "transparent",
+                    color: asideTab === tab ? "var(--text)" : "var(--muted)",
+                  }}
+                >
+                  {tab === "assistant" ? assistantT("tabAssistant") : assistantT("tabPreview")}
+                  {tab === "assistant" && review && openIssues(review).length > 0 ? (
+                    <span className="ms-1 rounded-full px-1.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+                      {openIssues(review).length}
+                    </span>
+                  ) : null}
+                </button>
+              ))}
+            </div>
           ) : null}
           <button
             type="button"
@@ -298,7 +485,28 @@ export function FreeTextWorkoutEditor({ draftId, onDraftReady }: Props) {
             {previewOpen ? i18n("hide34d8b60") : i18n("showd97d1ee")}
           </button>
         </div>
-        {previewOpen ? (
+        {previewOpen && asideTab === "assistant" ? (
+          <div className="mt-4">
+            <FreeTextAnalysisPanel
+              review={review}
+              status={analysisStatus}
+              errorCode={analysisError}
+              stale={stale}
+              hasText={Boolean(body.trim())}
+              blocking={blocking}
+              showBlocking={showBlocking}
+              notice={notice}
+              onAnalyze={() => void analyze()}
+              onAccept={handleAccept}
+              onReject={handleReject}
+              onUndo={handleUndo}
+              onAddSuggestion={handleAddSuggestion}
+              onDismissSuggestion={(suggestion) => review && setReview(dismissSuggestion(review, suggestion))}
+              onInsertExample={handleInsertExample}
+            />
+          </div>
+        ) : null}
+        {previewOpen && asideTab === "preview" ? (
           <div className="mt-4 rounded-2xl border p-4" style={{ borderColor: "var(--dim)", background: "var(--card)" }}>
             <div className="text-xl font-black" style={{ color: "var(--text)" }}>
               {title || i18n("untitledWorkout579b8a6")}
@@ -601,30 +809,68 @@ function buildPayload({
   body,
   document,
   expectedSourceRevision,
+  review,
 }: {
   title: string;
-  type: WorkoutType;
+  type: WorkoutType | "";
   body: string;
   document: JSONContent;
   expectedSourceRevision?: number | null;
+  review: ReviewState | null;
 }) {
+  // Canonical fields come from the assistant review the coach accepted; the
+  // free text stays the display source of truth (ADR-078, ADR-096).
+  const canonical = publishFields(review);
+  const workoutType = type || null;
+
   return {
+    ...canonical,
     title,
-    type,
+    type: workoutType,
     authoring_mode: "free_text",
     free_text_body: body,
     free_text_document: document,
     expected_source_revision: expectedSourceRevision,
     draft_data: {
+      ...canonical,
       title,
-      type,
+      type: workoutType,
       authoring_mode: "free_text",
       free_text_body: body,
       free_text_document: document,
-      sections: [],
+      free_text_review: review,
     },
-    sections: [],
   };
+}
+
+/**
+ * Replaces the first verbatim occurrence of `find` inside a single text block,
+ * keeping the surrounding formatting. Returns false when the text is absent.
+ */
+function replaceInEditor(editor: Editor, find: string, replace: string) {
+  let range: { from: number; to: number } | null = null;
+
+  editor.state.doc.descendants((node, position) => {
+    if (range || !node.isTextblock) return !range;
+    let text = "";
+    const offsets: number[] = [];
+    node.forEach((child, childOffset) => {
+      if (!child.isText || !child.text) return;
+      for (let index = 0; index < child.text.length; index += 1) {
+        offsets.push(position + 1 + childOffset + index);
+      }
+      text += child.text;
+    });
+    const index = text.indexOf(find);
+    if (index >= 0) {
+      range = { from: offsets[index]!, to: offsets[index + find.length - 1]! + 1 };
+    }
+    return false;
+  });
+
+  if (!range) return false;
+  editor.chain().focus().insertContentAt(range, replace).run();
+  return true;
 }
 
 function toolbarButton(label: string, text: string, active: boolean, run: () => unknown) {
