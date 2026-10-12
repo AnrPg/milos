@@ -7,6 +7,7 @@ defmodule MilosTrainingWeb.ExecutionController do
     CompleteWorkout,
     GetWorkoutExecution,
     GetWorkoutTimerSequence,
+    IngestExecutionInteractions,
     ListWorkoutExecutions,
     StartWorkoutExecution,
     SubmitExecutionNote,
@@ -388,6 +389,146 @@ defmodule MilosTrainingWeb.ExecutionController do
       not_found: {"Error", "application/json", %Schema{type: :object}}
     ]
   )
+
+  # ADR-105: client-only execution interaction signals. The kind enum is the
+  # Analytics allowlist itself, so the contract and validation cannot drift.
+  @interaction_metadata_schema %Schema{
+    type: :object,
+    additionalProperties: false,
+    description:
+      "Typed facts allowed for the interaction kind (see ADR-105). No free text; " <>
+        "keys not allowed for the kind reject the batch.",
+    properties: %{
+      segment_index: %Schema{type: :integer, minimum: 0, maximum: 10_000},
+      section_id: %Schema{type: :string, pattern: "^[A-Za-z0-9_-]{1,64}$"},
+      format: %Schema{type: :string, pattern: "^[A-Za-z0-9_-]{1,64}$"},
+      surface: %Schema{
+        type: :string,
+        enum: [
+          "pause_sheet",
+          "primary_action",
+          "header",
+          "gesture",
+          "keyboard",
+          "snackbar",
+          "ready_screen",
+          "finish_wizard",
+          "cast_display",
+          "lock_screen"
+        ]
+      },
+      round_count: %Schema{type: :integer, minimum: 0, maximum: 10_000},
+      delta_rounds: %Schema{type: :integer, minimum: -100, maximum: 100},
+      delta_seconds: %Schema{type: :integer, minimum: -3600, maximum: 3600},
+      elapsed_ms: %Schema{type: :integer, minimum: 0, maximum: 86_400_000},
+      remaining_ms: %Schema{type: :integer, minimum: 0, maximum: 86_400_000},
+      duration_ms: %Schema{type: :integer, minimum: 0, maximum: 86_400_000},
+      countdown_seconds: %Schema{type: :integer, minimum: 0, maximum: 600},
+      step: %Schema{type: :integer, minimum: 0, maximum: 20},
+      scored_section_count: %Schema{type: :integer, minimum: 0, maximum: 1000},
+      enabled: %Schema{type: :boolean},
+      orientation: %Schema{type: :string, enum: ["portrait", "landscape"]},
+      cue_channel: %Schema{type: :string, enum: ["sound", "voice", "vibration"]}
+    }
+  }
+
+  def interaction_metadata_schema, do: @interaction_metadata_schema
+
+  operation(:record_interactions,
+    summary: "Report client-only execution interaction events (analytics, ADR-105)",
+    description:
+      "Batched, idempotent ingestion of execution interaction signals the server cannot " <>
+        "observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish " <>
+        "wizard, cast mode). Each event dedupes on its client_event_id; retries are " <>
+        "accepted and counted as duplicates. Any invalid event rejects the batch.",
+    parameters: [@id_param],
+    request_body:
+      {"Interaction events", "application/json",
+       %Schema{
+         title: "ExecutionInteractionBatch",
+         type: :object,
+         required: [:events],
+         properties: %{
+           events: %Schema{
+             type: :array,
+             minItems: 1,
+             maxItems: MilosTraining.Analytics.execution_interaction_max_batch(),
+             items: %Schema{
+               title: "ExecutionInteractionEvent",
+               type: :object,
+               required: [:client_event_id, :kind, :occurred_at],
+               properties: %{
+                 client_event_id: %Schema{type: :string, format: :uuid},
+                 kind: %Schema{
+                   type: :string,
+                   enum: MilosTraining.Analytics.execution_interaction_kinds()
+                 },
+                 occurred_at: %Schema{type: :string, format: :"date-time"},
+                 metadata: @interaction_metadata_schema
+               }
+             }
+           }
+         }
+       }},
+    responses: [
+      accepted:
+        {"Batch accepted", "application/json",
+         %Schema{
+           title: "ExecutionInteractionBatchResult",
+           type: :object,
+           required: [:accepted, :duplicates],
+           properties: %{
+             accepted: %Schema{type: :integer, minimum: 0},
+             duplicates: %Schema{type: :integer, minimum: 0}
+           }
+         }},
+      not_found: {"Execution not found", "application/json", %Schema{type: :object}},
+      unprocessable_entity:
+        {"Invalid interaction batch", "application/json",
+         %Schema{
+           type: :object,
+           required: [:code, :errors],
+           properties: %{
+             code: %Schema{type: :string, enum: ["invalid_execution_interactions"]},
+             errors: %Schema{
+               type: :array,
+               items: %Schema{
+                 type: :object,
+                 required: [:index, :reason],
+                 properties: %{
+                   index: %Schema{type: :integer},
+                   reason: %Schema{type: :string}
+                 }
+               }
+             }
+           }
+         }}
+    ]
+  )
+
+  def record_interactions(conn, %{"id" => id} = params) do
+    current_user = Guardian.Plug.current_resource(conn)
+
+    case IngestExecutionInteractions.call(
+           conn.assigns[:user_context],
+           id,
+           current_user.id,
+           Map.get(params, "events")
+         ) do
+      {:ok, result} ->
+        conn
+        |> put_status(:accepted)
+        |> json(result)
+
+      {:error, {:invalid_execution_interactions, errors}} ->
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{code: "invalid_execution_interactions", errors: errors})
+
+      {:error, reason} ->
+        {:error, reason}
+    end
+  end
 
   def add_modifications(conn, %{"id" => id, "modifications" => modifications}) do
     current_user = Guardian.Plug.current_resource(conn)

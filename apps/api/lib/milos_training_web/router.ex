@@ -67,6 +67,15 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  pipeline :execution_interaction_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 60_000,
+      bucket: "execution-interactions",
+      methods: ["POST"]
+    )
+  end
+
   pipeline :notification_write_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 120,
@@ -276,6 +285,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/my-workouts", MyWorkoutController, :index)
     post("/my-workouts/requests", MyWorkoutController, :request_assignment)
+    post("/my-workouts/assignments/:id/open", MyWorkoutController, :open)
     patch("/my-workouts/assignments/:id/reject", MyWorkoutController, :reject)
     patch("/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule)
   end
@@ -588,6 +598,20 @@ defmodule MilosTrainingWeb.Router do
     post("/:id/notes", ExecutionController, :submit_note)
     patch("/:id/complete", ExecutionController, :complete)
     post("/:id/modifications", ExecutionController, :add_modifications)
+  end
+
+  # ADR-105: batched client interaction analytics get their own bucket so a
+  # chatty client can never eat into the progress/complete budget above.
+  scope "/api/executions", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :execution_interaction_rate_limited
+    ])
+
+    post("/:id/interactions", ExecutionController, :record_interactions)
   end
 
   scope "/api/gamification", MilosTrainingWeb do
