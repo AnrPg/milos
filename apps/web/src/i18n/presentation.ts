@@ -291,6 +291,27 @@ const API_ERROR_KEYS: Record<string, string> = {
   forbidden: "apiErrorForbidden",
   validation_failed: "apiErrorValidationFailed",
   offline: "apiErrorOffline",
+  // ADR-097 member booking codes
+  booking_window_closed: "mbErrBookingWindowClosed",
+  finance_membership_frozen: "mbErrMembershipFrozen",
+  finance_time_window_not_included: "mbErrOutsidePackageHours",
+  finance_location_not_included: "mbErrLocationNotIncluded",
+  slot_full: "mbErrSlotFull",
+  slot_in_past: "mbErrSlotInPast",
+  slot_not_full: "mbErrSlotNotFull",
+  already_booked: "mbErrAlreadyBooked",
+  invalid_guest_name: "mbErrInvalidGuestName",
+  guest_already_booked: "mbErrGuestAlreadyBooked",
+  location_archived: "mbErrLocationArchived",
+  location_not_found: "mbErrLocationNotFound",
+  // ADR-097 admin codes
+  invalid_freeze_dates: "admErrInvalidFreezeDates",
+  freeze_in_past: "admErrFreezeInPast",
+  freeze_not_included: "admErrFreezeNotIncluded",
+  freeze_overlaps: "admErrFreezeOverlaps",
+  freeze_allowance_exceeded: "admErrFreezeAllowanceExceeded",
+  freeze_already_cancelled: "admErrFreezeAlreadyCancelled",
+  package_commitment_active: "admErrPackageCommitmentActive",
 };
 
 const ADMIN_ASSIGNMENT_ERROR_KEYS: Record<string, string> = {
@@ -317,6 +338,13 @@ const PACKAGE_RULES = new Set([
 
 const CLASS_TYPE_ALLOWANCE_PREFIX = "class_visits:";
 
+// ADR-097 member allowance labels
+const MEMBER_ALLOWANCE_KEYS: Record<string, string> = {
+  event_visits: "mbAllowanceEventVisits",
+  guest_passes: "mbAllowanceGuestPasses",
+  open_gym_visits: "mbAllowanceOpenGymVisits",
+};
+
 /** Label for an allowance key, including per-class-type allowances (ADR-096). */
 export function allowanceLabel(
   key: string,
@@ -329,6 +357,8 @@ export function allowanceLabel(
       name: classTypeNames?.[id] ?? translate("pkgUnknownClassType"),
     });
   }
+  const memberKey = MEMBER_ALLOWANCE_KEYS[key];
+  if (memberKey) return translate(memberKey);
   return semanticLabel(key, translate);
 }
 

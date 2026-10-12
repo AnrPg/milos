@@ -7,6 +7,22 @@ function payloadUrl(notification: LinkableNotification) {
   return typeof notification.payload.url === "string" ? notification.payload.url : null;
 }
 
+// ADR-097: a promoted waitlist place opens its class; an expiring package
+// opens Billing even when the payload carries no explicit URL.
+function preferredUrl(notification: LinkableNotification) {
+  const slotId = notification.payload.scheduled_class_id;
+  if (notification.type === "booking_waitlist_promoted" && typeof slotId === "string" && slotId) {
+    return `/schedule?open_slot=${encodeURIComponent(slotId)}`;
+  }
+  return null;
+}
+
+function fallbackUrl(notification: LinkableNotification) {
+  if (notification.type === "booking_waitlist_promoted") return "/schedule";
+  if (notification.type === "package_expiring") return "/account/billing";
+  return null;
+}
+
 function localTarget(rawUrl: string) {
   const origin = "http://milos.local";
 
@@ -24,7 +40,7 @@ export function notificationTargetUrl(
   notification: LinkableNotification,
   role: string | null | undefined,
 ) {
-  const rawUrl = payloadUrl(notification);
+  const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = role === "admin" || role === "coach";
 
   if (

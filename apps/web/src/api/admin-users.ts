@@ -203,3 +203,36 @@ export function revokeAdminUserAllowance(token: string, userId: string, entryId:
     { token, method: "POST", body: { reason } },
   );
 }
+
+/** A package freeze; the package end date moves out by `extension_days` (ADR-097). */
+export type MembershipFreeze = {
+  id: string;
+  starts_on: string;
+  ends_on: string;
+  extension_days: number;
+  reason: string;
+  admin_id?: string | null;
+  cancelled_at: string | null;
+  cancel_reason?: string | null;
+};
+
+export async function fetchAdminUserFreezes(token: string, userId: string) {
+  const response = await apiRequest<{ freezes: MembershipFreeze[] }>(`/admin/users/${userId}/freezes`, { token });
+  return response.freezes;
+}
+
+export function createAdminUserFreeze(
+  token: string,
+  userId: string,
+  body: { starts_on: string; ends_on: string; reason: string },
+) {
+  return apiRequest<{ freeze: MembershipFreeze }>(`/admin/users/${userId}/freezes`, { token, method: "POST", body });
+}
+
+export function cancelAdminUserFreeze(token: string, userId: string, freezeId: string, reason?: string) {
+  return apiRequest<{ freeze: MembershipFreeze }>(`/admin/users/${userId}/freezes/${freezeId}/cancel`, {
+    token,
+    method: "POST",
+    body: reason ? { reason } : {},
+  });
+}

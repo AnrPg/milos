@@ -122,6 +122,7 @@ function DashboardDropdown({
         { href: "/admin/users", labelKey: "users", description: i18n("directoryAndPersonProfiles103196f") },
         { href: "/admin/finance", labelKey: "finance", description: i18n("invoicesPaymentsAndCredits3671159") },
         { href: "/admin/class-schedule", labelKey: "classes", description: i18n("slotsBookingsAndAttendanced9c2596") },
+        { href: "/admin/check-in", label: i18n("admCheckInTitle"), description: i18n("admCheckInNavDescription") },
         { href: "/admin/coaching-assignments", labelKey: "personalCoaching", description: i18n("athleteProgrammingBoard954ac27") },
       ],
     },

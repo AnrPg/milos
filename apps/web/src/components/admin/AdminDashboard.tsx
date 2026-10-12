@@ -140,6 +140,7 @@ export function AdminDashboard() {
         { label: i18n("users57f2b18"), href: "/admin/users" },
         { label: i18n("finance1b48d3f"), href: "/admin/finance" },
         { label: i18n("classesed1846a"), href: "/admin/class-schedule" },
+        { label: i18n("admCheckInTitle"), href: "/admin/check-in" },
         { label: i18n("personalCoaching6accdcd"), href: "/admin/coaching-assignments" },
       ],
     },

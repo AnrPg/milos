@@ -27,6 +27,7 @@ import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
+import { LocationSettings } from "@/components/admin/LocationSettings";
 import { TransientHero } from "@/components/TransientHero";
 import { IntegerInput } from "@/components/integer-input";
 
@@ -531,7 +532,7 @@ function financeFormFromSettings(s: FinanceSettings) {
 
 // ADR-096: services the gym offers; the package wizard only shows enabled ones.
 const DEFAULT_PACKAGE_MODULES = ["group_classes", "online_coaching"];
-const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching"] as const;
+const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching", "open_gym", "events"] as const;
 
 function FinanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
@@ -899,20 +900,68 @@ function formatCleanupAmount(record: FinanceCleanupRecord) {
   return new Intl.NumberFormat("el-GR", { style: "currency", currency }).format(cents / 100);
 }
 
+// A number setting where null means "no limit" (ADR-097 booking window and cancellation cutoff).
+function OptionalLimitField({
+  label,
+  hint,
+  value,
+  min,
+  max,
+  fallback,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  value: number | null;
+  min: number;
+  max: number;
+  fallback: number;
+  onChange: (value: number | null) => void;
+}) {
+  const i18n = useUiTranslations();
+  return (
+    <div className="text-sm font-semibold">
+      <span>{label}</span>
+      <div className="mt-2 flex items-center gap-3">
+        <IntegerInput aria-label={label} disabled={value === null} min={min} max={max} emptyValue={min} className="w-28 rounded-xl px-4 py-3 disabled:opacity-40" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={value} onValueChange={(next) => onChange(next ?? min)} />
+        <label className="flex items-center gap-2 text-sm font-normal" style={{ color: "var(--muted)" }}>
+          <input type="checkbox" checked={value === null} onChange={(event) => onChange(event.target.checked ? null : fallback)} />
+          {i18n("admNoLimit")}
+        </label>
+      </div>
+      <p className="mt-1 text-xs font-normal" style={{ color: "var(--dim)" }}>{hint}</p>
+    </div>
+  );
+}
+
+type SchedulingForm = {
+  capacity: number;
+  timeout: number;
+  autoApprove: boolean;
+  windowDays: number | null;
+  cutoffHours: number | null;
+};
+
+function schedulingFormFromSettings(value: SchedulingSettings): SchedulingForm {
+  return {
+    capacity: value.default_capacity,
+    timeout: value.default_booking_timeout_minutes,
+    autoApprove: value.default_auto_approve,
+    windowDays: value.default_booking_window_days ?? null,
+    cutoffHours: value.default_cancellation_cutoff_hours ?? null,
+  };
+}
+
 function SchedulingDefaultsSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const settingsQuery = useQuery({ queryKey: ["admin", "settings"], queryFn: () => fetchAdminSettings(token) });
-  const [form, setForm] = useState({ capacity: 12, timeout: 60, autoApprove: false });
+  const [form, setForm] = useState<SchedulingForm>({ capacity: 12, timeout: 60, autoApprove: false, windowDays: null, cutoffHours: null });
 
   useEffect(() => {
     const value = settingsQuery.data?.scheduling;
     if (value) {
-      queueMicrotask(() => setForm({
-        capacity: value.default_capacity,
-        timeout: value.default_booking_timeout_minutes,
-        autoApprove: value.default_auto_approve,
-      }));
+      queueMicrotask(() => setForm(schedulingFormFromSettings(value)));
     }
   }, [settingsQuery.data?.scheduling]);
 
@@ -921,21 +970,22 @@ function SchedulingDefaultsSection({ token }: { token: string }) {
       default_capacity: form.capacity,
       default_booking_timeout_minutes: form.timeout,
       default_auto_approve: form.autoApprove,
+      default_booking_window_days: form.windowDays,
+      default_cancellation_cutoff_hours: form.cutoffHours,
     } }),
     onSuccess: (data) => queryClient.setQueryData(["admin", "settings"], data),
   });
   const current: SchedulingSettings | undefined = settingsQuery.data?.scheduling;
-  const dirty = Boolean(current) && (
-    current!.default_capacity !== form.capacity ||
-    current!.default_booking_timeout_minutes !== form.timeout ||
-    current!.default_auto_approve !== form.autoApprove
-  );
+  const saved = current ? schedulingFormFromSettings(current) : null;
+  const dirty = Boolean(saved) && (Object.keys(form) as Array<keyof SchedulingForm>).some((key) => form[key] !== saved![key]);
 
   return <div className="grid max-w-3xl gap-4 sm:grid-cols-2">
     <label className="text-sm font-semibold">{i18n("featureDefaultClassCapacity")}<IntegerInput min={1} max={500} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.capacity} onValueChange={(capacity) => setForm({ ...form, capacity: capacity ?? 1 })} /></label>
     <label className="text-sm font-semibold">{i18n("featureDefaultBookingTimeout")}<IntegerInput min={1} max={10080} emptyValue={1} className="mt-2 w-full rounded-xl px-4 py-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }} value={form.timeout} onValueChange={(timeout) => setForm({ ...form, timeout: timeout ?? 1 })} /></label>
+    <OptionalLimitField label={i18n("admBookingWindowDays")} hint={i18n("admBookingWindowHint")} value={form.windowDays} min={1} max={365} fallback={14} onChange={(windowDays) => setForm({ ...form, windowDays })} />
+    <OptionalLimitField label={i18n("admCancellationCutoffHours")} hint={i18n("admCancellationCutoffHint")} value={form.cutoffHours} min={0} max={168} fallback={12} onChange={(cutoffHours) => setForm({ ...form, cutoffHours })} />
     <label className="flex items-center gap-3 text-sm font-semibold"><input type="checkbox" checked={form.autoApprove} onChange={(event) => setForm({ ...form, autoApprove: event.target.checked })} />{i18n("featureAutoApproveClassBookings")}</label>
-    <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => current && setForm({ capacity: current.default_capacity, timeout: current.default_booking_timeout_minutes, autoApprove: current.default_auto_approve })} /></div>
+    <div className="sm:col-span-2"><SaveBar dirty={dirty} pending={save.isPending} success={save.isSuccess} error={save.error} onSave={() => save.mutate()} onReset={() => saved && setForm(saved)} /></div>
   </div>;
 }
 
@@ -1215,6 +1265,15 @@ export function AdminSettingsHub() {
               description={i18n("scheduleClassificationAndFiltersc6f2df8")}
             >
               <ClassTypeSettings token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection
+              id="locations"
+              title={i18n("admLocationsTitle")}
+              description={i18n("admLocationsDescription")}
+              defaultOpen={false}
+            >
+              <LocationSettings token={token} />
             </CollapsibleSection>
 
             <CollapsibleSection

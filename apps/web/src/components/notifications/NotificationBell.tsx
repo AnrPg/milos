@@ -165,6 +165,30 @@ function NotificationCard({
       return [nickname, requestedFor, note].filter(Boolean).join(" · ");
     }
 
+    if (notification.type === "booking_waitlist_promoted") {
+      const className =
+        typeof notification.payload.class_name === "string" ? notification.payload.class_name : "";
+      const scheduledAt =
+        typeof notification.payload.scheduled_at === "string" ? notification.payload.scheduled_at : null;
+      const when = scheduledAt && !Number.isNaN(new Date(scheduledAt).getTime())
+        ? formatTimestamp(uiLocale, scheduledAt)
+        : "";
+      const detail = [className, when].filter(Boolean).join(" · ");
+      return notification.payload.status === "pending"
+        ? i18n("mbNotifWaitlistPromotedPendingBody", { class: detail })
+        : i18n("mbNotifWaitlistPromotedBody", { class: detail });
+    }
+
+    if (notification.type === "package_expiring") {
+      const packageName =
+        typeof notification.payload.package_name === "string" ? notification.payload.package_name : "";
+      const endsOn = typeof notification.payload.ends_on === "string" ? notification.payload.ends_on : null;
+      const date = endsOn && !Number.isNaN(new Date(endsOn).getTime())
+        ? new Intl.DateTimeFormat(uiLocale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(endsOn))
+        : "";
+      return i18n("mbNotifPackageExpiringBody", { package: packageName, date });
+    }
+
     if (notification.type === "review_submitted") {
       const rating =
         typeof notification.payload.rating === "number"
@@ -241,6 +265,10 @@ function NotificationCard({
         return i18n("invoiceIssued6a8d8fa");
       case "payment_reminder":
         return i18n("outstandingBalancee9fd5bb");
+      case "booking_waitlist_promoted":
+        return i18n("mbNotifWaitlistPromotedTitle");
+      case "package_expiring":
+        return i18n("mbNotifPackageExpiringTitle");
       default:
         return i18n("notificationc18f8f2");
     }
@@ -332,7 +360,7 @@ type FilterTab = "all" | "workouts" | "bookings";
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
   workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "workout_assignment_requested", "admin_note"],
-  bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout"],
+  bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout", "booking_waitlist_promoted"],
 };
 
 export function NotificationBell() {

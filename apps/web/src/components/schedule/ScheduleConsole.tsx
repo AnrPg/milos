@@ -20,9 +20,11 @@ import {
   updateScheduleSlot,
   type ScheduleBooking,
   type ClassTypeRecord,
+  type ScheduleLocation,
   type ScheduleSlot,
   type ScheduleSlotPayload,
 } from "@/api/schedule";
+import { fetchMyEntitlement, type EffectiveEntitlement } from "@/api/my-finance";
 import { fetchAdminSettings, type SchedulingSettings } from "@/api/settings";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
@@ -32,6 +34,11 @@ import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
+import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
+import { listAdminLocations } from "@/api/facility";
+import { useQuery } from "@tanstack/react-query";
+import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
+import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
@@ -101,6 +108,9 @@ export function ScheduleConsole({
   const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
+  const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null | undefined>(undefined);
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
@@ -116,9 +126,17 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
-  const { role } = useSelectedMembershipRole();
+  const { role, isLoading: roleLoading } = useSelectedMembershipRole();
 
   const isAdmin = role === "admin";
+  // ADR-097: the class editors offer a location only when the gym has one.
+  const adminLocationsQuery = useQuery({
+    queryKey: ["admin", "locations"],
+    queryFn: () => listAdminLocations(tokens!.access_token),
+    enabled: isAdmin && Boolean(tokens?.access_token),
+  });
+  const adminLocations = adminLocationsQuery.data ?? [];
+  const isMemberSurface = !roleLoading && !isAdmin;
   const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
   const title = pageTitle ?? t("title");
 
@@ -141,6 +159,7 @@ export function ScheduleConsole({
 
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
+      setLocations(Array.isArray(window.locations) ? window.locations : []);
       return nextSlots;
     } catch (loadError) {
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
@@ -196,6 +215,26 @@ export function ScheduleConsole({
     };
   }, [isAdmin, tokens?.access_token]);
 
+  // The member's package decides whether guest and open-gym actions appear.
+  useEffect(() => {
+    const accessToken = tokens?.access_token;
+    if (!isMemberSurface || typeof accessToken !== "string") return;
+
+    let cancelled = false;
+
+    void fetchMyEntitlement(accessToken)
+      .then((response) => {
+        if (!cancelled) setEntitlement(response.entitlement);
+      })
+      .catch(() => {
+        if (!cancelled) setEntitlement(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMemberSurface, tokens?.access_token]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (appliedMobileDefault.current) return;
@@ -234,10 +273,23 @@ export function ScheduleConsole({
       setSelectedSlot(null);
       await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToCreateBooking"));
+      setError(
+        requestError instanceof Error
+          ? localizeMemberBookingError(requestError, i18n, locale, "book")
+          : t("failedToCreateBooking"),
+      );
     } finally {
       setBusy(false);
     }
+  }
+
+  // Waitlist and guest changes keep the popup open on the refreshed class.
+  async function refreshSelectedSlot() {
+    const refreshedSlots = await loadSchedule();
+    if (!refreshedSlots) return;
+    setSelectedSlot((current) =>
+      current ? refreshedSlots.find((slot) => slot.id === current.id) ?? current : current,
+    );
   }
 
   async function handleResolve() {
@@ -385,7 +437,7 @@ export function ScheduleConsole({
       setSeriesEditor(null);
       await loadSchedule();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : i18n("featureSeriesCreateFailed"));
+      setError(reason instanceof Error ? localizeError(reason, i18n) : i18n("featureSeriesCreateFailed"));
     } finally {
       setBusy(false);
     }
@@ -403,6 +455,7 @@ export function ScheduleConsole({
         capacity: slot.capacity,
         auto_approve: slot.auto_approve,
         booking_timeout_minutes: slot.booking_timeout_minutes,
+        location_id: slot.location_id ?? null,
       },
     });
   }
@@ -465,9 +518,31 @@ export function ScheduleConsole({
           </div>
         ) : null}
 
+        {isMemberSurface && tokens?.access_token ? (
+          <OpenGymCheckIn accessToken={tokens.access_token} entitlement={entitlement} />
+        ) : null}
+
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
             {error}
+          </div>
+        ) : null}
+
+        {notice ? (
+          <div
+            className="flex items-start justify-between gap-3 rounded-[1.6rem] px-5 py-4 text-sm"
+            role="status"
+            style={{ background: "color-mix(in srgb, var(--info) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--info) 28%, transparent)", color: "var(--text-soft)" }}
+          >
+            <span>{notice}</span>
+            <button
+              className="shrink-0 text-xs font-semibold"
+              style={{ color: "var(--dim)" }}
+              onClick={() => setNotice(null)}
+              type="button"
+            >
+              {common("close")}
+            </button>
           </div>
         ) : null}
 
@@ -479,6 +554,7 @@ export function ScheduleConsole({
           <CalendarView
             days={days}
             isAdmin={isAdmin}
+            locations={locations}
             onCreateSlot={openCreateEditor}
             onSelectSlot={setSelectedSlot}
             slots={schedule}
@@ -497,7 +573,13 @@ export function ScheduleConsole({
             setResolveTarget({ booking, action: "approve" });
           }}
           onBook={() => setBookingTarget(selectedSlot)}
-          onCancelBooking={() => void loadSchedule()}
+          guestsIncluded={includesGuestPasses(entitlement)}
+          locations={locations}
+          onCancelBooking={({ lateCancellation }) => {
+            setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
+            void loadSchedule();
+          }}
+          onSlotChanged={() => void refreshSelectedSlot()}
           onClose={() => setSelectedSlot(null)}
           onDelete={() => void deleteSelectedSlot()}
           onEdit={() => openUpdateEditor(selectedSlot)}
@@ -694,6 +776,17 @@ export function ScheduleConsole({
               {t("autoApproveBookingsForThisSlot")}
             </label>
 
+            <SlotLocationSelect
+              className="mt-4 block space-y-2 text-sm font-semibold"
+              locations={adminLocations}
+              onChange={(locationId) =>
+                setEditor((current) => (current ? { ...current, values: { ...current.values, location_id: locationId } } : current))
+              }
+              selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={editor.values.location_id}
+            />
+
             <div className="mt-6 flex flex-wrap justify-between gap-3">
               {editor.slotId ? (
                 <button
@@ -743,6 +836,7 @@ export function ScheduleConsole({
               <label className="text-sm font-semibold">{i18n("featureTime")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="time" value={seriesEditor.time} onChange={(event) => setSeriesEditor({ ...seriesEditor, time: event.target.value })} /></label>
               <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
+              <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>
             <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>

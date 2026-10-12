@@ -13,6 +13,15 @@ export type AllowanceUsage = {
   remaining: number | "unlimited";
 };
 
+export type EntitlementFreeze = {
+  id?: string;
+  starts_on: string;
+  ends_on: string;
+  extension_days: number;
+  reason: string | null;
+  cancelled_at: string | null;
+};
+
 export type EffectiveEntitlement = {
   status: string;
   enforcement_mode: string;
@@ -20,7 +29,13 @@ export type EffectiveEntitlement = {
     entitlement_version: number;
     channels: string[];
     capabilities: string[];
+    terms?: Record<string, unknown>;
+    time_windows?: unknown[];
   };
+  /** Set while every usable subscription is paused by a freeze (ADR-097). */
+  frozen_until?: string | null;
+  freezes?: EntitlementFreeze[];
+  stacked_subscriptions?: Record<string, unknown>[];
   /** Includes per-class-type keys such as `class_visits:<class type id>` (ADR-096). */
   allowances: Partial<Record<string, AllowanceUsage>>;
   class_type_names?: Record<string, string>;

@@ -35,6 +35,10 @@ export type SchedulingSettings = {
   default_capacity: number;
   default_auto_approve: boolean;
   default_booking_timeout_minutes: number;
+  /** How many days ahead members may book; null means no limit. Packages can override it. */
+  default_booking_window_days?: number | null;
+  /** Hours before a class after which cancelling still uses the visit; null means no cutoff. */
+  default_cancellation_cutoff_hours?: number | null;
   inserted_at?: string | null;
   updated_at?: string | null;
 };
@@ -62,7 +66,16 @@ export type AdminSettingsUpdate = {
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;
-  scheduling?: Partial<Pick<SchedulingSettings, "default_capacity" | "default_auto_approve" | "default_booking_timeout_minutes">>;
+  scheduling?: Partial<
+    Pick<
+      SchedulingSettings,
+      | "default_capacity"
+      | "default_auto_approve"
+      | "default_booking_timeout_minutes"
+      | "default_booking_window_days"
+      | "default_cancellation_cutoff_hours"
+    >
+  >;
 };
 
 export async function fetchAdminSettings(token: string) {

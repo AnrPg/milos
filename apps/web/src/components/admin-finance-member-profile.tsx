@@ -46,6 +46,10 @@ import {
 } from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+import { ChargeCategorySelect } from "@/components/admin/finance/shared/ChargeCategorySelect";
+import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
+import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
+import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
@@ -190,6 +194,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
     service_period_start: "",
     service_period_end: "",
     membership_package_subscription_id: "",
+    charge_category: "",
   });
   const [renewalForm, setRenewalForm] = useState({
     membership_package_subscription_id: "",
@@ -291,7 +296,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   };
 
   const updateMembershipMutation = useMutation({
-    mutationFn: async () =>
+    mutationFn: async (overrideReason?: string) =>
       updateFinanceMember(token!, userId, {
         user_type_snapshot: membershipForm.user_type_snapshot,
         status: membershipForm.status,
@@ -299,9 +304,12 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         starts_on: membershipForm.starts_on || null,
         expires_on: membershipForm.expires_on || null,
         notes: membershipForm.notes,
+        ...(overrideReason ? { commitment_override_reason: overrideReason } : {}),
       }),
     onSuccess: invalidateMember,
   });
+  // ADR-097: ending a membership inside its minimum commitment needs a reason.
+  const membershipCommitment = commitmentConflict(updateMembershipMutation.error);
 
   const assignPackageMutation = useMutation({
     mutationFn: async () =>
@@ -367,12 +375,17 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
   const createInvoiceMutation = useMutation({
     mutationFn: async () =>
       createFinanceInvoice(token!, userId, {
-        amount_cents: Math.round(Number(invoiceForm.amount || 0) * 100),
-        description: invoiceForm.description,
+        ...manualInvoiceBody({
+          amountCents: Math.round(Number(invoiceForm.amount || 0) * 100),
+          description: invoiceForm.description,
+          dueDate: invoiceForm.due_date,
+          subscriptionId: invoiceForm.membership_package_subscription_id,
+          chargeCategory: invoiceForm.charge_category,
+          fallbackDescription: isChargeCategory(invoiceForm.charge_category) ? i18n(CHARGE_CATEGORY_LABEL_KEYS[invoiceForm.charge_category]) : "",
+        }),
         due_date: invoiceForm.due_date || null,
         service_period_start: invoiceForm.service_period_start || null,
         service_period_end: invoiceForm.service_period_end || null,
-        membership_package_subscription_id: invoiceForm.membership_package_subscription_id || undefined,
       }),
     onSuccess: async () => {
       setInvoiceForm({
@@ -382,6 +395,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
         service_period_start: "",
         service_period_end: "",
         membership_package_subscription_id: "",
+        charge_category: "",
       });
       await invalidateMember();
     },
@@ -518,7 +532,7 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
               className="space-y-3"
               onSubmit={(event) => {
                 event.preventDefault();
-                updateMembershipMutation.mutate();
+                updateMembershipMutation.mutate(undefined);
               }}
             >
               <Select
@@ -564,7 +578,16 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 onChange={(notes) => setMembershipOverrides({ ...membershipOverrides, notes })}
               />
               <SubmitButton pending={updateMembershipMutation.isPending}>{i18n("saveMembership592a509")}</SubmitButton>
-              <ErrorText error={updateMembershipMutation.error} />
+              {membershipCommitment ? (
+                <CommitmentOverridePrompt
+                  endsOn={membershipCommitment.endsOn}
+                  pending={updateMembershipMutation.isPending}
+                  onConfirm={(reason) => updateMembershipMutation.mutate(reason)}
+                  onCancel={() => updateMembershipMutation.reset()}
+                />
+              ) : (
+                <ErrorText error={updateMembershipMutation.error} />
+              )}
             </form>
           </Panel>
 
@@ -749,6 +772,16 @@ export function AdminFinanceMemberProfile({ userId }: { userId: string }) {
                 }}
               />
               <Input label={i18n("description55f8ebc")} value={invoiceForm.description} onChange={(description) => setInvoiceForm({ ...invoiceForm, description })} />
+              {!invoiceForm.membership_package_subscription_id ? (
+                <label className="block space-y-1 text-sm font-semibold">
+                  <span>{i18n("admChargeCategory")}</span>
+                  <ChargeCategorySelect
+                    className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
+                    value={invoiceForm.charge_category}
+                    onChange={(charge_category) => setInvoiceForm({ ...invoiceForm, charge_category })}
+                  />
+                </label>
+              ) : null}
               <Input label={i18n("dueDate4c1aeeb")} required={false} type="date" value={invoiceForm.due_date} onChange={(due_date) => setInvoiceForm({ ...invoiceForm, due_date })} />
               <div className="grid gap-3 md:grid-cols-2">
                 <Input label={i18n("serviceStarts2bacd5f")} required={false} type="date" value={invoiceForm.service_period_start} onChange={(service_period_start) => setInvoiceForm({ ...invoiceForm, service_period_start })} />

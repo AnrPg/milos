@@ -61,4 +61,34 @@ describe("notificationTargetUrl", () => {
       ),
     ).toBeNull();
   });
+
+  it("opens the promoted class from a waitlist promotion", () => {
+    expect(
+      notificationTargetUrl(
+        {
+          type: "booking_waitlist_promoted",
+          payload: { url: "/schedule", scheduled_class_id: "slot-9", booking_id: "booking-1" },
+        },
+        "member",
+      ),
+    ).toBe("/schedule?open_slot=slot-9");
+  });
+
+  it("falls back to the schedule for a waitlist promotion without a class id", () => {
+    expect(
+      notificationTargetUrl({ type: "booking_waitlist_promoted", payload: {} }, "member"),
+    ).toBe("/schedule");
+  });
+
+  it("links an expiring package to billing", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "package_expiring", payload: { url: "/account/billing", package_name: "Gold" } },
+        "member",
+      ),
+    ).toBe("/account/billing");
+    expect(
+      notificationTargetUrl({ type: "package_expiring", payload: { package_name: "Gold" } }, "member"),
+    ).toBe("/account/billing");
+  });
 });

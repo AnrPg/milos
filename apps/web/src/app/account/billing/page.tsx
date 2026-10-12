@@ -19,6 +19,7 @@ import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
   visibleBillingChannels,
+  visibleBillingFreezes,
 } from "@/app/account/billing/billing-entitlement-visibility";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -587,12 +588,24 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
   if (!entitlement?.plan) return null;
   const allowanceEntries = visibleBillingAllowances(entitlement.allowances);
   const channels = visibleBillingChannels(entitlement.plan.channels);
+  const freezes = visibleBillingFreezes(entitlement.freezes ?? []);
   return (
     <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("yourPackageBenefitsb75c7f4")}</h2>
         <StatusBadge status={entitlement.status} />
       </div>
+      {entitlement.frozen_until ? (
+        <div
+          className="mt-4 rounded-xl px-4 py-3"
+          style={{ background: "color-mix(in srgb, var(--info) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--info) 30%, transparent)" }}
+        >
+          <p className="text-sm font-semibold" style={{ color: "var(--info)" }}>
+            {i18n("mbPausedUntil", { date: formatDate(uiLocale, entitlement.frozen_until) })}
+          </p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>{i18n("mbPausedExplainer")}</p>
+        </div>
+      ) : null}
       <div className="mt-4 flex flex-wrap gap-2">
         {channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
       </div>
@@ -606,6 +619,25 @@ function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | 
           </div>
         ) : null)}
       </div>
+      {freezes.length > 0 ? (
+        <div className="mt-4">
+          <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--dim)" }}>{i18n("mbFreezesTitle")}</p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {freezes.map((freeze) => (
+              <li
+                key={freeze.id ?? `${freeze.starts_on}-${freeze.ends_on}`}
+                className="flex flex-wrap items-center justify-between gap-2 text-xs"
+                style={{ color: "var(--text-soft)" }}
+              >
+                <span>{i18n("mbFreezeRange", { start: formatDate(uiLocale, freeze.starts_on), end: formatDate(uiLocale, freeze.ends_on) })}</span>
+                {freeze.extension_days > 0 ? (
+                  <span style={{ color: "var(--success)" }}>{i18n("mbFreezeExtension", { days: freeze.extension_days })}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </section>
   );
 }
