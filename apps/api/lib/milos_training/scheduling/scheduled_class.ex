@@ -15,6 +15,8 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
     field :capacity, :integer
     field :auto_approve, :boolean, default: false
     field :booking_timeout_minutes, :integer, default: 60
+    # ADR-097: optional Facility location.
+    field :location_id, :binary_id
 
     belongs_to :class_type, ClassType
     belongs_to :class_series, ClassSeries
@@ -30,6 +32,7 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
       :organization_id,
       :master_workout_id,
       :class_type_id,
+      :location_id,
       :class_series_id,
       :name,
       :duration_minutes,
@@ -56,6 +59,7 @@ defmodule MilosTraining.Scheduling.ScheduledClass do
     |> validate_future_schedule()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:class_type_id)
+    |> foreign_key_constraint(:location_id)
     |> foreign_key_constraint(:class_series_id)
   end
 

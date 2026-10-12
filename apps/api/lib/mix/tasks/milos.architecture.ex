@@ -71,6 +71,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     wellbeing/wellbeing_store
     notifications/notification_store
     coaching/coaching_store
+    facility/facility_store
   )
 
   defp tenant_scope_violations do

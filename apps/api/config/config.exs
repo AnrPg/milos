@@ -62,6 +62,10 @@ config :milos_training,
 config :milos_training, :coaching_store, MilosTraining.Infrastructure.Coaching.EctoCoachingStore
 
 config :milos_training,
+       :facility_store,
+       MilosTraining.Infrastructure.Facility.EctoFacilityStore
+
+config :milos_training,
        :execution_store,
        MilosTraining.Infrastructure.Execution.EctoExecutionStore
 
