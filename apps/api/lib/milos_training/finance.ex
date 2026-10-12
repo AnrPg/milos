@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance do
-  alias MilosTraining.Finance.FinanceStore
+  alias MilosTraining.Finance.{Commands, FinanceStore, Queries}
 
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: FinanceStore.with_tenant_context(context, fun)
@@ -384,6 +384,86 @@ defmodule MilosTraining.Finance do
 
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
+
+  # ADR-108 refund receipts, payment-provider reconciliation and accounting
+  # exports. All of them attach to the append-only payment/reversal facts.
+  defdelegate list_refund_receipts(filters), to: Queries.ListRefundReceipts, as: :call
+
+  def list_refund_receipts(context, filters),
+    do: scoped(context, fn -> list_refund_receipts(filters) end)
+
+  defdelegate get_refund_receipt(id), to: Queries.GetRefundReceipt, as: :call
+  def get_refund_receipt(context, id), do: scoped(context, fn -> get_refund_receipt(id) end)
+
+  defdelegate get_refund_receipt_for_reversal(reversal_id),
+    to: Queries.GetRefundReceipt,
+    as: :for_reversal
+
+  def get_refund_receipt_for_reversal(context, reversal_id),
+    do: scoped(context, fn -> get_refund_receipt_for_reversal(reversal_id) end)
+
+  defdelegate record_reconciliation_line(params, actor_id),
+    to: Commands.RecordReconciliationLine,
+    as: :call
+
+  def record_reconciliation_line(context, params, actor_id),
+    do: scoped(context, fn -> record_reconciliation_line(params, actor_id) end)
+
+  defdelegate list_reconciliation_records(filters),
+    to: Queries.ListReconciliationRecords,
+    as: :call
+
+  def list_reconciliation_records(context, filters),
+    do: scoped(context, fn -> list_reconciliation_records(filters) end)
+
+  defdelegate get_reconciliation_record(id), to: Queries.GetReconciliationRecord, as: :call
+
+  def get_reconciliation_record(context, id),
+    do: scoped(context, fn -> get_reconciliation_record(id) end)
+
+  defdelegate reconciliation_candidates(id), to: Queries.ReconciliationCandidates, as: :call
+
+  def reconciliation_candidates(context, id),
+    do: scoped(context, fn -> reconciliation_candidates(id) end)
+
+  defdelegate match_reconciliation_record(id, target_type, target_id, attrs),
+    to: Commands.MatchReconciliationRecord,
+    as: :call
+
+  def match_reconciliation_record(context, id, target_type, target_id, attrs),
+    do: scoped(context, fn -> match_reconciliation_record(id, target_type, target_id, attrs) end)
+
+  defdelegate unmatch_reconciliation_record(id, attrs),
+    to: Commands.UnmatchReconciliationRecord,
+    as: :call
+
+  def unmatch_reconciliation_record(context, id, attrs),
+    do: scoped(context, fn -> unmatch_reconciliation_record(id, attrs) end)
+
+  defdelegate create_accounting_export(attrs), to: Commands.CreateAccountingExport, as: :call
+
+  def create_accounting_export(context, attrs),
+    do: scoped(context, fn -> create_accounting_export(attrs) end)
+
+  defdelegate update_accounting_export(id, attrs), to: Commands.UpdateAccountingExport, as: :call
+
+  def update_accounting_export(context, id, attrs),
+    do: scoped(context, fn -> update_accounting_export(id, attrs) end)
+
+  defdelegate get_accounting_export(id), to: Queries.GetAccountingExport, as: :call
+  def get_accounting_export(context, id), do: scoped(context, fn -> get_accounting_export(id) end)
+
+  defdelegate list_accounting_exports(filters), to: Queries.ListAccountingExports, as: :call
+
+  def list_accounting_exports(context, filters),
+    do: scoped(context, fn -> list_accounting_exports(filters) end)
+
+  defdelegate accounting_export_rows(range_start, range_end),
+    to: Queries.AccountingExportRows,
+    as: :call
+
+  def accounting_export_rows(context, range_start, range_end),
+    do: scoped(context, fn -> accounting_export_rows(range_start, range_end) end)
 
   # ADR-107 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
