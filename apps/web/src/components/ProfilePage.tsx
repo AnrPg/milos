@@ -142,6 +142,8 @@ export function ProfilePage() {
     function syncFromHash() {
       if (window.location.hash === "#vault") setProfileTab("vault");
     }
+    // Client-side navigation can set the hash after the first render.
+    syncFromHash();
     window.addEventListener("hashchange", syncFromHash);
     return () => window.removeEventListener("hashchange", syncFromHash);
   }, []);

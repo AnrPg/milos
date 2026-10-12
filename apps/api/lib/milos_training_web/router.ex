@@ -207,6 +207,7 @@ defmodule MilosTrainingWeb.Router do
     post("/form-reviews", CoachingExtrasController, :submit_form_review)
     post("/form-reviews/:id/withdraw", CoachingExtrasController, :withdraw_form_review)
     get("/nutrition-plan", CoachingExtrasController, :my_nutrition_plan)
+    get("/corporate-enrollment", PaymentModelsController, :enrollment_offer)
     post("/corporate-enrollment", PaymentModelsController, :enroll)
     get("/appointments/slots", AppointmentsController, :offered_slots)
     get("/appointments", AppointmentsController, :my_appointments)

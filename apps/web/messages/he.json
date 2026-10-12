@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "הערכות שנותרו:",
     "clUnlimited": "ללא הגבלה",
     "clCorporateTitle": "תוכנית חברה",
-    "clCorporateIntro": "אם למעסיק שלך יש תוכנית עם המכון הזה, הצטרף אליה עם הקוד שקיבלת. החברה משלמת על המקום שלך.",
-    "clCorporateCode": "קוד הצטרפות",
-    "clCorporateJoin": "הצטרפות עם קוד",
     "clCorporateJoining": "מצטרף…",
-    "clCorporateByEmail": "הצטרפות עם המייל של העבודה",
-    "clCorporateByEmailHelp": "אין קוד? חלק מתוכניות החברה מצרפות לפי הדומיין של המייל בחשבון שלך.",
     "clCorporateJoined": "הצטרפת. תוכנית החברה שלך פעילה עכשיו.",
     "clErrFormReviewClosed": "הבדיקה הזו כבר נסגרה.",
     "clErrApptCancelled": "המועד הזה בוטל.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "סרטונים",
     "stfVoid": "ביטול",
     "stfWeek": "שבוע",
-    "stfWriteReview": "כתיבת משוב"
+    "stfWriteReview": "כתיבת משוב",
+    "semanticPersonalTraining": "אימון אישי",
+    "semanticDigitalContent": "תוכן דיגיטלי",
+    "semanticNutrition": "תזונה",
+    "mbAllowancePtSessions": "אימונים אישיים",
+    "mbAllowanceAssessments": "הערכות כושר",
+    "mbAllowanceFormReviews": "משובי טכניקה",
+    "clCorporateInviteIntro": "המעסיק שלך הזמין אותך לתוכנית שהוא משלם עליה (קוד {code}).",
+    "clCorporateOfferIntro": "{company} משלמת על תוכנית במכון הזה לבעלי כתובת הדוא״ל של העבודה שלך.",
+    "clCorporateJoinCompany": "הצטרפות לתוכנית החברה",
+    "stfCopyEnrollmentLink": "העתקת קישור הרשמה",
+    "stfEnrollmentLinkCopied": "הקישור הועתק",
+    "stfEnrollmentLinkHelp": "שלחו את הקישור לעובדי החברה. החברים רואים את תוכנית החברה רק כשהם פותחים אותו, או כשכתובת הדוא״ל של העבודה שלהם תואמת לדומיין של התוכנית."
   }
 }

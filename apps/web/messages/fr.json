@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Bilans restants :",
     "clUnlimited": "Illimité",
     "clCorporateTitle": "Offre entreprise",
-    "clCorporateIntro": "Si ton employeur a une offre avec cette salle, rejoins-la avec le code qu'il t'a donné. L'entreprise paie ta place.",
-    "clCorporateCode": "Code d'inscription",
-    "clCorporateJoin": "Rejoindre avec le code",
     "clCorporateJoining": "Inscription…",
-    "clCorporateByEmail": "Rejoindre avec mon e-mail pro",
-    "clCorporateByEmailHelp": "Pas de code ? Certaines offres entreprise t'inscrivent selon le domaine de l'e-mail de ton compte.",
     "clCorporateJoined": "C'est fait. Ton offre entreprise est active.",
     "clErrFormReviewClosed": "Cette analyse est déjà clôturée.",
     "clErrApptCancelled": "Ce créneau a été annulé.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Vidéos",
     "stfVoid": "Annuler",
     "stfWeek": "Semaine",
-    "stfWriteReview": "Rédiger l'analyse"
+    "stfWriteReview": "Rédiger l'analyse",
+    "semanticPersonalTraining": "Coaching personnel",
+    "semanticDigitalContent": "Contenu numérique",
+    "semanticNutrition": "Nutrition",
+    "mbAllowancePtSessions": "Séances de coaching personnel",
+    "mbAllowanceAssessments": "Bilans de forme",
+    "mbAllowanceFormReviews": "Analyses de technique",
+    "clCorporateInviteIntro": "Votre employeur vous invite à une formule qu'il prend en charge (code {code}).",
+    "clCorporateOfferIntro": "{company} prend en charge une formule dans cette salle pour les personnes ayant votre e-mail professionnel.",
+    "clCorporateJoinCompany": "Rejoindre la formule entreprise",
+    "stfCopyEnrollmentLink": "Copier le lien d'inscription",
+    "stfEnrollmentLinkCopied": "Lien copié",
+    "stfEnrollmentLinkHelp": "Envoyez ce lien aux salariés de l'entreprise. Les membres ne voient la formule entreprise qu'en l'ouvrant, ou si leur e-mail professionnel correspond au domaine de la formule."
   }
 }

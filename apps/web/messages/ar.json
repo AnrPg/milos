@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "التقييمات المتبقية:",
     "clUnlimited": "غير محدود",
     "clCorporateTitle": "خطة الشركة",
-    "clCorporateIntro": "إذا كان لدى جهة عملك خطة مع هذا النادي، فانضم إليها بالرمز الذي أعطوك إياه. تدفع الشركة تكلفة مقعدك.",
-    "clCorporateCode": "رمز التسجيل",
-    "clCorporateJoin": "انضم بالرمز",
     "clCorporateJoining": "جارٍ الانضمام…",
-    "clCorporateByEmail": "انضم ببريد العمل",
-    "clCorporateByEmailHelp": "ليس لديك رمز؟ بعض خطط الشركات تسجّلك حسب نطاق بريد حسابك.",
     "clCorporateJoined": "تم الانضمام. خطة شركتك نشطة الآن.",
     "clErrFormReviewClosed": "هذه المراجعة مغلقة بالفعل.",
     "clErrApptCancelled": "أُلغيت هذه الجلسة.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "الفيديوهات",
     "stfVoid": "إلغاء",
     "stfWeek": "أسبوع",
-    "stfWriteReview": "كتابة المراجعة"
+    "stfWriteReview": "كتابة المراجعة",
+    "semanticPersonalTraining": "التدريب الشخصي",
+    "semanticDigitalContent": "المحتوى الرقمي",
+    "semanticNutrition": "التغذية",
+    "mbAllowancePtSessions": "جلسات التدريب الشخصي",
+    "mbAllowanceAssessments": "تقييمات اللياقة",
+    "mbAllowanceFormReviews": "مراجعات الأداء الفني",
+    "clCorporateInviteIntro": "دعاك صاحب العمل إلى خطة يدفع ثمنها (الرمز {code}).",
+    "clCorporateOfferIntro": "تدفع {company} ثمن خطة في هذه الصالة لمن لديهم بريد العمل الخاص بك.",
+    "clCorporateJoinCompany": "الانضمام إلى خطة الشركة",
+    "stfCopyEnrollmentLink": "نسخ رابط التسجيل",
+    "stfEnrollmentLinkCopied": "تم نسخ الرابط",
+    "stfEnrollmentLinkHelp": "أرسل هذا الرابط إلى موظفي الشركة. لا يرى الأعضاء خطة الشركة إلا عند فتحه، أو عندما يطابق بريد العمل الخاص بهم نطاق الخطة."
   }
 }

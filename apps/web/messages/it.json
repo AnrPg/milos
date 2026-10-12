@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Valutazioni rimaste:",
     "clUnlimited": "Illimitate",
     "clCorporateTitle": "Piano aziendale",
-    "clCorporateIntro": "Se la tua azienda ha un piano con questa palestra, aderisci con il codice che ti ha dato. Il tuo posto lo paga l'azienda.",
-    "clCorporateCode": "Codice di adesione",
-    "clCorporateJoin": "Aderisci con codice",
     "clCorporateJoining": "Adesione…",
-    "clCorporateByEmail": "Aderisci con l'email di lavoro",
-    "clCorporateByEmailHelp": "Nessun codice? Alcuni piani aziendali ti iscrivono in base al dominio dell'email del tuo account.",
     "clCorporateJoined": "Fatto. Il tuo piano aziendale è attivo.",
     "clErrFormReviewClosed": "Questa revisione è già chiusa.",
     "clErrApptCancelled": "Questa sessione è stata annullata.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Video",
     "stfVoid": "Annulla",
     "stfWeek": "Settimana",
-    "stfWriteReview": "Scrivi revisione"
+    "stfWriteReview": "Scrivi revisione",
+    "semanticPersonalTraining": "Personal training",
+    "semanticDigitalContent": "Contenuti digitali",
+    "semanticNutrition": "Nutrizione",
+    "mbAllowancePtSessions": "Sessioni di personal training",
+    "mbAllowanceAssessments": "Valutazioni fisiche",
+    "mbAllowanceFormReviews": "Revisioni della tecnica",
+    "clCorporateInviteIntro": "Il tuo datore di lavoro ti ha invitato a un piano pagato da lui (codice {code}).",
+    "clCorporateOfferIntro": "{company} paga un piano in questa palestra per chi ha la tua email aziendale.",
+    "clCorporateJoinCompany": "Aderisci al piano aziendale",
+    "stfCopyEnrollmentLink": "Copia link di adesione",
+    "stfEnrollmentLinkCopied": "Link copiato",
+    "stfEnrollmentLinkHelp": "Invia questo link ai dipendenti dell'azienda. I membri vedono il piano aziendale solo aprendolo o se la loro email di lavoro corrisponde al dominio del piano."
   }
 }

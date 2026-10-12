@@ -14109,6 +14109,49 @@
       }
     },
     "/api/org/{organization_slug}/me/corporate-enrollment": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PaymentModelsController.enrollment_offer",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "offer": {
+                      "nullable": true,
+                      "properties": {
+                        "company_name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "company_name"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "offer"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Offer"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A company plan my account email qualifies for, if any",
+        "tags": [
+          "Payment models"
+        ]
+      },
       "post": {
         "callbacks": {},
         "operationId": "MilosTrainingWeb.PaymentModelsController.enroll",

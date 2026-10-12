@@ -23,6 +23,7 @@ import {
   type CorporatePaymentMethod,
 } from "@/api/payment-models";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
+import { companyEnrollmentLink } from "@/components/client/corporate-enrollment";
 import { useSession } from "@/components/session-provider";
 import {
   centsToInput,
@@ -705,6 +706,7 @@ function ClientCard({ client }: { client: CorporateClient }) {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
   const refresh = () => queryClient.invalidateQueries({ queryKey: CLIENTS_KEY, exact: true });
   const update = useMutation({
     mutationFn: (body: { regenerate_code?: boolean; status?: "active" | "archived" }) => updateCorporateClient(token, client.id, body),
@@ -762,6 +764,21 @@ function ClientCard({ client }: { client: CorporateClient }) {
           <div className="flex flex-wrap gap-2">
             <button className={secondaryButtonClass} onClick={() => setEditing((value) => !value)} style={secondaryButtonStyle} type="button">
               {editing ? i18n("cancel77dfd21") : i18n("edit5301648")}
+            </button>
+            <button
+              className={secondaryButtonClass}
+              onClick={() => {
+                const link = companyEnrollmentLink(window.location.origin, client.enrollment_code);
+                void navigator.clipboard?.writeText(link).then(
+                  () => setLinkCopied(true),
+                  () => window.prompt(i18n("stfCopyEnrollmentLink"), link),
+                );
+              }}
+              style={secondaryButtonStyle}
+              title={i18n("stfEnrollmentLinkHelp")}
+              type="button"
+            >
+              {linkCopied ? i18n("stfEnrollmentLinkCopied") : i18n("stfCopyEnrollmentLink")}
             </button>
             <button
               className={secondaryButtonClass}

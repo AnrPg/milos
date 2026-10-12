@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Resterende assessments:",
     "clUnlimited": "Onbeperkt",
     "clCorporateTitle": "Bedrijfsplan",
-    "clCorporateIntro": "Heeft je werkgever een plan bij deze sportschool, sluit je dan aan met de code die je kreeg. Het bedrijf betaalt je plek.",
-    "clCorporateCode": "Inschrijvingscode",
-    "clCorporateJoin": "Aansluiten met code",
     "clCorporateJoining": "Aansluiten…",
-    "clCorporateByEmail": "Aansluiten met mijn werkmail",
-    "clCorporateByEmailHelp": "Geen code? Sommige bedrijfsplannen schrijven je in op basis van het domein van je account-e-mail.",
     "clCorporateJoined": "Gelukt. Je bedrijfsplan is nu actief.",
     "clErrFormReviewClosed": "Deze beoordeling is al gesloten.",
     "clErrApptCancelled": "Deze sessie is geannuleerd.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Video's",
     "stfVoid": "Laten vervallen",
     "stfWeek": "Week",
-    "stfWriteReview": "Beoordeling schrijven"
+    "stfWriteReview": "Beoordeling schrijven",
+    "semanticPersonalTraining": "Personal training",
+    "semanticDigitalContent": "Digitale content",
+    "semanticNutrition": "Voeding",
+    "mbAllowancePtSessions": "Personal-trainingsessies",
+    "mbAllowanceAssessments": "Fitnesstests",
+    "mbAllowanceFormReviews": "Techniekfeedback",
+    "clCorporateInviteIntro": "Je werkgever heeft je uitgenodigd voor een abonnement dat hij betaalt (code {code}).",
+    "clCorporateOfferIntro": "{company} betaalt een abonnement bij deze sportschool voor mensen met jouw werk-e-mailadres.",
+    "clCorporateJoinCompany": "Lid worden van bedrijfsabonnement",
+    "stfCopyEnrollmentLink": "Inschrijflink kopiëren",
+    "stfEnrollmentLinkCopied": "Link gekopieerd",
+    "stfEnrollmentLinkHelp": "Stuur deze link naar de medewerkers van het bedrijf. Leden zien het bedrijfsabonnement alleen als ze de link openen of als hun werk-e-mail bij het domein van het abonnement past."
   }
 }

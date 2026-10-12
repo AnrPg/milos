@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Оставащи оценки:",
     "clUnlimited": "Неограничени",
     "clCorporateTitle": "Фирмен план",
-    "clCorporateIntro": "Ако работодателят ти има план с тази зала, присъедини се с кода, който ти е дал. Мястото ти се плаща от фирмата.",
-    "clCorporateCode": "Код за записване",
-    "clCorporateJoin": "Присъедини се с код",
     "clCorporateJoining": "Присъединяване…",
-    "clCorporateByEmail": "Присъедини се с работния ми имейл",
-    "clCorporateByEmailHelp": "Нямаш код? Някои фирмени планове те записват по домейна на имейла в профила ти.",
     "clCorporateJoined": "Готово. Фирменият ти план вече е активен.",
     "clErrFormReviewClosed": "Този преглед вече е приключен.",
     "clErrApptCancelled": "Този час е отменен.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Видеа",
     "stfVoid": "Анулирай",
     "stfWeek": "Седмица",
-    "stfWriteReview": "Напиши преглед"
+    "stfWriteReview": "Напиши преглед",
+    "semanticPersonalTraining": "Персонални тренировки",
+    "semanticDigitalContent": "Дигитално съдържание",
+    "semanticNutrition": "Хранене",
+    "mbAllowancePtSessions": "Персонални тренировки",
+    "mbAllowanceAssessments": "Фитнес оценки",
+    "mbAllowanceFormReviews": "Прегледи на техниката",
+    "clCorporateInviteIntro": "Работодателят ви ви покани в план, който плаща той (код {code}).",
+    "clCorporateOfferIntro": "{company} плаща план в тази зала за хората с вашия служебен имейл.",
+    "clCorporateJoinCompany": "Присъедини се към фирмения план",
+    "stfCopyEnrollmentLink": "Копирай линка за записване",
+    "stfEnrollmentLinkCopied": "Линкът е копиран",
+    "stfEnrollmentLinkHelp": "Изпратете този линк на служителите на фирмата. Членовете виждат фирмения план само когато го отворят или когато служебният им имейл съвпада с домейна на плана."
   }
 }

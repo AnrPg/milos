@@ -171,6 +171,9 @@ const SEMANTIC_KEYS: Record<string, string> = {
   in_person: "semanticInPerson",
   events: "semanticEvents",
   facility: "semanticFacility",
+  personal_training: "semanticPersonalTraining",
+  digital_content: "semanticDigitalContent",
+  nutrition: "semanticNutrition",
   waitlisted: "semanticWaitlisted",
   mixed: "semanticMixed",
   personal_programming: "semanticPersonalProgramming",
@@ -346,6 +349,10 @@ const MEMBER_ALLOWANCE_KEYS: Record<string, string> = {
   event_visits: "mbAllowanceEventVisits",
   guest_passes: "mbAllowanceGuestPasses",
   open_gym_visits: "mbAllowanceOpenGymVisits",
+  // ADR-098
+  pt_sessions: "mbAllowancePtSessions",
+  assessments: "mbAllowanceAssessments",
+  form_reviews: "mbAllowanceFormReviews",
 };
 
 /** Label for an allowance key, including per-class-type allowances (ADR-096). */

@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Осталось тестирований:",
     "clUnlimited": "Без ограничений",
     "clCorporateTitle": "Корпоративный план",
-    "clCorporateIntro": "Если у вашего работодателя есть план в этом клубе, присоединитесь к нему по выданному коду. Ваше место оплачивает компания.",
-    "clCorporateCode": "Код подключения",
-    "clCorporateJoin": "Присоединиться по коду",
     "clCorporateJoining": "Подключение…",
-    "clCorporateByEmail": "Присоединиться по рабочей почте",
-    "clCorporateByEmailHelp": "Нет кода? Некоторые корпоративные планы подключают по домену почты вашего аккаунта.",
     "clCorporateJoined": "Готово. Корпоративный план активирован.",
     "clErrFormReviewClosed": "Этот разбор уже закрыт.",
     "clErrApptCancelled": "Это занятие отменено.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Видео",
     "stfVoid": "Аннулировать",
     "stfWeek": "Неделя",
-    "stfWriteReview": "Написать разбор"
+    "stfWriteReview": "Написать разбор",
+    "semanticPersonalTraining": "Персональные тренировки",
+    "semanticDigitalContent": "Цифровой контент",
+    "semanticNutrition": "Питание",
+    "mbAllowancePtSessions": "Персональные тренировки",
+    "mbAllowanceAssessments": "Фитнес-тестирования",
+    "mbAllowanceFormReviews": "Разборы техники",
+    "clCorporateInviteIntro": "Работодатель пригласил вас в оплачиваемый им план (код {code}).",
+    "clCorporateOfferIntro": "{company} оплачивает план в этом зале для сотрудников с вашим рабочим адресом почты.",
+    "clCorporateJoinCompany": "Подключиться к плану компании",
+    "stfCopyEnrollmentLink": "Скопировать ссылку для подключения",
+    "stfEnrollmentLinkCopied": "Ссылка скопирована",
+    "stfEnrollmentLinkHelp": "Отправьте эту ссылку сотрудникам компании. Участники видят план компании, только открыв её или если их рабочая почта совпадает с доменом плана."
   }
 }

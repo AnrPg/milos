@@ -10,6 +10,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/components/session-provider";
 import { TransientHero } from "@/components/TransientHero";
 import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollmentCard";
@@ -288,8 +289,17 @@ function InvoiceRow({
 export default function BillingPage() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
-  const { tokens } = useSession();
+  const { tokens, status } = useSession();
   const accessToken = tokens?.access_token ?? null;
+  const router = useRouter();
+
+  // Guests sign in first and come back here, query string included (a
+  // company enrollment link carries its code in it).
+  useEffect(() => {
+    if (status === "guest") {
+      router.replace(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+    }
+  }, [router, status]);
 
   const [finance, setFinance] = useState<MyFinanceData | null>(null);
   const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null>(null);

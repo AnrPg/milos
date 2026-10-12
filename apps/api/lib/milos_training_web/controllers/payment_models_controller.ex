@@ -348,6 +348,31 @@ defmodule MilosTrainingWeb.PaymentModelsController do
 
   # Member
 
+  operation(:enrollment_offer,
+    summary: "A company plan my account email qualifies for, if any",
+    responses: [
+      ok:
+        {"Offer", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             offer: %Schema{
+               type: :object,
+               nullable: true,
+               properties: %{company_name: %Schema{type: :string}},
+               required: [:company_name]
+             }
+           },
+           required: [:offer]
+         }}
+    ]
+  )
+
+  def enrollment_offer(conn, _params) do
+    actor = GuardianPlug.current_resource(conn)
+    json(conn, %{offer: EnrollCorporateSeat.offer(conn.assigns.tenant_context, actor)})
+  end
+
   operation(:enroll,
     summary: "Join my company's corporate plan with its code, or by my email domain",
     request_body:

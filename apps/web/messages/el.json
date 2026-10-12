@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Υπόλοιπες αξιολογήσεις:",
     "clUnlimited": "Απεριόριστες",
     "clCorporateTitle": "Εταιρικό πρόγραμμα",
-    "clCorporateIntro": "Αν ο εργοδότης σου έχει πρόγραμμα με αυτό το γυμναστήριο, εγγράψου με τον κωδικό που σου έδωσε. Τη θέση σου την πληρώνει η εταιρεία.",
-    "clCorporateCode": "Κωδικός εγγραφής",
-    "clCorporateJoin": "Εγγραφή με κωδικό",
     "clCorporateJoining": "Εγγραφή…",
-    "clCorporateByEmail": "Εγγραφή με το εταιρικό μου email",
-    "clCorporateByEmailHelp": "Δεν έχεις κωδικό; Ορισμένα εταιρικά προγράμματα σε εγγράφουν με βάση το domain του email του λογαριασμού σου.",
     "clCorporateJoined": "Μπήκες. Το εταιρικό σου πρόγραμμα είναι πλέον ενεργό.",
     "clErrFormReviewClosed": "Αυτή η αξιολόγηση έχει ήδη κλείσει.",
     "clErrApptCancelled": "Αυτή η συνεδρία ακυρώθηκε.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Βίντεο",
     "stfVoid": "Ακύρωση",
     "stfWeek": "Εβδομάδα",
-    "stfWriteReview": "Σύνταξη σχολίων"
+    "stfWriteReview": "Σύνταξη σχολίων",
+    "semanticPersonalTraining": "Προσωπική προπόνηση",
+    "semanticDigitalContent": "Ψηφιακό περιεχόμενο",
+    "semanticNutrition": "Διατροφή",
+    "mbAllowancePtSessions": "Συνεδρίες προσωπικής προπόνησης",
+    "mbAllowanceAssessments": "Αξιολογήσεις φυσικής κατάστασης",
+    "mbAllowanceFormReviews": "Αξιολογήσεις τεχνικής",
+    "clCorporateInviteIntro": "Ο εργοδότης σας σάς προσκάλεσε σε πρόγραμμα που πληρώνει ο ίδιος (κωδικός {code}).",
+    "clCorporateOfferIntro": "Η {company} πληρώνει πρόγραμμα σε αυτό το γυμναστήριο για όσους έχουν το εταιρικό σας email.",
+    "clCorporateJoinCompany": "Ένταξη στο εταιρικό πρόγραμμα",
+    "stfCopyEnrollmentLink": "Αντιγραφή συνδέσμου εγγραφής",
+    "stfEnrollmentLinkCopied": "Ο σύνδεσμος αντιγράφηκε",
+    "stfEnrollmentLinkHelp": "Στείλτε αυτόν τον σύνδεσμο στους υπαλλήλους της εταιρείας. Τα μέλη βλέπουν το εταιρικό πρόγραμμα μόνο όταν τον ανοίξουν ή όταν το εταιρικό τους email ταιριάζει με το domain του προγράμματος."
   }
 }

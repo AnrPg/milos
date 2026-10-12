@@ -1186,7 +1186,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** A company plan my account email qualifies for, if any */
+        get: operations["MilosTrainingWeb.PaymentModelsController.enrollment_offer"];
         put?: never;
         /** Join my company's corporate plan with its code, or by my email domain */
         post: operations["MilosTrainingWeb.PaymentModelsController.enroll"];
@@ -9082,6 +9083,30 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PaymentModelsController.enrollment_offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Offer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        offer: {
+                            company_name: string;
+                        } | null;
                     };
                 };
             };

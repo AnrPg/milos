@@ -241,6 +241,17 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
 
     {outsider, _} = member()
 
+    offer = fn user ->
+      conn
+      |> put_bearer_token(user)
+      |> get("#{base}/me/corporate-enrollment")
+      |> json_response(200)
+      |> Map.fetch!("offer")
+    end
+
+    assert offer.(employee) == %{"company_name" => "Acme"}
+    assert offer.(outsider) == nil
+
     seat =
       conn
       |> put_bearer_token(employee)
@@ -249,6 +260,7 @@ defmodule MilosTrainingWeb.PaymentModelsControllerTest do
       |> Map.fetch!("seat")
 
     assert :book_classes in capabilities(employee)
+    assert offer.(employee) == nil
 
     assert %{"code" => "corporate_enrollment_not_found"} =
              conn

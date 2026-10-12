@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Assessments left:",
     "clUnlimited": "Unlimited",
     "clCorporateTitle": "Company plan",
-    "clCorporateIntro": "If your employer has a plan with this gym, join it with the code they gave you. The company pays for your seat.",
-    "clCorporateCode": "Enrollment code",
-    "clCorporateJoin": "Join with code",
     "clCorporateJoining": "Joining…",
-    "clCorporateByEmail": "Join with my work email",
-    "clCorporateByEmailHelp": "No code? Some company plans enroll you by your account email's domain.",
     "clCorporateJoined": "You're in. Your company plan is now active.",
     "clErrFormReviewClosed": "This review is already closed.",
     "clErrApptCancelled": "This session was cancelled.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Videos",
     "stfVoid": "Void",
     "stfWeek": "Week",
-    "stfWriteReview": "Write review"
+    "stfWriteReview": "Write review",
+    "semanticPersonalTraining": "Personal training",
+    "semanticDigitalContent": "Digital content",
+    "semanticNutrition": "Nutrition",
+    "mbAllowancePtSessions": "Personal training sessions",
+    "mbAllowanceAssessments": "Fitness assessments",
+    "mbAllowanceFormReviews": "Form reviews",
+    "clCorporateInviteIntro": "Your employer invited you to a plan they pay for (code {code}).",
+    "clCorporateOfferIntro": "{company} pays for a plan at this gym for people with your work email.",
+    "clCorporateJoinCompany": "Join company plan",
+    "stfCopyEnrollmentLink": "Copy enrollment link",
+    "stfEnrollmentLinkCopied": "Link copied",
+    "stfEnrollmentLinkHelp": "Send this link to the company's employees. Members only see the company plan when they open it, or when their work email matches the plan's domain."
   }
 }

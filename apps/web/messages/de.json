@@ -3283,12 +3283,7 @@
     "clApptRemainingAssessments": "Verbleibende Assessments:",
     "clUnlimited": "Unbegrenzt",
     "clCorporateTitle": "Firmenplan",
-    "clCorporateIntro": "Wenn dein Arbeitgeber einen Plan mit diesem Studio hat, tritt ihm mit dem erhaltenen Code bei. Die Firma bezahlt deinen Platz.",
-    "clCorporateCode": "Anmeldecode",
-    "clCorporateJoin": "Mit Code beitreten",
     "clCorporateJoining": "Wird beigetreten…",
-    "clCorporateByEmail": "Mit meiner Arbeits-E-Mail beitreten",
-    "clCorporateByEmailHelp": "Kein Code? Manche Firmenpläne melden dich über die Domain deiner Konto-E-Mail an.",
     "clCorporateJoined": "Geschafft. Dein Firmenplan ist jetzt aktiv.",
     "clErrFormReviewClosed": "Dieser Check ist bereits abgeschlossen.",
     "clErrApptCancelled": "Dieser Termin wurde abgesagt.",
@@ -3538,6 +3533,18 @@
     "stfVideosTitle": "Videos",
     "stfVoid": "Stornieren",
     "stfWeek": "Woche",
-    "stfWriteReview": "Analyse schreiben"
+    "stfWriteReview": "Analyse schreiben",
+    "semanticPersonalTraining": "Personal Training",
+    "semanticDigitalContent": "Digitale Inhalte",
+    "semanticNutrition": "Ernährung",
+    "mbAllowancePtSessions": "Personal-Training-Einheiten",
+    "mbAllowanceAssessments": "Fitness-Checks",
+    "mbAllowanceFormReviews": "Technik-Feedback",
+    "clCorporateInviteIntro": "Ihr Arbeitgeber hat Sie zu einem von ihm bezahlten Tarif eingeladen (Code {code}).",
+    "clCorporateOfferIntro": "{company} bezahlt in diesem Studio einen Tarif für Personen mit Ihrer geschäftlichen E-Mail-Adresse.",
+    "clCorporateJoinCompany": "Firmentarif beitreten",
+    "stfCopyEnrollmentLink": "Anmeldelink kopieren",
+    "stfEnrollmentLinkCopied": "Link kopiert",
+    "stfEnrollmentLinkHelp": "Senden Sie diesen Link an die Mitarbeitenden. Mitglieder sehen den Firmentarif nur, wenn sie ihn öffnen oder ihre geschäftliche E-Mail zur Domain des Tarifs passt."
   }
 }

@@ -1,37 +1,54 @@
 "use client";
 
 import { useId, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { enrollCorporateSeat } from "@/api/my-finance";
+import { enrollCorporateSeat, fetchCorporateEnrollmentOffer } from "@/api/my-finance";
 import { useSession } from "@/components/session-provider";
 import { clientErrorMessage } from "@/components/client/errors";
+import { companyCodeFromSearch } from "@/components/client/corporate-enrollment";
 import { CLIENT_ENTITLEMENT_QUERY_KEY } from "@/components/client/use-client-entitlement";
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
- * "Company plan" (ADR-098): employees join their company's corporate plan
- * with its enrollment code, or without a code when the plan enrolls by the
- * account email's domain.
+ * Company plan enrollment (ADR-098). Company-paid plans are rare, so the card
+ * stays hidden unless it applies: the member opened the enrollment link their
+ * employer shared (`?company_code=`), or their account email matches an
+ * email-domain plan they have not joined yet.
  */
 export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => void }) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
+  const token = tokens?.access_token;
   const queryClient = useQueryClient();
   const id = useId();
-  const [code, setCode] = useState("");
+  // The billing page renders behind the signed-in session, on the client.
+  const [linkCode] = useState(() =>
+    typeof window === "undefined" ? null : companyCodeFromSearch(window.location.search),
+  );
   const [joined, setJoined] = useState(false);
+
+  const offer = useQuery({
+    queryKey: ["my", "corporate-enrollment-offer"],
+    queryFn: () => fetchCorporateEnrollmentOffer(token!),
+    enabled: Boolean(token),
+    staleTime: 5 * 60_000,
+  });
+
   const enroll = useMutation({
-    mutationFn: (withCode: string | null) => enrollCorporateSeat(tokens!.access_token, withCode),
+    mutationFn: (code: string | null) => enrollCorporateSeat(token!, code),
     onSuccess: () => {
       setJoined(true);
-      setCode("");
+      if (linkCode) window.history.replaceState(null, "", window.location.pathname);
       void queryClient.invalidateQueries({ queryKey: CLIENT_ENTITLEMENT_QUERY_KEY });
       void queryClient.invalidateQueries({ queryKey: ["my", "finance"] });
+      void queryClient.invalidateQueries({ queryKey: ["my", "corporate-enrollment-offer"] });
       onEnrolled?.();
     },
   });
-  const busy = enroll.isPending || !tokens?.access_token;
+
+  const companyName = offer.data?.company_name ?? null;
+  if (!joined && !linkCode && !companyName) return null;
 
   return (
     <section
@@ -42,9 +59,6 @@ export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => voi
       <h2 id={`${id}-title`} className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>
         {i18n("clCorporateTitle")}
       </h2>
-      <p className="text-xs" style={{ color: "var(--dim)" }}>
-        {i18n("clCorporateIntro")}
-      </p>
 
       {joined ? (
         <p role="status" className="text-sm font-semibold" style={{ color: "var(--success)" }}>
@@ -52,50 +66,20 @@ export function CorporateEnrollmentCard({ onEnrolled }: { onEnrolled?: () => voi
         </p>
       ) : (
         <>
-          <form
-            className="flex flex-col gap-2 sm:flex-row sm:items-end"
-            onSubmit={(event) => {
-              event.preventDefault();
-              if (code.trim()) enroll.mutate(code);
-            }}
-          >
-            <div className="flex-1">
-              <label htmlFor={`${id}-code`} className="mb-1 block text-xs font-semibold" style={{ color: "var(--muted)" }}>
-                {i18n("clCorporateCode")}
-              </label>
-              <input
-                id={`${id}-code`}
-                value={code}
-                autoComplete="off"
-                autoCapitalize="characters"
-                spellCheck={false}
-                maxLength={64}
-                onChange={(event) => setCode(event.target.value)}
-                className="w-full rounded-lg px-3 py-2 font-mono text-sm outline-none"
-                style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
-              />
-            </div>
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>
+            {linkCode
+              ? i18n("clCorporateInviteIntro", { code: linkCode })
+              : i18n("clCorporateOfferIntro", { company: companyName ?? "" })}
+          </p>
+          <div>
             <button
-              type="submit"
-              disabled={busy || !code.trim()}
+              type="button"
+              disabled={enroll.isPending || !token}
+              onClick={() => enroll.mutate(linkCode)}
               className="rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
               style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
-              {enroll.isPending && enroll.variables ? i18n("clCorporateJoining") : i18n("clCorporateJoin")}
-            </button>
-          </form>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs" style={{ color: "var(--dim)" }}>
-              {i18n("clCorporateByEmailHelp")}
-            </span>
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => enroll.mutate(null)}
-              className="rounded-lg px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            >
-              {enroll.isPending && !enroll.variables ? i18n("clCorporateJoining") : i18n("clCorporateByEmail")}
+              {enroll.isPending ? i18n("clCorporateJoining") : i18n("clCorporateJoinCompany")}
             </button>
           </div>
           {enroll.isError ? (

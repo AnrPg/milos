@@ -116,6 +116,11 @@ report will narrow this later (TD-054).
   corporate client (company name, billing contact). Employees enroll with the
   client's enrollment code, or automatically when `terms.enrollment =
   email_domain` and their account email matches `terms.enrollment_domain`.
+  Company-paid plans are rare, so members are never shown a company plan
+  prompt by default: the card appears only when a member opens the
+  enrollment link an admin copies for the client (`?company_code=`, kept
+  through sign-in), or when their account email matches an email-domain plan
+  they have not joined (`GET /me/corporate-enrollment`).
   Enrollment creates a seat subscription paid by the company, limited to
   `terms.seats` active seats. The company is invoiced per period through a
   separate corporate invoice: `seat_billing = agreed` bills all seats,

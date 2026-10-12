@@ -94,6 +94,14 @@ export type CorporateSeat =
  * Join my company's corporate plan (ADR-098). With a code the matching client
  * is used; without one the API matches my account email's domain.
  */
+/** A company plan the account email qualifies for (ADR-098), or null. */
+export async function fetchCorporateEnrollmentOffer(token: string) {
+  const data = await apiRequest<{ offer: { company_name: string } | null }>("/me/corporate-enrollment", {
+    token,
+  });
+  return data.offer;
+}
+
 export async function enrollCorporateSeat(token: string, code?: string | null) {
   const trimmed = code?.trim();
   return apiRequest<{ seat: CorporateSeat }>("/me/corporate-enrollment", {
