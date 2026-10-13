@@ -32,6 +32,14 @@ defmodule MilosTraining.Analytics do
   def list_recorded_dedupe_keys(event_name, keys),
     do: AnalyticsStore.list_recorded_dedupe_keys(event_name, keys)
 
+  @doc """
+  `{event_name, source_context_id}` pairs recorded in the current tenant for
+  `event_names` whose metadata `source_context_id` is one of
+  `source_context_ids` (TD-088: ready-screen injury warnings per execution).
+  """
+  def list_events_for_source_contexts(event_names, source_context_ids),
+    do: AnalyticsStore.list_events_for_source_contexts(event_names, source_context_ids)
+
   defdelegate record_notification_click(params), to: RecordNotificationClick, as: :call
   defdelegate record_push_attempt(params), to: RecordPushAttempt, as: :call
   defdelegate record_attendance(context, params), to: RecordAttendance, as: :call

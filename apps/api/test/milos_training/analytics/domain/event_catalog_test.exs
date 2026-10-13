@@ -170,5 +170,51 @@ defmodule MilosTraining.Analytics.Domain.EventCatalogTest do
       assert attrs.metadata["had_active_injury"] == true
       assert attrs.metadata["injury_warning_level"] == "caution"
     end
+
+    test "the injury allowlist keeps the evaluated scale level (TD-088)" do
+      assert "scale_level_slug" in EventCatalog.injury_warning_metadata_keys()
+
+      assert {:ok, attrs} =
+               EventCatalog.build("injury_warning_shown", %{organization_id: @org}, nil, %{
+                 context_id: @subject,
+                 metadata: %{audience: "self", surface: "pre_start", scale_level_slug: "scaled"}
+               })
+
+      assert attrs.metadata["scale_level_slug"] == "scaled"
+    end
+
+    test "abandonment and training-log events accept the injury facts (TD-088)" do
+      keys = EventCatalog.injury_segmentation_keys()
+
+      for key <- ~w(had_active_injury injury_warning_level injury_warning_shown
+                    injury_warning_acknowledged) do
+        assert key in keys
+      end
+
+      metadata = %{
+        had_active_injury: true,
+        injury_warning_level: "avoid",
+        injury_warning_shown: true,
+        injury_warning_acknowledged: false
+      }
+
+      assert {:ok, abandoned} =
+               EventCatalog.build("workout_execution_abandoned", nil, %{id: @subject}, %{
+                 organization_id: @org,
+                 metadata: metadata
+               })
+
+      assert abandoned.metadata["injury_warning_shown"] == true
+      assert abandoned.metadata["injury_warning_acknowledged"] == false
+
+      assert {:ok, logged} =
+               EventCatalog.build("training_log_entry_logged", nil, %{id: @subject}, %{
+                 organization_id: @org,
+                 metadata: Map.take(metadata, [:had_active_injury, :injury_warning_level])
+               })
+
+      assert logged.metadata["had_active_injury"] == true
+      assert logged.metadata["injury_warning_level"] == "avoid"
+    end
   end
 end

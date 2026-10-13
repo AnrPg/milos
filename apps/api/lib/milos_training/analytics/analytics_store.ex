@@ -14,6 +14,9 @@ defmodule MilosTraining.Analytics.AnalyticsStore do
   def list_recorded_dedupe_keys(event_name, keys),
     do: adapter().list_recorded_dedupe_keys(event_name, keys)
 
+  def list_events_for_source_contexts(event_names, source_context_ids),
+    do: adapter().list_events_for_source_contexts(event_names, source_context_ids)
+
   def record_notification_click(params), do: adapter().record_notification_click(params)
   def record_push_attempt(params), do: adapter().record_push_attempt(params)
   def record_attendance(params), do: adapter().record_attendance(params)
