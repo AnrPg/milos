@@ -416,6 +416,17 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         select: %{organization_id: invitation.organization_id}
       )
 
+    # Once an owner or admin is an active member the gym is running, even if
+    # another operator invitation is still open.
+    active_operators =
+      from(membership in OrganizationMembership,
+        where:
+          membership.status == :active and
+            fragment("? && ARRAY['owner', 'admin']::varchar[]", membership.roles),
+        distinct: membership.organization_id,
+        select: %{organization_id: membership.organization_id}
+      )
+
     Organization
     |> join(:left, [organization], settings in OrganizationSetting,
       on: settings.organization_id == organization.id
@@ -423,11 +434,15 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> join(:left, [organization], pending in subquery(pending_initial_operator_invitations),
       on: pending.organization_id == organization.id
     )
+    |> join(:left, [organization], operator in subquery(active_operators),
+      on: operator.organization_id == organization.id
+    )
     |> order_by([organization, _settings], asc: organization.name)
-    |> select([organization, settings, pending], %{
+    |> select([organization, settings, pending, operator], %{
       organization: organization,
       settings: settings,
-      pending_registration: not is_nil(pending.organization_id)
+      pending_registration:
+        not is_nil(pending.organization_id) and is_nil(operator.organization_id)
     })
     |> Repo.all()
   end

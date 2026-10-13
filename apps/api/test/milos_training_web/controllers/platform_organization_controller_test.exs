@@ -189,6 +189,28 @@ defmodule MilosTrainingWeb.PlatformOrganizationControllerTest do
       |> Enum.find(&(&1["organization"]["id"] == organization_id))
 
     assert entry["pending_registration"] == false
+
+    # A second operator invitation left open does not make a running gym pending.
+    assert context.conn
+           |> recycle()
+           |> put_bearer_token(context.platform_user)
+           |> post("/api/platform/organizations/#{organization_id}/invitations", %{
+             role: "admin",
+             lifetime_seconds: 3_600
+           })
+           |> json_response(201)
+
+    reinvited_index =
+      context.conn
+      |> recycle()
+      |> put_bearer_token(context.platform_user)
+      |> get("/api/platform/organizations")
+
+    entry =
+      json_response(reinvited_index, 200)["organizations"]
+      |> Enum.find(&(&1["organization"]["id"] == organization_id))
+
+    assert entry["pending_registration"] == false
   end
 
   test "the provisioned initial admin invitation registers a client through the setup link endpoint",
