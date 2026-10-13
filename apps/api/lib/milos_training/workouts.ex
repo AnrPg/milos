@@ -78,6 +78,11 @@ defmodule MilosTraining.Workouts do
     to: ListWorkoutChangeTargets,
     as: :for_workout
 
+  # TD-092: assignments are tenant rows; publish/delete fanout reads them in the
+  # gym's scope (unscoped, nobody assigned the workout was ever notified).
+  def list_workout_change_targets(context, workout_id),
+    do: with_tenant_context(context, fn -> list_workout_change_targets(workout_id) end)
+
   defdelegate list_assigned_workouts_for_athlete(athlete_id, start_date, end_date),
     to: GetAthleteWeekView,
     as: :for_athlete

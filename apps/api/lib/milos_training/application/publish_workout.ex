@@ -8,7 +8,7 @@ defmodule MilosTraining.Application.PublishWorkout do
     substitute_for = parse_substitute_for(params)
     substitute_context = load_substitute_context(context, substitute_for)
 
-    assignment_targets = Workouts.list_workout_change_targets(id)
+    assignment_targets = Workouts.list_workout_change_targets(context, id)
     booking_targets = Scheduling.list_workout_change_targets(context, id)
     slot_ids = Scheduling.list_slot_ids_for_workout(context, id)
     is_republish = assignment_targets != [] or booking_targets != []

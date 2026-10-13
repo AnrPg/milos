@@ -19,6 +19,8 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
   alias MilosTraining.Application.{
     AdminRecordAttendance,
+    AssignWorkout,
+    DeleteWorkout,
     LogTrainingEntry,
     ResolveBooking,
     SubmitBooking,
@@ -400,6 +402,39 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
       assert {:ok, _booking} = SubmitBooking.call(ctx.member_ctx, ctx.member, later.id)
     end)
+  end
+
+  describe "workout change fanout to assigned athletes" do
+    test "deleting a workout tells the athletes it was assigned to" do
+      {owner_ctx, athlete, workout} =
+        bypass_rls(fn ->
+          owner = user_fixture()
+          athlete = user_fixture(%{role: :athlete})
+          {:ok, gym} = Organizations.create_organization(%{name: "Fanout Gym"})
+          add!(gym, owner, :owner)
+          add!(gym, athlete, :athlete)
+          owner_ctx = tenant!(owner, gym)
+          workout = workout_fixture(owner, %{tenant_context: owner_ctx})
+
+          {:ok, _assignment} =
+            AssignWorkout.call(owner_ctx, %{
+              master_workout_id: workout.id,
+              athlete_ids: [athlete.id],
+              scheduled_for: Date.utc_today()
+            })
+
+          {owner_ctx, athlete, workout}
+        end)
+
+      clear_session!()
+      assert :ok = DeleteWorkout.call(owner_ctx, workout.id)
+
+      types =
+        bypass_rls(fn -> Notifications.list_for_user(athlete.id) end)
+        |> Enum.map(&to_string(&1.type))
+
+      assert "workout_deleted" in types
+    end
   end
 
   describe "materialized view refresh as the runtime (non-owner) role" do

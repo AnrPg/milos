@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
 
   def call(%{organization_id: _} = context, id) do
     with %{id: ^id} = workout <- Workouts.get_workout_for_admin(context, id),
-         assignment_targets <- Workouts.list_workout_change_targets(id),
+         assignment_targets <- Workouts.list_workout_change_targets(context, id),
          booking_targets <- Scheduling.list_workout_change_targets(context, id),
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(context, id),
          :ok <- Scheduling.delete_class_series_for_workout(context, id),
