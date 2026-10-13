@@ -1,7 +1,14 @@
 defmodule MilosTraining.Application.GetAdminAnalyticsSummary do
   alias MilosTraining.{Analytics, Coaching, Execution, Feedback, Finance, Wellbeing}
 
-  def call(params \\ %{}) do
+  # TD-092: every summary reads tenant facts, so the whole dashboard is built
+  # in the gym's scope. Unscoped, each read was empty under the production
+  # runtime role and the dashboard showed zeros.
+  def call(context, params) do
+    Analytics.with_tenant_context(context, fn -> build(params) end)
+  end
+
+  defp build(params) do
     analytics = Analytics.analytics_summary(params)
     finance = Finance.financial_summary(params)
     coaching = Coaching.get_aggregates()
