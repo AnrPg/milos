@@ -14,11 +14,11 @@ import Link from "next/link";
 
 import { fetchAdminAnalyticsSummary } from "@/api/analytics";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { HelpTooltip } from "@/components/HelpTooltip";
 import { ExecutionKpiDashboard } from "@/components/admin/ExecutionKpiDashboard";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
 function asRecord(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" ? (value as Record<string, unknown>) : {};
@@ -189,22 +189,14 @@ export function AdminAnalytics({ section = "overview" }: { section?: AnalyticsSe
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-6xl space-y-8">
-        <TransientHero collapsedTitle={copy.eyebrow} label={i18n("analyticsIntroductiond80c96b")} timeoutMs={3000}>
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{copy.eyebrow}</p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight md:text-4xl">{copy.title}</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--muted)]">
-            {copy.body}
-          </p>
-          <Link
-            className="mt-5 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-            href={adminHref("/admin/metrics", organizationSlug)}
-            style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}
-          >
-            {i18n("analyticsMarketing0ecf7f0")}
-          </Link>
-        </section>
-        </TransientHero>
+        <PageHeader
+          title={copy.title}
+          actions={
+            <Link href={adminHref("/admin/metrics", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+              {i18n("analyticsMarketing0ecf7f0")}
+            </Link>
+          }
+        />
 
         {summaryQuery.error instanceof Error ? (
           <p className="rounded-2xl border border-[color:var(--danger)] bg-[color-mix(in_srgb,var(--danger)_15%,transparent)] p-4 text-sm text-[var(--danger)]">

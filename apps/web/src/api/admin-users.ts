@@ -118,11 +118,15 @@ export type AdminUserMessageThread = {
   latest_message: null | { body: string; inserted_at: string; sender_id: string };
 };
 
-export function fetchAdminUsers(token: string, params: { q?: string; role?: string } = {}) {
+export function fetchAdminUsers(
+  token: string,
+  params: { q?: string; role?: string; offset?: number; limit?: number } = {},
+) {
   const query = new URLSearchParams();
   if (params.q) query.set("q", params.q);
   if (params.role) query.set("role", params.role);
-  query.set("limit", "50");
+  query.set("limit", String(params.limit ?? 50));
+  if (params.offset) query.set("offset", String(params.offset));
 
   return apiRequest<{
     users: AdminUserDirectoryEntry[];

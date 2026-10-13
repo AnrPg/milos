@@ -219,3 +219,30 @@ msgstr "Stock baixo"
 
 msgid "%{item}: %{quantity} left."
 msgstr "%{item}: restam %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "A sua subscrição termina em breve"
+
+msgid "Your subscription has ended"
+msgstr "A sua subscrição terminou"
+
+msgid "your subscription"
+msgstr "a sua subscrição"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} termina a %{date} (daqui a %{days} dias). Renove para continuar a reservar aulas."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} terminou. Mantém o acesso até %{date}; renove antes disso para continuar a reservar aulas."
+
+msgid "Your access has ended"
+msgstr "O seu acesso terminou"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "O seu acesso está suspenso porque há um pagamento em atraso. Pague o saldo em dívida para voltar a reservar aulas."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "O seu acesso terminou. Renove a subscrição para voltar a reservar aulas."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "As suas próximas reservas foram canceladas: %{count}."

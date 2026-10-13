@@ -19,12 +19,9 @@ import {
   revokeAdminUserAllowance,
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
-  type AdminUserExecution,
   type AdminUserFinance,
   type AdminUserPR,
 } from "@/api/admin-users";
-import type { DurationAdjustment } from "@/api/executions";
-import { formatClock } from "@/components/workouts/execution/TimerDisplay";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
@@ -52,6 +49,9 @@ import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
 import { IntegerInput } from "@/components/integer-input";
+import { TrainingHistory } from "@/components/history/TrainingHistory";
+import { defaultHistoryKind } from "@/lib/training-history";
+import { fetchUserTrainingHistory } from "@/api/training-history";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -199,55 +199,6 @@ function PRCard({ pr }: { pr: AdminUserPR }) {
         </div>
       ) : null}
     </DetailCard>
-  );
-}
-
-function ExecutionCard({ item, href }: { item: AdminUserExecution; href?: string }) {
-  const i18n = useUiTranslations();
-
-  return (
-    <DetailCard
-      title={item.workout_title}
-      meta={<><SemanticLabel value={item.status} /> · <SemanticLabel value={item.source} /> · {date(item.started_at_utc)}</>}
-      value={item.total_elapsed_ms ? `${Math.round(item.total_elapsed_ms / 60000)}m` : undefined}
-      href={href}
-    >
-      <ClockAdjustments adjustments={item.duration_adjustments} />
-      {item.section_scores?.length ? (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {item.section_scores.slice(0, 6).map((score, index) => (
-            <p key={`${item.id}-${index}`} className="text-xs">
-              <span style={{ color: "var(--muted)" }}>{valueText(score.section_name ?? score["section_name"])}:</span>{" "}
-              <LocalizedScore value={score.value ?? score["value"] ?? "—"} unit={valueText(score.unit ?? score["unit"])} />
-            </p>
-          ))}
-        </div>
-      ) : (
-        <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>
-      )}
-    </DetailCard>
-  );
-}
-
-/** "AMRAP 12: 12:00 → 14:00 (+2:00)" for each clock the athlete changed. */
-function ClockAdjustments({ adjustments }: { adjustments?: Record<string, DurationAdjustment> }) {
-  const i18n = useUiTranslations();
-  const entries = Object.values(adjustments ?? {}).filter((entry) => entry && entry.delta_seconds);
-  if (entries.length === 0) return null;
-
-  return (
-    <ul className="mb-2 grid gap-1 text-xs" aria-label={i18n("clockAdjustmentsLabel")} style={{ color: "var(--warning, var(--muted))" }}>
-      {entries.map((entry, index) => (
-        <li key={index}>
-          {i18n("clockAdjustedLabel", {
-            name: entry.section_name || entry.label || "—",
-            from: formatClock(entry.authored_seconds),
-            to: formatClock(entry.authored_seconds + entry.delta_seconds),
-            delta: `${entry.delta_seconds > 0 ? "+" : "−"}${formatClock(Math.abs(entry.delta_seconds))}`,
-          })}
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -621,11 +572,18 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
-          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href={adminHref("/admin/workouts", organizationSlug)}><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/workouts", organizationSlug)} />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
+
+          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? (
+            <TrainingHistory
+              id="training_history"
+              queryKey={["admin", "users", userId]}
+              fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
+              defaultKind={defaultHistoryKind(profile.identity.role)}
+            />
+          ) : null}
 
           {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.visibility === "coach_role_required" ? <Empty>{tPrSharing("dossierCoachOnly")}</Empty> : prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 
-          {sections.has("scores") ? <Panel id="scores" title={i18n("scores126cb93")}><div className="grid gap-3">{scores.length ? scores.slice(0, 10).map((score, index) => <GenericRecordCard key={`${String(score.execution_id)}-${index}`} title={String(score.section_name ?? i18n("workoutSection881e276"))} meta={`${date(score.completed_at_utc)} · ${String(score.workout_title ?? "—")}`} value={<LocalizedScore value={score.value ?? "—"} unit={valueText(score.unit)} />} />) : <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>}</div></Panel> : null}
 
           {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
@@ -635,7 +593,6 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
 
-          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href={adminHref("/admin/class-schedule", organizationSlug)}><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/class-schedule", organizationSlug)} />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 
           {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 

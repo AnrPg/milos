@@ -218,4 +218,30 @@ msgid "Running low"
 msgstr ""
 
 msgid "%{item}: %{quantity} left."
+
+msgid "Your subscription ends soon"
+msgstr ""
+
+msgid "Your subscription has ended"
+msgstr ""
+
+msgid "your subscription"
+msgstr ""
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr ""
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr ""
+
+msgid "Your access has ended"
+msgstr ""
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr ""
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr ""
+
+msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr ""

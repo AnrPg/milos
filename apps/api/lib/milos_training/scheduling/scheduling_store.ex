@@ -134,6 +134,10 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def get_booking_execution_access(_booking_id, _user_id), do: missing_tenant()
 
   @impl true
+  def list_class_history(context, user_id, opts),
+    do: tenant_call(context, :list_class_history, [user_id, opts])
+
+  @impl true
   def record_attendance(context, params), do: tenant_call(context, :record_attendance, [params])
   def record_attendance(_params), do: missing_tenant()
 

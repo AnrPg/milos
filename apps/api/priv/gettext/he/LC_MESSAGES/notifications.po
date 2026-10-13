@@ -219,3 +219,30 @@ msgstr "מלאי נמוך"
 
 msgid "%{item}: %{quantity} left."
 msgstr "%{item}: נותרו %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "המנוי שלך מסתיים בקרוב"
+
+msgid "Your subscription has ended"
+msgstr "המנוי שלך הסתיים"
+
+msgid "your subscription"
+msgstr "המנוי שלך"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} מסתיים ב־%{date} (בעוד %{days} ימים). חדשו כדי להמשיך להזמין שיעורים."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} הסתיים. הגישה נשמרת עד %{date}; חדשו עד אז כדי להמשיך להזמין שיעורים."
+
+msgid "Your access has ended"
+msgstr "הגישה שלך הסתיימה"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "הגישה שלך מושהית בגלל תשלום באיחור. שלמו את היתרה כדי להזמין שיעורים שוב."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "הגישה שלך הסתיימה. חדשו את המנוי כדי להזמין שיעורים שוב."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "ההזמנות הקרובות שלך בוטלו: %{count}."

@@ -36,7 +36,10 @@ defmodule MilosTraining.Notifications.Notification do
     :inventory_repair_needed,
     :inventory_stock_low,
     :inventory_digest,
-    :coach_note_viewed
+    :coach_note_viewed,
+    :subscription_expiring,
+    :subscription_grace,
+    :access_ended
   ]
 
   schema "notifications" do

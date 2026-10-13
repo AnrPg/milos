@@ -787,6 +787,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/join/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public: describe the organization behind a join link */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.inspect_join_link"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations/{id}": {
         parameters: {
             query?: never;
@@ -1613,6 +1630,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The signed-in user's training log (workouts or booked classes) with performance */
+        get: operations["MilosTrainingWeb.TrainingHistoryController.mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/coach-notes/reads": {
         parameters: {
             query?: never;
@@ -1641,6 +1675,41 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminCoachingController.drill_down"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/join-link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the organization's public join link settings */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.show_join_link"];
+        /** Enable, disable or change the role of the public join link */
+        put: operations["MilosTrainingWeb.OrganizationAccessController.update_join_link"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/tours/{audience}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record that the current account finished a product tour */
+        post: operations["MilosTrainingWeb.MeController.complete_tour"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1819,6 +1888,24 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/onboarding": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get the admin onboarding checklist */
+        get: operations["MilosTrainingWeb.AdminOnboardingController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Complete, skip or reopen a step, dismiss the popup or record the finished tour */
+        patch: operations["MilosTrainingWeb.AdminOnboardingController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/users/{id}/messages": {
@@ -2090,7 +2177,8 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /** List pending invitations of the organization */
+        get: operations["MilosTrainingWeb.OrganizationAccessController.list_invitations"];
         put?: never;
         /** Issue a one-time organization invitation */
         post: operations["MilosTrainingWeb.OrganizationAccessController.issue"];
@@ -2590,6 +2678,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/free-text/analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Read a free-text workout into the canonical schema with actionable issues */
+        post: operations["MilosTrainingWeb.AdminWorkoutFreeTextController.analyze"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/finance/packages/{id}/retire": {
         parameters: {
             query?: never;
@@ -2990,6 +3095,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/memberships/join/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an organization through its public join link */
+        post: operations["MilosTrainingWeb.OrganizationAccessController.join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}/dsl": {
         parameters: {
             query?: never;
@@ -3292,6 +3414,23 @@ export interface paths {
         };
         /** List all members with finance summary */
         get: operations["MilosTrainingWeb.AdminFinanceController.members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/users/{id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A user's training log (workouts or booked classes) with performance */
+        get: operations["MilosTrainingWeb.TrainingHistoryController.for_user"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6394,6 +6533,62 @@ export interface components {
             /** Format: date */
             warranty_until?: string | null;
         };
+        /** FreeTextWorkoutAnalysis */
+        FreeTextWorkoutAnalysis: {
+            issues: {
+                /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                code: string;
+                current_value?: unknown;
+                id: string;
+                /** @description For text_correction: spelling | unit | number | abbreviation | format | ambiguity */
+                kind?: string | null;
+                message?: string | null;
+                params: {
+                    [key: string]: unknown;
+                };
+                /** @description Canonical field path, or "text" for a text-only correction */
+                path: string;
+                required: boolean;
+                /** @enum {string} */
+                severity: "error" | "warning" | "info";
+                suggestion?: {
+                    label?: string | null;
+                    text_edit?: {
+                        find: string;
+                        replace: string;
+                    } | null;
+                    /** @description Canonical value for the issue path */
+                    value?: unknown;
+                } | null;
+            }[];
+            /** @description How much the parser answer had to be repaired against the contract */
+            quality?: {
+                corrections?: number;
+                remaining_violations?: number;
+                repair_attempts?: number;
+                /** @description Whether the structure step (sections and their formats) succeeded before parsing */
+                structure_inferred?: boolean;
+            };
+            suggestions: {
+                field: string;
+                id: string;
+                path: string;
+                reason?: string | null;
+                text_insert?: string | null;
+                value?: unknown;
+            }[];
+            summary: {
+                blocking: number;
+                errors: number;
+                exercises: number;
+                sections: number;
+                warnings: number;
+            };
+            /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd) */
+            workout: {
+                [key: string]: unknown;
+            };
+        };
         /** WorkoutDslManualResponse */
         WorkoutDslManualResponse: {
             markdown: string;
@@ -6568,6 +6763,21 @@ export interface components {
             supply_id: string;
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** AdminOnboardingChecklist */
+        AdminOnboardingChecklist: {
+            completed_count: number;
+            dismissed: boolean;
+            finished: boolean;
+            steps: {
+                auto: boolean;
+                done: boolean;
+                /** @enum {string} */
+                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                skipped: boolean;
+            }[];
+            total: number;
+            tour_completed: boolean;
         };
         /** FinanceReconciliationLineRequest */
         FinanceReconciliationLineRequest: {
@@ -6882,6 +7092,58 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         } | null;
+        /** TrainingHistoryPage */
+        TrainingHistoryPage: {
+            entries: {
+                class?: {
+                    attendance?: string | null;
+                    duration_minutes?: number | null;
+                    name?: string | null;
+                    type_name?: string | null;
+                } | null;
+                id: string;
+                occurred_at?: string | null;
+                performance: {
+                    completed_at?: string | null;
+                    elapsed_ms?: number | null;
+                    execution_id: string;
+                    scale_level_slug?: string | null;
+                    scores: {
+                        score_type?: string | null;
+                        section_id?: string | null;
+                        section_name?: string | null;
+                        unit?: string | null;
+                        value?: unknown;
+                    }[];
+                    started_at?: string | null;
+                    status: string;
+                } | null;
+                source?: string | null;
+                workout: {
+                    id?: string;
+                    sections?: {
+                        exercises?: {
+                            [key: string]: unknown;
+                        }[];
+                        format?: string;
+                        id?: string;
+                        name?: string | null;
+                        nested?: boolean;
+                        score_type?: string | null;
+                        timer_config?: {
+                            [key: string]: unknown;
+                        } | null;
+                    }[];
+                    title?: string | null;
+                    type?: string | null;
+                } | null;
+            }[];
+            /** @enum {string} */
+            kind: "workouts" | "classes";
+            next_offset: number | null;
+            offset: number;
+            total: number;
+        };
         /** ProgressStats */
         ProgressStats: {
             consistency: {
@@ -10207,6 +10469,42 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.inspect_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.revoke": {
         parameters: {
             query?: never;
@@ -12317,6 +12615,10 @@ export interface operations {
                             inserted_at?: string | null;
                             package_modules?: string[];
                             payment_reminder_interval_days: number;
+                            /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                            subscription_expiry_reminder_days: number;
+                            /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                            subscription_grace_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
@@ -12378,6 +12680,10 @@ export interface operations {
                         document_mode?: "invoice" | "receipt";
                         package_modules?: ("group_classes" | "online_coaching" | "open_gym" | "events" | "personal_training" | "digital_content" | "corporate_clients")[];
                         payment_reminder_interval_days?: number;
+                        /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                        subscription_expiry_reminder_days?: number;
+                        /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                        subscription_grace_days?: number;
                     };
                     gamification?: {
                         leaderboard_enabled?: boolean;
@@ -12420,6 +12726,10 @@ export interface operations {
                             inserted_at?: string | null;
                             package_modules?: string[];
                             payment_reminder_interval_days: number;
+                            /** @description Days before a subscription ends to remind the member (0 = no reminder) */
+                            subscription_expiry_reminder_days: number;
+                            /** @description Slack days after a subscription ends or an invoice falls overdue before the member loses access */
+                            subscription_grace_days: number;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
@@ -13349,6 +13659,80 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.TrainingHistoryController.mine": {
+        parameters: {
+            query?: {
+                kind?: "workouts" | "classes";
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training log page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            class?: {
+                                attendance?: string | null;
+                                duration_minutes?: number | null;
+                                name?: string | null;
+                                type_name?: string | null;
+                            } | null;
+                            id: string;
+                            occurred_at?: string | null;
+                            performance: {
+                                completed_at?: string | null;
+                                elapsed_ms?: number | null;
+                                execution_id: string;
+                                scale_level_slug?: string | null;
+                                scores: {
+                                    score_type?: string | null;
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                started_at?: string | null;
+                                status: string;
+                            } | null;
+                            source?: string | null;
+                            workout: {
+                                id?: string;
+                                sections?: {
+                                    exercises?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    format?: string;
+                                    id?: string;
+                                    name?: string | null;
+                                    nested?: boolean;
+                                    score_type?: string | null;
+                                    timer_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                                title?: string | null;
+                                type?: string | null;
+                            } | null;
+                        }[];
+                        /** @enum {string} */
+                        kind: "workouts" | "classes";
+                        next_offset: number | null;
+                        offset: number;
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CoachNotesController.reads": {
         parameters: {
             query?: never;
@@ -13512,6 +13896,90 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.show_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.update_join_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled?: boolean;
+                    /** @enum {string} */
+                    role?: "member" | "athlete";
+                };
+            };
+        };
+        responses: {
+            /** @description Join link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        /** @enum {string} */
+                        role: "member" | "athlete";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MeController.complete_tour": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                audience: "admin" | "member" | "athlete";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Completed tours */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_tours: string[];
                     };
                 };
             };
@@ -14023,6 +14491,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
+                        completed_tours: ("admin" | "member" | "athlete")[];
                         /** Format: uuid */
                         id: string;
                         nickname: string;
@@ -14146,6 +14615,81 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminOnboardingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_count: number;
+                        dismissed: boolean;
+                        finished: boolean;
+                        steps: {
+                            auto: boolean;
+                            done: boolean;
+                            /** @enum {string} */
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            skipped: boolean;
+                        }[];
+                        total: number;
+                        tour_completed: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminOnboardingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
+                    /** @enum {string} */
+                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                };
+            };
+        };
+        responses: {
+            /** @description Checklist */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        completed_count: number;
+                        dismissed: boolean;
+                        finished: boolean;
+                        steps: {
+                            auto: boolean;
+                            done: boolean;
+                            /** @enum {string} */
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            skipped: boolean;
+                        }[];
+                        total: number;
+                        tour_completed: boolean;
                     };
                 };
             };
@@ -16138,6 +16682,37 @@ export interface operations {
                             organization_id: string;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OrganizationAccessController.list_invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                organization_slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pending invitations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        email_bound: boolean;
+                        /** Format: date_time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date_time */
+                        issued_at: string;
+                        role: string;
+                    }[];
                 };
             };
         };
@@ -19084,6 +19659,123 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutFreeTextController.analyze": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    locale?: string;
+                    text: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Analysis */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        issues: {
+                            /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
+                            code: string;
+                            current_value?: unknown;
+                            id: string;
+                            /** @description For text_correction: spelling | unit | number | abbreviation | format | ambiguity */
+                            kind?: string | null;
+                            message?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** @description Canonical field path, or "text" for a text-only correction */
+                            path: string;
+                            required: boolean;
+                            /** @enum {string} */
+                            severity: "error" | "warning" | "info";
+                            suggestion?: {
+                                label?: string | null;
+                                text_edit?: {
+                                    find: string;
+                                    replace: string;
+                                } | null;
+                                /** @description Canonical value for the issue path */
+                                value?: unknown;
+                            } | null;
+                        }[];
+                        /** @description How much the parser answer had to be repaired against the contract */
+                        quality?: {
+                            corrections?: number;
+                            remaining_violations?: number;
+                            repair_attempts?: number;
+                            /** @description Whether the structure step (sections and their formats) succeeded before parsing */
+                            structure_inferred?: boolean;
+                        };
+                        suggestions: {
+                            field: string;
+                            id: string;
+                            path: string;
+                            reason?: string | null;
+                            text_insert?: string | null;
+                            value?: unknown;
+                        }[];
+                        summary: {
+                            blocking: number;
+                            errors: number;
+                            exercises: number;
+                            sections: number;
+                            warnings: number;
+                        };
+                        /** @description Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd) */
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid text */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Assistant unavailable */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Assistant not configured */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFinanceController.retire_package": {
         parameters: {
             query?: never;
@@ -20867,6 +21559,85 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OrganizationAccessController.join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Already a member */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description capability => scope (all, own, status), ADR-099 */
+                        capabilities: {
+                            [key: string]: string;
+                        };
+                        /** @enum {string} */
+                        coach_scope?: "own" | "all";
+                        /** Format: uuid */
+                        id: string;
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        roles: string[];
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Membership */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description capability => scope (all, own, status), ADR-099 */
+                        capabilities: {
+                            [key: string]: string;
+                        };
+                        /** @enum {string} */
+                        coach_scope?: "own" | "all";
+                        /** Format: uuid */
+                        id: string;
+                        /** @description ADR-101 */
+                        notes_visible_to_admins?: boolean;
+                        organization: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            slug: string;
+                        };
+                        role: string;
+                        roles: string[];
+                        settings?: {
+                            brand_logo_url?: string | null;
+                            brand_name?: string | null;
+                            brand_primary_color?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutDslController.show_authoring": {
         parameters: {
             query?: never;
@@ -21712,6 +22483,82 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingHistoryController.for_user": {
+        parameters: {
+            query?: {
+                kind?: "workouts" | "classes";
+                offset?: number;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training log page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            class?: {
+                                attendance?: string | null;
+                                duration_minutes?: number | null;
+                                name?: string | null;
+                                type_name?: string | null;
+                            } | null;
+                            id: string;
+                            occurred_at?: string | null;
+                            performance: {
+                                completed_at?: string | null;
+                                elapsed_ms?: number | null;
+                                execution_id: string;
+                                scale_level_slug?: string | null;
+                                scores: {
+                                    score_type?: string | null;
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                started_at?: string | null;
+                                status: string;
+                            } | null;
+                            source?: string | null;
+                            workout: {
+                                id?: string;
+                                sections?: {
+                                    exercises?: {
+                                        [key: string]: unknown;
+                                    }[];
+                                    format?: string;
+                                    id?: string;
+                                    name?: string | null;
+                                    nested?: boolean;
+                                    score_type?: string | null;
+                                    timer_config?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                }[];
+                                title?: string | null;
+                                type?: string | null;
+                            } | null;
+                        }[];
+                        /** @enum {string} */
+                        kind: "workouts" | "classes";
+                        next_offset: number | null;
+                        offset: number;
+                        total: number;
                     };
                 };
             };

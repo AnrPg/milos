@@ -21,6 +21,7 @@ defmodule MilosTraining.Workouts do
   }
 
   alias MilosTraining.Workouts.Queries.{
+    AnalyzeFreeText,
     GetAdminWorkout,
     ListWorkoutChangeTargets,
     GetWorkout,
@@ -40,6 +41,9 @@ defmodule MilosTraining.Workouts do
 
   def create_workout(context, admin, params),
     do: WorkoutStore.create_workout(context, admin.id, params)
+
+  @doc "Proposes a canonical reading of a free-text workout. Never persists."
+  def analyze_free_text(text, options), do: AnalyzeFreeText.call(text, options)
 
   def create_draft(admin), do: CreateDraftWorkout.call(admin.id)
   def create_draft(context, admin), do: WorkoutStore.create_draft(context, admin.id)

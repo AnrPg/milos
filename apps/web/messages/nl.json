@@ -2555,7 +2555,7 @@
     "freeTextEditorPlaceholder": "Schrijf de WOD precies zoals deze op het bord moet verschijnen...",
     "freeTextEditorLabel": "Trainingseditor met vrije tekst",
     "freeTextTitle": "Vrije tekst WOD",
-    "freeTextDescription": "Schrijf een snelle rich-text WOD. Het wordt opgeslagen en weergegeven als één ongestructureerde tekst.",
+    "freeTextDescription": "Schrijf de WOD zoals op het whiteboard. Sporters zien je tekst zoals je hem schrijft; de assistent zet hem om in gestructureerde gegevens.",
     "freeTextPreviewEmpty": "Het vrije-tekst WOD-voorbeeld verschijnt hier.",
     "timerFormatLabel": "Timer-formaat",
     "durationMinutesLabel": "Duur (minuten)",
@@ -4174,7 +4174,35 @@
     "invItem": "Artikel",
     "invUsedPerMonth": "Verbruik / maand",
     "invSpendPerMonth": "Uitgaven / maand",
-    "invTotalSpend": "Totale uitgaven"
+    "invTotalSpend": "Totale uitgaven",
+    "subscriptionExpiryReminderDays": "Herinnering einde (dagen vooraf)",
+    "subscriptionExpiryReminderDaysHelp": "Klanten krijgen zoveel dagen vóór het einde van hun abonnement een melding. 0 zet dit uit.",
+    "subscriptionGraceDays": "Coulanceperiode (dagen)",
+    "subscriptionGraceDaysHelp": "Na het einde van een abonnement of een achterstallige factuur houden klanten zoveel dagen toegang. Daarna verliezen ze die, bijv. ze kunnen geen lessen meer boeken.",
+    "accessGraceEnded": "Je abonnement is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken.",
+    "accessGraceOverdue": "Er staat een betaling open. Je houdt toegang tot {date}; betaal vóór die datum om lessen te blijven boeken.",
+    "accessBlockedOverdue": "Je toegang is gepauzeerd omdat een betaling openstaat. Betaal het openstaande bedrag om weer lessen te boeken.",
+    "accessEnded": "Je toegang is afgelopen. Verleng je abonnement om weer lessen te boeken.",
+    "subscriptionEndsSoonTitle": "Je abonnement loopt binnenkort af",
+    "subscriptionEndedTitle": "Je abonnement is afgelopen",
+    "yourSubscription": "Je abonnement",
+    "subscriptionEndsSoonBody": "{package} loopt af op {date} (over {days} dagen). Verleng om lessen te blijven boeken.",
+    "subscriptionEndedBody": "{package} is afgelopen. Je houdt toegang tot {date}; verleng vóór die datum om lessen te blijven boeken.",
+    "historyTitle": "Trainingsgeschiedenis",
+    "historyWorkouts": "Workouts",
+    "historyClasses": "Lessen",
+    "historyLoading": "Laden…",
+    "historyError": "De geschiedenis kon niet worden geladen. Probeer het later opnieuw.",
+    "historyNoWorkouts": "Nog geen workouts gelogd.",
+    "historyNoClasses": "Nog geen eerdere lessen geboekt.",
+    "historyShowing": "{shown} van {total} getoond",
+    "historyShowMore": "Meer tonen",
+    "historyDeletedWorkout": "Verwijderde workout",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Geen resultaat gelogd.",
+    "workoutCount": "{count, plural, one {# workout} other {# workouts}}",
+    "accessEndedTitle": "Je toegang is afgelopen",
+    "accessEndedCancelledBookings": "{count, plural, one {Je komende boeking is geannuleerd.} other {Je # komende boekingen zijn geannuleerd.}}"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4291,5 +4319,359 @@
     "errorGeneric": "Het verzoek kon niet worden voltooid.",
     "myReceiptsTitle": "Terugbetalingsbewijzen",
     "myReceiptsEmpty": "Je hebt geen terugbetalingsbewijzen."
+  },
+  "WorkoutAssistant": {
+    "title": "Trainingsassistent",
+    "intro": "Schrijf de training zoals op het whiteboard. De assistent zet hem om in gestructureerde gegevens en wijst je op wat onduidelijk is.",
+    "analyze": "Controleren met assistent",
+    "reanalyze": "Opnieuw controleren",
+    "analyzing": "Je training wordt gelezen…",
+    "analyzingHint": "Dit duurt meestal een paar seconden. Je tekst is opgeslagen.",
+    "stale": "Je hebt de tekst gewijzigd sinds de laatste controle. Controleer opnieuw om de resultaten bij te werken.",
+    "insertExample": "Begin met een voorbeeld",
+    "exampleWorkout": "Murph-voorbereiding\nWarming-up: 400 m hardlopen, daarna 2 rondes van 10 air squats\nFor time, limiet 25 min:\n5 rondes\n10 pull-ups\n20 push-ups\n30 air squats\nKracht:\nBack squat 5x5 @ 100 kg, rust 2 min",
+    "tipsTitle": "Tips voor een schone verwerking",
+    "tipOneLine": "Eén oefening per regel.",
+    "tipSetsReps": "Schrijf sets × herhalingen @ gewicht, bijv. 5x5 @ 100 kg.",
+    "tipBlocks": "Geef elk blok een naam: Warming-up, Kracht, WOD.",
+    "tipTimers": "Vermeld timers: AMRAP 12, EMOM 10, For time limiet 20.",
+    "panelTabs": "Zijpaneel van de editor",
+    "tabAssistant": "Assistent",
+    "tabPreview": "Voorbeeld",
+    "summarySections": "Blokken",
+    "summaryExercises": "Oefeningen",
+    "summaryOpen": "Te controleren",
+    "issuesHeading": "Te controleren ({count})",
+    "suggestionsHeading": "Voorgestelde aanvullingen ({count})",
+    "resolvedHeading": "Gecontroleerd ({count})",
+    "allClear": "Alles is duidelijk. Je kunt publiceren.",
+    "severityError": "Moet worden opgelost",
+    "severityWarning": "Controleren",
+    "requiredBadge": "Verplicht",
+    "accept": "Accepteren",
+    "apply": "Toepassen",
+    "reject": "Afwijzen",
+    "undo": "Ongedaan maken",
+    "add": "Toevoegen",
+    "dismiss": "Negeren",
+    "accepted": "geaccepteerd",
+    "rejectedOptional": "afgewezen, blijft leeg",
+    "rejectedRequired": "afgewezen, verplicht: publiceren is geblokkeerd tot je het invult",
+    "rejectOptionalHint": "Afwijzen laat dit veld leeg. De training kan nog steeds worden gepubliceerd.",
+    "rejectRequiredHint": "Dit veld is verplicht. Afwijzen maakt het leeg en blokkeert publiceren tot je een waarde invult.",
+    "typeValue": "Jouw waarde",
+    "typeValuePlaceholder": "Typ een waarde",
+    "invalidTyped": "Die waarde past niet in dit veld. Controleer het formaat en probeer het opnieuw.",
+    "alsoInText": "Voeg deze regel ook toe aan de tekst:",
+    "hintMinutes": "Duur in minuten",
+    "hintList": "Scheid items met komma's",
+    "hintDifficulty": "beginner, intermediate, advanced of all-levels",
+    "hintValue": "Waarde",
+    "readAs": "Zo heeft de assistent het gelezen",
+    "noBlocks": "Nog geen trainingsblokken gevonden. Voeg oefeningen toe, één per regel.",
+    "unnamed": "Naamloos",
+    "setsOnly": "{count} sets",
+    "bodyweight": "lichaamsgewicht",
+    "restShort": "rust {seconds} s",
+    "units": {
+      "secs": "sec.",
+      "kcal": "calorieën",
+      "meters": "meter"
+    },
+    "pathSection": "Blok {number}",
+    "pathExercise": "Oefening {number}",
+    "fields": {
+      "title": "Titel",
+      "type": "Soort training",
+      "subtitle": "Ondertitel",
+      "description": "Beschrijving",
+      "difficulty": "Moeilijkheid",
+      "estimated_duration_seconds": "Duur",
+      "equipment": "Materiaal",
+      "tags": "Labels",
+      "name": "Naam",
+      "note": "Notitie",
+      "timer_config": "Timer",
+      "sets": "Sets",
+      "prescription_value": "Herhalingen / hoeveelheid",
+      "prescription_unit": "Eenheid",
+      "load_value": "Gewicht",
+      "load_mode": "Soort belasting",
+      "rest_seconds": "Rust (seconden)",
+      "tempo": "Uitvoeringstempo",
+      "text": "Tekst"
+    },
+    "why": {
+      "difficulty": "Sporters kiezen sneller als ze het niveau kennen.",
+      "estimated_duration_seconds": "Een duur helpt jou lessen te plannen en sporters hun dag.",
+      "equipment": "Met een materiaallijst zetten sporters alles klaar voor ze beginnen.",
+      "description": "Een kort doel houdt iedereen gefocust.",
+      "generic": "Dit toevoegen maakt de training completer."
+    },
+    "codes": {
+      "missing_title": "Je training heeft een titel nodig. Vul er een in bij Titel, bijv. ‘Murph-voorbereiding’.",
+      "missing_type": "Kies een soort training zodat hij in de juiste bibliotheek komt.",
+      "missing_section_name": "Geef dit blok een naam, bijv. ‘Warming-up’ of ‘Kracht’.",
+      "missing_exercise_name": "Deze regel bevat getallen maar geen oefening. Schrijf welke beweging het is.",
+      "too_short": "Gebruik minstens {min} tekens.",
+      "invalid_value": "‘{value}’ is hier niet geldig. Vul een juiste waarde in of wijs hem af om hem weg te laten.",
+      "invalid_timer": "Bij de timer {format} ontbreekt: {missing}. Voeg het toe aan de tekst, bijv. ‘elke minuut, 10 min lang’.",
+      "unknown_format": "‘{value}’ is geen bekend timerformaat. Gebruik er een zoals AMRAP, EMOM of For time.",
+      "generic": "De assistent vond hier iets om te controleren."
+    },
+    "errors": {
+      "notConfigured": "De assistent is nog niet ingesteld op deze server. Je kunt de tekst nog steeds zo publiceren.",
+      "unavailable": "De assistent is bezet of offline. Probeer het zo opnieuw. Je tekst is opgeslagen.",
+      "textRequired": "Schrijf eerst de training en controleer hem dan.",
+      "textTooLong": "Deze tekst is te lang voor één controle. Splits hem op in aparte trainingen."
+    },
+    "blockingTitle": "Publiceren kan nog niet. Los eerst op:",
+    "blockingRequired": "verplicht",
+    "blockingTooShort": "te kort (minstens 3 tekens)",
+    "chooseType": "Kies een soort…",
+    "titlePlaceholder": "Laat leeg, dan stelt de assistent er een voor",
+    "checkAndPublish": "Controleren en publiceren",
+    "reviewBeforePublish": "De assistent heeft een paar opmerkingen. Bekijk ze en klik dan opnieuw op Publiceren.",
+    "resolveErrorsFirst": "Los de punten met ‘Moet worden opgelost’ op voordat je publiceert.",
+    "publishFailed": "Publiceren is mislukt. Je concept is opgeslagen. Probeer het opnieuw.",
+    "rejectTextHint": "Afwijzen laat je tekst zoals hij is.",
+    "rejectedText": "gelaten zoals geschreven",
+    "editNotApplied": "‘{text}’ staat niet meer in de tekst, dus deze correctie is niet toegepast. Controleer opnieuw om de suggesties te vernieuwen.",
+    "intervalSlot": "Interval {slot}",
+    "oddIntervals": "Oneven intervallen",
+    "evenIntervals": "Even intervallen",
+    "severityAssumption": "Aangenomen",
+    "keepAssumption": "Behouden",
+    "rejectAssumptionHint": "Afwijzen wist deze waarde; de tekst blijft zoals geschreven."
+  },
+  "Invites": {
+    "inviteClients": "Klanten uitnodigen",
+    "dialogIntro": "Stuur een persoonlijke link of deel de aanmeldlink van je sportschool.",
+    "close": "Sluiten",
+    "clientAccess": "Toegang voor klanten",
+    "clientAccessIntro": "Kies hoe nieuwe klanten in je app komen: met een persoonlijke eenmalige link of met de openbare aanmeldlink.",
+    "tabPersonal": "Persoonlijke link",
+    "tabPublic": "Aanmeldlink",
+    "tabPending": "Openstaand ({count})",
+    "joinsAs": "Meldt zich aan als",
+    "roles": {
+      "member": "Lid",
+      "athlete": "Atleet"
+    },
+    "roleHints": {
+      "member": "Boekt lessen in de sportschool",
+      "athlete": "Krijgt persoonlijke programmering"
+    },
+    "emailOptional": "E-mail (optioneel)",
+    "emailHint": "Als je dit invult, kan alleen een account met dit e-mailadres de link gebruiken.",
+    "validFor": "Geldig voor",
+    "days": "{count, plural, one {# dag} other {# dagen}}",
+    "createLink": "Uitnodigingslink maken",
+    "creating": "Bezig met maken…",
+    "linkReady": "Link klaar. Stuur hem naar je nieuwe {role}.",
+    "singleUse": "Werkt één keer. Verloopt op {date}.",
+    "createAnother": "Nog een link maken",
+    "inviteSubject": "Je uitnodiging voor {organization}",
+    "inviteMessage": "Je bent uitgenodigd voor {organization}. Maak hier je account aan: {url}",
+    "publicTitle": "Openbare aanmeldlink",
+    "publicHint": "Iedereen met het adres van je sportschool kan zich aanmelden. Zet hem altijd uit wanneer je wilt.",
+    "publicOff": "De aanmeldlink staat uit. Zet hem aan voor een adres voor je website, sociale media of een QR-code bij de balie.",
+    "publicWarning": "Iedereen die dit adres gebruikt, wordt {role}. Medewerkers hebben nog steeds een persoonlijke link nodig.",
+    "joinSubject": "Doe mee",
+    "joinMessage": "Meld je aan bij onze sportschool in de app: {url}",
+    "noPending": "Geen openstaande uitnodigingen. Links die je maakt staan hier tot ze gebruikt worden of verlopen.",
+    "emailBound": "gekoppeld aan e-mail",
+    "expires": "Verloopt op {date}",
+    "revoke": "Intrekken",
+    "confirmRevoke": "Ja, intrekken",
+    "keep": "Behouden",
+    "loading": "Laden…",
+    "linkLabel": "Uitnodigingslink",
+    "copy": "Kopiëren",
+    "copied": "Gekopieerd",
+    "share": "Delen",
+    "email": "E-mail",
+    "whatsapp": "WhatsApp",
+    "youreInvited": "Je bent uitgenodigd",
+    "joinTitle": "Word lid van {organization}",
+    "joinBody": "Maak een account of log in om je aan te melden als {role}. Het duurt minder dan een minuut.",
+    "joinCta": "Aanmelden bij {organization}",
+    "joining": "Aanmelden…",
+    "createAccount": "Account maken",
+    "haveAccount": "Ik heb al een account",
+    "joinUnavailableTitle": "Deze link is niet actief",
+    "joinUnavailable": "De sportschool heeft hem misschien uitgezet. Vraag om een nieuwe link of een persoonlijke uitnodiging.",
+    "membershipUnavailable": "Je lidmaatschap hier is gepauzeerd. Neem contact op met de sportschool om het te heractiveren.",
+    "goHome": "Naar de startpagina"
+  },
+  "UsersDirectory": {
+    "filters": "Filters",
+    "searchLabel": "Personen zoeken",
+    "searchPlaceholder": "Zoeken op naam",
+    "financeFilter": "Status lidmaatschap",
+    "financeAll": "Elke lidmaatschapsstatus",
+    "sortLabel": "Sorteren",
+    "sort": {
+      "name": "Naam A–Z",
+      "newest": "Nieuwste eerst",
+      "oldest": "Oudste eerst"
+    },
+    "roleFilter": "Filteren op rol",
+    "roles": {
+      "all": "Iedereen",
+      "member": "Leden",
+      "athlete": "Atleten",
+      "admin": "Medewerkers"
+    },
+    "showing": "{shown} van {total} getoond",
+    "clearFilters": "Filters wissen",
+    "retry": "Opnieuw proberen",
+    "emptyTitle": "Nog geen klanten",
+    "emptyBody": "Nodig je eerste leden en atleten uit. Ze verschijnen hier zodra ze zich aanmelden.",
+    "inviteFirst": "Nodig je eerste klanten uit",
+    "noMatchesTitle": "Geen resultaten",
+    "noMatchesBody": "Probeer een andere naam of wis de filters.",
+    "listLabel": "Personen",
+    "columns": {
+      "person": "Persoon",
+      "finance": "Lidmaatschap",
+      "joined": "Aangemeld",
+      "open": "Profiel openen"
+    }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Instellen niet afgerond",
+    "popupTitle": "Welkom! Laten we je sportschool klaarzetten",
+    "popupIntro": "Zes korte stappen. Stop wanneer je wilt: deze lijst wacht op je in {path}.",
+    "progress": "{done} van {total} klaar",
+    "later": "Herinner me later",
+    "dontShow": "Niet meer tonen",
+    "takeTour": "Rondleiding volgen",
+    "panelTitle": "Instelchecklist",
+    "panelIntro": "Ga verder waar je gebleven was. Stappen vinken zichzelf af zodra de app ziet dat ze klaar zijn.",
+    "showPopupAgain": "Welkomstvenster opnieuw tonen",
+    "showSteps": "Stappen tonen",
+    "hideSteps": "Stappen verbergen",
+    "allDone": "Alles staat klaar. Je app is klaar voor klanten.",
+    "markDone": "Markeren als klaar",
+    "skip": "Overslaan",
+    "reopen": "Ongedaan maken",
+    "unskip": "Terugzetten",
+    "doneAuto": "Klaar. Automatisch herkend.",
+    "statusDone": "(klaar)",
+    "statusSkipped": "(overgeslagen)",
+    "statusOpen": "(te doen)",
+    "steps": {
+      "settings": {
+        "title": "Controleer je app-regels",
+        "body": "Standaarden voor boekingen, betalingen en meldingen. Twee minuten.",
+        "cta": "Instellingen openen"
+      },
+      "classes": {
+        "title": "Voeg je lessen toe",
+        "body": "Maak lestypes aan (bijv. CrossFit, Yoga) zodat klanten kunnen boeken.",
+        "cta": "Lessen instellen"
+      },
+      "packages": {
+        "title": "Maak lidmaatschapspakketten",
+        "body": "Abonnementen en prijzen die klanten kopen of die jij toewijst.",
+        "cta": "Pakket maken"
+      },
+      "workout": {
+        "title": "Schrijf je eerste training",
+        "body": "Schrijf hem zoals op het whiteboard. De assistent doet de rest.",
+        "cta": "Training schrijven"
+      },
+      "invite": {
+        "title": "Nodig je klanten uit",
+        "body": "Stuur een persoonlijke link of zet de aanmeldlink van je sportschool aan.",
+        "cta": "Klanten uitnodigen"
+      },
+      "tour": {
+        "title": "Volg de rondleiding van 1 minuut",
+        "body": "Zie waar alles staat.",
+        "cta": "Rondleiding starten"
+      }
+    },
+    "tour": {
+      "roleDescription": "rondleiding",
+      "stepOf": "Stap {current} van {total}",
+      "skip": "Rondleiding overslaan",
+      "showMe": "Laat zien",
+      "back": "Terug",
+      "next": "Volgende",
+      "done": "Begrepen",
+      "replay": "App-rondleiding opnieuw bekijken",
+      "admin": {
+        "welcome": {
+          "title": "Welkom in de app van je sportschool",
+          "body": "Een blik van één minuut op de basis. Sla over wanneer je wilt."
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "body": "Je dag in één oogopslag: lessen, omzet en wat jouw aandacht nodig heeft."
+        },
+        "classes": {
+          "title": "Lessen",
+          "body": "Maak lestypes aan, plan sessies en keur boekingen goed."
+        },
+        "workouts": {
+          "title": "Trainingen",
+          "body": "Schrijf een training als gewone tekst. De assistent structureert hem en markeert fouten."
+        },
+        "people": {
+          "title": "Mensen & uitnodigingen",
+          "body": "Nodig klanten uit met een link en open van iedereen het profiel, de betalingen en de voortgang."
+        },
+        "config": {
+          "title": "App-configuratie",
+          "body": "Regels, meldingen, klanttoegang en deze lijst vind je onder {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Welkom!",
+          "body": "Zo haal je in minder dan een minuut het meeste uit de app."
+        },
+        "schedule": {
+          "title": "Lessen boeken",
+          "body": "Open {schedule}, kies een les en tik op Boeken. We herinneren je voordat hij begint."
+        },
+        "train": {
+          "title": "Train met de timer",
+          "body": "Start een training en volg hem stap voor stap met de ingebouwde timer."
+        },
+        "records": {
+          "title": "Volg je voortgang",
+          "body": "Je persoonlijke records en reeksen verzamelen zich in {pantheon}."
+        },
+        "account": {
+          "title": "Facturatie & profiel",
+          "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Welkom!",
+          "body": "Zo haal je in minder dan een minuut het meeste uit de app."
+        },
+        "programme": {
+          "title": "Je programma",
+          "body": "De trainingen van je coach verschijnen onder {myWorkouts}, dag voor dag."
+        },
+        "train": {
+          "title": "Train met de timer",
+          "body": "Open een training en druk op Start. De timer leidt je door elk blok."
+        },
+        "records": {
+          "title": "Volg je voortgang",
+          "body": "Je persoonlijke records en reeksen verzamelen zich in {pantheon}."
+        },
+        "account": {
+          "title": "Facturatie & profiel",
+          "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
+        }
+      }
+    }
   }
 }

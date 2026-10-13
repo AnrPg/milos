@@ -104,6 +104,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/entitlement",
   "/me/finance",
   "/me/form-reviews",
+  "/me/history",
   "/me/invoices",
   "/me/refund-receipts",
   "/me/nutrition-plan",

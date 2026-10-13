@@ -30,17 +30,39 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     required: [:weekly_workout_target, :leaderboard_enabled, :theme_slug]
   }
 
+  @expiry_reminder_days_schema %Schema{
+    type: :integer,
+    minimum: 0,
+    maximum: 60,
+    description: "Days before a subscription ends to remind the member (0 = no reminder)"
+  }
+
+  @grace_days_schema %Schema{
+    type: :integer,
+    minimum: 0,
+    maximum: 60,
+    description:
+      "Slack days after a subscription ends or an invoice falls overdue before the member loses access"
+  }
+
   @finance_settings_schema %Schema{
     type: :object,
     properties: %{
       id: %Schema{type: :string, format: :uuid, nullable: true},
       payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
+      subscription_expiry_reminder_days: @expiry_reminder_days_schema,
+      subscription_grace_days: @grace_days_schema,
       document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]},
       package_modules: %Schema{type: :array, items: %Schema{type: :string}},
       inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time", nullable: true}
     },
-    required: [:payment_reminder_interval_days, :document_mode]
+    required: [
+      :payment_reminder_interval_days,
+      :subscription_expiry_reminder_days,
+      :subscription_grace_days,
+      :document_mode
+    ]
   }
 
   @notification_push_settings_schema %Schema{
@@ -115,6 +137,8 @@ defmodule MilosTrainingWeb.AdminSettingsController do
         type: :object,
         properties: %{
           payment_reminder_interval_days: %Schema{type: :integer, minimum: 1},
+          subscription_expiry_reminder_days: @expiry_reminder_days_schema,
+          subscription_grace_days: @grace_days_schema,
           document_mode: %Schema{type: :string, enum: ["invoice", "receipt"]},
           package_modules: %Schema{
             type: :array,

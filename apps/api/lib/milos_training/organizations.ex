@@ -190,6 +190,29 @@ defmodule MilosTraining.Organizations do
   def revoke_invitation(context, invitation_id, revoked_at \\ DateTime.utc_now()),
     do: RevokeInvitation.call(context, invitation_id, revoked_at)
 
+  def list_active_invitations(context, now \\ DateTime.utc_now()),
+    do: MilosTraining.Organizations.Queries.ListActiveInvitations.call(context, now)
+
+  def get_join_link(context), do: MilosTraining.Organizations.Queries.GetJoinLink.call(context)
+
+  def update_join_link(context, params),
+    do: MilosTraining.Organizations.Commands.UpdateJoinLink.call(context, params)
+
+  def get_onboarding_state(context),
+    do: MilosTraining.Organizations.Queries.GetOnboardingState.call(context)
+
+  def update_onboarding(context, params, now \\ DateTime.utc_now()),
+    do: MilosTraining.Organizations.Commands.UpdateOnboarding.call(context, params, now)
+
+  @doc "Builds the onboarding checklist view from stored state and setup signals."
+  def onboarding_checklist(state, signals),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals)
+
+  def inspect_join_link(slug), do: MilosTraining.Organizations.Queries.InspectJoinLink.call(slug)
+
+  def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
+    do: MilosTraining.Organizations.Commands.JoinByLink.call(slug, user_id, joined_at)
+
   def inspect_invitation(token, now \\ DateTime.utc_now()),
     do: InspectInvitation.call(token, now)
 

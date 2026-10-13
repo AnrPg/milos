@@ -38,7 +38,6 @@ import {
 } from "@/api/assigned-workouts";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { AssignedWorkoutPanel } from "@/components/workouts/AssignedWorkoutPanel";
 import { QuickAssignModal } from "@/components/workouts/QuickAssignModal";
@@ -48,9 +47,11 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
-import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { PageHeader } from "@/components/PageHeader";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -759,7 +760,7 @@ export function AssignedWorkoutsConsole({
     setError(null);
 
     try {
-      if (isFreeTextWorkout(assignment.workout)) {
+      if (usesManualTimer(assignment.workout)) {
         const execution = await startExecution(tokens.access_token, {
           master_workout_id: assignment.workout.id,
           source: "assigned",
@@ -1356,25 +1357,12 @@ export function AssignedWorkoutsConsole({
   return (
     <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <TransientHero
-          collapsedTitle={pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
-          label={i18n("workoutCalendarIntroduction1a3befd")}
-          timeoutMs={3000}
-        >
-          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
-              {isAdmin ? i18n("personalCoaching6accdcd") : i18n("workoutCalendarf82cdf2")}
-            </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              {pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
-            </h1>
-            {isMember ? (
-              <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                {i18n("memberProgrammingMyWorkoutsIntro")}
-              </p>
-            ) : null}
-          </section>
-        </TransientHero>
+        <PageHeader title={pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))} />
+        {isMember ? (
+          <p className="-mt-3 text-sm" style={{ color: "var(--muted)" }}>
+            {i18n("memberProgrammingMyWorkoutsIntro")}
+          </p>
+        ) : null}
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">

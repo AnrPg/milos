@@ -225,6 +225,25 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("subscription_expiring", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["ends_on"] || "",
+      days: payload["days_left"] || 0
+    }
+
+    %{
+      title: localize.("Your subscription ends soon", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
   def build("form_review_submitted", payload, localize) do
     %{
       title: localize.("New form review request", %{}),
@@ -353,6 +372,52 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
           time: payload["read_at"] || ""
         }),
       url: payload["url"] || "/admin/users"
+    }
+  end
+
+  def build("subscription_grace", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["grace_until"] || ""
+    }
+
+    %{
+      title: localize.("Your subscription has ended", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("access_ended", payload, localize) do
+    body =
+      if payload["reason"] == "overdue_payment",
+        do:
+          localize.(
+            "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again.",
+            %{}
+          ),
+        else:
+          localize.("Your access has ended. Renew your subscription to book classes again.", %{})
+
+    cancelled = payload["cancelled_bookings"] || 0
+
+    body =
+      if cancelled > 0,
+        do:
+          body <>
+            " " <>
+            localize.("Your upcoming bookings were cancelled: %{count}.", %{count: cancelled}),
+        else: body
+
+    %{
+      title: localize.("Your access has ended", %{}),
+      body: payload["body"] || body,
+      url: payload["url"] || "/account/billing"
     }
   end
 

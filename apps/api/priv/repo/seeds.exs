@@ -10,7 +10,7 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias MilosTraining.{Identity, Repo, Workouts}
+alias MilosTraining.{Identity, Organizations, Repo, Workouts}
 alias MilosTraining.Gamification.TrainingQuote
 
 quotes = [
@@ -76,6 +76,7 @@ for organization <- Repo.all(MilosTraining.Organizations.Organization) do
   {:ok, _levels} = Workouts.seed_default_scale_levels(%{organization_id: organization.id})
 end
 
+# Registration requires an email (invitation email binding, F-10).
 ensure_admin = fn admin_nickname, admin_password, admin_email ->
   admin =
     case Identity.find_by_nickname(admin_nickname) do
@@ -85,6 +86,7 @@ ensure_admin = fn admin_nickname, admin_password, admin_email ->
             nickname: admin_nickname,
             email: admin_email,
             password: admin_password,
+            email: admin_email,
             role: :member
           })
 
@@ -102,6 +104,33 @@ ensure_admin = fn admin_nickname, admin_password, admin_email ->
     end
 
   IO.puts("Ensured #{Mix.env()} admin account: #{admin.nickname}")
+  admin
+end
+
+# Tenant admins need an organization membership: membershipless non-vendor
+# accounts cannot reach any tenant surface (ADR-091/ADR-095). Dev only; in
+# production organizations are provisioned by a vendor (ADR-092).
+ensure_dev_organization = fn admin, name ->
+  organization =
+    case Organizations.get_by_slug(System.get_env("DEV_ORGANIZATION_SLUG", "demo-gym")) do
+      nil ->
+        {:ok, organization} = Organizations.create_organization(%{name: name})
+        organization
+
+      organization ->
+        organization
+    end
+
+  {:ok, _membership} =
+    Organizations.add_membership(%{
+      organization_id: organization.id,
+      user_id: admin.id,
+      role: :owner,
+      status: :active,
+      joined_at: DateTime.utc_now()
+    })
+
+  IO.puts("Ensured dev organization: #{organization.name} (/org/#{organization.slug}/admin)")
 end
 
 case Mix.env() do
@@ -110,7 +139,9 @@ case Mix.env() do
     admin_password = System.get_env("DEV_ADMIN_PASSWORD", "AdminPass123!")
     admin_email = System.get_env("DEV_ADMIN_EMAIL", "admin@example.com")
 
-    ensure_admin.(admin_nickname, admin_password, admin_email)
+    admin_nickname
+    |> ensure_admin.(admin_password, admin_email)
+    |> ensure_dev_organization.(System.get_env("DEV_ORGANIZATION_NAME", "Demo Gym"))
 
   :prod ->
     admin_nickname = System.get_env("PROD_ADMIN_NICKNAME", "xristoforos_coach")

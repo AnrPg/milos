@@ -519,6 +519,51 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def list_class_history(%{organization_id: organization_id}, user_id, opts) do
+    limit = Map.get(opts, :limit, 10)
+    offset = Map.get(opts, :offset, 0)
+    now = DateTime.utc_now()
+
+    base =
+      Booking
+      |> join(:inner, [booking], slot in ScheduledClass,
+        on: slot.id == booking.scheduled_class_id
+      )
+      |> where(
+        [booking, slot],
+        booking.organization_id == ^organization_id and booking.user_id == ^user_id and
+          booking.status == :approved and slot.scheduled_at <= ^now
+      )
+
+    total = Repo.aggregate(base, :count)
+
+    entries =
+      base
+      |> join(:left, [_booking, slot], class_type in ClassType,
+        on: class_type.id == slot.class_type_id
+      )
+      |> join(:left, [booking, slot], attendance in ClassAttendanceRecord,
+        on: attendance.scheduled_class_id == slot.id and attendance.user_id == booking.user_id
+      )
+      |> order_by([_booking, slot], desc: slot.scheduled_at)
+      |> limit(^limit)
+      |> offset(^offset)
+      |> select([booking, slot, class_type, attendance], %{
+        booking_id: booking.id,
+        scheduled_class_id: slot.id,
+        class_name: slot.name,
+        class_type_name: class_type.name,
+        scheduled_at: slot.scheduled_at,
+        duration_minutes: slot.duration_minutes,
+        master_workout_id: slot.master_workout_id,
+        attendance_status: attendance.status
+      })
+      |> Repo.all()
+
+    %{entries: entries, total: total}
+  end
+
+  @impl true
   def record_attendance(%{organization_id: organization_id}, params) do
     params =
       params

@@ -219,3 +219,30 @@ msgstr "Ниска наличност"
 
 msgid "%{item}: %{quantity} left."
 msgstr "%{item}: остават %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "Абонаментът ви изтича скоро"
+
+msgid "Your subscription has ended"
+msgstr "Абонаментът ви изтече"
+
+msgid "your subscription"
+msgstr "абонаментът ви"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} изтича на %{date} (след %{days} дни). Подновете, за да продължите да записвате часове."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} изтече. Запазвате достъп до %{date}; подновете дотогава, за да продължите да записвате часове."
+
+msgid "Your access has ended"
+msgstr "Достъпът ви изтече"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Достъпът ви е спрян заради просрочено плащане. Платете дължимото, за да записвате отново часове."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Достъпът ви изтече. Подновете абонамента си, за да записвате отново часове."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Предстоящите ви записвания бяха отменени: %{count}."

@@ -77,6 +77,11 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
               %{optional(Ecto.UUID.t()) => non_neg_integer()}
   @callback update_membership_reminder_timestamp(Ecto.UUID.t()) :: :ok
   @callback memberships_needing_payment_reminder(non_neg_integer()) :: [map()]
+  @callback subscriptions_needing_expiry_notice(:expiry_reminder | :grace_notice, integer()) ::
+              [map()]
+  @callback mark_subscription_notice_sent(Ecto.UUID.t(), :expiry_reminder | :grace_notice) :: :ok
+  @doc "Refreshes every snapshot; returns the memberships that lost access."
+  @callback refresh_entitlement_snapshots() :: [map()]
   @callback total_outstanding_balance_cents() :: non_neg_integer()
   @callback count_pending_referral_approvals() :: non_neg_integer()
 

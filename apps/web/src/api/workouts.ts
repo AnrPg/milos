@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { components } from "@/api/generated/schema";
 import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
 import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
@@ -227,6 +228,16 @@ export type WorkoutDslPublishResult = {
 export async function listScaleLevels(token: string) {
   const response = await apiRequest<{ scale_levels: ScaleLevel[] }>("/admin/scale-levels", { token });
   return response.scale_levels;
+}
+
+export type FreeTextWorkoutAnalysis = components["schemas"]["FreeTextWorkoutAnalysis"];
+
+export function analyzeFreeTextWorkout(token: string, text: string, locale: string) {
+  return apiRequest<FreeTextWorkoutAnalysis>("/admin/workouts/free-text/analyze", {
+    method: "POST",
+    token,
+    body: { text, locale },
+  });
 }
 
 export async function parseWorkoutDsl(token: string, source: string) {

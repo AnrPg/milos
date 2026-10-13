@@ -23,8 +23,8 @@ import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
 import { QueuesTab } from "@/components/admin/finance/tabs/QueuesTab";
 import { ReferralsTab } from "@/components/admin/finance/tabs/ReferralsTab";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
 type Tab = "members" | "packages" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
 
@@ -102,28 +102,14 @@ export function FinanceOperations() {
       <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Hero */}
-        <TransientHero label={i18n("financeOperationsIntroduction1d3b6fc")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>{i18n("finance1b48d3f")}</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                {i18n("financeOperations60f9e5a")}
-              </h1>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {i18n("manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d")}
-              </p>
-            </div>
-            <Link
-              href={adminHref("/admin/metrics/finance", organizationSlug)}
-              className="rounded-2xl px-5 py-3 text-sm font-semibold text-center self-start"
-              style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
-            >
+        <PageHeader
+          title={i18n("financeOperations60f9e5a")}
+          actions={
+            <Link href={adminHref("/admin/metrics/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
               {i18n("financeAnalytics271fe3b")}
             </Link>
-          </div>
-        </section>
-        </TransientHero>
+          }
+        />
 
         {summaryQuery.isLoading || queuesQuery.isLoading || attentionItems.length > 0 ? (
           <section

@@ -1,8 +1,10 @@
+import { usesManualTimer, type ExecutableWorkout } from "@/lib/workout-execution-mode";
+
 type ExecutionCandidate = {
   id: string;
   status: string;
   master_workout_id?: string | null;
-  workout?: { authoring_mode?: string | null } | null;
+  workout?: ExecutableWorkout | null;
 };
 type ScheduleCandidate = {
   id: string;
@@ -32,7 +34,7 @@ export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
   const activeExecution = input.executions.find((execution) => execution.status !== "completed");
   if (activeExecution) {
     if (
-      activeExecution.workout?.authoring_mode === "free_text" &&
+      usesManualTimer(activeExecution.workout) &&
       activeExecution.master_workout_id
     ) {
       const params = new URLSearchParams({

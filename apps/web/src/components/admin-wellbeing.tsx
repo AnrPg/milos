@@ -15,9 +15,9 @@ import {
   type AdminReportInjuryRequest,
 } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { semanticLabel } from "@/i18n/presentation";
+import { PageHeader } from "@/components/PageHeader";
 
 export function AdminWellbeing() {
   const i18n = useUiTranslations();
@@ -93,15 +93,7 @@ export function AdminWellbeing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <TransientHero label={i18n("wellbeingAdministrationIntroductionf721cc4")} timeoutMs={3000}>
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("wellbeingAdminef7f328")}</p>
-          <h1 className="mt-2 text-3xl font-black">{i18n("injuryAndLimitationHistory76a0775")}</h1>
-          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            {i18n("staffCanSeeInjuryStatusBodyAreaTags5ea970b")}
-          </p>
-        </section>
-        </TransientHero>
+        <PageHeader title={i18n("injuryAndLimitationHistory76a0775")} />
 
         <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-6">
           <div className="flex flex-wrap items-start justify-between gap-4">

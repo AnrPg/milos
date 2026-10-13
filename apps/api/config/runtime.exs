@@ -6,6 +6,15 @@ if System.get_env("PHX_SERVER") do
   config :milos_training, MilosTrainingWeb.Endpoint, server: true
 end
 
+# Free-text workout analysis assistant. Without a key the analyze endpoint
+# answers 503 and the editor keeps working as a plain text editor.
+config :milos_training, :gemini,
+  api_key: System.get_env("GEMINI_API_KEY"),
+  model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
+  # Leave empty for models without thinking levels (e.g. gemini-2.5-*).
+  thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low"),
+  parser_thinking_level: System.get_env("GEMINI_PARSER_THINKING_LEVEL", "medium")
+
 config :web_push_elixir,
   vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),
   vapid_private_key: System.get_env("WEB_PUSH_PRIVATE_KEY"),

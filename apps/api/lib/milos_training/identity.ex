@@ -17,6 +17,7 @@ defmodule MilosTraining.Identity do
   defdelegate regenerate_calendar_feed_token(user), to: UserStore
   defdelegate update_profile(user_id, params), to: UserStore
   defdelegate update_avatar(user_id, avatar_url), to: UserStore
+  defdelegate mark_tour_completed(user_id, audience), to: UserStore
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore

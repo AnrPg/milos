@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 import { useId, useState } from "react";
 
 import {
@@ -28,9 +27,8 @@ import {
   StaffPanel,
   StatusText,
 } from "@/components/staff/staff-ui";
-import { TransientHero } from "@/components/TransientHero";
+import { PageHeader } from "@/components/PageHeader";
 import { useUiTranslations } from "@/i18n/ui";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 const VIDEOS_KEY = ["admin", "videos"] as const;
 type Filter = "all" | VideoState;
@@ -257,7 +255,6 @@ function VideoRow({ video, onEdit }: { video: ContentVideo; onEdit: () => void }
 export function AdminContent() {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
-  const organizationSlug = useOrganizationSlug();
   const [editing, setEditing] = useState<ContentVideo | "new" | null>(null);
   const [filter, setFilter] = useState<Filter>("all");
   const filterId = useId();
@@ -273,24 +270,7 @@ export function AdminContent() {
   return (
     <main className="min-h-screen px-4 py-10 sm:px-6 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">
-        <TransientHero label={i18n("stfContentIntro")} timeoutMs={3000}>
-          <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("stfStaffEyebrow")}</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-              {i18n("stfContentTitle")}
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-              {i18n("stfContentSubtitle")}
-            </p>
-            <Link
-              className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-              href={adminHref("/admin", organizationSlug)}
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            >
-              {i18n("backToAdminHome941355d")}
-            </Link>
-          </section>
-        </TransientHero>
+        <PageHeader title={i18n("stfContentTitle")} />
 
         {editing ? (
           <StaffPanel labelledBy="content-video-form" title={editing === "new" ? i18n("stfAddVideo") : i18n("stfEditVideo")}>

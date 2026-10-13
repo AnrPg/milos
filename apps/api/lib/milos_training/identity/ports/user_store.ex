@@ -16,6 +16,8 @@ defmodule MilosTraining.Identity.Ports.UserStore do
   @callback search_athletes(String.t() | nil) :: [Account.t()]
   @callback update_profile(Ecto.UUID.t(), map()) ::
               {:ok, Account.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @callback mark_tour_completed(Ecto.UUID.t(), String.t()) ::
+              {:ok, map()} | {:error, :not_found | :invalid_tour | Ecto.Changeset.t()}
   @callback update_avatar(Ecto.UUID.t(), String.t()) ::
               {:ok, Account.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback search_users(String.t() | nil) :: [Account.t()]

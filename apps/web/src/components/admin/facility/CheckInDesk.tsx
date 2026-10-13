@@ -10,7 +10,7 @@ import { localizeCheckInError } from "@/components/admin/facility/check-in-error
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
 import { localIsoDate } from "@/components/admin/users/membership-freezes";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
+import { PageHeader } from "@/components/PageHeader";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -66,12 +66,7 @@ export function CheckInDesk() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-4xl space-y-6">
-        <TransientHero collapsedTitle={i18n("admCheckInTitle")} label={i18n("admCheckInIntro")} timeoutMs={3000}>
-          <section className="rounded-[2.4rem] p-8" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>{i18n("admCheckInTitle")}</p>
-            <p className="mt-4 max-w-3xl text-base leading-7" style={{ color: "var(--muted)" }}>{i18n("admCheckInIntro")}</p>
-          </section>
-        </TransientHero>
+        <PageHeader title={i18n("admCheckInTitle")} />
 
         {token ? (
           <>

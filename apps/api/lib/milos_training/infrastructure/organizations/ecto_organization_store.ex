@@ -650,6 +650,39 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   def get_organization_settings(organization_id),
     do: Repo.get_by(OrganizationSetting, organization_id: organization_id)
 
+  # Tenant-owned preferences (join link, onboarding progress) live as entries of
+  # the free-form `settings` map. Unlike vendor settings updates they are not
+  # recorded as provisioning events.
+  @impl true
+  def put_organization_settings_entry(organization_id, key, value) when is_binary(key) do
+    Repo.transaction(fn ->
+      settings =
+        OrganizationSetting
+        |> where([setting], setting.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(settings), do: Repo.rollback(:not_found)
+
+      settings
+      |> OrganizationSetting.changeset(%{settings: Map.put(settings.settings || %{}, key, value)})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def list_active_invitations(organization_id, now) do
+    RegistrationInvitation
+    |> where([invitation], invitation.organization_id == ^organization_id)
+    |> where([invitation], is_nil(invitation.redeemed_at) and is_nil(invitation.revoked_at))
+    |> where([invitation], invitation.expires_at > ^now)
+    |> order_by([invitation], desc: invitation.inserted_at)
+    |> limit(100)
+    |> Repo.all()
+  end
+
   @impl true
   def update_organization_settings(organization_id, params, platform_user_id, changed_at) do
     Repo.transaction(fn ->

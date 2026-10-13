@@ -2555,7 +2555,7 @@
     "freeTextEditorPlaceholder": "Escribe el WOD exactamente como debe aparecer en la pizarra...",
     "freeTextEditorLabel": "Editor de ejercicios de texto libre",
     "freeTextTitle": "WOD de texto libre",
-    "freeTextDescription": "Escribe un WOD rápido de texto enriquecido. Se guarda y se muestra como un cuerpo de texto no estructurado.",
+    "freeTextDescription": "Escribe el WOD como en la pizarra. Los atletas ven tu texto tal cual; el asistente lo convierte en datos estructurados.",
     "freeTextPreviewEmpty": "La vista previa del WOD en texto libre aparecerá aquí.",
     "timerFormatLabel": "Formato del temporizador",
     "durationMinutesLabel": "Duración (minutos)",
@@ -4174,7 +4174,35 @@
     "invItem": "Artículo",
     "invUsedPerMonth": "Uso / mes",
     "invSpendPerMonth": "Gasto / mes",
-    "invTotalSpend": "Gasto total"
+    "invTotalSpend": "Gasto total",
+    "subscriptionExpiryReminderDays": "Aviso de vencimiento (días antes)",
+    "subscriptionExpiryReminderDaysHelp": "Los clientes reciben un aviso estos días antes de que termine su suscripción. 0 lo desactiva.",
+    "subscriptionGraceDays": "Periodo de gracia (días)",
+    "subscriptionGraceDaysHelp": "Tras terminar la suscripción o vencer una factura, los clientes mantienen el acceso estos días. Después lo pierden, p. ej. no pueden reservar clases.",
+    "accessGraceEnded": "Tu suscripción ha terminado. Mantienes el acceso hasta el {date}; renueva antes para seguir reservando clases.",
+    "accessGraceOverdue": "Hay un pago vencido. Mantienes el acceso hasta el {date}; paga antes para seguir reservando clases.",
+    "accessBlockedOverdue": "Tu acceso está en pausa porque hay un pago vencido. Paga el saldo pendiente para volver a reservar clases.",
+    "accessEnded": "Tu acceso ha terminado. Renueva tu suscripción para volver a reservar clases.",
+    "subscriptionEndsSoonTitle": "Tu suscripción termina pronto",
+    "subscriptionEndedTitle": "Tu suscripción ha terminado",
+    "yourSubscription": "Tu suscripción",
+    "subscriptionEndsSoonBody": "{package} termina el {date} (en {days} días). Renueva para seguir reservando clases.",
+    "subscriptionEndedBody": "{package} ha terminado. Mantienes el acceso hasta el {date}; renueva antes para seguir reservando clases.",
+    "historyTitle": "Historial de entrenamiento",
+    "historyWorkouts": "Entrenamientos",
+    "historyClasses": "Clases",
+    "historyLoading": "Cargando…",
+    "historyError": "No se pudo cargar el historial. Inténtalo más tarde.",
+    "historyNoWorkouts": "Aún no hay entrenamientos registrados.",
+    "historyNoClasses": "Aún no hay clases pasadas reservadas.",
+    "historyShowing": "Mostrando {shown} de {total}",
+    "historyShowMore": "Ver más",
+    "historyDeletedWorkout": "Entrenamiento eliminado",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "No se registró resultado.",
+    "workoutCount": "{count, plural, one {# entrenamiento} other {# entrenamientos}}",
+    "accessEndedTitle": "Tu acceso ha terminado",
+    "accessEndedCancelledBookings": "{count, plural, one {Se canceló tu próxima reserva.} other {Se cancelaron tus # próximas reservas.}}"
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -4291,5 +4319,359 @@
     "errorGeneric": "No se pudo completar la solicitud.",
     "myReceiptsTitle": "Recibos de reembolso",
     "myReceiptsEmpty": "No tienes recibos de reembolso."
+  },
+  "WorkoutAssistant": {
+    "title": "Asistente de entrenamiento",
+    "intro": "Escribe el entrenamiento como en la pizarra. El asistente lo convierte en datos estructurados y te señala lo que no está claro.",
+    "analyze": "Revisar con el asistente",
+    "reanalyze": "Revisar de nuevo",
+    "analyzing": "Leyendo tu entrenamiento…",
+    "analyzingHint": "Suele tardar unos segundos. Tu texto está guardado.",
+    "stale": "Has cambiado el texto desde la última revisión. Revisa de nuevo para actualizar los resultados.",
+    "insertExample": "Empezar con un ejemplo",
+    "exampleWorkout": "Preparación Murph\nCalentamiento: correr 400 m y luego 2 rondas de 10 sentadillas al aire\nFor time, límite 25 min:\n5 rondas\n10 dominadas\n20 flexiones\n30 sentadillas al aire\nFuerza:\nSentadilla trasera 5x5 @ 100 kg, descanso 2 min",
+    "tipsTitle": "Consejos para una lectura limpia",
+    "tipOneLine": "Un movimiento por línea.",
+    "tipSetsReps": "Escribe series × repeticiones @ carga, p. ej. 5x5 @ 100 kg.",
+    "tipBlocks": "Nombra cada bloque: Calentamiento, Fuerza, WOD.",
+    "tipTimers": "Indica los temporizadores: AMRAP 12, EMOM 10, For time límite 20.",
+    "panelTabs": "Panel lateral del editor",
+    "tabAssistant": "Asistente",
+    "tabPreview": "Vista previa",
+    "summarySections": "Bloques",
+    "summaryExercises": "Ejercicios",
+    "summaryOpen": "Por revisar",
+    "issuesHeading": "Por revisar ({count})",
+    "suggestionsHeading": "Añadidos sugeridos ({count})",
+    "resolvedHeading": "Revisados ({count})",
+    "allClear": "Todo está claro. Ya puedes publicar.",
+    "severityError": "Hay que corregir",
+    "severityWarning": "Revisar",
+    "requiredBadge": "Obligatorio",
+    "accept": "Aceptar",
+    "apply": "Aplicar",
+    "reject": "Rechazar",
+    "undo": "Deshacer",
+    "add": "Añadir",
+    "dismiss": "Descartar",
+    "accepted": "aceptado",
+    "rejectedOptional": "rechazado, queda vacío",
+    "rejectedRequired": "rechazado, obligatorio: no se puede publicar hasta que lo completes",
+    "rejectOptionalHint": "Rechazar deja este campo vacío. El entrenamiento se puede publicar igualmente.",
+    "rejectRequiredHint": "Este campo es obligatorio. Rechazarlo lo vacía y bloquea la publicación hasta que indiques un valor.",
+    "typeValue": "Tu valor",
+    "typeValuePlaceholder": "Escribe un valor",
+    "invalidTyped": "Ese valor no encaja en este campo. Revisa el formato e inténtalo de nuevo.",
+    "alsoInText": "Añadir también esta línea al texto:",
+    "hintMinutes": "Duración en minutos",
+    "hintList": "Separa los elementos con comas",
+    "hintDifficulty": "beginner, intermediate, advanced o all-levels",
+    "hintValue": "Valor",
+    "readAs": "Cómo lo ha leído el asistente",
+    "noBlocks": "Aún no hay bloques de entrenamiento. Añade ejercicios, uno por línea.",
+    "unnamed": "Sin nombre",
+    "setsOnly": "{count} series",
+    "bodyweight": "peso corporal",
+    "restShort": "descanso {seconds} s",
+    "units": {
+      "secs": "seg.",
+      "kcal": "calorías",
+      "meters": "metros"
+    },
+    "pathSection": "Bloque {number}",
+    "pathExercise": "Ejercicio {number}",
+    "fields": {
+      "title": "Título",
+      "type": "Tipo de entrenamiento",
+      "subtitle": "Subtítulo",
+      "description": "Descripción",
+      "difficulty": "Dificultad",
+      "estimated_duration_seconds": "Duración",
+      "equipment": "Material",
+      "tags": "Etiquetas",
+      "name": "Nombre",
+      "note": "Nota",
+      "timer_config": "Temporizador",
+      "sets": "Series",
+      "prescription_value": "Reps / cantidad",
+      "prescription_unit": "Unidad",
+      "load_value": "Carga",
+      "load_mode": "Tipo de carga",
+      "rest_seconds": "Descanso (segundos)",
+      "tempo": "Tempo",
+      "text": "Texto"
+    },
+    "why": {
+      "difficulty": "Los atletas eligen antes cuando conocen el nivel.",
+      "estimated_duration_seconds": "La duración te ayuda a planificar clases y a los atletas a organizar su día.",
+      "equipment": "Con la lista de material los atletas se preparan antes de empezar.",
+      "description": "Un objetivo breve mantiene a todos centrados.",
+      "generic": "Añadirlo completa el entrenamiento."
+    },
+    "codes": {
+      "missing_title": "Tu entrenamiento necesita un título. Escribe uno en el campo Título, p. ej. «Preparación Murph».",
+      "missing_type": "Elige un tipo de entrenamiento para que quede en la biblioteca correcta.",
+      "missing_section_name": "Ponle nombre a este bloque, p. ej. «Calentamiento» o «Fuerza».",
+      "missing_exercise_name": "Esta línea tiene números pero ningún ejercicio. Indica de qué movimiento se trata.",
+      "too_short": "Usa al menos {min} caracteres.",
+      "invalid_value": "«{value}» no es válido aquí. Escribe un valor correcto o recházalo para omitirlo.",
+      "invalid_timer": "Al temporizador {format} le falta: {missing}. Añádelo al texto, p. ej. «cada minuto durante 10 min».",
+      "unknown_format": "«{value}» no es un formato de temporizador conocido. Usa uno como AMRAP, EMOM o For time.",
+      "generic": "El asistente encontró algo que conviene revisar."
+    },
+    "errors": {
+      "notConfigured": "El asistente aún no está configurado en este servidor. Puedes publicar el texto tal cual.",
+      "unavailable": "El asistente está ocupado o sin conexión. Inténtalo en un momento. Tu texto está guardado.",
+      "textRequired": "Escribe primero el entrenamiento y luego revísalo.",
+      "textTooLong": "El texto es demasiado largo para revisarlo de una vez. Divídelo en entrenamientos separados."
+    },
+    "blockingTitle": "Aún no se puede publicar. Corrige primero:",
+    "blockingRequired": "obligatorio",
+    "blockingTooShort": "demasiado corto (mínimo 3 caracteres)",
+    "chooseType": "Elige un tipo…",
+    "titlePlaceholder": "Déjalo vacío y el asistente propondrá uno",
+    "checkAndPublish": "Revisar y publicar",
+    "reviewBeforePublish": "El asistente ha dejado algunas notas. Revísalas y pulsa Publicar otra vez.",
+    "resolveErrorsFirst": "Resuelve los puntos marcados como «Hay que corregir» antes de publicar.",
+    "publishFailed": "No se pudo publicar. Tu borrador está guardado. Inténtalo de nuevo.",
+    "rejectTextHint": "Rechazar mantiene tu texto tal cual.",
+    "rejectedText": "se mantiene como está escrito",
+    "editNotApplied": "«{text}» ya no está en el texto, así que no se aplicó la corrección. Revisa de nuevo para actualizar las sugerencias.",
+    "intervalSlot": "Intervalo {slot}",
+    "oddIntervals": "Intervalos impares",
+    "evenIntervals": "Intervalos pares",
+    "severityAssumption": "Supuesto",
+    "keepAssumption": "Mantener",
+    "rejectAssumptionHint": "Rechazar borra este valor; el texto queda como está."
+  },
+  "Invites": {
+    "inviteClients": "Invitar clientes",
+    "dialogIntro": "Envía un enlace personal o comparte el enlace de alta de tu gimnasio.",
+    "close": "Cerrar",
+    "clientAccess": "Acceso de clientes",
+    "clientAccessIntro": "Elige cómo entran los nuevos clientes en tu app: con un enlace personal de un solo uso o con el enlace público de alta.",
+    "tabPersonal": "Enlace personal",
+    "tabPublic": "Enlace de alta",
+    "tabPending": "Pendientes ({count})",
+    "joinsAs": "Se une como",
+    "roles": {
+      "member": "Socio",
+      "athlete": "Atleta"
+    },
+    "roleHints": {
+      "member": "Reserva clases en el gimnasio",
+      "athlete": "Recibe programación personal"
+    },
+    "emailOptional": "Correo (opcional)",
+    "emailHint": "Si lo indicas, solo una cuenta con este correo podrá usar el enlace.",
+    "validFor": "Válido durante",
+    "days": "{count, plural, one {# día} other {# días}}",
+    "createLink": "Crear enlace de invitación",
+    "creating": "Creando…",
+    "linkReady": "Enlace listo. Envíaselo a tu nuevo {role}.",
+    "singleUse": "Funciona una vez. Caduca el {date}.",
+    "createAnother": "Crear otro enlace",
+    "inviteSubject": "Tu invitación a {organization}",
+    "inviteMessage": "Te invitamos a unirte a {organization}. Crea tu cuenta aquí: {url}",
+    "publicTitle": "Enlace público de alta",
+    "publicHint": "Cualquiera con la dirección de tu gimnasio puede registrarse. Desactívalo cuando quieras.",
+    "publicOff": "El enlace de alta está desactivado. Actívalo para tener una dirección para tu web, redes sociales o un código QR en recepción.",
+    "publicWarning": "Quien use esta dirección se une como {role}. El personal sigue necesitando un enlace personal.",
+    "joinSubject": "Únete a nosotros",
+    "joinMessage": "Únete a nuestro gimnasio en la app: {url}",
+    "noPending": "No hay invitaciones pendientes. Los enlaces que crees aparecerán aquí hasta que se usen o caduquen.",
+    "emailBound": "ligado a un correo",
+    "expires": "Caduca el {date}",
+    "revoke": "Revocar",
+    "confirmRevoke": "Sí, revocar",
+    "keep": "Mantener",
+    "loading": "Cargando…",
+    "linkLabel": "Enlace de invitación",
+    "copy": "Copiar",
+    "copied": "Copiado",
+    "share": "Compartir",
+    "email": "Correo",
+    "whatsapp": "WhatsApp",
+    "youreInvited": "Estás invitado",
+    "joinTitle": "Únete a {organization}",
+    "joinBody": "Crea una cuenta o inicia sesión para unirte como {role}. Tardas menos de un minuto.",
+    "joinCta": "Unirme a {organization}",
+    "joining": "Uniéndote…",
+    "createAccount": "Crear una cuenta",
+    "haveAccount": "Ya tengo una cuenta",
+    "joinUnavailableTitle": "Este enlace no está activo",
+    "joinUnavailable": "Puede que el gimnasio lo haya desactivado. Pide un enlace nuevo o una invitación personal.",
+    "membershipUnavailable": "Tu membresía aquí está en pausa. Contacta con el gimnasio para reactivarla.",
+    "goHome": "Ir a la página de inicio"
+  },
+  "UsersDirectory": {
+    "filters": "Filtros",
+    "searchLabel": "Buscar personas",
+    "searchPlaceholder": "Buscar por nombre",
+    "financeFilter": "Estado de la membresía",
+    "financeAll": "Cualquier estado de membresía",
+    "sortLabel": "Ordenar",
+    "sort": {
+      "name": "Nombre A–Z",
+      "newest": "Más recientes",
+      "oldest": "Más antiguos"
+    },
+    "roleFilter": "Filtrar por rol",
+    "roles": {
+      "all": "Todos",
+      "member": "Socios",
+      "athlete": "Atletas",
+      "admin": "Personal"
+    },
+    "showing": "Mostrando {shown} de {total}",
+    "clearFilters": "Borrar filtros",
+    "retry": "Reintentar",
+    "emptyTitle": "Aún no hay clientes",
+    "emptyBody": "Invita a tus primeros socios y atletas. Aparecerán aquí en cuanto se unan.",
+    "inviteFirst": "Invita a tus primeros clientes",
+    "noMatchesTitle": "Sin coincidencias",
+    "noMatchesBody": "Prueba con otro nombre o borra los filtros.",
+    "listLabel": "Personas",
+    "columns": {
+      "person": "Persona",
+      "finance": "Membresía",
+      "joined": "Alta",
+      "open": "Abrir perfil"
+    }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Configuración sin terminar",
+    "popupTitle": "¡Bienvenido! Preparemos tu gimnasio",
+    "popupIntro": "Seis pasos cortos. Para cuando quieras: esta lista te espera en {path}.",
+    "progress": "{done} de {total} hechos",
+    "later": "Recordármelo luego",
+    "dontShow": "No volver a mostrar",
+    "takeTour": "Hacer el recorrido",
+    "panelTitle": "Lista de configuración",
+    "panelIntro": "Sigue donde lo dejaste. Los pasos se marcan solos cuando la app detecta que están hechos.",
+    "showPopupAgain": "Volver a mostrar la bienvenida",
+    "showSteps": "Mostrar pasos",
+    "hideSteps": "Ocultar pasos",
+    "allDone": "Todo listo. Tu app está preparada para recibir clientes.",
+    "markDone": "Marcar como hecho",
+    "skip": "Omitir",
+    "reopen": "Deshacer",
+    "unskip": "Recuperar",
+    "doneAuto": "Hecho. Lo detectamos automáticamente.",
+    "statusDone": "(hecho)",
+    "statusSkipped": "(omitido)",
+    "statusOpen": "(pendiente)",
+    "steps": {
+      "settings": {
+        "title": "Revisa las reglas de la app",
+        "body": "Valores por defecto de reservas, pagos y avisos. Dos minutos.",
+        "cta": "Abrir ajustes"
+      },
+      "classes": {
+        "title": "Añade tus clases",
+        "body": "Crea tipos de clase (p. ej. CrossFit, Yoga) para que los clientes reserven.",
+        "cta": "Configurar clases"
+      },
+      "packages": {
+        "title": "Crea paquetes de membresía",
+        "body": "Planes y precios que los clientes compran o que tú asignas.",
+        "cta": "Crear paquete"
+      },
+      "workout": {
+        "title": "Escribe tu primer entrenamiento",
+        "body": "Escríbelo como en la pizarra. El asistente hace el resto.",
+        "cta": "Escribir entrenamiento"
+      },
+      "invite": {
+        "title": "Invita a tus clientes",
+        "body": "Envía un enlace personal o activa el enlace de alta del gimnasio.",
+        "cta": "Invitar clientes"
+      },
+      "tour": {
+        "title": "Haz el recorrido de 1 minuto",
+        "body": "Descubre dónde está cada cosa.",
+        "cta": "Empezar recorrido"
+      }
+    },
+    "tour": {
+      "roleDescription": "recorrido guiado",
+      "stepOf": "Paso {current} de {total}",
+      "skip": "Saltar recorrido",
+      "showMe": "Muéstramelo",
+      "back": "Atrás",
+      "next": "Siguiente",
+      "done": "Entendido",
+      "replay": "Repetir el recorrido",
+      "admin": {
+        "welcome": {
+          "title": "Bienvenido a la app de tu gimnasio",
+          "body": "Un vistazo de un minuto a lo esencial. Sáltalo cuando quieras."
+        },
+        "dashboard": {
+          "title": "Panel",
+          "body": "Tu día de un vistazo: clases, ingresos y lo que necesita tu atención."
+        },
+        "classes": {
+          "title": "Clases",
+          "body": "Crea tipos de clase, programa sesiones y aprueba reservas."
+        },
+        "workouts": {
+          "title": "Entrenamientos",
+          "body": "Escribe un entrenamiento en texto libre. El asistente lo estructura y señala errores."
+        },
+        "people": {
+          "title": "Personas e invitaciones",
+          "body": "Invita clientes con un enlace y abre el perfil, los pagos y el progreso de cualquiera."
+        },
+        "config": {
+          "title": "Configuración de la app",
+          "body": "Reglas, avisos, acceso de clientes y esta lista están en {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "¡Bienvenido!",
+          "body": "Así le sacas el máximo partido a la app en menos de un minuto."
+        },
+        "schedule": {
+          "title": "Reserva clases",
+          "body": "Abre {schedule}, elige una clase y pulsa Reservar. Te avisaremos antes de que empiece."
+        },
+        "train": {
+          "title": "Entrena con el temporizador",
+          "body": "Empieza un entrenamiento y síguelo paso a paso con el temporizador integrado."
+        },
+        "records": {
+          "title": "Sigue tu progreso",
+          "body": "Tus marcas personales y rachas se reúnen en {pantheon}."
+        },
+        "account": {
+          "title": "Facturación y perfil",
+          "body": "Consulta tu membresía en {billing}. Cambia el idioma y los avisos en tu perfil."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "¡Bienvenido!",
+          "body": "Así le sacas el máximo partido a la app en menos de un minuto."
+        },
+        "programme": {
+          "title": "Tu programa",
+          "body": "Los entrenamientos de tu coach aparecen en {myWorkouts}, día a día."
+        },
+        "train": {
+          "title": "Entrena con el temporizador",
+          "body": "Abre un entrenamiento y pulsa Empezar. El temporizador te guía en cada bloque."
+        },
+        "records": {
+          "title": "Sigue tu progreso",
+          "body": "Tus marcas personales y rachas se reúnen en {pantheon}."
+        },
+        "account": {
+          "title": "Facturación y perfil",
+          "body": "Consulta tu membresía en {billing}. Cambia el idioma y los avisos en tu perfil."
+        }
+      }
+    }
   }
 }

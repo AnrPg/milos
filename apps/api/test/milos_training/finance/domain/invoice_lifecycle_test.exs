@@ -158,4 +158,60 @@ defmodule MilosTraining.Finance.Domain.InvoiceLifecycleTest do
     assert {:error, :invalid_billing_period} =
              InvoiceLifecycle.renewal_period("weekly", ~D[2026-06-12], nil)
   end
+
+  describe "grace slack" do
+    defp facts(overrides) do
+      Map.merge(
+        %{
+          membership_status: "active",
+          membership_expires_on: nil,
+          active_subscription?: false,
+          open_invoice_count: 0,
+          overdue_invoice_count: 0,
+          today: ~D[2026-10-12],
+          grace_days: 3
+        },
+        overrides
+      )
+    end
+
+    test "a lapsed subscription keeps access for the grace days, then loses it" do
+      assert %{status: "grace", source: "subscription_grace", grace_until: ~D[2026-10-13]} =
+               InvoiceLifecycle.entitlement(facts(%{lapsed_subscription_ends_on: ~D[2026-10-10]}))
+
+      assert %{status: "inactive"} =
+               InvoiceLifecycle.entitlement(facts(%{lapsed_subscription_ends_on: ~D[2026-10-08]}))
+
+      assert %{status: "inactive"} =
+               InvoiceLifecycle.entitlement(
+                 facts(%{lapsed_subscription_ends_on: ~D[2026-10-10], grace_days: 0})
+               )
+    end
+
+    test "an overdue invoice blocks only after the grace days" do
+      overdue = %{overdue_invoice_count: 1, open_invoice_count: 1, active_subscription?: true}
+
+      assert %{status: "grace", source: "overdue_grace"} =
+               InvoiceLifecycle.entitlement(
+                 facts(Map.put(overdue, :earliest_overdue_due_date, ~D[2026-10-11]))
+               )
+
+      assert %{status: "blocked"} =
+               InvoiceLifecycle.entitlement(
+                 facts(Map.put(overdue, :earliest_overdue_due_date, ~D[2026-10-01]))
+               )
+    end
+
+    test "an expired membership keeps access for the grace days" do
+      assert %{status: "grace", source: "membership_expiry_grace"} =
+               InvoiceLifecycle.entitlement(
+                 facts(%{membership_expires_on: ~D[2026-10-11], active_subscription?: true})
+               )
+
+      assert %{status: "inactive", source: "membership_expired"} =
+               InvoiceLifecycle.entitlement(
+                 facts(%{membership_expires_on: ~D[2026-10-01], active_subscription?: true})
+               )
+    end
+  end
 end

@@ -25,7 +25,6 @@ import { fetchMyEntitlement, type EffectiveEntitlement } from "@/api/my-finance"
 import { fetchAdminSettings, type SchedulingSettings } from "@/api/settings";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
@@ -49,6 +48,7 @@ import { can } from "@/lib/role-navigation";
 
 /** A class may name its coach (ADR-100). */
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
+import { PageHeader } from "@/components/PageHeader";
 
 type SlotEditorState = {
   slotId: string | null;
@@ -99,11 +99,9 @@ function defaultSlotValues(
 export function ScheduleConsole({
   initialOpenSlotId = null,
   pageTitle,
-  heroTimeoutMs,
 }: {
   initialOpenSlotId?: string | null;
   pageTitle?: string;
-  heroTimeoutMs?: number;
 } = {}) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
@@ -501,12 +499,7 @@ export function ScheduleConsole({
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label={t("introduction")} showIntroLabel={t("showIntro")} timeoutMs={heroTimeoutMs}>
-          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("classSchedule")}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{title}</h1>
-          </section>
-        </TransientHero>
+        <PageHeader title={title} />
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

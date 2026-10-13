@@ -21,7 +21,6 @@ import { WorkoutVault } from "@/components/client/WorkoutVault";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -32,6 +31,11 @@ import {
   SUPPORTED_LOCALES,
   type AppLocale,
 } from "@/i18n/locales";
+import { PageHeader } from "@/components/PageHeader";
+import { ReplayTourButton } from "@/components/onboarding/Onboarding";
+import { TrainingHistory } from "@/components/history/TrainingHistory";
+import { defaultHistoryKind } from "@/lib/training-history";
+import { fetchMyTrainingHistory } from "@/api/training-history";
 
 function CollapsibleSection({
   id,
@@ -331,16 +335,7 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <TransientHero label={i18n("profileIntroductioncf30917")}>
-        <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {tProfile("eyebrow")}
-          </p>
-          <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-            {tProfile("title")}
-          </h1>
-        </div>
-        </TransientHero>
+        <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
 
         {showVault ? (
           <div role="tablist" aria-label={tProfile("eyebrow")} className="flex gap-1 rounded-full p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -386,6 +381,15 @@ export function ProfilePage() {
             {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
           </button>
         </div>
+
+        {tokens?.access_token && showSelfServiceSurfaces && (user?.role === "member" || user?.role === "athlete") ? (
+          <TrainingHistory
+            id="history"
+            queryKey={["me", user.id]}
+            fetchPage={(kind, offset) => fetchMyTrainingHistory(tokens.access_token, kind, offset)}
+            defaultKind={defaultHistoryKind(user.role)}
+          />
+        ) : null}
 
         <CollapsibleSection
           id="language-region"

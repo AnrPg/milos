@@ -2604,7 +2604,20 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.reject(&(&1.id in frozen))
     |> PaymentModelPolicy.drop_orphan_add_ons()
     |> SubscriptionSelection.order()
+    |> with_lapsed_fallback(membership_id, occurred_on)
   end
+
+  # ADR-112: during the grace slack after the last subscription ended, the one
+  # that just lapsed keeps governing (its allowances apply until the slack is
+  # over).
+  defp with_lapsed_fallback([], membership_id, occurred_on) do
+    case lapsed_subscription(membership_id, occurred_on, subscription_grace_days()) do
+      nil -> []
+      lapsed -> [lapsed]
+    end
+  end
+
+  defp with_lapsed_fallback(subscriptions, _membership_id, _occurred_on), do: subscriptions
 
   defp beneficiary_subscription_ids(membership_id) do
     FinanceSubscriptionBeneficiary
@@ -2746,6 +2759,32 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           {:error, changeset} -> Repo.rollback(changeset)
         end
     end
+  end
+
+  defp lapsed_subscription(_membership_id, _occurred_on, grace_days) when grace_days <= 0,
+    do: nil
+
+  defp lapsed_subscription(membership_id, occurred_on, grace_days) do
+    MembershipPackageSubscription
+    |> where([subscription], subscription.membership_id == ^membership_id)
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], not is_nil(subscription.ends_on))
+    |> where([subscription], subscription.ends_on < ^occurred_on)
+    |> where([subscription], subscription.ends_on >= ^Date.add(occurred_on, -grace_days))
+    |> order_by([subscription], desc: subscription.ends_on, desc: subscription.inserted_at)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  defp lapsed_subscription_ends_on(membership_id, today, grace_days) do
+    case lapsed_subscription(membership_id, today, grace_days) do
+      %MembershipPackageSubscription{ends_on: ends_on} -> ends_on
+      nil -> nil
+    end
+  end
+
+  defp subscription_grace_days do
+    Map.get(get_finance_settings(), :subscription_grace_days, 0) || 0
   end
 
   defp normalize_usage_entry(entry) do
@@ -4058,11 +4097,16 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     open_invoice_count =
       Enum.count(blocking_invoices, fn invoice -> invoice_balance_due(invoice.id) > 0 end)
 
-    overdue_invoice_count =
-      Enum.count(blocking_invoices, fn invoice ->
+    overdue_invoices =
+      Enum.filter(blocking_invoices, fn invoice ->
         invoice_balance_due(invoice.id) > 0 and invoice.due_date != nil and
           Date.compare(today, invoice.due_date) == :gt
       end)
+
+    overdue_invoice_count = length(overdue_invoices)
+
+    earliest_overdue_due_date =
+      overdue_invoices |> Enum.map(& &1.due_date) |> Enum.min(Date, fn -> nil end)
 
     # ADR-098: a beneficiary of a shared membership holds it as well.
     shared_ids = beneficiary_subscription_ids(membership.id)
@@ -4081,6 +4125,13 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       |> where([subscription], is_nil(subscription.ends_on) or subscription.ends_on >= ^today)
       |> Repo.exists?()
 
+    grace_days = subscription_grace_days()
+
+    lapsed_subscription_ends_on =
+      if active_subscription?,
+        do: nil,
+        else: lapsed_subscription_ends_on(membership.id, today, grace_days)
+
     derived =
       InvoiceLifecycle.entitlement(%{
         membership_status: membership.status,
@@ -4088,13 +4139,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         active_subscription?: active_subscription?,
         open_invoice_count: open_invoice_count,
         overdue_invoice_count: overdue_invoice_count,
-        today: Date.utc_today()
+        earliest_overdue_due_date: earliest_overdue_due_date,
+        lapsed_subscription_ends_on: lapsed_subscription_ends_on,
+        grace_days: grace_days,
+        today: today
       })
 
     %{
       status: derived.status,
       source: derived.source,
       expires_on: derived.expires_on,
+      grace_until: derived.grace_until,
       open_invoice_count: open_invoice_count,
       overdue_invoice_count: overdue_invoice_count,
       credit_balance_cents: credit_balance(membership.id),
@@ -5577,6 +5632,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       nil ->
         %{
           payment_reminder_interval_days: 7,
+          subscription_expiry_reminder_days: 5,
+          subscription_grace_days: 3,
           entitlement_enforcement_mode: "observe",
           entitlement_timezone: "Europe/Athens",
           document_mode: "invoice",
@@ -5612,6 +5669,8 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       id: s.id,
       organization_id: s.organization_id,
       payment_reminder_interval_days: s.payment_reminder_interval_days,
+      subscription_expiry_reminder_days: s.subscription_expiry_reminder_days,
+      subscription_grace_days: s.subscription_grace_days,
       entitlement_enforcement_mode: s.entitlement_enforcement_mode,
       entitlement_timezone: s.entitlement_timezone,
       document_mode: s.document_mode,
@@ -5773,6 +5832,110 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.update_all(set: [last_payment_reminder_sent_at: DateTime.utc_now()])
 
     :ok
+  end
+
+  @impl true
+  def subscriptions_needing_expiry_notice(:expiry_reminder, days) when days > 0 do
+    today = Date.utc_today()
+
+    :expiry_reminder_sent_at
+    |> subscription_notices(today, Date.add(today, days))
+    # A package with its own reminder days (ADR-097) is reminded by
+    # PackageExpiryReminderJob on that day instead, so members get one reminder.
+    |> Enum.reject(&((package_terms(&1.params_snapshot)[:expiry_reminder_days] || 0) > 0))
+    |> Enum.map(&Map.delete(&1, :params_snapshot))
+  end
+
+  def subscriptions_needing_expiry_notice(:grace_notice, days) when days > 0 do
+    today = Date.utc_today()
+
+    :grace_notice_sent_at
+    |> subscription_notices(Date.add(today, -days), Date.add(today, -1))
+    |> Enum.map(&Map.delete(&1, :params_snapshot))
+  end
+
+  def subscriptions_needing_expiry_notice(_kind, _days), do: []
+
+  # Active subscriptions ending between the two days that were not renewed
+  # (no later subscription for the same membership) and not yet notified.
+  defp subscription_notices(sent_field, first_day, last_day) do
+    from(subscription in MembershipPackageSubscription, as: :subscription)
+    |> tenant_scope()
+    |> join(:inner, [subscription], membership in Membership,
+      on: membership.id == subscription.membership_id
+    )
+    |> join(:left, [subscription], package in MembershipPackage,
+      on: package.id == subscription.membership_package_id
+    )
+    |> where([subscription], subscription.status == "active")
+    |> where([subscription], not is_nil(subscription.ends_on))
+    |> where(
+      [subscription],
+      subscription.ends_on >= ^first_day and subscription.ends_on <= ^last_day
+    )
+    |> where([subscription], is_nil(field(subscription, ^sent_field)))
+    |> where(
+      [_subscription, membership],
+      membership.status in ["active", "expiring", "trial", "comped"]
+    )
+    |> where(
+      [subscription],
+      not exists(
+        from(later in MembershipPackageSubscription,
+          where:
+            later.membership_id == parent_as(:subscription).membership_id and
+              later.id != parent_as(:subscription).id and later.status == "active" and
+              (is_nil(later.ends_on) or later.ends_on > parent_as(:subscription).ends_on)
+        )
+      )
+    )
+    |> select([subscription, membership, package], %{
+      subscription_id: subscription.id,
+      membership_id: membership.id,
+      user_id: membership.user_id,
+      ends_on: subscription.ends_on,
+      package_name: coalesce(package.name, subscription.package_code_snapshot),
+      params_snapshot: subscription.params_snapshot
+    })
+    |> Repo.all()
+  end
+
+  @impl true
+  def mark_subscription_notice_sent(subscription_id, kind) do
+    field = if kind == :grace_notice, do: :grace_notice_sent_at, else: :expiry_reminder_sent_at
+
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([subscription], subscription.id == ^subscription_id)
+    |> Repo.update_all(set: [{field, utc_now()}])
+
+    :ok
+  end
+
+  @impl true
+  def refresh_entitlement_snapshots do
+    Membership
+    |> tenant_scope()
+    |> Repo.all()
+    |> Enum.flat_map(fn membership ->
+      refresh_entitlement_snapshot(membership.id)
+      updated = Repo.get(Membership, membership.id)
+
+      # Lost access with this refresh (e.g. the grace slack is over).
+      if (membership.entitlement_status in ["active", "grace"] and updated) &&
+           updated.entitlement_status in ["inactive", "blocked"] do
+        [
+          %{
+            membership_id: updated.id,
+            user_id: updated.user_id,
+            status: updated.entitlement_status,
+            source: updated.entitlement_source
+          }
+        ]
+      else
+        []
+      end
+    end)
   end
 
   @impl true

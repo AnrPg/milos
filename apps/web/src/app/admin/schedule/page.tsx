@@ -15,7 +15,7 @@ export default async function AdminSchedulePage({
 
   return (
     <AuthGuard roles={["admin"]}>
-      <ScheduleConsole initialOpenSlotId={initialOpenSlotId} heroTimeoutMs={3000} />
+      <ScheduleConsole initialOpenSlotId={initialOpenSlotId} />
     </AuthGuard>
   );
 }

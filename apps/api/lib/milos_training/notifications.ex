@@ -291,6 +291,15 @@ defmodule MilosTraining.Notifications do
         url: "/admin/inventory"
       })
 
+  def process_event("subscription_expiring", payload),
+    do: enqueue_subscription_notice(:subscription_expiring, payload)
+
+  def process_event("subscription_grace", payload),
+    do: enqueue_subscription_notice(:subscription_grace, payload)
+
+  def process_event("access_ended", payload),
+    do: enqueue_subscription_notice(:access_ended, payload)
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),
@@ -671,6 +680,40 @@ defmodule MilosTraining.Notifications do
     end
   end
 
+  # Sent to the client whose subscription ends; deduplicated per subscription
+  # so a retried job never notifies twice.
+  def enqueue_subscription_notice(type, payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+
+    notification_payload =
+      payload
+      |> Map.take([
+        :package_name,
+        :ends_on,
+        :days_left,
+        :grace_days,
+        :grace_until,
+        :reason,
+        :cancelled_bookings
+      ])
+      |> Map.merge(%{
+        url: "/account/billing",
+        dedupe_key: dedupe_key(type, payload)
+      })
+
+    case deliver_notification(user_id, type, notification_payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
+        error
+    end
+  end
+
   defp stringify_values(payload) do
     Map.new(payload, fn
       {key, %DateTime{} = value} ->
@@ -686,6 +729,13 @@ defmodule MilosTraining.Notifications do
         pair
     end)
   end
+
+  # Access can be lost more than once per membership (renew, lapse again), so
+  # that notice is unique per day rather than per subscription.
+  defp dedupe_key(:access_ended, payload),
+    do: "access_ended:#{field(payload, :membership_id)}:#{Date.utc_today()}"
+
+  defp dedupe_key(type, payload), do: "#{type}:#{field(payload, :subscription_id)}"
 
   def delete_booking_pending_notifications(booking_id) do
     case NotificationStore.delete_booking_pending_for_booking(booking_id) do

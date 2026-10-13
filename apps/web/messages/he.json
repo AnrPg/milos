@@ -2555,7 +2555,7 @@
     "freeTextEditorPlaceholder": "כתוב את ה-WOD בדיוק כפי שהוא אמור להופיע על הלוח...",
     "freeTextEditorLabel": "עורך אימון בטקסט חופשי",
     "freeTextTitle": "טקסט חופשי WOD",
-    "freeTextDescription": "כתוב WOD מהיר בטקסט עשיר. הוא נשמר ומוצג כגוף טקסט אחד לא מובנה.",
+    "freeTextDescription": "כתבו את ה-WOD כמו על הלוח. הספורטאים רואים את הטקסט כפי שנכתב, והעוזר הופך אותו לנתונים מובנים.",
     "freeTextPreviewEmpty": "התצוגה המקדימה של WOD בטקסט חופשי תופיע כאן.",
     "timerFormatLabel": "פורמט טיימר",
     "durationMinutesLabel": "משך (דקות)",
@@ -4174,7 +4174,35 @@
     "invItem": "פריט",
     "invUsedPerMonth": "צריכה / חודש",
     "invSpendPerMonth": "הוצאה / חודש",
-    "invTotalSpend": "סה\"כ הוצאות"
+    "invTotalSpend": "סה\"כ הוצאות",
+    "subscriptionExpiryReminderDays": "תזכורת סיום (ימים לפני)",
+    "subscriptionExpiryReminderDaysHelp": "הלקוחות מקבלים התראה מספר ימים זה לפני סיום המנוי. 0 מבטל.",
+    "subscriptionGraceDays": "תקופת חסד (ימים)",
+    "subscriptionGraceDaysHelp": "לאחר סיום המנוי או חשבונית באיחור, הלקוחות שומרים על גישה מספר ימים זה. לאחר מכן הם מאבדים אותה, למשל לא יוכלו להזמין שיעורים.",
+    "accessGraceEnded": "המנוי שלך הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים.",
+    "accessGraceOverdue": "יש תשלום באיחור. הגישה נשמרת עד {date}; שלמו עד אז כדי להמשיך להזמין שיעורים.",
+    "accessBlockedOverdue": "הגישה שלך מושהית בגלל תשלום באיחור. שלמו את היתרה כדי להזמין שיעורים שוב.",
+    "accessEnded": "הגישה שלך הסתיימה. חדשו את המנוי כדי להזמין שיעורים שוב.",
+    "subscriptionEndsSoonTitle": "המנוי שלך מסתיים בקרוב",
+    "subscriptionEndedTitle": "המנוי שלך הסתיים",
+    "yourSubscription": "המנוי שלך",
+    "subscriptionEndsSoonBody": "{package} מסתיים ב־{date} (בעוד {days} ימים). חדשו כדי להמשיך להזמין שיעורים.",
+    "subscriptionEndedBody": "{package} הסתיים. הגישה נשמרת עד {date}; חדשו עד אז כדי להמשיך להזמין שיעורים.",
+    "historyTitle": "היסטוריית אימונים",
+    "historyWorkouts": "אימונים",
+    "historyClasses": "שיעורים",
+    "historyLoading": "טוען…",
+    "historyError": "לא ניתן היה לטעון את ההיסטוריה. נסו שוב מאוחר יותר.",
+    "historyNoWorkouts": "עדיין לא נרשמו אימונים.",
+    "historyNoClasses": "עדיין אין שיעורים קודמים.",
+    "historyShowing": "מוצגים {shown} מתוך {total}",
+    "historyShowMore": "הצג עוד",
+    "historyDeletedWorkout": "אימון שנמחק",
+    "historyMinutes": "{minutes} דק׳",
+    "historyNoResult": "לא נרשמה תוצאה.",
+    "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}",
+    "accessEndedTitle": "הגישה שלך הסתיימה",
+    "accessEndedCancelledBookings": "{count, plural, one {ההזמנה הקרובה שלך בוטלה.} other {# ההזמנות הקרובות שלך בוטלו.}}"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4291,5 +4319,359 @@
     "errorGeneric": "לא ניתן היה להשלים את הבקשה.",
     "myReceiptsTitle": "קבלות החזר",
     "myReceiptsEmpty": "אין לכם קבלות החזר."
+  },
+  "WorkoutAssistant": {
+    "title": "עוזר אימונים",
+    "intro": "כתבו את האימון כמו על הלוח. העוזר הופך אותו לנתונים מובנים ומצביע על כל מה שלא ברור.",
+    "analyze": "בדיקה עם העוזר",
+    "reanalyze": "בדיקה חוזרת",
+    "analyzing": "קורא את האימון…",
+    "analyzingHint": "זה לוקח בדרך כלל כמה שניות. הטקסט שלכם נשמר.",
+    "stale": "שיניתם את הטקסט מאז הבדיקה האחרונה. בדקו שוב כדי לעדכן את התוצאות.",
+    "insertExample": "להתחיל מדוגמה",
+    "exampleWorkout": "הכנה ל-Murph\nחימום: ריצת 400 מ׳, ואז 2 סבבים של 10 סקוואטים\nFor time, מגבלה 25 דק׳:\n5 סבבים\n10 מתח\n20 שכיבות סמיכה\n30 סקוואטים\nכוח:\nסקוואט אחורי 5x5 @ 100 ק״ג, מנוחה 2 דק׳",
+    "tipsTitle": "טיפים לקריאה נקייה",
+    "tipOneLine": "תרגיל אחד בכל שורה.",
+    "tipSetsReps": "כתבו סטים × חזרות @ משקל, למשל 5x5 @ 100 ק״ג.",
+    "tipBlocks": "תנו שם לכל חלק: חימום, כוח, WOD.",
+    "tipTimers": "ציינו טיימרים: AMRAP 12, EMOM 10, For time מגבלה 20.",
+    "panelTabs": "לוח צד של העורך",
+    "tabAssistant": "עוזר",
+    "tabPreview": "תצוגה מקדימה",
+    "summarySections": "חלקים",
+    "summaryExercises": "תרגילים",
+    "summaryOpen": "לבדיקה",
+    "issuesHeading": "לבדיקה ({count})",
+    "suggestionsHeading": "תוספות מוצעות ({count})",
+    "resolvedHeading": "נבדקו ({count})",
+    "allClear": "הכול ברור. אפשר לפרסם.",
+    "severityError": "חובה לתקן",
+    "severityWarning": "לבדוק",
+    "requiredBadge": "חובה",
+    "accept": "אישור",
+    "apply": "החלה",
+    "reject": "דחייה",
+    "undo": "ביטול",
+    "add": "הוספה",
+    "dismiss": "התעלמות",
+    "accepted": "אושר",
+    "rejectedOptional": "נדחה, נשאר ריק",
+    "rejectedRequired": "נדחה, שדה חובה: הפרסום חסום עד שתמלאו אותו",
+    "rejectOptionalHint": "דחייה משאירה את השדה ריק. עדיין אפשר לפרסם את האימון.",
+    "rejectRequiredHint": "זהו שדה חובה. דחייה מרוקנת אותו וחוסמת פרסום עד שתזינו ערך.",
+    "typeValue": "הערך שלכם",
+    "typeValuePlaceholder": "הקלידו ערך",
+    "invalidTyped": "הערך לא מתאים לשדה הזה. בדקו את הפורמט ונסו שוב.",
+    "alsoInText": "להוסיף גם את השורה הזו לטקסט:",
+    "hintMinutes": "משך בדקות",
+    "hintList": "הפרידו פריטים בפסיקים",
+    "hintDifficulty": "beginner‏, intermediate‏, advanced או all-levels",
+    "hintValue": "ערך",
+    "readAs": "איך העוזר הבין את זה",
+    "noBlocks": "עדיין לא נמצאו חלקי אימון. הוסיפו תרגילים, אחד בכל שורה.",
+    "unnamed": "ללא שם",
+    "setsOnly": "{count} סטים",
+    "bodyweight": "משקל גוף",
+    "restShort": "מנוחה {seconds} שנ׳",
+    "units": {
+      "secs": "שנ׳",
+      "kcal": "קלוריות",
+      "meters": "מטר"
+    },
+    "pathSection": "חלק {number}",
+    "pathExercise": "תרגיל {number}",
+    "fields": {
+      "title": "כותרת",
+      "type": "סוג אימון",
+      "subtitle": "כותרת משנה",
+      "description": "תיאור",
+      "difficulty": "רמת קושי",
+      "estimated_duration_seconds": "משך",
+      "equipment": "ציוד",
+      "tags": "תגיות",
+      "name": "שם",
+      "note": "הערה",
+      "timer_config": "טיימר",
+      "sets": "סטים",
+      "prescription_value": "חזרות / כמות",
+      "prescription_unit": "יחידה",
+      "load_value": "משקל",
+      "load_mode": "סוג עומס",
+      "rest_seconds": "מנוחה (שניות)",
+      "tempo": "קצב",
+      "text": "טקסט"
+    },
+    "why": {
+      "difficulty": "ספורטאים בוחרים מהר יותר כשהם יודעים את הרמה.",
+      "estimated_duration_seconds": "משך עוזר לכם לתכנן שיעורים ולספורטאים לתכנן את היום.",
+      "equipment": "רשימת ציוד מאפשרת לספורטאים להתארגן לפני שמתחילים.",
+      "description": "מטרה קצרה שומרת על כולם ממוקדים.",
+      "generic": "הוספה של זה הופכת את האימון לשלם יותר."
+    },
+    "codes": {
+      "missing_title": "לאימון צריך כותרת. כתבו אחת בשדה הכותרת, למשל „הכנה ל-Murph”.",
+      "missing_type": "בחרו סוג אימון כדי שיגיע לספרייה הנכונה.",
+      "missing_section_name": "תנו שם לחלק הזה, למשל „חימום” או „כוח”.",
+      "missing_exercise_name": "בשורה הזו יש מספרים אבל אין תרגיל. כתבו איזו תנועה זו.",
+      "too_short": "השתמשו לפחות ב-{min} תווים.",
+      "invalid_value": "„{value}” אינו תקין כאן. הזינו ערך נכון או דחו אותו כדי להשמיט.",
+      "invalid_timer": "בטיימר {format} חסר: {missing}. הוסיפו זאת לטקסט, למשל „כל דקה במשך 10 דקות”.",
+      "unknown_format": "„{value}” אינו פורמט טיימר מוכר. השתמשו למשל ב-AMRAP‏, EMOM או For time.",
+      "generic": "העוזר מצא כאן משהו שכדאי לבדוק."
+    },
+    "errors": {
+      "notConfigured": "העוזר עדיין לא הוגדר בשרת הזה. עדיין אפשר לפרסם את הטקסט כמו שהוא.",
+      "unavailable": "העוזר עמוס או לא מחובר. נסו שוב בעוד רגע. הטקסט שלכם נשמר.",
+      "textRequired": "כתבו קודם את האימון ואז בדקו אותו.",
+      "textTooLong": "הטקסט ארוך מדי לבדיקה אחת. פצלו אותו לאימונים נפרדים."
+    },
+    "blockingTitle": "עדיין אי אפשר לפרסם. תקנו קודם:",
+    "blockingRequired": "חובה",
+    "blockingTooShort": "קצר מדי (לפחות 3 תווים)",
+    "chooseType": "בחרו סוג…",
+    "titlePlaceholder": "השאירו ריק והעוזר יציע כותרת",
+    "checkAndPublish": "בדיקה ופרסום",
+    "reviewBeforePublish": "העוזר השאיר כמה הערות. עברו עליהן ולחצו שוב על פרסום.",
+    "resolveErrorsFirst": "טפלו בפריטים המסומנים „חובה לתקן” לפני הפרסום.",
+    "publishFailed": "הפרסום נכשל. הטיוטה נשמרה. נסו שוב.",
+    "rejectTextHint": "דחייה משאירה את הטקסט כפי שנכתב.",
+    "rejectedText": "נשאר כפי שנכתב",
+    "editNotApplied": "„{text}” כבר לא מופיע בטקסט, ולכן התיקון לא הוחל. בדקו שוב כדי לרענן את ההצעות.",
+    "intervalSlot": "מקטע {slot}",
+    "oddIntervals": "מקטעים אי־זוגיים",
+    "evenIntervals": "מקטעים זוגיים",
+    "severityAssumption": "הנחה",
+    "keepAssumption": "להשאיר",
+    "rejectAssumptionHint": "דחייה מוחקת את הערך; הטקסט נשאר כפי שנכתב."
+  },
+  "Invites": {
+    "inviteClients": "הזמנת לקוחות",
+    "dialogIntro": "שלחו קישור אישי או שתפו את קישור ההצטרפות של המכון.",
+    "close": "סגירה",
+    "clientAccess": "גישת לקוחות",
+    "clientAccessIntro": "בחרו איך לקוחות חדשים נכנסים לאפליקציה: קישור אישי חד־פעמי או קישור ההצטרפות הציבורי.",
+    "tabPersonal": "קישור אישי",
+    "tabPublic": "קישור הצטרפות",
+    "tabPending": "ממתינות ({count})",
+    "joinsAs": "מצטרף בתור",
+    "roles": {
+      "member": "מנוי",
+      "athlete": "ספורטאי"
+    },
+    "roleHints": {
+      "member": "נרשם לשיעורים במכון",
+      "athlete": "מקבל תוכנית אישית"
+    },
+    "emailOptional": "אימייל (לא חובה)",
+    "emailHint": "אם תמלאו, רק חשבון עם האימייל הזה יוכל להשתמש בקישור.",
+    "validFor": "בתוקף למשך",
+    "days": "{count, plural, one {יום אחד} two {יומיים} other {# ימים}}",
+    "createLink": "יצירת קישור הזמנה",
+    "creating": "יוצר…",
+    "linkReady": "הקישור מוכן. שלחו אותו ל{role} החדש.",
+    "singleUse": "עובד פעם אחת. פג תוקף ב־{date}.",
+    "createAnother": "יצירת קישור נוסף",
+    "inviteSubject": "ההזמנה שלך ל־{organization}",
+    "inviteMessage": "הוזמנת להצטרף ל־{organization}. צרו חשבון כאן: {url}",
+    "publicTitle": "קישור הצטרפות ציבורי",
+    "publicHint": "כל מי שיש לו את הכתובת של המכון יכול להירשם. אפשר לכבות בכל רגע.",
+    "publicOff": "קישור ההצטרפות כבוי. הפעילו אותו כדי לקבל כתובת לאתר, לרשתות החברתיות או לקוד QR בקבלה.",
+    "publicWarning": "כל מי שמשתמש בכתובת הזו מצטרף בתור {role}. אנשי צוות עדיין צריכים קישור אישי.",
+    "joinSubject": "הצטרפו אלינו",
+    "joinMessage": "הצטרפו למכון שלנו באפליקציה: {url}",
+    "noPending": "אין הזמנות ממתינות. קישורים שתיצרו יופיעו כאן עד שישומשו או שיפוג תוקפם.",
+    "emailBound": "מקושר לאימייל",
+    "expires": "פג תוקף ב־{date}",
+    "revoke": "ביטול",
+    "confirmRevoke": "כן, לבטל",
+    "keep": "להשאיר",
+    "loading": "טוען…",
+    "linkLabel": "קישור הזמנה",
+    "copy": "העתקה",
+    "copied": "הועתק",
+    "share": "שיתוף",
+    "email": "אימייל",
+    "whatsapp": "וואטסאפ",
+    "youreInvited": "הוזמנת",
+    "joinTitle": "הצטרפות ל־{organization}",
+    "joinBody": "צרו חשבון או התחברו כדי להצטרף בתור {role}. זה לוקח פחות מדקה.",
+    "joinCta": "הצטרפות ל־{organization}",
+    "joining": "מצטרף…",
+    "createAccount": "יצירת חשבון",
+    "haveAccount": "כבר יש לי חשבון",
+    "joinUnavailableTitle": "הקישור הזה לא פעיל",
+    "joinUnavailable": "ייתכן שהמכון כיבה אותו. בקשו קישור חדש או הזמנה אישית.",
+    "membershipUnavailable": "המנוי שלך כאן מושהה. פנו למכון כדי להפעיל אותו מחדש.",
+    "goHome": "לדף הבית"
+  },
+  "UsersDirectory": {
+    "filters": "מסננים",
+    "searchLabel": "חיפוש אנשים",
+    "searchPlaceholder": "חיפוש לפי שם",
+    "financeFilter": "סטטוס מנוי",
+    "financeAll": "כל סטטוס מנוי",
+    "sortLabel": "מיון",
+    "sort": {
+      "name": "שם א–ת",
+      "newest": "החדשים קודם",
+      "oldest": "הוותיקים קודם"
+    },
+    "roleFilter": "סינון לפי תפקיד",
+    "roles": {
+      "all": "כולם",
+      "member": "מנויים",
+      "athlete": "ספורטאים",
+      "admin": "צוות"
+    },
+    "showing": "מוצגים {shown} מתוך {total}",
+    "clearFilters": "ניקוי מסננים",
+    "retry": "לנסות שוב",
+    "emptyTitle": "עדיין אין לקוחות",
+    "emptyBody": "הזמינו את המנויים והספורטאים הראשונים. הם יופיעו כאן ברגע שיצטרפו.",
+    "inviteFirst": "הזמנת הלקוחות הראשונים",
+    "noMatchesTitle": "אין תוצאות",
+    "noMatchesBody": "נסו שם אחר או נקו את המסננים.",
+    "listLabel": "אנשים",
+    "columns": {
+      "person": "אדם",
+      "finance": "מנוי",
+      "joined": "הצטרפות",
+      "open": "פתיחת פרופיל"
+    }
+  },
+  "Onboarding": {
+    "popupEyebrow": "ההגדרה לא הושלמה",
+    "popupTitle": "ברוכים הבאים! בואו נכין את המכון",
+    "popupIntro": "שישה צעדים קצרים. אפשר לעצור בכל רגע: הרשימה מחכה לכם ב{path}.",
+    "progress": "הושלמו {done} מתוך {total}",
+    "later": "להזכיר לי מאוחר יותר",
+    "dontShow": "לא להציג שוב",
+    "takeTour": "לסיור",
+    "panelTitle": "רשימת הגדרה",
+    "panelIntro": "המשיכו מאיפה שעצרתם. צעדים מסומנים לבד כשהאפליקציה מזהה שהם בוצעו.",
+    "showPopupAgain": "להציג שוב את חלון הפתיחה",
+    "showSteps": "הצגת הצעדים",
+    "hideSteps": "הסתרת הצעדים",
+    "allDone": "הכול מוכן. האפליקציה מוכנה ללקוחות.",
+    "markDone": "סימון כבוצע",
+    "skip": "דילוג",
+    "reopen": "ביטול",
+    "unskip": "החזרה",
+    "doneAuto": "בוצע. זיהינו את זה אוטומטית.",
+    "statusDone": "(בוצע)",
+    "statusSkipped": "(דולג)",
+    "statusOpen": "(לביצוע)",
+    "steps": {
+      "settings": {
+        "title": "בדקו את כללי האפליקציה",
+        "body": "ברירות מחדל להזמנות, תשלומים והתראות. שתי דקות.",
+        "cta": "פתיחת ההגדרות"
+      },
+      "classes": {
+        "title": "הוסיפו את השיעורים",
+        "body": "צרו סוגי שיעורים (למשל CrossFit, יוגה) כדי שלקוחות יוכלו להירשם.",
+        "cta": "הגדרת שיעורים"
+      },
+      "packages": {
+        "title": "צרו חבילות מנוי",
+        "body": "מסלולים ומחירים שלקוחות קונים או שאתם מקצים.",
+        "cta": "יצירת חבילה"
+      },
+      "workout": {
+        "title": "כתבו את האימון הראשון",
+        "body": "כתבו אותו כמו על הלוח. העוזר יעשה את השאר.",
+        "cta": "כתיבת אימון"
+      },
+      "invite": {
+        "title": "הזמינו את הלקוחות",
+        "body": "שלחו קישור אישי או הפעילו את קישור ההצטרפות של המכון.",
+        "cta": "הזמנת לקוחות"
+      },
+      "tour": {
+        "title": "סיור של דקה",
+        "body": "ראו איפה נמצא כל דבר.",
+        "cta": "התחלת הסיור"
+      }
+    },
+    "tour": {
+      "roleDescription": "סיור מודרך",
+      "stepOf": "שלב {current} מתוך {total}",
+      "skip": "דילוג על הסיור",
+      "showMe": "הראו לי",
+      "back": "הקודם",
+      "next": "הבא",
+      "done": "הבנתי",
+      "replay": "צפייה חוזרת בסיור",
+      "admin": {
+        "welcome": {
+          "title": "ברוכים הבאים לאפליקציית המכון",
+          "body": "מבט של דקה על העיקר. אפשר לדלג בכל רגע."
+        },
+        "dashboard": {
+          "title": "לוח בקרה",
+          "body": "היום במבט אחד: שיעורים, הכנסות וכל מה שדורש את תשומת לבכם."
+        },
+        "classes": {
+          "title": "שיעורים",
+          "body": "צרו סוגי שיעורים, תזמנו מפגשים ואשרו הרשמות."
+        },
+        "workouts": {
+          "title": "אימונים",
+          "body": "כתבו אימון כטקסט רגיל. העוזר מסדר אותו ומסמן טעויות."
+        },
+        "people": {
+          "title": "אנשים והזמנות",
+          "body": "הזמינו לקוחות בקישור ופתחו את הפרופיל, התשלומים וההתקדמות של כל אחד."
+        },
+        "config": {
+          "title": "הגדרות האפליקציה",
+          "body": "כללים, התראות, גישת לקוחות והרשימה הזו נמצאים ב{path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "ברוכים הבאים!",
+          "body": "כך תפיקו את המרב מהאפליקציה בפחות מדקה."
+        },
+        "schedule": {
+          "title": "הרשמה לשיעורים",
+          "body": "פתחו את {schedule}, בחרו שיעור והקישו על הרשמה. נזכיר לכם לפני שהוא מתחיל."
+        },
+        "train": {
+          "title": "התאמנו עם הטיימר",
+          "body": "התחילו אימון ועקבו אחריו צעד אחר צעד עם הטיימר המובנה."
+        },
+        "records": {
+          "title": "עקבו אחרי ההתקדמות",
+          "body": "השיאים האישיים והרצפים שלכם נאספים ב{pantheon}."
+        },
+        "account": {
+          "title": "חיוב ופרופיל",
+          "body": "את המנוי רואים ב{billing}. שפה והתראות משנים בפרופיל."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "ברוכים הבאים!",
+          "body": "כך תפיקו את המרב מהאפליקציה בפחות מדקה."
+        },
+        "programme": {
+          "title": "התוכנית שלכם",
+          "body": "האימונים מהמאמן מופיעים ב{myWorkouts}, יום אחר יום."
+        },
+        "train": {
+          "title": "התאמנו עם הטיימר",
+          "body": "פתחו אימון ולחצו על התחלה. הטיימר ידריך אתכם בכל חלק."
+        },
+        "records": {
+          "title": "עקבו אחרי ההתקדמות",
+          "body": "השיאים האישיים והרצפים שלכם נאספים ב{pantheon}."
+        },
+        "account": {
+          "title": "חיוב ופרופיל",
+          "body": "את המנוי רואים ב{billing}. שפה והתראות משנים בפרופיל."
+        }
+      }
+    }
   }
 }

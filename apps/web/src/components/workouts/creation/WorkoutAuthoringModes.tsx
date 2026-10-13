@@ -1,8 +1,11 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
+import { fetchAdminWorkout } from "@/api/workouts";
+import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
@@ -11,15 +14,41 @@ import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
 import { QuickTextWorkoutEditor } from "./QuickTextWorkoutEditor";
 import { WorkoutCreationCanvas } from "./WorkoutCreationCanvas";
 
+type AuthoringMode = "structured" | "quick-text" | "free-text";
+
+/**
+ * Free text is the only way to create new workouts. Structured and Quick Text
+ * stay in the codebase (and keep editing workouts that were authored with
+ * them), but their tabs are hidden. Flip this to bring the switcher back.
+ */
+const SHOW_AUTHORING_MODE_SWITCHER = false;
+
 export function WorkoutAuthoringModes() {
   const i18n = useUiTranslations();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const searchParams = useSearchParams();
+  const { tokens } = useSession();
   const storeDraftId = useWorkoutCreationStore((state) => state.draftId);
   const requestedMode = searchParams.get("mode");
-  const mode = requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
   const draftId = searchParams.get("draft") ?? storeDraftId;
+  const switcherMode: AuthoringMode =
+    requestedMode === "quick-text" || requestedMode === "free-text" ? requestedMode : "structured";
+
+  // Existing drafts open in the editor they were authored with, so legacy
+  // structured or Quick Text content is never overwritten by a free-text save.
+  const draftQuery = useQuery({
+    queryKey: ["admin-workout-authoring-mode", draftId],
+    enabled: !SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId && tokens?.access_token),
+    queryFn: () => fetchAdminWorkout(tokens!.access_token, draftId!),
+    staleTime: Infinity,
+  });
+  const mode: AuthoringMode = SHOW_AUTHORING_MODE_SWITCHER
+    ? switcherMode
+    : draftId
+      ? legacyEditorFor(draftQuery.data)
+      : "free-text";
+  const resolvingDraft = !SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending;
   const [modeBarVisible, setModeBarVisible] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
 
@@ -62,7 +91,7 @@ export function WorkoutAuthoringModes() {
     setModeBarVisible(false);
   }
 
-  function selectMode(nextMode: "structured" | "quick-text" | "free-text", selectedDraftId = draftId) {
+  function selectMode(nextMode: AuthoringMode, selectedDraftId = draftId) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("mode", nextMode);
 
@@ -73,8 +102,14 @@ export function WorkoutAuthoringModes() {
     router.replace(adminHref(`/admin/workouts/new?${params.toString()}`, organizationSlug));
   }
 
+  if (resolvingDraft) {
+    return <div className="min-h-[calc(100dvh-3.25rem)]" style={{ background: "var(--bg)" }} aria-busy="true" />;
+  }
+
   return (
     <div className="flex min-h-[calc(100dvh-3.25rem)] flex-col" style={{ background: "var(--bg)" }}>
+      {SHOW_AUTHORING_MODE_SWITCHER ? (
+      <>
       <div
         className="fixed inset-x-0 top-[3.25rem] z-40 h-3"
         onFocus={revealModeBar}
@@ -119,6 +154,8 @@ export function WorkoutAuthoringModes() {
           label={i18n("authoringModeFreeText")}
         />
       </div>
+      </>
+      ) : null}
 
       <div className="min-h-0 flex-1">
         {mode === "quick-text" ? (
@@ -138,6 +175,18 @@ export function WorkoutAuthoringModes() {
       </div>
     </div>
   );
+}
+
+function legacyEditorFor(workout: Awaited<ReturnType<typeof fetchAdminWorkout>> | undefined): AuthoringMode {
+  if (!workout) return "free-text";
+  if (workout.authoring_mode === "quick_text") return "quick-text";
+  // New drafts default to "structured" before their first save; only drafts
+  // that already hold structured sections need the structured canvas.
+  const draftSections = (workout.draft_data as { sections?: unknown[] } | null | undefined)?.sections;
+  if (workout.authoring_mode === "structured" && ((workout.sections?.length ?? 0) > 0 || (draftSections?.length ?? 0) > 0)) {
+    return "structured";
+  }
+  return "free-text";
 }
 
 function ModeButton({

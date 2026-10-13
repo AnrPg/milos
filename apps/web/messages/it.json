@@ -2555,7 +2555,7 @@
     "freeTextEditorPlaceholder": "Scrivi il WOD esattamente come dovrebbe apparire sulla lavagna...",
     "freeTextEditorLabel": "Editor di allenamenti a testo libero",
     "freeTextTitle": "WOD a testo libero",
-    "freeTextDescription": "Scrivi un WOD veloce e ricco di testo. Viene salvato e visualizzato come un unico corpo di testo non strutturato.",
+    "freeTextDescription": "Scrivi il WOD come sulla lavagna. Gli atleti vedono il testo così com’è; l’assistente lo trasforma in dati strutturati.",
     "freeTextPreviewEmpty": "L'anteprima del WOD a testo libero apparirà qui.",
     "timerFormatLabel": "Formato del timer",
     "durationMinutesLabel": "Durata (minuti)",
@@ -4174,7 +4174,35 @@
     "invItem": "Articolo",
     "invUsedPerMonth": "Usato / mese",
     "invSpendPerMonth": "Spesa / mese",
-    "invTotalSpend": "Spesa totale"
+    "invTotalSpend": "Spesa totale",
+    "subscriptionExpiryReminderDays": "Promemoria scadenza (giorni prima)",
+    "subscriptionExpiryReminderDaysHelp": "I clienti ricevono una notifica questi giorni prima della scadenza dell'abbonamento. 0 la disattiva.",
+    "subscriptionGraceDays": "Periodo di tolleranza (giorni)",
+    "subscriptionGraceDaysHelp": "Dopo la scadenza dell'abbonamento o una fattura scaduta, i clienti mantengono l'accesso per questi giorni. Poi lo perdono, ad es. non possono più prenotare lezioni.",
+    "accessGraceEnded": "Il tuo abbonamento è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni.",
+    "accessGraceOverdue": "Un pagamento è scaduto. Mantieni l'accesso fino al {date}; paga entro quella data per continuare a prenotare le lezioni.",
+    "accessBlockedOverdue": "Il tuo accesso è sospeso perché un pagamento è scaduto. Salda il dovuto per prenotare di nuovo le lezioni.",
+    "accessEnded": "Il tuo accesso è terminato. Rinnova l'abbonamento per prenotare di nuovo le lezioni.",
+    "subscriptionEndsSoonTitle": "Il tuo abbonamento sta per scadere",
+    "subscriptionEndedTitle": "Il tuo abbonamento è scaduto",
+    "yourSubscription": "Il tuo abbonamento",
+    "subscriptionEndsSoonBody": "{package} scade il {date} (tra {days} giorni). Rinnova per continuare a prenotare le lezioni.",
+    "subscriptionEndedBody": "{package} è scaduto. Mantieni l'accesso fino al {date}; rinnova entro quella data per continuare a prenotare le lezioni.",
+    "historyTitle": "Storico allenamenti",
+    "historyWorkouts": "Allenamenti",
+    "historyClasses": "Lezioni",
+    "historyLoading": "Caricamento…",
+    "historyError": "Impossibile caricare lo storico. Riprova più tardi.",
+    "historyNoWorkouts": "Nessun allenamento registrato.",
+    "historyNoClasses": "Nessuna lezione passata prenotata.",
+    "historyShowing": "{shown} di {total} mostrati",
+    "historyShowMore": "Mostra altro",
+    "historyDeletedWorkout": "Allenamento eliminato",
+    "historyMinutes": "{minutes} min",
+    "historyNoResult": "Nessun risultato registrato.",
+    "workoutCount": "{count, plural, one {# allenamento} other {# allenamenti}}",
+    "accessEndedTitle": "Il tuo accesso è terminato",
+    "accessEndedCancelledBookings": "{count, plural, one {La tua prossima prenotazione è stata annullata.} other {Le tue # prossime prenotazioni sono state annullate.}}"
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -4291,5 +4319,359 @@
     "errorGeneric": "Non è stato possibile completare la richiesta.",
     "myReceiptsTitle": "Ricevute di rimborso",
     "myReceiptsEmpty": "Non hai ricevute di rimborso."
+  },
+  "WorkoutAssistant": {
+    "title": "Assistente allenamento",
+    "intro": "Scrivi l’allenamento come sulla lavagna. L’assistente lo trasforma in dati strutturati e ti segnala ciò che non è chiaro.",
+    "analyze": "Controlla con l’assistente",
+    "reanalyze": "Controlla di nuovo",
+    "analyzing": "Sto leggendo il tuo allenamento…",
+    "analyzingHint": "Di solito bastano pochi secondi. Il tuo testo è salvato.",
+    "stale": "Hai modificato il testo dall’ultimo controllo. Controlla di nuovo per aggiornare i risultati.",
+    "insertExample": "Parti da un esempio",
+    "exampleWorkout": "Preparazione Murph\nRiscaldamento: corsa 400 m, poi 2 giri da 10 air squat\nFor time, limite 25 min:\n5 giri\n10 trazioni\n20 piegamenti\n30 air squat\nForza:\nBack squat 5x5 @ 100 kg, recupero 2 min",
+    "tipsTitle": "Consigli per una lettura pulita",
+    "tipOneLine": "Un movimento per riga.",
+    "tipSetsReps": "Scrivi serie × ripetizioni @ carico, es. 5x5 @ 100 kg.",
+    "tipBlocks": "Dai un nome a ogni blocco: Riscaldamento, Forza, WOD.",
+    "tipTimers": "Indica i timer: AMRAP 12, EMOM 10, For time limite 20.",
+    "panelTabs": "Pannello laterale dell’editor",
+    "tabAssistant": "Assistente",
+    "tabPreview": "Anteprima",
+    "summarySections": "Blocchi",
+    "summaryExercises": "Esercizi",
+    "summaryOpen": "Da controllare",
+    "issuesHeading": "Da controllare ({count})",
+    "suggestionsHeading": "Aggiunte suggerite ({count})",
+    "resolvedHeading": "Controllati ({count})",
+    "allClear": "È tutto chiaro. Puoi pubblicare.",
+    "severityError": "Da correggere",
+    "severityWarning": "Da verificare",
+    "requiredBadge": "Obbligatorio",
+    "accept": "Accetta",
+    "apply": "Applica",
+    "reject": "Rifiuta",
+    "undo": "Annulla",
+    "add": "Aggiungi",
+    "dismiss": "Ignora",
+    "accepted": "accettato",
+    "rejectedOptional": "rifiutato, lasciato vuoto",
+    "rejectedRequired": "rifiutato, obbligatorio: la pubblicazione è bloccata finché non lo completi",
+    "rejectOptionalHint": "Rifiutare lascia vuoto questo campo. L’allenamento si può comunque pubblicare.",
+    "rejectRequiredHint": "Questo campo è obbligatorio. Rifiutarlo lo svuota e blocca la pubblicazione finché non inserisci un valore.",
+    "typeValue": "Il tuo valore",
+    "typeValuePlaceholder": "Scrivi un valore",
+    "invalidTyped": "Questo valore non è adatto a questo campo. Controlla il formato e riprova.",
+    "alsoInText": "Aggiungi questa riga anche al testo:",
+    "hintMinutes": "Durata in minuti",
+    "hintList": "Separa le voci con virgole",
+    "hintDifficulty": "beginner, intermediate, advanced o all-levels",
+    "hintValue": "Valore",
+    "readAs": "Come l’ha letto l’assistente",
+    "noBlocks": "Nessun blocco di allenamento trovato. Aggiungi esercizi, uno per riga.",
+    "unnamed": "Senza nome",
+    "setsOnly": "{count} serie",
+    "bodyweight": "corpo libero",
+    "restShort": "recupero {seconds} s",
+    "units": {
+      "secs": "sec.",
+      "kcal": "calorie",
+      "meters": "metri"
+    },
+    "pathSection": "Blocco {number}",
+    "pathExercise": "Esercizio {number}",
+    "fields": {
+      "title": "Titolo",
+      "type": "Tipo di allenamento",
+      "subtitle": "Sottotitolo",
+      "description": "Descrizione",
+      "difficulty": "Difficoltà",
+      "estimated_duration_seconds": "Durata",
+      "equipment": "Attrezzatura",
+      "tags": "Etichette",
+      "name": "Nome",
+      "note": "Nota",
+      "timer_config": "Timer",
+      "sets": "Serie",
+      "prescription_value": "Ripetizioni / quantità",
+      "prescription_unit": "Unità",
+      "load_value": "Carico",
+      "load_mode": "Tipo di carico",
+      "rest_seconds": "Recupero (secondi)",
+      "tempo": "Tempo esecutivo",
+      "text": "Testo"
+    },
+    "why": {
+      "difficulty": "Gli atleti scelgono più in fretta se conoscono il livello.",
+      "estimated_duration_seconds": "La durata aiuta te a pianificare le lezioni e gli atleti a organizzare la giornata.",
+      "equipment": "Con l’elenco dell’attrezzatura gli atleti si preparano prima di iniziare.",
+      "description": "Un obiettivo breve mantiene tutti concentrati.",
+      "generic": "Aggiungerlo rende l’allenamento più completo."
+    },
+    "codes": {
+      "missing_title": "Il tuo allenamento ha bisogno di un titolo. Scrivilo nel campo Titolo, es. «Preparazione Murph».",
+      "missing_type": "Scegli un tipo di allenamento perché finisca nella libreria giusta.",
+      "missing_section_name": "Dai un nome a questo blocco, es. «Riscaldamento» o «Forza».",
+      "missing_exercise_name": "Questa riga ha dei numeri ma nessun esercizio. Scrivi di quale movimento si tratta.",
+      "too_short": "Usa almeno {min} caratteri.",
+      "invalid_value": "«{value}» non è valido qui. Inserisci un valore corretto o rifiutalo per ometterlo.",
+      "invalid_timer": "Al timer {format} manca: {missing}. Aggiungilo al testo, es. «ogni minuto per 10 min».",
+      "unknown_format": "«{value}» non è un formato di timer conosciuto. Usane uno come AMRAP, EMOM o For time.",
+      "generic": "L’assistente ha trovato qualcosa da verificare qui."
+    },
+    "errors": {
+      "notConfigured": "L’assistente non è ancora configurato su questo server. Puoi comunque pubblicare il testo così com’è.",
+      "unavailable": "L’assistente è occupato o non in linea. Riprova tra poco. Il tuo testo è salvato.",
+      "textRequired": "Scrivi prima l’allenamento, poi controllalo.",
+      "textTooLong": "Il testo è troppo lungo per un unico controllo. Dividilo in allenamenti separati."
+    },
+    "blockingTitle": "Non puoi ancora pubblicare. Correggi prima:",
+    "blockingRequired": "obbligatorio",
+    "blockingTooShort": "troppo corto (almeno 3 caratteri)",
+    "chooseType": "Scegli un tipo…",
+    "titlePlaceholder": "Lascia vuoto e l’assistente ne proporrà uno",
+    "checkAndPublish": "Controlla e pubblica",
+    "reviewBeforePublish": "L’assistente ha lasciato alcune note. Controllale e premi di nuovo Pubblica.",
+    "resolveErrorsFirst": "Risolvi i punti segnati «Da correggere» prima di pubblicare.",
+    "publishFailed": "Pubblicazione non riuscita. La bozza è salvata. Riprova.",
+    "rejectTextHint": "Rifiutare lascia il testo così com’è.",
+    "rejectedText": "lasciato com’era",
+    "editNotApplied": "«{text}» non è più nel testo, quindi la correzione non è stata applicata. Controlla di nuovo per aggiornare i suggerimenti.",
+    "intervalSlot": "Intervallo {slot}",
+    "oddIntervals": "Intervalli dispari",
+    "evenIntervals": "Intervalli pari",
+    "severityAssumption": "Ipotesi",
+    "keepAssumption": "Mantieni",
+    "rejectAssumptionHint": "Rifiutare elimina questo valore; il testo resta com'è."
+  },
+  "Invites": {
+    "inviteClients": "Invita clienti",
+    "dialogIntro": "Invia un link personale o condividi il link di iscrizione della tua palestra.",
+    "close": "Chiudi",
+    "clientAccess": "Accesso clienti",
+    "clientAccessIntro": "Scegli come entrano i nuovi clienti nella tua app: un link personale monouso o il link di iscrizione pubblico.",
+    "tabPersonal": "Link personale",
+    "tabPublic": "Link di iscrizione",
+    "tabPending": "In sospeso ({count})",
+    "joinsAs": "Entra come",
+    "roles": {
+      "member": "Iscritto",
+      "athlete": "Atleta"
+    },
+    "roleHints": {
+      "member": "Prenota lezioni in palestra",
+      "athlete": "Riceve una programmazione personale"
+    },
+    "emailOptional": "Email (facoltativa)",
+    "emailHint": "Se la indichi, solo un account con questa email potrà usare il link.",
+    "validFor": "Valido per",
+    "days": "{count, plural, one {# giorno} other {# giorni}}",
+    "createLink": "Crea link di invito",
+    "creating": "Creazione…",
+    "linkReady": "Link pronto. Invialo al tuo nuovo {role}.",
+    "singleUse": "Funziona una volta. Scade il {date}.",
+    "createAnother": "Crea un altro link",
+    "inviteSubject": "Il tuo invito a {organization}",
+    "inviteMessage": "Sei invitato a unirti a {organization}. Crea il tuo account qui: {url}",
+    "publicTitle": "Link di iscrizione pubblico",
+    "publicHint": "Chiunque abbia l’indirizzo della tua palestra può iscriversi. Disattivabile in qualsiasi momento.",
+    "publicOff": "Il link di iscrizione è disattivato. Attivalo per avere un indirizzo da mettere sul sito, sui social o in un QR code alla reception.",
+    "publicWarning": "Chi usa questo indirizzo entra come {role}. Lo staff ha comunque bisogno di un link personale.",
+    "joinSubject": "Unisciti a noi",
+    "joinMessage": "Iscriviti alla nostra palestra nell’app: {url}",
+    "noPending": "Nessun invito in sospeso. I link che crei compaiono qui finché non vengono usati o scadono.",
+    "emailBound": "legato a un’email",
+    "expires": "Scade il {date}",
+    "revoke": "Revoca",
+    "confirmRevoke": "Sì, revoca",
+    "keep": "Mantieni",
+    "loading": "Caricamento…",
+    "linkLabel": "Link di invito",
+    "copy": "Copia",
+    "copied": "Copiato",
+    "share": "Condividi",
+    "email": "Email",
+    "whatsapp": "WhatsApp",
+    "youreInvited": "Sei invitato",
+    "joinTitle": "Unisciti a {organization}",
+    "joinBody": "Crea un account o accedi per entrare come {role}. Ci vuole meno di un minuto.",
+    "joinCta": "Entra in {organization}",
+    "joining": "Iscrizione…",
+    "createAccount": "Crea un account",
+    "haveAccount": "Ho già un account",
+    "joinUnavailableTitle": "Questo link non è attivo",
+    "joinUnavailable": "La palestra potrebbe averlo disattivato. Chiedi un nuovo link o un invito personale.",
+    "membershipUnavailable": "La tua iscrizione qui è sospesa. Contatta la palestra per riattivarla.",
+    "goHome": "Vai alla home"
+  },
+  "UsersDirectory": {
+    "filters": "Filtri",
+    "searchLabel": "Cerca persone",
+    "searchPlaceholder": "Cerca per nome",
+    "financeFilter": "Stato dell’abbonamento",
+    "financeAll": "Qualsiasi stato dell’abbonamento",
+    "sortLabel": "Ordina",
+    "sort": {
+      "name": "Nome A–Z",
+      "newest": "Più recenti",
+      "oldest": "Meno recenti"
+    },
+    "roleFilter": "Filtra per ruolo",
+    "roles": {
+      "all": "Tutti",
+      "member": "Iscritti",
+      "athlete": "Atleti",
+      "admin": "Staff"
+    },
+    "showing": "{shown} di {total} visualizzati",
+    "clearFilters": "Azzera filtri",
+    "retry": "Riprova",
+    "emptyTitle": "Ancora nessun cliente",
+    "emptyBody": "Invita i tuoi primi iscritti e atleti. Compariranno qui appena si uniscono.",
+    "inviteFirst": "Invita i primi clienti",
+    "noMatchesTitle": "Nessun risultato",
+    "noMatchesBody": "Prova un altro nome o azzera i filtri.",
+    "listLabel": "Persone",
+    "columns": {
+      "person": "Persona",
+      "finance": "Abbonamento",
+      "joined": "Iscrizione",
+      "open": "Apri profilo"
+    }
+  },
+  "Onboarding": {
+    "popupEyebrow": "Configurazione non completata",
+    "popupTitle": "Benvenuto! Prepariamo la tua palestra",
+    "popupIntro": "Sei passaggi brevi. Fermati quando vuoi: questa lista ti aspetta in {path}.",
+    "progress": "{done} di {total} completati",
+    "later": "Ricordamelo più tardi",
+    "dontShow": "Non mostrare più",
+    "takeTour": "Fai il tour",
+    "panelTitle": "Lista di configurazione",
+    "panelIntro": "Riprendi da dove avevi lasciato. I passaggi si spuntano da soli quando l’app li vede completati.",
+    "showPopupAgain": "Mostra di nuovo il benvenuto",
+    "showSteps": "Mostra passaggi",
+    "hideSteps": "Nascondi passaggi",
+    "allDone": "Tutto pronto. La tua app è pronta per i clienti.",
+    "markDone": "Segna come fatto",
+    "skip": "Salta",
+    "reopen": "Annulla",
+    "unskip": "Ripristina",
+    "doneAuto": "Fatto. Rilevato automaticamente.",
+    "statusDone": "(fatto)",
+    "statusSkipped": "(saltato)",
+    "statusOpen": "(da fare)",
+    "steps": {
+      "settings": {
+        "title": "Controlla le regole dell’app",
+        "body": "Impostazioni predefinite per prenotazioni, pagamenti e notifiche. Due minuti.",
+        "cta": "Apri impostazioni"
+      },
+      "classes": {
+        "title": "Aggiungi i tuoi corsi",
+        "body": "Crea tipi di corso (es. CrossFit, Yoga) così i clienti possono prenotare.",
+        "cta": "Configura i corsi"
+      },
+      "packages": {
+        "title": "Crea pacchetti di abbonamento",
+        "body": "Piani e prezzi che i clienti acquistano o che assegni tu.",
+        "cta": "Crea pacchetto"
+      },
+      "workout": {
+        "title": "Scrivi il tuo primo allenamento",
+        "body": "Scrivilo come sulla lavagna. Al resto pensa l’assistente.",
+        "cta": "Scrivi allenamento"
+      },
+      "invite": {
+        "title": "Invita i tuoi clienti",
+        "body": "Invia un link personale o attiva il link di iscrizione della palestra.",
+        "cta": "Invita clienti"
+      },
+      "tour": {
+        "title": "Fai il tour di 1 minuto",
+        "body": "Scopri dove si trova ogni cosa.",
+        "cta": "Inizia il tour"
+      }
+    },
+    "tour": {
+      "roleDescription": "tour guidato",
+      "stepOf": "Passo {current} di {total}",
+      "skip": "Salta il tour",
+      "showMe": "Mostrami",
+      "back": "Indietro",
+      "next": "Avanti",
+      "done": "Ho capito",
+      "replay": "Rivedi il tour dell’app",
+      "admin": {
+        "welcome": {
+          "title": "Benvenuto nell’app della tua palestra",
+          "body": "Uno sguardo di un minuto all’essenziale. Saltalo quando vuoi."
+        },
+        "dashboard": {
+          "title": "Dashboard",
+          "body": "La giornata in un colpo d’occhio: corsi, incassi e ciò che richiede la tua attenzione."
+        },
+        "classes": {
+          "title": "Corsi",
+          "body": "Crea tipi di corso, programma le sessioni e approva le prenotazioni."
+        },
+        "workouts": {
+          "title": "Allenamenti",
+          "body": "Scrivi un allenamento come testo libero. L’assistente lo struttura e segnala gli errori."
+        },
+        "people": {
+          "title": "Persone e inviti",
+          "body": "Invita clienti con un link e apri profilo, pagamenti e progressi di chiunque."
+        },
+        "config": {
+          "title": "Configurazione app",
+          "body": "Regole, notifiche, accesso clienti e questa lista si trovano in {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "Benvenuto!",
+          "body": "Ecco come sfruttare al meglio l’app in meno di un minuto."
+        },
+        "schedule": {
+          "title": "Prenota i corsi",
+          "body": "Apri {schedule}, scegli un corso e tocca Prenota. Ti avviseremo prima dell’inizio."
+        },
+        "train": {
+          "title": "Allenati con il timer",
+          "body": "Avvia un allenamento e seguilo passo dopo passo con il timer integrato."
+        },
+        "records": {
+          "title": "Segui i tuoi progressi",
+          "body": "I tuoi record personali e le serie si raccolgono in {pantheon}."
+        },
+        "account": {
+          "title": "Fatturazione e profilo",
+          "body": "Vedi il tuo abbonamento in {billing}. Cambia lingua e notifiche nel tuo profilo."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "Benvenuto!",
+          "body": "Ecco come sfruttare al meglio l’app in meno di un minuto."
+        },
+        "programme": {
+          "title": "Il tuo programma",
+          "body": "Gli allenamenti del tuo coach compaiono in {myWorkouts}, giorno per giorno."
+        },
+        "train": {
+          "title": "Allenati con il timer",
+          "body": "Apri un allenamento e premi Avvia. Il timer ti guida in ogni blocco."
+        },
+        "records": {
+          "title": "Segui i tuoi progressi",
+          "body": "I tuoi record personali e le serie si raccolgono in {pantheon}."
+        },
+        "account": {
+          "title": "Fatturazione e profilo",
+          "body": "Vedi il tuo abbonamento in {billing}. Cambia lingua e notifiche nel tuo profilo."
+        }
+      }
+    }
   }
 }

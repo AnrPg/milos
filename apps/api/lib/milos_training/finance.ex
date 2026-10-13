@@ -381,6 +381,16 @@ defmodule MilosTraining.Finance do
   def update_membership_reminder_timestamp(context, membership_id),
     do: scoped(context, fn -> update_membership_reminder_timestamp(membership_id) end)
 
+  def subscriptions_needing_expiry_notice(context, kind, days),
+    do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
+
+  def mark_subscription_notice_sent(context, subscription_id, kind),
+    do:
+      scoped(context, fn -> FinanceStore.mark_subscription_notice_sent(subscription_id, kind) end)
+
+  def refresh_entitlement_snapshots(context),
+    do: scoped(context, fn -> FinanceStore.refresh_entitlement_snapshots() end)
+
   defdelegate total_outstanding_balance_cents(),
     to: FinanceStore,
     as: :total_outstanding_balance_cents

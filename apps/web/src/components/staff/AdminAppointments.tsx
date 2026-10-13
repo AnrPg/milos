@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import Link from "next/link";
 import { useId, useMemo, useState } from "react";
 
 import { listAdminLocations } from "@/api/facility";
@@ -43,10 +42,9 @@ import {
   StaffPanel,
   StatusText,
 } from "@/components/staff/staff-ui";
-import { TransientHero } from "@/components/TransientHero";
+import { PageHeader } from "@/components/PageHeader";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 type View = "week" | "day";
 type Kind = AppointmentSlot["kind"];
@@ -476,7 +474,6 @@ export function AdminAppointments() {
   const uiLocale = useUiLocale();
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token ?? "";
-  const organizationSlug = useOrganizationSlug();
   const [view, setView] = useState<View>("week");
   const [anchor, setAnchor] = useState(() => new Date());
   const [showCreate, setShowCreate] = useState(false);
@@ -524,24 +521,7 @@ export function AdminAppointments() {
   return (
     <main className="min-h-screen px-4 py-10 sm:px-6 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-6xl space-y-6">
-        <TransientHero label={i18n("stfAppointmentsIntro")} timeoutMs={3000}>
-          <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("stfStaffEyebrow")}</p>
-            <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-              {i18n("stfAppointmentsTitle")}
-            </h1>
-            <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-              {i18n("stfAppointmentsSubtitle")}
-            </p>
-            <Link
-              className="mt-6 inline-flex rounded-full px-4 py-2 text-sm font-semibold"
-              href={adminHref("/admin", organizationSlug)}
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            >
-              {i18n("backToAdminHome941355d")}
-            </Link>
-          </section>
-        </TransientHero>
+        <PageHeader title={i18n("stfAppointmentsTitle")} />
 
         <StaffPanel
           labelledBy="staff-new-slot"

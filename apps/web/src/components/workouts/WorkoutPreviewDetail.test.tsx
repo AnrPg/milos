@@ -11,22 +11,28 @@ vi.mock("@/i18n/ui", () => ({
 }));
 
 describe("WorkoutPreviewDetail composition groups", () => {
-  it("renders only the stored free-text body for free-text workouts", () => {
+  it("shows the structured workout for free-text workouts that were parsed", () => {
     render(
       <WorkoutPreviewDetail
         authoringMode="free_text"
         freeTextBody={"AMRAP 20\n10 pull-ups"}
         sections={[{
           id: "section-1",
-          name: "Should not show",
-          exercises: [{ id: "a", name: "Hidden squat", sets: 4, prescription_value: 6, prescription_unit: "reps" }],
+          name: "Main block",
+          exercises: [{ id: "a", name: "Back squat", sets: 4, prescription_value: 6, prescription_unit: "reps" }],
         }]}
       />,
     );
 
+    expect(screen.getByText("Main block")).toBeInTheDocument();
+    expect(screen.getByText("Back squat")).toBeInTheDocument();
+    expect(screen.queryByText(/AMRAP 20/)).not.toBeInTheDocument();
+  });
+
+  it("falls back to the free-text body when a free-text workout has no structure", () => {
+    render(<WorkoutPreviewDetail authoringMode="free_text" freeTextBody={"AMRAP 20\n10 pull-ups"} sections={[]} />);
+
     expect(screen.getByText(/AMRAP 20/)).toBeInTheDocument();
-    expect(screen.queryByText("Should not show")).not.toBeInTheDocument();
-    expect(screen.queryByText("Hidden squat")).not.toBeInTheDocument();
   });
 
   it("preserves rich free-text document formatting", () => {

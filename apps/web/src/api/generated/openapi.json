@@ -5460,6 +5460,186 @@
         "title": "InventoryMachine",
         "type": "object"
       },
+      "FreeTextWorkoutAnalysis": {
+        "properties": {
+          "issues": {
+            "items": {
+              "properties": {
+                "code": {
+                  "description": "assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                  "type": "string"
+                },
+                "current_value": {
+                  "nullable": true
+                },
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "description": "For text_correction: spelling | unit | number | abbreviation | format | ambiguity",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "path": {
+                  "description": "Canonical field path, or \"text\" for a text-only correction",
+                  "type": "string"
+                },
+                "required": {
+                  "type": "boolean"
+                },
+                "severity": {
+                  "enum": [
+                    "error",
+                    "warning",
+                    "info"
+                  ],
+                  "type": "string"
+                },
+                "suggestion": {
+                  "nullable": true,
+                  "properties": {
+                    "label": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "text_edit": {
+                      "nullable": true,
+                      "properties": {
+                        "find": {
+                          "type": "string"
+                        },
+                        "replace": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "find",
+                        "replace"
+                      ],
+                      "type": "object"
+                    },
+                    "value": {
+                      "description": "Canonical value for the issue path",
+                      "nullable": true
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "code",
+                "severity",
+                "required",
+                "params"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "quality": {
+            "description": "How much the parser answer had to be repaired against the contract",
+            "properties": {
+              "corrections": {
+                "type": "integer"
+              },
+              "remaining_violations": {
+                "type": "integer"
+              },
+              "repair_attempts": {
+                "type": "integer"
+              },
+              "structure_inferred": {
+                "description": "Whether the structure step (sections and their formats) succeeded before parsing",
+                "type": "boolean"
+              }
+            },
+            "type": "object"
+          },
+          "suggestions": {
+            "items": {
+              "properties": {
+                "field": {
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "path": {
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "text_insert": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "value": {
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "path",
+                "field"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "properties": {
+              "blocking": {
+                "type": "integer"
+              },
+              "errors": {
+                "type": "integer"
+              },
+              "exercises": {
+                "type": "integer"
+              },
+              "sections": {
+                "type": "integer"
+              },
+              "warnings": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sections",
+              "exercises",
+              "errors",
+              "warnings",
+              "blocking"
+            ],
+            "type": "object"
+          },
+          "workout": {
+            "additionalProperties": true,
+            "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd)",
+            "type": "object"
+          }
+        },
+        "required": [
+          "workout",
+          "issues",
+          "suggestions",
+          "summary"
+        ],
+        "title": "FreeTextWorkoutAnalysis",
+        "type": "object"
+      },
       "WorkoutDslManualResponse": {
         "additionalProperties": false,
         "properties": {
@@ -6130,6 +6310,69 @@
           "reported_at"
         ],
         "title": "InventoryLowReport",
+        "type": "object"
+      },
+      "AdminOnboardingChecklist": {
+        "properties": {
+          "completed_count": {
+            "type": "integer"
+          },
+          "dismissed": {
+            "type": "boolean"
+          },
+          "finished": {
+            "type": "boolean"
+          },
+          "steps": {
+            "items": {
+              "properties": {
+                "auto": {
+                  "type": "boolean"
+                },
+                "done": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "enum": [
+                    "settings",
+                    "classes",
+                    "packages",
+                    "workout",
+                    "invite",
+                    "tour"
+                  ],
+                  "type": "string"
+                },
+                "skipped": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "done",
+                "auto",
+                "skipped"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "tour_completed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "steps",
+          "completed_count",
+          "total",
+          "finished",
+          "dismissed",
+          "tour_completed"
+        ],
+        "title": "AdminOnboardingChecklist",
         "type": "object"
       },
       "FinanceReconciliationLineRequest": {
@@ -7149,6 +7392,196 @@
           "body"
         ],
         "title": "NutritionPlan",
+        "type": "object"
+      },
+      "TrainingHistoryPage": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "class": {
+                  "nullable": true,
+                  "properties": {
+                    "attendance": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "duration_minutes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type_name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "performance": {
+                  "nullable": true,
+                  "properties": {
+                    "completed_at": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "elapsed_ms": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "execution_id": {
+                      "type": "string"
+                    },
+                    "scale_level_slug": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scores": {
+                      "items": {
+                        "properties": {
+                          "score_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "section_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "section_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "started_at": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "execution_id",
+                    "status",
+                    "scores"
+                  ],
+                  "type": "object"
+                },
+                "source": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "sections": {
+                      "items": {
+                        "properties": {
+                          "exercises": {
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "format": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nested": {
+                            "type": "boolean"
+                          },
+                          "score_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "timer_config": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "title": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "workout",
+                "performance"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "workouts",
+              "classes"
+            ],
+            "type": "string"
+          },
+          "next_offset": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "total",
+          "offset",
+          "next_offset",
+          "entries"
+        ],
+        "title": "TrainingHistoryPage",
         "type": "object"
       },
       "ProgressStats": {
@@ -15464,6 +15897,89 @@
         ]
       }
     },
+    "/api/auth/join/{slug}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.inspect_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "summary": "Public: describe the organization behind a join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/invitations/{id}": {
       "delete": {
         "callbacks": {},
@@ -20440,6 +20956,18 @@
                           "minimum": 1,
                           "type": "integer"
                         },
+                        "subscription_expiry_reminder_days": {
+                          "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "subscription_grace_days": {
+                          "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -20448,6 +20976,8 @@
                       },
                       "required": [
                         "payment_reminder_interval_days",
+                        "subscription_expiry_reminder_days",
+                        "subscription_grace_days",
                         "document_mode"
                       ],
                       "type": "object"
@@ -20655,6 +21185,18 @@
                       "payment_reminder_interval_days": {
                         "minimum": 1,
                         "type": "integer"
+                      },
+                      "subscription_expiry_reminder_days": {
+                        "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                        "maximum": 60,
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "subscription_grace_days": {
+                        "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                        "maximum": 60,
+                        "minimum": 0,
+                        "type": "integer"
                       }
                     },
                     "type": "object"
@@ -20784,6 +21326,18 @@
                           "minimum": 1,
                           "type": "integer"
                         },
+                        "subscription_expiry_reminder_days": {
+                          "description": "Days before a subscription ends to remind the member (0 = no reminder)",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "subscription_grace_days": {
+                          "description": "Slack days after a subscription ends or an invoice falls overdue before the member loses access",
+                          "maximum": 60,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -20792,6 +21346,8 @@
                       },
                       "required": [
                         "payment_reminder_interval_days",
+                        "subscription_expiry_reminder_days",
+                        "subscription_grace_days",
                         "document_mode"
                       ],
                       "type": "object"
@@ -22903,6 +23459,251 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingHistoryController.mine",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "default": "workouts",
+              "enum": [
+                "workouts",
+                "classes"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "class": {
+                            "nullable": true,
+                            "properties": {
+                              "attendance": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "performance": {
+                            "nullable": true,
+                            "properties": {
+                              "completed_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "elapsed_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "execution_id": {
+                                "type": "string"
+                              },
+                              "scale_level_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scores": {
+                                "items": {
+                                  "properties": {
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "unit": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "started_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "execution_id",
+                              "status",
+                              "scores"
+                            ],
+                            "type": "object"
+                          },
+                          "source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "properties": {
+                                    "exercises": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "format": {
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "nested": {
+                                      "type": "boolean"
+                                    },
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "timer_config": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "workout",
+                          "performance"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kind": {
+                      "enum": [
+                        "workouts",
+                        "classes"
+                      ],
+                      "type": "string"
+                    },
+                    "next_offset": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "total",
+                    "offset",
+                    "next_offset",
+                    "entries"
+                  ],
+                  "title": "TrainingHistoryPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Training log page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The signed-in user's training log (workouts or booked classes) with performance",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/staff/coach-notes/reads": {
       "get": {
         "callbacks": {},
@@ -23376,6 +24177,185 @@
         "summary": "Fetch an athlete coaching drill-down",
         "tags": [
           "Admin Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/join-link": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.show_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the organization's public join link settings",
+        "tags": [
+          "Organizations"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.update_join_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  },
+                  "role": {
+                    "enum": [
+                      "member",
+                      "athlete"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "role": {
+                      "enum": [
+                        "member",
+                        "athlete"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "role"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Join link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Enable, disable or change the role of the public join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
+    "/api/me/tours/{audience}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MeController.complete_tour",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "audience",
+            "required": true,
+            "schema": {
+              "enum": [
+                "admin",
+                "member",
+                "athlete"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_tours": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "completed_tours"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Completed tours"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Record that the current account finished a product tour",
+        "tags": [
+          "Me"
         ]
       }
     },
@@ -24678,6 +25658,17 @@
                       "nullable": true,
                       "type": "string"
                     },
+                    "completed_tours": {
+                      "items": {
+                        "enum": [
+                          "admin",
+                          "member",
+                          "athlete"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "id": {
                       "format": "uuid",
                       "type": "string"
@@ -24714,7 +25705,8 @@
                     "nickname",
                     "role",
                     "vendor",
-                    "preferred_locale"
+                    "preferred_locale",
+                    "completed_tours"
                   ],
                   "type": "object"
                 }
@@ -25037,6 +26029,217 @@
         "summary": "A corporate invoice with its payments, client and issuer, for the document",
         "tags": [
           "Payment models"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/onboarding": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminOnboardingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_count": {
+                      "type": "integer"
+                    },
+                    "dismissed": {
+                      "type": "boolean"
+                    },
+                    "finished": {
+                      "type": "boolean"
+                    },
+                    "steps": {
+                      "items": {
+                        "properties": {
+                          "auto": {
+                            "type": "boolean"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "enum": [
+                              "settings",
+                              "classes",
+                              "packages",
+                              "workout",
+                              "invite",
+                              "tour"
+                            ],
+                            "type": "string"
+                          },
+                          "skipped": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "done",
+                          "auto",
+                          "skipped"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "tour_completed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "steps",
+                    "completed_count",
+                    "total",
+                    "finished",
+                    "dismissed",
+                    "tour_completed"
+                  ],
+                  "title": "AdminOnboardingChecklist",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Checklist"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Get the admin onboarding checklist",
+        "tags": [
+          "Admin Onboarding"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminOnboardingController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "action": {
+                    "enum": [
+                      "complete",
+                      "skip",
+                      "reopen",
+                      "dismiss",
+                      "restore",
+                      "tour_completed"
+                    ],
+                    "type": "string"
+                  },
+                  "step": {
+                    "enum": [
+                      "settings",
+                      "classes",
+                      "packages",
+                      "workout",
+                      "invite",
+                      "tour"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "completed_count": {
+                      "type": "integer"
+                    },
+                    "dismissed": {
+                      "type": "boolean"
+                    },
+                    "finished": {
+                      "type": "boolean"
+                    },
+                    "steps": {
+                      "items": {
+                        "properties": {
+                          "auto": {
+                            "type": "boolean"
+                          },
+                          "done": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "enum": [
+                              "settings",
+                              "classes",
+                              "packages",
+                              "workout",
+                              "invite",
+                              "tour"
+                            ],
+                            "type": "string"
+                          },
+                          "skipped": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "done",
+                          "auto",
+                          "skipped"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "total": {
+                      "type": "integer"
+                    },
+                    "tour_completed": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "steps",
+                    "completed_count",
+                    "total",
+                    "finished",
+                    "dismissed",
+                    "tour_completed"
+                  ],
+                  "title": "AdminOnboardingChecklist",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Checklist"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Complete, skip or reopen a step, dismiss the popup or record the finished tour",
+        "tags": [
+          "Admin Onboarding"
         ]
       }
     },
@@ -31063,6 +32266,71 @@
       }
     },
     "/api/org/{organization_slug}/invitations": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.list_invitations",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "organization_slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "properties": {
+                      "email_bound": {
+                        "type": "boolean"
+                      },
+                      "expires_at": {
+                        "format": "date_time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "issued_at": {
+                        "format": "date_time",
+                        "type": "string"
+                      },
+                      "role": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "role",
+                      "expires_at",
+                      "issued_at",
+                      "email_bound"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Pending invitations"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "List pending invitations of the organization",
+        "tags": [
+          "Organizations"
+        ]
+      },
       "post": {
         "callbacks": {},
         "operationId": "MilosTrainingWeb.OrganizationAccessController.issue",
@@ -39599,6 +40867,300 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/free-text/analyze": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutFreeTextController.analyze",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "locale": {
+                    "maxLength": 10,
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 20000,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "issues": {
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "description": "assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
+                            "type": "string"
+                          },
+                          "current_value": {
+                            "nullable": true
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "description": "For text_correction: spelling | unit | number | abbreviation | format | ambiguity",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "path": {
+                            "description": "Canonical field path, or \"text\" for a text-only correction",
+                            "type": "string"
+                          },
+                          "required": {
+                            "type": "boolean"
+                          },
+                          "severity": {
+                            "enum": [
+                              "error",
+                              "warning",
+                              "info"
+                            ],
+                            "type": "string"
+                          },
+                          "suggestion": {
+                            "nullable": true,
+                            "properties": {
+                              "label": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "text_edit": {
+                                "nullable": true,
+                                "properties": {
+                                  "find": {
+                                    "type": "string"
+                                  },
+                                  "replace": {
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "find",
+                                  "replace"
+                                ],
+                                "type": "object"
+                              },
+                              "value": {
+                                "description": "Canonical value for the issue path",
+                                "nullable": true
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "path",
+                          "code",
+                          "severity",
+                          "required",
+                          "params"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "quality": {
+                      "description": "How much the parser answer had to be repaired against the contract",
+                      "properties": {
+                        "corrections": {
+                          "type": "integer"
+                        },
+                        "remaining_violations": {
+                          "type": "integer"
+                        },
+                        "repair_attempts": {
+                          "type": "integer"
+                        },
+                        "structure_inferred": {
+                          "description": "Whether the structure step (sections and their formats) succeeded before parsing",
+                          "type": "boolean"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "suggestions": {
+                      "items": {
+                        "properties": {
+                          "field": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "path": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "text_insert": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "path",
+                          "field"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "summary": {
+                      "properties": {
+                        "blocking": {
+                          "type": "integer"
+                        },
+                        "errors": {
+                          "type": "integer"
+                        },
+                        "exercises": {
+                          "type": "integer"
+                        },
+                        "sections": {
+                          "type": "integer"
+                        },
+                        "warnings": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sections",
+                        "exercises",
+                        "errors",
+                        "warnings",
+                        "blocking"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "additionalProperties": true,
+                      "description": "Canonical workout: title, type, subtitle, description, difficulty, estimated_duration_seconds, equipment, tags and sections[] with name, note, timer_config (its own format per section), scoreable/score_config and exercises[] (interval_assignment for complex_emom / even_odd)",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "workout",
+                    "issues",
+                    "suggestions",
+                    "summary"
+                  ],
+                  "title": "FreeTextWorkoutAnalysis",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Analysis"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid text"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Assistant unavailable"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Assistant not configured"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Read a free-text workout into the canonical schema with actionable issues",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/finance/packages/{id}/retire": {
       "patch": {
         "callbacks": {},
@@ -44457,6 +46019,209 @@
         ]
       }
     },
+    "/api/memberships/join/{slug}": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.OrganizationAccessController.join",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "capabilities": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "capability => scope (all, own, status), ADR-099",
+                      "type": "object"
+                    },
+                    "coach_scope": {
+                      "enum": [
+                        "own",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "notes_visible_to_admins": {
+                      "description": "ADR-101",
+                      "type": "boolean"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "roles",
+                    "capabilities",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already a member"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "capabilities": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "description": "capability => scope (all, own, status), ADR-099",
+                      "type": "object"
+                    },
+                    "coach_scope": {
+                      "enum": [
+                        "own",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "notes_visible_to_admins": {
+                      "description": "ADR-101",
+                      "type": "boolean"
+                    },
+                    "organization": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name",
+                        "slug"
+                      ],
+                      "type": "object"
+                    },
+                    "role": {
+                      "type": "string"
+                    },
+                    "roles": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "settings": {
+                      "nullable": true,
+                      "properties": {
+                        "brand_logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "brand_primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role",
+                    "roles",
+                    "capabilities",
+                    "organization"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join an organization through its public join link",
+        "tags": [
+          "Organizations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/{id}/dsl": {
       "get": {
         "callbacks": {},
@@ -46496,6 +48261,260 @@
         "summary": "List all members with finance summary",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/users/{id}/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingHistoryController.for_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "default": "workouts",
+              "enum": [
+                "workouts",
+                "classes"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "class": {
+                            "nullable": true,
+                            "properties": {
+                              "attendance": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "id": {
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "performance": {
+                            "nullable": true,
+                            "properties": {
+                              "completed_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "elapsed_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "execution_id": {
+                                "type": "string"
+                              },
+                              "scale_level_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scores": {
+                                "items": {
+                                  "properties": {
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "unit": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "started_at": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "execution_id",
+                              "status",
+                              "scores"
+                            ],
+                            "type": "object"
+                          },
+                          "source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "sections": {
+                                "items": {
+                                  "properties": {
+                                    "exercises": {
+                                      "items": {
+                                        "additionalProperties": true,
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "format": {
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "nested": {
+                                      "type": "boolean"
+                                    },
+                                    "score_type": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "timer_config": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "workout",
+                          "performance"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kind": {
+                      "enum": [
+                        "workouts",
+                        "classes"
+                      ],
+                      "type": "string"
+                    },
+                    "next_offset": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "total",
+                    "offset",
+                    "next_offset",
+                    "entries"
+                  ],
+                  "title": "TrainingHistoryPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Training log page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A user's training log (workouts or booked classes) with performance",
+        "tags": [
+          "Training Log"
         ]
       }
     },

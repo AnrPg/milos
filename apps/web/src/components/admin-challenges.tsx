@@ -21,10 +21,10 @@ import {
   type SaveChallengePayload,
 } from "@/api/challenges";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
 import { addLocalDays, formatLocalDate } from "@/lib/local-date";
 import { HelpTooltip } from "@/components/HelpTooltip";
+import { PageHeader } from "@/components/PageHeader";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
 
@@ -445,33 +445,16 @@ export function AdminChallenges() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label={i18n("challengeManagementIntroduction7702a15")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-wrap items-start justify-between gap-6">
-            <div className="max-w-4xl">
-              <p className="text-sm font-semibold uppercase tracking-[0.28em] text-[var(--primary)]">{i18n("adminChallenges67e0d16")}</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                {i18n("seasonalChallengeManagement522b160")}
-              </h1>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {i18n("createAndEditSeasonalChallengesInspectLiveParticipation96025e7")}
-              </p>
-            </div>
-
-            <div className="rounded-[1.4rem] px-5 py-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-              <div className="flex items-center gap-2">
-                <p className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                  {i18n("activeToday9f14dee")}
-                </p>
-                <HelpTooltip label={i18n("activeToday9f14dee")}>{challengeInsight}</HelpTooltip>
-              </div>
-              <p className="mt-2 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                {activeCount} / 3
-              </p>
-            </div>
-          </div>
-        </section>
-        </TransientHero>
+        <PageHeader
+          title={i18n("adminChallenges67e0d16")}
+          actions={
+            <span className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}>
+              <span className="text-[11px] uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("activeToday9f14dee")}</span>
+              <strong>{activeCount} / 3</strong>
+              <HelpTooltip label={i18n("activeToday9f14dee")}>{challengeInsight}</HelpTooltip>
+            </span>
+          }
+        />
 
         <section className="grid gap-6 xl:grid-cols-[0.92fr_1.08fr]">
           <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>

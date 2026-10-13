@@ -12,6 +12,7 @@ import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
+import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { APP_THEMES, cssVariablesForTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY } from "@/lib/theme";
 import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "./globals.css";
@@ -91,6 +92,7 @@ export default async function RootLayout({
                 <ServiceWorkerBootstrap />
                 <TopNav />
                 {children}
+                <OnboardingHost />
               </SessionProvider>
             </ThemeProvider>
           </QueryProvider>

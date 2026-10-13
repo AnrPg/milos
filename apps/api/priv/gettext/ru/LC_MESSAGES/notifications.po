@@ -219,3 +219,30 @@ msgstr "Заканчивается"
 
 msgid "%{item}: %{quantity} left."
 msgstr "%{item}: осталось %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "Ваша подписка скоро закончится"
+
+msgid "Your subscription has ended"
+msgstr "Ваша подписка закончилась"
+
+msgid "your subscription"
+msgstr "ваша подписка"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} заканчивается %{date} (через %{days} дн.). Продлите, чтобы и дальше записываться на занятия."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} закончилась. Доступ сохраняется до %{date}; продлите до этой даты, чтобы и дальше записываться на занятия."
+
+msgid "Your access has ended"
+msgstr "Ваш доступ закончился"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Доступ приостановлен из-за просроченного платежа. Оплатите задолженность, чтобы снова записываться на занятия."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Доступ закончился. Продлите подписку, чтобы снова записываться на занятия."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Ваши предстоящие записи отменены: %{count}."

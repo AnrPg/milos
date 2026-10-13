@@ -110,6 +110,15 @@ must have an ADR. See `template.md` for the format.
 | ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
 | ADR-103 | Role-aware navigation on today's UI | Accepted |
 | ADR-104 | Gym inventory: machines and consumables | Accepted |
+| ADR-105 | AI-assisted free-text workout authoring | Accepted |
+| ADR-106 | Client invitations and public join link | Accepted |
+| ADR-107 | First-run onboarding checklist and tours | Accepted |
+| ADR-108 | Static page headers and client-side users directory | Accepted |
+| ADR-109 | Structured-first workouts and workout assistant hardening | Accepted |
+| ADR-110 | Canonical section format schemas and structure-first parsing | Accepted |
+| ADR-111 | Reasoning-first workout assistant | Accepted |
+| ADR-112 | Subscription expiry reminders and grace slack | Accepted |
+| ADR-113 | Training log on profiles | Accepted |
 | ADR-114 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
 | ADR-115 | Dialyzer baseline paid down to zero | Accepted |
 | ADR-116 | Observability dashboards and alerting | Accepted |

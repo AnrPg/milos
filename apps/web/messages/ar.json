@@ -2555,7 +2555,7 @@
     "freeTextEditorPlaceholder": "اكتب WOD تمامًا كما يجب أن يظهر على السبورة...",
     "freeTextEditorLabel": "محرر تجريب النص الحر",
     "freeTextTitle": "نص مجاني WOD",
-    "freeTextDescription": "اكتب WOD نصًا سريعًا. يتم حفظه وإظهاره كنص نصي واحد غير منظم.",
+    "freeTextDescription": "اكتب تمرين اليوم كما على السبورة. يرى الرياضيون نصك كما كتبته، ويحوّله المساعد إلى بيانات منظّمة.",
     "freeTextPreviewEmpty": "ستظهر معاينة WOD للنص الحر هنا.",
     "timerFormatLabel": "تنسيق الموقت",
     "durationMinutesLabel": "المدة (بالدقائق)",
@@ -4174,7 +4174,35 @@
     "invItem": "العنصر",
     "invUsedPerMonth": "الاستهلاك / شهر",
     "invSpendPerMonth": "الإنفاق / شهر",
-    "invTotalSpend": "إجمالي الإنفاق"
+    "invTotalSpend": "إجمالي الإنفاق",
+    "subscriptionExpiryReminderDays": "تذكير الانتهاء (أيام قبل)",
+    "subscriptionExpiryReminderDaysHelp": "يتلقى العملاء إشعارًا قبل انتهاء اشتراكهم بهذا العدد من الأيام. القيمة 0 توقفه.",
+    "subscriptionGraceDays": "فترة السماح (أيام)",
+    "subscriptionGraceDaysHelp": "بعد انتهاء الاشتراك أو تأخر فاتورة، يحتفظ العملاء بالوصول هذا العدد من الأيام، ثم يفقدونه، مثلًا لا يمكنهم حجز الحصص.",
+    "accessGraceEnded": "انتهى اشتراكك. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص.",
+    "accessGraceOverdue": "هناك دفعة متأخرة. يبقى وصولك متاحًا حتى {date}؛ ادفع قبل ذلك لتواصل حجز الحصص.",
+    "accessBlockedOverdue": "تم إيقاف وصولك مؤقتًا بسبب دفعة متأخرة. ادفع الرصيد المستحق لتحجز الحصص مجددًا.",
+    "accessEnded": "انتهى وصولك. جدّد اشتراكك لتحجز الحصص مجددًا.",
+    "subscriptionEndsSoonTitle": "اشتراكك ينتهي قريبًا",
+    "subscriptionEndedTitle": "انتهى اشتراكك",
+    "yourSubscription": "اشتراكك",
+    "subscriptionEndsSoonBody": "ينتهي {package} في {date} (بعد {days} أيام). جدّد لتواصل حجز الحصص.",
+    "subscriptionEndedBody": "انتهى {package}. يبقى وصولك متاحًا حتى {date}؛ جدّد قبل ذلك لتواصل حجز الحصص.",
+    "historyTitle": "سجل التدريب",
+    "historyWorkouts": "التمارين",
+    "historyClasses": "الحصص",
+    "historyLoading": "جارٍ التحميل…",
+    "historyError": "تعذّر تحميل السجل. حاول لاحقًا.",
+    "historyNoWorkouts": "لا توجد تمارين مسجّلة بعد.",
+    "historyNoClasses": "لا توجد حصص سابقة محجوزة بعد.",
+    "historyShowing": "عرض {shown} من {total}",
+    "historyShowMore": "عرض المزيد",
+    "historyDeletedWorkout": "تمرين محذوف",
+    "historyMinutes": "{minutes} د",
+    "historyNoResult": "لم تُسجَّل نتيجة لهذه الحصة.",
+    "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
+    "accessEndedTitle": "انتهى وصولك",
+    "accessEndedCancelledBookings": "{count, plural, one {أُلغي حجزك القادم.} other {أُلغيت حجوزاتك القادمة (#).}}"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4291,5 +4319,359 @@
     "errorGeneric": "تعذّر إكمال الطلب.",
     "myReceiptsTitle": "إيصالات الاسترداد",
     "myReceiptsEmpty": "ليست لديك إيصالات استرداد."
+  },
+  "WorkoutAssistant": {
+    "title": "مساعد التمارين",
+    "intro": "اكتب التمرين كما تكتبه على السبورة. يحوّله المساعد إلى بيانات منظّمة ويشير إلى أي شيء غير واضح.",
+    "analyze": "التحقق مع المساعد",
+    "reanalyze": "تحقّق مرة أخرى",
+    "analyzing": "جارٍ قراءة تمرينك…",
+    "analyzingHint": "يستغرق ذلك عادةً بضع ثوانٍ. نصّك محفوظ.",
+    "stale": "غيّرت النص بعد آخر تحقق. تحقّق مرة أخرى لتحديث النتائج.",
+    "insertExample": "ابدأ من مثال",
+    "exampleWorkout": "تحضير Murph\nإحماء: جري 400 م ثم جولتان من 10 قرفصاء\nFor time، الحد 25 دقيقة:\n5 جولات\n10 عقلة\n20 ضغط\n30 قرفصاء\nقوة:\nقرفصاء خلفية 5x5 @ 100 كغ، راحة دقيقتان",
+    "tipsTitle": "نصائح لقراءة دقيقة",
+    "tipOneLine": "حركة واحدة في كل سطر.",
+    "tipSetsReps": "اكتب المجموعات × التكرارات @ الحمل، مثل 5x5 @ 100 كغ.",
+    "tipBlocks": "سمِّ كل قسم: إحماء، قوة، WOD.",
+    "tipTimers": "حدّد المؤقتات: AMRAP 12، EMOM 10، For time بحد 20.",
+    "panelTabs": "اللوحة الجانبية للمحرر",
+    "tabAssistant": "المساعد",
+    "tabPreview": "معاينة",
+    "summarySections": "الأقسام",
+    "summaryExercises": "التمارين",
+    "summaryOpen": "للمراجعة",
+    "issuesHeading": "للمراجعة ({count})",
+    "suggestionsHeading": "إضافات مقترحة ({count})",
+    "resolvedHeading": "تمت مراجعته ({count})",
+    "allClear": "كل شيء واضح. يمكنك النشر.",
+    "severityError": "يجب إصلاحه",
+    "severityWarning": "للتحقق",
+    "requiredBadge": "إلزامي",
+    "accept": "قبول",
+    "apply": "تطبيق",
+    "reject": "رفض",
+    "undo": "تراجع",
+    "add": "إضافة",
+    "dismiss": "تجاهل",
+    "accepted": "مقبول",
+    "rejectedOptional": "مرفوض، يبقى فارغًا",
+    "rejectedRequired": "مرفوض، حقل إلزامي: النشر محظور حتى تملأه",
+    "rejectOptionalHint": "الرفض يترك هذا الحقل فارغًا. يمكن نشر التمرين رغم ذلك.",
+    "rejectRequiredHint": "هذا الحقل إلزامي. رفضه يفرغه ويمنع النشر حتى تُدخل قيمة.",
+    "typeValue": "قيمتك",
+    "typeValuePlaceholder": "اكتب قيمة",
+    "invalidTyped": "هذه القيمة لا تناسب هذا الحقل. تحقّق من الصيغة وحاول مجددًا.",
+    "alsoInText": "أضف هذا السطر إلى النص أيضًا:",
+    "hintMinutes": "المدة بالدقائق",
+    "hintList": "افصل العناصر بفواصل",
+    "hintDifficulty": "beginner أو intermediate أو advanced أو all-levels",
+    "hintValue": "القيمة",
+    "readAs": "كيف فهمه المساعد",
+    "noBlocks": "لم يُعثر على أقسام تدريب بعد. أضف التمارين، كل تمرين في سطر.",
+    "unnamed": "بلا اسم",
+    "setsOnly": "{count} مجموعات",
+    "bodyweight": "وزن الجسم",
+    "restShort": "راحة {seconds} ث",
+    "units": {
+      "secs": "ثانية",
+      "kcal": "سعرة",
+      "meters": "متر"
+    },
+    "pathSection": "القسم {number}",
+    "pathExercise": "التمرين {number}",
+    "fields": {
+      "title": "العنوان",
+      "type": "نوع التمرين",
+      "subtitle": "العنوان الفرعي",
+      "description": "الوصف",
+      "difficulty": "الصعوبة",
+      "estimated_duration_seconds": "المدة",
+      "equipment": "المعدات",
+      "tags": "الوسوم",
+      "name": "الاسم",
+      "note": "ملاحظة",
+      "timer_config": "المؤقت",
+      "sets": "المجموعات",
+      "prescription_value": "التكرارات / الكمية",
+      "prescription_unit": "الوحدة",
+      "load_value": "الحمل",
+      "load_mode": "نوع الحمل",
+      "rest_seconds": "الراحة (ثوانٍ)",
+      "tempo": "الإيقاع",
+      "text": "النص"
+    },
+    "why": {
+      "difficulty": "يختار الرياضيون أسرع عندما يعرفون المستوى.",
+      "estimated_duration_seconds": "المدة تساعدك على تخطيط الحصص وتساعد الرياضيين على تنظيم يومهم.",
+      "equipment": "قائمة المعدات تتيح للرياضيين التجهيز قبل البدء.",
+      "description": "هدف قصير يبقي الجميع مركّزين.",
+      "generic": "إضافة هذا تجعل التمرين أكثر اكتمالًا."
+    },
+    "codes": {
+      "missing_title": "يحتاج تمرينك إلى عنوان. اكتبه في حقل العنوان، مثل «تحضير Murph».",
+      "missing_type": "اختر نوع التمرين ليظهر في المكتبة الصحيحة.",
+      "missing_section_name": "أعطِ هذا القسم اسمًا، مثل «إحماء» أو «قوة».",
+      "missing_exercise_name": "يحتوي هذا السطر على أرقام بلا حركة. اكتب اسم التمرين.",
+      "too_short": "استخدم {min} أحرف على الأقل.",
+      "invalid_value": "«{value}» غير صالح هنا. أدخل قيمة صحيحة أو ارفضها لحذفها.",
+      "invalid_timer": "ينقص المؤقت {format}: {missing}. أضفه إلى النص، مثل «كل دقيقة لمدة 10 دقائق».",
+      "unknown_format": "«{value}» ليست صيغة مؤقت معروفة. استخدم مثلًا AMRAP أو EMOM أو For time.",
+      "generic": "وجد المساعد شيئًا يستحق التحقق هنا."
+    },
+    "errors": {
+      "notConfigured": "لم يُضبط المساعد على هذا الخادم بعد. لا يزال بإمكانك نشر النص كما هو.",
+      "unavailable": "المساعد مشغول أو غير متصل. حاول بعد قليل. نصّك محفوظ.",
+      "textRequired": "اكتب التمرين أولًا ثم تحقّق منه.",
+      "textTooLong": "النص طويل جدًا لتحقق واحد. قسّمه إلى تمارين منفصلة."
+    },
+    "blockingTitle": "لا يمكن النشر بعد. أصلح أولًا:",
+    "blockingRequired": "إلزامي",
+    "blockingTooShort": "قصير جدًا (3 أحرف على الأقل)",
+    "chooseType": "اختر نوعًا…",
+    "titlePlaceholder": "اتركه فارغًا ليقترح المساعد عنوانًا",
+    "checkAndPublish": "تحقّق وانشر",
+    "reviewBeforePublish": "ترك المساعد بعض الملاحظات. راجعها ثم اضغط نشر مرة أخرى.",
+    "resolveErrorsFirst": "عالج البنود المعلّمة «يجب إصلاحه» قبل النشر.",
+    "publishFailed": "فشل النشر. المسودة محفوظة. حاول مرة أخرى.",
+    "rejectTextHint": "الرفض يُبقي نصك كما كتبته.",
+    "rejectedText": "بقي كما كُتب",
+    "editNotApplied": "لم يعد «{text}» موجودًا في النص، لذا لم يُطبَّق هذا الإصلاح. تحقّق مرة أخرى لتحديث الاقتراحات.",
+    "intervalSlot": "الفاصل {slot}",
+    "oddIntervals": "الفواصل الفردية",
+    "evenIntervals": "الفواصل الزوجية",
+    "severityAssumption": "افتراض",
+    "keepAssumption": "إبقاء",
+    "rejectAssumptionHint": "الرفض يحذف هذه القيمة؛ ويبقى النص كما كُتب."
+  },
+  "Invites": {
+    "inviteClients": "دعوة العملاء",
+    "dialogIntro": "أرسل رابطًا شخصيًا أو شارك رابط الانضمام إلى ناديك.",
+    "close": "إغلاق",
+    "clientAccess": "وصول العملاء",
+    "clientAccessIntro": "اختر كيف يدخل العملاء الجدد إلى تطبيقك: برابط شخصي لمرة واحدة أو برابط الانضمام العام.",
+    "tabPersonal": "رابط شخصي",
+    "tabPublic": "رابط الانضمام",
+    "tabPending": "قيد الانتظار ({count})",
+    "joinsAs": "ينضم بصفة",
+    "roles": {
+      "member": "عضو",
+      "athlete": "رياضي"
+    },
+    "roleHints": {
+      "member": "يحجز الحصص في النادي",
+      "athlete": "يحصل على برنامج شخصي"
+    },
+    "emailOptional": "البريد الإلكتروني (اختياري)",
+    "emailHint": "عند إدخاله، لا يستخدم الرابط إلا حساب بهذا البريد.",
+    "validFor": "صالح لمدة",
+    "days": "{count, plural, zero {# يوم} one {يوم واحد} two {يومان} few {# أيام} many {# يومًا} other {# يوم}}",
+    "createLink": "إنشاء رابط دعوة",
+    "creating": "جارٍ الإنشاء…",
+    "linkReady": "الرابط جاهز. أرسله إلى {role} الجديد.",
+    "singleUse": "يعمل مرة واحدة. ينتهي في {date}.",
+    "createAnother": "إنشاء رابط آخر",
+    "inviteSubject": "دعوتك إلى {organization}",
+    "inviteMessage": "أنت مدعو للانضمام إلى {organization}. أنشئ حسابك هنا: {url}",
+    "publicTitle": "رابط الانضمام العام",
+    "publicHint": "يمكن لأي شخص لديه عنوان ناديك التسجيل. أوقفه متى شئت.",
+    "publicOff": "رابط الانضمام متوقف. فعّله لتحصل على عنوان لموقعك أو حساباتك الاجتماعية أو رمز QR في الاستقبال.",
+    "publicWarning": "كل من يستخدم هذا العنوان ينضم بصفة {role}. ما زال الطاقم يحتاج إلى رابط شخصي.",
+    "joinSubject": "انضم إلينا",
+    "joinMessage": "انضم إلى نادينا عبر التطبيق: {url}",
+    "noPending": "لا توجد دعوات معلّقة. تظهر الروابط التي تنشئها هنا حتى تُستخدم أو تنتهي صلاحيتها.",
+    "emailBound": "مرتبط ببريد",
+    "expires": "ينتهي في {date}",
+    "revoke": "إلغاء",
+    "confirmRevoke": "نعم، ألغِ",
+    "keep": "إبقاء",
+    "loading": "جارٍ التحميل…",
+    "linkLabel": "رابط الدعوة",
+    "copy": "نسخ",
+    "copied": "تم النسخ",
+    "share": "مشاركة",
+    "email": "البريد",
+    "whatsapp": "واتساب",
+    "youreInvited": "أنت مدعو",
+    "joinTitle": "انضم إلى {organization}",
+    "joinBody": "أنشئ حسابًا أو سجّل الدخول لتنضم بصفة {role}. يستغرق ذلك أقل من دقيقة.",
+    "joinCta": "الانضمام إلى {organization}",
+    "joining": "جارٍ الانضمام…",
+    "createAccount": "إنشاء حساب",
+    "haveAccount": "لدي حساب بالفعل",
+    "joinUnavailableTitle": "هذا الرابط غير نشط",
+    "joinUnavailable": "ربما أوقفه النادي. اطلب رابطًا جديدًا أو دعوة شخصية.",
+    "membershipUnavailable": "عضويتك هنا متوقفة مؤقتًا. تواصل مع النادي لإعادة تفعيلها.",
+    "goHome": "الذهاب إلى الصفحة الرئيسية"
+  },
+  "UsersDirectory": {
+    "filters": "عوامل التصفية",
+    "searchLabel": "البحث عن أشخاص",
+    "searchPlaceholder": "ابحث بالاسم",
+    "financeFilter": "حالة الاشتراك",
+    "financeAll": "أي حالة اشتراك",
+    "sortLabel": "الترتيب",
+    "sort": {
+      "name": "الاسم أ–ي",
+      "newest": "الأحدث أولًا",
+      "oldest": "الأقدم أولًا"
+    },
+    "roleFilter": "التصفية حسب الدور",
+    "roles": {
+      "all": "الجميع",
+      "member": "الأعضاء",
+      "athlete": "الرياضيون",
+      "admin": "الطاقم"
+    },
+    "showing": "عرض {shown} من {total}",
+    "clearFilters": "مسح عوامل التصفية",
+    "retry": "إعادة المحاولة",
+    "emptyTitle": "لا يوجد عملاء بعد",
+    "emptyBody": "ادعُ أول أعضائك ورياضييك. سيظهرون هنا فور انضمامهم.",
+    "inviteFirst": "ادعُ أول عملائك",
+    "noMatchesTitle": "لا توجد نتائج",
+    "noMatchesBody": "جرّب اسمًا آخر أو امسح عوامل التصفية.",
+    "listLabel": "الأشخاص",
+    "columns": {
+      "person": "الشخص",
+      "finance": "الاشتراك",
+      "joined": "تاريخ الانضمام",
+      "open": "فتح الملف"
+    }
+  },
+  "Onboarding": {
+    "popupEyebrow": "لم يكتمل الإعداد",
+    "popupTitle": "أهلًا بك! لنجهّز ناديك",
+    "popupIntro": "ست خطوات قصيرة. توقّف متى شئت: هذه القائمة بانتظارك في {path}.",
+    "progress": "اكتمل {done} من {total}",
+    "later": "ذكّرني لاحقًا",
+    "dontShow": "عدم الإظهار مجددًا",
+    "takeTour": "ابدأ الجولة",
+    "panelTitle": "قائمة الإعداد",
+    "panelIntro": "تابع من حيث توقفت. تُعلَّم الخطوات تلقائيًا عندما يرى التطبيق أنها اكتملت.",
+    "showPopupAgain": "إظهار رسالة الترحيب مجددًا",
+    "showSteps": "إظهار الخطوات",
+    "hideSteps": "إخفاء الخطوات",
+    "allDone": "كل شيء جاهز. تطبيقك مستعد لاستقبال العملاء.",
+    "markDone": "تعليم كمكتمل",
+    "skip": "تخطٍّ",
+    "reopen": "تراجع",
+    "unskip": "إعادة",
+    "doneAuto": "تم. اكتشفناه تلقائيًا.",
+    "statusDone": "(مكتمل)",
+    "statusSkipped": "(متخطى)",
+    "statusOpen": "(قيد الانتظار)",
+    "steps": {
+      "settings": {
+        "title": "راجع قواعد التطبيق",
+        "body": "الإعدادات الافتراضية للحجوزات والمدفوعات والإشعارات. دقيقتان.",
+        "cta": "فتح الإعدادات"
+      },
+      "classes": {
+        "title": "أضف حصصك",
+        "body": "أنشئ أنواع الحصص (مثل CrossFit واليوغا) ليتمكن العملاء من الحجز.",
+        "cta": "إعداد الحصص"
+      },
+      "packages": {
+        "title": "أنشئ باقات الاشتراك",
+        "body": "خطط وأسعار يشتريها العملاء أو تخصصها لهم.",
+        "cta": "إنشاء باقة"
+      },
+      "workout": {
+        "title": "اكتب أول تمرين لك",
+        "body": "اكتبه كما على السبورة. والمساعد يتولى الباقي.",
+        "cta": "كتابة تمرين"
+      },
+      "invite": {
+        "title": "ادعُ عملاءك",
+        "body": "أرسل رابطًا شخصيًا أو فعّل رابط الانضمام إلى النادي.",
+        "cta": "دعوة العملاء"
+      },
+      "tour": {
+        "title": "جولة في دقيقة واحدة",
+        "body": "تعرّف على مكان كل شيء.",
+        "cta": "بدء الجولة"
+      }
+    },
+    "tour": {
+      "roleDescription": "جولة إرشادية",
+      "stepOf": "الخطوة {current} من {total}",
+      "skip": "تخطي الجولة",
+      "showMe": "أرني",
+      "back": "رجوع",
+      "next": "التالي",
+      "done": "فهمت",
+      "replay": "إعادة جولة التطبيق",
+      "admin": {
+        "welcome": {
+          "title": "أهلًا بك في تطبيق ناديك",
+          "body": "نظرة لمدة دقيقة على الأساسيات. تخطَّها متى شئت."
+        },
+        "dashboard": {
+          "title": "لوحة التحكم",
+          "body": "يومك بلمحة: الحصص والإيرادات وكل ما يحتاج انتباهك."
+        },
+        "classes": {
+          "title": "الحصص",
+          "body": "أنشئ أنواع الحصص وجدول الجلسات ووافق على الحجوزات."
+        },
+        "workouts": {
+          "title": "التمارين",
+          "body": "اكتب التمرين نصًا عاديًا. يرتّبه المساعد ويشير إلى الأخطاء."
+        },
+        "people": {
+          "title": "الأشخاص والدعوات",
+          "body": "ادعُ العملاء برابط وافتح ملف أي شخص ومدفوعاته وتقدّمه."
+        },
+        "config": {
+          "title": "إعدادات التطبيق",
+          "body": "القواعد والإشعارات ووصول العملاء وهذه القائمة موجودة في {path}."
+        }
+      },
+      "member": {
+        "welcome": {
+          "title": "أهلًا بك!",
+          "body": "إليك كيف تستفيد من التطبيق إلى أقصى حد في أقل من دقيقة."
+        },
+        "schedule": {
+          "title": "احجز الحصص",
+          "body": "افتح {schedule} واختر حصة واضغط حجز. سنذكّرك قبل أن تبدأ."
+        },
+        "train": {
+          "title": "تدرّب مع المؤقت",
+          "body": "ابدأ تمرينًا واتبعه خطوة بخطوة مع المؤقت المدمج."
+        },
+        "records": {
+          "title": "تابع تقدّمك",
+          "body": "أرقامك القياسية وسلاسل إنجازك تُجمع في {pantheon}."
+        },
+        "account": {
+          "title": "الفوترة والملف الشخصي",
+          "body": "اطّلع على اشتراكك في {billing}. غيّر اللغة والإشعارات من ملفك الشخصي."
+        }
+      },
+      "athlete": {
+        "welcome": {
+          "title": "أهلًا بك!",
+          "body": "إليك كيف تستفيد من التطبيق إلى أقصى حد في أقل من دقيقة."
+        },
+        "programme": {
+          "title": "برنامجك",
+          "body": "تظهر تمارين مدربك في {myWorkouts} يومًا بيوم."
+        },
+        "train": {
+          "title": "تدرّب مع المؤقت",
+          "body": "افتح تمرينًا واضغط ابدأ. يرشدك المؤقت في كل قسم."
+        },
+        "records": {
+          "title": "تابع تقدّمك",
+          "body": "أرقامك القياسية وسلاسل إنجازك تُجمع في {pantheon}."
+        },
+        "account": {
+          "title": "الفوترة والملف الشخصي",
+          "body": "اطّلع على اشتراكك في {billing}. غيّر اللغة والإشعارات من ملفك الشخصي."
+        }
+      }
+    }
   }
 }

@@ -1,0 +1,82 @@
+{
+  "description": "Terse coach: conventions must be applied (death by, Tabata) and one block lacks a value nobody can infer (EMOM length), so it stays untimed with an actionable fix.",
+  "locale": "en",
+  "text": "Death by thrusters 40kg\nthen Tabata: row / burpees\nEMOM: 5 power cleans @ 70%",
+  "answer": {
+    "workout": {
+      "title": "Death by thrusters + Tabata",
+      "type": "crossfit"
+    },
+    "sections": [
+      {
+        "name": "Death by thrusters",
+        "format": "death_by",
+        "timer": {
+          "start_reps": 1,
+          "step_reps": 1
+        },
+        "score": "intervals_survived",
+        "exercises": [
+          {
+            "name": "Thruster",
+            "load_kg": 40
+          }
+        ]
+      },
+      {
+        "name": "Tabata",
+        "format": "tabata",
+        "timer": {
+          "work_seconds": 20,
+          "rest_seconds": 10,
+          "rounds": 8
+        },
+        "exercises": [
+          {
+            "name": "Row"
+          },
+          {
+            "name": "Burpee"
+          }
+        ]
+      },
+      {
+        "name": "EMOM",
+        "format": "untimed",
+        "note": "EMOM, length not stated",
+        "exercises": [
+          {
+            "name": "Power Clean",
+            "reps": 5,
+            "load_percent_1rm": 70
+          }
+        ]
+      }
+    ],
+    "issues": [
+      {
+        "path": "sections.2.format",
+        "severity": "warning",
+        "message": "The EMOM has no length, so it cannot be timed.",
+        "suggestion_label": "Make it EMOM 10",
+        "find_text": "EMOM:",
+        "replace_text": "EMOM 10:"
+      }
+    ],
+    "missing_fields": [],
+    "assumptions": [
+      {
+        "path": "sections.0.timer.start_reps",
+        "message": "“Death by” starts at 1 rep in the first minute."
+      },
+      {
+        "path": "sections.0.timer.step_reps",
+        "message": "“Death by” adds 1 rep every minute."
+      },
+      {
+        "path": "sections.1.timer.rounds",
+        "message": "Tabata is 8 rounds of 20 s work / 10 s rest."
+      }
+    ]
+  }
+}

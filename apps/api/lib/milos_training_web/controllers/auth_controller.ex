@@ -334,9 +334,13 @@ defmodule MilosTrainingWeb.AuthController do
              preferred_locale: %Schema{
                type: :string,
                enum: MilosTraining.Identity.supported_locales()
+             },
+             completed_tours: %Schema{
+               type: :array,
+               items: %Schema{type: :string, enum: ~w(admin member athlete)}
              }
            },
-           required: [:id, :nickname, :role, :vendor, :preferred_locale]
+           required: [:id, :nickname, :role, :vendor, :preferred_locale, :completed_tours]
          }},
       unauthorized:
         {"Unauthorized", "application/json",
@@ -451,7 +455,8 @@ defmodule MilosTrainingWeb.AuthController do
       role: to_string(user.role),
       avatar_url: user.avatar_url,
       vendor: vendor?(user),
-      preferred_locale: user.preferred_locale
+      preferred_locale: user.preferred_locale,
+      completed_tours: Map.get(user, :completed_tours) || []
     })
   end
 

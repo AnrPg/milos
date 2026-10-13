@@ -187,6 +187,7 @@ defmodule MilosTrainingWeb.Router do
     post("/register-member", AuthController, :register_member)
     post("/register-admin", AuthController, :register_admin)
     post("/invitations/inspect", OrganizationAccessController, :inspect)
+    get("/join/:slug", OrganizationAccessController, :inspect_join_link)
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
@@ -210,6 +211,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :invitation_rate_limited])
 
     post("/memberships/redeem", OrganizationAccessController, :redeem)
+    post("/memberships/join/:slug", OrganizationAccessController, :join)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -222,7 +224,10 @@ defmodule MilosTrainingWeb.Router do
       :tenant_write_rate_limited
     ])
 
+    get("/invitations", OrganizationAccessController, :list_invitations)
     post("/invitations", OrganizationAccessController, :issue)
+    get("/join-link", OrganizationAccessController, :show_join_link)
+    put("/join-link", OrganizationAccessController, :update_join_link)
     delete("/invitations/:id", OrganizationAccessController, :revoke)
   end
 
@@ -250,6 +255,7 @@ defmodule MilosTrainingWeb.Router do
     post("/appointments", AppointmentsController, :book)
     post("/appointments/:id/cancel", AppointmentsController, :cancel)
     get("/progress", MyContentController, :progress)
+    get("/history", TrainingHistoryController, :mine)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     get("/refund-receipts", MyFinanceController, :refund_receipts)
     get("/refund-receipts/:id", MyFinanceController, :refund_receipt)
@@ -448,6 +454,7 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id", AdminUserController, :show)
     get("/users/:id/finance", AdminUserController, :finance)
     get("/users/:id/training-history", AdminUserController, :training_history)
+    get("/users/:id/history", TrainingHistoryController, :for_user)
     get("/users/:id/schedule", AdminUserController, :schedule)
     post("/users/:id/programming", AdminUserController, :program_workout)
     get("/users/:id/incidents", AdminUserController, :incidents)
@@ -501,6 +508,7 @@ defmodule MilosTrainingWeb.Router do
     post("/workouts", AdminWorkoutController, :create)
     post("/workouts/dsl/parse", AdminWorkoutDslController, :parse)
     post("/workouts/timer-preview", AdminWorkoutTimerPreviewController, :create)
+    post("/workouts/free-text/analyze", AdminWorkoutFreeTextController, :analyze)
     get("/workouts/dsl/manual", AdminWorkoutDslController, :manual)
     get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
     post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)
@@ -520,6 +528,8 @@ defmodule MilosTrainingWeb.Router do
     patch("/challenges/:id", AdminChallengeController, :update)
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
+    get("/onboarding", AdminOnboardingController, :show)
+    patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     get("/branding", AdminBrandingController, :show)
     post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
@@ -788,6 +798,7 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     patch("/profile", MeController, :update_profile)
+    post("/tours/:audience/complete", MeController, :complete_tour)
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)
     get("/search/users", MeController, :search_users)

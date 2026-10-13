@@ -33,7 +33,10 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.InventoryController => [:manage_inventory],
     W.OwnerOrganizationController => [:manage_organization_lifecycle],
     W.AdminWorkoutTimerPreviewController => [:manage_workouts],
-    W.AdminBrandingController => [:manage_settings]
+    W.AdminBrandingController => [:manage_settings],
+    W.AdminWorkoutFreeTextController => [:manage_workouts],
+    W.AdminOnboardingController => [:manage_settings],
+    W.TrainingHistoryController => [:view_client_training]
   }
 
   @actions %{
@@ -192,6 +195,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
 
     # Invitations
     {W.OrganizationAccessController, :issue} => [:invite_clients],
+    {W.OrganizationAccessController, :list_invitations} => [:invite_clients],
+    {W.OrganizationAccessController, :show_join_link} => [:invite_clients],
+    {W.OrganizationAccessController, :update_join_link} => [:invite_clients],
     {W.OrganizationAccessController, :revoke} => [:invite_clients],
     # ADR-104: the whole team reports; front desk, admins and owners manage.
     {W.InventoryController, :machines} => [:manage_inventory, :report_inventory],

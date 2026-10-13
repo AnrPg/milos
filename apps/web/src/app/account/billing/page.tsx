@@ -12,7 +12,6 @@ import { useEffect, useRef, useState } from "react";
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollmentCard";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -381,11 +380,7 @@ export default function BillingPage() {
 
         {/* header */}
         <div className="flex items-center justify-between">
-          <TransientHero label={i18n("billingIntroduction58b604b")}>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-              {i18n("billingabaec45")}
-            </h1>
-          </TransientHero>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>{i18n("billingabaec45")}</h1>
           <button
             type="button"
             onClick={() => setShowPackages(true)}
@@ -462,6 +457,7 @@ export default function BillingPage() {
               )}
             </div>
 
+            <AccessNotice entitlement={entitlement} />
             <EntitlementCard entitlement={entitlement} />
 
             <CorporateEnrollmentCard onEnrolled={refreshAfterEnrollment} />
@@ -607,6 +603,35 @@ export default function BillingPage() {
       )}
     </div>
   );
+}
+
+/** Grace slack or lost access, told plainly to the client. */
+function AccessNotice({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  const uiLocale = useUiLocale();
+  const i18n = useUiTranslations();
+  if (!entitlement) return null;
+
+  if (entitlement.status === "grace" && entitlement.grace_until) {
+    const message =
+      entitlement.source === "overdue_grace"
+        ? i18n("accessGraceOverdue", { date: formatDate(uiLocale, entitlement.grace_until) })
+        : i18n("accessGraceEnded", { date: formatDate(uiLocale, entitlement.grace_until) });
+    return (
+      <p role="status" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning, #d97706) 14%, transparent)", color: "var(--text)", border: "1px solid var(--warning, #d97706)" }}>
+        {message}
+      </p>
+    );
+  }
+
+  if (entitlement.status === "blocked" || (entitlement.status === "inactive" && entitlement.source !== "membership_status")) {
+    return (
+      <p role="alert" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--text)", border: "1px solid var(--danger)" }}>
+        {entitlement.status === "blocked" ? i18n("accessBlockedOverdue") : i18n("accessEnded")}
+      </p>
+    );
+  }
+
+  return null;
 }
 
 function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {

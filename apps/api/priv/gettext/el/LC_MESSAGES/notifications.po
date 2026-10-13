@@ -219,3 +219,30 @@ msgstr "Χαμηλό απόθεμα"
 
 msgid "%{item}: %{quantity} left."
 msgstr "%{item}: απομένουν %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "Η συνδρομή σας λήγει σύντομα"
+
+msgid "Your subscription has ended"
+msgstr "Η συνδρομή σας έληξε"
+
+msgid "your subscription"
+msgstr "η συνδρομή σας"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "Η συνδρομή %{package} λήγει στις %{date} (σε %{days} ημέρες). Ανανεώστε για να συνεχίσετε να κλείνετε μαθήματα."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "Η συνδρομή %{package} έληξε. Διατηρείτε πρόσβαση έως τις %{date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα."
+
+msgid "Your access has ended"
+msgstr "Η πρόσβασή σας έληξε"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Η πρόσβασή σας έχει παγώσει επειδή μια πληρωμή καθυστερεί. Εξοφλήστε το υπόλοιπο για να κλείνετε ξανά μαθήματα."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Η πρόσβασή σας έληξε. Ανανεώστε τη συνδρομή σας για να κλείνετε ξανά μαθήματα."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Οι επερχόμενες κρατήσεις σας ακυρώθηκαν: %{count}."

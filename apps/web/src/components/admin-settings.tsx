@@ -34,8 +34,10 @@ import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
-import { TransientHero } from "@/components/TransientHero";
 import { IntegerInput } from "@/components/integer-input";
+import { PageHeader } from "@/components/PageHeader";
+import { ClientAccessPanel } from "@/components/invites/InviteClients";
+import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -568,6 +570,8 @@ function LevelTaxonomySection({ token }: { token: string }) {
 function financeFormFromSettings(s: FinanceSettings) {
   return {
     paymentReminderIntervalDays: String(s.payment_reminder_interval_days),
+    expiryReminderDays: String(s.subscription_expiry_reminder_days ?? 5),
+    graceDays: String(s.subscription_grace_days ?? 3),
     documentMode: s.document_mode,
     packageModules: [...(s.package_modules ?? DEFAULT_PACKAGE_MODULES)].sort(),
   };
@@ -577,11 +581,50 @@ function financeFormFromSettings(s: FinanceSettings) {
 const DEFAULT_PACKAGE_MODULES = ["group_classes", "online_coaching"];
 const AVAILABLE_PACKAGE_MODULES = ["group_classes", "online_coaching", "open_gym", "events", "personal_training", "digital_content", "corporate_clients"] as const;
 
+function DaysField({
+  id,
+  label,
+  help,
+  min,
+  value,
+  onChange,
+}: {
+  id: string;
+  label: string;
+  help: string;
+  min: number;
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }} htmlFor={id}>
+        {label}
+      </label>
+      <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>
+        {help}
+      </p>
+      <input
+        id={id}
+        type="number"
+        min={min}
+        max={60}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className="w-28 rounded-xl px-4 py-2.5 text-sm outline-none"
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+      />
+    </div>
+  );
+}
+
 function FinanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
   const [form, setForm] = useState({
     paymentReminderIntervalDays: "7",
+    expiryReminderDays: "5",
+    graceDays: "3",
     documentMode: "invoice" as "invoice" | "receipt",
     packageModules: DEFAULT_PACKAGE_MODULES,
   });
@@ -604,6 +647,8 @@ function FinanceSection({ token }: { token: string }) {
         gamification: {},
         finance: {
           payment_reminder_interval_days: Number(form.paymentReminderIntervalDays),
+          subscription_expiry_reminder_days: Number(form.expiryReminderDays),
+          subscription_grace_days: Number(form.graceDays),
           document_mode: form.documentMode,
           package_modules: form.packageModules,
         },
@@ -619,10 +664,13 @@ function FinanceSection({ token }: { token: string }) {
     ? String(settingsQuery.data.finance.payment_reminder_interval_days)
     : "7";
   const serverMode = settingsQuery.data?.finance?.document_mode ?? "invoice";
+  const serverForm = settingsQuery.data?.finance ? financeFormFromSettings(settingsQuery.data.finance) : null;
   const dirty =
     initialized &&
     (form.paymentReminderIntervalDays !== serverDays ||
       form.documentMode !== serverMode ||
+      form.expiryReminderDays !== (serverForm?.expiryReminderDays ?? "5") ||
+      form.graceDays !== (serverForm?.graceDays ?? "3") ||
       form.packageModules.join(",") !== serverModules);
 
   return (
@@ -653,6 +701,22 @@ function FinanceSection({ token }: { token: string }) {
           }}
         />
       </div>
+      <DaysField
+        id="expiry-reminder-days"
+        label={i18n("subscriptionExpiryReminderDays")}
+        help={i18n("subscriptionExpiryReminderDaysHelp")}
+        min={0}
+        value={form.expiryReminderDays}
+        onChange={(value) => setForm((current) => ({ ...current, expiryReminderDays: value }))}
+      />
+      <DaysField
+        id="grace-days"
+        label={i18n("subscriptionGraceDays")}
+        help={i18n("subscriptionGraceDaysHelp")}
+        min={0}
+        value={form.graceDays}
+        onChange={(value) => setForm((current) => ({ ...current, graceDays: value }))}
+      />
       <fieldset className="space-y-3">
         <legend className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
           {i18n("featureFinanceDocumentWorkflow")}
@@ -731,7 +795,7 @@ function FinanceSection({ token }: { token: string }) {
         success={saveMutation.isSuccess}
         error={saveMutation.error}
         onSave={() => saveMutation.mutate()}
-        onReset={() => setForm({ paymentReminderIntervalDays: serverDays, documentMode: serverMode, packageModules: serverModules.split(",") })}
+        onReset={() => setForm(serverForm ?? { paymentReminderIntervalDays: serverDays, expiryReminderDays: "5", graceDays: "3", documentMode: serverMode, packageModules: serverModules.split(",") })}
       />
 
       <FinanceCleanupSection token={token} />
@@ -1255,19 +1319,9 @@ export function AdminSettingsHub() {
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-5xl space-y-6">
 
-        <TransientHero label={i18n("applicationSettingsIntroduction8f2e9b7")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {i18n("appConfigurationse0effaa")}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-            {i18n("appConfigurations1e15749")}
-          </h1>
-          <p className="mt-2 max-w-3xl text-sm leading-6" style={{ color: "var(--muted)" }}>
-            {i18n("globalSettingsForAppearanceEngagementRulesAndWorkout915168c")}
-          </p>
-        </section>
-        </TransientHero>
+        <PageHeader title={i18n("appConfigurationse0effaa")} />
+        <AdminOnboardingPanel />
+        <ClientAccessPanel />
 
         {token ? (
           <>

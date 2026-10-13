@@ -22,8 +22,8 @@ import {
 import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
 function money(uiLocale: string, cents: unknown) {
   const amount = typeof cents === "number" ? cents : Number(cents ?? 0);
@@ -93,41 +93,19 @@ export function FinanceDashboard({ analyticsMode = false }: { analyticsMode?: bo
       <div className="mx-auto max-w-6xl space-y-8">
 
         {/* Hero */}
-        <TransientHero label={i18n("financeDashboardIntroduction7e0cc12")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-                {analyticsMode ? i18n("financeAnalytics107dfa1") : i18n("revenue35cf82f")}
-              </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                {i18n("membershipRevenueOverview8e92aee")}
-              </h1>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {analyticsMode
-                  ? i18n("membershipRevenueRenewalAndPackageSignalsUseFinance9e261ff")
-                  : i18n("readOnlyFinancialSnapshotUseFinanceOperationsFor5173cce")}
-              </p>
-            </div>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={adminHref("/admin/finance", organizationSlug)}
-                className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
-                style={{ background: "var(--text)", color: "var(--bg)" }}
-              >
+        <PageHeader
+          title={analyticsMode ? i18n("financeAnalytics107dfa1") : i18n("membershipRevenueOverview8e92aee")}
+          actions={
+            <>
+              <Link href={adminHref("/admin/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {i18n("openFinanceOperationscffd9ab")}
               </Link>
-              <Link
-                href={adminHref(analyticsMode ? "/admin/metrics" : "/admin", organizationSlug)}
-                className="rounded-2xl px-5 py-3 text-sm font-semibold text-center"
-                style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
-              >
+              <Link href={adminHref(analyticsMode ? "/admin/metrics" : "/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
                 {analyticsMode ? i18n("analyticsMarketing0ecf7f0") : i18n("dashboard79e4071")}
               </Link>
-            </div>
-          </div>
-        </section>
-        </TransientHero>
+            </>
+          }
+        />
 
         {/* KPIs */}
         <section className="grid gap-4 md:grid-cols-4">

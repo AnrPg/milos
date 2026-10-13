@@ -83,6 +83,14 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().list_deletable_organization_user_ids(organization_id, platform_user_id)
 
   @impl true
+  def put_organization_settings_entry(organization_id, key, value),
+    do: impl().put_organization_settings_entry(organization_id, key, value)
+
+  @impl true
+  def list_active_invitations(organization_id, now),
+    do: impl().list_active_invitations(organization_id, now)
+
+  @impl true
   def get_invitation_by_digest(digest), do: impl().get_invitation_by_digest(digest)
   @impl true
   def get_invitation_with_organization(digest),

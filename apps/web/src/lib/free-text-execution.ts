@@ -66,9 +66,3 @@ export function readFreeTextExecutionWorkout(workoutId?: string | null) {
     return null;
   }
 }
-
-export function isFreeTextWorkout(
-  workout: { authoring_mode?: string | null } | null | undefined,
-) {
-  return workout?.authoring_mode === "free_text";
-}

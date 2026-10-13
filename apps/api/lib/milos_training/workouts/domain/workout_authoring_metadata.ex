@@ -18,7 +18,10 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
       "program_position" => :short_string,
       "default_scale" => :slug,
       "source_revision" => :non_negative_integer,
-      "schema_version" => :positive_integer
+      "schema_version" => :positive_integer,
+      # Free-text workouts: whether the assistant inferred every section timer.
+      # "incomplete" makes execution fall back to the manual timer (ADR-109).
+      "timer_inference" => {:enum, ~w(complete incomplete)}
     },
     section: %{
       "composition" => {:enum, ~w(straight_sets rounds circuit stations)},

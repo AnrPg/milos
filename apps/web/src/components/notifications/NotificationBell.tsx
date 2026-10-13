@@ -192,6 +192,29 @@ function NotificationCard({
     const phaseCBody = coachingNotificationBody(notification);
     if (phaseCBody !== null) return phaseCBody;
 
+    if (notification.type === "access_ended") {
+      const payload = notification.payload;
+      const reason = payload.reason === "overdue_payment" ? i18n("accessBlockedOverdue") : i18n("accessEnded");
+      const cancelled = typeof payload.cancelled_bookings === "number" ? payload.cancelled_bookings : 0;
+      return cancelled > 0 ? `${reason} ${i18n("accessEndedCancelledBookings", { count: cancelled })}` : reason;
+    }
+
+    if (notification.type === "subscription_expiring" || notification.type === "subscription_grace") {
+      const payload = notification.payload;
+      const packageName = typeof payload.package_name === "string" ? payload.package_name : i18n("yourSubscription");
+      if (notification.type === "subscription_expiring") {
+        return i18n("subscriptionEndsSoonBody", {
+          package: packageName,
+          date: formatDay(payload.ends_on),
+          days: typeof payload.days_left === "number" ? payload.days_left : 0,
+        });
+      }
+      return i18n("subscriptionEndedBody", {
+        package: packageName,
+        date: formatDay(payload.grace_until),
+      });
+    }
+
     if (notification.type === "review_submitted") {
       const rating =
         typeof notification.payload.rating === "number"
@@ -349,6 +372,12 @@ function NotificationCard({
         return i18n("ntfStockLowTitle");
       case "inventory_digest":
         return i18n("ntfDigestTitle");
+      case "subscription_expiring":
+        return i18n("subscriptionEndsSoonTitle");
+      case "subscription_grace":
+        return i18n("subscriptionEndedTitle");
+      case "access_ended":
+        return i18n("accessEndedTitle");
       default:
         return i18n("notificationc18f8f2");
     }
@@ -938,4 +967,11 @@ export function NotificationBell({
       ) : null}
     </>
   );
+}
+
+/** "2026-10-15" → a short local date; unknown values stay empty. */
+function formatDay(value: unknown) {
+  if (typeof value !== "string") return "";
+  const date = new Date(`${value}T12:00:00`);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }

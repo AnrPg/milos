@@ -1,6 +1,6 @@
 # ADR-078: Free-text Workout Authoring
 Date: 2026-08-02
-Status: Accepted
+Status: Accepted (amended by ADR-105 and ADR-109: free text is an authoring format only; workouts display and run structured)
 
 ## Context
 Admins need a fast WOD authoring mode for writing the board as ordinary rich text.

@@ -3,14 +3,13 @@
 import Link from "next/link";
 
 import { useUiTranslations } from "@/i18n/ui";
-import { TransientHero } from "@/components/TransientHero";
+import { PageHeader } from "@/components/PageHeader";
 import { isNotEntitledError } from "@/components/client/entitlement";
 import { clientErrorMessage } from "@/components/client/errors";
 
 /** Shared frame for client (member/athlete) pages. */
 export function ClientPage({
   title,
-  intro,
   actions,
   children,
 }: {
@@ -23,18 +22,7 @@ export function ClientPage({
     <main className="min-h-screen px-4 py-8 md:px-10 md:py-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex max-w-4xl flex-col gap-6">
         <div className="flex flex-wrap items-end justify-between gap-3">
-          <TransientHero label={title} collapsedTitle={title}>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>
-                {title}
-              </h1>
-              {intro ? (
-                <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                  {intro}
-                </p>
-              ) : null}
-            </div>
-          </TransientHero>
+          <PageHeader title={title} />
           {actions}
         </div>
         {children}

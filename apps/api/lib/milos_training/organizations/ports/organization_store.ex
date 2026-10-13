@@ -100,6 +100,9 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, struct()} | {:error, term()}
   @callback update_membership_settings(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
               {:ok, struct()} | {:error, term()}
+  @callback put_organization_settings_entry(Ecto.UUID.t(), String.t(), term()) ::
+              {:ok, OrganizationSetting.t()} | {:error, term()}
+  @callback list_active_invitations(Ecto.UUID.t(), DateTime.t()) :: [RegistrationInvitation.t()]
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
 
   # ADR-117 reviewed tenant purge records (platform-level, survive the purge).

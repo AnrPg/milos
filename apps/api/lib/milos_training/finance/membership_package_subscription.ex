@@ -23,6 +23,8 @@ defmodule MilosTraining.Finance.MembershipPackageSubscription do
     # ADR-098: an add-on follows its base; a corporate seat is paid by a client.
     field :base_subscription_id, :binary_id
     field :corporate_client_id, :binary_id
+    field :expiry_reminder_sent_at, :utc_datetime_usec
+    field :grace_notice_sent_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -44,7 +46,9 @@ defmodule MilosTraining.Finance.MembershipPackageSubscription do
       :commitment_ends_on,
       :activated_on,
       :base_subscription_id,
-      :corporate_client_id
+      :corporate_client_id,
+      :expiry_reminder_sent_at,
+      :grace_notice_sent_at
     ])
     |> validate_required([
       :membership_id,

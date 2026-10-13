@@ -247,6 +247,110 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
       assert workout["available_scale_levels"] == []
     end
 
+    test "publishes a free-text workout with assistant-derived canonical sections", %{conn: conn} do
+      {admin_conn, organization} = authenticate_as_admin(conn, "free_text_ai_publisher")
+
+      draft_id =
+        post(admin_conn, "/api/org/#{organization.slug}/admin/workouts")
+        |> json_response(201)
+        |> get_in(["draft", "id"])
+
+      body = "For time, cap 20\n5 rounds\n10 pull-ups\n20 push-ups\nBack squat 5x5 @ 100 kg"
+
+      # Same shape FreeTextAnalysis.normalize/2 returns for "workout".
+      payload = %{
+        title: "Murph prep",
+        type: "crossfit",
+        difficulty: "intermediate",
+        estimated_duration_seconds: 1500,
+        equipment: ["pull-up bar", "barbell"],
+        tags: [],
+        subtitle: nil,
+        description: nil,
+        workout_metadata: %{timer_inference: "complete"},
+        authoring_mode: "free_text",
+        expected_source_revision: 0,
+        free_text_body: body,
+        sections: [
+          %{
+            name: "Main",
+            note: nil,
+            timer_config: %{"type" => "for_time", "rounds" => 5, "time_cap_seconds" => 1200},
+            exercises: [
+              %{
+                "name" => "Pull-up",
+                "item_type" => "exercise",
+                "prescription_value" => 10,
+                "prescription_unit" => "reps",
+                "load_value" => nil,
+                "load_mode" => nil,
+                "sets" => nil,
+                "rest_seconds" => nil,
+                "tempo" => nil,
+                "note" => nil
+              },
+              %{
+                "name" => "Push-up",
+                "item_type" => "exercise",
+                "prescription_value" => 20,
+                "prescription_unit" => "reps",
+                "load_value" => nil,
+                "load_mode" => "bw"
+              }
+            ]
+          },
+          %{
+            name: "Strength",
+            note: nil,
+            timer_config: nil,
+            exercises: [
+              %{
+                "name" => "Back squat",
+                "item_type" => "exercise",
+                "sets" => 5,
+                "prescription_value" => 5,
+                "prescription_unit" => "reps",
+                "load_value" => 100,
+                "load_mode" => "absolute",
+                "rest_seconds" => 120
+              }
+            ]
+          }
+        ]
+      }
+
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> patch(
+        "/api/org/#{organization.slug}/admin/workouts/#{draft_id}/draft",
+        Jason.encode!(Map.put(payload, :draft_data, payload))
+      )
+      |> json_response(200)
+
+      workout =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "/api/org/#{organization.slug}/admin/workouts/#{draft_id}/publish",
+          Jason.encode!(Map.put(payload, :expected_source_revision, 1))
+        )
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      assert workout["status"] == "published"
+      assert workout["authoring_mode"] == "free_text"
+      assert workout["free_text_body"] == body
+      assert workout["difficulty"] == "intermediate"
+      assert workout["equipment"] == ["pull-up bar", "barbell"]
+      assert workout["workout_metadata"]["timer_inference"] == "complete"
+      assert [main, strength] = workout["sections"]
+      assert main["timer_config"]["time_cap_seconds"] == 1200
+      assert length(main["exercises"]) == 2
+      assert [%{"name" => "Back squat", "load_value" => 100}] = strength["exercises"]
+    end
+
     test "publishes structured set composition and returns it without losing notes", %{conn: conn} do
       {admin_conn, organization} = authenticate_as_admin(conn, "structured_set_author")
 
