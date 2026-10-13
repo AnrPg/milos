@@ -19,19 +19,48 @@ defmodule MilosTraining.Application.AssignWorkoutToAthletes do
 
   def call(context, params) do
     workout_id = value(params, :master_workout_id)
+    athlete_ids = value(params, :athlete_ids)
 
-    with {:ok, athletes} <- tenant_athletes(context, value(params, :athlete_ids)) do
-      athletes
-      |> Enum.reduce_while({:ok, []}, fn athlete, {:ok, assignments} ->
-        case assign_one(context, params, workout_id, athlete) do
-          {:ok, assignment} -> {:cont, {:ok, [assignment | assignments]}}
-          error -> {:halt, error}
-        end
-      end)
-      |> case do
-        {:ok, assignments} -> {:ok, Enum.reverse(assignments)}
-        error -> error
+    with false <- class_variant?(params),
+         {:ok, athletes} <- tenant_athletes(context, athlete_ids) do
+      assign_each(context, params, workout_id, athletes)
+    else
+      true ->
+        assign_directly(context, params)
+
+      {:error, :invalid_athletes} when athlete_ids not in [nil, []] ->
+        assign_directly(context, params)
+
+      error ->
+        error
+    end
+  end
+
+  # ADR-125: members, mixed selections and class variants (a `source_slot_id`)
+  # are classified, entitled and linked to their class by `AssignWorkout`; only
+  # a plain athlete selection gets a filed copy per athlete.
+  defp assign_directly(context, params) do
+    with {:ok, assignment} <- AssignWorkout.call(context, params), do: {:ok, [assignment]}
+  end
+
+  defp class_variant?(params) do
+    case value(params, :source_slot_id) do
+      slot_id when is_binary(slot_id) and slot_id != "" -> true
+      _ -> false
+    end
+  end
+
+  defp assign_each(context, params, workout_id, athletes) do
+    athletes
+    |> Enum.reduce_while({:ok, []}, fn athlete, {:ok, assignments} ->
+      case assign_one(context, params, workout_id, athlete) do
+        {:ok, assignment} -> {:cont, {:ok, [assignment | assignments]}}
+        error -> {:halt, error}
       end
+    end)
+    |> case do
+      {:ok, assignments} -> {:ok, Enum.reverse(assignments)}
+      error -> error
     end
   end
 

@@ -53,8 +53,11 @@ defmodule MilosTraining.Application.PlaceMemberInClass do
     end
   end
 
-  defp approve(context, %{status: :pending, id: booking_id}),
-    do: ResolveBooking.call(context, booking_id, %{action: :approve})
+  defp approve(context, %{status: :pending, id: booking_id}) do
+    with {:ok, booking, _outcome} <-
+           ResolveBooking.call(context, booking_id, %{action: :approve}),
+         do: {:ok, booking}
+  end
 
   defp approve(_context, booking), do: {:ok, booking}
 

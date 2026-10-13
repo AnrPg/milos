@@ -361,7 +361,7 @@ defmodule MilosTrainingWeb.PersonalizedMemberProgrammingControllerTest do
     test "without a folder a member's personal copy is filed in their variations folder", %{
       conn: conn
     } do
-      gym = tenant("pm_variation_folder")
+      gym = tenant("pm_varfolder")
 
       member =
         gym
