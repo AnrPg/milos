@@ -45,6 +45,9 @@ defmodule MilosTrainingWeb.LandingControllerTest do
 
     {:ok, execution} =
       Execution.start_execution(athlete.id, %{
+        # Server-derived in production (F-03); the history reads the workout
+        # in this organization (ADR-133).
+        organization_id: organization.id,
         master_workout_id: workout.id,
         source: :self_selected
       })

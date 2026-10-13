@@ -61,7 +61,7 @@ defmodule MilosTrainingWeb.ChatChannelTest do
 
     {:ok, thread} =
       Messaging.with_tenant_context(context, fn ->
-        GetOrCreateMessagingThread.call(athlete, %{
+        GetOrCreateMessagingThread.call(context, athlete, %{
           context_type: :assignment,
           context_id: assignment.id
         })

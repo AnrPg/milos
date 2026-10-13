@@ -40,16 +40,19 @@ defmodule MilosTraining.Application.SubmitExecutionNote do
     # routes are user-scoped, not org-scoped, so the outer context here never
     # carries an organization_id. Re-open the tenant scope using the
     # execution's own organization so the workout lookup below can see it.
-    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
-      resolve_workout_in_tenant(workout_id, scale_slug)
-    end)
+    context = %{organization_id: organization_id, user_id: user_id}
+
+    case resolve_workout_in_tenant(context, workout_id, scale_slug) do
+      %{} = workout -> workout
+      _missing -> nil
+    end
   end
 
-  defp resolve_workout_in_tenant(workout_id, nil), do: Workouts.get_workout(workout_id)
-  defp resolve_workout_in_tenant(workout_id, ""), do: Workouts.get_workout(workout_id)
+  defp resolve_workout_in_tenant(context, workout_id, slug) when slug in [nil, ""],
+    do: Workouts.get_workout(context, workout_id)
 
-  defp resolve_workout_in_tenant(workout_id, scale_slug),
-    do: Workouts.materialize_workout_for_scale(workout_id, scale_slug)
+  defp resolve_workout_in_tenant(context, workout_id, scale_slug),
+    do: Workouts.materialize_workout_for_scale(context, workout_id, scale_slug)
 
   defp ensure_note_id(%{} = params) do
     if Map.has_key?(params, :id) or Map.has_key?(params, "id") do

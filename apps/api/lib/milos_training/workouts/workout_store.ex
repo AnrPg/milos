@@ -1,5 +1,13 @@
 defmodule MilosTraining.Workouts.WorkoutStore do
-  @behaviour MilosTraining.Workouts.Ports.WorkoutStore
+  @moduledoc """
+  Facade over the configured `Workouts.Ports.WorkoutStore` adapter.
+
+  The adapter is session-scoped: it reads and writes in whatever RepoContext
+  session is open. This facade is where that session is opened, so every read
+  takes a tenant context (ADR-091, ADR-133). Context-free write arities remain
+  for the legacy commands still being migrated; RLS limits them to the
+  session's tenant.
+  """
 
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
@@ -10,8 +18,56 @@ defmodule MilosTraining.Workouts.WorkoutStore do
     Application.fetch_env!(:milos_training, :workout_store)
   end
 
-  # Scoped variants are the tenant-aware public boundary. The legacy arities remain
-  # temporarily for jobs and callers still being migrated; RLS limits those to legacy.
+  # Tenant-scoped reads.
+
+  def get_workout(context, id), do: within_tenant(context, fn -> adapter().get_workout(id) end)
+
+  def get_workout_for_admin(context, id),
+    do: within_tenant(context, fn -> adapter().get_workout_for_admin(id) end)
+
+  def exercise_exists?(context, id),
+    do: within_tenant(context, fn -> adapter().exercise_exists?(id) end)
+
+  def list_workouts(context), do: within_tenant(context, &adapter().list_workouts/0)
+  def list_folders(context), do: within_tenant(context, &adapter().list_folders/0)
+
+  def get_assigned_workout(context, id),
+    do: within_tenant(context, fn -> adapter().get_assigned_workout(id) end)
+
+  def get_assignment(context, assignment_id),
+    do: within_tenant(context, fn -> adapter().get_assignment(assignment_id) end)
+
+  def list_assigned_workouts_for_admin(context, start_date, end_date),
+    do:
+      within_tenant(context, fn ->
+        adapter().list_assigned_workouts_for_admin(start_date, end_date)
+      end)
+
+  def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
+    do:
+      within_tenant(context, fn ->
+        adapter().list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
+      end)
+
+  def list_workout_change_targets(context, workout_id),
+    do: within_tenant(context, fn -> adapter().list_workout_change_targets(workout_id) end)
+
+  def list_class_variants(context, slot_ids, assignee_id),
+    do: within_tenant(context, fn -> adapter().list_class_variants(slot_ids, assignee_id) end)
+
+  def get_assignment_execution_access(context, assignment_id, athlete_id),
+    do:
+      within_tenant(context, fn ->
+        adapter().get_assignment_execution_access(assignment_id, athlete_id)
+      end)
+
+  # Deliberately un-scoped (F-03): derives which tenant owns a workout so an
+  # execution can open that tenant's scope; every caller follows it with a
+  # membership check.
+  def workout_organization_id(id), do: adapter().workout_organization_id(id)
+
+  # Tenant-scoped writes.
+
   def create_draft(context, admin_id),
     do: within_tenant(context, fn -> create_draft(admin_id) end)
 
@@ -25,14 +81,6 @@ defmodule MilosTraining.Workouts.WorkoutStore do
 
   def publish_workout(context, id, params),
     do: within_tenant(context, fn -> publish_workout(id, params) end)
-
-  def get_workout(context, id), do: within_tenant(context, fn -> get_workout(id) end)
-
-  def get_workout_for_admin(context, id),
-    do: within_tenant(context, fn -> get_workout_for_admin(id) end)
-
-  def list_workouts(context), do: within_tenant(context, &list_workouts/0)
-  def list_folders(context), do: within_tenant(context, &list_folders/0)
 
   def create_folder(context, admin_id, params),
     do: within_tenant(context, fn -> create_folder(admin_id, params) end)
@@ -57,27 +105,8 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def delete_assigned_workout(context, id),
     do: within_tenant(context, fn -> delete_assigned_workout(id) end)
 
-  def get_assigned_workout(context, id),
-    do: within_tenant(context, fn -> get_assigned_workout(id) end)
-
-  def list_assigned_workouts_for_admin(context, start_date, end_date),
-    do: within_tenant(context, fn -> list_assigned_workouts_for_admin(start_date, end_date) end)
-
-  def list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date),
-    do:
-      within_tenant(context, fn ->
-        list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
-      end)
-
-  def list_class_variants(context, slot_ids, assignee_id),
-    do: within_tenant(context, fn -> list_class_variants(slot_ids, assignee_id) end)
-
   def reject_assignment_for_athlete(context, assignment_id, athlete_id),
     do: within_tenant(context, fn -> reject_assignment_for_athlete(assignment_id, athlete_id) end)
-
-  def get_assignment_execution_access(context, assignment_id, athlete_id),
-    do:
-      within_tenant(context, fn -> get_assignment_execution_access(assignment_id, athlete_id) end)
 
   def reopen_workout(context, id), do: within_tenant(context, fn -> reopen_workout(id) end)
 
@@ -93,144 +122,62 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def delete_superseded_drafts(context, published_id, admin_id),
     do: within_tenant(context, fn -> delete_superseded_drafts(published_id, admin_id) end)
 
-  @impl true
-  def create_workout(admin_id, params), do: adapter().create_workout(admin_id, params)
-
-  @impl true
-  def create_draft(admin_id), do: adapter().create_draft(admin_id)
-
-  @impl true
-  def update_draft(id, params), do: adapter().update_draft(id, params)
-
-  @impl true
-  def delete_workout(id), do: adapter().delete_workout(id)
-
-  @impl true
-  def publish_workout(id, params), do: adapter().publish_workout(id, params)
-
-  @impl true
-  def get_workout(id), do: adapter().get_workout(id)
-
-  @impl true
-  def get_workout_for_admin(id), do: adapter().get_workout_for_admin(id)
-
-  @impl true
-  def exercise_exists?(id), do: adapter().exercise_exists?(id)
-
-  @impl true
-  def assign_workout(params), do: adapter().assign_workout(params)
-
-  @impl true
-  def update_assigned_workout(id, params), do: adapter().update_assigned_workout(id, params)
-
-  @impl true
-  def delete_assigned_workout(id), do: adapter().delete_assigned_workout(id)
-
-  @impl true
-  def list_class_variants(slot_ids, assignee_id),
-    do: adapter().list_class_variants(slot_ids, assignee_id)
-
-  @impl true
-  def list_assigned_workouts_for_athlete(athlete_id, start_date, end_date),
-    do: adapter().list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
-
-  @impl true
-  def list_workout_change_targets(workout_id),
-    do: adapter().list_workout_change_targets(workout_id)
-
-  @impl true
-  def list_assigned_workouts_for_admin(start_date, end_date),
-    do: adapter().list_assigned_workouts_for_admin(start_date, end_date)
-
-  @impl true
-  def list_workouts, do: adapter().list_workouts()
-
-  @impl true
-  def list_folders, do: adapter().list_folders()
-
-  @impl true
-  def create_folder(admin_id, params), do: adapter().create_folder(admin_id, params)
-
-  @impl true
-  def update_folder(id, params), do: adapter().update_folder(id, params)
-
-  @impl true
-  def delete_folder(id), do: adapter().delete_folder(id)
-
-  @impl true
-  def update_library_metadata(id, params), do: adapter().update_library_metadata(id, params)
-
-  @impl true
-  def list_scale_levels, do: adapter().list_scale_levels()
-
-  @impl true
-  def replace_scale_levels(levels), do: adapter().replace_scale_levels(levels)
-
-  @impl true
-  def ensure_default_scale_levels(levels), do: adapter().ensure_default_scale_levels(levels)
+  def archive_active_assignments_for_athlete(context, athlete_id),
+    do: adapter().archive_active_assignments_for_athlete(context, athlete_id)
 
   # ADR-128: scale levels are tenant-owned, so they are only reachable through
   # an organization-scoped session; anything else fails closed.
   def list_scale_levels(%{organization_id: organization_id} = context)
       when is_binary(organization_id),
-      do: within_tenant(context, &list_scale_levels/0)
+      do: within_tenant(context, &adapter().list_scale_levels/0)
 
   def list_scale_levels(_context), do: {:error, :organization_context_required}
 
   def replace_scale_levels(%{organization_id: organization_id} = context, levels)
       when is_binary(organization_id),
-      do: within_tenant(context, fn -> replace_scale_levels(levels) end)
+      do: within_tenant(context, fn -> adapter().replace_scale_levels(levels) end)
 
   def replace_scale_levels(_context, _levels), do: {:error, :organization_context_required}
 
   def ensure_default_scale_levels(%{organization_id: organization_id} = context, levels)
       when is_binary(organization_id),
-      do: within_tenant(context, fn -> ensure_default_scale_levels(levels) end)
+      do: within_tenant(context, fn -> adapter().ensure_default_scale_levels(levels) end)
 
   def ensure_default_scale_levels(_context, _levels),
     do: {:error, :organization_context_required}
 
-  @impl true
+  # Legacy context-free writes, run in the caller's session.
+
+  def create_workout(admin_id, params), do: adapter().create_workout(admin_id, params)
+  def create_draft(admin_id), do: adapter().create_draft(admin_id)
+  def update_draft(id, params), do: adapter().update_draft(id, params)
+  def delete_workout(id), do: adapter().delete_workout(id)
+  def publish_workout(id, params), do: adapter().publish_workout(id, params)
+  def assign_workout(params), do: adapter().assign_workout(params)
+  def update_assigned_workout(id, params), do: adapter().update_assigned_workout(id, params)
+  def delete_assigned_workout(id), do: adapter().delete_assigned_workout(id)
+  def create_folder(admin_id, params), do: adapter().create_folder(admin_id, params)
+  def update_folder(id, params), do: adapter().update_folder(id, params)
+  def delete_folder(id), do: adapter().delete_folder(id)
+  def update_library_metadata(id, params), do: adapter().update_library_metadata(id, params)
+
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do: adapter().reject_assignment_for_athlete(assignment_id, athlete_id)
 
-  @impl true
   def archive_active_assignments_for_athlete(athlete_id),
     do: adapter().archive_active_assignments_for_athlete(athlete_id)
 
-  @impl true
-  def workout_organization_id(id), do: adapter().workout_organization_id(id)
-
-  @impl true
-  def archive_active_assignments_for_athlete(context, athlete_id),
-    do: adapter().archive_active_assignments_for_athlete(context, athlete_id)
-
-  @impl true
   def reopen_workout(id), do: adapter().reopen_workout(id)
 
-  @impl true
-  def get_assigned_workout(id), do: adapter().get_assigned_workout(id)
-
-  @impl true
-  def get_assignment_execution_access(assignment_id, athlete_id),
-    do: adapter().get_assignment_execution_access(assignment_id, athlete_id)
-
-  @impl true
   def duplicate_workout(id, title_suffix, attrs \\ %{}),
     do: adapter().duplicate_workout(id, title_suffix, attrs)
 
-  @impl true
   def substitute_assignment_workout(assignment_id, new_workout_id),
     do: adapter().substitute_assignment_workout(assignment_id, new_workout_id)
 
-  @impl true
-  def get_assignment(assignment_id), do: adapter().get_assignment(assignment_id)
-
-  @impl true
   def update_assignment_date(id, athlete_id, new_date),
     do: adapter().update_assignment_date(id, athlete_id, new_date)
 
-  @impl true
   def delete_superseded_drafts(published_id, admin_id),
     do: adapter().delete_superseded_drafts(published_id, admin_id)
 

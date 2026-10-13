@@ -39,7 +39,7 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
     assert {:ok, %{user_id: ^id, threads: []}} = GetAdminUserMessages.call(tenant_context, id)
 
     assert {:ok, %{user_id: ^id, available: false, drill_down: nil}} =
-             GetAdminUserCoachingContext.call(id)
+             GetAdminUserCoachingContext.call(tenant_context, id, %{})
   end
 
   test "finance dossier includes package, referral, and referred-member context" do
@@ -137,7 +137,7 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
           GetAdminUserIncidents,
           GetAdminUserMessages
         ] do
-      assert {:error, :not_found} = service.call(missing_id)
+      assert {:error, :not_found} = service.call(tenant_context, missing_id)
     end
 
     assert {:error, :not_found} =
@@ -147,7 +147,8 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
                Organizations.legacy_organization_slug()
              )
 
-    assert {:error, :not_found} = GetAdminUserCoachingContext.call(missing_id)
+    assert {:error, :not_found} =
+             GetAdminUserCoachingContext.call(tenant_context, missing_id, %{})
   end
 
   defp legacy_tenant_context(user, role \\ :owner) do

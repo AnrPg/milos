@@ -15,7 +15,7 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
          executions: history,
          scores: Enum.flat_map(history, &scores_for_execution/1),
          class_participation: Enum.filter(history, &(&1.source == "class_booking")),
-         assigned_workouts: assigned_workouts(user),
+         assigned_workouts: assigned_workouts(context, user),
          summary: %{
            execution_count: length(history),
            completed_count: Enum.count(history, &(&1.status == "completed")),
@@ -25,16 +25,15 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
     end
   end
 
-  def call(user_id), do: call(%{}, user_id)
-
-  defp assigned_workouts(%{role: :athlete, id: id}) do
-    case GetCoachingAthleteDrillDown.call(id) do
+  # Assignments are tenant data: read them in the dossier's tenant (ADR-133).
+  defp assigned_workouts(context, %{role: :athlete, id: id}) do
+    case GetCoachingAthleteDrillDown.call(context, id, %{}) do
       {:ok, %{drill_down: drill_down}} -> drill_down.assigned_workouts
       _ -> []
     end
   end
 
-  defp assigned_workouts(_user), do: []
+  defp assigned_workouts(_context, _user), do: []
 
   defp execution_summary(execution) do
     %{

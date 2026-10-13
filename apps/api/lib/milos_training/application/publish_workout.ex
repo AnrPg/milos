@@ -2,13 +2,13 @@ defmodule MilosTraining.Application.PublishWorkout do
   require Logger
 
   alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
-  alias MilosTraining.{Notifications, Organizations, Scheduling, Workouts}
+  alias MilosTraining.{Notifications, Scheduling, Workouts}
 
   def call(%{organization_id: _} = context, id, params) do
     substitute_for = parse_substitute_for(params)
     substitute_context = load_substitute_context(context, substitute_for)
 
-    assignment_targets = Workouts.list_workout_change_targets(id)
+    assignment_targets = Workouts.list_workout_change_targets(context, id)
     booking_targets = Scheduling.list_workout_change_targets(context, id)
     slot_ids = Scheduling.list_slot_ids_for_workout(context, id)
     is_republish = assignment_targets != [] or booking_targets != []
@@ -41,20 +41,7 @@ defmodule MilosTraining.Application.PublishWorkout do
     end
   end
 
-  def call(id, params) do
-    case Workouts.get_workout_for_admin(id) do
-      %{organization_id: organization_id} ->
-        with {:ok, context} <-
-               Organizations.resolve_system_tenant_context(organization_id, :workout_publish, %{
-                 service: __MODULE__
-               }) do
-          call(context, id, params)
-        end
-
-      nil ->
-        {:error, :not_found}
-    end
-  end
+  def call(_context, _id, _params), do: {:error, :organization_context_required}
 
   defp parse_substitute_for(params) do
     case Map.get(params, "substitute_for") do

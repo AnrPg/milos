@@ -180,29 +180,34 @@ defmodule MilosTraining.Application.CompleteWorkout do
     # carries an organization_id. Re-open the tenant scope using the
     # execution's own organization so the workout lookup below can see it,
     # instead of silently completing against zero timer segments.
-    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
-      case resolve_workout(workout_id, scale_slug) do
-        nil -> {:ok, [], nil}
-        workout -> {:ok, Execution.build_timer_sequence(workout), workout}
-      end
-    end)
+    context = %{organization_id: organization_id, user_id: user_id}
+
+    case resolve_workout(context, workout_id, scale_slug) do
+      %{} = workout -> {:ok, Execution.build_timer_sequence(workout), workout}
+      _missing -> {:ok, [], nil}
+    end
   end
 
-  defp resolve_workout(workout_id, nil), do: Workouts.get_workout(workout_id)
-  defp resolve_workout(workout_id, ""), do: Workouts.get_workout(workout_id)
+  defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
+    do: Workouts.get_workout(context, workout_id)
 
-  defp resolve_workout(workout_id, scale_slug),
-    do: Workouts.materialize_workout_for_scale(workout_id, scale_slug)
+  defp resolve_workout(context, workout_id, scale_slug),
+    do: Workouts.materialize_workout_for_scale(context, workout_id, scale_slug)
 
+  # Each completion's workout is read in the organization it was done in; the
+  # projection job itself runs without a tenant session (ADR-133).
   defp build_workout_lookup(executions) do
     executions
-    |> Enum.map(& &1.master_workout_id)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.uniq()
-    |> Enum.reduce(%{}, fn workout_id, acc ->
-      case Workouts.get_workout(workout_id) do
-        nil -> acc
-        workout -> Map.put(acc, workout_id, workout)
+    |> Enum.filter(
+      &(is_binary(&1.master_workout_id) and is_binary(Map.get(&1, :organization_id)))
+    )
+    |> Enum.uniq_by(&{&1.organization_id, &1.master_workout_id})
+    |> Enum.reduce(%{}, fn completion, acc ->
+      context = %{organization_id: completion.organization_id, user_id: completion.user_id}
+
+      case Workouts.get_workout(context, completion.master_workout_id) do
+        %{} = workout -> Map.put(acc, completion.master_workout_id, workout)
+        _missing -> acc
       end
     end)
   end

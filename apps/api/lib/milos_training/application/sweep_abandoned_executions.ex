@@ -100,24 +100,23 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
         {segments, cache}
 
       :error ->
-        segments =
-          Workouts.with_tenant_context(%{organization_id: execution.organization_id}, fn ->
-            case resolve_workout(execution.master_workout_id, execution.scale_level_slug) do
-              nil -> []
-              workout -> Execution.build_timer_sequence(workout)
-            end
-          end)
+        context = %{organization_id: execution.organization_id}
 
-        segments = if is_list(segments), do: segments, else: []
+        segments =
+          case resolve_workout(context, execution.master_workout_id, execution.scale_level_slug) do
+            %{} = workout -> Execution.build_timer_sequence(workout)
+            _missing -> []
+          end
+
         {segments, Map.put(cache, key, segments)}
     end
   end
 
-  defp resolve_workout(workout_id, slug) when slug in [nil, ""],
-    do: Workouts.get_workout(workout_id)
+  defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
+    do: Workouts.get_workout(context, workout_id)
 
-  defp resolve_workout(workout_id, slug),
-    do: Workouts.materialize_workout_for_scale(workout_id, slug)
+  defp resolve_workout(context, workout_id, slug),
+    do: Workouts.materialize_workout_for_scale(context, workout_id, slug)
 
   defp normalize_datetime(%DateTime{} = at), do: at
   defp normalize_datetime(_other), do: nil

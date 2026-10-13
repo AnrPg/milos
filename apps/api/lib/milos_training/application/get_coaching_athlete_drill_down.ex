@@ -8,32 +8,6 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
   alias MilosTraining.Messaging
   alias MilosTraining.Workouts
 
-  def call(athlete_id, params \\ %{}) do
-    with %{role: :athlete} = athlete <- Identity.find_by_id(athlete_id),
-         {:ok, executions} <- ListWorkoutExecutions.call(athlete_id) do
-      {start_date, end_date} = assignment_window(params)
-
-      assignments = Workouts.list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
-      coaching_messages = fetch_coaching_messages(athlete_id)
-
-      {:ok,
-       %{
-         drill_down:
-           AthleteDrillDown.build(
-             athlete,
-             assignments,
-             executions,
-             coaching_messages,
-             Date.utc_today()
-           )
-       }}
-    else
-      nil -> {:error, :not_found}
-      %{role: _other_role} -> {:error, :forbidden}
-      error -> error
-    end
-  end
-
   def call(%{organization_id: organization_id} = context, athlete_id, params)
       when is_binary(organization_id) do
     Coaching.with_tenant_context(context, fn ->
@@ -42,7 +16,7 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
         {start_date, end_date} = assignment_window(params)
 
         assignments =
-          Workouts.list_assigned_workouts_for_athlete(athlete_id, start_date, end_date)
+          Workouts.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
 
         executions = ListWorkoutExecutions.for_coaching(athlete_id)
         coaching_messages = Messaging.list_recent_coaching_notes_for_organization(athlete_id, 50)
@@ -67,9 +41,7 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
     end)
   end
 
-  defp fetch_coaching_messages(athlete_id) do
-    Messaging.list_recent_coaching_notes(athlete_id, 50)
-  end
+  def call(_context, _athlete_id, _params), do: {:error, :organization_context_required}
 
   defp active_athlete_membership?(athlete_id, organization_id) do
     Enum.any?(Organizations.list_memberships(athlete_id), fn %{membership: membership} ->

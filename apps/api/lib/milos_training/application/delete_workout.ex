@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
 
   def call(%{organization_id: _} = context, id) do
     with %{id: ^id} = workout <- Workouts.get_workout_for_admin(context, id),
-         assignment_targets <- Workouts.list_workout_change_targets(id),
+         assignment_targets <- Workouts.list_workout_change_targets(context, id),
          booking_targets <- Scheduling.list_workout_change_targets(context, id),
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(context, id),
          :ok <- Scheduling.delete_class_series_for_workout(context, id),
@@ -35,22 +35,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
     end
   end
 
-  def call(id) do
-    case Workouts.get_workout_for_admin(id) do
-      %{organization_id: organization_id} ->
-        with {:ok, context} <-
-               MilosTraining.Organizations.resolve_system_tenant_context(
-                 organization_id,
-                 :workout_deletion,
-                 %{service: __MODULE__}
-               ) do
-          call(context, id)
-        end
-
-      nil ->
-        {:error, :not_found}
-    end
-  end
+  def call(_context, _id), do: {:error, :organization_context_required}
 
   defp broadcast_deleted_slots(slot_ids, organization_id) do
     Enum.each(slot_ids, fn slot_id ->

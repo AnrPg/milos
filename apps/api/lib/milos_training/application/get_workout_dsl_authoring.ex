@@ -12,12 +12,6 @@ defmodule MilosTraining.Application.GetWorkoutDslAuthoring do
     |> build_result()
   end
 
-  def call(id) do
-    id
-    |> Workouts.get_workout_for_admin()
-    |> build_result()
-  end
-
   defp build_result(nil), do: {:error, :not_found}
 
   defp build_result(workout) do
