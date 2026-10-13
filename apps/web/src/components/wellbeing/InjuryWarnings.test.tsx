@@ -212,6 +212,37 @@ describe("MyInjuryWarningsPanel", () => {
     expect(await screen.findByText("injuryWarningAcknowledged")).toBeInTheDocument();
   });
 
+  it("evaluates and acknowledges the scale the athlete will run (TD-088)", async () => {
+    const api = {
+      fetch: vi.fn().mockResolvedValue({
+        workout_id: "workout-1",
+        scale_level_slug: "scaled",
+        level: "avoid",
+        warnings: [warning()],
+      }),
+      acknowledge: vi.fn().mockResolvedValue({ level: "avoid", warning_count: 1 }),
+    };
+
+    render(
+      <MyInjuryWarningsPanel
+        accessToken="token"
+        workoutId="workout-1"
+        surface="pre_start"
+        sourceContextId="execution-1"
+        scale="scaled"
+        api={api}
+      />,
+      { wrapper },
+    );
+
+    expect(await screen.findByText("injuryWarningSelfTitle")).toBeInTheDocument();
+    const options = { surface: "pre_start", source_context_id: "execution-1", scale: "scaled" };
+    expect(api.fetch).toHaveBeenCalledWith("token", "workout-1", options);
+
+    fireEvent.click(screen.getByRole("button", { name: "injuryWarningAcknowledge" }));
+    await waitFor(() => expect(api.acknowledge).toHaveBeenCalledWith("token", "workout-1", options));
+  });
+
   it("renders nothing without warnings", async () => {
     const api = {
       fetch: vi.fn().mockResolvedValue({ workout_id: "workout-1", level: "none", warnings: [] }),

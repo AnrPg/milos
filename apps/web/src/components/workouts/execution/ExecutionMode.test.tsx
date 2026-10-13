@@ -32,6 +32,15 @@ vi.mock("@/lib/realtime", () => ({
   subscribeToTopic: () => () => undefined,
 }));
 
+const injuryPanelProps = vi.fn();
+
+vi.mock("@/components/wellbeing/InjuryWarnings", () => ({
+  MyInjuryWarningsPanel: (props: Record<string, unknown>) => {
+    injuryPanelProps(props);
+    return <div data-testid="ready-injury-warnings" />;
+  },
+}));
+
 vi.mock("@/api/executions", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/executions")>()),
   updateExecutionProgress: (...args: unknown[]) => updateExecutionProgress(...args),
@@ -186,6 +195,54 @@ describe("ExecutionMode", () => {
     expect(state.pausedElapsed).toBe(0);
     expect(state.resumeCountdownEndsAt! - before).toBeGreaterThanOrEqual(10_000);
     expect(screen.getByText("getReadyLabel")).toBeInTheDocument();
+    expect(screen.queryByTestId("ready-injury-warnings")).not.toBeInTheDocument();
+  });
+
+  it("shows the athlete's own injury warnings for the chosen scale on the ready screen, without blocking start (TD-088)", async () => {
+    injuryPanelProps.mockClear();
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      workoutId: "workout-1",
+      scaleSlug: "scaled",
+      segments,
+      status: "active",
+      segmentStartedAt: Date.now(),
+    });
+    render(<ExecutionMode />);
+
+    expect(screen.getByTestId("ready-injury-warnings")).toBeInTheDocument();
+    expect(injuryPanelProps).toHaveBeenCalledWith(
+      expect.objectContaining({
+        accessToken: "token",
+        workoutId: "workout-1",
+        surface: "pre_start",
+        sourceContextId: "execution-1",
+        scale: "scaled",
+      }),
+    );
+
+    const start = screen.getByRole("button", { name: "start952f375" });
+    expect(start).toBeEnabled();
+    await act(async () => {
+      fireEvent.click(start);
+    });
+    expect(useExecutionStore.getState().resumeCountdownEndsAt).not.toBeNull();
+  });
+
+  it("has no injury panel on the ready screen of a workout-less execution", () => {
+    injuryPanelProps.mockClear();
+    useExecutionStore.getState().initExecution({
+      executionId: "execution-1",
+      workoutId: null,
+      scaleSlug: null,
+      segments,
+      status: "active",
+      segmentStartedAt: Date.now(),
+    });
+    render(<ExecutionMode />);
+
+    expect(screen.getByText("readyTitle")).toBeInTheDocument();
+    expect(screen.queryByTestId("ready-injury-warnings")).not.toBeInTheDocument();
   });
 
   it("catches up on intervals that ran out while the screen was off, on schedule", async () => {

@@ -36,11 +36,14 @@ export function ReadyScreen({
   soundControl,
   onTestSound,
   onStart,
+  notice,
 }: {
   segments: TimerSegment[];
   soundControl: React.ReactNode;
   onTestSound: () => void;
   onStart: () => void;
+  /** Informational content shown before the plan (e.g. injury warnings); never gates Start. */
+  notice?: React.ReactNode;
 }) {
   const i18n = useUiTranslations();
   const formatLabels = getFormatLabels(i18n);
@@ -58,6 +61,8 @@ export function ReadyScreen({
         <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
           {i18n("readySubtitle")}
         </p>
+
+        {notice ? <div className="mt-4">{notice}</div> : null}
 
         <ol className="mt-6 flex flex-col gap-2">
           {sections.map((section, index) => (

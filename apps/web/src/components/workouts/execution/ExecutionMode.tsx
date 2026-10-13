@@ -15,6 +15,7 @@ import {
 } from "@/api/executions";
 import { useSession } from "@/components/session-provider";
 import { LocalizedScore } from "@/components/localized-score";
+import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { useExecutionSync, type SyncProblem } from "@/hooks/useExecutionSync";
 import { useMediaSession } from "@/hooks/useMediaSession";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
@@ -163,6 +164,8 @@ export function ExecutionMode() {
 
   const {
     executionId,
+    workoutId,
+    scaleSlug,
     lockVersion,
     segments,
     currentSegmentIndex,
@@ -736,6 +739,19 @@ export function ExecutionMode() {
             playCue("work", cueMode === "off" ? "sound" : cueMode);
           }}
           onStart={handleStart}
+          notice={
+            // ADR-124 / TD-088: the athlete's own injury warnings for the
+            // scale they chose, before the clock starts. Informational only.
+            tokens?.access_token && workoutId ? (
+              <MyInjuryWarningsPanel
+                accessToken={tokens.access_token}
+                workoutId={workoutId}
+                surface="pre_start"
+                sourceContextId={executionId ?? undefined}
+                scale={scaleSlug}
+              />
+            ) : null
+          }
         />
       </div>
     );
