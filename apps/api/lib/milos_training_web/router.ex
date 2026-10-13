@@ -382,6 +382,8 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/users/:id/prs", AdminUserController, :prs)
+    # ADR-132: how a coach finds those members (client scope does not narrow it).
+    get("/pr-members", AdminUserController, :pr_members)
   end
 
   # Staff work that coaches share with owners and admins (ADR-098).

@@ -49,6 +49,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminUserController, :schedule} => [:view_client_training, :run_classes],
     {W.AdminUserController, :program_workout} => [:manage_coaching],
     {W.AdminUserController, :prs} => [:view_client_training],
+    {W.AdminUserController, :pr_members} => [:view_client_training],
     {W.AdminUserController, :incidents} => [:view_health],
     {W.AdminUserController, :messages} => [:message_clients],
     {W.AdminUserController, :coaching_context} => [:view_client_training],

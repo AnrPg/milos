@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     DeleteAdminUser,
     ListAdminUsers,
     ListAthletes,
+    ListPRDossierMembers,
     ProgramUserWorkout,
     RevokeUserAllowance
   }
@@ -99,6 +100,18 @@ defmodule MilosTrainingWeb.AdminUserController do
         description:
           "ADR-129: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned."
       },
+      member: %Schema{
+        type: :object,
+        nullable: true,
+        description:
+          "ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier.",
+        required: [:id, :nickname],
+        properties: %{
+          id: @user_id,
+          nickname: %Schema{type: :string},
+          avatar_url: %Schema{type: :string, nullable: true}
+        }
+      },
       prs: %Schema{
         type: :array,
         items: %Schema{
@@ -113,6 +126,32 @@ defmodule MilosTrainingWeb.AdminUserController do
             higher_is_better: %Schema{type: :boolean},
             beaten_on: %Schema{type: :string, format: :date},
             history: %Schema{type: :array, items: @summary_object}
+          }
+        }
+      }
+    }
+  }
+  @pr_members_response %Schema{
+    type: :object,
+    required: [:visibility, :members],
+    properties: %{
+      visibility: %Schema{
+        type: :string,
+        enum: ["coach", "coach_role_required"],
+        description:
+          "ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed."
+      },
+      members: %Schema{
+        type: :array,
+        items: %Schema{
+          type: :object,
+          required: [:id, :nickname, :role],
+          properties: %{
+            id: @user_id,
+            nickname: %Schema{type: :string},
+            avatar_url: %Schema{type: :string, nullable: true},
+            role: %Schema{type: :string},
+            joined_at: %Schema{type: :string, format: :"date-time", nullable: true}
           }
         }
       }
@@ -378,6 +417,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     summary: "Get a user's personal records",
     parameters: [@id_parameter],
     responses: [ok: {"Personal records", "application/json", @pr_response}]
+  )
+
+  operation(:pr_members,
+    summary: "Active members whose PR dossier a coach may open (ADR-132)",
+    description:
+      "Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.",
+    responses: [ok: {"PR dossier members", "application/json", @pr_members_response}]
   )
 
   operation(:incidents,
@@ -961,6 +1007,12 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def prs(conn, params), do: render_service(conn, GetAdminUserPRs, params)
+
+  def pr_members(conn, _params) do
+    with {:ok, payload} <- ListPRDossierMembers.call(conn.assigns.tenant_context) do
+      json(conn, payload)
+    end
+  end
 
   def incidents(conn, params) do
     with {:ok, payload} <-
