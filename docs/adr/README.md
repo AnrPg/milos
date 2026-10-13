@@ -135,3 +135,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-126 | Refund receipts, provider reconciliation and accounting exports | Accepted |
 | ADR-128 | Tenant-owned scale levels | Accepted |
 | ADR-129 | PR visibility for gym coaches and explicit sharing grants | Accepted |
+| ADR-130 | Injury warnings on the ready screen, scaled variations and drop-off facts | Accepted |
+| ADR-131 | Background and system paths under RLS | Accepted |
+| ADR-132 | Coach PR dossier, legacy PR provenance backfill and grantee lookup | Accepted |
+| ADR-133 | Atomic organization provisioning and tenant-scoped workout reads | Accepted |
+| ADR-134 | BEAM literal area root cause and deterministic OpenAPI export | Accepted |
