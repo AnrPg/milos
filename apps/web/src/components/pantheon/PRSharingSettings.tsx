@@ -8,6 +8,7 @@ import { searchUsers } from "@/api/messaging";
 import {
   fetchPRSharing,
   grantPRAccess,
+  lookupPRGrantee,
   revokePRAccess,
   updatePRCoachVisibility,
   type PRSharingSettings as PRSharingSettingsData,
@@ -34,6 +35,8 @@ export function PRSharingSettings() {
   const [candidates, setCandidates] = useState<Candidate[]>([]);
   const [searched, setSearched] = useState(false);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // ADR-132: an account outside one's gyms, by exact nickname, on request only.
+  const [exactMiss, setExactMiss] = useState(false);
 
   const sharingQuery = useQuery({
     queryKey: PR_SHARING_QUERY_KEY,
@@ -52,6 +55,7 @@ export function PRSharingSettings() {
       setQuery("");
       setCandidates([]);
       setSearched(false);
+      setExactMiss(false);
       void queryClient.invalidateQueries({ queryKey: PR_SHARING_QUERY_KEY });
     },
   });
@@ -65,8 +69,22 @@ export function PRSharingSettings() {
   const grantedIds = new Set(sharing?.grants.map((grant) => grant.grantee.id) ?? []);
   if (currentUser?.id) grantedIds.add(currentUser.id);
 
+  const exactLookupMutation = useMutation({
+    mutationFn: (nickname: string) => lookupPRGrantee(token!, nickname),
+    onSuccess: ({ grantee }) => {
+      setExactMiss(!grantee);
+      if (!grantee) return;
+      setCandidates((current) =>
+        current.some((candidate) => candidate.id === grantee.id)
+          ? current
+          : [...current, { id: grantee.id, nickname: grantee.display_nickname }],
+      );
+    },
+  });
+
   function handleQueryChange(value: string) {
     setQuery(value);
+    setExactMiss(false);
     if (searchTimer.current) clearTimeout(searchTimer.current);
     if (!value.trim() || !token) {
       setCandidates([]);
@@ -91,7 +109,7 @@ export function PRSharingSettings() {
 
   if (!sharing) return null;
 
-  const saveFailed = visibilityMutation.isError || grantMutation.isError || revokeMutation.isError;
+  const saveFailed = visibilityMutation.isError || grantMutation.isError || revokeMutation.isError || exactLookupMutation.isError;
   const visibleCandidates = candidates.filter((candidate) => !grantedIds.has(candidate.id));
 
   return (
@@ -165,6 +183,23 @@ export function PRSharingSettings() {
           </label>
           {searched && visibleCandidates.length === 0 ? (
             <p className="text-xs" style={{ color: "var(--dim)" }}>{t("searchEmpty")}</p>
+          ) : null}
+          {query.trim() ? (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs" style={{ color: "var(--muted)" }}>{t("exactLookupHint")}</span>
+              <button
+                type="button"
+                disabled={exactLookupMutation.isPending}
+                onClick={() => exactLookupMutation.mutate(query.trim())}
+                className="rounded-xl px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
+                style={{ background: "var(--border)", color: "var(--text-soft)" }}
+              >
+                {t("exactLookup")}
+              </button>
+            </div>
+          ) : null}
+          {exactMiss ? (
+            <p className="text-xs" style={{ color: "var(--dim)" }}>{t("exactLookupEmpty")}</p>
           ) : null}
           {visibleCandidates.length > 0 ? (
             <ul className="space-y-1">
