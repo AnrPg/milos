@@ -17,3 +17,12 @@ export function shouldShowAllowanceQuota(usage: {
 }) {
   return usage.limit !== "unlimited" || usage.remaining !== "unlimited";
 }
+
+/** Freezes worth showing to the member: not cancelled, newest first (ADR-097). */
+export function visibleBillingFreezes<
+  T extends { starts_on: string; cancelled_at: string | null },
+>(freezes: T[]): T[] {
+  return freezes
+    .filter((freeze) => !freeze.cancelled_at)
+    .sort((a, b) => b.starts_on.localeCompare(a.starts_on));
+}

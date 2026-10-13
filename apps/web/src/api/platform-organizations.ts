@@ -1,3 +1,4 @@
+import type { paths } from "@/api/generated/schema";
 import { apiRequest } from "@/api/client";
 
 export type OrganizationStatus = "active" | "suspended" | "archived";
@@ -24,6 +25,8 @@ export type OrganizationSettings = {
   invitation_lifetime_seconds: number;
   brand_name: string | null;
   brand_logo_url: string | null;
+  /** ADR-121: true when brand_logo_url is derived from an uploaded logo. */
+  brand_logo_uploaded?: boolean;
   brand_primary_color: string | null;
   settings: Record<string, unknown>;
 };
@@ -112,6 +115,32 @@ export function renamePlatformOrganization(token: string, organizationId: string
   );
 }
 
+// ADR-122 slug rename: impact summary, then a typed-confirmation rename that
+// keeps the previous slug as a redirecting alias.
+export type OrganizationSlugImpact =
+  paths["/api/platform/organizations/{id}/slug-impact"]["get"]["responses"]["200"]["content"]["application/json"];
+
+export type OrganizationSlugRenameResult =
+  paths["/api/platform/organizations/{id}/slug"]["patch"]["responses"]["200"]["content"]["application/json"];
+
+export function fetchOrganizationSlugImpact(token: string, organizationId: string) {
+  return apiRequest<OrganizationSlugImpact>(`/platform/organizations/${organizationId}/slug-impact`, {
+    token,
+  });
+}
+
+export function renamePlatformOrganizationSlug(
+  token: string,
+  organizationId: string,
+  input: { slug: string; confirmation: string },
+) {
+  return apiRequest<OrganizationSlugRenameResult>(`/platform/organizations/${organizationId}/slug`, {
+    method: "PATCH",
+    token,
+    body: input,
+  });
+}
+
 export function changePlatformOrganizationSettings(
   token: string,
   organizationId: string,
@@ -171,4 +200,89 @@ export function updatePlatformOrganizationMembershipRole(
     `/platform/organizations/${organizationId}/memberships/${membershipId}/role`,
     { method: "PATCH", token, body: { role } },
   );
+}
+
+// ADR-117 reviewed tenant export/purge workflow.
+export type OrganizationPurgeStatus =
+  | "requested"
+  | "exporting"
+  | "exported"
+  | "approved"
+  | "purging"
+  | "completed"
+  | "failed"
+  | "cancelled";
+
+export type RetentionDisposition = "purge" | "retain" | "retain_anonymized";
+
+export type RetentionReviewEntry = {
+  context: string;
+  disposition: RetentionDisposition;
+  retain_years: number | null;
+  retained_until: string | null;
+  basis: string;
+  record_count: number;
+  resources: { resource: string; count: number }[];
+};
+
+export type OrganizationPurge = {
+  id: string;
+  organization_id: string;
+  organization_slug: string;
+  status: OrganizationPurgeStatus;
+  failed_stage: "export" | "purge" | null;
+  failure_reason: string | null;
+  requested_by_user_id: string;
+  requested_at: string;
+  export_completed_at: string | null;
+  export_byte_size: number | null;
+  export_sha256: string | null;
+  retention_review: RetentionReviewEntry[];
+  approved_by_user_id: string | null;
+  approval_mode: "second_vendor" | "typed_confirmation" | null;
+  approved_at: string | null;
+  purge_started_at: string | null;
+  steps: Record<string, unknown>;
+  completed_at: string | null;
+  cancelled_at: string | null;
+};
+
+export type OrganizationPurgeStatusResult = {
+  purge: OrganizationPurge;
+  export_download_url: string | null;
+};
+
+const purgePath = (organizationId: string) => `/platform/organizations/${organizationId}/purge`;
+
+export function fetchOrganizationPurge(token: string, organizationId: string) {
+  return apiRequest<OrganizationPurgeStatusResult>(purgePath(organizationId), { token });
+}
+
+export function requestOrganizationPurge(token: string, organizationId: string) {
+  return apiRequest<{ purge: OrganizationPurge }>(purgePath(organizationId), {
+    method: "POST",
+    token,
+  });
+}
+
+export function approveOrganizationPurge(token: string, organizationId: string, confirmation: string) {
+  return apiRequest<{ purge: OrganizationPurge }>(`${purgePath(organizationId)}/approve`, {
+    method: "POST",
+    token,
+    body: { confirmation },
+  });
+}
+
+export function cancelOrganizationPurge(token: string, organizationId: string) {
+  return apiRequest<{ purge: OrganizationPurge }>(`${purgePath(organizationId)}/cancel`, {
+    method: "POST",
+    token,
+  });
+}
+
+export function resumeOrganizationPurge(token: string, organizationId: string) {
+  return apiRequest<{ purge: OrganizationPurge }>(`${purgePath(organizationId)}/resume`, {
+    method: "POST",
+    token,
+  });
 }

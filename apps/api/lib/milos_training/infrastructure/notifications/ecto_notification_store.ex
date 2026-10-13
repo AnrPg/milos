@@ -121,7 +121,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   @impl true
   def delete_booking_pending_for_booking(booking_id) do
     Notification
-    |> scoped_to_organization()
+    |> scoped_to_organization_or_unattributed()
     |> where(
       [n],
       n.type == :booking_pending and
@@ -132,17 +132,14 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     :ok
   end
 
+  # TD-092 / ADR-131: the rows belong to many recipients and RLS is owner-only,
+  # so the rewrite goes through the rename-gated SECURITY DEFINER helper.
   @impl true
   def propagate_nickname_change(old_nickname, new_nickname) do
-    Repo.query!(
-      "UPDATE notifications SET payload = jsonb_set(payload, '{sender_nickname}', to_jsonb($1::text)) WHERE payload->>'sender_nickname' = $2",
-      [new_nickname, old_nickname]
-    )
-
-    Repo.query!(
-      "UPDATE notifications SET payload = jsonb_set(payload, '{athlete_nickname}', to_jsonb($1::text)) WHERE payload->>'athlete_nickname' = $2",
-      [new_nickname, old_nickname]
-    )
+    Repo.query!("SELECT milos_propagate_notification_nickname($1, $2)", [
+      old_nickname,
+      new_nickname
+    ])
 
     :ok
   end
@@ -269,10 +266,16 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     end
   end
 
-  defp scoped_to_organization(query) do
+  # Booking notices written before TD-092 carry no organization; booking ids are
+  # globally unique, so such a row can only belong to this booking.
+  defp scoped_to_organization_or_unattributed(query) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->
-        where(query, [row], row.organization_id == ^organization_id)
+        where(
+          query,
+          [row],
+          row.organization_id == ^organization_id or is_nil(row.organization_id)
+        )
 
       _missing_scope ->
         where(query, [row], false)

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
@@ -18,15 +19,18 @@ import {
   revokeAdminUserAllowance,
   updateAdminUserRole,
   type AdminUserDirectoryEntry,
-  type AdminUserExecution,
   type AdminUserFinance,
   type AdminUserPR,
+  type AdminUserPRMember,
 } from "@/api/admin-users";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlement-visibility";
-import { packageSubscriptionLabel, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
+import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
+import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
   openAdminProfileSection,
@@ -39,11 +43,19 @@ import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
+import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
+import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
+import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can, membershipRoles } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
 import { IntegerInput } from "@/components/integer-input";
+import { TrainingHistory } from "@/components/history/TrainingHistory";
+import { defaultHistoryKind } from "@/lib/training-history";
+import { fetchUserTrainingHistory } from "@/api/training-history";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -194,32 +206,6 @@ function PRCard({ pr }: { pr: AdminUserPR }) {
   );
 }
 
-function ExecutionCard({ item, href }: { item: AdminUserExecution; href?: string }) {
-  const i18n = useUiTranslations();
-
-  return (
-    <DetailCard
-      title={item.workout_title}
-      meta={<><SemanticLabel value={item.status} /> · <SemanticLabel value={item.source} /> · {date(item.started_at_utc)}</>}
-      value={item.total_elapsed_ms ? `${Math.round(item.total_elapsed_ms / 60000)}m` : undefined}
-      href={href}
-    >
-      {item.section_scores?.length ? (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {item.section_scores.slice(0, 6).map((score, index) => (
-            <p key={`${item.id}-${index}`} className="text-xs">
-              <span style={{ color: "var(--muted)" }}>{valueText(score.section_name ?? score["section_name"])}:</span>{" "}
-              <LocalizedScore value={score.value ?? score["value"] ?? "—"} unit={valueText(score.unit ?? score["unit"])} />
-            </p>
-          ))}
-        </div>
-      ) : (
-        <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>
-      )}
-    </DetailCard>
-  );
-}
-
 function GenericRecordCard({ title, meta, detail, value, href }: { title: React.ReactNode; meta?: React.ReactNode; detail?: React.ReactNode; value?: React.ReactNode; href?: string }) {
   return (
     <DetailCard title={title} meta={meta} value={value} href={href}>
@@ -230,7 +216,7 @@ function GenericRecordCard({ title, meta, detail, value, href }: { title: React.
 
 function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: string; userId: string; entitlement: EffectiveEntitlement | null | undefined; onRefresh: () => Promise<unknown> }) {
   const i18n = useUiTranslations();
-  const [form, setForm] = useState({ allowance: "class_visits" as const, quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
+  const [form, setForm] = useState({ allowance: "class_visits" as string, quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
   const [revokeReason, setRevokeReason] = useState("");
   const grant = useMutation({ mutationFn: () => grantAdminUserAllowance(token, userId, form), onSuccess: async () => { setForm((value) => ({ ...value, quantity: 1, reason: "" })); await onRefresh(); } });
@@ -241,13 +227,13 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
       <div className="mt-5 space-y-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
         <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <select value={form.allowance} onChange={() => setForm({ ...form, allowance: "class_visits" })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option></select>
+            <select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</select>
             <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
             <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
           </div>
@@ -257,7 +243,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
         </form>
         <div className="mt-5 space-y-2">
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
-          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
+          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {allowanceLabel(entry.allowance_key, i18n, entitlement?.class_type_names)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
           {entries.every((entry) => entry.allowance_key === "coaching_touchpoints" || entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
         </div>
       </div>
@@ -294,11 +280,18 @@ function FinanceDetails({
     signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
     notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
   }));
+  const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
     onSuccess: async () => {
       setEditing(null);
+      setCommitment(null);
       await onRefresh();
+    },
+    // ADR-097: ending a membership inside its minimum commitment needs a reason.
+    onError: (error, patch) => {
+      const conflict = commitmentConflict(error);
+      if (conflict) setCommitment({ patch, endsOn: conflict.endsOn });
     },
   });
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
@@ -330,7 +323,20 @@ function FinanceDetails({
             ))}
             <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />
             {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
-            {updateMembership.isError ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+            {updateMembership.isError && !commitment ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+            {commitment ? (
+              <CommitmentOverridePrompt
+                endsOn={commitment.endsOn}
+                pending={updateMembership.isPending}
+                onConfirm={(reason) => updateMembership.mutate({ ...commitment.patch, commitment_override_reason: reason })}
+                onCancel={() => {
+                  setCommitment(null);
+                  updateMembership.reset();
+                  setDraft((current) => ({ ...current, status: valueText(membership.status) === "—" ? "active" : valueText(membership.status) }));
+                }}
+              />
+            ) : null}
+            <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
@@ -459,18 +465,54 @@ function arrayCount(value: unknown) {
   return Array.isArray(value) ? value.length : 0;
 }
 
+/**
+ * ADR-132: what a coach sees of a member outside their client scope - the PRs
+ * the member recorded in this gym (ADR-129), nothing else.
+ */
+function PRDossier({ member, prs }: { member: AdminUserPRMember; prs: AdminUserPR[] }) {
+  const i18n = useUiTranslations();
+  const tPrSharing = useTranslations("PrSharing");
+  const organizationSlug = useOrganizationSlug();
+
+  return (
+    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <Link href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {tPrSharing("dossierBack")}</Link>
+        <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <Avatar user={{ nickname: member.nickname, avatar_url: member.avatar_url ?? null }} />
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{member.nickname}</h1>
+            <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>{tPrSharing("dossierCoachScope")}</p>
+          </div>
+        </section>
+        <article id="prs" className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{i18n("personalRecords05223a0")}</p>
+          <div className="mt-4 grid gap-3">
+            {prs.length ? prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}
+          </div>
+        </article>
+      </div>
+    </main>
+  );
+}
+
 export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
+  const tPrSharing = useTranslations("PrSharing");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const organizationSlug = useOrganizationSlug();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { membership: actor } = useSelectedMembershipRole();
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
   const training = useDossierQuery(token, userId, "training", fetchAdminUserTraining, Boolean(profile?.available_sections.includes("training_history")));
-  const prs = useDossierQuery(token, userId, "prs", fetchAdminUserPRs, Boolean(profile?.available_sections.includes("prs")));
+  // ADR-132: a coach always fetches the PR panel - it is their fallback when
+  // client scope (ADR-100) refuses the full profile.
+  const actorCoaches = membershipRoles(actor).includes("coach");
+  const prs = useDossierQuery(token, userId, "prs", fetchAdminUserPRs, Boolean(profile?.available_sections.includes("prs")) || actorCoaches);
   const incidents = useDossierQuery(token, userId, "incidents", fetchAdminUserIncidents, Boolean(profile?.available_sections.includes("health_incidents")));
   const messages = useDossierQuery(token, userId, "messages", fetchAdminUserMessages, Boolean(profile?.available_sections.includes("messages")));
   const coaching = useDossierQuery(token, userId, "coaching", fetchAdminUserCoachingContext, Boolean(profile?.available_sections.includes("coaching_context")));
@@ -505,7 +547,15 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
   }, [queryClient, userId]);
 
-  if (profileQuery.isLoading) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
+  const mode = dossierMode({
+    profileLoading: profileQuery.isLoading,
+    profileLoaded: Boolean(profile),
+    actorCoaches,
+    prsLoading: prs.isLoading,
+    prs: prs.data,
+  });
+  if (mode === "loading") return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
+  if (mode === "prs_only" && prs.data?.member) return <PRDossier member={prs.data.member} prs={prs.data.prs} />;
   if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</main>;
 
   const executions = training.data?.executions ?? [];
@@ -520,7 +570,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     : 0;
   const visibleSections = visibleAdminProfileSections(profile.available_sections, {
     training_history: executions.length,
-    prs: prs.data?.prs.length ?? 0,
+    prs: prSectionContentCount(prs.data),
     scores: scores.length,
     health_incidents: incidents.data?.incidents.length ?? 0,
     coaching_context: coachingCount,
@@ -529,6 +579,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   });
   const sections = new Set(visibleSections);
   if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
+  // ADR-100/101: coaches and private coach notes belong to client profiles.
+  const isClient = profile.membership?.roles?.length
+    ? profile.membership.roles.some((role) => role === "member" || role === "athlete")
+    : profile.identity.role === "member" || profile.identity.role === "athlete";
+  const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
+  const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -607,23 +663,36 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
-          {sections.has("training_history") ? <Panel id="training_history" title={i18n("trainingHistorya512053")} href={adminHref("/admin/workouts", organizationSlug)}><p>{training.data?.summary.completed_count ?? 0} {i18n("completedOf88964ae")} {training.data?.summary.execution_count ?? 0} {i18n("executions8319d6e")}</p><div className="mt-3 grid gap-3">{executions.length ? executions.slice(0, 8).map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/workouts", organizationSlug)} />) : <Empty>{i18n("noWorkoutExecutionsRecorded0a0b1d0")}</Empty>}</div></Panel> : null}
 
-          {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
+          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? (
+            <TrainingHistory
+              id="training_history"
+              queryKey={["admin", "users", userId]}
+              fetchPage={(kind, offset) => fetchUserTrainingHistory(token, userId, kind, offset)}
+              defaultKind={defaultHistoryKind(profile.identity.role)}
+            />
+          ) : null}
 
-          {sections.has("scores") ? <Panel id="scores" title={i18n("scores126cb93")}><div className="grid gap-3">{scores.length ? scores.slice(0, 10).map((score, index) => <GenericRecordCard key={`${String(score.execution_id)}-${index}`} title={String(score.section_name ?? i18n("workoutSection881e276"))} meta={`${date(score.completed_at_utc)} · ${String(score.workout_title ?? "—")}`} value={<LocalizedScore value={score.value ?? "—"} unit={valueText(score.unit)} />} />) : <Empty>{i18n("noScoredWorkoutSectionsRecordedcfa7742")}</Empty>}</div></Panel> : null}
+          {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.visibility === "coach_role_required" ? <Empty>{tPrSharing("dossierCoachOnly")}</Empty> : prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
+
 
           {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
           {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
 
-          {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href={adminHref("/admin/class-schedule", organizationSlug)}><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/class-schedule", organizationSlug)} />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
+          {token && showCoaches ? <Panel id="coaching_relationships" title={i18n("rhCoaches")}><CoachAssignmentPanel userId={userId} /></Panel> : null}
+
+          {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
+
 
           {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
           {sections.has("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>
               <div className="space-y-5">
+                {profile.membership && token ? (
+                  <MemberRolesEditor token={token} userId={userId} membership={profile.membership} />
+                ) : (
                 <div>
                   <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -645,6 +714,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                   </div>
                   {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
                 </div>
+                )}
                 <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
                   <button
                     type="button"

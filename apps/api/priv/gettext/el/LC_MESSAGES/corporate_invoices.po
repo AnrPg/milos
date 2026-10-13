@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "Αριθμός τιμολογίου"
+
+msgid "Period"
+msgstr "Περίοδος"
+
+msgid "Seats"
+msgstr "Θέσεις"
+
+msgid "Price per seat"
+msgstr "Τιμή ανά θέση"
+
+msgid "Total"
+msgstr "Σύνολο"
+
+msgid "Paid"
+msgstr "Πληρώθηκαν"
+
+msgid "Balance due"
+msgstr "Υπόλοιπο προς πληρωμή"
+
+msgid "Due date"
+msgstr "Ημερομηνία λήξης"
+
+msgid "Hello %{name},"
+msgstr "Γεια σας %{name},"
+
+msgid "Thank you."
+msgstr "Ευχαριστούμε."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "Τιμολόγιο %{number} από %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "Το %{gym} εξέδωσε το τιμολόγιο %{number} προς %{company} για την περίοδο %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "Παρακαλούμε εξοφλήστε έως τις %{due} αναγράφοντας τον αριθμό τιμολογίου."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "Υπενθύμιση: το τιμολόγιο %{number} από %{gym} είναι ληξιπρόθεσμο"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "Το τιμολόγιο %{number} προς %{company} έληγε στις %{due} και παραμένει ανεξόφλητο."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "Αν έχετε ήδη πληρώσει, αγνοήστε αυτή την υπενθύμιση."

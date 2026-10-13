@@ -38,12 +38,16 @@ defmodule MilosTrainingWeb.AdminAnalyticsControllerTest do
       )
       |> json_response(200)
 
-    assert response["analytics"]["events"]["by_name"]["payment_recorded"] >= 1
+    # TD-092: `nil >= 1` is true in Elixir term order, so check the count
+    # itself - the summary used to read nothing outside the gym's scope.
+    assert response["analytics"]["events"]["by_name"]["payment_recorded"] == 1
     assert is_map(response["finance"])
     assert is_map(response["feedback"])
     assert is_map(response["wellbeing"])
     assert is_map(response["coaching"])
     assert is_integer(response["coaching"]["active_athlete_count"])
     assert is_map(response["dashboard"]["cross_context"])
+    assert response["execution"]["started"] == 0
+    assert Map.has_key?(response["execution"], "completion_rate")
   end
 end

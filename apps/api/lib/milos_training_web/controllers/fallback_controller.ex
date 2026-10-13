@@ -35,18 +35,24 @@ defmodule MilosTrainingWeb.FallbackController do
   end
 
   def call(conn, {:error, :invalid_credentials}) do
+    emit_auth_anomaly(:invalid_credentials)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_credentials", error: "Invalid credentials"})
   end
 
   def call(conn, {:error, :invalid_refresh_token}) do
+    emit_auth_anomaly(:invalid_refresh_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_refresh_token", error: "Invalid refresh token"})
   end
 
   def call(conn, {:error, :invalid_token}) do
+    emit_auth_anomaly(:invalid_token)
+
     conn
     |> put_status(:unauthorized)
     |> json(%{code: "invalid_token", error: "Invalid token"})
@@ -158,6 +164,39 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:not_found)
     |> json(%{code: "invalid_invitation", error: "Invitation is invalid or unavailable"})
+  end
+
+  def call(conn, {:error, :join_link_unavailable}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "join_link_unavailable", error: "This join link is not active"})
+  end
+
+  def call(conn, {:error, :membership_unavailable}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "membership_unavailable",
+      error: "Your membership in this organization is not active. Contact the organization."
+    })
+  end
+
+  def call(conn, {:error, :invalid_tour}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_tour", error: "Unknown product tour"})
+  end
+
+  def call(conn, {:error, :invalid_onboarding_action}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_onboarding_action", error: "Unknown onboarding action or step"})
+  end
+
+  def call(conn, {:error, :invalid_join_link}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_join_link", error: "Choose member or athlete and on or off"})
   end
 
   def call(conn, {:error, :stale_dsl_revision}) do
@@ -343,6 +382,62 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-121 tenant logo upload.
+  def call(conn, {:error, :invalid_brand_logo_upload}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_brand_logo_upload",
+      error: "Use a PNG, JPEG, or WebP logo up to 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_upload_missing}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_upload_missing",
+      error: "The logo upload was not found in storage. Upload the image again."
+    })
+  end
+
+  def call(conn, {:error, :unsupported_brand_logo_type}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "unsupported_brand_logo_type",
+      error: "The uploaded file is not a PNG, JPEG, or WebP image."
+    })
+  end
+
+  def call(conn, {:error, {:brand_logo_too_large, byte_size}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "brand_logo_too_large",
+      params: %{byte_size: byte_size, max_bytes: 2_097_152},
+      error: "The uploaded logo is larger than 2 MiB."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "brand_logo_key_forbidden",
+      error: "The logo upload does not belong to this organization."
+    })
+  end
+
+  def call(conn, {:error, :brand_logo_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "brand_logo_storage_unavailable",
+      error: "Logo storage could not be reached for verification. Try again shortly."
+    })
+  end
+
   def call(conn, {:error, :invalid_invoice_upload}) do
     emit_upload_rejection(:invalid_invoice_upload)
 
@@ -460,6 +555,69 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_training_log_source}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_training_log_source",
+      error: "Training log source type or reference is invalid"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "training_log_source_forbidden",
+      error: "You cannot log a workout for this source"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_not_started}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "training_log_source_not_started",
+      error: "This class has not started yet"
+    })
+  end
+
+  def call(conn, {:error, :training_log_already_counted}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_already_counted",
+      error: "A completed workout execution already counts this workout"
+    })
+  end
+
+  def call(conn, {:error, :training_log_source_already_logged}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_source_already_logged",
+      error: "This workout has already been logged"
+    })
+  end
+
+  def call(conn, {:error, :training_log_entry_voided}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "training_log_entry_voided",
+      error: "Voided training log entries cannot be changed"
+    })
+  end
+
+  def call(conn, {:error, :stale_training_log_entry}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "stale_training_log_entry",
+      error: "This entry changed elsewhere. Reload before saving."
+    })
+  end
+
   def call(conn, {:error, :promotion_code_inactive}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -494,6 +652,148 @@ defmodule MilosTrainingWeb.FallbackController do
       code: "promotion_code_max_redemptions_reached",
       error: "Promotion code redemption limit reached"
     })
+  end
+
+  # ADR-096 package contract errors. `params` carry the catalog field or lock
+  # path so clients can localize and focus the offending input.
+  def call(conn, {:error, {:package_type_invariant_violated, path}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_invariant_violated",
+      "This value is defined by the package type",
+      %{field: path}
+    )
+  end
+
+  def call(conn, {:error, {:entitlement_not_available, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "entitlement_not_available",
+      "This benefit is not available yet",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:invalid_package_field, field, reason}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package field value",
+      %{field: field, reason: to_string(reason)}
+    )
+  end
+
+  def call(conn, {:error, {:unknown_package_field, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "unknown_package_field",
+      "Unknown package field",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:package_rule_violated, rule, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_rule_violated",
+      "Package rule violated",
+      %{rule: to_string(rule), field: field}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_fields}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package fields",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_type}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_type",
+      "Invalid package type",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_not_available}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_not_available",
+      "This package type is not available yet",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_change_requires_copy}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_type_change_requires_copy",
+      "A sold package cannot change type; create a copy instead",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_already_used}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_already_used",
+      "This package can be used only once per person",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_new_members_only}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_new_members_only",
+      "This package is only for new members",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_not_renewable}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_not_renewable",
+      "This package does not renew",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included, details}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      details
+    )
   end
 
   def call(conn, {:error, :package_inactive}) do
@@ -1059,7 +1359,44 @@ defmodule MilosTrainingWeb.FallbackController do
   def call(conn, {:error, :invalid_athletes}) do
     conn
     |> put_status(:unprocessable_entity)
-    |> json(%{code: "invalid_athletes", error: "Assigned workouts may target athlete users only"})
+    |> json(%{
+      code: "invalid_athletes",
+      error: "Assigned workouts may target active athletes or members of this organization only"
+    })
+  end
+
+  # ADR-125: personal member programming needs an explicit package grant.
+  def call(conn, {:error, :member_programming_not_entitled, details}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "member_programming_not_entitled",
+      error:
+        "The member's package does not include personal programming " <>
+          "(personal_programming channel and execute_assigned_workouts capability)",
+      params: details
+    })
+  end
+
+  def call(conn, {:error, :class_variant_requires_single_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "class_variant_requires_single_member",
+      error: "A member's class version must target exactly one member"
+    })
+  end
+
+  def call(conn, {:error, :slot_not_found}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "slot_not_found", error: "Class not found"})
+  end
+
+  def call(conn, {:error, :invalid_programming_mode}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_programming_mode", error: "Unknown programming mode"})
   end
 
   def call(conn, {:error, :workout_reassignment_not_supported}) do
@@ -1195,6 +1532,15 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :idempotency_key_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "idempotency_key_conflict",
+      error: "This operation id was already used for a different request"
+    })
+  end
+
   def call(conn, {:error, :booking_not_pending}) do
     conn
     |> put_status(:conflict)
@@ -1219,6 +1565,285 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-117 reviewed tenant purge workflow.
+  def call(conn, {:error, :organization_purge_exists}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_exists",
+      error: "This organization already has an open purge request"
+    })
+  end
+
+  def call(conn, {:error, :organization_purge_in_progress}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_purge_in_progress",
+      error: "Cancel the open purge request before changing this organization's status"
+    })
+  end
+
+  def call(conn, {:error, :invalid_purge_transition}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "invalid_purge_transition",
+      error: "The purge request is not in a state that allows this action"
+    })
+  end
+
+  def call(conn, {:error, :purge_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "purge_confirmation_mismatch",
+      error: "Type the organization slug exactly to approve the purge"
+    })
+  end
+
+  # ADR-122 organization slug rename.
+  def call(conn, {:error, :invalid_slug}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_slug",
+      error: "Use 3-63 lowercase letters, digits and single hyphens"
+    })
+  end
+
+  def call(conn, {:error, :slug_unchanged}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "slug_unchanged", error: "The new slug matches the current slug"})
+  end
+
+  def call(conn, {:error, :slug_confirmation_mismatch}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "slug_confirmation_mismatch",
+      error: "Type the current organization slug exactly to confirm the rename"
+    })
+  end
+
+  def call(conn, {:error, :slug_taken}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_taken",
+      error: "This slug belongs to another organization or is reserved as its previous slug"
+    })
+  end
+
+  def call(conn, {:error, :slug_rename_blocked_by_purge}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "slug_rename_blocked_by_purge",
+      error: "Cancel the open purge request before renaming this organization's slug"
+    })
+  end
+
+  def call(conn, {:error, :purge_job_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "purge_job_unavailable",
+      error: "Background processing is unavailable; resume the purge later"
+    })
+  end
+
+  def call(conn, {:error, :cannot_share_prs_with_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_share_prs_with_self", error: "You already own these records"})
+  end
+
+  def call(conn, {:error, :pr_organization_unavailable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "pr_organization_unavailable",
+      error: "PRs can only be recorded in a gym you are an active member of"
+    })
+  end
+
+  # ADR-126 refund receipts, reconciliation and accounting exports.
+  def call(conn, {:error, :reconciliation_reference_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "reconciliation_reference_conflict",
+      error: "This provider reference was already recorded with a different amount, date or type"
+    })
+  end
+
+  def call(conn, {:error, :reconciliation_target_already_matched}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "reconciliation_target_already_matched",
+      error: "This payment or reversal is already matched to another statement line"
+    })
+  end
+
+  def call(conn, {:error, :invalid_reconciliation_target}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_reconciliation_target",
+      error: "Choose a payment or reversal to match"
+    })
+  end
+
+  def call(conn, {:error, :invalid_export_range}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_export_range",
+      error: "Choose a start date that is not in the future and an end date on or after it"
+    })
+  end
+
+  def call(conn, {:error, :export_range_too_long}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "export_range_too_long", error: "Export at most five years at a time"})
+  end
+
+  def call(conn, {:error, :export_job_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "export_job_unavailable",
+      error: "Background processing is unavailable; try a shorter range or retry later"
+    })
+  end
+
+  def call(conn, {:error, :accounting_export_not_ready}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "accounting_export_not_ready", error: "This export has not completed"})
+  end
+
+  def call(conn, {:error, :accounting_export_failed}) do
+    conn
+    |> put_status(:internal_server_error)
+    |> json(%{
+      code: "accounting_export_failed",
+      error: "The accounting export could not be built"
+    })
+  end
+
+  # ADR-097 Phase B: booking rules, perks, freezes and facility.
+  @phase_b_errors %{
+    finance_membership_frozen: {:forbidden, "The membership is frozen"},
+    finance_time_window_not_included: {:forbidden, "This time is outside the package's hours"},
+    finance_location_not_included: {:forbidden, "This location is not included in the package"},
+    invalid_freeze_dates: {:unprocessable_entity, "The freeze dates are invalid"},
+    freeze_in_past: {:unprocessable_entity, "A freeze cannot start in the past"},
+    freeze_not_included: {:unprocessable_entity, "The package does not include freezes"},
+    freeze_overlaps: {:conflict, "The freeze overlaps another freeze"},
+    freeze_allowance_exceeded:
+      {:unprocessable_entity, "The freeze exceeds the yearly freeze days"},
+    freeze_already_cancelled: {:conflict, "The freeze is already cancelled"},
+    slot_not_full: {:conflict, "The class still has free spots"},
+    invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},
+    guest_already_booked: {:conflict, "A guest is already booked for this class"},
+    booking_not_waitlisted: {:conflict, "The booking is not on the waitlist"},
+    location_not_found: {:not_found, "Location not found"},
+    location_archived: {:unprocessable_entity, "The location is archived"},
+    # ADR-098
+    form_review_closed: {:conflict, "The form review is already closed"},
+    appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},
+    appointment_slot_in_past: {:unprocessable_entity, "The appointment has already started"},
+    appointment_slot_full: {:conflict, "The appointment is full"},
+    appointment_format_not_included:
+      {:forbidden, "This session format is not included in the package"},
+    appointment_coach_not_included: {:forbidden, "This coach is not included in the package"},
+    appointment_not_active: {:conflict, "The appointment is no longer active"},
+    appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
+    invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"},
+    add_on_base_required:
+      {:unprocessable_entity, "The member needs a compatible membership first"},
+    corporate_package_requires_enrollment:
+      {:unprocessable_entity, "Corporate seats are added through the corporate client"},
+    beneficiary_is_payer: {:unprocessable_entity, "The payer is already on the membership"},
+    not_a_shared_membership: {:unprocessable_entity, "This membership is not shared"},
+    beneficiary_limit_reached: {:conflict, "The membership has no room for more people"},
+    minor_beneficiaries_not_allowed:
+      {:unprocessable_entity, "This package does not allow minors"},
+    not_a_corporate_package: {:unprocessable_entity, "Choose a corporate package"},
+    already_enrolled: {:conflict, "The member already has a seat"},
+    corporate_seats_full: {:conflict, "All seats are taken"},
+    corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
+    invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
+    corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
+    corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
+    add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
+    last_owner: {:conflict, "A gym needs at least one owner"},
+    owner_required: {:forbidden, "Only gym owners can create gyms"},
+    machine_retired: {:unprocessable_entity, "This machine is retired"},
+    invalid_machine_event: {:unprocessable_entity, "Unknown machine log entry"},
+    not_enough_stock: {:unprocessable_entity, "There is not that much in stock"},
+    invalid_movement: {:unprocessable_entity, "Unknown stock change"},
+    confirmation_mismatch: {:unprocessable_entity, "Type the gym's slug to confirm"},
+    cleaning_area_archived: {:unprocessable_entity, "That area is archived"},
+    cleaning_already_finished: {:conflict, "This cleaning is already finished"},
+    cleaning_finished_before_start: {:unprocessable_entity, "Finish cannot be before start"},
+    not_a_coach: {:unprocessable_entity, "That person is not a coach here"},
+    not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
+    only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
+    not_your_client: {:forbidden, "Not one of your clients"},
+    roles_required: {:unprocessable_entity, "Choose at least one role"},
+    invalid_role: {:unprocessable_entity, "Unknown role"},
+    invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},
+    payment_exceeds_balance: {:unprocessable_entity, "The payment is more than the balance due"},
+    corporate_invoice_has_payments: {:conflict, "Reverse the payments before voiding"},
+    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, %{})
+  end
+
+  def call(conn, {:error, reason, details}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, details)
+  end
+
+  def call(conn, {:error, :booking_window_closed, details}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "booking_window_closed",
+      "Booking for this class is not open yet",
+      details
+    )
+  end
+
+  def call(conn, {:error, {:package_commitment_active, details}}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      details
+    )
+  end
+
+  def call(conn, {:error, :package_commitment_active}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      %{}
+    )
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)
@@ -1241,11 +1866,23 @@ defmodule MilosTrainingWeb.FallbackController do
     end)
   end
 
+  # Credential failures use a bounded reason set; ops/observability alert rules
+  # watch their rate for brute force and refresh-token reuse.
+  defp emit_auth_anomaly(reason) do
+    :telemetry.execute([:milos, :auth, :anomaly], %{count: 1}, %{reason: Atom.to_string(reason)})
+  end
+
   defp emit_upload_rejection(reason) do
     :telemetry.execute(
       [:milos, :upload, :rejected],
       %{count: 1},
       %{context: "invoice", reason: reason}
     )
+  end
+
+  defp package_contract_error(conn, status, code, message, params) do
+    conn
+    |> put_status(status)
+    |> json(%{code: code, error: message, params: params})
   end
 end

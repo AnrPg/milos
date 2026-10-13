@@ -144,6 +144,96 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
              athlete_replacement.id
   end
 
+  test "admin reads the package catalog and authors v2 packages with stable error codes", %{
+    conn: conn
+  } do
+    admin = admin_fixture()
+    {organization, _context} = tenant_fixture(admin, "Package Catalog Tenant")
+    base = "/api/org/#{organization.slug}/admin/finance"
+
+    catalog =
+      conn
+      |> put_bearer_token(admin)
+      |> get("#{base}/package-catalog")
+      |> json_response(200)
+
+    assert catalog["version"] == 2
+    types = Map.new(catalog["types"], &{&1["key"], &1})
+    assert types["drop_in"]["available"]
+    assert types["corporate"]["available"]
+    # Corporate needs its module switched on before admins see it.
+    refute types["corporate"]["enabled"]
+    assert types["drop_in"]["billing_periods"] == ["one_off"]
+    assert Enum.any?(types["drop_in"]["locks"], &(&1["path"] == "group_classes.visits.limit"))
+    assert types["class_pack"]["preset"]["group_classes.visits"]["limit"] == 10
+    assert Enum.any?(catalog["fields"], &(&1["key"] == "group_classes.class_types"))
+    assert Enum.find(catalog["modules"], &(&1["key"] == "group_classes"))["enabled"]
+
+    created =
+      conn
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> post("#{base}/packages", %{
+        name: "Δοκιμαστική εβδομάδα",
+        package_type: "trial",
+        base_price_cents: 0,
+        fields: %{"terms.new_members_only" => false}
+      })
+      |> json_response(201)
+
+    assert created["package"]["code"] == "dokimastiki_evdomada"
+    assert created["package"]["package_type"] == "trial"
+    assert created["package"]["billing_period"] == "one_off"
+    assert created["package"]["changed_fields"] == ["terms.new_members_only"]
+
+    locked =
+      conn
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> post("#{base}/packages", %{
+        name: "Drop in",
+        package_type: "drop_in",
+        fields: %{"group_classes.visits" => %{limit: 4, period: "subscription_period"}}
+      })
+      |> json_response(422)
+
+    assert locked["code"] == "package_type_invariant_violated"
+    assert locked["params"]["field"] == "group_classes.visits.limit"
+
+    rule =
+      conn
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> post("#{base}/packages", %{
+        name: "Nothing",
+        package_type: "membership",
+        fields: %{"group_classes.included" => false}
+      })
+      |> json_response(422)
+
+    assert rule["code"] == "package_rule_violated"
+    assert rule["params"]["rule"] == "at_least_one_service"
+
+    unavailable =
+      conn
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> post("#{base}/packages", %{
+        name: "Library",
+        package_type: "membership",
+        fields: %{"content.workout_library" => true}
+      })
+      |> json_response(422)
+
+    assert unavailable["code"] == "entitlement_not_available"
+
+    conn
+    |> recycle()
+    |> put_bearer_token(admin)
+    |> post("#{base}/packages", %{name: "Legacy", family: "hybrid", package_type: "membership"})
+    |> json_response(422)
+  end
+
   test "admin can manage package, membership, promo code, redemption, and search slices", %{
     conn: conn
   } do
@@ -160,7 +250,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
         %{
           code: "controller hybrid",
           name: "Controller Hybrid",
-          family: "hybrid",
+          package_type: "membership",
           billing_period: "monthly",
           base_price_cents: 9900
         }
@@ -698,6 +788,9 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     assert [credit_entry] = profile_response["credit_ledger_entries"]
     assert credit_entry["referral_reward_id"] == reward_response["referral_reward"]["id"]
 
+    # TD-092: an account that is not a member of this gym is never listed.
+    outsider = user_fixture(%{role: :member})
+
     members_response =
       conn
       |> recycle()
@@ -710,6 +803,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
 
     assert referrer_row["credit_balance"] == 1750
     assert referrer_row["credit_balance_cents"] == 1750
+    refute Enum.any?(members_response["members"], &(&1["id"] == outsider.id))
   end
 
   test "admin finance package and referral actions stay inside the selected org", %{conn: conn} do

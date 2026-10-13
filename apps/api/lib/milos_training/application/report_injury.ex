@@ -1,13 +1,17 @@
 defmodule MilosTraining.Application.ReportInjury do
-  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
-  alias MilosTraining.{Identity, Wellbeing}
+  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent, TenantStaffRecipients}
+  alias MilosTraining.Wellbeing
   alias MilosTraining.Wellbeing.Domain.InjuryPolicy
 
   def call(context, user_id, params),
     do:
-      MilosTraining.Wellbeing.WellbeingStore.with_context(context, fn -> call(user_id, params) end)
+      MilosTraining.Wellbeing.WellbeingStore.with_context(context, fn ->
+        do_call(context, user_id, params)
+      end)
 
-  def call(user_id, params) do
+  def call(user_id, params), do: do_call(nil, user_id, params)
+
+  defp do_call(context, user_id, params) do
     with {:ok, injury} <-
            Wellbeing.report_injury(
              user_id,
@@ -16,7 +20,7 @@ defmodule MilosTraining.Application.ReportInjury do
              InjuryPolicy.self_report_params(params)
            ) do
       record_injury_reported(injury)
-      broadcast_injury_reported(user_id, injury.id)
+      broadcast_injury_reported(context, user_id, injury)
       {:ok, injury}
     end
   end
@@ -36,8 +40,9 @@ defmodule MilosTraining.Application.ReportInjury do
     })
   end
 
-  defp broadcast_injury_reported(user_id, injury_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_injury_reported(context, user_id, injury) do
+    injury_id = injury.id
+    admin_ids = TenantStaffRecipients.user_ids([context, injury])
 
     BroadcastUserSync.for_user(user_id, ["my_wellbeing"],
       reason: "injury_reported",

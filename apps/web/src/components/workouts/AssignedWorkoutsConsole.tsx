@@ -4,6 +4,7 @@
 
 
 
+import { AssigneeRoleBadge } from "@/components/workouts/AssigneeRoleBadge";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import {useUiLocale} from "@/i18n/use-ui-locale";
@@ -28,6 +29,7 @@ import {
   deleteAssignedWorkout,
   fetchAssignedWorkoutWeek,
   listAthletes,
+  reportAssignmentOpened,
   requestWorkoutAssignment,
   rescheduleAssignment,
   updateAssignedWorkout,
@@ -36,7 +38,6 @@ import {
 } from "@/api/assigned-workouts";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { AssignedWorkoutPanel } from "@/components/workouts/AssignedWorkoutPanel";
 import { QuickAssignModal } from "@/components/workouts/QuickAssignModal";
@@ -46,9 +47,11 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useExecutionStore } from "@/stores/execution";
-import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
+import { PageHeader } from "@/components/PageHeader";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -396,6 +399,9 @@ export function AssignedWorkoutsConsole({
   const { role } = useSelectedMembershipRole();
 
   const isAdmin = role === "admin";
+  // ADR-125: members receive personal workouts and class versions here too,
+  // but reschedule and "request a workout" remain athlete services.
+  const isMember = role === "member";
 
   const openParamId = searchParams.get("open_assignment") ?? searchParams.get("open");
   const openParamDate = searchParams.get("date");
@@ -424,6 +430,13 @@ export function AssignedWorkoutsConsole({
   }, [refDate, viewMode]);
 
   const accessToken = tokens?.access_token;
+
+  // ADR-123: an athlete opening an assignment's detail is an analytics fact.
+  const panelAssignmentId = panelAssignment?.id ?? null;
+  useEffect(() => {
+    if (!panelAssignmentId || isAdmin || !accessToken) return;
+    void reportAssignmentOpened(accessToken, panelAssignmentId);
+  }, [panelAssignmentId, isAdmin, accessToken]);
 
   const loadAssignments = useCallback(async () => {
     if (!accessToken) return;
@@ -499,7 +512,7 @@ export function AssignedWorkoutsConsole({
 
     let cancelled = false;
     const timeoutId = window.setTimeout(() => {
-      void listAthletes(tokens.access_token!, editQuery)
+      void listAthletes(tokens.access_token!, editQuery, { includeMembers: true })
         .then((nextAthletes) => {
           if (!cancelled) setAthletes(nextAthletes);
         })
@@ -522,7 +535,7 @@ export function AssignedWorkoutsConsole({
 
     let cancelled = false;
     const timeoutId = window.setTimeout(() => {
-      void listAthletes(tokens.access_token!, filterQuery)
+      void listAthletes(tokens.access_token!, filterQuery, { includeMembers: true })
         .then((result) => { if (!cancelled) setFilterAthletes(result); })
         .catch(() => { if (!cancelled) setFilterAthletes([]); });
     }, 200);
@@ -747,7 +760,7 @@ export function AssignedWorkoutsConsole({
     setError(null);
 
     try {
-      if (isFreeTextWorkout(assignment.workout)) {
+      if (usesManualTimer(assignment.workout)) {
         const execution = await startExecution(tokens.access_token, {
           master_workout_id: assignment.workout.id,
           source: "assigned",
@@ -818,7 +831,7 @@ export function AssignedWorkoutsConsole({
 
   function handleDragEnd({ active, over }: DragEndEvent) {
     setActiveAssignment(null);
-    if (!over || !tokens?.access_token) return;
+    if (!over || !tokens?.access_token || isMember) return;
 
     const newDate = over.id as string;
     const assignment = allAssignments.find((a) => a.id === active.id);
@@ -931,7 +944,7 @@ export function AssignedWorkoutsConsole({
                     <DraggableCard
                       key={a.id}
                       assignment={a}
-                      disabled={isWeekDone}
+                      disabled={isWeekDone || isMember}
                       className="group"
                       style={{ background: "var(--panel-muted)", border: `1px solid ${isWeekDone ? "color-mix(in srgb, var(--success) 25%, var(--border))" : "var(--border)"}`, borderRadius: "0.8rem", position: "relative" }}
                     >
@@ -1017,7 +1030,7 @@ export function AssignedWorkoutsConsole({
                   >
                     <div className="flex flex-col gap-3">
                       <p>{i18n("noWorkoutAssigned9553f04")}</p>
-                      {!isAdmin && date >= todayIso ? (
+                      {!isAdmin && !isMember && date >= todayIso ? (
                         requestingDate === date ? (
                           <div className="space-y-2">
                             <input
@@ -1086,7 +1099,7 @@ export function AssignedWorkoutsConsole({
                   <DraggableCard
                     key={assignment.id}
                     assignment={assignment}
-                    disabled={isPastDone}
+                    disabled={isPastDone || isMember}
                     className="group relative rounded-[1.4rem] p-4"
                     style={{
                       background: "var(--panel-muted)",
@@ -1112,6 +1125,11 @@ export function AssignedWorkoutsConsole({
                         {assignment.workout.is_team_workout ? (
                           <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "color-mix(in srgb, var(--warning) 15%, transparent)", color: "var(--warning)", border: "1px solid color-mix(in srgb, var(--warning) 30%, transparent)" }}>
                             {i18n("team2188872")}
+                          </span>
+                        ) : null}
+                        {assignment.assignment_kind === "class_variant" ? (
+                          <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold" style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", color: "var(--primary)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)" }}>
+                            {isAdmin ? i18n("memberProgrammingClassVersionBadge") : i18n("memberProgrammingYourClassVersion")}
                           </span>
                         ) : null}
                       </div>
@@ -1275,7 +1293,7 @@ export function AssignedWorkoutsConsole({
                                 }
                                 type="button"
                               >
-                                <span>{athlete.nickname}</span>
+                                <span>{athlete.nickname}<AssigneeRoleBadge role={athlete.role} /></span>
                                 <span className="text-[11px] uppercase tracking-[0.18em]">
                                   {selected ? i18n("selected9a976fc") : i18n("add61cc55a")}
                                 </span>
@@ -1339,20 +1357,12 @@ export function AssignedWorkoutsConsole({
   return (
     <main className="min-h-screen px-4 py-8 md:px-8 md:py-12" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-6">
-        <TransientHero
-          collapsedTitle={pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
-          label={i18n("workoutCalendarIntroduction1a3befd")}
-          timeoutMs={3000}
-        >
-          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">
-              {isAdmin ? i18n("personalCoaching6accdcd") : i18n("workoutCalendarf82cdf2")}
-            </p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
-              {pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))}
-            </h1>
-          </section>
-        </TransientHero>
+        <PageHeader title={pageTitle ?? (isAdmin ? i18n("workoutBoardc309600") : i18n("myWorkouts89fd2fd"))} />
+        {isMember ? (
+          <p className="-mt-3 text-sm" style={{ color: "var(--muted)" }}>
+            {i18n("memberProgrammingMyWorkoutsIntro")}
+          </p>
+        ) : null}
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
@@ -1566,6 +1576,7 @@ export function AssignedWorkoutsConsole({
           key={panelAssignment.id}
           assignment={panelAssignment}
           isAdmin={isAdmin}
+          allowReschedule={!isMember}
           accessToken={tokens.access_token}
           onClose={() => setPanelAssignment(null)}
           onStartWorkout={(assignment) => void executeAssignedWorkout(assignment)}

@@ -33,6 +33,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     properties: %{
       master_workout_id: %Schema{type: :string, format: :uuid},
       class_type_id: %Schema{type: :string, format: :uuid},
+      location_id: %Schema{type: :string, format: :uuid, nullable: true},
+      coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
       name: %Schema{type: :string, minLength: 1, maxLength: 120},
       duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
       scheduled_at: %Schema{type: :string, format: :"date-time"},
@@ -52,8 +54,23 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   @message_schema %Schema{
     type: :object,
-    properties: %{admin_message: %Schema{type: :string}},
+    properties: %{
+      admin_message: %Schema{type: :string},
+      client_operation_id: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description:
+          "Stable client operation id (ADR-120). Replaying the operation that already " <>
+            "resolved the booking returns it with 200 and no new notification."
+      }
+    },
     required: []
+  }
+
+  @resolution_error %Schema{
+    type: :object,
+    properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}}
   }
 
   @id_param %Parameter{
@@ -91,6 +108,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
             additionalProperties: false,
             properties: %{
               class_type_id: %Schema{type: :string, format: :uuid},
+              location_id: %Schema{type: :string, format: :uuid, nullable: true},
+              coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
               master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
               name: %Schema{type: :string, minLength: 1, maxLength: 120},
               duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
@@ -163,6 +182,10 @@ defmodule MilosTrainingWeb.AdminScheduleController do
 
   operation(:approve_booking,
     summary: "Approve a booking",
+    description:
+      "Booking resolution is never replayed blindly (ADR-120): a booking that is no longer " <>
+        "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
+        "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],
     request_body: %RequestBody{
       required: false,
@@ -175,12 +198,21 @@ defmodule MilosTrainingWeb.AdminScheduleController do
            type: :object,
            properties: %{booking: %Schema{type: :object, additionalProperties: true}},
            required: [:booking]
-         }}
+         }},
+      not_found: {"Booking not found", "application/json", @resolution_error},
+      conflict:
+        {"Booking no longer pending, slot full, or operation id conflict", "application/json",
+         @resolution_error},
+      unprocessable_entity: {"Invalid request", "application/json", @resolution_error}
     ]
   )
 
   operation(:reject_booking,
     summary: "Reject a booking",
+    description:
+      "Booking resolution is never replayed blindly (ADR-120): a booking that is no longer " <>
+        "pending returns 409 `booking_not_pending` unless it was resolved by this same " <>
+        "`client_operation_id`, which returns the booking with 200.",
     parameters: [@id_param],
     request_body: %RequestBody{
       required: false,
@@ -193,14 +225,20 @@ defmodule MilosTrainingWeb.AdminScheduleController do
            type: :object,
            properties: %{booking: %Schema{type: :object, additionalProperties: true}},
            required: [:booking]
-         }}
+         }},
+      not_found: {"Booking not found", "application/json", @resolution_error},
+      conflict:
+        {"Booking no longer pending, slot full, or operation id conflict", "application/json",
+         @resolution_error},
+      unprocessable_entity: {"Invalid request", "application/json", @resolution_error}
     ]
   )
 
   def create_slot(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
       conn
       |> put_status(:created)
       |> json(%{slot: slot})
@@ -210,7 +248,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   def create_series(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
       conn |> put_status(:created) |> json(%{series: series})
     end
   end
@@ -219,8 +258,22 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
       json(conn, %{slot: slot})
+    end
+  end
+
+  # A class's coach must be a coach of this gym (ADR-100).
+  defp valid_coach(context, body) do
+    case body["coach_user_id"] || body[:coach_user_id] do
+      coach_id when is_binary(coach_id) and coach_id != "" ->
+        if :coach in MilosTraining.Organizations.member_roles(context.organization_id, coach_id),
+          do: :ok,
+          else: {:error, :not_a_coach}
+
+      _none ->
+        :ok
     end
   end
 
@@ -234,10 +287,11 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, booking} <-
+    with {:ok, booking, _outcome} <-
            ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :approve,
-             admin_message: body["admin_message"] || body[:admin_message]
+             admin_message: body["admin_message"] || body[:admin_message],
+             client_operation_id: body["client_operation_id"] || body[:client_operation_id]
            }) do
       json(conn, %{booking: booking})
     end
@@ -247,10 +301,11 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, booking} <-
+    with {:ok, booking, _outcome} <-
            ResolveBooking.call(conn.assigns.tenant_context, id, %{
              action: :reject,
-             admin_message: body["admin_message"] || body[:admin_message]
+             admin_message: body["admin_message"] || body[:admin_message],
+             client_operation_id: body["client_operation_id"] || body[:client_operation_id]
            }) do
       json(conn, %{booking: booking})
     end

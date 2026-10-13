@@ -19,6 +19,8 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :draft_data, :map
     field :created_by_id, :binary_id
     field :source_workout_id, :binary_id
+    # ADR-125: `personal` copies (member programming) stay out of the library.
+    field :library_visibility, :string, default: "shared"
     field :is_team_workout, :boolean, default: false
     field :subtitle, :string
     field :description, :string

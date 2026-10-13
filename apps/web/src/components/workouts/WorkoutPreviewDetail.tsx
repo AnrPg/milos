@@ -10,6 +10,7 @@ import { semanticLabel } from "@/i18n/presentation";
 import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
+import { hasStructuredContent } from "@/lib/workout-execution-mode";
 
 export type PreviewExercise = {
   id?: string;
@@ -464,7 +465,9 @@ export function WorkoutPreviewDetail({
   });
   const [sectionScales, setSectionScales] = useState<Record<string, string | null>>({});
 
-  if (authoringMode === "free_text") {
+  // Free text is how coaches write; everyone reads the structured workout. The
+  // text is shown only for free-text workouts that have no structure.
+  if (authoringMode === "free_text" && !hasStructuredContent(sections)) {
     const richContent = renderFreeTextDocument(freeTextDocument);
 
     return (

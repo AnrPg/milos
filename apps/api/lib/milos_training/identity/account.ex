@@ -16,6 +16,21 @@ defmodule MilosTraining.Identity.Account do
     # struct so invitation email binding can be checked without reaching for
     # the Ecto schema.
     :email,
-    :inserted_at
+    :inserted_at,
+    completed_tours: []
   ]
+
+  @type t :: %__MODULE__{
+          id: Ecto.UUID.t(),
+          nickname: String.t(),
+          normalized_nickname: String.t() | nil,
+          role: atom(),
+          password_hash: String.t() | nil,
+          calendar_feed_token_version: integer() | nil,
+          security_version: integer() | nil,
+          avatar_url: String.t() | nil,
+          preferred_locale: String.t() | nil,
+          email: String.t() | nil,
+          inserted_at: DateTime.t() | NaiveDateTime.t() | nil
+        }
 end

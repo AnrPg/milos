@@ -134,6 +134,10 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def get_booking_execution_access(_booking_id, _user_id), do: missing_tenant()
 
   @impl true
+  def list_class_history(context, user_id, opts),
+    do: tenant_call(context, :list_class_history, [user_id, opts])
+
+  @impl true
   def record_attendance(context, params), do: tenant_call(context, :record_attendance, [params])
   def record_attendance(_params), do: missing_tenant()
 
@@ -156,10 +160,26 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def create_booking(_user_id, _slot_id, _timeout_minutes), do: missing_tenant()
 
   @impl true
+  def create_booking(context, user_id, slot_id, timeout_minutes, opts),
+    do: tenant_call(context, :create_booking, [user_id, slot_id, timeout_minutes, opts])
+
+  @impl true
+  def get_booking_by_client_operation(context, user_id, client_operation_id),
+    do: tenant_call(context, :get_booking_by_client_operation, [user_id, client_operation_id])
+
+  @impl true
+  def resolve_booking_operation(context, id, params, reconciliation),
+    do: tenant_call(context, :resolve_booking_operation, [id, params, reconciliation])
+
+  @impl true
   def create_approved_booking(context, user_id, slot_id),
     do: tenant_call(context, :create_approved_booking, [user_id, slot_id])
 
   def create_approved_booking(_user_id, _slot_id), do: missing_tenant()
+
+  @impl true
+  def create_approved_booking(context, user_id, slot_id, opts),
+    do: tenant_call(context, :create_approved_booking, [user_id, slot_id, opts])
 
   @impl true
   def approve_booking(context, id, admin_message),
@@ -219,4 +239,24 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def count_classes_today, do: missing_tenant()
 
   defp missing_tenant, do: {:error, :organization_context_required}
+
+  # Phase B (ADR-097)
+  @impl true
+  def create_booking_with(context, user_id, slot_id, timeout_minutes, attrs),
+    do: tenant_call(context, :create_booking_with, [user_id, slot_id, timeout_minutes, attrs])
+
+  @impl true
+  def create_approved_booking_with(context, user_id, slot_id, attrs),
+    do: tenant_call(context, :create_approved_booking_with, [user_id, slot_id, attrs])
+
+  @impl true
+  def create_waitlisted_booking(context, user_id, slot_id, attrs),
+    do: tenant_call(context, :create_waitlisted_booking, [user_id, slot_id, attrs])
+
+  @impl true
+  def list_waitlist(context, slot_id), do: tenant_call(context, :list_waitlist, [slot_id])
+
+  @impl true
+  def promote_waitlisted_booking(context, booking_id),
+    do: tenant_call(context, :promote_waitlisted_booking, [booking_id])
 end

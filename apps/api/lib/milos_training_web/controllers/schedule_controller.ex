@@ -3,10 +3,19 @@ defmodule MilosTrainingWeb.ScheduleController do
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.GetScheduleCalendar
-  alias MilosTraining.Application.SubmitBooking
-  alias MilosTraining.Application.WithdrawBooking
+
+  alias MilosTraining.Application.{
+    CheckInOpenGym,
+    GetScheduleCalendar,
+    JoinClassWaitlist,
+    SubmitBooking,
+    SubmitGuestBooking,
+    WithdrawBooking
+  }
+
+  alias MilosTraining.Facility
   alias MilosTrainingWeb.ParamExtractor
+  alias MilosTrainingWeb.Schemas.Facility, as: FacilitySchemas
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -15,7 +24,10 @@ defmodule MilosTrainingWeb.ScheduleController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:index, :create_booking]
+       [json_render_error_v2: true]
+       when action in [:index, :create_booking, :join_waitlist, :create_guest_booking, :check_in]
+
+  @location_schema FacilitySchemas.location_schema()
 
   @date_param %Parameter{
     name: :start_date,
@@ -75,6 +87,7 @@ defmodule MilosTrainingWeb.ScheduleController do
                type: :array,
                items: %Schema{type: :object, additionalProperties: true}
              },
+             locations: %Schema{type: :array, items: @location_schema},
              slots: %Schema{
                type: :array,
                items: %Schema{type: :object, additionalProperties: true}
@@ -85,29 +98,52 @@ defmodule MilosTrainingWeb.ScheduleController do
     ]
   )
 
+  @booking_response %Schema{
+    type: :object,
+    properties: %{booking: %Schema{type: :object, additionalProperties: true}},
+    required: [:booking]
+  }
+
+  @error_response %Schema{
+    type: :object,
+    properties: %{code: %Schema{type: :string}, error: %Schema{type: :string}}
+  }
+
   operation(:create_booking,
     summary: "Book a schedule slot",
+    description:
+      "Optionally idempotent per `client_operation_id` (ADR-120): replaying the same id for " <>
+        "the same slot returns the original booking with 200 and no new reservation, " <>
+        "notification, or broadcast; reusing it for another slot returns 409 " <>
+        "`idempotency_key_conflict`.",
     request_body: %RequestBody{
       required: true,
       content: %{
         "application/json" => %MediaType{
           schema: %Schema{
             type: :object,
-            properties: %{slot_id: %Schema{type: :string, format: :uuid}},
+            properties: %{
+              slot_id: %Schema{type: :string, format: :uuid},
+              client_operation_id: %Schema{
+                type: :string,
+                format: :uuid,
+                nullable: true,
+                description: "Stable client operation id for offline replay dedupe"
+              }
+            },
             required: [:slot_id]
           }
         }
       }
     },
     responses: [
-      created:
-        {"Booking", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{booking: %Schema{type: :object, additionalProperties: true}},
-           required: [:booking]
-         }},
-      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}}
+      created: {"Booking", "application/json", @booking_response},
+      ok: {"Replayed booking", "application/json", @booking_response},
+      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}},
+      conflict:
+        {"Slot full, already booked, or operation id conflict", "application/json",
+         @error_response},
+      unprocessable_entity: {"Invalid request", "application/json", @error_response}
     ]
   )
 
@@ -119,19 +155,20 @@ defmodule MilosTrainingWeb.ScheduleController do
     end
   end
 
-  def create_booking(conn, %{"slot_id" => slot_id}) do
+  def create_booking(conn, params) do
     actor = GuardianPlug.current_resource(conn)
+    body = conn.body_params |> normalize_body_params(params)
+    slot_id = ParamExtractor.get(body, "slot_id")
+    operation_id = ParamExtractor.get(body, "client_operation_id")
 
-    with {:ok, booking} <- SubmitBooking.call(conn.assigns.tenant_context, actor, slot_id) do
+    with {:ok, booking, outcome} <-
+           SubmitBooking.call(conn.assigns.tenant_context, actor, slot_id,
+             client_operation_id: operation_id
+           ) do
       conn
-      |> put_status(:created)
+      |> put_status(if(outcome == :created, do: :created, else: :ok))
       |> json(%{booking: booking})
     end
-  end
-
-  def create_booking(conn, params) do
-    body = conn.body_params |> normalize_body_params(params)
-    create_booking(conn, %{"slot_id" => body["slot_id"] || body[:slot_id]})
   end
 
   operation(:delete_booking,
@@ -155,11 +192,149 @@ defmodule MilosTrainingWeb.ScheduleController do
     actor = GuardianPlug.current_resource(conn)
 
     case WithdrawBooking.call(conn.assigns.tenant_context, actor.id, booking_id) do
-      {:ok, _booking} -> json(conn, %{ok: true})
-      {:error, :not_found} -> {:error, :not_found}
-      {:error, :forbidden} -> {:error, :forbidden}
-      {:error, :booking_not_withdrawable} -> {:error, :unprocessable_entity}
-      {:error, _} -> {:error, :unprocessable_entity}
+      {:ok, booking} ->
+        json(conn, %{ok: true, late_cancellation: Map.get(booking, :late_cancellation, false)})
+
+      {:error, :not_found} ->
+        {:error, :not_found}
+
+      {:error, :forbidden} ->
+        {:error, :forbidden}
+
+      {:error, _} ->
+        {:error, :unprocessable_entity}
+    end
+  end
+
+  @booking_response %Schema{
+    type: :object,
+    properties: %{booking: %Schema{type: :object, additionalProperties: true}},
+    required: [:booking]
+  }
+
+  operation(:join_waitlist,
+    summary: "Join the waitlist of a full class",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{slot_id: %Schema{type: :string, format: :uuid}},
+            required: [:slot_id]
+          }
+        }
+      }
+    },
+    responses: [
+      created: {"Waitlist entry", "application/json", @booking_response},
+      conflict: {"Class not full or already booked", "application/json", %Schema{type: :object}},
+      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def join_waitlist(conn, _params) do
+    actor = GuardianPlug.current_resource(conn)
+    slot_id = Map.get(conn.body_params, :slot_id)
+
+    with {:ok, entry} <- JoinClassWaitlist.call(conn.assigns.tenant_context, actor, slot_id) do
+      conn
+      |> put_status(:created)
+      |> json(%{booking: entry})
+    end
+  end
+
+  operation(:create_guest_booking,
+    summary: "Book a named guest into a class on a guest pass",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              slot_id: %Schema{type: :string, format: :uuid},
+              guest_name: %Schema{type: :string, minLength: 2, maxLength: 80}
+            },
+            required: [:slot_id, :guest_name]
+          }
+        }
+      }
+    },
+    responses: [
+      created: {"Guest booking", "application/json", @booking_response},
+      conflict:
+        {"Class full or guest already booked", "application/json", %Schema{type: :object}},
+      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def create_guest_booking(conn, _params) do
+    actor = GuardianPlug.current_resource(conn)
+    slot_id = Map.get(conn.body_params, :slot_id)
+    guest_name = Map.get(conn.body_params, :guest_name)
+
+    with {:ok, booking} <-
+           SubmitGuestBooking.call(conn.assigns.tenant_context, actor, slot_id, guest_name) do
+      conn
+      |> put_status(:created)
+      |> json(%{booking: booking})
+    end
+  end
+
+  operation(:locations,
+    summary: "List the gym's locations",
+    responses: [
+      ok:
+        {"Locations", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             locations: %Schema{type: :array, items: @location_schema}
+           },
+           required: [:locations]
+         }}
+    ]
+  )
+
+  def locations(conn, _params) do
+    json(conn, %{locations: Facility.list_locations(conn.assigns.tenant_context)})
+  end
+
+  operation(:check_in,
+    summary: "Check in to open gym",
+    request_body: %RequestBody{
+      required: false,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{location_id: %Schema{type: :string, format: :uuid, nullable: true}}
+          }
+        }
+      }
+    },
+    responses: [
+      created:
+        {"Check-in", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{check_in: FacilitySchemas.check_in_schema()},
+           required: [:check_in]
+         }},
+      forbidden: {"Finance entitlement denied", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def check_in(conn, _params) do
+    actor = GuardianPlug.current_resource(conn)
+    params = %{"location_id" => Map.get(conn.body_params, :location_id)}
+
+    with {:ok, check_in} <-
+           CheckInOpenGym.call(conn.assigns.tenant_context, actor, actor.id, params) do
+      conn
+      |> put_status(:created)
+      |> json(%{check_in: check_in})
     end
   end
 

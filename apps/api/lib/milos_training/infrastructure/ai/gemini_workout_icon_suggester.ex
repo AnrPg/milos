@@ -1,6 +1,6 @@
 defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
   @moduledoc """
-  Asks Google Gemini for one fitting emoji per workout (see ADR-096).
+  Asks Google Gemini for one fitting emoji per workout (see ADR-136).
 
   Optional: without `GEMINI_API_KEY` it returns `{:error, :not_configured}` and
   the library falls back to its keyword rules. Only the workout's title, type,
@@ -27,8 +27,11 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
     config = Application.get_env(:milos_training, :gemini, [])
 
     case Keyword.get(config, :api_key) do
-      key when is_binary(key) and key != "" -> request(key, Keyword.get(config, :model), summary)
-      _missing -> {:error, :not_configured}
+      key when is_binary(key) and key != "" ->
+        request(key, Keyword.get(config, :icon_model), summary)
+
+      _missing ->
+        {:error, :not_configured}
     end
   end
 

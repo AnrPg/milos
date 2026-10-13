@@ -32,12 +32,14 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
     assert {:ok, %{user_id: ^id, executions: [], scores: []}} =
              GetAdminUserTrainingHistory.call(tenant_context, id)
 
-    assert {:ok, %{user_id: ^id, prs: []}} = GetAdminUserPRs.call(tenant_context, id)
+    assert {:ok, %{user_id: ^id, visibility: "coach_role_required", prs: []}} =
+             GetAdminUserPRs.call(tenant_context, id)
+
     assert {:ok, %{user_id: ^id, incidents: []}} = GetAdminUserIncidents.call(tenant_context, id)
     assert {:ok, %{user_id: ^id, threads: []}} = GetAdminUserMessages.call(tenant_context, id)
 
     assert {:ok, %{user_id: ^id, available: false, drill_down: nil}} =
-             GetAdminUserCoachingContext.call(id)
+             GetAdminUserCoachingContext.call(tenant_context, id, %{})
   end
 
   test "finance dossier includes package, referral, and referred-member context" do
@@ -88,9 +90,21 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
 
   test "PR dossier includes every prior result with its beaten date" do
     member = user_fixture(%{role: :member})
+    coach_context = legacy_tenant_context(user_fixture(), :coach)
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: coach_context.organization_id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
 
     assert {:ok, pr} =
-             Pantheon.create_pr(member.id, %{
+             Pantheon.create_record(%{
+               "user_id" => member.id,
+               "organization_id" => coach_context.organization_id,
                "name" => "Back squat",
                "current_score" => 100,
                "unit" => "kg",
@@ -105,7 +119,9 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
                "beaten_on" => ~D[2026-07-17]
              })
 
-    assert {:ok, %{prs: [%{history: [history]}]}} = GetAdminUserPRs.call(member.id)
+    assert {:ok, %{visibility: "coach", prs: [%{history: [history]}]}} =
+             GetAdminUserPRs.call(coach_context, member.id)
+
     assert history.beaten_on == "2026-07-01"
     assert Decimal.equal?(Decimal.new(to_string(history.score)), 100)
   end
@@ -114,13 +130,14 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
     missing_id = Ecto.UUID.generate()
     tenant_context = legacy_tenant_context(admin_fixture())
 
+    assert {:error, :not_found} = GetAdminUserPRs.call(tenant_context, missing_id)
+
     for service <- [
           GetAdminUserTrainingHistory,
-          GetAdminUserPRs,
           GetAdminUserIncidents,
           GetAdminUserMessages
         ] do
-      assert {:error, :not_found} = service.call(missing_id)
+      assert {:error, :not_found} = service.call(tenant_context, missing_id)
     end
 
     assert {:error, :not_found} =
@@ -130,10 +147,11 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
                Organizations.legacy_organization_slug()
              )
 
-    assert {:error, :not_found} = GetAdminUserCoachingContext.call(missing_id)
+    assert {:error, :not_found} =
+             GetAdminUserCoachingContext.call(tenant_context, missing_id, %{})
   end
 
-  defp legacy_tenant_context(user) do
+  defp legacy_tenant_context(user, role \\ :owner) do
     {:ok, organization} =
       Organizations.create_organization(%{
         name: "Dossier Test Gym #{System.unique_integer([:positive])}"
@@ -143,7 +161,7 @@ defmodule MilosTraining.Application.AdminUserDossierTest do
       Organizations.add_membership(%{
         organization_id: organization.id,
         user_id: user.id,
-        role: :owner,
+        role: role,
         status: :active,
         joined_at: DateTime.utc_now()
       })

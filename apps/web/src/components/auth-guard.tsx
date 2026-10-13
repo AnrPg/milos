@@ -53,7 +53,9 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
 
   useEffect(() => {
     if (status === "guest") {
-      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+      // Keep the query string so links such as a company enrollment link
+      // (ADR-098) survive signing in.
+      router.replace(`/login?next=${encodeURIComponent(pathname + window.location.search)}`);
       return;
     }
 

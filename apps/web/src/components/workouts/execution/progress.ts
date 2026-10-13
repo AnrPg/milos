@@ -109,15 +109,33 @@ function exerciseSetCount(exercise: TimerSegment["exercises"][number]) {
   return exercise.sets && exercise.sets > 1 ? exercise.sets : 1;
 }
 
+const ROUND_COUNTING_FORMATS = [
+  "amrap",
+  "edt",
+  "death_by",
+  "ladder_ascending",
+  "ladder_descending",
+  "pyramid",
+];
+
+/**
+ * Segments where the athlete repeats the same list and counts rounds: AMRAP
+ * style formats, ladders, open-ended interval cycles (Death By, EMOM to
+ * failure) and "N rounds for time".
+ */
 export function isRepeatableSegment(segment: TimerSegment) {
-  return [
-    "amrap",
-    "edt",
-    "death_by",
-    "ladder_ascending",
-    "ladder_descending",
-    "pyramid",
-  ].includes(segment.format);
+  return (
+    ROUND_COUNTING_FORMATS.includes(segment.format) ||
+    segment.kind === "interval_cycle" ||
+    roundTarget(segment) !== null
+  );
+}
+
+/** Rounds to complete before the segment is done ("5 rounds for time"). */
+export function roundTarget(segment: TimerSegment) {
+  return segment.format === "for_time" && segment.total_rounds && segment.total_rounds > 1
+    ? segment.total_rounds
+    : null;
 }
 
 export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
@@ -126,6 +144,44 @@ export function shouldAutoAdvanceOnChecklistComplete(segment: TimerSegment) {
   }
 
   return segment.kind === "countup" || segment.kind === "manual" || segment.kind === "no_timer";
+}
+
+/**
+ * Exercises of an interval cycle shown in a given window. Exercises assigned to
+ * minute N of a rotation repeat every rotation (the authored interval pattern
+ * length, else the highest assignment); unassigned ones appear every window.
+ */
+export function stepsForWindow(segment: TimerSegment, windowIndex: number | null) {
+  const steps = buildSegmentStepDefinitions(segment);
+  if (windowIndex === null || segment.kind !== "interval_cycle") return steps;
+
+  const pattern = segment.timer_config?.interval_pattern_seconds;
+  const assignments = segment.exercises
+    .map((exercise) => exercise.interval_assignment ?? 0)
+    .filter((assignment) => assignment > 0);
+  const rotation = Array.isArray(pattern) && pattern.length > 0 ? pattern.length : Math.max(0, ...assignments);
+  if (rotation === 0) return steps;
+
+  const slot = ((windowIndex - 1) % rotation) + 1;
+  return steps.filter(
+    (step) => step.exercise.interval_assignment == null || step.exercise.interval_assignment === slot,
+  );
+}
+
+/** Reps each exercise targets in a round of a growing/shrinking format. */
+export function targetRepsForRound(segment: TimerSegment, round: number) {
+  return repsForRound(segment, round);
+}
+
+/**
+ * Whether the segment at `index` is the last one emitted for its section.
+ * Interval formats (Tabata, EMOM, Billat, Cluster…) split one section into many
+ * segments; score capture belongs at the end of the section, not every interval.
+ */
+export function isLastSegmentOfSection(segments: TimerSegment[], index: number) {
+  const segment = segments[index];
+  if (!segment) return false;
+  return segments[index + 1]?.section_id !== segment.section_id;
 }
 
 export function formatDurationMs(totalMs: number) {
@@ -321,4 +377,35 @@ function formatRoundsReps(rounds: number, reps: number) {
   if (rounds <= 0) return `${reps} reps`;
   if (reps <= 0) return `${rounds} rounds`;
   return `${rounds} rounds + ${reps} reps`;
+}
+
+/**
+ * Seconds of rest to count down after checking off `stepId` in a straight-set
+ * workout: the exercise's prescribed rest between sets, after every set but
+ * the last. In a superset or alternating group the rest follows the group's
+ * last member of that set, using the longest rest any member prescribes.
+ * Timed and interval formats already schedule their own rests.
+ */
+export function setRestSeconds(segment: TimerSegment, stepId: string): number | null {
+  if (segment.format !== "untimed" || segment.kind !== "no_timer") return null;
+
+  const steps = buildSegmentStepDefinitions(segment);
+  const index = steps.findIndex((step) => step.stepId === stepId);
+  const step = steps[index];
+  if (!step) return null;
+
+  const sameBlock = (candidate: SegmentStepDefinition) =>
+    step.groupId ? candidate.groupId === step.groupId : candidate.exercise.id === step.exercise.id;
+  const block = steps.filter(sameBlock);
+  const lastSetNumber = Math.max(...block.map((candidate) => candidate.setNumber));
+  if (step.setNumber >= lastSetNumber) return null;
+
+  // Rest only once the whole set of a group is done.
+  const laterInSet = steps
+    .slice(index + 1)
+    .some((candidate) => sameBlock(candidate) && candidate.setNumber === step.setNumber);
+  if (laterInSet) return null;
+
+  const rest = Math.max(0, ...block.map((candidate) => candidate.exercise.rest_seconds ?? 0));
+  return rest > 0 ? rest : null;
 }

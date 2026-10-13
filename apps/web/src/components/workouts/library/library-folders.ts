@@ -2,7 +2,16 @@ import type { WorkoutFolder, WorkoutRecord } from "@/api/workouts";
 import type { WorkoutType } from "@/types/workout";
 
 /** Folders the app maintains are recognised by their `system_key`, never by name. */
-export type FolderKind = "athletes" | "athlete" | "classes" | "year" | "month" | "day" | "custom";
+export type FolderKind =
+  | "athletes"
+  | "athlete"
+  | "classes"
+  | "year"
+  | "month"
+  | "day"
+  | "memberVariations"
+  | "memberVariation"
+  | "custom";
 
 export const FOLDER_KIND_ICONS: Record<FolderKind, string> = {
   athletes: "👥",
@@ -12,6 +21,8 @@ export const FOLDER_KIND_ICONS: Record<FolderKind, string> = {
   year: "🗂️",
   month: "🗂️",
   day: "🗂️",
+  memberVariations: "🧬",
+  memberVariation: "🙋",
   custom: "📁",
 };
 
@@ -88,6 +99,8 @@ export function folderKind(folder: Pick<WorkoutFolder, "system_key">): FolderKin
   if (key === "athletes") return "athletes";
   if (key.startsWith("athlete:")) return "athlete";
   if (key === "classes") return "classes";
+  if (key === "member_variations") return "memberVariations";
+  if (key.startsWith("member_variations:")) return "memberVariation";
   if (/^classes:\d{4}$/.test(key)) return "year";
   if (/^classes:\d{4}-\d{2}$/.test(key)) return "month";
   if (/^classes:\d{4}-\d{2}-\d{2}$/.test(key)) return "day";
@@ -102,6 +115,8 @@ function defaultSystemName(folder: WorkoutFolder): string | null {
       return "Athletes";
     case "classes":
       return "Classes";
+    case "memberVariations":
+      return "Variations for member";
     case "year":
       return key.slice(8, 12);
     case "month":
@@ -115,7 +130,7 @@ function defaultSystemName(folder: WorkoutFolder): string | null {
 
 export function folderDisplayName(
   folder: WorkoutFolder,
-  labels: { athletes: string; classes: string },
+  labels: { athletes: string; classes: string; memberVariations?: string },
   locale?: string,
 ) {
   if (defaultSystemName(folder) !== folder.name) return folder.name;
@@ -126,6 +141,8 @@ export function folderDisplayName(
       return labels.athletes;
     case "classes":
       return labels.classes;
+    case "memberVariations":
+      return labels.memberVariations ?? folder.name;
     case "month": {
       const date = new Date(Date.UTC(Number(key.slice(8, 12)), Number(key.slice(13, 15)) - 1, 15));
       return capitalize(new Intl.DateTimeFormat(locale, { month: "long", timeZone: "UTC" }).format(date), locale);
@@ -139,11 +156,11 @@ export function folderDisplayName(
   }
 }
 
-const ROOT_ORDER: Partial<Record<FolderKind, number>> = { athletes: 0, classes: 1 };
+const ROOT_ORDER: Partial<Record<FolderKind, number>> = { athletes: 0, classes: 1, memberVariations: 2 };
 
-/** Athletes and Classes first, then natural name order (so "2" sorts before "10"). */
+/** Athletes, Classes and Variations for member first, then natural name order (so "2" sorts before "10"). */
 export function compareFolders(a: WorkoutFolder, b: WorkoutFolder) {
-  const rank = (folder: WorkoutFolder) => ROOT_ORDER[folderKind(folder)] ?? 2;
+  const rank = (folder: WorkoutFolder) => ROOT_ORDER[folderKind(folder)] ?? 3;
   return rank(a) - rank(b) || a.name.localeCompare(b.name, undefined, { numeric: true, sensitivity: "base" });
 }
 

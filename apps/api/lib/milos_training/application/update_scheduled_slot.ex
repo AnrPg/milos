@@ -1,5 +1,11 @@
 defmodule MilosTraining.Application.UpdateScheduledSlot do
-  alias MilosTraining.Application.{ClassWorkoutFiling, ScheduleRealtime}
+  alias MilosTraining.Application.{
+    ClassLocation,
+    ClassWorkoutFiling,
+    PromoteClassWaitlist,
+    ScheduleRealtime
+  }
+
   alias MilosTraining.Scheduling
   alias MilosTraining.Workouts
 
@@ -9,6 +15,7 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
 
     with {:ok, _workout} <- fetch_workout(context, master_workout_id),
          {:ok, _class_type} <- fetch_class_type(context, class_type_id),
+         :ok <- ClassLocation.check(context, params),
          {:ok, slot} <-
            ClassWorkoutFiling.with_filed_workout(
              context,
@@ -17,6 +24,8 @@ defmodule MilosTraining.Application.UpdateScheduledSlot do
              current_workout_id(context, id)
            ) do
       broadcast_slot_updated(slot)
+      # A larger capacity may admit waitlisted members (ADR-097).
+      PromoteClassWaitlist.call(context, slot.id)
       {:ok, slot}
     else
       {:error, reason} -> {:error, reason}

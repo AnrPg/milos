@@ -7,6 +7,7 @@ defmodule MilosTraining.Wellbeing.Ports.WellbeingStore do
 
   @callback get_injury_for_user(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil
   @callback list_injuries_for_user(Ecto.UUID.t()) :: [map()]
+  @callback list_active_tenant_injuries_for_users([Ecto.UUID.t()]) :: [map()]
   @callback list_injuries(map()) :: [map()]
   @callback injury_summary(map()) :: map()
 end

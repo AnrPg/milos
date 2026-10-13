@@ -21,7 +21,7 @@ defmodule MilosTraining.Execution.Domain.ProgressValidator do
          :ok <- validate_map(progress.section_elapsed_ms, section_ids, @max_elapsed_ms),
          :ok <- validate_map(progress.segment_cycle_counts, segment_keys, @max_cycles),
          :ok <- validate_scores(value(progress, :section_scores, []), section_ids),
-         :ok <- validate_monotonic(progress, previous) do
+         :ok <- validate_monotonic(progress, previous, segments) do
       :ok
     else
       _ -> {:error, :bad_request}
@@ -95,14 +95,18 @@ defmodule MilosTraining.Execution.Domain.ProgressValidator do
   defp valid_optional_string?(value, maximum),
     do: is_binary(value) and byte_size(value) <= maximum
 
-  defp validate_monotonic(progress, previous) do
+  # Free-text workouts have no timer segments and no section time to protect;
+  # their single clock may be reset by the athlete, so it may go back.
+  defp validate_monotonic(_progress, _previous, []), do: :ok
+
+  defp validate_monotonic(progress, previous, _segments) do
     previous_total = previous[:total_elapsed_ms] || previous["total_elapsed_ms"] || 0
     previous_sections = previous[:section_elapsed_ms] || previous["section_elapsed_ms"] || %{}
-    previous_cycles = previous[:segment_cycle_counts] || previous["segment_cycle_counts"] || %{}
 
+    # Round counts may go down: athletes undo an accidental "+1 round". Elapsed
+    # time only ever grows; concurrent writers are rejected by lock_version.
     if progress.total_elapsed_ms >= previous_total and
-         map_does_not_regress?(progress.section_elapsed_ms, previous_sections) and
-         map_does_not_regress?(progress.segment_cycle_counts, previous_cycles) do
+         map_does_not_regress?(progress.section_elapsed_ms, previous_sections) do
       :ok
     else
       :error

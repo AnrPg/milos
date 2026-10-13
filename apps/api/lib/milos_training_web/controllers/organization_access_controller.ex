@@ -5,9 +5,13 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
   alias Guardian.Plug, as: GuardianPlug
 
   alias MilosTraining.Application.{
+    InspectOrganizationJoinLink,
     InspectRegistrationInvitation,
     IssueRegistrationInvitation,
+    JoinOrganizationByLink,
+    ListOrganizationInvitations,
     ListOrganizationMemberships,
+    ManageOrganizationJoinLink,
     RedeemRegistrationInvitation,
     RevokeRegistrationInvitation
   }
@@ -81,10 +85,18 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       role: %Schema{type: :string},
+      roles: %Schema{type: :array, items: %Schema{type: :string}},
+      coach_scope: %Schema{type: :string, enum: ["own", "all"]},
+      notes_visible_to_admins: %Schema{type: :boolean, description: "ADR-101"},
+      capabilities: %Schema{
+        type: :object,
+        description: "capability => scope (all, own, status), ADR-099",
+        additionalProperties: %Schema{type: :string}
+      },
       organization: @organization_schema,
       settings: @organization_settings_schema
     },
-    required: [:id, :role, :organization]
+    required: [:id, :role, :roles, :capabilities, :organization]
   }
 
   # Keep CastAndValidate on the body-only unauthenticated invitation endpoints.
@@ -146,6 +158,152 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     parameters: [@organization_slug_parameter, @invitation_id_parameter],
     responses: [no_content: {"Revoked", nil, nil}]
   )
+
+  @pending_invitation_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      role: %Schema{type: :string},
+      expires_at: %Schema{type: :string, format: :date_time},
+      issued_at: %Schema{type: :string, format: :date_time},
+      email_bound: %Schema{type: :boolean}
+    },
+    required: [:id, :role, :expires_at, :issued_at, :email_bound]
+  }
+
+  @join_link_schema %Schema{
+    type: :object,
+    properties: %{
+      enabled: %Schema{type: :boolean},
+      role: %Schema{type: :string, enum: ~w(member athlete)}
+    },
+    required: [:enabled, :role]
+  }
+
+  @public_join_link_schema %Schema{
+    type: :object,
+    properties: %{
+      organization: @organization_schema,
+      role: %Schema{type: :string, enum: ~w(member athlete)},
+      settings: @organization_settings_schema
+    },
+    required: [:organization, :role]
+  }
+
+  @public_slug_parameter %Parameter{
+    name: :slug,
+    in: :path,
+    required: true,
+    schema: %Schema{type: :string}
+  }
+
+  operation(:list_invitations,
+    summary: "List pending invitations of the organization",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter],
+    responses: [
+      ok:
+        {"Pending invitations", "application/json",
+         %Schema{type: :array, items: @pending_invitation_schema}}
+    ]
+  )
+
+  operation(:show_join_link,
+    summary: "Get the organization's public join link settings",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter],
+    responses: [ok: {"Join link", "application/json", @join_link_schema}]
+  )
+
+  operation(:update_join_link,
+    summary: "Enable, disable or change the role of the public join link",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@organization_slug_parameter],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              enabled: %Schema{type: :boolean},
+              role: %Schema{type: :string, enum: ~w(member athlete)}
+            }
+          }
+        }
+      }
+    },
+    responses: [ok: {"Join link", "application/json", @join_link_schema}]
+  )
+
+  operation(:inspect_join_link,
+    summary: "Public: describe the organization behind a join link",
+    parameters: [@public_slug_parameter],
+    responses: [ok: {"Join link", "application/json", @public_join_link_schema}]
+  )
+
+  operation(:join,
+    summary: "Join an organization through its public join link",
+    security: [%{"bearerAuth" => []}],
+    parameters: [@public_slug_parameter],
+    responses: [
+      ok: {"Already a member", "application/json", @membership_schema},
+      created: {"Membership", "application/json", @membership_schema}
+    ]
+  )
+
+  def list_invitations(conn, _params) do
+    with {:ok, invitations} <- ListOrganizationInvitations.call(conn.assigns.tenant_context) do
+      json(conn, Enum.map(invitations, &serialize_pending_invitation/1))
+    end
+  end
+
+  def show_join_link(conn, _params) do
+    with {:ok, join_link} <- ManageOrganizationJoinLink.get(conn.assigns.tenant_context) do
+      json(conn, join_link)
+    end
+  end
+
+  def update_join_link(conn, _params) do
+    with {:ok, join_link} <-
+           ManageOrganizationJoinLink.update(conn.assigns.tenant_context, conn.body_params) do
+      json(conn, join_link)
+    end
+  end
+
+  def inspect_join_link(conn, %{"slug" => slug}) do
+    with {:ok, link} <- InspectOrganizationJoinLink.call(slug) do
+      json(conn, %{
+        organization: %{
+          id: link.organization.id,
+          name: link.organization.name,
+          slug: link.organization.slug
+        },
+        role: link.role,
+        settings: serialize_settings(link.settings)
+      })
+    end
+  end
+
+  def join(conn, %{"slug" => slug}) do
+    user = GuardianPlug.current_resource(conn)
+
+    with {:ok, result} <- JoinOrganizationByLink.call(user, slug) do
+      conn
+      |> put_status(if(result.created, do: :created, else: :ok))
+      |> json(serialize_membership(result))
+    end
+  end
+
+  defp serialize_pending_invitation(invitation) do
+    %{
+      id: invitation.id,
+      role: to_string(invitation.role),
+      expires_at: invitation.expires_at,
+      issued_at: invitation.inserted_at,
+      email_bound: not is_nil(invitation.intended_email_digest)
+    }
+  end
 
   def inspect(conn, _params) do
     with {:ok, invitation} <-
@@ -211,10 +369,23 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     %{
       id: membership.id,
       role: to_string(membership.role),
+      roles: Enum.map(membership.roles, &to_string/1),
+      coach_scope: to_string(membership.coach_scope),
+      notes_visible_to_admins: membership.notes_visible_to_admins != false,
+      capabilities:
+        membership.roles
+        |> MilosTraining.Organizations.capabilities_for(
+          membership.coach_scope,
+          role_grants(Map.get(entry, :settings))
+        )
+        |> Map.new(fn {capability, scope} -> {to_string(capability), to_string(scope)} end),
       organization: %{id: organization.id, name: organization.name, slug: organization.slug},
       settings: serialize_settings(Map.get(entry, :settings))
     }
   end
+
+  defp role_grants(%{settings: %{"role_grants" => grants}}) when is_map(grants), do: grants
+  defp role_grants(_settings), do: %{}
 
   defp serialize_settings(nil), do: nil
 

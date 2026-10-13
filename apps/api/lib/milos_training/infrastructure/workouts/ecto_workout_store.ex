@@ -12,6 +12,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     ScaleLevel,
     Workouts.AssignedWorkout,
     Workouts.AssignedWorkoutAthlete,
+    Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.WorkoutAuthoring,
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
@@ -243,6 +244,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   def list_workouts do
     MasterWorkout
     |> scoped_to_tenant()
+    # ADR-125: member-programming copies are personal, not library entries.
+    |> where([workout], workout.library_visibility == "shared")
     |> order_by([workout], desc: workout.inserted_at)
     |> Repo.all()
     |> Repo.preload(@workout_preloads)
@@ -421,7 +424,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
       workout ->
         workout
-        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id])
+        |> Ecto.Changeset.cast(params, [:folder_id, :source_workout_id, :library_visibility])
+        |> Ecto.Changeset.validate_inclusion(:library_visibility, ["shared", "personal"])
         |> Ecto.Changeset.foreign_key_constraint(:folder_id)
         |> Ecto.Changeset.foreign_key_constraint(:source_workout_id)
         |> Repo.update()
@@ -450,9 +454,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
+  # Scale levels are tenant-owned (ADR-128). Every query is filtered to the
+  # session's organization on top of RLS, and writes fail closed without one.
   @impl true
   def list_scale_levels do
     ScaleLevel
+    |> scoped_to_tenant()
     |> where([scale_level], scale_level.is_active == true)
     |> order_by([scale_level], asc: scale_level.sort_order)
     |> Repo.all()
@@ -461,19 +468,53 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
   @impl true
   def replace_scale_levels(levels) when is_list(levels) do
-    cleaned_levels =
-      levels
-      |> Enum.map(&normalize_scale_level_params/1)
-      |> Enum.reject(&blank_scale_level?/1)
+    with {:ok, organization_id} <- current_organization_id() do
+      cleaned_levels =
+        levels
+        |> Enum.map(&normalize_scale_level_params/1)
+        |> Enum.reject(&blank_scale_level?/1)
 
-    changeset =
-      Ecto.Changeset.change(%ScaleLevel{})
-      |> validate_scale_level_list(cleaned_levels)
+      changeset =
+        Ecto.Changeset.change(%ScaleLevel{})
+        |> validate_scale_level_list(cleaned_levels)
 
-    if changeset.valid? do
-      do_replace_scale_levels(cleaned_levels)
-    else
-      {:error, changeset}
+      if changeset.valid? do
+        do_replace_scale_levels(organization_id, cleaned_levels)
+      else
+        {:error, changeset}
+      end
+    end
+  end
+
+  @impl true
+  def ensure_default_scale_levels(levels) when is_list(levels) do
+    with {:ok, organization_id} <- current_organization_id() do
+      Repo.transaction(fn ->
+        existing? = ScaleLevel |> scoped_to_tenant() |> Repo.exists?()
+
+        unless existing? do
+          Enum.each(levels, fn level ->
+            %ScaleLevel{}
+            |> ScaleLevel.changeset(
+              Map.merge(level, %{organization_id: organization_id, is_active: true})
+            )
+            |> Repo.insert()
+            |> case do
+              {:ok, _level} -> :ok
+              {:error, changeset} -> Repo.rollback(changeset)
+            end
+          end)
+        end
+
+        list_scale_levels()
+      end)
+    end
+  end
+
+  defp current_organization_id do
+    case RepoContext.current_setting("app.organization_id") do
+      organization_id when is_binary(organization_id) -> {:ok, organization_id}
+      _no_tenant_context -> {:error, :organization_context_required}
     end
   end
 
@@ -492,7 +533,23 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
         admin_notes = normalize_admin_notes_input(params)
 
-        case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+        source_slot_id =
+          Map.get(params, :source_scheduled_class_id) ||
+            Map.get(params, "source_scheduled_class_id")
+
+        # ADR-125: an assignment only absorbs a new one with the same workout,
+        # date and notes when both share the same source slot, so a class
+        # variant never silently loses (or gains) its class link.
+        existing =
+          case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+            %AssignedWorkout{source_scheduled_class_id: ^source_slot_id} = assignment ->
+              assignment
+
+            _other ->
+              nil
+          end
+
+        case existing do
           nil ->
             %AssignedWorkout{}
             |> AssignedWorkout.changeset(params)
@@ -615,6 +672,63 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   @impl true
+  def list_class_variants([], _assignee_id), do: []
+
+  def list_class_variants(slot_ids, assignee_id) when is_list(slot_ids) do
+    # ADR-125: live per-member variants of the given class occurrences. With an
+    # assignee id only that user's variants are returned (the member's own
+    # "Your version"); with nil every assignee's (the staff view).
+    variants =
+      AssignedWorkout
+      |> scoped_to_tenant()
+      |> join(:inner, [assignment], link in AssignedWorkoutAthlete,
+        on: link.assigned_workout_id == assignment.id
+      )
+      |> where(
+        [assignment, link],
+        assignment.source_scheduled_class_id in ^slot_ids and
+          (is_nil(link.athlete_status) or link.athlete_status == :accepted)
+      )
+      |> maybe_scope_variant_assignee(assignee_id)
+      |> order_by([assignment, _link], asc: assignment.inserted_at)
+      |> select([assignment, link], {assignment, link})
+      |> Repo.all()
+      |> Enum.map(fn {assignment, link} ->
+        assignment = Repo.preload(assignment, master_workout: @workout_preloads)
+
+        %{
+          assignment_id: assignment.id,
+          source_slot_id: assignment.source_scheduled_class_id,
+          assignee_id: link.athlete_id,
+          assignee_status: link.athlete_status && to_string(link.athlete_status),
+          scheduled_for: Date.to_iso8601(link.scheduled_for),
+          master_workout_id: assignment.master_workout_id,
+          workout: normalize_assigned_workout(assignment.master_workout)
+        }
+      end)
+
+    attach_variant_completion(variants, assignee_id)
+  end
+
+  defp maybe_scope_variant_assignee(query, nil), do: query
+
+  defp maybe_scope_variant_assignee(query, assignee_id),
+    do: where(query, [_assignment, link], link.athlete_id == ^assignee_id)
+
+  defp attach_variant_completion(variants, nil), do: variants
+
+  defp attach_variant_completion(variants, assignee_id) do
+    completion_map =
+      fetch_completed_assignment_executions(assignee_id, Enum.map(variants, & &1.assignment_id))
+
+    Enum.map(variants, fn variant ->
+      if Map.has_key?(completion_map, variant.assignment_id),
+        do: Map.put(variant, :execution_status, "completed"),
+        else: variant
+    end)
+  end
+
+  @impl true
   def list_workout_change_targets(workout_id) do
     AssignedWorkout
     |> where([assignment], assignment.master_workout_id == ^workout_id)
@@ -674,12 +788,15 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
-  defp do_replace_scale_levels(levels) do
+  defp do_replace_scale_levels(organization_id, levels) do
     now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    tenant_levels =
+      from(scale_level in ScaleLevel, where: scale_level.organization_id == ^organization_id)
 
     Multi.new()
     |> Multi.run(:existing, fn repo, _changes ->
-      {:ok, repo.all(from(scale_level in ScaleLevel))}
+      {:ok, repo.all(tenant_levels)}
     end)
     |> Multi.run(:guard_removals, fn repo, %{existing: existing} ->
       requested_slugs = MapSet.new(Enum.map(levels, & &1.slug))
@@ -693,7 +810,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         else
           repo.aggregate(
             from(variation in ExerciseVariation,
-              where: variation.scale_level_id in ^removable_ids
+              where:
+                variation.organization_id == ^organization_id and
+                  variation.scale_level_id in ^removable_ids
             ),
             :count
           )
@@ -740,7 +859,9 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
               case Map.get(existing_by_slug, level_params.slug) do
                 nil ->
                   %ScaleLevel{}
-                  |> ScaleLevel.changeset(Map.put(level_params, :is_active, true))
+                  |> ScaleLevel.changeset(
+                    Map.merge(level_params, %{organization_id: organization_id, is_active: true})
+                  )
                   |> repo.insert()
 
                 %ScaleLevel{} = scale_level ->
@@ -765,7 +886,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end)
     |> Multi.run(:normalize, fn repo, _changes ->
       levels =
-        repo.all(from scale_level in ScaleLevel, order_by: [asc: scale_level.sort_order])
+        repo.all(from scale_level in tenant_levels, order_by: [asc: scale_level.sort_order])
         |> Enum.map(&normalize_scale_level/1)
         |> Enum.map(fn level -> Map.put(level, :updated_at, now) end)
 
@@ -948,6 +1069,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       admin_notes: assignment.admin_notes,
       inserted_at: assignment.inserted_at,
       athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
+      source_slot_id: assignment.source_scheduled_class_id,
+      assignment_kind: AssignmentAudiencePolicy.kind(assignment.source_scheduled_class_id),
       workout: normalize_assigned_workout(assignment.master_workout)
     }
   end
@@ -1894,7 +2017,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
           athlete_scheduled_for:
             Map.new(assignment.athlete_links, &{&1.athlete_id, &1.scheduled_for}),
-          scheduled_for: assignment.scheduled_for
+          scheduled_for: assignment.scheduled_for,
+          source_slot_id: assignment.source_scheduled_class_id
         }
     end
   end

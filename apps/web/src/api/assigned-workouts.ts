@@ -67,6 +67,10 @@ export type AssignedWorkoutRecord = {
   my_athlete_status?: "accepted" | "rejected" | null;
   execution_status?: "completed" | null;
   execution_scores?: SectionScore[];
+  /** ADR-125: a personal workout, or one member's version of a class. */
+  assignment_kind?: "personal" | "class_variant";
+  /** ADR-125: the class occurrence a class variant belongs to. */
+  source_slot_id?: string | null;
 };
 
 export type AssignedWorkoutWeek = {
@@ -77,9 +81,12 @@ export type AssignedWorkoutWeek = {
 
 export type AssignWorkoutPayload = {
   master_workout_id: string;
+  /** Assignee user ids: athletes or (ADR-125) entitled members. */
   athlete_ids: string[];
   scheduled_for: string;
   admin_notes?: string;
+  /** ADR-125: makes the assignment one member's version of this class. */
+  source_slot_id?: string;
 };
 
 export type UpdateAssignedWorkoutPayload = {
@@ -131,6 +138,22 @@ export async function deleteAssignedWorkout(token: string, assignmentId: string)
     method: "DELETE",
     token,
   });
+}
+
+/**
+ * Analytics (ADR-123): the athlete opened an assignment's detail. Recorded at
+ * most once per athlete, assignment and day server-side; best effort, never
+ * throws.
+ */
+export async function reportAssignmentOpened(token: string, assignmentId: string) {
+  try {
+    await apiRequest(`/my-workouts/assignments/${assignmentId}/open`, {
+      method: "POST",
+      token,
+    });
+  } catch {
+    // Analytics must never affect the assignment view.
+  }
 }
 
 export async function rejectAssignment(token: string, assignmentId: string) {
@@ -210,11 +233,20 @@ export async function sendAssignmentMessage(token: string, assignmentId: string,
   });
 }
 
-export async function listAthletes(token: string, query?: string) {
+export async function listAthletes(
+  token: string,
+  query?: string,
+  options: { includeMembers?: boolean } = {},
+) {
   const search = new URLSearchParams();
 
   if (query && query.trim()) {
     search.set("q", query.trim());
+  }
+
+  // ADR-125: members can receive personal programming when their package allows it.
+  if (options.includeMembers) {
+    search.set("include_members", "true");
   }
 
   const suffix = search.toString() ? `?${search.toString()}` : "";

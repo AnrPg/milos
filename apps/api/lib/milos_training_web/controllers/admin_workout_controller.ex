@@ -291,7 +291,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
   )
 
   def reopen(conn, %{"id" => id}) do
-    case ReopenWorkout.call(id) do
+    case ReopenWorkout.call(conn.assigns.tenant_context, id) do
       {:ok, draft} -> json(conn, %{draft: draft})
       {:error, :not_found} -> {:error, :not_found}
       {:error, :not_published} -> {:error, :unprocessable_entity}
@@ -385,7 +385,7 @@ defmodule MilosTrainingWeb.AdminWorkoutController do
       slot_id: Map.get(conn.body_params, "slot_id")
     ]
 
-    case DuplicateWorkout.call(id, opts) do
+    case DuplicateWorkout.call(conn.assigns.tenant_context, id, opts) do
       {:ok, draft} ->
         conn
         |> put_status(:created)

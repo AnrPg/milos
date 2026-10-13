@@ -8,37 +8,52 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchFinanceQueues, fetchFinanceSummary, type FinanceRecord } from "@/api/finance";
+import { fetchFinanceQueues, fetchFinanceSummary, fetchPackageCatalog, type FinanceRecord } from "@/api/finance";
+import { AccountingTab } from "@/components/admin/finance/tabs/AccountingTab";
+import { moduleEnabled } from "@/components/admin/finance/packages/package-catalog";
+import { CorporateTab } from "@/components/admin/finance/tabs/CorporateTab";
 import { MembersTab } from "@/components/admin/finance/tabs/MembersTab";
 import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
 import { QueuesTab } from "@/components/admin/finance/tabs/QueuesTab";
 import { ReferralsTab } from "@/components/admin/finance/tabs/ReferralsTab";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
-type Tab = "members" | "packages" | "promotions" | "referrals" | "queues";
+type Tab = "members" | "packages" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
 
 export function FinanceOperations() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const accountingT = useTranslations("FinanceAccounting");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { tokens } = useSession();
+  const organizationSlug = useOrganizationSlug();
+  const token = tokens?.access_token;
+  // ADR-098: the Corporate tab appears once the corporate_clients module is on.
+  const catalogQuery = useQuery({
+    queryKey: ["admin", "finance", "package-catalog"],
+    enabled: Boolean(token),
+    queryFn: () => fetchPackageCatalog(token!),
+    staleTime: 60_000,
+  });
+  const corporateEnabled = catalogQuery.data ? moduleEnabled(catalogQuery.data, "corporate_clients") : false;
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: "members", label: i18n("members1cb449c") },
     { id: "packages", label: i18n("packages0a99901") },
     { id: "promotions", label: i18n("promotions086e09b") },
     { id: "referrals", label: i18n("referrals2b0e3a3") },
     { id: "queues", label: i18n("queues83dbc32") },
+    { id: "accounting", label: accountingT("tab") },
+    ...(corporateEnabled ? [{ id: "corporate" as const, label: i18n("stfTabCorporate") }] : []),
   ];
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const { tokens } = useSession();
-  const organizationSlug = useOrganizationSlug();
-  const token = tokens?.access_token;
   const requestedTab = searchParams.get("tab");
   const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
 
@@ -87,28 +102,14 @@ export function FinanceOperations() {
       <div className="mx-auto max-w-7xl space-y-8">
 
         {/* Hero */}
-        <TransientHero label={i18n("financeOperationsIntroduction1d3b6fc")} timeoutMs={3000}>
-        <section className="rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>{i18n("finance1b48d3f")}</p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight md:text-4xl" style={{ color: "var(--text)" }}>
-                {i18n("financeOperations60f9e5a")}
-              </h1>
-              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>
-                {i18n("manageMembersPackagesPromotionsReferralsAndOperationalQueues9eab02d")}
-              </p>
-            </div>
-            <Link
-              href={adminHref("/admin/metrics/finance", organizationSlug)}
-              className="rounded-2xl px-5 py-3 text-sm font-semibold text-center self-start"
-              style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
-            >
+        <PageHeader
+          title={i18n("financeOperations60f9e5a")}
+          actions={
+            <Link href={adminHref("/admin/metrics/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
               {i18n("financeAnalytics271fe3b")}
             </Link>
-          </div>
-        </section>
-        </TransientHero>
+          }
+        />
 
         {summaryQuery.isLoading || queuesQuery.isLoading || attentionItems.length > 0 ? (
           <section
@@ -142,11 +143,11 @@ export function FinanceOperations() {
         ) : null}
 
         {/* Tab switcher */}
-        <div className="flex rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>
+        <div className="flex max-w-full overflow-x-auto rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>
           {TABS.map(({ id, label }) => (
             <button
               key={id}
-              className="rounded-full px-5 py-2 text-sm font-semibold transition-colors"
+              className="shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-colors"
               style={
                 activeTab === id
                   ? { background: "var(--text)", color: "var(--bg)" }
@@ -166,6 +167,8 @@ export function FinanceOperations() {
         {activeTab === "promotions" && <PromotionsTab />}
         {activeTab === "referrals" && <ReferralsTab />}
         {activeTab === "queues" && <QueuesTab />}
+        {activeTab === "accounting" && <AccountingTab />}
+        {activeTab === "corporate" && <CorporateTab />}
 
       </div>
     </main>

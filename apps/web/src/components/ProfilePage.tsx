@@ -6,7 +6,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -16,12 +16,14 @@ import { fetchMyReviews } from "@/api/reviews";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
 import { ReviewList } from "@/components/my-reviews";
+import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
+import { WorkoutVault } from "@/components/client/WorkoutVault";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -29,6 +31,11 @@ import {
   SUPPORTED_LOCALES,
   type AppLocale,
 } from "@/i18n/locales";
+import { PageHeader } from "@/components/PageHeader";
+import { ReplayTourButton } from "@/components/onboarding/Onboarding";
+import { TrainingHistory } from "@/components/history/TrainingHistory";
+import { defaultHistoryKind } from "@/lib/training-history";
+import { fetchMyTrainingHistory } from "@/api/training-history";
 
 function CollapsibleSection({
   id,
@@ -125,9 +132,27 @@ export function ProfilePage() {
     ),
   );
   const tProfile = useTranslations("Profile");
+  const tPrSharing = useTranslations("PrSharing");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
   const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(user);
+  const { role: surfaceRole, membership } = useSelectedMembershipRole();
+  // Clients (members and athletes) get a Vault of completed workouts (ADR-098).
+  const showVault = showSelfServiceSurfaces && Boolean(membership) && surfaceRole !== "admin";
+  const [profileTab, setProfileTab] = useState<"account" | "vault">(() =>
+    typeof window !== "undefined" && window.location.hash === "#vault" ? "vault" : "account",
+  );
+  const activeProfileTab = showVault ? profileTab : "account";
+
+  useEffect(() => {
+    function syncFromHash() {
+      if (window.location.hash === "#vault") setProfileTab("vault");
+    }
+    // Client-side navigation can set the hash after the first render.
+    syncFromHash();
+    window.addEventListener("hashchange", syncFromHash);
+    return () => window.removeEventListener("hashchange", syncFromHash);
+  }, []);
   const push = usePushNotifications(tokens?.access_token);
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
@@ -310,16 +335,40 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
-        <TransientHero label={i18n("profileIntroductioncf30917")}>
-        <div className="mb-4">
-          <p className="text-xs font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {tProfile("eyebrow")}
-          </p>
-          <h1 className="mt-1 text-3xl font-black" style={{ color: "var(--text)" }}>
-            {tProfile("title")}
-          </h1>
-        </div>
-        </TransientHero>
+        <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
+
+        {showVault ? (
+          <div role="tablist" aria-label={tProfile("eyebrow")} className="flex gap-1 rounded-full p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+            {(["account", "vault"] as const).map((tab) => (
+              <button
+                key={tab}
+                id={`profile-tab-${tab}`}
+                type="button"
+                role="tab"
+                aria-selected={activeProfileTab === tab}
+                aria-controls={`profile-panel-${tab}`}
+                onClick={() => {
+                  setProfileTab(tab);
+                  window.history.replaceState(null, "", tab === "vault" ? "#vault" : window.location.pathname);
+                }}
+                className="flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                style={{
+                  background: activeProfileTab === tab ? "var(--border)" : "transparent",
+                  color: activeProfileTab === tab ? "var(--text)" : "var(--dim)",
+                }}
+              >
+                {tab === "vault" ? i18n("clProfileTabVault") : i18n("clProfileTabAccount")}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        {activeProfileTab === "vault" ? (
+          <div id="profile-panel-vault" role="tabpanel" aria-labelledby="profile-tab-vault">
+            <WorkoutVault />
+          </div>
+        ) : (
+        <div id="profile-panel-account" role={showVault ? "tabpanel" : undefined} aria-labelledby={showVault ? "profile-tab-account" : undefined} className="space-y-4">
 
         <div className="flex justify-end">
           <button
@@ -332,6 +381,15 @@ export function ProfilePage() {
             {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
           </button>
         </div>
+
+        {tokens?.access_token && showSelfServiceSurfaces && (user?.role === "member" || user?.role === "athlete") ? (
+          <TrainingHistory
+            id="history"
+            queryKey={["me", user.id]}
+            fetchPage={(kind, offset) => fetchMyTrainingHistory(tokens.access_token, kind, offset)}
+            defaultKind={defaultHistoryKind(user.role)}
+          />
+        ) : null}
 
         <CollapsibleSection
           id="language-region"
@@ -528,6 +586,14 @@ export function ProfilePage() {
           </CollapsibleSection>
         ) : null}
 
+        <CollapsibleSection
+          id="pr-sharing"
+          title={tPrSharing("settingsTitle")}
+          description={tPrSharing("settingsDescription")}
+        >
+          <PRSharingSettings />
+        </CollapsibleSection>
+
         <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
           <div className="space-y-5">
             {avatarPreview && (
@@ -613,6 +679,8 @@ export function ProfilePage() {
             </div>
           </CollapsibleSection>
         ) : null}
+        </div>
+        )}
       </div>
     </main>
   );

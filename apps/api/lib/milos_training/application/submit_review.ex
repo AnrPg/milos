@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.SubmitReview do
-  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent}
+  alias MilosTraining.Application.{BroadcastUserSync, RecordAnalyticsEvent, TenantStaffRecipients}
   alias MilosTraining.Feedback.Domain.ReviewEligibility
 
   alias MilosTraining.{
@@ -7,7 +7,6 @@ defmodule MilosTraining.Application.SubmitReview do
     Execution,
     Feedback,
     Finance,
-    Identity,
     Notifications,
     Scheduling,
     Workouts
@@ -33,7 +32,7 @@ defmodule MilosTraining.Application.SubmitReview do
         }
       })
 
-      broadcast_review_submitted(user_id, review.id)
+      broadcast_review_submitted(user_id, review)
       dispatch_review_notification(user_id, review)
 
       {:ok, review}
@@ -94,7 +93,7 @@ defmodule MilosTraining.Application.SubmitReview do
         end
 
       {"exercise", id} ->
-        case {Workouts.exercise_exists?(id), exercise_execution_status(user_id, id)} do
+        case {exercise_exists?(context, id), exercise_execution_status(user_id, id)} do
           {false, _status} -> {:error, :review_target_not_found}
           {_exists?, :missing} -> {:error, :review_target_not_found}
           {_exists?, :incomplete} -> {:error, :review_target_not_completed}
@@ -151,7 +150,6 @@ defmodule MilosTraining.Application.SubmitReview do
 
   defp target_label("private_coaching"), do: "Private coaching"
   defp target_label(type) when is_binary(type), do: String.replace(type, "_", " ")
-  defp target_label(_type), do: "Review target"
 
   defp normalize_target_type("private_coaching"), do: "coaching_parameter"
   defp normalize_target_type(type), do: type
@@ -229,8 +227,23 @@ defmodule MilosTraining.Application.SubmitReview do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
 
-  defp get_workout(%{organization_id: _} = context, id), do: Workouts.get_workout(context, id)
-  defp get_workout(_context, id), do: Workouts.get_workout(id)
+  # Workouts and their exercises are tenant data: without a tenant context a
+  # workout or exercise target is not found (ADR-133).
+  defp get_workout(%{organization_id: organization_id} = context, id)
+       when is_binary(organization_id) do
+    case Workouts.get_workout(context, id) do
+      %{} = workout -> workout
+      _missing -> nil
+    end
+  end
+
+  defp get_workout(_context, _id), do: nil
+
+  defp exercise_exists?(%{organization_id: organization_id} = context, id)
+       when is_binary(organization_id),
+       do: Workouts.exercise_exists?(context, id) == true
+
+  defp exercise_exists?(_context, _id), do: false
 
   defp get_slot(%{organization_id: _} = context, id), do: Scheduling.get_slot(context, id)
   defp get_slot(_context, _id), do: nil
@@ -240,8 +253,9 @@ defmodule MilosTraining.Application.SubmitReview do
 
   defp get_attendance(_context, _user_id, _slot_id), do: nil
 
-  defp broadcast_review_submitted(user_id, review_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_review_submitted(user_id, review) do
+    review_id = review.id
+    admin_ids = TenantStaffRecipients.user_ids(review)
 
     BroadcastUserSync.for_user(user_id, ["my_reviews"],
       reason: "review_submitted",

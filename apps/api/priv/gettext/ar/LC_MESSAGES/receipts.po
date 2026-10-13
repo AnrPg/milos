@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "إيصال استرداد"
+
+msgid "Receipt number"
+msgstr "رقم الإيصال"
+
+msgid "Issued on"
+msgstr "تاريخ الإصدار"
+
+msgid "Issued by"
+msgstr "صادر عن"
+
+msgid "Issued to"
+msgstr "صادر إلى"
+
+msgid "Refund details"
+msgstr "تفاصيل الاسترداد"
+
+msgid "Refund type"
+msgstr "نوع الاسترداد"
+
+msgid "Refunded amount"
+msgstr "المبلغ المسترد"
+
+msgid "Reason"
+msgstr "السبب"
+
+msgid "Original payment"
+msgstr "الدفعة الأصلية"
+
+msgid "Payment date"
+msgstr "تاريخ الدفع"
+
+msgid "Payment method"
+msgstr "طريقة الدفع"
+
+msgid "Original amount"
+msgstr "المبلغ الأصلي"
+
+msgid "Invoice"
+msgstr "الفاتورة"
+
+msgid "Previously refunded"
+msgstr "مبالغ مستردة سابقًا"
+
+msgid "Remaining paid amount"
+msgstr "المبلغ المدفوع المتبقي"
+
+msgid "Refund"
+msgstr "استرداد"
+
+msgid "Payment reversal"
+msgstr "عكس الدفعة"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "هذا الإيصال سجل غير قابل للتعديل لعملية عكس دفعة خضعت للتدقيق. احتفظ به مع سجلات مدفوعاتك."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "البصمة الرقمية للمستند (SHA-256)"
+
+msgid "Not provided"
+msgstr "غير متوفر"

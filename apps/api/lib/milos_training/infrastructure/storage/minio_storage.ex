@@ -2,11 +2,199 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   @moduledoc false
   @behaviour MilosTraining.Application.Ports.DocumentStorage
   @behaviour MilosTraining.Application.Ports.AvatarStorage
+  @behaviour MilosTraining.Application.Ports.TenantObjectStore
   require Logger
 
   @expires_seconds 900
   @max_avatar_bytes 5 * 1_024 * 1_024
   @allowed_avatar_types ~w(image/jpeg image/png image/webp image/gif image/bmp image/avif)
+  @delete_batch_size 1_000
+
+  # --- ADR-117 tenant object inventory/cleanup -------------------------------
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def put_object(bucket, key, body, content_type) when is_binary(key) and is_binary(body) do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+
+    with :ok <- ensure_bucket(config, bucket_name) do
+      case ExAws.S3.put_object(bucket_name, key, body, content_type: content_type)
+           |> ExAws.request(config) do
+        {:ok, _response} -> :ok
+        {:error, reason} -> {:error, {:object_store_failed, reason}}
+      end
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def list_objects(bucket, prefix) when is_binary(prefix) and prefix != "" do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+    list_objects_page(config, bucket_name, prefix, nil, [])
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def delete_objects(_bucket, []), do: {:ok, 0}
+
+  def delete_objects(bucket, keys) when is_list(keys) do
+    {config, _url_config, bucket_name} = bucket_config(bucket)
+
+    keys
+    |> Enum.chunk_every(@delete_batch_size)
+    |> Enum.reduce_while({:ok, 0}, fn batch, {:ok, deleted} ->
+      case ExAws.S3.delete_multiple_objects(bucket_name, batch, quiet: true)
+           |> Map.put(:parser, & &1)
+           |> ExAws.request(config) do
+        {:ok, %{body: body}} when is_binary(body) ->
+          if String.contains?(body, "<Error>"),
+            do: {:halt, {:error, {:object_store_failed, :partial_delete}}},
+            else: {:cont, {:ok, deleted + length(batch)}}
+
+        {:ok, _response} ->
+          {:cont, {:ok, deleted + length(batch)}}
+
+        {:error, reason} ->
+          {:halt, {:error, {:object_store_failed, reason}}}
+      end
+    end)
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def presigned_object_url(bucket, key) when is_binary(key) do
+    {_config, url_config, bucket_name} = bucket_config(bucket)
+
+    ExAws.S3.presigned_url(url_config, :get, bucket_name, key,
+      expires_in: @expires_seconds,
+      virtual_host: false
+    )
+  end
+
+  # ADR-121: tenant logos share the public media (avatar) bucket; the bucket
+  # policy makes only `organizations/*/branding/logo/*` publicly readable.
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def presigned_upload(bucket, key, content_type) when is_binary(key) do
+    {storage_config, url_config, bucket_name} = bucket_config(bucket)
+    headers = [{"content-type", content_type}]
+
+    with :ok <- ensure_bucket(storage_config, bucket_name),
+         :ok <- ensure_public_read_policy(bucket, storage_config, bucket_name),
+         {:ok, url} <-
+           ExAws.S3.presigned_url(url_config, :put, bucket_name, key,
+             expires_in: @expires_seconds,
+             virtual_host: false,
+             headers: headers
+           ) do
+      {:ok, %{url: url, headers: Map.new(headers)}}
+    else
+      {:error, reason} -> {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def probe_object(bucket, key, bytes) when is_binary(key) and is_integer(bytes) and bytes > 0 do
+    {storage_config, _url_config, bucket_name} = bucket_config(bucket)
+
+    case ExAws.S3.get_object(bucket_name, key, range: "bytes=0-#{bytes - 1}")
+         |> ExAws.request(storage_config) do
+      {:ok, %{headers: headers, body: body}} ->
+        normalized = Map.new(headers, fn {name, value} -> {String.downcase(name), value} end)
+        {:ok, %{head: to_string(body), byte_size: total_object_size(normalized)}}
+
+      {:error, {:http_error, 404, _response}} ->
+        {:error, :not_found}
+
+      # An empty object cannot satisfy any byte range.
+      {:error, {:http_error, 416, _response}} ->
+        {:ok, %{head: "", byte_size: 0}}
+
+      {:error, reason} ->
+        {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def public_object_url(:branding, key) when is_binary(key) do
+    {_storage_config, _url_config, bucket_name} = bucket_config(:branding)
+    {:ok, avatar_public_url(bucket_name, key)}
+  end
+
+  def public_object_url(_bucket, _key), do: {:error, :not_public}
+
+  defp ensure_public_read_policy(:branding, config, bucket_name),
+    do: ensure_avatar_read_policy(config, bucket_name)
+
+  defp ensure_public_read_policy(_bucket, _config, _bucket_name), do: :ok
+
+  defp bucket_config(:documents), do: ex_aws_config()
+  defp bucket_config(:avatars), do: avatar_ex_aws_config()
+  defp bucket_config(:branding), do: avatar_ex_aws_config()
+
+  defp list_objects_page(config, bucket_name, prefix, token, acc) do
+    options =
+      [prefix: prefix, max_keys: 1_000] ++
+        if(token, do: [continuation_token: token], else: [])
+
+    # The ExAws list parser needs SweetXml, which this app does not depend on;
+    # the response is parsed by parse_list_objects_xml/1 instead.
+    case ExAws.S3.list_objects_v2(bucket_name, options)
+         |> Map.put(:parser, & &1)
+         |> ExAws.request(config) do
+      {:ok, %{body: body}} when is_binary(body) ->
+        {objects, next_token} = parse_list_objects_xml(body)
+        acc = acc ++ objects
+
+        if next_token,
+          do: list_objects_page(config, bucket_name, prefix, next_token, acc),
+          else: {:ok, acc}
+
+      {:error, {:http_error, 404, _response}} ->
+        {:ok, acc}
+
+      {:error, reason} ->
+        {:error, {:object_store_failed, reason}}
+    end
+  end
+
+  @doc false
+  def parse_list_objects_xml(body) when is_binary(body) do
+    objects =
+      ~r{<Contents>(.*?)</Contents>}s
+      |> Regex.scan(body, capture: :all_but_first)
+      |> Enum.flat_map(fn [contents] ->
+        with [key] <- Regex.run(~r{<Key>(.*?)</Key>}s, contents, capture: :all_but_first) do
+          size =
+            case Regex.run(~r{<Size>(\d+)</Size>}, contents, capture: :all_but_first) do
+              [size] -> String.to_integer(size)
+              _missing -> 0
+            end
+
+          [%{key: unescape_xml(key), size: size}]
+        else
+          _missing -> []
+        end
+      end)
+
+    truncated? = Regex.match?(~r{<IsTruncated>true</IsTruncated>}, body)
+
+    next_token =
+      case Regex.run(~r{<NextContinuationToken>(.*?)</NextContinuationToken>}s, body,
+             capture: :all_but_first
+           ) do
+        [token] when truncated? -> unescape_xml(token)
+        _other -> nil
+      end
+
+    {objects, next_token}
+  end
+
+  defp unescape_xml(value) do
+    value
+    |> String.replace("&lt;", "<")
+    |> String.replace("&gt;", ">")
+    |> String.replace("&quot;", "\"")
+    |> String.replace("&apos;", "'")
+    |> String.replace("&amp;", "&")
+  end
+
+  # ---------------------------------------------------------------------------
 
   def ensure_buckets do
     {document_config, _document_url, document_bucket} = ex_aws_config()
@@ -237,7 +425,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
     bucket = Application.get_env(:milos_training, :minio_bucket, "milos-invoices")
 
-    {build_ex_aws_config(endpoint, access_key, secret_key),
+    {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
   end
 
@@ -248,7 +436,7 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
     bucket = Application.get_env(:milos_training, :minio_avatar_bucket, "milos-avatars")
 
-    {build_ex_aws_config(endpoint, access_key, secret_key),
+    {build_ex_aws_overrides(endpoint, access_key, secret_key),
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
   end
 
@@ -276,19 +464,28 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
+  @doc false
+  # Anonymous reads are limited to avatars and (ADR-121) tenant logos; every
+  # other key in the public media bucket stays private.
+  def public_read_policy(bucket) do
+    %{
+      Version: "2012-10-17",
+      Statement: [
+        %{
+          Effect: "Allow",
+          Principal: "*",
+          Action: ["s3:GetObject"],
+          Resource: [
+            "arn:aws:s3:::#{bucket}/users/*/avatars/*",
+            "arn:aws:s3:::#{bucket}/organizations/*/branding/logo/*"
+          ]
+        }
+      ]
+    }
+  end
+
   defp ensure_avatar_read_policy(config, bucket) do
-    policy =
-      Jason.encode!(%{
-        Version: "2012-10-17",
-        Statement: [
-          %{
-            Effect: "Allow",
-            Principal: "*",
-            Action: ["s3:GetObject"],
-            Resource: ["arn:aws:s3:::#{bucket}/users/*/avatars/*"]
-          }
-        ]
-      })
+    policy = Jason.encode!(public_read_policy(bucket))
 
     case ExAws.S3.put_bucket_policy(bucket, policy) |> ExAws.request(config) do
       {:ok, _response} -> :ok
@@ -296,18 +493,24 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
-  defp build_ex_aws_config(endpoint, access_key, secret_key) do
+  # Requests take keyword overrides (ExAws.request/2); presigning takes a
+  # resolved config map (ExAws.S3.presigned_*), so the public URL config is
+  # resolved eagerly while the storage config stays as overrides.
+  defp build_ex_aws_overrides(endpoint, access_key, secret_key) do
     uri = URI.parse(endpoint)
 
-    ExAws.Config.new(:s3,
+    [
       access_key_id: access_key,
       secret_access_key: secret_key,
       scheme: "#{uri.scheme}://",
       host: uri.host,
       port: uri.port,
       region: "us-east-1"
-    )
+    ]
   end
+
+  defp build_ex_aws_config(endpoint, access_key, secret_key),
+    do: ExAws.Config.new(:s3, build_ex_aws_overrides(endpoint, access_key, secret_key))
 
   defp avatar_public_url(bucket, key) do
     endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")

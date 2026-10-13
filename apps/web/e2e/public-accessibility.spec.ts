@@ -11,7 +11,7 @@ const pages = [
   },
   {
     path: "/admin",
-    heading: /ada admin/i,
+    heading: /^dashboard$/i,
     user: { id: "admin-1", nickname: "Ada Admin", role: "admin" },
   },
 ];
@@ -49,6 +49,8 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
     ({
       ...user,
       email: `${user.id}@example.com`,
+      // The first-run product tour (ADR-107) would cover the page under test.
+      completed_tours: ["admin", "member", "athlete"],
       preferred_locale: "en",
       vendor: false,
       memberships: [{ organization_slug: "demo-gym", role: user.role, settings: {} }],

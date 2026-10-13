@@ -10,14 +10,18 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
+import { useRouter } from "next/navigation";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
+import { CorporateEnrollmentCard } from "@/components/client/CorporateEnrollmentCard";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { SemanticLabel } from "@/components/semantic-label";
+import { MyRefundReceipts } from "@/components/finance/MyRefundReceipts";
+import { allowanceLabel, semanticLabel } from "@/i18n/presentation";
 import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
   visibleBillingChannels,
+  visibleBillingFreezes,
 } from "@/app/account/billing/billing-entitlement-visibility";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
@@ -137,7 +141,7 @@ function PackageSidePanel({
         ) : (
           packages.map((pkg) => {
             const name = String(pkg.name ?? pkg.code ?? i18n("package7431e3d"));
-            const family = pkg.family ? String(pkg.family) : null;
+            const packageType = pkg.package_type ? semanticLabel(String(pkg.package_type), i18n) : null;
             const billing = pkg.billing_period ? String(pkg.billing_period) : null;
             const price = typeof pkg.base_price_cents === "number" ? pkg.base_price_cents : null;
             const currency = String(pkg.currency ?? i18n("eurd06e073"));
@@ -164,10 +168,10 @@ function PackageSidePanel({
                     </span>
                   )}
                 </div>
-                {family && (
+                {packageType && (
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    {family}
-                    {billing ? "· " + (billing) : ""}
+                    {packageType}
+                    {billing ? " · " + semanticLabel(billing, i18n) : ""}
                   </span>
                 )}
                 {price != null && (
@@ -285,8 +289,17 @@ function InvoiceRow({
 export default function BillingPage() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
-  const { tokens } = useSession();
+  const { tokens, status } = useSession();
   const accessToken = tokens?.access_token ?? null;
+  const router = useRouter();
+
+  // Guests sign in first and come back here, query string included (a
+  // company enrollment link carries its code in it).
+  useEffect(() => {
+    if (status === "guest") {
+      router.replace(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+    }
+  }, [router, status]);
 
   const [finance, setFinance] = useState<MyFinanceData | null>(null);
   const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null>(null);
@@ -338,6 +351,17 @@ export default function BillingPage() {
     return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
   }, [accessToken]);
 
+  // A new corporate seat changes the package and benefits; refresh in place.
+  function refreshAfterEnrollment() {
+    if (!accessToken) return;
+    void Promise.all([fetchMyFinance(accessToken), fetchMyEntitlement(accessToken)])
+      .then(([data, entitlementData]) => {
+        setFinance(data);
+        setEntitlement(entitlementData.entitlement);
+      })
+      .catch(() => {});
+  }
+
   const membership = finance?.membership as Record<string, unknown> | null;
   const activeSub = finance?.active_package_subscription as Record<string, unknown> | null;
   const promoRedemptions = (finance?.promotion_redemptions ?? []) as Record<string, unknown>[];
@@ -356,11 +380,7 @@ export default function BillingPage() {
 
         {/* header */}
         <div className="flex items-center justify-between">
-          <TransientHero label={i18n("billingIntroduction58b604b")}>
-            <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-              {i18n("billingabaec45")}
-            </h1>
-          </TransientHero>
+          <h1 className="text-2xl font-semibold tracking-tight md:text-3xl" style={{ color: "var(--text)" }}>{i18n("billingabaec45")}</h1>
           <button
             type="button"
             onClick={() => setShowPackages(true)}
@@ -406,9 +426,9 @@ export default function BillingPage() {
                   </span>
                   <span className="text-xs" style={{ color: "var(--dim)" }}>
                     {activeSub.billing_period_snapshot
-                      ? i18n("billed763fe55") + (String(activeSub.billing_period_snapshot))
+                      ? `${i18n("billed763fe55")} ${semanticLabel(String(activeSub.billing_period_snapshot), i18n)}`
                       : ""}
-                    {activeSub.ends_on ? i18n("renews241920c") + (formatDate(uiLocale, activeSub.ends_on as string)) : ""}
+                    {activeSub.ends_on ? ` ${i18n("renews241920c")} ${formatDate(uiLocale, activeSub.ends_on as string)}` : ""}
                   </span>
                   {typeof activeSub.price_cents_snapshot === "number" && (
                     <span className="text-sm" style={{ color: "var(--text-soft)" }}>
@@ -437,7 +457,10 @@ export default function BillingPage() {
               )}
             </div>
 
+            <AccessNotice entitlement={entitlement} />
             <EntitlementCard entitlement={entitlement} />
+
+            <CorporateEnrollmentCard onEnrolled={refreshAfterEnrollment} />
 
             {/* credits */}
             {hasCredits && (
@@ -568,6 +591,8 @@ export default function BillingPage() {
             )}
           </>
         )}
+
+        {accessToken && !loading && !error ? <MyRefundReceipts /> : null}
       </div>
 
       {showPackages && finance && (
@@ -580,31 +605,91 @@ export default function BillingPage() {
   );
 }
 
+/** Grace slack or lost access, told plainly to the client. */
+function AccessNotice({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
+  const uiLocale = useUiLocale();
+  const i18n = useUiTranslations();
+  if (!entitlement) return null;
+
+  if (entitlement.status === "grace" && entitlement.grace_until) {
+    const message =
+      entitlement.source === "overdue_grace"
+        ? i18n("accessGraceOverdue", { date: formatDate(uiLocale, entitlement.grace_until) })
+        : i18n("accessGraceEnded", { date: formatDate(uiLocale, entitlement.grace_until) });
+    return (
+      <p role="status" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning, #d97706) 14%, transparent)", color: "var(--text)", border: "1px solid var(--warning, #d97706)" }}>
+        {message}
+      </p>
+    );
+  }
+
+  if (entitlement.status === "blocked" || (entitlement.status === "inactive" && entitlement.source !== "membership_status")) {
+    return (
+      <p role="alert" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--text)", border: "1px solid var(--danger)" }}>
+        {entitlement.status === "blocked" ? i18n("accessBlockedOverdue") : i18n("accessEnded")}
+      </p>
+    );
+  }
+
+  return null;
+}
+
 function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitlement | null }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   if (!entitlement?.plan) return null;
   const allowanceEntries = visibleBillingAllowances(entitlement.allowances);
   const channels = visibleBillingChannels(entitlement.plan.channels);
+  const freezes = visibleBillingFreezes(entitlement.freezes ?? []);
   return (
     <section className="rounded-2xl p-5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-medium" style={{ color: "var(--text-soft)" }}>{i18n("yourPackageBenefitsb75c7f4")}</h2>
         <StatusBadge status={entitlement.status} />
       </div>
+      {entitlement.frozen_until ? (
+        <div
+          className="mt-4 rounded-xl px-4 py-3"
+          style={{ background: "color-mix(in srgb, var(--info) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--info) 30%, transparent)" }}
+        >
+          <p className="text-sm font-semibold" style={{ color: "var(--info)" }}>
+            {i18n("mbPausedUntil", { date: formatDate(uiLocale, entitlement.frozen_until) })}
+          </p>
+          <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>{i18n("mbPausedExplainer")}</p>
+        </div>
+      ) : null}
       <div className="mt-4 flex flex-wrap gap-2">
         {channels.map((channel) => <span key={channel} className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }}><SemanticLabel value={channel} /></span>)}
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (
           <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
-            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}><SemanticLabel value={key} /></p>
+            <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{allowanceLabel(key, i18n, entitlement.class_type_names)}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
             {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}
             {usage.extensions > 0 ? <p className="mt-1 text-xs" style={{ color: "var(--success)" }}>{i18n("includes820531f")}{usage.extensions} {i18n("personalExtension95a8d48")}</p> : null}
           </div>
         ) : null)}
       </div>
+      {freezes.length > 0 ? (
+        <div className="mt-4">
+          <p className="text-xs font-medium uppercase tracking-wide" style={{ color: "var(--dim)" }}>{i18n("mbFreezesTitle")}</p>
+          <ul className="mt-2 flex flex-col gap-1">
+            {freezes.map((freeze) => (
+              <li
+                key={freeze.id ?? `${freeze.starts_on}-${freeze.ends_on}`}
+                className="flex flex-wrap items-center justify-between gap-2 text-xs"
+                style={{ color: "var(--text-soft)" }}
+              >
+                <span>{i18n("mbFreezeRange", { start: formatDate(uiLocale, freeze.starts_on), end: formatDate(uiLocale, freeze.ends_on) })}</span>
+                {freeze.extension_days > 0 ? (
+                  <span style={{ color: "var(--success)" }}>{i18n("mbFreezeExtension", { days: freeze.extension_days })}</span>
+                ) : null}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
     </section>
   );
 }

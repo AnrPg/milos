@@ -17,7 +17,9 @@ defmodule MilosTraining.Infrastructure.Maintenance.CleanSlatePurge do
 
   @confirmation "PURGE_ALL_TENANT_DATA_KEEP_SAAS_OWNER"
   @finch MilosTraining.MaintenanceFinch
-  @preserved_tables ~w(schema_migrations users vendors scale_levels training_quotes)
+  # scale_levels is tenant data since ADR-128 (and TRUNCATE ... CASCADE on
+  # organizations would empty it anyway), so it is no longer preserved.
+  @preserved_tables ~w(schema_migrations users vendors training_quotes)
 
   def run_from_env do
     with :ok <- require_confirmation(),

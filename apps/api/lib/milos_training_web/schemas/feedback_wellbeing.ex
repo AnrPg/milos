@@ -82,6 +82,7 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
     type: :object,
     properties: %{
       id: %Schema{type: :string, format: :uuid},
+      organization_id: %Schema{type: :string, format: :uuid, nullable: true},
       user_id: %Schema{type: :string, format: :uuid},
       reported_by_id: %Schema{type: :string, format: :uuid},
       reported_by_role: %Schema{type: :string, enum: ["self", "admin"]},

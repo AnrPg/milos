@@ -1,0 +1,65 @@
+{
+  "description": "Gym/strength coach: supersets (A1/A2), rep ranges, RPE and tempo, rest attached to one exercise, and an EMOM with odd/even minutes written on one line with slashes.",
+  "locale": "en",
+  "text": "Upper A\nA1. DB bench 4x8-10 @ RPE 8, tempo 3010\nA2. Pull ups 4x6\nrest 90s after A2\nB. EMOM 10 - odd: 12 cal bike / even: 30s plank",
+  "answer": {
+    "workout": {
+      "title": "Upper A",
+      "type": "strength"
+    },
+    "sections": [
+      {
+        "name": "A. Superset",
+        "format": "untimed",
+        "exercises": [
+          {
+            "name": "Dumbbell Bench Press",
+            "sets": 4,
+            "reps": 8,
+            "tempo": "3010",
+            "note": "8-10 reps @ RPE 8"
+          },
+          {
+            "name": "Pull ups",
+            "sets": 4,
+            "reps": 6,
+            "bodyweight": true,
+            "rest_seconds": 90
+          }
+        ]
+      },
+      {
+        "name": "B. EMOM 10",
+        "format": "even_odd",
+        "timer": {
+          "duration_seconds": 600,
+          "interval_seconds": 60
+        },
+        "exercises": [
+          {
+            "name": "Bike",
+            "calories": 12,
+            "interval_assignment": 1
+          },
+          {
+            "name": "Plank",
+            "duration_seconds": 30,
+            "interval_assignment": 2
+          }
+        ]
+      }
+    ],
+    "issues": [],
+    "missing_fields": [],
+    "assumptions": [
+      {
+        "path": "sections.0.exercises.0.reps",
+        "message": "Used the low end of “8-10”; the range and RPE are kept in the note."
+      },
+      {
+        "path": "sections.1.timer.interval_seconds",
+        "message": "“EMOM” means one-minute intervals."
+      }
+    ]
+  }
+}

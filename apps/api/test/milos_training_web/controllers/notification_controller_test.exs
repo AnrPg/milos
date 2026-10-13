@@ -1,4 +1,5 @@
 defmodule MilosTrainingWeb.NotificationControllerTest do
+  # TD-046: the inbox spans organizations; requests run under RLS.
   use MilosTrainingWeb.ConnCase, async: false
 
   alias MilosTraining.Analytics
@@ -100,9 +101,12 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
     conn: conn,
     user: user
   } do
+    {:ok, organization} = Organizations.create_organization(%{name: "Click Gym"})
+
     {:ok, notification} =
       Notifications.create_notification(%{
         user_id: user.id,
+        organization_id: organization.id,
         type: :booking_approved,
         payload: %{url: "/schedule"}
       })
@@ -118,9 +122,34 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
     [updated_notification] = inbox.notifications
     assert updated_notification.read_at != nil
 
-    summary = Analytics.analytics_summary(%{"days" => "1"})
+    summary =
+      MilosTraining.Analytics.AnalyticsStore.with_tenant_context(
+        %{organization_id: organization.id},
+        fn -> Analytics.analytics_summary(%{"days" => "1"}) end
+      )
+
     assert summary.notification_clicks.total >= 1
     assert summary.events.by_name["notification_clicked"] >= 1
+  end
+
+  test "an organization-less notification click is marked read without a tenant click fact",
+       %{conn: conn, user: user} do
+    {:ok, notification} =
+      Notifications.create_notification(%{
+        user_id: user.id,
+        type: :booking_approved,
+        payload: %{url: "/schedule"}
+      })
+
+    response =
+      conn
+      |> post("/api/notifications/#{notification.id}/click", %{url: "/schedule"})
+      |> json_response(200)
+
+    assert response == %{"clicked" => true, "read" => true}
+
+    {:ok, inbox} = Notifications.list_inbox(user.id)
+    assert [%{read_at: %DateTime{}}] = inbox.notifications
   end
 
   test "creates workout moved notifications", %{user: user} do

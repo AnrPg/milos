@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: ru\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Квитанция о возврате"
+
+msgid "Receipt number"
+msgstr "Номер квитанции"
+
+msgid "Issued on"
+msgstr "Дата выдачи"
+
+msgid "Issued by"
+msgstr "Выдана"
+
+msgid "Issued to"
+msgstr "Получатель"
+
+msgid "Refund details"
+msgstr "Сведения о возврате"
+
+msgid "Refund type"
+msgstr "Тип возврата"
+
+msgid "Refunded amount"
+msgstr "Сумма возврата"
+
+msgid "Reason"
+msgstr "Причина"
+
+msgid "Original payment"
+msgstr "Исходный платёж"
+
+msgid "Payment date"
+msgstr "Дата платежа"
+
+msgid "Payment method"
+msgstr "Способ оплаты"
+
+msgid "Original amount"
+msgstr "Исходная сумма"
+
+msgid "Invoice"
+msgstr "Счёт"
+
+msgid "Previously refunded"
+msgstr "Ранее возвращено"
+
+msgid "Remaining paid amount"
+msgstr "Оставшаяся оплаченная сумма"
+
+msgid "Refund"
+msgstr "Возврат"
+
+msgid "Payment reversal"
+msgstr "Сторнирование платежа"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Эта квитанция является неизменяемой записью проверенного сторнирования платежа. Храните её вместе с документами об оплате."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Отпечаток документа (SHA-256)"
+
+msgid "Not provided"
+msgstr "Не указано"

@@ -2,6 +2,8 @@ defmodule MilosTrainingWeb.MeController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
+  alias MilosTraining.Application.CompleteProductTour
+
   alias MilosTraining.Application.{
     RequestAvatarUpload,
     ResolvePlatformContext,
@@ -21,6 +23,35 @@ defmodule MilosTrainingWeb.MeController do
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
        when action in [:update_profile, :avatar_upload_url, :update_avatar]
+
+  operation(:complete_tour,
+    summary: "Record that the current account finished a product tour",
+    parameters: [
+      %Parameter{
+        name: :audience,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, enum: ~w(admin member athlete)}
+      }
+    ],
+    responses: [
+      ok:
+        {"Completed tours", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{completed_tours: %Schema{type: :array, items: %Schema{type: :string}}},
+           required: [:completed_tours]
+         }}
+    ]
+  )
+
+  def complete_tour(conn, %{"audience" => audience}) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, account} <- CompleteProductTour.call(user, audience) do
+      json(conn, %{completed_tours: account.completed_tours})
+    end
+  end
 
   operation(:update_profile,
     summary: "Update current user profile and language preference",
@@ -202,9 +233,15 @@ defmodule MilosTrainingWeb.MeController do
     end
   end
 
-  defp avatar_key_param(%{avatar_key: avatar_key}), do: {:ok, avatar_key}
-  defp avatar_key_param(%{"avatar_key" => avatar_key}), do: {:ok, avatar_key}
-  defp avatar_key_param(_params), do: {:error, :invalid_avatar_upload}
+  # OpenApiSpex casting replaces body_params with an atom-keyed map, which
+  # Plug's string-keyed body_params type does not model; Map.fetch/2 keeps
+  # both shapes reachable for Dialyzer.
+  defp avatar_key_param(params) do
+    with :error <- Map.fetch(params, :avatar_key),
+         :error <- Map.fetch(params, "avatar_key") do
+      {:error, :invalid_avatar_upload}
+    end
+  end
 
   def avatar_upload_url(conn, _params) do
     user = Guardian.Plug.current_resource(conn)

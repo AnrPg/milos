@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Terugbetalingsbewijs"
+
+msgid "Receipt number"
+msgstr "Bewijsnummer"
+
+msgid "Issued on"
+msgstr "Uitgegeven op"
+
+msgid "Issued by"
+msgstr "Uitgegeven door"
+
+msgid "Issued to"
+msgstr "Uitgegeven aan"
+
+msgid "Refund details"
+msgstr "Details van de terugbetaling"
+
+msgid "Refund type"
+msgstr "Soort terugbetaling"
+
+msgid "Refunded amount"
+msgstr "Terugbetaald bedrag"
+
+msgid "Reason"
+msgstr "Reden"
+
+msgid "Original payment"
+msgstr "Oorspronkelijke betaling"
+
+msgid "Payment date"
+msgstr "Betaaldatum"
+
+msgid "Payment method"
+msgstr "Betaalmethode"
+
+msgid "Original amount"
+msgstr "Oorspronkelijk bedrag"
+
+msgid "Invoice"
+msgstr "Factuur"
+
+msgid "Previously refunded"
+msgstr "Eerder terugbetaald"
+
+msgid "Remaining paid amount"
+msgstr "Resterend betaald bedrag"
+
+msgid "Refund"
+msgstr "Terugbetaling"
+
+msgid "Payment reversal"
+msgstr "Betalingsstorno"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Dit bewijs is een onveranderlijke registratie van een gecontroleerde betalingsstorno. Bewaar het bij je betalingsgegevens."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Digitale vingerafdruk van het document (SHA-256)"
+
+msgid "Not provided"
+msgstr "Niet opgegeven"

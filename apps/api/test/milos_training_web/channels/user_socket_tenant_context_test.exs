@@ -119,4 +119,54 @@ defmodule MilosTrainingWeb.UserSocketTenantContextTest do
                "schedule:#{organization.id}"
              )
   end
+
+  test "a socket connected before a slug rename keeps working, and the retired slug connects (ADR-122)" do
+    user = user_fixture()
+    vendor = user_fixture()
+    {:ok, _vendor} = Organizations.grant_vendor(vendor.id)
+    {:ok, platform} = Organizations.resolve_platform_context(vendor)
+    {:ok, organization} = Organizations.create_organization(%{name: "Socket Rename Gym"})
+    old_slug = organization.slug
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    {:ok, token, _claims} =
+      Guardian.encode_and_sign(user, %{"sv" => user.security_version || 1}, token_type: "access")
+
+    assert {:ok, socket} =
+             Phoenix.ChannelTest.connect(UserSocket, %{
+               "token" => token,
+               "organization_slug" => old_slug
+             })
+
+    assert {:ok, _result} =
+             Organizations.rename_organization_slug(platform, organization.id, %{
+               "slug" => "socket-renamed-gym",
+               "confirmation" => old_slug
+             })
+
+    # Topics are keyed by organization id, and the join-time revalidation
+    # resolves the (now retired) slug held in the socket's context.
+    assert {:ok, _reply, _socket} =
+             Phoenix.ChannelTest.subscribe_and_join(
+               socket,
+               ScheduleChannel,
+               "schedule:#{organization.id}"
+             )
+
+    assert {:ok, renamed_socket} =
+             Phoenix.ChannelTest.connect(UserSocket, %{
+               "token" => token,
+               "organization_slug" => old_slug
+             })
+
+    assert renamed_socket.assigns.tenant_context.organization.slug == "socket-renamed-gym"
+  end
 end

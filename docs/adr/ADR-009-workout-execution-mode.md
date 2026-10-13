@@ -175,3 +175,97 @@ bounded TTL to offline reads.
 - Execution progress snapshots are now semantic as well as transport-level: the backend stores `total_elapsed_ms`, per-section elapsed maps, per-segment cycle counters, and auto-derived section score snapshots so interrupted sessions retain meaningful progress even before final completion.
 - Timer segments now carry stable `segment_key` identifiers and execution checklist steps are keyed by segment + exercise + set, which prevents repeated rounds or interval segments from colliding on the same exercise ID.
 - Completing a scoreable workout no longer depends on manual score entry. The score modal is prefilled with a measured value, the athlete may override it, and if they do not, the backend persists the derived fallback score automatically. For scoreable time-based formats this fixes blank history entries like completed for-time workouts with no submitted score.
+
+## Schedule-Based Timer and Optimistic Progress Amendment — 2026-10-12
+
+Supersedes the "commit after acknowledgement" rule above for execution
+progress, and the IndexedDB check-off queue.
+
+- **Timer engine** (`apps/web/src/lib/timer-engine.ts`): pure functions derive
+  every clock from the segment's scheduled start, banked pause time and "now".
+  When a timed segment ends, the next one starts at the moment it ended
+  (`planCatchUp`), not when the client noticed or the server answered, and
+  every segment that ran out while the page was hidden is skipped through in
+  one step. Ticks use `setInterval` plus `visibilitychange`, because
+  `requestAnimationFrame` stops in background tabs.
+- **Optimistic progress**: all progress changes apply locally first and are
+  sent by `useExecutionSync`, one request at a time, coalescing changes made
+  during a request. Failures leave `pendingSync` set and retry; on reload the
+  unsynced local state wins while the server `lock_version` is unchanged. A
+  409 means another device moved on: its timeline wins (see the conflict
+  rebase below).
+- **Elapsed accounting**: the client store holds committed time only (segments
+  already left). Progress snapshots send committed time plus the current
+  segment's banked pause time, and hydration subtracts it again. A pause is no
+  longer counted twice, and leaving a segment backwards commits its time.
+- **Sequence shape**: segments carry `phase` (`work`/`rest`/`transition`).
+  Between-section transitions and rests use synthetic `<id>:transition` and
+  `<id>:rest-after` section ids and never count toward section time or scoring.
+  Open-ended formats (Death By, EMOM to failure) are one `interval_cycle`
+  segment. Round counts may decrease (undo); elapsed totals stay monotonic.
+- **Authoring preview**: `POST /admin/workouts/timer-preview` runs the same
+  builder on a draft section, so the editor's timeline always matches execution.
+
+## Conflict Rebase, Labels and KPIs Amendment — 2026-10-12 (P2)
+
+- **Conflict rebase** (`apps/web/src/lib/execution-rebase.ts`): the store keeps
+  the hand-made marks (check-offs, round counts, scores) as the server last
+  acknowledged them. On a 409, or on reload after another device moved on, the
+  client adopts the server's clock and position and replays its own unsent
+  marks on top: check-offs added or removed, round-count deltas, and scores
+  changed locally. The result is resent with the new `lock_version`. This
+  restores what the retired IndexedDB queue did for check-offs, now for every
+  mark. Check-offs still waiting in that old queue are adopted once on load
+  (`legacy-offline-queue.ts`, to be removed after one release).
+- **Clock adjustments**: +/-30 s from the pause sheet changes the segment's
+  length. It never shortens below what already ran (superseded below: the
+  change is now synced).
+- **Localized labels**: segments carry `label_key` and `label_params` next to
+  the English `label`; clients render the key in the viewer's language and
+  fall back to `label` for unknown keys.
+- **Free-text timer**: free-text workouts run on the same timer engine, built
+  from a preset (format plus durations) that the coach can attach under
+  `workout_metadata.free_text_timer`. The clock is persisted per execution in
+  `localStorage` as a start timestamp plus banked time, so reloads keep it.
+- **KPIs**: progress and completion payloads carry `kpi_counters` (skips,
+  countdown skips and segments, pauses and paused time, finish-review opens,
+  first start). The API keeps the maximum of each counter, so replays and
+  stale snapshots never lower them. `ExecutionKpis.summarize/1` turns those
+  counters plus the execution records into the `execution` block of the admin
+  analytics summary.
+
+## Synced Adjustments, Free-Text Progress, KPI Dashboard and Class Wall Display — 2026-10-12
+
+- **Clock adjustments are synced.** Progress and completion payloads carry
+  `duration_adjustments` (`segment_key → delta seconds`). The API keeps them
+  only for countdowns and capped count-ups in the validated sequence (±1 h,
+  never below 5 s; unknown keys are dropped so a device can't get stuck) and
+  stores each with the authored length and section name. Every device applies
+  the server's copy to the authored sequence on load, conflict rebases treat
+  them like round deltas, the finish review shows them, and coaches see
+  "AMRAP 12: 12:00 → 14:00 (+2:00)" in the athlete's training history.
+- **Free-text progress.** Free-text workouts save their clock every 30 s
+  while running and on pause/resume/reset/hide, with device KPIs (pauses,
+  paused time, resets, first start, review opens). With no timer segments
+  the server lets that single clock go back (a reset); structured workouts
+  keep monotonic elapsed totals.
+- **Where workouts stop.** The server records `kpi_counters.position`
+  (format, section, segment, elapsed) and the workout's `formats` on every
+  progress write. The KPI report adds stopping points by format and section,
+  completion by format and by source, structured vs free text, a daily trend,
+  median workout time and the share of workouts whose clock was changed. The
+  admin training analytics page shows them (7/30/90 days, table view for the
+  trend).
+- **Class wall display.** `class_timers` holds one coach-run timer per
+  scheduled class (RLS by organization): status, segment, start time (in the
+  future during the get-ready countdown), banked pause time, adjustments and
+  an optional preset that replaces the class workout (e.g. an EMOM clock for a
+  strength class; free-text workouts use their attached preset). The timer is
+  a schedule, so timed segments ending need no writes: `ClassTimerMachine`
+  (server) and `classTimerPosition` (client) catch up identically, and the
+  preset builders are checked against one shared fixture. Coaches/admins send
+  commands (`start`, `pause`, `resume`, `next`, `previous`, `jump`, `adjust`,
+  `reset`, `finish`, `configure`) with the version they saw; a conflict
+  refetches instead of re-sending. Updates are pushed on `class_timer:<class>`;
+  any active member of the gym can follow (wall display or phone). Responses
+  carry `server_now` so screens correct their own clock skew.

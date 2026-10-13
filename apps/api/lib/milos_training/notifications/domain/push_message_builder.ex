@@ -199,6 +199,228 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("booking_waitlist_promoted", payload, localize) do
+    %{
+      title: localize.("You got a spot", %{}),
+      body:
+        localize.(
+          "A place opened up in %{class}. Your booking is confirmed or awaiting approval.",
+          %{
+            class: payload["class_name"] || ""
+          }
+        ),
+      url: payload["url"] || "/schedule"
+    }
+  end
+
+  def build("package_expiring", payload, localize) do
+    %{
+      title: localize.("Your package ends soon", %{}),
+      body:
+        localize.("%{package} ends on %{date}.", %{
+          package: payload["package_name"] || "",
+          date: payload["ends_on"] || ""
+        }),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("subscription_expiring", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["ends_on"] || "",
+      days: payload["days_left"] || 0
+    }
+
+    %{
+      title: localize.("Your subscription ends soon", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("form_review_submitted", payload, localize) do
+    %{
+      title: localize.("New form review request", %{}),
+      body:
+        localize.("%{client} sent a video for feedback.", %{
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/admin/coaching?tab=form-reviews"
+    }
+  end
+
+  def build("form_review_completed", payload, localize) do
+    %{
+      title: localize.("Your form review is ready", %{}),
+      body: localize.("Your coach left feedback on your video.", %{}),
+      url: payload["url"] || "/coaching"
+    }
+  end
+
+  def build("coaching_reply_overdue", payload, localize) do
+    %{
+      title: localize.("A client is waiting for a reply", %{}),
+      body:
+        localize.("%{client} has been waiting longer than the promised reply time.", %{
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/admin/coaching?tab=replies"
+    }
+  end
+
+  def build("nutrition_plan_updated", payload, localize) do
+    %{
+      title: localize.("Your nutrition plan was updated", %{}),
+      body: localize.("Open it to see what changed.", %{}),
+      url: payload["url"] || "/coaching"
+    }
+  end
+
+  def build("appointment_booked", payload, localize) do
+    %{
+      title: localize.("New appointment booked", %{}),
+      body:
+        localize.("%{client} booked a session for %{time}.", %{
+          client: payload["client_nickname"] || "",
+          time: payload["starts_at"] || ""
+        }),
+      url: payload["url"] || "/admin/appointments"
+    }
+  end
+
+  def build("appointment_cancelled", payload, localize) do
+    %{
+      title: localize.("Appointment cancelled", %{}),
+      body:
+        localize.("The session on %{time} was cancelled.", %{time: payload["starts_at"] || ""}),
+      url: payload["url"] || "/appointments"
+    }
+  end
+
+  def build("coach_client_assigned", payload, localize) do
+    %{
+      title: localize.("A coach took a new athlete", %{}),
+      body:
+        localize.("%{coach} is now coaching %{client}.", %{
+          coach: payload["coach_nickname"] || "",
+          client: payload["client_nickname"] || ""
+        }),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
+  def build("inventory_repair_needed", payload, localize) do
+    %{
+      title: localize.("A machine needs attention", %{}),
+      body:
+        localize.("%{machine}: %{note}", %{
+          machine: payload["machine_name"] || "",
+          note: payload["body"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_stock_low", %{"status" => "reported"} = payload, localize) do
+    %{
+      title: localize.("Reported running low", %{}),
+      body:
+        localize.("%{item}: %{note}", %{
+          item: payload["supply_name"] || "",
+          note: payload["note"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_digest", payload, localize) do
+    %{
+      title: localize.("Inventory today", %{}),
+      body:
+        localize.("Needs attention: %{items}", %{
+          items: Enum.join(List.wrap(payload["highlights"]), ", ")
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("inventory_stock_low", payload, localize) do
+    %{
+      title: localize.("Running low", %{}),
+      body:
+        localize.("%{item}: %{quantity} left.", %{
+          item: payload["supply_name"] || "",
+          quantity: payload["quantity"] || ""
+        }),
+      url: payload["url"] || "/admin/inventory"
+    }
+  end
+
+  def build("coach_note_viewed", payload, localize) do
+    %{
+      title: localize.("An admin read your note", %{}),
+      body:
+        localize.("%{reader} read your note about %{client} at %{time}.", %{
+          reader: payload["reader_nickname"] || "",
+          client: payload["client_nickname"] || "",
+          time: payload["read_at"] || ""
+        }),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
+  def build("subscription_grace", payload, localize) do
+    params = %{
+      package: payload["package_name"] || localize.("your subscription", %{}),
+      date: payload["grace_until"] || ""
+    }
+
+    %{
+      title: localize.("Your subscription has ended", %{}),
+      body:
+        payload["body"] ||
+          localize.(
+            "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes.",
+            params
+          ),
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
+  def build("access_ended", payload, localize) do
+    body =
+      if payload["reason"] == "overdue_payment",
+        do:
+          localize.(
+            "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again.",
+            %{}
+          ),
+        else:
+          localize.("Your access has ended. Renew your subscription to book classes again.", %{})
+
+    cancelled = payload["cancelled_bookings"] || 0
+
+    body =
+      if cancelled > 0,
+        do:
+          body <>
+            " " <>
+            localize.("Your upcoming bookings were cancelled: %{count}.", %{count: cancelled}),
+        else: body
+
+    %{
+      title: localize.("Your access has ended", %{}),
+      body: payload["body"] || body,
+      url: payload["url"] || "/account/billing"
+    }
+  end
+
   def build("chat_message", payload, localize) do
     title =
       if payload["context_type"] in ["assignment", "class_slot"],

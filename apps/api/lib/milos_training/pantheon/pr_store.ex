@@ -1,9 +1,16 @@
 defmodule MilosTraining.Pantheon.PRStore do
   @behaviour MilosTraining.Pantheon.Ports.PRStore
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
+
   defp adapter do
     Application.fetch_env!(:milos_training, :pr_store)
   end
+
+  # PRs, history, sharing preferences and grants are RLS-protected: every
+  # access runs in an explicit ownership scope - the acting user (personal
+  # reads/writes, grantee reads) or the acting coach's tenant (ADR-129).
+  def with_scope(context, fun) when is_function(fun, 0), do: RepoContext.run(context, fun)
 
   @impl true
   def list_user_prs(user_id), do: adapter().list_user_prs(user_id)
@@ -33,5 +40,36 @@ defmodule MilosTraining.Pantheon.PRStore do
   def list_pr_history(pr_record_id), do: adapter().list_pr_history(pr_record_id)
 
   @impl true
+  def list_user_pr_history(user_id), do: adapter().list_user_pr_history(user_id)
+
+  @impl true
   def count_user_prs(user_id), do: adapter().count_user_prs(user_id)
+
+  @impl true
+  def list_organization_prs(user_id, organization_id),
+    do: adapter().list_organization_prs(user_id, organization_id)
+
+  @impl true
+  def get_sharing_preference(user_id), do: adapter().get_sharing_preference(user_id)
+
+  @impl true
+  def put_coach_visibility(user_id, enabled?),
+    do: adapter().put_coach_visibility(user_id, enabled?)
+
+  @impl true
+  def list_owned_grants(user_id), do: adapter().list_owned_grants(user_id)
+
+  @impl true
+  def list_received_grants(grantee_user_id), do: adapter().list_received_grants(grantee_user_id)
+
+  @impl true
+  def get_active_grant(user_id, grantee_user_id),
+    do: adapter().get_active_grant(user_id, grantee_user_id)
+
+  @impl true
+  def create_grant(user_id, grantee_user_id), do: adapter().create_grant(user_id, grantee_user_id)
+
+  @impl true
+  def revoke_grant(user_id, grant_id, revoked_at),
+    do: adapter().revoke_grant(user_id, grant_id, revoked_at)
 end

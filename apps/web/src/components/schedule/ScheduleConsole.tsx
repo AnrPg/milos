@@ -10,41 +10,53 @@ import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
-  approveBooking,
-  createBooking,
   createScheduleSlot,
   createScheduleSeries,
   deleteScheduleSlot,
   fetchSchedule,
-  rejectBooking,
   updateScheduleSlot,
   type ScheduleBooking,
   type ClassTypeRecord,
+  type ScheduleLocation,
   type ScheduleSlot,
   type ScheduleSlotPayload,
 } from "@/api/schedule";
+import { fetchMyEntitlement, type EffectiveEntitlement } from "@/api/my-finance";
 import { fetchAdminSettings, type SchedulingSettings } from "@/api/settings";
 import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { BookingModal } from "@/components/schedule/BookingModal";
 import { CalendarView } from "@/components/schedule/CalendarView";
 import { buildScheduleWindow } from "@/components/schedule/calendar-window";
 import { SlotPopup } from "@/components/schedule/SlotPopup";
+import { SlotLocationSelect } from "@/components/schedule/SlotLocationSelect";
+import { listAdminLocations } from "@/api/facility";
+import { useQuery } from "@tanstack/react-query";
+import { OpenGymCheckIn } from "@/components/schedule/OpenGymCheckIn";
+import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { TypeFilterChips } from "@/components/schedule/TypeFilterChips";
+import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useScheduleStore } from "@/stores/schedule";
 import { IntegerInput } from "@/components/integer-input";
+import { fetchGymStaff } from "@/api/staff";
+import { coachOptions } from "@/components/admin/staff-home";
+import { can } from "@/lib/role-navigation";
+
+/** A class may name its coach (ADR-100). */
+type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
+import { PageHeader } from "@/components/PageHeader";
 
 type SlotEditorState = {
   slotId: string | null;
-  values: ScheduleSlotPayload;
+  values: ClassPayload;
 };
 
 type SeriesEditorState = {
-  values: Omit<ScheduleSlotPayload, "scheduled_at" | "master_workout_id">;
+  values: Omit<ClassPayload, "scheduled_at" | "master_workout_id">;
   startDate: string;
   endDate: string;
   time: string;
@@ -87,11 +99,9 @@ function defaultSlotValues(
 export function ScheduleConsole({
   initialOpenSlotId = null,
   pageTitle,
-  heroTimeoutMs,
 }: {
   initialOpenSlotId?: string | null;
   pageTitle?: string;
-  heroTimeoutMs?: number;
 } = {}) {
   const i18n = useUiTranslations();
   const t = useTranslations("Schedule");
@@ -101,8 +111,12 @@ export function ScheduleConsole({
   const { days, setDays, shiftWindow, resetWindow, startDate, classTypeIds, setClassTypeIds } = useScheduleStore();
   const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
   const [classTypes, setClassTypes] = useState<ClassTypeRecord[]>([]);
+  const [locations, setLocations] = useState<ScheduleLocation[]>([]);
+  const [entitlement, setEntitlement] = useState<EffectiveEntitlement | null | undefined>(undefined);
+  const [notice, setNotice] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const submitCommand = useOutboxCommand();
   const [selectedSlot, setSelectedSlot] = useState<ScheduleSlot | null>(null);
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [resolveTarget, setResolveTarget] = useState<{ booking: ScheduleBooking; action: "approve" | "reject" } | null>(
@@ -116,9 +130,25 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
-  const { role } = useSelectedMembershipRole();
+  const { role, isLoading: roleLoading, membership } = useSelectedMembershipRole();
+  const canManageSchedule = can(membership, "manage_schedule");
 
   const isAdmin = role === "admin";
+  // ADR-097: the class editors offer a location only when the gym has one.
+  const adminLocationsQuery = useQuery({
+    queryKey: ["admin", "locations"],
+    queryFn: () => listAdminLocations(tokens!.access_token),
+    enabled: isAdmin && Boolean(tokens?.access_token),
+  });
+  const adminLocations = adminLocationsQuery.data ?? [];
+  const coachesQuery = useQuery({
+    queryKey: ["staff", "members"],
+    queryFn: () => fetchGymStaff(tokens!.access_token),
+    enabled: canManageSchedule && Boolean(tokens?.access_token),
+    staleTime: 60_000,
+  });
+  const coaches = coachOptions(coachesQuery.data ?? []);
+  const isMemberSurface = !roleLoading && !isAdmin;
   const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
   const title = pageTitle ?? t("title");
 
@@ -141,6 +171,7 @@ export function ScheduleConsole({
 
       setSchedule(nextSlots);
       setClassTypes(nextClassTypes);
+      setLocations(Array.isArray(window.locations) ? window.locations : []);
       return nextSlots;
     } catch (loadError) {
       setError(loadError instanceof Error ? localizeError(loadError, i18n) : t("failedToLoadSchedule"));
@@ -156,6 +187,19 @@ export function ScheduleConsole({
     });
 
     return () => window.cancelAnimationFrame(frame);
+  }, [loadSchedule]);
+
+  useEffect(() => {
+    const handleOutbox = (event: Event) => {
+      const detail = (event as CustomEvent<{ kind?: string; delivered?: boolean }>).detail;
+      if (detail?.delivered && detail.kind?.startsWith("booking.")) {
+        setNotice(null);
+        void loadSchedule();
+      }
+    };
+
+    window.addEventListener(OFFLINE_COMMAND_OUTBOX_EVENT, handleOutbox);
+    return () => window.removeEventListener(OFFLINE_COMMAND_OUTBOX_EVENT, handleOutbox);
   }, [loadSchedule]);
 
   useEffect(() => {
@@ -196,6 +240,26 @@ export function ScheduleConsole({
     };
   }, [isAdmin, tokens?.access_token]);
 
+  // The member's package decides whether guest and open-gym actions appear.
+  useEffect(() => {
+    const accessToken = tokens?.access_token;
+    if (!isMemberSurface || typeof accessToken !== "string") return;
+
+    let cancelled = false;
+
+    void fetchMyEntitlement(accessToken)
+      .then((response) => {
+        if (!cancelled) setEntitlement(response.entitlement);
+      })
+      .catch(() => {
+        if (!cancelled) setEntitlement(null);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isMemberSurface, tokens?.access_token]);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (appliedMobileDefault.current) return;
@@ -229,15 +293,34 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      await createBooking(tokens.access_token, bookingTarget.id);
+      // ADR-120: booking requests go through the durable outbox so an offline
+      // request is replayed once, with the same idempotency key, on reconnect.
+      const outcome = await submitCommand("booking.request", {
+        slotId: bookingTarget.id,
+        label: bookingTarget.name,
+      });
+      setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
       setBookingTarget(null);
       setSelectedSlot(null);
-      await loadSchedule();
+      if (outcome.status === "delivered") await loadSchedule();
     } catch (requestError) {
-      setError(requestError instanceof Error ? localizeError(requestError, i18n) : t("failedToCreateBooking"));
+      setError(
+        requestError instanceof Error
+          ? localizeMemberBookingError(requestError, i18n, locale, "book")
+          : t("failedToCreateBooking"),
+      );
     } finally {
       setBusy(false);
     }
+  }
+
+  // Waitlist and guest changes keep the popup open on the refreshed class.
+  async function refreshSelectedSlot() {
+    const refreshedSlots = await loadSchedule();
+    if (!refreshedSlots) return;
+    setSelectedSlot((current) =>
+      current ? refreshedSlots.find((slot) => slot.id === current.id) ?? current : current,
+    );
   }
 
   async function handleResolve() {
@@ -246,13 +329,17 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      if (resolveTarget.action === "approve") {
-        await approveBooking(tokens.access_token, resolveTarget.booking.id, resolveMessage.trim() || undefined);
-      } else {
-        await rejectBooking(tokens.access_token, resolveTarget.booking.id, resolveMessage.trim() || undefined);
-      }
+      const outcome = await submitCommand(
+        resolveTarget.action === "approve" ? "booking.approve" : "booking.reject",
+        {
+          bookingId: resolveTarget.booking.id,
+          adminMessage: resolveMessage.trim() || null,
+          label: resolveTarget.booking.user_nickname ?? null,
+        },
+      );
+      setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
 
-      const refreshedSlots = await loadSchedule();
+      const refreshedSlots = outcome.status === "delivered" ? await loadSchedule() : null;
       setResolveTarget(null);
       setResolveMessage("");
 
@@ -385,7 +472,7 @@ export function ScheduleConsole({
       setSeriesEditor(null);
       await loadSchedule();
     } catch (reason) {
-      setError(reason instanceof Error ? reason.message : i18n("featureSeriesCreateFailed"));
+      setError(reason instanceof Error ? localizeError(reason, i18n) : i18n("featureSeriesCreateFailed"));
     } finally {
       setBusy(false);
     }
@@ -403,6 +490,8 @@ export function ScheduleConsole({
         capacity: slot.capacity,
         auto_approve: slot.auto_approve,
         booking_timeout_minutes: slot.booking_timeout_minutes,
+        location_id: slot.location_id ?? null,
+        ...(canManageSchedule ? { coach_user_id: (slot as ScheduleSlot & { coach_user_id?: string | null }).coach_user_id ?? null } : {}),
       },
     });
   }
@@ -410,12 +499,7 @@ export function ScheduleConsole({
   return (
     <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-7xl space-y-8">
-        <TransientHero label={t("introduction")} showIntroLabel={t("showIntro")} timeoutMs={heroTimeoutMs}>
-          <section className="rounded-[2rem] px-6 py-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("classSchedule")}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>{title}</h1>
-          </section>
-        </TransientHero>
+        <PageHeader title={title} />
 
 
         <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -465,9 +549,31 @@ export function ScheduleConsole({
           </div>
         ) : null}
 
+        {isMemberSurface && tokens?.access_token ? (
+          <OpenGymCheckIn accessToken={tokens.access_token} entitlement={entitlement} />
+        ) : null}
+
         {error ? (
           <div className="rounded-[1.6rem] px-5 py-4 text-sm" style={{ background: "var(--primary)]/10", border: "1px solid var(--primary)30", color: "var(--primary-strong)" }}>
             {error}
+          </div>
+        ) : null}
+
+        {notice ? (
+          <div
+            className="flex items-start justify-between gap-3 rounded-[1.6rem] px-5 py-4 text-sm"
+            role="status"
+            style={{ background: "color-mix(in srgb, var(--info) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--info) 28%, transparent)", color: "var(--text-soft)" }}
+          >
+            <span>{notice}</span>
+            <button
+              className="shrink-0 text-xs font-semibold"
+              style={{ color: "var(--dim)" }}
+              onClick={() => setNotice(null)}
+              type="button"
+            >
+              {common("close")}
+            </button>
           </div>
         ) : null}
 
@@ -479,6 +585,7 @@ export function ScheduleConsole({
           <CalendarView
             days={days}
             isAdmin={isAdmin}
+            locations={locations}
             onCreateSlot={openCreateEditor}
             onSelectSlot={setSelectedSlot}
             slots={schedule}
@@ -497,7 +604,13 @@ export function ScheduleConsole({
             setResolveTarget({ booking, action: "approve" });
           }}
           onBook={() => setBookingTarget(selectedSlot)}
-          onCancelBooking={() => void loadSchedule()}
+          guestsIncluded={includesGuestPasses(entitlement)}
+          locations={locations}
+          onCancelBooking={({ lateCancellation }) => {
+            setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
+            void loadSchedule();
+          }}
+          onSlotChanged={() => void refreshSelectedSlot()}
           onClose={() => setSelectedSlot(null)}
           onDelete={() => void deleteSelectedSlot()}
           onEdit={() => openUpdateEditor(selectedSlot)}
@@ -694,6 +807,32 @@ export function ScheduleConsole({
               {t("autoApproveBookingsForThisSlot")}
             </label>
 
+            <SlotLocationSelect
+              className="mt-4 block space-y-2 text-sm font-semibold"
+              locations={adminLocations}
+              onChange={(locationId) =>
+                setEditor((current) => (current ? { ...current, values: { ...current.values, location_id: locationId } } : current))
+              }
+              selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+              selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={editor.values.location_id}
+            />
+
+            {canManageSchedule ? (
+              <ClassCoachSelect
+                className="mt-4 block space-y-2 text-sm font-semibold"
+                coaches={coaches}
+                label={i18n("rhClassCoach")}
+                noneLabel={i18n("rhNoCoach")}
+                onChange={(coachUserId) =>
+                  setEditor((current) => (current ? { ...current, values: { ...current.values, coach_user_id: coachUserId } } : current))
+                }
+                selectClassName="w-full rounded-2xl px-4 py-3 outline-none"
+                selectStyle={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+                value={editor.values.coach_user_id}
+              />
+            ) : null}
+
             <div className="mt-6 flex flex-wrap justify-between gap-3">
               {editor.slotId ? (
                 <button
@@ -743,6 +882,8 @@ export function ScheduleConsole({
               <label className="text-sm font-semibold">{i18n("featureTime")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="time" value={seriesEditor.time} onChange={(event) => setSeriesEditor({ ...seriesEditor, time: event.target.value })} /></label>
               <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
+              <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
+              {canManageSchedule ? <ClassCoachSelect className="text-sm font-semibold" coaches={coaches} label={i18n("rhClassCoach")} noneLabel={i18n("rhNoCoach")} onChange={(coachUserId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, coach_user_id: coachUserId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.coach_user_id} /> : null}
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>
             <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
@@ -751,5 +892,37 @@ export function ScheduleConsole({
         </div>
       ) : null}
     </main>
+  );
+}
+
+function ClassCoachSelect({
+  className,
+  coaches,
+  label,
+  noneLabel,
+  onChange,
+  selectClassName,
+  selectStyle,
+  value,
+}: {
+  className: string;
+  coaches: Array<{ user_id: string; nickname?: string | null }>;
+  label: string;
+  noneLabel: string;
+  onChange: (coachUserId: string | null) => void;
+  selectClassName: string;
+  selectStyle?: React.CSSProperties;
+  value: string | null | undefined;
+}) {
+  return (
+    <label className={className} style={selectStyle ? { color: "var(--muted)" } : undefined}>
+      <span>{label}</span>
+      <select className={selectClassName} style={selectStyle} value={value ?? ""} onChange={(event) => onChange(event.target.value || null)}>
+        <option value="">{noneLabel}</option>
+        {coaches.map((coach) => (
+          <option key={coach.user_id} value={coach.user_id}>{coach.nickname ?? coach.user_id}</option>
+        ))}
+      </select>
+    </label>
   );
 }

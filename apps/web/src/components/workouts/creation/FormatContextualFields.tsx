@@ -6,7 +6,9 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { FORMAT_FIELD_DEFS, type FormatParams, type SectionFormat } from "@/types/workout";
 
-import { TimeInput } from "./TimeInput";
+import { LONG_DURATION_PRESETS, SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
+
+const LONG_DURATION_FIELDS = new Set(["duration_seconds", "time_cap_seconds", "recovery_cap_seconds"]);
 import { SemanticLabel } from "@/components/semantic-label";
 
 type FieldLabel = {
@@ -25,7 +27,10 @@ type Props = {
 export function FormatContextualFields({ format, params, onChange }: Props) {
   const i18n = useUiTranslations();
   const FORMAT_FIELD_LABELS: Partial<Record<SectionFormat, FieldLabel[]>> = {
-    for_time: [{ key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true }],
+    for_time: [
+      { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
+      { key: "rounds", label: i18n("roundsceeac4a"), unit: "", optional: true },
+    ],
     train_to_exhaustion: [{ key: "rest_seconds", label: i18n("restBetweenSets882ab69"), unit: "secs", optional: true }],
     kcal_target: [
       { key: "kcal_target", label: i18n("target61ad50a"), unit: "kcal" },
@@ -39,7 +44,10 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
       { key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" },
       { key: "interval_seconds", label: i18n("interval011efcd"), unit: "secs" },
     ],
-    even_odd: [{ key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" }],
+    even_odd: [
+      { key: "duration_seconds", label: i18n("totalDuration886186d"), unit: "secs" },
+      { key: "interval_seconds", label: i18n("interval011efcd"), unit: "secs", optional: true },
+    ],
     billat: [
       { key: "work_seconds", label: i18n("work00040ba"), unit: "secs" },
       { key: "rest_seconds", label: i18n("restb79e5f4"), unit: "secs" },
@@ -51,7 +59,8 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
       { key: "pr_zone_rounds", label: i18n("prZoneRounds9799ad4"), unit: "", optional: true },
     ],
     death_by: [
-      { key: "max_rounds", label: i18n("maxRoundsc005103"), unit: "rounds", optional: true },
+      { key: "interval_seconds", label: i18n("interval011efcd"), unit: "secs", optional: true },
+      { key: "ladder_cap", label: i18n("maxRoundsc005103"), unit: "rounds", optional: true },
     ],
     tabata: [
       { key: "work_seconds", label: i18n("work00040ba"), unit: "secs" },
@@ -64,13 +73,15 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
       { key: "rounds", label: i18n("roundsceeac4a"), unit: "" },
     ],
     cluster: [
+      { key: "sets", label: i18n("sets2ab262f"), unit: "" },
+      { key: "cluster_reps", label: i18n("clustersPerSetLabel"), unit: "", optional: true },
       { key: "intra_rest_seconds", label: i18n("intraSetRest46c5759"), unit: "secs" },
+      { key: "rest_seconds", label: i18n("restBetweenSets882ab69"), unit: "secs", optional: true },
     ],
     hrr: [
-      { key: "hr_ceiling_bpm", label: i18n("hrCeilingStopWork3e9d698"), unit: "bpm" },
-      { key: "hr_floor_bpm", label: i18n("hrFloorResumeWork82d77a0"), unit: "bpm" },
-      { key: "cycles", label: i18n("cycles97f064a"), unit: "", optional: true },
-      { key: "effort_cap_seconds", label: i18n("effortCapf1d0911"), unit: "secs", optional: true },
+      { key: "effort_seconds", label: i18n("effortDurationLabel"), unit: "secs" },
+      { key: "hr_drop_target", label: i18n("hrDropTargetLabel"), unit: "bpm", optional: true },
+      { key: "recovery_cap_seconds", label: i18n("recoveryCapLabel"), unit: "secs", optional: true },
     ],
     ladder_ascending: [
       { key: "time_cap_seconds", label: i18n("timeCap42f692a"), unit: "secs", optional: true },
@@ -104,7 +115,7 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
         const field = { ...label, defaultValue };
 
         return (
-          <div key={field.key} className="flex items-center justify-between gap-2">
+          <div key={field.key} className="flex items-start justify-between gap-2">
             <label className="shrink-0 text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
               {field.label}
               {field.optional ? (
@@ -119,6 +130,8 @@ export function FormatContextualFields({ format, params, onChange }: Props) {
                 <TimeInput
                   value={typeof value === "number" ? value : null}
                   onChange={(secs) => onChange({ ...params, [field.key]: secs })}
+                  presets={LONG_DURATION_FIELDS.has(field.key) ? LONG_DURATION_PRESETS : SHORT_DURATION_PRESETS}
+                  ariaLabel={field.label}
                 />
               ) : (
                 <>

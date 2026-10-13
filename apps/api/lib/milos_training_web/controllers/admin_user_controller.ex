@@ -15,11 +15,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     DeleteAdminUser,
     ListAdminUsers,
     ListAthletes,
+    ListPRDossierMembers,
     PlaceMemberInClass,
     ProgramUserWorkout,
     RevokeUserAllowance
   }
 
+  alias MilosTraining.Finance
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -90,9 +92,27 @@ defmodule MilosTrainingWeb.AdminUserController do
   }
   @pr_response %Schema{
     type: :object,
-    required: [:user_id, :prs],
+    required: [:user_id, :visibility, :prs],
     properties: %{
       user_id: @user_id,
+      visibility: %Schema{
+        type: :string,
+        enum: ["coach", "coach_role_required"],
+        description:
+          "ADR-129: `coach` - PRs recorded in this gym that the member shares with its coaches; `coach_role_required` - the caller is staff but not a coach of this gym, so no PRs are returned."
+      },
+      member: %Schema{
+        type: :object,
+        nullable: true,
+        description:
+          "ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier.",
+        required: [:id, :nickname],
+        properties: %{
+          id: @user_id,
+          nickname: %Schema{type: :string},
+          avatar_url: %Schema{type: :string, nullable: true}
+        }
+      },
       prs: %Schema{
         type: :array,
         items: %Schema{
@@ -107,6 +127,32 @@ defmodule MilosTrainingWeb.AdminUserController do
             higher_is_better: %Schema{type: :boolean},
             beaten_on: %Schema{type: :string, format: :date},
             history: %Schema{type: :array, items: @summary_object}
+          }
+        }
+      }
+    }
+  }
+  @pr_members_response %Schema{
+    type: :object,
+    required: [:visibility, :members],
+    properties: %{
+      visibility: %Schema{
+        type: :string,
+        enum: ["coach", "coach_role_required"],
+        description:
+          "ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed."
+      },
+      members: %Schema{
+        type: :array,
+        items: %Schema{
+          type: :object,
+          required: [:id, :nickname, :role],
+          properties: %{
+            id: @user_id,
+            nickname: %Schema{type: :string},
+            avatar_url: %Schema{type: :string, nullable: true},
+            role: %Schema{type: :string},
+            joined_at: %Schema{type: :string, format: :"date-time", nullable: true}
           }
         }
       }
@@ -136,9 +182,20 @@ defmodule MilosTrainingWeb.AdminUserController do
             scheduled_for: %Schema{type: :string, format: :date},
             slot_id: %Schema{allOf: [@user_id], nullable: true},
             copy_source: %Schema{type: :boolean, default: true},
-            admin_notes: %Schema{type: :string, nullable: true}
+            admin_notes: %Schema{type: :string, nullable: true},
+            mode: %Schema{
+              type: :string,
+              enum: ["class_workout", "class_variant", "personal"],
+              description:
+                "Member programming mode (ADR-125; ignored for athletes). " <>
+                  "`class_workout` (default) replaces the booked class's workout for everyone; " <>
+                  "`class_variant` assigns this member's own version of the booked class " <>
+                  "(source defaults to the class's workout when `master_workout_id` is omitted); " <>
+                  "`personal` assigns a personal workout without a class. Both assignment " <>
+                  "modes require the member's package to include personal programming."
+            }
           },
-          required: [:master_workout_id, :scheduled_for, :copy_source]
+          required: [:scheduled_for, :copy_source]
         }
       }
     }
@@ -168,7 +225,10 @@ defmodule MilosTrainingWeb.AdminUserController do
               :grant_allowance,
               :revoke_allowance,
               :program_workout,
-              :place_in_class
+              :place_in_class,
+              :freezes,
+              :create_freeze,
+              :cancel_freeze
             ]
 
   @allowance_grant_body %RequestBody{
@@ -182,7 +242,10 @@ defmodule MilosTrainingWeb.AdminUserController do
           properties: %{
             allowance: %Schema{
               type: :string,
-              enum: ["class_visits", "coaching_touchpoints"]
+              description:
+                "class_visits, coaching_touchpoints, event_visits, guest_passes, open_gym_visits, or class_visits:<class type id> for a per-class-type limit (ADR-096, ADR-097)",
+              pattern:
+                "^(class_visits|coaching_touchpoints|event_visits|guest_passes|open_gym_visits|class_visits:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$"
             },
             quantity: %Schema{type: :integer, minimum: 1, maximum: 10_000},
             period: %Schema{
@@ -210,6 +273,73 @@ defmodule MilosTrainingWeb.AdminUserController do
       }
     }
   }
+
+  @membership_roles_response %Schema{
+    type: :object,
+    properties: %{
+      membership: %Schema{
+        type: :object,
+        properties: %{
+          user_id: %Schema{type: :string, format: :uuid},
+          role: %Schema{type: :string},
+          roles: %Schema{type: :array, items: %Schema{type: :string}},
+          coach_scope: %Schema{type: :string, enum: ["own", "all"]},
+          status: %Schema{type: :string}
+        },
+        required: [:user_id, :role, :roles, :coach_scope]
+      }
+    },
+    required: [:membership]
+  }
+
+  # A coach with scope `:own` reaches only their own clients (ADR-100). PRs are
+  # the exception: every coach of the gym reads members' PRs and coach scope
+  # must not narrow that (ADR-129); the database policy enforces it instead.
+  @client_actions %{
+    show: [:view_directory, :view_billing_contacts],
+    training_history: [:view_client_training],
+    schedule: [:view_client_training, :run_classes],
+    program_workout: [:manage_coaching],
+    place_in_class: [:book_for_clients, :manage_schedule],
+    incidents: [:view_health],
+    messages: [:message_clients],
+    coaching_context: [:view_client_training]
+  }
+
+  plug :authorize_client
+       when action in [
+              :show,
+              :training_history,
+              :schedule,
+              :program_workout,
+              :place_in_class,
+              :incidents,
+              :messages,
+              :coaching_context
+            ]
+
+  defp authorize_client(conn, _opts) do
+    capabilities = Map.fetch!(@client_actions, action_name(conn))
+    client_id = conn.path_params["id"]
+
+    allowed? =
+      Enum.any?(capabilities, fn capability ->
+        MilosTraining.Application.AuthorizeClientAccess.call(
+          conn.assigns.tenant_context,
+          capability,
+          client_id
+        ) == :ok
+      end)
+
+    if allowed? do
+      conn
+    else
+      conn
+      |> put_status(:forbidden)
+      |> json(%{code: "not_your_client", error: "Not one of your clients"})
+      |> halt()
+    end
+  end
 
   operation(:index,
     summary: "List all users for the admin directory",
@@ -294,7 +424,14 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   operation(:program_workout,
     summary:
-      "Copy or save a workout and associate it with this user's athlete assignment or booked class (filed in the athlete's or class-day folder unless folder_id is given)",
+      "Copy or save a workout and associate it with this user's assignment, class variant or booked class",
+    description:
+      "Athletes receive a personal assignment. Members follow `mode` (ADR-125). " <>
+        "Without folder_id, copies are filed automatically (ADR-136): athletes in their " <>
+        "folder, class workouts in the class-day folder, member variations in the " <>
+        "member's variations folder. " <>
+        "Member assignment modes fail with 403 `member_programming_not_entitled` when the " <>
+        "member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
@@ -311,6 +448,13 @@ defmodule MilosTrainingWeb.AdminUserController do
     summary: "Get a user's personal records",
     parameters: [@id_parameter],
     responses: [ok: {"Personal records", "application/json", @pr_response}]
+  )
+
+  operation(:pr_members,
+    summary: "Active members whose PR dossier a coach may open (ADR-132)",
+    description:
+      "Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.",
+    responses: [ok: {"PR dossier members", "application/json", @pr_members_response}]
   )
 
   operation(:incidents,
@@ -332,13 +476,21 @@ defmodule MilosTrainingWeb.AdminUserController do
   )
 
   operation(:index_athletes,
-    summary: "List athlete users",
+    summary: "List assignable users (athletes; optionally members, ADR-125)",
     parameters: [
       %Parameter{
         name: :q,
         in: :query,
         required: false,
         schema: %Schema{type: :string}
+      },
+      %Parameter{
+        name: :include_members,
+        in: :query,
+        required: false,
+        description:
+          "Also list active members (who may receive personal programming when their package allows it).",
+        schema: %Schema{type: :boolean, default: false}
       }
     ],
     responses: [
@@ -498,6 +650,148 @@ defmodule MilosTrainingWeb.AdminUserController do
     end
   end
 
+  operation(:update_roles,
+    summary: "Set every role a person holds in this gym (ADR-099)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{
+              roles: %Schema{
+                type: :array,
+                minItems: 1,
+                items: %Schema{
+                  type: :string,
+                  enum:
+                    Enum.map(
+                      MilosTraining.Organizations.roles(),
+                      &to_string/1
+                    )
+                }
+              }
+            },
+            required: [:roles]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Membership", "application/json", @membership_roles_response}]
+  )
+
+  def update_roles(conn, params) do
+    id = params["id"] || params[:id]
+    roles = Map.get(conn.body_params, :roles) || Map.get(conn.body_params, "roles")
+
+    with {:ok, membership} <-
+           MilosTraining.Organizations.set_membership_roles(
+             conn.assigns.tenant_context,
+             id,
+             roles
+           ) do
+      json(conn, %{membership: membership_json(membership)})
+    end
+  end
+
+  operation(:update_coach_scope,
+    summary: "Make a coach a head coach (all clients) or limit them to their own (ADR-100)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{coach_scope: %Schema{type: :string, enum: ["own", "all"]}},
+            required: [:coach_scope]
+          }
+        }
+      }
+    },
+    responses: [ok: {"Membership", "application/json", @membership_roles_response}]
+  )
+
+  def update_coach_scope(conn, params) do
+    id = params["id"] || params[:id]
+    scope = Map.get(conn.body_params, :coach_scope) || Map.get(conn.body_params, "coach_scope")
+
+    with {:ok, membership} <-
+           MilosTraining.Organizations.set_coach_scope(conn.assigns.tenant_context, id, scope) do
+      json(conn, %{membership: membership_json(membership)})
+    end
+  end
+
+  operation(:membership_status,
+    summary: "A client's membership status without amounts (coaches, front desk)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Status", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             membership_status: %Schema{
+               type: :object,
+               properties: %{
+                 status: %Schema{type: :string},
+                 expires_on: %Schema{type: :string, format: :date, nullable: true},
+                 frozen_until: %Schema{type: :string, format: :date, nullable: true},
+                 packages: %Schema{type: :array, items: %Schema{type: :string}},
+                 allowances: %Schema{type: :object, additionalProperties: true}
+               },
+               required: [:status, :packages, :allowances]
+             }
+           },
+           required: [:membership_status]
+         }}
+    ]
+  )
+
+  def membership_status(conn, params) do
+    id = params["id"] || params[:id]
+
+    with {:ok, status} <-
+           MilosTraining.Application.GetClientMembershipStatus.call(
+             conn.assigns.tenant_context,
+             id
+           ) do
+      json(conn, %{membership_status: status})
+    end
+  end
+
+  defp membership_json(membership) do
+    %{
+      user_id: membership.user_id,
+      role: to_string(membership.role),
+      roles: Enum.map(membership.roles, &to_string/1),
+      coach_scope: to_string(membership.coach_scope),
+      status: to_string(membership.status)
+    }
+  end
+
   def delete(conn, params) do
     admin = Guardian.Plug.current_resource(conn)
 
@@ -520,6 +814,130 @@ defmodule MilosTrainingWeb.AdminUserController do
       conn
       |> put_status(:created)
       |> json(result)
+    end
+  end
+
+  @freeze_schema %Schema{
+    title: "SubscriptionFreeze",
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      starts_on: %Schema{type: :string, format: :date},
+      ends_on: %Schema{type: :string, format: :date},
+      extension_days: %Schema{type: :integer},
+      reason: %Schema{type: :string},
+      admin_id: %Schema{type: :string, format: :uuid, nullable: true},
+      cancelled_at: %Schema{type: :string, format: :"date-time", nullable: true},
+      cancel_reason: %Schema{type: :string, nullable: true}
+    },
+    required: [:id, :starts_on, :ends_on, :extension_days, :reason, :cancelled_at]
+  }
+
+  @freeze_response %Schema{
+    type: :object,
+    properties: %{freeze: @freeze_schema},
+    required: [:freeze]
+  }
+
+  operation(:freezes,
+    summary: "List a member's package freezes (ADR-097)",
+    parameters: [@id_parameter],
+    responses: [
+      ok:
+        {"Freezes", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{freezes: %Schema{type: :array, items: @freeze_schema}},
+           required: [:freezes]
+         }}
+    ]
+  )
+
+  def freezes(conn, %{id: user_id}) do
+    json(conn, %{freezes: Finance.list_freezes(conn.assigns.tenant_context, user_id)})
+  end
+
+  operation(:create_freeze,
+    summary: "Freeze a member's package for a date range; the package end moves out",
+    parameters: [@id_parameter],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            required: [:starts_on, :ends_on, :reason],
+            properties: %{
+              starts_on: %Schema{type: :string, format: :date},
+              ends_on: %Schema{type: :string, format: :date},
+              reason: %Schema{type: :string, minLength: 3, maxLength: 500}
+            }
+          }
+        }
+      }
+    },
+    responses: [
+      created: {"Freeze", "application/json", @freeze_response},
+      unprocessable_entity: {"Invalid freeze", "application/json", @summary_object},
+      conflict: {"Overlapping freeze", "application/json", @summary_object}
+    ]
+  )
+
+  def create_freeze(conn, %{id: user_id}) do
+    admin = Guardian.Plug.current_resource(conn)
+
+    with {:ok, freeze} <-
+           Finance.create_freeze(
+             conn.assigns.tenant_context,
+             user_id,
+             admin.id,
+             conn.body_params
+           ) do
+      conn
+      |> put_status(:created)
+      |> json(%{freeze: freeze})
+    end
+  end
+
+  operation(:cancel_freeze,
+    summary: "Cancel a freeze; unused days are given back",
+    parameters: [
+      @id_parameter,
+      %Parameter{
+        name: :freeze_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: false,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{reason: %Schema{type: :string, maxLength: 500, nullable: true}}
+          }
+        }
+      }
+    },
+    responses: [
+      ok: {"Freeze", "application/json", @freeze_response},
+      not_found: {"Freeze not found", "application/json", @summary_object},
+      conflict: {"Freeze already cancelled", "application/json", @summary_object}
+    ]
+  )
+
+  def cancel_freeze(conn, %{id: user_id, freeze_id: freeze_id}) do
+    with {:ok, freeze} <-
+           Finance.cancel_freeze(
+             conn.assigns.tenant_context,
+             user_id,
+             freeze_id,
+             conn.body_params || %{}
+           ) do
+      json(conn, %{freeze: freeze})
     end
   end
 
@@ -632,6 +1050,12 @@ defmodule MilosTrainingWeb.AdminUserController do
 
   def prs(conn, params), do: render_service(conn, GetAdminUserPRs, params)
 
+  def pr_members(conn, _params) do
+    with {:ok, payload} <- ListPRDossierMembers.call(conn.assigns.tenant_context) do
+      json(conn, payload)
+    end
+  end
+
   def incidents(conn, params) do
     with {:ok, payload} <-
            GetAdminUserIncidents.call(conn.assigns.tenant_context, params["id"] || params[:id]) do
@@ -651,11 +1075,15 @@ defmodule MilosTrainingWeb.AdminUserController do
   end
 
   def index_athletes(conn, params) do
-    case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q]) do
+    opts = [include_members: truthy?(params["include_members"] || params[:include_members])]
+
+    case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q], opts) do
       {:error, reason} -> {:error, reason}
       athletes -> json(conn, %{athletes: athletes})
     end
   end
+
+  defp truthy?(value), do: value in [true, "true", "1"]
 
   defp render_service(conn, service, params) do
     with {:ok, payload} <- service.call(conn.assigns.tenant_context, params["id"] || params[:id]) do

@@ -16,6 +16,7 @@ defmodule MilosTrainingWeb.Plugs.ResolveTenantContext do
           {:ok, context} ->
             conn
             |> assign(:tenant_context, context)
+            |> signal_canonical_slug(slug, context)
             |> drop_organization_slug_path_param()
 
           {:error, _reason} ->
@@ -35,6 +36,19 @@ defmodule MilosTrainingWeb.Plugs.ResolveTenantContext do
         |> halt()
     end
   end
+
+  @canonical_slug_header "x-organization-canonical-slug"
+
+  def canonical_slug_header, do: @canonical_slug_header
+
+  # ADR-122: a retired slug resolves transparently to its organization; the
+  # response names the current slug so clients can update stored selections
+  # and links without a failed request.
+  defp signal_canonical_slug(conn, requested_slug, %{organization: %{slug: canonical}})
+       when is_binary(canonical) and canonical != requested_slug,
+       do: put_resp_header(conn, @canonical_slug_header, canonical)
+
+  defp signal_canonical_slug(conn, _requested_slug, _context), do: conn
 
   defp drop_organization_slug_path_param(conn) do
     %{

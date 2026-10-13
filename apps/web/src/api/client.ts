@@ -47,6 +47,8 @@ type ApiRequestOptions = {
   method?: "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
   token?: string | null;
   body?: unknown;
+  /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
+  responseType?: "json" | "text";
 };
 
 function organizationSlugFromPath() {
@@ -85,18 +87,38 @@ function organizationSlugForRequest(token?: string | null) {
   return organizationSlugFromPath() ?? selectedOrganizationSlug() ?? organizationSlugFromToken(token);
 }
 
+/** The organization a tenant-scoped request would target right now. */
+export function currentOrganizationSlug(token?: string | null) {
+  return organizationSlugForRequest(token);
+}
+
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",
+  "/challenges",
+  "/class-timers",
+  "/check-ins",
   "/landing",
+  "/locations",
+  "/me/appointments",
+  "/me/corporate-enrollment",
   "/me/entitlement",
   "/me/finance",
+  "/me/form-reviews",
+  "/me/history",
   "/me/invoices",
+  "/me/refund-receipts",
+  "/me/nutrition-plan",
+  "/me/progress",
   "/me/reviews",
   "/me/search/users",
   "/me/threads",
+  "/me/training-log",
+  "/me/workouts",
   "/my-workouts",
   "/schedule",
+  "/staff",
+  "/me/videos",
 ];
 
 function pathMatchesPrefix(path: string, prefix: string) {
@@ -130,6 +152,17 @@ function rememberOrganizationSlug(slug: string) {
   try {
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, slug);
   } catch {}
+}
+
+// ADR-122: the API resolves a retired organization slug transparently and
+// names the current one in this header. A remembered selection that still
+// holds the retired slug is updated so later requests use the new one.
+export const CANONICAL_ORGANIZATION_SLUG_HEADER = "x-organization-canonical-slug";
+
+function rememberCanonicalOrganizationSlug(response: Response, requestedSlug: string | null) {
+  const canonicalSlug = response.headers?.get?.(CANONICAL_ORGANIZATION_SLUG_HEADER);
+  if (!canonicalSlug || !requestedSlug || canonicalSlug === requestedSlug) return;
+  if (selectedOrganizationSlug() === requestedSlug) rememberOrganizationSlug(canonicalSlug);
 }
 
 let refreshPromise: Promise<string | null> | null = null;
@@ -318,6 +351,8 @@ export async function apiRequest<T>(
     credentials: "same-origin",
   });
 
+  rememberCanonicalOrganizationSlug(response, organizationSlug);
+
   if (response.status === 401 && allowRefresh && token) {
     const refreshedToken = await refreshAccessToken();
 
@@ -331,6 +366,10 @@ export async function apiRequest<T>(
         false,
       );
     }
+  }
+
+  if (options.responseType === "text" && response.ok) {
+    return (await response.text()) as T;
   }
 
   const payload = (await response.json().catch(() => ({}))) as T | ApiErrorPayload;

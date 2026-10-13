@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: he\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "מספר חשבונית"
+
+msgid "Period"
+msgstr "תקופה"
+
+msgid "Seats"
+msgstr "מקומות"
+
+msgid "Price per seat"
+msgstr "מחיר למקום"
+
+msgid "Total"
+msgstr "סה״כ"
+
+msgid "Paid"
+msgstr "שולם"
+
+msgid "Balance due"
+msgstr "יתרה לתשלום"
+
+msgid "Due date"
+msgstr "תאריך לתשלום"
+
+msgid "Hello %{name},"
+msgstr "שלום %{name},"
+
+msgid "Thank you."
+msgstr "תודה."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "חשבונית %{number} מאת %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "%{gym} הנפיק את חשבונית %{number} ל-%{company} עבור התקופה %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "נא לשלם עד %{due} ולציין את מספר החשבונית."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "תזכורת: חשבונית %{number} מאת %{gym} לא שולמה במועד"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "חשבונית %{number} ל-%{company} הייתה לתשלום ב-%{due} ועדיין לא שולמה."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "אם כבר שילמתם, אנא התעלמו מתזכורת זו."

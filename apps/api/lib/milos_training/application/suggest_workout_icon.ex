@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.SuggestWorkoutIcon do
   @moduledoc """
   Gives a freshly published workout a fitting emoji using the configured
-  suggester (Gemini, ADR-096). Runs in the background after publishing and never
+  suggester (Gemini, ADR-136). Runs in the background after publishing and never
   overrides an icon a coach picked. Failures are silent: the library's keyword
   rules keep showing an icon.
   """

@@ -20,6 +20,10 @@ defmodule MilosTraining.Gamification.GamificationStore do
   def get_settings, do: adapter().get_settings()
 
   @impl true
+  def get_public_theme_slug(organization_slug),
+    do: adapter().get_public_theme_slug(organization_slug)
+
+  @impl true
   def update_settings(params), do: adapter().update_settings(params)
 
   @impl true

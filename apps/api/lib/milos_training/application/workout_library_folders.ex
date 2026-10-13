@@ -8,6 +8,9 @@ defmodule MilosTraining.Application.WorkoutLibraryFolders do
       athlete are filed (copied) here.
     * `Classes/<year>/<month>/<date>` — workouts attached to a dated class are
       filed (copied) here, using the gym's local date.
+    * `Variations for member/<nickname>` — a member's personal workouts and
+      own versions of classes (ADR-125) are filed here. Member folders are
+      created on first use; the copies stay hidden from the shared library.
 
   System folders are found by a stable `system_key`, so coaches may rename,
   move or nest them however they like; deleted ones are recreated on demand.
@@ -18,6 +21,7 @@ defmodule MilosTraining.Application.WorkoutLibraryFolders do
 
   @athletes {"athletes", "Athletes"}
   @classes {"classes", "Classes"}
+  @member_variations {"member_variations", "Variations for member"}
 
   @doc "Lists the library folders after making sure every system folder exists."
   def list(context) do
@@ -35,6 +39,13 @@ defmodule MilosTraining.Application.WorkoutLibraryFolders do
   def athlete_folder(context, %{id: athlete_id, nickname: nickname}) do
     with {:ok, root} <- ensure(context, @athletes, nil) do
       ensure(context, {athlete_key(athlete_id), nickname || athlete_id}, root.id)
+    end
+  end
+
+  @doc "The member's own variations folder (`Variations for member/<nickname>`)."
+  def member_variation_folder(context, %{id: member_id, nickname: nickname}) do
+    with {:ok, root} <- ensure(context, @member_variations, nil) do
+      ensure(context, {"member_variations:#{member_id}", nickname || member_id}, root.id)
     end
   end
 
@@ -70,12 +81,14 @@ defmodule MilosTraining.Application.WorkoutLibraryFolders do
 
     roots_missing? =
       not MapSet.member?(existing, elem(@athletes, 0)) or
-        not MapSet.member?(existing, elem(@classes, 0))
+        not MapSet.member?(existing, elem(@classes, 0)) or
+        not MapSet.member?(existing, elem(@member_variations, 0))
 
     if missing_athletes == [] and not roots_missing? do
       :unchanged
     else
-      with {:ok, _classes} <- ensure(context, @classes, nil) do
+      with {:ok, _classes} <- ensure(context, @classes, nil),
+           {:ok, _variations} <- ensure(context, @member_variations, nil) do
         Enum.reduce_while(missing_athletes, :ok, fn athlete, :ok ->
           case athlete_folder(context, athlete) do
             {:ok, _folder} -> {:cont, :ok}

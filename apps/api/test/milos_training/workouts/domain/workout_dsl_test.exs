@@ -261,6 +261,34 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       end)
     end
 
+    test "a complex EMOM interval pattern parses and round-trips" do
+      source = """
+      [workout]
+      dsl-version: 1
+      title: Rotating EMOM
+      type: crossfit
+      [section: complex-emom]
+      title: Engine
+      duration: 12 min
+      interval: 1 min
+      interval-pattern: 1 min, 2 min, 90 sec
+      [exercise: Bike]
+      calories: 15
+      [/exercise]
+      [/section]
+      [/workout]
+      """
+
+      assert {:ok, first} = WorkoutDsl.parse(source)
+      [section] = first.workout.sections
+      assert section.timer_config.interval_pattern_seconds == [60, 120, 90]
+
+      formatted = WorkoutDsl.format(first.workout, version: first.version)
+      assert formatted =~ "interval-pattern: 1 min, 2 min, 1 min 30 sec"
+      assert {:ok, second} = WorkoutDsl.parse(formatted)
+      assert second.workout == first.workout
+    end
+
     test "nested sections, groups, scales, rich metadata and linear deload survive round-trip" do
       source = """
       [workout]

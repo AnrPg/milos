@@ -135,3 +135,114 @@ msgstr "New workouts assigned"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Your coach assigned one or more workouts to you."
+
+msgid "You got a spot"
+msgstr "You got a spot"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+
+msgid "Your package ends soon"
+msgstr "Your package ends soon"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} ends on %{date}."
+
+msgid "New form review request"
+msgstr "New form review request"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} sent a video for feedback."
+
+msgid "Your form review is ready"
+msgstr "Your form review is ready"
+
+msgid "Your coach left feedback on your video."
+msgstr "Your coach left feedback on your video."
+
+msgid "A client is waiting for a reply"
+msgstr "A client is waiting for a reply"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} has been waiting longer than the promised reply time."
+
+msgid "Your nutrition plan was updated"
+msgstr "Your nutrition plan was updated"
+
+msgid "Open it to see what changed."
+msgstr "Open it to see what changed."
+
+msgid "New appointment booked"
+msgstr "New appointment booked"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} booked a session for %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Appointment cancelled"
+
+msgid "The session on %{time} was cancelled."
+msgstr "The session on %{time} was cancelled."
+
+msgid "A coach took a new athlete"
+msgstr "A coach took a new athlete"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} is now coaching %{client}."
+
+msgid "An admin read your note"
+msgstr "An admin read your note"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} read your note about %{client} at %{time}."
+
+msgid "A machine needs attention"
+msgstr "A machine needs attention"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Reported running low"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventory today"
+
+msgid "Needs attention: %{items}"
+msgstr "Needs attention: %{items}"
+
+msgid "Running low"
+msgstr "Running low"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: %{quantity} left."
+
+msgid "Your subscription ends soon"
+msgstr "Your subscription ends soon"
+
+msgid "Your subscription has ended"
+msgstr "Your subscription has ended"
+
+msgid "your subscription"
+msgstr "your subscription"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+
+msgid "Your access has ended"
+msgstr "Your access has ended"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Your access has ended. Renew your subscription to book classes again."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Your upcoming bookings were cancelled: %{count}."

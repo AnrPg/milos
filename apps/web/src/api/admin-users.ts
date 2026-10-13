@@ -1,3 +1,4 @@
+import type { DurationAdjustment } from "@/api/executions";
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 import type { EffectiveEntitlement } from "@/api/my-finance";
@@ -20,6 +21,8 @@ export type AdminUserDirectoryEntry = {
 export type AdminUserProfileShell = {
   identity: Pick<AdminUserDirectoryEntry, "id" | "nickname" | "avatar_url" | "role" | "joined_at">;
   account_status: string;
+  /** Roles held together in this gym and the coach scope (ADR-099, ADR-100). */
+  membership?: { roles: string[]; coach_scope: string } | null;
   available_sections: string[];
   attention: Array<Record<string, unknown>>;
   operational_links: Record<string, string>;
@@ -56,6 +59,8 @@ export type AdminUserExecution = {
   completed_at_utc: string | null;
   total_elapsed_ms: number;
   section_scores: Array<Record<string, unknown>>;
+  /** Clock changes the athlete made mid-workout, by segment key. */
+  duration_adjustments?: Record<string, DurationAdjustment>;
 };
 
 export type AdminUserTraining = {
@@ -74,6 +79,8 @@ export type AdminUserSchedule = {
   end_date: string;
   items: Array<Record<string, unknown>>;
 };
+
+export type AdminUserPRVisibility = "coach" | "coach_role_required";
 
 export type AdminUserPR = {
   id: string;
@@ -111,11 +118,15 @@ export type AdminUserMessageThread = {
   latest_message: null | { body: string; inserted_at: string; sender_id: string };
 };
 
-export function fetchAdminUsers(token: string, params: { q?: string; role?: string } = {}) {
+export function fetchAdminUsers(
+  token: string,
+  params: { q?: string; role?: string; offset?: number; limit?: number } = {},
+) {
   const query = new URLSearchParams();
   if (params.q) query.set("q", params.q);
   if (params.role) query.set("role", params.role);
-  query.set("limit", "50");
+  query.set("limit", String(params.limit ?? 50));
+  if (params.offset) query.set("offset", String(params.offset));
 
   return apiRequest<{
     users: AdminUserDirectoryEntry[];
@@ -140,23 +151,43 @@ export function fetchAdminUserSchedule(token: string, userId: string, startDate:
   return apiRequest<AdminUserSchedule>(`/admin/users/${userId}/schedule?${query}`, { token });
 }
 
+/**
+ * ADR-125 member programming modes: replace the booked class's workout for
+ * everyone (ADR-071 default), create this member's own version of the class,
+ * or assign a personal workout without a class.
+ */
+export type MemberProgrammingMode = "class_workout" | "class_variant" | "personal";
+
 export function programAdminUserWorkout(
   token: string,
   userId: string,
   body: {
-    master_workout_id: string;
+    /** Optional only for a member `class_variant` (defaults to the class's workout). */
+    master_workout_id?: string;
     folder_id: string | null;
     scheduled_for: string;
     slot_id?: string | null;
     copy_source: boolean;
     admin_notes?: string;
+    /** ADR-125 member programming mode; ignored for athletes. */
+    mode?: MemberProgrammingMode;
   },
 ) {
-  return apiRequest<{ workout: Record<string, unknown>; association: Record<string, unknown> }>(
+  return apiRequest<{ workout: Record<string, unknown>; association: Record<string, unknown>; mode?: string }>(
     `/admin/users/${userId}/programming`,
     { token, method: "POST", body },
   );
 }
+
+/** ADR-132: the PR owner's public identity when they are active in this gym. */
+export type AdminUserPRMember = { id: string; nickname: string; avatar_url?: string | null };
+
+export type AdminUserPRs = {
+  user_id: string;
+  visibility: AdminUserPRVisibility;
+  member?: AdminUserPRMember | null;
+  prs: AdminUserPR[];
+};
 
 export function placeAdminUserInClass(
   token: string,
@@ -170,7 +201,25 @@ export function placeAdminUserInClass(
 }
 
 export function fetchAdminUserPRs(token: string, userId: string) {
-  return apiRequest<{ user_id: string; prs: AdminUserPR[] }>(`/admin/users/${userId}/prs`, { token });
+  // ADR-129: only the gym's coaches read members' PRs; other staff receive
+  // `coach_role_required` and no records.
+  return apiRequest<AdminUserPRs>(`/admin/users/${userId}/prs`, { token });
+}
+
+export type PRDossierMember = {
+  id: string;
+  nickname: string;
+  avatar_url?: string | null;
+  role: string;
+  joined_at?: string | null;
+};
+
+/**
+ * ADR-132: the gym's active members whose PR panel a coach may open. Coach
+ * client scope (ADR-100) does not narrow it; non-coach staff get an empty list.
+ */
+export function fetchPRDossierMembers(token: string) {
+  return apiRequest<{ visibility: AdminUserPRVisibility; members: PRDossierMember[] }>("/admin/pr-members", { token });
 }
 
 export function fetchAdminUserIncidents(token: string, userId: string) {
@@ -213,4 +262,37 @@ export function revokeAdminUserAllowance(token: string, userId: string, entryId:
     `/admin/users/${userId}/allowance-extensions/${entryId}/revoke`,
     { token, method: "POST", body: { reason } },
   );
+}
+
+/** A package freeze; the package end date moves out by `extension_days` (ADR-097). */
+export type MembershipFreeze = {
+  id: string;
+  starts_on: string;
+  ends_on: string;
+  extension_days: number;
+  reason: string;
+  admin_id?: string | null;
+  cancelled_at: string | null;
+  cancel_reason?: string | null;
+};
+
+export async function fetchAdminUserFreezes(token: string, userId: string) {
+  const response = await apiRequest<{ freezes: MembershipFreeze[] }>(`/admin/users/${userId}/freezes`, { token });
+  return response.freezes;
+}
+
+export function createAdminUserFreeze(
+  token: string,
+  userId: string,
+  body: { starts_on: string; ends_on: string; reason: string },
+) {
+  return apiRequest<{ freeze: MembershipFreeze }>(`/admin/users/${userId}/freezes`, { token, method: "POST", body });
+}
+
+export function cancelAdminUserFreeze(token: string, userId: string, freezeId: string, reason?: string) {
+  return apiRequest<{ freeze: MembershipFreeze }>(`/admin/users/${userId}/freezes/${freezeId}/cancel`, {
+    token,
+    method: "POST",
+    body: reason ? { reason } : {},
+  });
 }

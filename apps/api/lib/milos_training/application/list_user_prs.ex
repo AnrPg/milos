@@ -2,7 +2,13 @@ defmodule MilosTraining.Application.ListUserPRs do
   alias MilosTraining.Application.PRSearchIndex
   alias MilosTraining.Pantheon
 
-  def call(user_id, opts \\ []) do
+  def call(user_or_context, opts \\ [])
+
+  # Owner-only under RLS: runs in the acting user's scope (ADR-129).
+  def call(%{user_id: user_id} = context, opts) when is_list(opts),
+    do: Pantheon.with_user_context(context, fn -> call(user_id, opts) end)
+
+  def call(user_id, opts) do
     query = Keyword.get(opts, :query)
 
     prs =

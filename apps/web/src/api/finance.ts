@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { PackageCatalog } from "@/components/admin/finance/packages/package-catalog";
 
 export type FinanceRecord = Record<string, unknown>;
 
@@ -52,6 +53,10 @@ export async function purgeFinanceRecord(
 
 export async function fetchFinancePackages(token: string) {
   return apiRequest<{ packages: FinanceRecord[] }>("/admin/finance/packages", { token });
+}
+
+export async function fetchPackageCatalog(token: string) {
+  return apiRequest<PackageCatalog>("/admin/finance/package-catalog", { token });
 }
 
 export async function fetchFinancePackage(token: string, packageId: string) {

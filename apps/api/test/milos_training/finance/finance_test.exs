@@ -78,7 +78,7 @@ defmodule MilosTraining.FinanceTest do
     assert receipt.invoice.membership_package_subscription_id == subscription.id
     assert receipt.package_name == "Monthly Receipt Package"
     assert receipt.package_code_snapshot == "monthly_receipt"
-    assert receipt.package_family_snapshot == "unlimited"
+    assert receipt.package_family_snapshot == "membership"
     assert [%{membership_package_subscription_id: subscription_id} = line] = receipt.invoice.lines
     assert subscription_id == subscription.id
     assert line.line_type == "membership_package"
@@ -229,7 +229,7 @@ defmodule MilosTraining.FinanceTest do
              })
 
     assert subscription.package_code_snapshot == "unlimited_monthly"
-    assert subscription.package_family_snapshot == "unlimited"
+    assert subscription.package_family_snapshot == "membership"
 
     profile = Finance.get_member_profile(user.id)
     assert profile.membership.status == "active"
@@ -960,7 +960,8 @@ defmodule MilosTraining.FinanceTest do
              Finance.create_invoice(membership.id, %{
                amount_cents: 4500,
                description: "Late charge",
-               due_date: Date.add(Date.utc_today(), -2)
+               # Beyond the default 3-day grace slack (ADR-112).
+               due_date: Date.add(Date.utc_today(), -10)
              })
 
     assert {:ok, overdue_invoice} = Finance.issue_invoice(invoice.id)

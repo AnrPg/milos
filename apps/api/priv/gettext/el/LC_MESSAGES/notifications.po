@@ -135,3 +135,114 @@ msgstr "Ανατέθηκαν νέες προπονήσεις"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ο προπονητής σας ανέθεσε μία ή περισσότερες προπονήσεις."
+
+msgid "You got a spot"
+msgstr "Βρέθηκε θέση για σένα"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Άνοιξε θέση στο %{class}. Η κράτησή σου επιβεβαιώθηκε ή περιμένει έγκριση."
+
+msgid "Your package ends soon"
+msgstr "Το πακέτο σου λήγει σύντομα"
+
+msgid "%{package} ends on %{date}."
+msgstr "Το %{package} λήγει στις %{date}."
+
+msgid "New form review request"
+msgstr "Νέο αίτημα αξιολόγησης τεχνικής"
+
+msgid "%{client} sent a video for feedback."
+msgstr "Ο/Η %{client} έστειλε βίντεο για σχόλια."
+
+msgid "Your form review is ready"
+msgstr "Η αξιολόγηση τεχνικής σου είναι έτοιμη"
+
+msgid "Your coach left feedback on your video."
+msgstr "Ο προπονητής σου άφησε σχόλια στο βίντεό σου."
+
+msgid "A client is waiting for a reply"
+msgstr "Ένας πελάτης περιμένει απάντηση"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "Ο/Η %{client} περιμένει περισσότερο από τον χρόνο απάντησης που υποσχεθήκαμε."
+
+msgid "Your nutrition plan was updated"
+msgstr "Το διατροφικό σου πλάνο ενημερώθηκε"
+
+msgid "Open it to see what changed."
+msgstr "Άνοιξέ το για να δεις τι άλλαξε."
+
+msgid "New appointment booked"
+msgstr "Νέο ραντεβού"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "Ο/Η %{client} έκλεισε συνεδρία για %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Το ραντεβού ακυρώθηκε"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Η συνεδρία της %{time} ακυρώθηκε."
+
+msgid "A coach took a new athlete"
+msgstr "Ένας coach ανέλαβε νέο αθλητή"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "Ο/Η %{coach} προπονεί πλέον τον/την %{client}."
+
+msgid "An admin read your note"
+msgstr "Ένας admin διάβασε τη σημείωσή σας"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "Ο/Η %{reader} διάβασε τη σημείωσή σας για τον/την %{client} στις %{time}."
+
+msgid "A machine needs attention"
+msgstr "Ένα μηχάνημα χρειάζεται προσοχή"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Αναφέρθηκε χαμηλό απόθεμα"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Απόθεμα σήμερα"
+
+msgid "Needs attention: %{items}"
+msgstr "Χρειάζονται προσοχή: %{items}"
+
+msgid "Running low"
+msgstr "Χαμηλό απόθεμα"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: απομένουν %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "Η συνδρομή σας λήγει σύντομα"
+
+msgid "Your subscription has ended"
+msgstr "Η συνδρομή σας έληξε"
+
+msgid "your subscription"
+msgstr "η συνδρομή σας"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "Η συνδρομή %{package} λήγει στις %{date} (σε %{days} ημέρες). Ανανεώστε για να συνεχίσετε να κλείνετε μαθήματα."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "Η συνδρομή %{package} έληξε. Διατηρείτε πρόσβαση έως τις %{date}· ανανεώστε μέχρι τότε για να συνεχίσετε να κλείνετε μαθήματα."
+
+msgid "Your access has ended"
+msgstr "Η πρόσβασή σας έληξε"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Η πρόσβασή σας έχει παγώσει επειδή μια πληρωμή καθυστερεί. Εξοφλήστε το υπόλοιπο για να κλείνετε ξανά μαθήματα."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Η πρόσβασή σας έληξε. Ανανεώστε τη συνδρομή σας για να κλείνετε ξανά μαθήματα."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Οι επερχόμενες κρατήσεις σας ακυρώθηκαν: %{count}."

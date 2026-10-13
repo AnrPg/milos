@@ -3,7 +3,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Pantheon.{PRHistory, PRRecord}
+  alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant, PRSharingPreference}
   alias MilosTraining.Pantheon.Domain.PRHistoryPolicy
   alias MilosTraining.Repo
 
@@ -11,6 +11,15 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   def list_user_prs(user_id) do
     PRRecord
     |> where([r], r.user_id == ^user_id)
+    |> order_by([r], desc: r.beaten_on, desc: r.inserted_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_pr/1)
+  end
+
+  @impl true
+  def list_organization_prs(user_id, organization_id) do
+    PRRecord
+    |> where([r], r.user_id == ^user_id and r.organization_id == ^organization_id)
     |> order_by([r], desc: r.beaten_on, desc: r.inserted_at)
     |> Repo.all()
     |> Enum.map(&normalize_pr/1)
@@ -56,8 +65,8 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   @impl true
   def create_pr(params) do
-    %PRRecord{}
-    |> PRRecord.changeset(params)
+    params
+    |> PRRecord.create_changeset()
     |> Repo.insert()
     |> normalize_result(&normalize_pr/1)
   end
@@ -77,6 +86,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
               if PRHistoryPolicy.snapshot_required?(changeset.changes) do
                 %PRHistory{}
                 |> PRHistory.changeset(%{
+                  organization_id: existing.organization_id,
                   pr_record_id: id,
                   score: existing.current_score,
                   beaten_on: existing.beaten_on,
@@ -130,6 +140,23 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
     |> Enum.map(&normalize_history/1)
   end
 
+  # Every history entry of the user's PRs with its record's name and unit, for
+  # the progress timeline (ADR-098).
+  @impl true
+  def list_user_pr_history(user_id) do
+    PRHistory
+    |> join(:inner, [h], r in PRRecord, on: r.id == h.pr_record_id)
+    |> where([_h, r], r.user_id == ^user_id)
+    |> order_by([h], asc: h.beaten_on, asc: h.inserted_at)
+    |> select([h, r], {h, r.name, r.unit, r.higher_is_better})
+    |> Repo.all()
+    |> Enum.map(fn {history, name, unit, higher_is_better} ->
+      history
+      |> normalize_history()
+      |> Map.merge(%{name: name, unit: unit, higher_is_better: higher_is_better})
+    end)
+  end
+
   @impl true
   def count_user_prs(user_id) do
     PRRecord
@@ -137,10 +164,92 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
     |> Repo.aggregate(:count, :id)
   end
 
+  @impl true
+  def get_sharing_preference(user_id) do
+    case Repo.get(PRSharingPreference, user_id) do
+      nil -> %{coach_visibility: true}
+      preference -> %{coach_visibility: preference.coach_visibility}
+    end
+  end
+
+  @impl true
+  def put_coach_visibility(user_id, enabled?) do
+    (Repo.get(PRSharingPreference, user_id) || %PRSharingPreference{user_id: user_id})
+    |> PRSharingPreference.changeset(%{user_id: user_id, coach_visibility: enabled?})
+    |> Repo.insert_or_update()
+    |> normalize_result(&%{coach_visibility: &1.coach_visibility})
+  end
+
+  @impl true
+  def list_owned_grants(user_id) do
+    PRShareGrant
+    |> where([g], g.user_id == ^user_id and is_nil(g.revoked_at))
+    |> order_by([g], asc: g.created_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_grant/1)
+  end
+
+  @impl true
+  def list_received_grants(grantee_user_id) do
+    PRShareGrant
+    |> where([g], g.grantee_user_id == ^grantee_user_id and is_nil(g.revoked_at))
+    |> order_by([g], asc: g.created_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_grant/1)
+  end
+
+  @impl true
+  def get_active_grant(user_id, grantee_user_id) do
+    PRShareGrant
+    |> where([g], g.user_id == ^user_id and g.grantee_user_id == ^grantee_user_id)
+    |> where([g], is_nil(g.revoked_at))
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      grant -> normalize_grant(grant)
+    end
+  end
+
+  @impl true
+  def create_grant(user_id, grantee_user_id) do
+    %{user_id: user_id, grantee_user_id: grantee_user_id}
+    |> PRShareGrant.create_changeset()
+    |> Repo.insert()
+    |> normalize_result(&normalize_grant/1)
+  end
+
+  @impl true
+  def revoke_grant(user_id, grant_id, revoked_at) do
+    PRShareGrant
+    |> where([g], g.id == ^grant_id and g.user_id == ^user_id and is_nil(g.revoked_at))
+    |> Repo.one()
+    |> case do
+      nil ->
+        {:error, :not_found}
+
+      grant ->
+        grant
+        |> PRShareGrant.revoke_changeset(revoked_at)
+        |> Repo.update()
+        |> normalize_result(&normalize_grant/1)
+    end
+  end
+
+  defp normalize_grant(grant) do
+    %{
+      id: grant.id,
+      user_id: grant.user_id,
+      grantee_user_id: grant.grantee_user_id,
+      created_at: DateTime.to_iso8601(grant.created_at),
+      revoked_at: grant.revoked_at && DateTime.to_iso8601(grant.revoked_at)
+    }
+  end
+
   defp normalize_pr(pr) do
     %{
       id: pr.id,
       user_id: pr.user_id,
+      organization_id: pr.organization_id,
       name: pr.name,
       current_score: Decimal.to_float(pr.current_score),
       unit: pr.unit,

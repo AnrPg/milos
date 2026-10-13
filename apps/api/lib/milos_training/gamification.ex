@@ -34,6 +34,11 @@ defmodule MilosTraining.Gamification do
   defdelegate delete_seasonal_challenge(id), to: DeleteSeasonalChallenge, as: :call
   defdelegate set_leaderboard_opt_in(user_id, opted_in), to: SetLeaderboardOptIn, as: :call
   defdelegate get_settings(), to: GetSettings, as: :call
+
+  defdelegate public_theme_slug(organization_slug),
+    to: GamificationStore,
+    as: :get_public_theme_slug
+
   defdelegate update_settings(params), to: UpdateSettings, as: :call
   defdelegate get_challenge(id), to: GetChallenge, as: :call
   defdelegate get_user_stats(user_id), to: GetUserStats, as: :call
@@ -77,4 +82,18 @@ defmodule MilosTraining.Gamification do
       Map.put(achievement, :label, AchievementRules.badge_label(achievement.badge_key))
     end)
   end
+
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
+  # retention policy; the shared executor only runs what this policy declares,
+  # always inside a RepoContext session for the purge's tenant.
+  def tenant_data_policy, do: MilosTraining.Gamification.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
 end

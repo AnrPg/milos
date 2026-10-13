@@ -1,5 +1,5 @@
 defmodule MilosTraining.Workers.SuggestWorkoutIconJob do
-  @moduledoc "Background icon suggestion for a published workout (ADR-096)."
+  @moduledoc "Background icon suggestion for a published workout (ADR-136)."
 
   use Oban.Worker,
     queue: :default,

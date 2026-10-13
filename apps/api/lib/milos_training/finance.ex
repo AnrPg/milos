@@ -1,5 +1,5 @@
 defmodule MilosTraining.Finance do
-  alias MilosTraining.Finance.FinanceStore
+  alias MilosTraining.Finance.{Commands, FinanceStore, Queries}
 
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: FinanceStore.with_tenant_context(context, fun)
@@ -51,6 +51,7 @@ defmodule MilosTraining.Finance do
     GetEffectiveEntitlement,
     GetMemberProfile,
     GetPackage,
+    GetPackageCatalog,
     ListExpiringMemberships,
     ListPackages,
     ListPromotionCampaigns,
@@ -78,6 +79,15 @@ defmodule MilosTraining.Finance do
   defdelegate list_packages(), to: ListPackages, as: :call
   def list_packages(context), do: scoped(context, fn -> list_packages() end)
   defdelegate get_package(id), to: GetPackage, as: :call
+  defdelegate get_package_catalog(), to: GetPackageCatalog, as: :call
+
+  # Closed package vocabularies used by interface contracts (ADR-096).
+  def package_type_keys, do: MilosTraining.Finance.Domain.PackageType.keys()
+  def package_billing_periods, do: MilosTraining.Finance.Domain.PackageType.all_billing_periods()
+  def package_catalog_fields, do: MilosTraining.Finance.Domain.PackageCatalog.fields()
+  def package_module_keys, do: MilosTraining.Finance.Domain.PackageType.module_keys()
+  def package_quota_periods, do: MilosTraining.Finance.Domain.PackageCatalog.quota_periods()
+  def get_package_catalog(context), do: scoped(context, fn -> get_package_catalog() end)
   def get_package(context, id), do: scoped(context, fn -> get_package(id) end)
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 
@@ -371,6 +381,16 @@ defmodule MilosTraining.Finance do
   def update_membership_reminder_timestamp(context, membership_id),
     do: scoped(context, fn -> update_membership_reminder_timestamp(membership_id) end)
 
+  def subscriptions_needing_expiry_notice(context, kind, days),
+    do: scoped(context, fn -> FinanceStore.subscriptions_needing_expiry_notice(kind, days) end)
+
+  def mark_subscription_notice_sent(context, subscription_id, kind),
+    do:
+      scoped(context, fn -> FinanceStore.mark_subscription_notice_sent(subscription_id, kind) end)
+
+  def refresh_entitlement_snapshots(context),
+    do: scoped(context, fn -> FinanceStore.refresh_entitlement_snapshots() end)
+
   defdelegate total_outstanding_balance_cents(),
     to: FinanceStore,
     as: :total_outstanding_balance_cents
@@ -384,4 +404,204 @@ defmodule MilosTraining.Finance do
 
   def count_pending_referral_approvals(context),
     do: scoped(context, fn -> count_pending_referral_approvals() end)
+
+  # ADR-126 refund receipts, payment-provider reconciliation and accounting
+  # exports. All of them attach to the append-only payment/reversal facts.
+  defdelegate list_refund_receipts(filters), to: Queries.ListRefundReceipts, as: :call
+
+  def list_refund_receipts(context, filters),
+    do: scoped(context, fn -> list_refund_receipts(filters) end)
+
+  defdelegate get_refund_receipt(id), to: Queries.GetRefundReceipt, as: :call
+  def get_refund_receipt(context, id), do: scoped(context, fn -> get_refund_receipt(id) end)
+
+  defdelegate get_refund_receipt_for_reversal(reversal_id),
+    to: Queries.GetRefundReceipt,
+    as: :for_reversal
+
+  def get_refund_receipt_for_reversal(context, reversal_id),
+    do: scoped(context, fn -> get_refund_receipt_for_reversal(reversal_id) end)
+
+  defdelegate record_reconciliation_line(params, actor_id),
+    to: Commands.RecordReconciliationLine,
+    as: :call
+
+  def record_reconciliation_line(context, params, actor_id),
+    do: scoped(context, fn -> record_reconciliation_line(params, actor_id) end)
+
+  defdelegate list_reconciliation_records(filters),
+    to: Queries.ListReconciliationRecords,
+    as: :call
+
+  def list_reconciliation_records(context, filters),
+    do: scoped(context, fn -> list_reconciliation_records(filters) end)
+
+  defdelegate get_reconciliation_record(id), to: Queries.GetReconciliationRecord, as: :call
+
+  def get_reconciliation_record(context, id),
+    do: scoped(context, fn -> get_reconciliation_record(id) end)
+
+  defdelegate reconciliation_candidates(id), to: Queries.ReconciliationCandidates, as: :call
+
+  def reconciliation_candidates(context, id),
+    do: scoped(context, fn -> reconciliation_candidates(id) end)
+
+  defdelegate match_reconciliation_record(id, target_type, target_id, attrs),
+    to: Commands.MatchReconciliationRecord,
+    as: :call
+
+  def match_reconciliation_record(context, id, target_type, target_id, attrs),
+    do: scoped(context, fn -> match_reconciliation_record(id, target_type, target_id, attrs) end)
+
+  defdelegate unmatch_reconciliation_record(id, attrs),
+    to: Commands.UnmatchReconciliationRecord,
+    as: :call
+
+  def unmatch_reconciliation_record(context, id, attrs),
+    do: scoped(context, fn -> unmatch_reconciliation_record(id, attrs) end)
+
+  defdelegate create_accounting_export(attrs), to: Commands.CreateAccountingExport, as: :call
+
+  def create_accounting_export(context, attrs),
+    do: scoped(context, fn -> create_accounting_export(attrs) end)
+
+  defdelegate update_accounting_export(id, attrs), to: Commands.UpdateAccountingExport, as: :call
+
+  def update_accounting_export(context, id, attrs),
+    do: scoped(context, fn -> update_accounting_export(id, attrs) end)
+
+  defdelegate get_accounting_export(id), to: Queries.GetAccountingExport, as: :call
+  def get_accounting_export(context, id), do: scoped(context, fn -> get_accounting_export(id) end)
+
+  defdelegate list_accounting_exports(filters), to: Queries.ListAccountingExports, as: :call
+
+  def list_accounting_exports(context, filters),
+    do: scoped(context, fn -> list_accounting_exports(filters) end)
+
+  defdelegate accounting_export_rows(range_start, range_end),
+    to: Queries.AccountingExportRows,
+    as: :call
+
+  def accounting_export_rows(context, range_start, range_end),
+    do: scoped(context, fn -> accounting_export_rows(range_start, range_end) end)
+
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
+  # retention policy; the shared executor only runs what this policy declares,
+  # always inside a RepoContext session for the purge's tenant.
+  def tenant_data_policy, do: MilosTraining.Finance.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # Phase B (ADR-097)
+  defdelegate create_freeze(user_id, admin_id, params), to: FinanceStore
+
+  def create_freeze(context, user_id, admin_id, params),
+    do: scoped(context, fn -> create_freeze(user_id, admin_id, params) end)
+
+  defdelegate cancel_freeze(user_id, freeze_id, params), to: FinanceStore
+
+  def cancel_freeze(context, user_id, freeze_id, params),
+    do: scoped(context, fn -> cancel_freeze(user_id, freeze_id, params) end)
+
+  defdelegate list_freezes(user_id), to: FinanceStore
+  def list_freezes(context, user_id), do: scoped(context, fn -> list_freezes(user_id) end)
+
+  defdelegate booking_terms(user_id, occurred_on), to: FinanceStore
+
+  def booking_terms(context, user_id, occurred_on),
+    do: scoped(context, fn -> booking_terms(user_id, occurred_on) end)
+
+  @doc """
+  Terms of the package that would pay for `allowance` on that day (ADR-098),
+  or nil when no held package includes it.
+  """
+  def allowance_terms(context, user_id, allowance, occurred_on),
+    do: scoped(context, fn -> FinanceStore.allowance_terms(user_id, allowance, occurred_on) end)
+
+  # ADR-098 payment models: shared beneficiaries and corporate clients.
+  def list_beneficiaries(context, subscription_id),
+    do: scoped(context, fn -> FinanceStore.list_beneficiaries(subscription_id) end)
+
+  def add_beneficiary(context, subscription_id, user_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.add_beneficiary(subscription_id, user_id, admin_id, params)
+      end)
+
+  def remove_beneficiary(context, subscription_id, beneficiary_id),
+    do:
+      scoped(context, fn -> FinanceStore.remove_beneficiary(subscription_id, beneficiary_id) end)
+
+  def list_corporate_clients(context),
+    do: scoped(context, fn -> FinanceStore.list_corporate_clients() end)
+
+  def get_corporate_client(context, id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_client(id) end)
+
+  def find_corporate_client(context, criteria),
+    do: scoped(context, fn -> FinanceStore.find_corporate_client(criteria) end)
+
+  def create_corporate_client(context, params),
+    do: scoped(context, fn -> FinanceStore.create_corporate_client(params) end)
+
+  def update_corporate_client(context, id, params),
+    do: scoped(context, fn -> FinanceStore.update_corporate_client(id, params) end)
+
+  def enroll_corporate_seat(context, client_id, user_id, params),
+    do: scoped(context, fn -> FinanceStore.enroll_corporate_seat(client_id, user_id, params) end)
+
+  def end_corporate_seat(context, client_id, subscription_id),
+    do: scoped(context, fn -> FinanceStore.end_corporate_seat(client_id, subscription_id) end)
+
+  def list_corporate_seats(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_seats(client_id) end)
+
+  def generate_corporate_invoice(context, client_id, on),
+    do: scoped(context, fn -> FinanceStore.generate_corporate_invoice(client_id, on) end)
+
+  def list_corporate_invoices(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_invoices(client_id) end)
+
+  def set_corporate_invoice_status(context, invoice_id, status),
+    do: scoped(context, fn -> FinanceStore.set_corporate_invoice_status(invoice_id, status) end)
+
+  def get_corporate_invoice(context, invoice_id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_invoice(invoice_id) end)
+
+  def record_corporate_payment(context, invoice_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.record_corporate_payment(invoice_id, admin_id, params)
+      end)
+
+  def reverse_corporate_payment(context, invoice_id, payment_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.reverse_corporate_payment(invoice_id, payment_id, admin_id, params)
+      end)
+
+  def issue_due_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.issue_due_corporate_invoices(today) end)
+
+  def mark_overdue_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.mark_overdue_corporate_invoices(today) end)
+
+  def corporate_invoices_needing_reminder(context, today, interval_days),
+    do:
+      scoped(context, fn ->
+        FinanceStore.corporate_invoices_needing_reminder(today, interval_days)
+      end)
+
+  def mark_corporate_invoice_reminded(context, invoice_id, on),
+    do: scoped(context, fn -> FinanceStore.mark_corporate_invoice_reminded(invoice_id, on) end)
+
+  def subscriptions_due_for_expiry_reminder(context, today),
+    do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

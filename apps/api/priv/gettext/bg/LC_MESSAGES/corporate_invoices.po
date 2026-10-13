@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: bg\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "Номер на фактура"
+
+msgid "Period"
+msgstr "Период"
+
+msgid "Seats"
+msgstr "Места"
+
+msgid "Price per seat"
+msgstr "Цена на място"
+
+msgid "Total"
+msgstr "Общо"
+
+msgid "Paid"
+msgstr "Платено"
+
+msgid "Balance due"
+msgstr "Дължима сума"
+
+msgid "Due date"
+msgstr "Падеж"
+
+msgid "Hello %{name},"
+msgstr "Здравейте, %{name},"
+
+msgid "Thank you."
+msgstr "Благодарим ви."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "Фактура %{number} от %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "%{gym} издаде фактура %{number} на %{company} за периода %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "Моля, платете до %{due}, като посочите номера на фактурата."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "Напомняне: фактура %{number} от %{gym} е просрочена"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "Фактура %{number} към %{company} беше с падеж %{due} и все още не е платена."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "Ако вече сте платили, моля, игнорирайте това напомняне."

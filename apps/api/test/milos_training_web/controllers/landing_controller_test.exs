@@ -45,6 +45,9 @@ defmodule MilosTrainingWeb.LandingControllerTest do
 
     {:ok, execution} =
       Execution.start_execution(athlete.id, %{
+        # Server-derived in production (F-03); the history reads the workout
+        # in this organization (ADR-133).
+        organization_id: organization.id,
         master_workout_id: workout.id,
         source: :self_selected
       })
@@ -143,11 +146,17 @@ defmodule MilosTrainingWeb.LandingControllerTest do
       |> put_bearer_token(athlete)
       |> put_req_header("content-type", "application/json")
       |> put_req_header("accept", "application/json")
-      |> post("/api/landing/leaderboard-opt-in", Jason.encode!(%{opted_in: true}))
+      |> post(
+        "/api/org/#{organization.slug}/landing/leaderboard-opt-in",
+        Jason.encode!(%{opted_in: true})
+      )
       |> json_response(200)
 
     assert preference["opted_in"] == true
-    assert is_boolean(preference["visible"])
+    # TD-092: the opt-in is stored in the gym and the (definer-refreshed)
+    # leaderboard immediately lists the member.
+    assert preference["visible"] == true
+    assert Enum.any?(preference["weekly"], &(&1["user_id"] == athlete.id))
 
     updated_preference =
       conn
@@ -155,7 +164,10 @@ defmodule MilosTrainingWeb.LandingControllerTest do
       |> put_bearer_token(athlete)
       |> put_req_header("content-type", "application/json")
       |> put_req_header("accept", "application/json")
-      |> post("/api/landing/leaderboard-opt-in", Jason.encode!(%{opted_in: false}))
+      |> post(
+        "/api/org/#{organization.slug}/landing/leaderboard-opt-in",
+        Jason.encode!(%{opted_in: false})
+      )
       |> json_response(200)
 
     assert updated_preference["opted_in"] == false

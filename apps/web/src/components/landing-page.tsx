@@ -16,6 +16,7 @@ import { fetchExecution, isFreeTextModification, listMyExecutions, type WorkoutE
 import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
 import { fetchSchedule } from "@/api/schedule";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
+import { TrainingLogSection } from "@/components/training-log/TrainingLogSection";
 import { ChallengeCard } from "@/components/workouts/ChallengeCard";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import {
@@ -472,7 +473,7 @@ export function LandingPage() {
 
   const ctaAssignmentsQuery = useQuery({
     queryKey: ["landing", "workout-cta", "assignments", formatLocalIsoDate(ctaNow)],
-    enabled: Boolean(tokens?.access_token) && role === "athlete",
+    enabled: Boolean(tokens?.access_token) && (role === "athlete" || role === "member"),
     queryFn: () => fetchAssignedWorkoutWeek(tokens!.access_token, formatLocalIsoDate(ctaNow)),
     staleTime: 60_000,
   });
@@ -1173,6 +1174,9 @@ export function LandingPage() {
               </HomeDisclosure>
             );
           })()}
+
+          {/* ── Training log (class / offline workouts, ADR-118) ─────── */}
+          <TrainingLogSection />
         </div>
 
         {/* ── Info modals ──────────────────────────────────────────────── */}

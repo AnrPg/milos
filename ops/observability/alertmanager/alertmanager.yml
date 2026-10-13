@@ -1,0 +1,54 @@
+# Alertmanager for the opt-in `observability` Compose profile (ADR-116).
+#
+# Destination: a generic webhook whose URL comes from ALERTMANAGER_WEBHOOK_URL
+# (rendered into /tmp/alertmanager-webhook-url by entrypoint.sh, because
+# Alertmanager does not expand environment variables). Any receiver that
+# accepts Alertmanager's webhook JSON works: ntfy, Gotify, Matrix hookshot,
+# a Slack/Discord/Teams bridge, n8n, or your own endpoint.
+#
+# Email instead of (or in addition to) the webhook: uncomment the `email`
+# receiver below, set ALERTMANAGER_SMTP_* in .env, and point `route.receiver`
+# at it. See ops/observability/README.md.
+global:
+  resolve_timeout: 5m
+  # smtp_smarthost: "smtp.example.com:587"
+  # smtp_from: "alerts@example.com"
+  # smtp_auth_username: "alerts@example.com"
+  # smtp_auth_password_file: /tmp/alertmanager-smtp-password
+  # smtp_require_tls: true
+
+route:
+  receiver: default
+  group_by: [alertname, queue, dependency, worker, cache]
+  group_wait: 30s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers: ['severity="critical"']
+      receiver: default
+      repeat_interval: 1h
+    - matchers: ['severity="info"']
+      receiver: default
+      repeat_interval: 24h
+
+inhibit_rules:
+  # A critical alert silences its own warning tier (same signal and queue),
+  # e.g. MilosOutboxBacklogCritical hides MilosOutboxBacklogAging.
+  - source_matchers: ['severity="critical"', 'signal=~".+"']
+    target_matchers: ['severity="warning"']
+    equal: [signal, queue]
+  # When the API cannot be scraped, its readiness gauges are stale.
+  - source_matchers: ['alertname="MilosApiMetricsDown"']
+    target_matchers: ['alertname="MilosReadinessDependencyDown"']
+
+receivers:
+  - name: default
+    webhook_configs:
+      - url_file: /tmp/alertmanager-webhook-url
+        send_resolved: true
+        max_alerts: 20
+
+  # - name: email
+  #   email_configs:
+  #     - to: "owner@example.com"
+  #       send_resolved: true

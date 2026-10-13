@@ -135,3 +135,114 @@ msgstr "Neue Workouts zugewiesen"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Ihr Coach hat Ihnen ein oder mehrere Workouts zugewiesen."
+
+msgid "You got a spot"
+msgstr "Du hast einen Platz"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Im Kurs %{class} ist ein Platz frei geworden. Deine Buchung ist bestätigt oder wartet auf Freigabe."
+
+msgid "Your package ends soon"
+msgstr "Dein Paket endet bald"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} endet am %{date}."
+
+msgid "New form review request"
+msgstr "Neue Technik-Analyse angefragt"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} hat ein Video für Feedback geschickt."
+
+msgid "Your form review is ready"
+msgstr "Deine Technik-Analyse ist fertig"
+
+msgid "Your coach left feedback on your video."
+msgstr "Dein Coach hat Feedback zu deinem Video hinterlassen."
+
+msgid "A client is waiting for a reply"
+msgstr "Ein Kunde wartet auf eine Antwort"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} wartet länger als die versprochene Antwortzeit."
+
+msgid "Your nutrition plan was updated"
+msgstr "Dein Ernährungsplan wurde aktualisiert"
+
+msgid "Open it to see what changed."
+msgstr "Öffne ihn, um die Änderungen zu sehen."
+
+msgid "New appointment booked"
+msgstr "Neuer Termin gebucht"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} hat eine Session für %{time} gebucht."
+
+msgid "Appointment cancelled"
+msgstr "Termin abgesagt"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Die Session am %{time} wurde abgesagt."
+
+msgid "A coach took a new athlete"
+msgstr "Ein Coach hat einen neuen Athleten übernommen"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} coacht jetzt %{client}."
+
+msgid "An admin read your note"
+msgstr "Ein Admin hat Ihre Notiz gelesen"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} hat Ihre Notiz zu %{client} um %{time} gelesen."
+
+msgid "A machine needs attention"
+msgstr "Ein Gerät braucht Aufmerksamkeit"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Als knapp gemeldet"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventar heute"
+
+msgid "Needs attention: %{items}"
+msgstr "Braucht Aufmerksamkeit: %{items}"
+
+msgid "Running low"
+msgstr "Wird knapp"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: noch %{quantity} übrig."
+
+msgid "Your subscription ends soon"
+msgstr "Ihr Abo endet bald"
+
+msgid "Your subscription has ended"
+msgstr "Ihr Abo ist abgelaufen"
+
+msgid "your subscription"
+msgstr "Ihr Abo"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} endet am %{date} (in %{days} Tagen). Verlängern Sie, um weiter Kurse buchen zu können."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} ist abgelaufen. Sie haben noch bis %{date} Zugang; verlängern Sie bis dahin, um weiter Kurse buchen zu können."
+
+msgid "Your access has ended"
+msgstr "Ihr Zugang ist abgelaufen"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Ihr Zugang ist pausiert, weil eine Zahlung überfällig ist. Begleichen Sie den offenen Betrag, um wieder Kurse zu buchen."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Ihr Zugang ist abgelaufen. Verlängern Sie Ihr Abo, um wieder Kurse zu buchen."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Ihre kommenden Buchungen wurden storniert: %{count}."

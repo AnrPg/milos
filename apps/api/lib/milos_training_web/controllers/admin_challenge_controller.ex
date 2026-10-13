@@ -182,9 +182,11 @@ defmodule MilosTrainingWeb.AdminChallengeController do
     admin = GuardianPlug.current_resource(conn)
 
     with {:ok, challenge} <-
-           Gamification.with_tenant_context(conn.assigns.tenant_context, fn ->
-             CreateSeasonalChallenge.call(admin.id, body_params(conn, params))
-           end) do
+           CreateSeasonalChallenge.call(
+             conn.assigns.tenant_context,
+             admin.id,
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{challenge: challenge})
@@ -192,13 +194,18 @@ defmodule MilosTrainingWeb.AdminChallengeController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, payload} <- GetAdminChallenge.call(id) do
+    with {:ok, payload} <- GetAdminChallenge.call(conn.assigns.tenant_context, id) do
       json(conn, payload)
     end
   end
 
   def update(conn, %{"id" => id} = params) do
-    with {:ok, challenge} <- UpdateSeasonalChallenge.call(id, body_params(conn, params)) do
+    with {:ok, challenge} <-
+           UpdateSeasonalChallenge.call(
+             conn.assigns.tenant_context,
+             id,
+             body_params(conn, params)
+           ) do
       json(conn, %{challenge: challenge})
     end
   end
@@ -215,7 +222,7 @@ defmodule MilosTrainingWeb.AdminChallengeController do
   )
 
   def delete(conn, %{"id" => id}) do
-    with :ok <- DeleteSeasonalChallenge.call(id) do
+    with :ok <- DeleteSeasonalChallenge.call(conn.assigns.tenant_context, id) do
       send_resp(conn, :no_content, "")
     end
   end

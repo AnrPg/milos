@@ -135,3 +135,114 @@ msgstr "Nieuwe trainingen toegewezen"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Uw coach heeft een of meer trainingen aan u toegewezen."
+
+msgid "You got a spot"
+msgstr "Je hebt een plek"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Er is een plek vrijgekomen in %{class}. Je boeking is bevestigd of wacht op goedkeuring."
+
+msgid "Your package ends soon"
+msgstr "Je pakket loopt binnenkort af"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} loopt af op %{date}."
+
+msgid "New form review request"
+msgstr "Nieuw verzoek om techniekfeedback"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} heeft een video gestuurd voor feedback."
+
+msgid "Your form review is ready"
+msgstr "Je techniekfeedback staat klaar"
+
+msgid "Your coach left feedback on your video."
+msgstr "Je coach heeft feedback gegeven op je video."
+
+msgid "A client is waiting for a reply"
+msgstr "Een klant wacht op een antwoord"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} wacht langer dan de beloofde reactietijd."
+
+msgid "Your nutrition plan was updated"
+msgstr "Je voedingsplan is bijgewerkt"
+
+msgid "Open it to see what changed."
+msgstr "Open het om te zien wat er is veranderd."
+
+msgid "New appointment booked"
+msgstr "Nieuwe afspraak geboekt"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} heeft een sessie geboekt voor %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Afspraak geannuleerd"
+
+msgid "The session on %{time} was cancelled."
+msgstr "De sessie van %{time} is geannuleerd."
+
+msgid "A coach took a new athlete"
+msgstr "Een coach heeft een nieuwe atleet aangenomen"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} coacht nu %{client}."
+
+msgid "An admin read your note"
+msgstr "Een beheerder heeft je notitie gelezen"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} heeft je notitie over %{client} gelezen om %{time}."
+
+msgid "A machine needs attention"
+msgstr "Een toestel heeft aandacht nodig"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Gemeld als bijna op"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventaris vandaag"
+
+msgid "Needs attention: %{items}"
+msgstr "Heeft aandacht nodig: %{items}"
+
+msgid "Running low"
+msgstr "Bijna op"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: nog %{quantity} over."
+
+msgid "Your subscription ends soon"
+msgstr "Je abonnement loopt binnenkort af"
+
+msgid "Your subscription has ended"
+msgstr "Je abonnement is afgelopen"
+
+msgid "your subscription"
+msgstr "je abonnement"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} loopt af op %{date} (over %{days} dagen). Verleng om lessen te blijven boeken."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} is afgelopen. Je houdt toegang tot %{date}; verleng vóór die datum om lessen te blijven boeken."
+
+msgid "Your access has ended"
+msgstr "Je toegang is afgelopen"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Je toegang is gepauzeerd omdat een betaling openstaat. Betaal het openstaande bedrag om weer lessen te boeken."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Je toegang is afgelopen. Verleng je abonnement om weer lessen te boeken."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Je komende boekingen zijn geannuleerd: %{count}."

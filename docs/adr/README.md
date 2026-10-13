@@ -101,4 +101,44 @@ must have an ADR. See `template.md` for the format.
 | ADR-093 | Tenant delete purges eligible client accounts | Accepted |
 | ADR-094 | Temporary clean slate production purge | Accepted |
 | ADR-095 | Align account role with membership | Accepted |
-| ADR-096 | Self-organising workout library and workout icons | Accepted |
+| ADR-096 | Package types and entitlement catalog v2 | Accepted |
+| ADR-097 | Package Phase B: booking rules, perks and facility | Accepted |
+| ADR-098 | Package Phase C: new services and payment models | Accepted |
+| ADR-099 | Role sets and capability authorization | Accepted |
+| ADR-100 | Coach client scope and head coaches | Accepted |
+| ADR-101 | Private coach notes and their access log | Accepted |
+| ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
+| ADR-103 | Role-aware navigation on today's UI | Accepted |
+| ADR-104 | Gym inventory: machines and consumables | Accepted |
+| ADR-105 | AI-assisted free-text workout authoring | Accepted |
+| ADR-106 | Client invitations and public join link | Accepted |
+| ADR-107 | First-run onboarding checklist and tours | Accepted |
+| ADR-108 | Static page headers and client-side users directory | Accepted |
+| ADR-109 | Structured-first workouts and workout assistant hardening | Accepted |
+| ADR-110 | Canonical section format schemas and structure-first parsing | Accepted |
+| ADR-111 | Reasoning-first workout assistant | Accepted |
+| ADR-112 | Subscription expiry reminders and grace slack | Accepted |
+| ADR-113 | Training log on profiles | Accepted |
+| ADR-114 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
+| ADR-115 | Dialyzer baseline paid down to zero | Accepted |
+| ADR-116 | Observability dashboards and alerting | Accepted |
+| ADR-117 | Reviewed tenant export and purge | Accepted |
+| ADR-118 | Standalone training-log entries | Accepted |
+| ADR-119 | Controller tests run under the RLS-enforcing runtime role | Accepted |
+| ADR-120 | Offline outbox failure controls and command adapters | Accepted |
+| ADR-121 | Tenant logo upload | Accepted |
+| ADR-122 | Organization name and slug editing | Accepted |
+| ADR-123 | Comprehensive analytics instrumentation | Accepted |
+| ADR-127 | Web dependency security refresh and patched OpenAPI generator chain | Accepted |
+| ADR-124 | Injury-aware workout safety warnings | Accepted |
+| ADR-125 | Personalized member programming | Accepted |
+| ADR-126 | Refund receipts, provider reconciliation and accounting exports | Accepted |
+| ADR-128 | Tenant-owned scale levels | Accepted |
+| ADR-129 | PR visibility for gym coaches and explicit sharing grants | Accepted |
+| ADR-130 | Injury warnings on the ready screen, scaled variations and drop-off facts | Accepted |
+| ADR-131 | Background and system paths under RLS | Accepted |
+| ADR-132 | Coach PR dossier, legacy PR provenance backfill and grantee lookup | Accepted |
+| ADR-133 | Atomic organization provisioning and tenant-scoped workout reads | Accepted |
+| ADR-134 | BEAM literal area root cause and deterministic OpenAPI export | Accepted |
+| ADR-135 | One staff dashboard for every role | Accepted |
+| ADR-136 | Self-organising workout library and workout icons | Accepted |

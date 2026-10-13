@@ -56,6 +56,52 @@ defmodule MilosTrainingWeb.AdminChallengeControllerTest do
     assert Enum.any?(listing["challenges"], &(&1["badge_key"] == "challenge_streak_week"))
   end
 
+  # TD-092: the detail runs in the gym's scope (the challenge is a tenant row)
+  # and lists only the gym's own members, never every account on the platform.
+  test "admin sees a challenge's detail with the gym's members only", %{conn: conn} do
+    admin = admin_fixture()
+    organization = org_with_owner!(admin)
+    member = user_fixture()
+    outsider = user_fixture()
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: member.id,
+        role: :member,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    authed = put_bearer_token(conn, admin)
+
+    %{"challenge" => %{"id" => id}} =
+      authed
+      |> post_json("/api/org/#{organization.slug}/admin/challenges", %{
+        title: "Detail Week",
+        criteria_type: "workout_count",
+        criteria_value: %{count: 2},
+        badge_key: "challenge_detail_week",
+        badge_label: "Detail Week",
+        starts_at: Date.to_iso8601(Date.utc_today()),
+        ends_at: Date.to_iso8601(Date.add(Date.utc_today(), 7))
+      })
+      |> json_response(201)
+
+    detail =
+      authed
+      |> recycle()
+      |> put_bearer_token(admin)
+      |> get("/api/org/#{organization.slug}/admin/challenges/#{id}")
+      |> json_response(200)
+
+    participant_ids = Enum.map(detail["participants"], & &1["user_id"])
+
+    assert detail["challenge"]["id"] == id
+    assert member.id in participant_ids
+    refute outsider.id in participant_ids
+  end
+
   test "rejects a fourth overlapping active challenge", %{conn: conn} do
     admin = admin_fixture()
     organization = org_with_owner!(admin)

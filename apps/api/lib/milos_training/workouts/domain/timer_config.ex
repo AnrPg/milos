@@ -91,12 +91,22 @@ defmodule MilosTraining.Workouts.Domain.TimerConfig do
   defp valid_registered_value?(field, value) do
     case Vocabulary.timer_value_kind(field) do
       :duration -> is_integer(value) and value > 0
+      :duration_list -> valid_duration_list?(value)
       :distance -> is_number(value) and value > 0
       :integer -> is_integer(value) and value > 0
       :enum -> value in Vocabulary.timer_enum_values(field)
       :string -> is_binary(value) and String.trim(value) != ""
     end
   end
+
+  @max_interval_pattern_length 60
+
+  defp valid_duration_list?(values) when is_list(values) do
+    values != [] and length(values) <= @max_interval_pattern_length and
+      Enum.all?(values, &(is_integer(&1) and &1 > 0))
+  end
+
+  defp valid_duration_list?(_values), do: false
 
   defp reject_unknown_fields(type, config) do
     allowed =

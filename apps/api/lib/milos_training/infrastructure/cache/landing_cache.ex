@@ -25,28 +25,68 @@ defmodule MilosTraining.Infrastructure.Cache.LandingCache do
 
   def batch_invalidate([]), do: :ok
 
+  # Invalidation stays best-effort (the 60s TTL bounds staleness), but each
+  # outcome is reported so failed invalidations are visible on dashboards.
   def batch_invalidate(user_ids) when is_list(user_ids) do
-    with {:ok, redix} <- redix() do
-      user_ids
-      |> Enum.flat_map(&landing_keys_for_user(redix, &1))
-      |> case do
-        [] -> :ok
-        keys -> Redix.command(redix, ["DEL" | keys])
+    result =
+      with {:ok, redix} <- redix() do
+        user_ids
+        |> Enum.flat_map(&landing_keys_for_user(redix, &1))
+        |> case do
+          [] -> :ok
+          keys -> Redix.command(redix, ["DEL" | keys])
+        end
       end
-    end
 
+    emit_state("invalidate", invalidation_result(result), %{keys: length(user_ids)})
     :ok
   end
 
+  defp invalidation_result(:error), do: "unavailable"
+  defp invalidation_result({:error, _reason}), do: "error"
+  defp invalidation_result(_ok), do: "ok"
+
   defp get(organization_id, user_id) do
-    with {:ok, redix} <- redix(),
-         {:ok, cached} when not is_nil(cached) <-
-           Redix.command(redix, ["GET", cache_key(organization_id, user_id)]),
-         {:ok, payload} <- Jason.decode(cached) do
-      {:ok, payload}
-    else
-      _ -> :miss
+    case redix() do
+      {:ok, redix} ->
+        redix
+        |> Redix.command(["GET", cache_key(organization_id, user_id)])
+        |> decode_cached()
+
+      :error ->
+        emit_state("read", "unavailable")
+        :miss
     end
+  end
+
+  defp decode_cached({:ok, cached}) when is_binary(cached) do
+    case Jason.decode(cached) do
+      {:ok, payload} ->
+        emit_state("read", "hit")
+        {:ok, payload}
+
+      {:error, _reason} ->
+        emit_state("read", "error")
+        :miss
+    end
+  end
+
+  defp decode_cached({:ok, nil}) do
+    emit_state("read", "miss")
+    :miss
+  end
+
+  defp decode_cached(_error) do
+    emit_state("read", "error")
+    :miss
+  end
+
+  defp emit_state(operation, result, measurements \\ %{}) do
+    :telemetry.execute(
+      [:milos, :cache, :state],
+      Map.put(measurements, :count, 1),
+      %{cache: "landing", operation: operation, result: result}
+    )
   end
 
   defp put(organization_id, user_id, payload) do

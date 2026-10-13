@@ -14,7 +14,7 @@ msgid "repetitions"
 msgstr "επαναλήψεις"
 
 msgid "sets"
-msgstr "σκηνικά"
+msgstr "σετ"
 
 msgid "kilocalories"
 msgstr "χιλιοθερμίδες"

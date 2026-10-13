@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchOrganizationMemberships, type OrganizationMembership } from "@/api/organizations";
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { useSession } from "@/components/session-provider";
+import { hasStaffRole } from "@/lib/role-navigation";
 
 export function adminHref(href: string, organizationSlug: string | null) {
   if (href === "/") return "/";
@@ -25,7 +26,7 @@ export function rememberSelectedOrganization(slug: string) {
 // console for a vendor account.
 export function membershipWorkspaceHref(membership: OrganizationMembership) {
   const slug = membership.organization.slug;
-  return ["owner", "admin", "coach"].includes(membership.role) ? `/org/${slug}/admin` : `/org/${slug}`;
+  return hasStaffRole(membership) ? `/org/${slug}/admin` : `/org/${slug}`;
 }
 
 function storedOrganizationSlug() {

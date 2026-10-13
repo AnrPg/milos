@@ -19,6 +19,7 @@ defmodule MilosTraining.Identity.User do
     field :preferred_locale, :string, default: "en"
     # Nullable: every account created before F-10 predates this column.
     field :email, :string
+    field :completed_tours, {:array, :string}, default: []
 
     timestamps()
   end
@@ -81,6 +82,12 @@ defmodule MilosTraining.Identity.User do
     |> maybe_validate_nickname()
     |> maybe_validate_password()
     |> validate_inclusion(:preferred_locale, Locale.supported(), message: "is not supported")
+  end
+
+  def tours_changeset(user, completed_tours) do
+    user
+    |> cast(%{completed_tours: completed_tours}, [:completed_tours])
+    |> validate_subset(:completed_tours, MilosTraining.Identity.Domain.ProductTours.audiences())
   end
 
   def avatar_changeset(user, params) do

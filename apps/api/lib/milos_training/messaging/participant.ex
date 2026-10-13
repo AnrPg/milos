@@ -14,6 +14,8 @@ defmodule MilosTraining.Messaging.Participant do
     timestamps(updated_at: false)
   end
 
+  @type t :: %__MODULE__{}
+
   def changeset(participant, attrs) do
     participant
     |> cast(attrs, [:organization_id, :thread_id, :user_id, :last_read_message_id])

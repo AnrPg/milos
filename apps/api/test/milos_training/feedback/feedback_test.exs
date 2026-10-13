@@ -203,7 +203,7 @@ defmodule MilosTraining.FeedbackTest do
     assert {:ok, _completed_execution} = Execution.complete_execution(execution.id, user.id, %{})
 
     assert {:ok, review} =
-             SubmitReview.call(user.id, %{
+             SubmitReview.call(legacy_tenant_context(user), user.id, %{
                target_type: "workout",
                target_id: workout.id,
                target_snapshot: %{"label" => "Forged title"},

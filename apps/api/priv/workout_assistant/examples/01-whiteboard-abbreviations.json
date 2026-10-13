@@ -1,0 +1,86 @@
+{
+  "description": "CrossFit whiteboard: lettered parts, varying strength reps, abbreviations, Rx/scaled loads, rest written after the movements, a cap and a cash-out.",
+  "locale": "en",
+  "text": "TUESDAY\nA) Back Squat\n5-5-3-3-1, build\nB) 5 RFT, 15' cap\n15 WB 9/6\n10 T2B\n200m run\nrest 2:00 b/w rounds\nC) Cash out: 3x max HSPU",
+  "answer": {
+    "workout": {
+      "title": "Back squat + 5 RFT",
+      "type": "crossfit"
+    },
+    "sections": [
+      {
+        "name": "A) Back Squat",
+        "format": "untimed",
+        "exercises": [
+          {
+            "name": "Back Squat",
+            "sets": 5,
+            "note": "5-5-3-3-1, building to a heavy single"
+          }
+        ]
+      },
+      {
+        "name": "B) 5 RFT",
+        "format": "for_time",
+        "timer": {
+          "rounds": 5,
+          "time_cap_seconds": 900
+        },
+        "score": "time",
+        "note": "Rest 2:00 between rounds",
+        "exercises": [
+          {
+            "name": "Wall Ball",
+            "reps": 15,
+            "load_kg": 9,
+            "note": "9/6 kg"
+          },
+          {
+            "name": "Toes-to-bar",
+            "reps": 10
+          },
+          {
+            "name": "Run",
+            "distance_meters": 200
+          }
+        ]
+      },
+      {
+        "name": "C) Cash out",
+        "format": "train_to_exhaustion",
+        "timer": {
+          "rounds": 3
+        },
+        "score": "reps",
+        "exercises": [
+          {
+            "name": "Handstand Push-up"
+          }
+        ]
+      }
+    ],
+    "issues": [],
+    "missing_fields": [
+      {
+        "path": "workout.estimated_duration_minutes",
+        "reason": "Helps plan the class.",
+        "suggested_value": "50",
+        "insert_text": "Duration: 50 min"
+      }
+    ],
+    "assumptions": [
+      {
+        "path": "sections.0.exercises.0.sets",
+        "message": "Read “5-5-3-3-1” as 5 sets with changing reps; the reps per set are kept in the note."
+      },
+      {
+        "path": "sections.1.exercises.0.load_kg",
+        "message": "“9/6” is the Rx / scaled load: used 9 kg, both kept in the note."
+      },
+      {
+        "path": "sections.2.timer.rounds",
+        "message": "Read “3x max HSPU” as 3 rounds of max reps."
+      }
+    ]
+  }
+}

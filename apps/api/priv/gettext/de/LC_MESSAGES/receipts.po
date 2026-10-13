@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: de\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Erstattungsbeleg"
+
+msgid "Receipt number"
+msgstr "Belegnummer"
+
+msgid "Issued on"
+msgstr "Ausgestellt am"
+
+msgid "Issued by"
+msgstr "Ausgestellt von"
+
+msgid "Issued to"
+msgstr "Ausgestellt für"
+
+msgid "Refund details"
+msgstr "Erstattungsdetails"
+
+msgid "Refund type"
+msgstr "Erstattungsart"
+
+msgid "Refunded amount"
+msgstr "Erstatteter Betrag"
+
+msgid "Reason"
+msgstr "Grund"
+
+msgid "Original payment"
+msgstr "Ursprüngliche Zahlung"
+
+msgid "Payment date"
+msgstr "Zahlungsdatum"
+
+msgid "Payment method"
+msgstr "Zahlungsart"
+
+msgid "Original amount"
+msgstr "Ursprünglicher Betrag"
+
+msgid "Invoice"
+msgstr "Rechnung"
+
+msgid "Previously refunded"
+msgstr "Bereits erstattet"
+
+msgid "Remaining paid amount"
+msgstr "Verbleibender bezahlter Betrag"
+
+msgid "Refund"
+msgstr "Erstattung"
+
+msgid "Payment reversal"
+msgstr "Zahlungsstorno"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Dieser Beleg ist ein unveränderlicher Nachweis eines geprüften Zahlungsstornos. Bewahre ihn bei deinen Zahlungsunterlagen auf."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Dokument-Fingerabdruck (SHA-256)"
+
+msgid "Not provided"
+msgstr "Nicht angegeben"

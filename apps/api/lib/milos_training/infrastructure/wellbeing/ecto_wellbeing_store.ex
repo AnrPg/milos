@@ -104,6 +104,19 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> Enum.map(&normalize_injury/1)
   end
 
+  # ADR-124 staff safety warnings: organization-provenance only. The tenant
+  # predicate (not the owner-or-tenant disjunction) keeps the acting staff
+  # member's own injuries and every personal self-report out of the result.
+  @impl true
+  def list_active_tenant_injuries_for_users(user_ids) when is_list(user_ids) do
+    InjuryReport
+    |> scoped_to_tenant()
+    |> where([injury], injury.user_id in ^user_ids and injury.status == "active")
+    |> order_by([injury], desc: injury.inserted_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_injury/1)
+  end
+
   @impl true
   def list_injuries(filters) do
     filters = string_key_map(filters || %{})
@@ -145,6 +158,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   defp normalize_injury(%InjuryReport{} = injury_report) do
     %{
       id: injury_report.id,
+      organization_id: injury_report.organization_id,
       user_id: injury_report.user_id,
       reported_by_id: injury_report.reported_by_id,
       reported_by_role: injury_report.reported_by_role,

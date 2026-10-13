@@ -39,6 +39,107 @@ defmodule MilosTraining.DataCase do
     pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MilosTraining.Repo, shared: not tags[:async])
     allow_background_processes(pid)
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+
+    if rls_enforced?(tags), do: enforce_rls!()
+  end
+
+  @doc """
+  TD-046: the suite connects as a Postgres superuser (`rolbypassrls`), so
+  Row Level Security never applies to ordinary tests and a query that skips
+  `RepoContext.run/2` passes locally but returns nothing in production.
+
+  Tests tagged `@moduletag :rls_enforced` (or every test when
+  `MILOS_TEST_ENFORCE_RLS=1`) switch the sandbox transaction to the
+  non-superuser `#{MilosTraining.RLSCase.runtime_role()}` role with
+  `SET LOCAL ROLE`, so RLS policies apply exactly as they do for the
+  production runtime role. Use `bypass_rls/1` for fixture setup that models
+  pre-existing data rather than the code under test.
+  """
+  def rls_enforced?(tags),
+    do: Map.get(tags, :rls_enforced, false) or System.get_env("MILOS_TEST_ENFORCE_RLS") == "1"
+
+  def enforce_rls! do
+    MilosTraining.Repo.query!("SET LOCAL ROLE #{MilosTraining.RLSCase.runtime_role()}")
+    :ok
+  end
+
+  @doc """
+  Runs `fun` as the RLS-enforcing runtime role inside the sandbox transaction
+  and restores the superuser test role afterwards, even if `fun` raises.
+  """
+  def with_runtime_role(fun) when is_function(fun, 0) do
+    enforce_rls!()
+
+    try do
+      fun.()
+    after
+      MilosTraining.Repo.query!("RESET ROLE")
+    end
+  end
+
+  @session_settings ~w(
+    app.organization_id
+    app.user_id
+    app.admin_mode
+    app.execution_authorization_check
+    app.invitation_redemption
+    app.slug_alias_lookup
+  )
+
+  @doc """
+  TD-092: runs `fun` with every RLS session setting (`app.*`) cleared, the way
+  a production request or Oban job starts on a pooled connection, and restores
+  the test's own settings afterwards.
+
+  Tests often set `app.organization_id`/`app.user_id` on the sandbox
+  connection for fixtures. Without this, a request issued afterwards inherited
+  that ambient scope, so a code path missing `RepoContext.run/2` still passed.
+  """
+  def with_clean_session(fun) when is_function(fun, 0) do
+    previous =
+      Enum.map(@session_settings, fn name ->
+        %{rows: [[value]]} =
+          MilosTraining.Repo.query!("SELECT current_setting($1, true)", [name])
+
+        {name, value || ""}
+      end)
+
+    clear_session!()
+
+    try do
+      fun.()
+    after
+      Enum.each(previous, fn {name, value} -> set_session!(name, value) end)
+    end
+  end
+
+  @doc "Clears every RLS session setting (`app.*`) on the sandbox connection."
+  def clear_session! do
+    Enum.each(@session_settings, &set_session!(&1, ""))
+    :ok
+  end
+
+  defp set_session!(name, value),
+    do: MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [name, value])
+
+  @doc """
+  Runs `fun` as the superuser test role and restores the previous role.
+  Only for fixtures: assertions about tenant isolation must run enforced.
+  """
+  def bypass_rls(fun) when is_function(fun, 0) do
+    %{rows: [[role]]} = MilosTraining.Repo.query!("SELECT current_user")
+
+    if role == MilosTraining.RLSCase.runtime_role() do
+      MilosTraining.Repo.query!("RESET ROLE")
+
+      try do
+        fun.()
+      after
+        MilosTraining.Repo.query!("SET LOCAL ROLE #{role}")
+      end
+    else
+      fun.()
+    end
   end
 
   defp allow_background_processes(_owner_pid), do: :ok

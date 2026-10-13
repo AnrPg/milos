@@ -1,3 +1,5 @@
+import { FREE_TEXT_TIMER_METADATA_KEY, type FreeTextTimerPreset, parseFreeTextTimerPreset } from "@/lib/free-text-timer";
+
 export type FreeTextExecutionWorkout = {
   id: string;
   title: string;
@@ -6,6 +8,8 @@ export type FreeTextExecutionWorkout = {
   execution_id?: string | null;
   source?: "class_booking" | "assigned" | "self_selected" | string | null;
   source_reference_id?: string | null;
+  /** Timer the coach attached to the workout, if any. */
+  timer_preset?: FreeTextTimerPreset | null;
 };
 
 const STORAGE_KEY = "milos:free-text-execution";
@@ -15,6 +19,7 @@ export function storeFreeTextExecutionWorkout(workout: {
   title: string;
   type?: string | null;
   free_text_body?: string | null;
+  workout_metadata?: Record<string, unknown> | null;
 }, execution?: {
   id?: string | null;
   source?: string | null;
@@ -30,6 +35,7 @@ export function storeFreeTextExecutionWorkout(workout: {
     execution_id: execution?.id ?? null,
     source: execution?.source ?? null,
     source_reference_id: execution?.source_reference_id ?? null,
+    timer_preset: parseFreeTextTimerPreset(workout.workout_metadata?.[FREE_TEXT_TIMER_METADATA_KEY]),
   };
 
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
@@ -59,10 +65,4 @@ export function readFreeTextExecutionWorkout(workoutId?: string | null) {
   } catch {
     return null;
   }
-}
-
-export function isFreeTextWorkout(
-  workout: { authoring_mode?: string | null } | null | undefined,
-) {
-  return workout?.authoring_mode === "free_text";
 }

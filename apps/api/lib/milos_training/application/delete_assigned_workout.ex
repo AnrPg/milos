@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.DeleteAssignedWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Application.{BroadcastUserSync, TrackAnalyticsEvent}
   alias MilosTraining.{Organizations, Workouts}
 
   def call(context, id) do
@@ -14,6 +14,7 @@ defmodule MilosTraining.Application.DeleteAssignedWorkout do
     with %{id: ^id} <- assignment,
          :ok <- delete_assigned_workout(context, id) do
       broadcast_assignment_refresh(context, assignment)
+      TrackAnalyticsEvent.call("workout_assignment_deleted", context, assignment)
       :ok
     else
       nil -> {:error, :not_found}

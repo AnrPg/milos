@@ -20,6 +20,11 @@ defmodule MilosTraining.Notifications do
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
+  # ADR-123: push dispatch result -> {outcome, reason_class} for analytics.
+  defdelegate classify_push_outcome(result),
+    to: MilosTraining.Notifications.Domain.PushDeliveryOutcome,
+    as: :classify
+
   def list_for_user(user_id),
     do:
       NotificationStore.with_user_context(%{user_id: user_id}, fn ->
@@ -148,6 +153,153 @@ defmodule MilosTraining.Notifications do
   def process_event("review_submitted", payload), do: enqueue_review_submitted(payload)
   def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
   def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
+
+  def process_event("booking_waitlist_promoted", payload),
+    do:
+      enqueue_simple(:booking_waitlist_promoted, payload, %{
+        class_name: field(payload, :class_name),
+        scheduled_at: field(payload, :scheduled_at),
+        booking_id: field(payload, :booking_id),
+        scheduled_class_id: field(payload, :scheduled_class_id),
+        status: field(payload, :status),
+        url: "/schedule"
+      })
+
+  def process_event("package_expiring", payload),
+    do:
+      enqueue_simple(:package_expiring, payload, %{
+        package_name: field(payload, :package_name),
+        ends_on: field(payload, :ends_on),
+        days: field(payload, :days),
+        subscription_id: field(payload, :subscription_id),
+        url: "/account/billing"
+      })
+
+  # ADR-098 coaching notifications.
+  def process_event("form_review_submitted", payload),
+    do:
+      enqueue_simple(:form_review_submitted, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        client_nickname: field(payload, :client_nickname),
+        exercise_name: field(payload, :exercise_name),
+        url: "/admin/coaching?tab=form-reviews"
+      })
+
+  def process_event("form_review_completed", payload),
+    do:
+      enqueue_simple(:form_review_completed, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        exercise_name: field(payload, :exercise_name),
+        url: "/coaching"
+      })
+
+  def process_event("coaching_reply_overdue", payload),
+    do:
+      enqueue_simple(:coaching_reply_overdue, payload, %{
+        thread_id: field(payload, :thread_id),
+        client_nickname: field(payload, :client_nickname),
+        due_at: field(payload, :due_at),
+        url: "/admin/coaching?tab=replies"
+      })
+
+  def process_event("nutrition_plan_updated", payload),
+    do:
+      enqueue_simple(:nutrition_plan_updated, payload, %{
+        title: field(payload, :title),
+        url: "/coaching"
+      })
+
+  def process_event("appointment_booked", payload),
+    do:
+      enqueue_simple(:appointment_booked, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        client_nickname: field(payload, :client_nickname),
+        url: "/admin/appointments"
+      })
+
+  def process_event("appointment_cancelled", payload),
+    do:
+      enqueue_simple(:appointment_cancelled, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        url: field(payload, :url) || "/appointments"
+      })
+
+  # ADR-100: owners and admins see when a coach takes an athlete.
+  def process_event("coach_client_assigned", payload),
+    do:
+      enqueue_simple(:coach_client_assigned, payload, %{
+        coach_nickname: field(payload, :coach_nickname),
+        client_nickname: field(payload, :client_nickname),
+        client_user_id: field(payload, :client_user_id),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  # ADR-101: a coach learns which admin read which note, and when.
+  def process_event("coach_note_viewed", payload),
+    do:
+      enqueue_simple(:coach_note_viewed, payload, %{
+        note_id: field(payload, :note_id),
+        reader_nickname: field(payload, :reader_nickname),
+        client_nickname: field(payload, :client_nickname),
+        read_at: field(payload, :read_at),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  # ADR-104: a machine needs a repair, or a consumable is running out.
+  def process_event("inventory_repair_needed", payload),
+    do:
+      enqueue_simple(:inventory_repair_needed, payload, %{
+        machine_id: field(payload, :machine_id),
+        machine_name: field(payload, :machine_name),
+        kind: field(payload, :kind),
+        severity: field(payload, :severity),
+        symptom: field(payload, :symptom),
+        body: field(payload, :body),
+        url: "/admin/inventory?tab=machines"
+      })
+
+  def process_event("inventory_stock_low", payload),
+    do:
+      enqueue_simple(:inventory_stock_low, payload, %{
+        supply_id: field(payload, :supply_id),
+        supply_name: field(payload, :supply_name),
+        status: field(payload, :status),
+        quantity: field(payload, :quantity),
+        days_left: field(payload, :days_left),
+        note: field(payload, :note),
+        level: field(payload, :level),
+        place: field(payload, :place),
+        url: "/admin/inventory?tab=supplies"
+      })
+
+  def process_event("inventory_digest", payload),
+    do:
+      enqueue_simple(:inventory_digest, payload, %{
+        date: field(payload, :date),
+        reported_low: field(payload, :reported_low),
+        low_stock: field(payload, :low_stock),
+        critical_stock: field(payload, :critical_stock),
+        service_due: field(payload, :service_due),
+        service_soon: field(payload, :service_soon),
+        machines_down: field(payload, :machines_down),
+        machine_notes: field(payload, :machine_notes),
+        highlights: field(payload, :highlights),
+        url: "/admin/inventory"
+      })
+
+  def process_event("subscription_expiring", payload),
+    do: enqueue_subscription_notice(:subscription_expiring, payload)
+
+  def process_event("subscription_grace", payload),
+    do: enqueue_subscription_notice(:subscription_grace, payload)
+
+  def process_event("access_ended", payload),
+    do: enqueue_subscription_notice(:access_ended, payload)
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),
@@ -281,8 +433,10 @@ defmodule MilosTraining.Notifications do
         nil ->
           "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}"
 
+        # Assignments are normalized with ISO-8601 string dates (and job args
+        # are JSON), so accept both a Date and its string form.
         date ->
-          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{Date.to_iso8601(date)}"
+          "/admin/coaching-assignments?open_assignment=#{assigned_workout_id}&date=#{iso_date(date)}"
       end
 
     payload
@@ -290,6 +444,7 @@ defmodule MilosTraining.Notifications do
     |> Enum.each(fn admin ->
       result =
         deliver_notification(admin.id, :workout_rejected, %{
+          organization_id: field(payload, :organization_id),
           assigned_workout_id: assigned_workout_id,
           workout_title: workout_title,
           athlete_nickname: athlete_nickname,
@@ -305,6 +460,9 @@ defmodule MilosTraining.Notifications do
 
     :ok
   end
+
+  defp iso_date(%Date{} = date), do: Date.to_iso8601(date)
+  defp iso_date(date) when is_binary(date), do: date
 
   def enqueue_athlete_message(payload) do
     sender_nickname = field(payload, :sender_nickname)
@@ -505,12 +663,105 @@ defmodule MilosTraining.Notifications do
     end
   end
 
-  def delete_booking_pending_notifications(booking_id) do
-    case NotificationStore.delete_booking_pending_for_booking(booking_id) do
-      :ok -> :ok
-      {:error, reason} -> {:error, reason}
+  # ADR-097 notifications with a fixed payload shape.
+  defp enqueue_simple(type, payload, notification_payload) do
+    user_id = field(payload, :user_id)
+
+    case deliver_notification(user_id, type, stringify_values(notification_payload)) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
+        error
     end
   end
+
+  # Sent to the client whose subscription ends; deduplicated per subscription
+  # so a retried job never notifies twice.
+  def enqueue_subscription_notice(type, payload) when is_map(payload) do
+    user_id = field(payload, :user_id)
+
+    notification_payload =
+      payload
+      |> Map.take([
+        :package_name,
+        :ends_on,
+        :days_left,
+        :grace_days,
+        :grace_until,
+        :reason,
+        :cancelled_bookings
+      ])
+      |> Map.merge(%{
+        url: "/account/billing",
+        dedupe_key: dedupe_key(type, payload)
+      })
+
+    case deliver_notification(user_id, type, notification_payload) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
+        error
+    end
+  end
+
+  defp stringify_values(payload) do
+    Map.new(payload, fn
+      {key, %DateTime{} = value} ->
+        {key, DateTime.to_iso8601(value)}
+
+      {key, %Date{} = value} ->
+        {key, Date.to_iso8601(value)}
+
+      {key, value} when is_atom(value) and not is_nil(value) and not is_boolean(value) ->
+        {key, Atom.to_string(value)}
+
+      pair ->
+        pair
+    end)
+  end
+
+  # Access can be lost more than once per membership (renew, lapse again), so
+  # that notice is unique per day rather than per subscription.
+  defp dedupe_key(:access_ended, payload),
+    do: "access_ended:#{field(payload, :membership_id)}:#{Date.utc_today()}"
+
+  defp dedupe_key(type, payload), do: "#{type}:#{field(payload, :subscription_id)}"
+
+  @doc """
+  Removes the staff's `booking_pending` notifications for a booking that is no
+  longer pending (withdrawn by the member).
+
+  TD-092: notifications are owner-only under RLS, so a delete issued in the
+  member's (or a job's) session never reached the staff's rows. The staff of
+  the booking's organization are resolved server-side and each recipient's
+  rows are removed in that recipient's own scope, limited to the organization.
+  """
+  def delete_booking_pending_notifications(organization_id, booking_id)
+      when is_binary(organization_id) do
+    organization_id
+    |> Organizations.list_staff_user_ids()
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case NotificationStore.with_user_context(
+             %{organization_id: organization_id, user_id: staff_id},
+             fn -> NotificationStore.delete_booking_pending_for_booking(booking_id) end
+           ) do
+        :ok -> {:cont, :ok}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
+
+  def delete_booking_pending_notifications(_organization_id, _booking_id), do: :ok
 
   def create_booking_notification_once(user_id, type, booking) do
     case deliver_notification(user_id, type, booking_payload(user_id, type, booking)) do
@@ -542,6 +793,9 @@ defmodule MilosTraining.Notifications do
 
     payload = %{
       booking_id: field(booking, :id),
+      # TD-092: tenant provenance, so the row can be found again in the
+      # organization's scope (pending-notice cleanup) and push links are org-scoped.
+      organization_id: field(booking, :organization_id),
       scheduled_class_id: field(booking, :scheduled_class_id),
       scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
       class_type_id: scheduled_class && field(scheduled_class, :class_type_id),
@@ -575,10 +829,12 @@ defmodule MilosTraining.Notifications do
 
       {:ok, notification} = ok ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         ok
 
       {:error, {:push_enqueue_failed, notification, _reason}} = error ->
         broadcast_notification_changed(notification.user_id)
+        emit_delivered(notification)
         error
 
       {:error, _reason} = error ->
@@ -623,6 +879,19 @@ defmodule MilosTraining.Notifications do
     )
   end
 
+  # ADR-123: a new in-app notification row is the in-app delivery. Emitted as
+  # telemetry (not a call into Analytics) so this context stays independent;
+  # MilosTraining.Application.RecordNotificationDelivered records it.
+  defp emit_delivered(notification) do
+    :telemetry.execute([:milos, :notification, :delivered], %{count: 1}, %{
+      notification_id: notification.id,
+      user_id: notification.user_id,
+      organization_id: Map.get(notification, :organization_id),
+      type: Map.get(notification, :type),
+      channel: "in_app"
+    })
+  end
+
   defp create_and_broadcast_notification(params) do
     user_id = Map.get(params, :user_id) || Map.get(params, "user_id")
 
@@ -636,6 +905,7 @@ defmodule MilosTraining.Notifications do
 
           _notification ->
             broadcast_notification_changed(notification.user_id)
+            emit_delivered(notification)
             ok
         end
 
@@ -702,4 +972,18 @@ defmodule MilosTraining.Notifications do
   defp challenge_completed_dedupe_key(user_id, payload) do
     NotificationDedupe.challenge_completed_key(user_id, field(payload, :challenge_id))
   end
+
+  # ADR-117 reviewed tenant export/purge. This context owns its table list and
+  # retention policy; the shared executor only runs what this policy declares,
+  # always inside a RepoContext session for the purge's tenant.
+  def tenant_data_policy, do: MilosTraining.Notifications.Domain.TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
 end

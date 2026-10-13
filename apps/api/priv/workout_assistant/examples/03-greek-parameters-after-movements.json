@@ -1,0 +1,79 @@
+{
+  "description": "Greek coach, no format keyword: the time and the scoring are written after the movements in plain words (an AMRAP), and the warm-up mixes a single run with a 2-round circuit.",
+  "locale": "el",
+  "text": "Ζέσταμα\n400μ τρέξιμο και μετά 2 γύροι: 10 air squats, 10 push ups\n\nΚυρίως\n5 pull ups\n10 push ups\n15 squats\nΌσους γύρους μπορείτε σε 20 λεπτά",
+  "answer": {
+    "workout": {
+      "title": "Ζέσταμα + 20 λεπτά AMRAP",
+      "type": "crossfit"
+    },
+    "sections": [
+      {
+        "name": "Ζέσταμα",
+        "format": "untimed",
+        "exercises": [
+          {
+            "name": "τρέξιμο",
+            "distance_meters": 400
+          },
+          {
+            "name": "air squats",
+            "sets": 2,
+            "reps": 10,
+            "bodyweight": true
+          },
+          {
+            "name": "push ups",
+            "sets": 2,
+            "reps": 10,
+            "bodyweight": true
+          }
+        ]
+      },
+      {
+        "name": "Κυρίως",
+        "format": "amrap",
+        "timer": {
+          "duration_seconds": 1200
+        },
+        "score": "rounds+reps",
+        "exercises": [
+          {
+            "name": "pull ups",
+            "reps": 5,
+            "bodyweight": true
+          },
+          {
+            "name": "push ups",
+            "reps": 10,
+            "bodyweight": true
+          },
+          {
+            "name": "squats",
+            "reps": 15,
+            "bodyweight": true
+          }
+        ]
+      }
+    ],
+    "issues": [],
+    "missing_fields": [
+      {
+        "path": "workout.difficulty",
+        "reason": "Βοηθά τους αθλητές να διαλέξουν.",
+        "suggested_value": "intermediate",
+        "insert_text": "Επίπεδο: μέτριο"
+      }
+    ],
+    "assumptions": [
+      {
+        "path": "sections.0.exercises.1.sets",
+        "message": "Οι «2 γύροι» αφορούν τα air squats και τα push ups, όχι το τρέξιμο."
+      },
+      {
+        "path": "sections.1.timer.duration_seconds",
+        "message": "Το «Όσους γύρους μπορείτε σε 20 λεπτά» είναι AMRAP 20 λεπτών."
+      }
+    ]
+  }
+}

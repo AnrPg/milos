@@ -21,10 +21,19 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "execution:progress_updated")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "workout:note_submitted")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "workout:completed")
+    Phoenix.PubSub.subscribe(MilosTraining.PubSub, "class_timer:updated")
     {:ok, %{}}
   end
 
   @impl true
+  def handle_info(
+        {:class_timer_updated, %{scheduled_class_id: scheduled_class_id, payload: payload}},
+        state
+      ) do
+    Realtime.broadcast_class_timer(scheduled_class_id, payload)
+    {:noreply, state}
+  end
+
   def handle_info({:booking_submitted, booking}, state) do
     Realtime.broadcast_schedule_refresh("booking_submitted", %{
       slot_id: booking.scheduled_class_id,

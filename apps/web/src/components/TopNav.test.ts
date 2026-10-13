@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { adminHref, pathActive, tenantBrandName } from "@/components/TopNav";
+import { adminHref, pathActive, tenantBrandLogoUrl, tenantBrandName } from "@/components/TopNav";
 
 describe("pathActive", () => {
   it("only marks Home active on the root page", () => {
@@ -64,5 +64,38 @@ describe("tenantBrandName", () => {
 
   it("returns null when the user has no tenant memberships", () => {
     expect(tenantBrandName([], null)).toBeNull();
+  });
+});
+
+describe("tenantBrandLogoUrl", () => {
+  const memberships = [
+    {
+      organization: { name: "Milos Training", slug: "milos" },
+      settings: { brand_logo_url: "https://media.test/organizations/a/branding/logo/a.png" },
+    },
+    {
+      organization: { name: "TestAccount", slug: "test-account" },
+      settings: { brand_logo_url: "  " },
+    },
+  ];
+
+  it("uses the selected organization's logo", () => {
+    expect(tenantBrandLogoUrl(memberships, "milos")).toBe(
+      "https://media.test/organizations/a/branding/logo/a.png",
+    );
+  });
+
+  it("does not leak another organization's logo when the selected one has none", () => {
+    expect(tenantBrandLogoUrl(memberships, "test-account")).toBeNull();
+    expect(tenantBrandLogoUrl([], null)).toBeNull();
+  });
+});
+
+describe("pathActive for my workouts", () => {
+  it("keeps My Workouts inactive on history and pantheon pages", () => {
+    expect(pathActive("/my-workouts", "/my-workouts")).toBe(true);
+    expect(pathActive("/my-workouts/history", "/my-workouts")).toBe(false);
+    expect(pathActive("/my-workouts/history", "/my-workouts/history")).toBe(true);
+    expect(pathActive("/my-workouts/pantheon", "/my-workouts")).toBe(false);
   });
 });

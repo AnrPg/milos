@@ -28,15 +28,14 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
       # org-scoped, so `context` never carries an organization_id. Re-open
       # the tenant scope using the organization AuthorizeWorkoutExecutionSource
       # just derived so the workout lookup below can see it.
-      Workouts.with_tenant_context(execution_context, fn ->
-        with workout when not is_nil(workout) <- Workouts.get_workout(workout_id),
-             {:ok, materialized_workout} <- materialize_workout(workout, scale_slug) do
-          {:ok, Execution.build_timer_sequence(materialized_workout)}
-        else
-          nil -> {:error, :not_found}
-          error -> error
-        end
-      end)
+      with %{} = workout <- Workouts.get_workout(execution_context, workout_id) || :not_found,
+           {:ok, materialized_workout} <-
+             materialize_workout(workout, scale_slug) do
+        {:ok, Execution.build_timer_sequence(materialized_workout)}
+      else
+        :not_found -> {:error, :not_found}
+        error -> error
+      end
     end
   end
 
@@ -76,11 +75,10 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
       |> Map.get(:available_scale_levels, [])
       |> Enum.map(& &1.slug)
 
+    # The workout was already read in the execution's tenant; materialize it
+    # in place rather than reading it again (ADR-128).
     if scale_slug in available_slugs do
-      case Workouts.materialize_workout_for_scale(workout.id, scale_slug) do
-        nil -> {:error, :invalid_scale_level}
-        materialized -> {:ok, materialized}
-      end
+      {:ok, Workouts.materialize_for_scale(workout, scale_slug)}
     else
       {:error, :invalid_scale_level}
     end

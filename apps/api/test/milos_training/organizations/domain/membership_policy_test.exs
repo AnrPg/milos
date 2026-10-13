@@ -4,7 +4,17 @@ defmodule MilosTraining.Organizations.Domain.MembershipPolicyTest do
   alias MilosTraining.Organizations.Domain.MembershipPolicy
 
   test "keeps tenant roles distinct from membership lifecycle" do
-    assert MembershipPolicy.roles() == [:owner, :admin, :coach, :member, :athlete]
+    assert MembershipPolicy.roles() == [
+             :owner,
+             :admin,
+             :coach,
+             :front_desk,
+             :accountant,
+             :janitor,
+             :member,
+             :athlete
+           ]
+
     assert MembershipPolicy.statuses() == [:invited, :active, :suspended, :revoked]
   end
 

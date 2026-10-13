@@ -6,16 +6,19 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import type { ScheduleSlot } from "@/api/schedule";
+import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
 import { useLocale } from "next-intl";
 import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
+import { semanticLabel } from "@/i18n/presentation";
+import { isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
 
 type CalendarViewProps = {
   days: ScheduleDays;
   startDate: string;
   slots: ScheduleSlot[];
   isAdmin: boolean;
+  locations?: ScheduleLocation[];
   onSelectSlot: (slot: ScheduleSlot) => void;
   onCreateSlot: (isoDate: string) => void;
 };
@@ -44,7 +47,7 @@ function slotClassType(slot: ScheduleSlot) {
   };
 }
 
-export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, onCreateSlot }: CalendarViewProps) {
+export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot }: CalendarViewProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
   const todayKey = localDateKey(new Date());
@@ -211,7 +214,14 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
                   )
                 ) : null}
                 {daySlots.map((slot) => (
-                  <SlotCard key={slot.id} slot={slot} compact={days === 7} onSelectSlot={onSelectSlot} />
+                  <SlotCard
+                    key={slot.id}
+                    slot={slot}
+                    compact={days === 7}
+                    isAdmin={isAdmin}
+                    locationName={slotLocationName(slot, locations)}
+                    onSelectSlot={onSelectSlot}
+                  />
                 ))}
               </div>
             </section>
@@ -222,19 +232,36 @@ export function CalendarView({ days, startDate, slots, isAdmin, onSelectSlot, on
   );
 }
 
-function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact: boolean; onSelectSlot: (slot: ScheduleSlot) => void }) {
+function SlotCard({
+  slot,
+  compact,
+  isAdmin,
+  locationName,
+  onSelectSlot,
+}: {
+  slot: ScheduleSlot;
+  compact: boolean;
+  isAdmin: boolean;
+  locationName: string | null;
+  onSelectSlot: (slot: ScheduleSlot) => void;
+}) {
   const i18n = useUiTranslations();
+  const memberState = memberSlotState(slot);
 
   function slotStatusLabel(slot: ScheduleSlot, isPast: boolean) {
-    if (slot.current_user_booking) return slot.current_user_booking.status;
+    if (memberState.kind === "waitlisted") return waitlistPositionLabel(memberState.position, i18n);
+    if (slot.current_user_booking) return semanticLabel(slot.current_user_booking.status, i18n);
     if (isPast) return i18n("ended90303d8");
-    if (slot.spots_remaining === 0) return i18n("full10b28a8");
+    if (slot.spots_remaining === 0) return isAdmin ? i18n("full10b28a8") : i18n("mbFullWaitlistOpen");
     return i18n("value0SpotsLeft3ff0ef6", {value0: slot.spots_remaining});
   }
 
   const locale = useLocale();
   const isPast = new Date(slot.scheduled_at) <= new Date();
-  const isUnavailable = !slot.current_user_booking && (slot.spots_remaining === 0 || isPast);
+  // A full class stays inviting for members because they can join the waitlist.
+  const isUnavailable =
+    !slot.current_user_booking && (isPast || (slot.spots_remaining === 0 && isAdmin));
+  const details = [isEventSlot(slot) ? i18n("mbEventMarker") : null, locationName].filter(Boolean).join(" · ");
   const classType = slotClassType(slot);
   const typeColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
 
@@ -255,6 +282,11 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {classType.name}
         </p>
+        {slot.my_version ? (
+          <p className="truncate text-[9px] font-bold" style={{ color: "var(--primary)" }}>
+            {i18n("memberProgrammingYourVersion")}
+          </p>
+        ) : null}
       </button>
     );
   }
@@ -277,6 +309,17 @@ function SlotCard({ slot, compact, onSelectSlot }: { slot: ScheduleSlot; compact
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
           {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}
           </p>
+          {slot.my_version ? (
+            <span
+              className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold"
+              style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", color: "var(--primary)" }}
+            >
+              {i18n("memberProgrammingYourVersion")}
+            </span>
+          ) : null}
+          {details ? (
+            <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{details}</p>
+          ) : null}
         </div>
         <span
           className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"

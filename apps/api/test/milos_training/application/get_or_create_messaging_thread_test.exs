@@ -61,22 +61,30 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThreadTest do
 
     # Before the fix: owner_b's *global* :admin role alone granted access to
     # any organization's assignment thread.
-    assert {:error, :forbidden} =
-             GetOrCreateMessagingThread.call(owner_b, %{
+    # In its own tenant owner_b cannot reach org_a's assignment at all (RLS
+    # hides it; without RLS the membership check forbids it).
+    assert {:error, reason} =
+             GetOrCreateMessagingThread.call(
+               %{organization_id: org_b.id, user_id: owner_b.id},
+               owner_b,
+               %{context_type: :assignment, context_id: assignment.id}
+             )
+
+    assert reason in [:forbidden, :not_found]
+
+    # Assignment threads need a tenant context (ADR-133).
+    assert {:error, :organization_context_required} =
+             GetOrCreateMessagingThread.call(owner_a, %{
                context_type: :assignment,
                context_id: assignment.id
              })
 
-    thread =
-      RepoContext.run(%{organization_id: org_a.id, user_id: owner_a.id}, fn ->
-        assert {:ok, thread} =
-                 GetOrCreateMessagingThread.call(owner_a, %{
-                   context_type: :assignment,
-                   context_id: assignment.id
-                 })
-
-        thread
-      end)
+    assert {:ok, thread} =
+             GetOrCreateMessagingThread.call(
+               %{organization_id: org_a.id, user_id: owner_a.id},
+               owner_a,
+               %{context_type: :assignment, context_id: assignment.id}
+             )
 
     # Before the fix: every admin on the platform (owner_b included) was
     # auto-added as a thread participant via Identity.list_by_role(:admin).

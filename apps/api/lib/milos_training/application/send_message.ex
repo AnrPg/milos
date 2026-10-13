@@ -7,6 +7,7 @@ defmodule MilosTraining.Application.SendMessage do
   reservations after Messaging durably creates the message.
   """
 
+  alias MilosTraining.Application.TrackMessagingAnalytics
   alias MilosTraining.{Finance, Identity, Messaging}
 
   def call(%{id: sender_id, role: :admin}, %{message_type: :coaching_note} = params) do
@@ -16,11 +17,18 @@ defmodule MilosTraining.Application.SendMessage do
          recipients <- coaching_recipients(thread, sender_id),
          {:ok, reservations} <- reserve_touchpoints(recipients, delivery_id),
          {:ok, message} <- send_or_release(params, reservations, delivery_id) do
-      {:ok, message}
+      TrackMessagingAnalytics.call({:ok, message})
     end
   end
 
-  def call(_sender, params), do: Messaging.send_message(params, %{reservations: []})
+  # Only staff write coaching notes: a client-sent note would skip the
+  # touchpoint ledger (ADR-098).
+  def call(_sender, params) do
+    params
+    |> Map.put(:message_type, :chat)
+    |> Messaging.send_message(%{reservations: []})
+    |> TrackMessagingAnalytics.call()
+  end
 
   defp coaching_recipients(thread, sender_id) do
     ids =

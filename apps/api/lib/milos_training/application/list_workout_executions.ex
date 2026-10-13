@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.ListWorkoutExecutions do
   alias MilosTraining.Execution
   alias MilosTraining.Execution.ExecutionStore
-  alias MilosTraining.Workouts
+  alias MilosTraining.{Organizations, Workouts}
 
   def call(context, user_id),
     do: ExecutionStore.with_user_context(context, fn -> call(user_id) end)
@@ -22,7 +22,7 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
   end
 
   defp attach_workout_summary(execution) do
-    case execution.master_workout_id && Workouts.get_workout(execution.master_workout_id) do
+    case execution.master_workout_id && fetch_workout(execution) do
       nil ->
         Map.merge(execution, %{
           workout_title: "Deleted workout",
@@ -39,6 +39,24 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
         })
     end
   end
+
+  # The workout belongs to the gym where it was done; the user-scoped history
+  # cannot see it without that gym's tenant context. Without one it is
+  # unreachable and shows as deleted (ADR-133).
+  defp fetch_workout(%{organization_id: organization_id, master_workout_id: workout_id})
+       when is_binary(organization_id) do
+    with {:ok, context} <-
+           Organizations.resolve_system_tenant_context(organization_id, :execution_history, %{
+             service: __MODULE__
+           }),
+         %{} = workout <- Workouts.get_workout(context, workout_id) do
+      workout
+    else
+      _unreachable -> nil
+    end
+  end
+
+  defp fetch_workout(_execution), do: nil
 
   defp attach_section_names(section_scores, lookup) do
     Enum.map(section_scores, fn score ->

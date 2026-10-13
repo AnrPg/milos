@@ -73,7 +73,9 @@ defmodule MilosTraining.Application.GetWorkoutExecution do
         presented_workout =
           case execution.scale_level_slug do
             nil -> workout
-            scale_slug -> Workouts.materialize_workout_for_scale(workout.id, scale_slug)
+            # ADR-128: materialize the workout already read in its own tenant
+            # scope instead of re-reading it outside that scope.
+            scale_slug -> Workouts.materialize_for_scale(workout, scale_slug)
           end
 
         Map.merge(execution, %{

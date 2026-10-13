@@ -17,8 +17,16 @@ defmodule MilosTraining.Identity do
   defdelegate regenerate_calendar_feed_token(user), to: UserStore
   defdelegate update_profile(user_id, params), to: UserStore
   defdelegate update_avatar(user_id, avatar_url), to: UserStore
+  defdelegate mark_tour_completed(user_id, audience), to: UserStore
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore
   defdelegate bump_security_version(user_id), to: UserStore
   defdelegate supported_locales(), to: Locale, as: :supported
+
+  @doc "Secret-free account records for a tenant export (ADR-117)."
+  def export_accounts(user_ids) when is_list(user_ids) do
+    user_ids
+    |> list_by_ids()
+    |> Enum.map(&MilosTraining.Identity.Domain.AccountExport.to_export/1)
+  end
 end

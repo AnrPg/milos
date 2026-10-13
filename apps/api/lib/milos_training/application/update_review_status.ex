@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.UpdateReviewStatus do
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Feedback, Identity}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients}
+  alias MilosTraining.Feedback
 
   def call(id, params) do
     status = params["status"] || params[:status]
@@ -16,7 +16,7 @@ defmodule MilosTraining.Application.UpdateReviewStatus do
   end
 
   defp broadcast_review_status_updated(review) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+    admin_ids = TenantStaffRecipients.user_ids(review)
     user_id = Map.get(review, :user_id) || Map.get(review, "user_id")
 
     BroadcastUserSync.for_users(admin_ids, ["admin_reviews"],

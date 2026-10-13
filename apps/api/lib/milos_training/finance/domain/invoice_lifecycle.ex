@@ -149,37 +149,83 @@ defmodule MilosTraining.Finance.Domain.InvoiceLifecycle do
   defp receipt?(%{document_kind: "receipt"}), do: true
   defp receipt?(_params), do: false
 
-  def entitlement(%{
-        membership_status: membership_status,
-        membership_expires_on: membership_expires_on,
-        active_subscription?: active_subscription?,
-        open_invoice_count: open_invoice_count,
-        overdue_invoice_count: overdue_invoice_count,
-        today: today
-      }) do
-    cond do
-      membership_status in ["cancelled", "paused", "expired"] ->
-        %{status: "inactive", source: "membership_status", expires_on: membership_expires_on}
+  @doc """
+  Derives a membership's access on `today`.
 
-      membership_expires_on && Date.compare(membership_expires_on, today) == :lt ->
-        %{status: "inactive", source: "membership_expired", expires_on: membership_expires_on}
+  Members keep their access for `grace_days` of slack after their
+  subscription or membership ends and after an invoice falls overdue
+  (status `"grace"`, with `grace_until`); beyond that they lose it
+  (`"inactive"` or `"blocked"`), e.g. they can no longer book classes.
 
-      overdue_invoice_count > 0 ->
-        %{status: "blocked", source: "overdue_invoice", expires_on: membership_expires_on}
+  Inputs: `membership_status`, `membership_expires_on`, `active_subscription?`,
+  `open_invoice_count`, `overdue_invoice_count` and `today`; optionally
+  `grace_days` (default 0), `lapsed_subscription_ends_on` (the latest
+  subscription that has ended, when no other one is active) and
+  `earliest_overdue_due_date`.
+  """
+  def entitlement(
+        %{
+          membership_status: membership_status,
+          membership_expires_on: membership_expires_on,
+          active_subscription?: active_subscription?,
+          open_invoice_count: open_invoice_count,
+          overdue_invoice_count: overdue_invoice_count,
+          today: today
+        } = facts
+      ) do
+    grace_days = max(Map.get(facts, :grace_days) || 0, 0)
+    lapsed_on = Map.get(facts, :lapsed_subscription_ends_on)
+    overdue_since = Map.get(facts, :earliest_overdue_due_date)
+    active_membership? = membership_status in @active_membership_statuses
 
-      open_invoice_count > 0 and membership_status in @active_membership_statuses ->
-        %{status: "grace", source: "open_invoice", expires_on: membership_expires_on}
+    result =
+      cond do
+        membership_status in ["cancelled", "paused", "expired"] ->
+          %{status: "inactive", source: "membership_status"}
 
-      active_subscription? and membership_status in @active_membership_statuses ->
-        %{status: "active", source: "membership_package", expires_on: membership_expires_on}
+        membership_expires_on && Date.compare(membership_expires_on, today) == :lt ->
+          if within_grace?(membership_expires_on, grace_days, today),
+            do: grace("membership_expiry_grace", membership_expires_on, grace_days),
+            else: %{status: "inactive", source: "membership_expired"}
 
-      membership_status in ["trial", "comped"] ->
-        %{status: "active", source: membership_status, expires_on: membership_expires_on}
+        overdue_invoice_count > 0 and
+            not within_grace?(overdue_since || today, grace_days, today) ->
+          %{status: "blocked", source: "overdue_invoice"}
 
-      true ->
-        %{status: "inactive", source: "no_active_package", expires_on: membership_expires_on}
-    end
+        overdue_invoice_count > 0 ->
+          grace("overdue_grace", overdue_since || today, grace_days)
+
+        open_invoice_count > 0 and active_membership? ->
+          %{status: "grace", source: "open_invoice"}
+
+        active_subscription? and active_membership? ->
+          %{status: "active", source: "membership_package"}
+
+        lapsed_on && active_membership? && within_grace?(lapsed_on, grace_days, today) ->
+          grace("subscription_grace", lapsed_on, grace_days)
+
+        membership_status in ["trial", "comped"] ->
+          %{status: "active", source: membership_status}
+
+        true ->
+          %{status: "inactive", source: "no_active_package"}
+      end
+
+    result
+    |> Map.put(:expires_on, membership_expires_on)
+    |> Map.put_new(:grace_until, nil)
   end
+
+  @doc "Last day of slack after `ended_on` (the day access ended or payment fell due)."
+  def grace_until(%Date{} = ended_on, grace_days), do: Date.add(ended_on, max(grace_days, 0))
+
+  defp within_grace?(_ended_on, grace_days, _today) when grace_days <= 0, do: false
+
+  defp within_grace?(ended_on, grace_days, today),
+    do: Date.compare(today, grace_until(ended_on, grace_days)) != :gt
+
+  defp grace(source, ended_on, grace_days),
+    do: %{status: "grace", source: source, grace_until: grace_until(ended_on, grace_days)}
 
   def active_subscription_statuses, do: @active_subscription_statuses
   def blocking_invoice_statuses, do: @blocking_invoice_statuses

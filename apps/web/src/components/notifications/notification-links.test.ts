@@ -61,4 +61,74 @@ describe("notificationTargetUrl", () => {
       ),
     ).toBeNull();
   });
+
+  it("opens the promoted class from a waitlist promotion", () => {
+    expect(
+      notificationTargetUrl(
+        {
+          type: "booking_waitlist_promoted",
+          payload: { url: "/schedule", scheduled_class_id: "slot-9", booking_id: "booking-1" },
+        },
+        "member",
+      ),
+    ).toBe("/schedule?open_slot=slot-9");
+  });
+
+  it("falls back to the schedule for a waitlist promotion without a class id", () => {
+    expect(
+      notificationTargetUrl({ type: "booking_waitlist_promoted", payload: {} }, "member"),
+    ).toBe("/schedule");
+  });
+
+  it("links an expiring package to billing", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "package_expiring", payload: { url: "/account/billing", package_name: "Gold" } },
+        "member",
+      ),
+    ).toBe("/account/billing");
+    expect(
+      notificationTargetUrl({ type: "package_expiring", payload: { package_name: "Gold" } }, "member"),
+    ).toBe("/account/billing");
+  });
+
+  it("sends staff coaching notifications to the coaching queues", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "form_review_submitted", payload: { url: "/admin/coaching/form-reviews", form_review_id: "r1" } },
+        "admin",
+      ),
+    ).toBe("/admin/coaching?tab=form-reviews");
+    expect(
+      notificationTargetUrl(
+        { type: "coaching_reply_overdue", payload: { url: "/account/activity/chats?thread=t1", thread_id: "t1" } },
+        "coach",
+      ),
+    ).toBe("/admin/coaching?tab=replies");
+  });
+
+  it("sends member coaching notifications to the coaching page", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "form_review_completed", payload: { url: "/account/coaching", form_review_id: "r1" } },
+        "member",
+      ),
+    ).toBe("/coaching");
+    expect(
+      notificationTargetUrl({ type: "nutrition_plan_updated", payload: { title: "Cut" } }, "athlete"),
+    ).toBe("/coaching");
+  });
+
+  it("opens appointments on the side of the reader", () => {
+    expect(
+      notificationTargetUrl({ type: "appointment_booked", payload: { url: "/staff/appointments", slot_id: "s1" } }, "admin"),
+    ).toBe("/admin/appointments");
+    expect(
+      notificationTargetUrl({ type: "appointment_cancelled", payload: { url: "/account/coaching", slot_id: "s1" } }, "owner"),
+    ).toBe("/admin/appointments");
+    expect(
+      notificationTargetUrl({ type: "appointment_cancelled", payload: { url: "/account/coaching", slot_id: "s1" } }, "member"),
+    ).toBe("/appointments");
+    expect(notificationTargetUrl({ type: "appointment_booked", payload: {} }, null)).toBe("/appointments");
+  });
 });

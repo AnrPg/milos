@@ -67,10 +67,22 @@ defmodule Mix.Tasks.Milos.Architecture do
     analytics/analytics_store
     gamification/gamification_store
     finance/finance_store
+    finance/finance_accounting_store
     execution/execution_store
+    execution/training_log_store
     wellbeing/wellbeing_store
     notifications/notification_store
     coaching/coaching_store
+    pantheon/pr_store
+    coaching/form_review_store
+    coaching/relationship_store
+    coaching/note_store
+    housekeeping/housekeeping_store
+    inventory/inventory_store
+    facility/facility_store
+    content/content_store
+    appointments/appointment_store
+    nutrition/nutrition_store
   )
 
   defp tenant_scope_violations do
@@ -131,7 +143,8 @@ defmodule Mix.Tasks.Milos.Architecture do
   # organization_id predicate. A window is used rather than whole-file matching
   # so one query's predicate cannot vouch for another's.
   #
-  # Exempt: REFRESH MATERIALIZED VIEW and the refresh_view/1 helper, which
+  # Exempt: REFRESH MATERIALIZED VIEW, the refresh_view/1 helper and the
+  # milos_refresh_materialized_view/1 SECURITY DEFINER helper (ADR-131), which
   # rebuild the whole view as a platform operation and carry no row predicate.
   @view_window 8
 
@@ -143,7 +156,8 @@ defmodule Mix.Tasks.Milos.Architecture do
     |> Enum.filter(fn {line, _i} -> String.contains?(line, view) end)
     |> Enum.reject(fn {line, _i} ->
       String.contains?(line, "REFRESH MATERIALIZED VIEW") or
-        String.contains?(line, "refresh_view(")
+        String.contains?(line, "refresh_view(") or
+        String.contains?(line, "milos_refresh_materialized_view(")
     end)
     |> Enum.any?(fn {_line, i} ->
       lines

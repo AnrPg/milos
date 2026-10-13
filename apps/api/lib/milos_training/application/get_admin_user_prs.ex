@@ -1,47 +1,45 @@
 defmodule MilosTraining.Application.GetAdminUserPRs do
-  @moduledoc false
+  @moduledoc """
+  Staff dossier PR tab (ADR-129).
 
-  alias MilosTraining.Application.ListUserPRs
-  alias MilosTraining.{Identity, Pantheon}
+  Only coaches of the tenant may read members' PRs, and only PRs recorded in
+  this tenant, of members with an active membership here who have not opted
+  out. The database enforces all of it (`user_pr_records_coach_read_policy`);
+  this service adds the role-safe response for staff who are not coaches:
+  owners and admins get `visibility: "coach_role_required"` and no records,
+  without touching PR data at all.
 
-  def call(_context, user_id) do
-    with %{} <- Identity.find_by_id(user_id) || {:error, :not_found},
-         {:ok, prs} <- ListUserPRs.call(user_id) do
-      {:ok, %{user_id: user_id, prs: Enum.map(prs, &serialize(&1, user_id))}}
+  `member` is the PR owner's public identity when they are an active member of
+  this gym (else `nil`), so a coach whose client scope (ADR-100) does not
+  reach the full profile can still title the PR dossier (ADR-132).
+  """
+
+  alias MilosTraining.Application.TenantUserAccess
+  alias MilosTraining.{Identity, Organizations, Pantheon}
+
+  def call(context, user_id) do
+    with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
+      member = member(context, user_id)
+
+      if Organizations.acting_user_coaches?(context) do
+        prs = Pantheon.with_tenant_context(context, fn -> read(context, user_id) end)
+        {:ok, %{user_id: user_id, visibility: "coach", member: member, prs: prs}}
+      else
+        {:ok, %{user_id: user_id, visibility: "coach_role_required", member: member, prs: []}}
+      end
     end
   end
 
-  def call(user_id), do: call(%{}, user_id)
-
-  defp serialize(pr, user_id) do
-    history =
-      case Pantheon.get_pr_history(pr.id, user_id) do
-        {:ok, entries} -> Enum.map(entries, &serialize_history/1)
-        _error -> []
-      end
-
-    %{
-      id: pr.id,
-      name: pr.name,
-      current_score: pr.current_score,
-      unit: pr.unit,
-      higher_is_better: pr.higher_is_better,
-      beaten_on: pr.beaten_on,
-      supporting_metrics: pr.supporting_metrics || %{},
-      notes: pr.notes,
-      updated_at: pr.updated_at,
-      history: history
-    }
+  defp member(context, user_id) do
+    case TenantUserAccess.fetch_active_user(context, user_id) do
+      {:ok, user} -> %{id: user.id, nickname: user.nickname, avatar_url: user.avatar_url}
+      _not_active_here -> nil
+    end
   end
 
-  defp serialize_history(entry) do
-    %{
-      id: entry.id,
-      score: entry.score,
-      beaten_on: entry.beaten_on,
-      supporting_metrics: entry.supporting_metrics || %{},
-      notes: entry.notes,
-      inserted_at: entry.inserted_at
-    }
+  defp read(context, user_id) do
+    user_id
+    |> Pantheon.list_organization_records(context.organization_id)
+    |> Enum.map(&Pantheon.read_only_view(&1, Pantheon.list_record_history(&1.id)))
   end
 end

@@ -25,8 +25,14 @@ import {
 } from "@/api/platform-organizations";
 import { ApiError } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { platformLogoApi } from "@/api/organization-branding";
+import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
+import { OrganizationPurgeDialog } from "@/components/platform/OrganizationPurgeDialog";
+import { OrganizationSlugRenameDialog } from "@/components/platform/OrganizationSlugRenameDialog";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
+import { platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 
@@ -53,6 +59,8 @@ type GeneratedInvitation = PlatformInvitationResult["invitation"] & {
 export function PlatformOrganizationsPage() {
   const locale = useUiLocale();
   const copy = platformOrganizationsCopy(locale);
+  const purgeCopy = platformOrganizationPurgeCopy(locale);
+  const slugCopy = platformOrganizationSlugCopy(locale);
   const { tokens } = useSession();
   const [form, setForm] = useState(defaultForm);
   const [submitting, setSubmitting] = useState(false);
@@ -68,6 +76,8 @@ export function PlatformOrganizationsPage() {
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
   const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
+  const [reviewingPurge, setReviewingPurge] = useState<PlatformOrganization | null>(null);
+  const [renamingSlug, setRenamingSlug] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
   const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
   const [generatedInvitationsByOrg, setGeneratedInvitationsByOrg] = useState<
@@ -178,10 +188,15 @@ export function PlatformOrganizationsPage() {
       if (name !== editing.organization.name) {
         await renamePlatformOrganization(accessToken, editing.organization.id, name);
       }
+      // The logo is managed by its own upload/remove endpoints (ADR-121);
+      // never echo a possibly stale brand_logo_url back through settings.
+      const editableSettings: Partial<OrganizationSettings> = { ...settings };
+      delete editableSettings.brand_logo_url;
+      delete editableSettings.brand_logo_uploaded;
       await changePlatformOrganizationSettings(
         accessToken,
         editing.organization.id,
-        settings,
+        editableSettings,
       );
       await organizationsQuery.refetch();
       setEditing(null);
@@ -384,6 +399,9 @@ export function PlatformOrganizationsPage() {
                     <button type="button" onClick={() => setEditing(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.edit}
                     </button>
+                    <button type="button" onClick={() => setRenamingSlug(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
+                      {slugCopy.open}
+                    </button>
                     <button type="button" onClick={() => setManagingAccess(entry)} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
                       {copy.manageAccess}
                     </button>
@@ -417,6 +435,13 @@ export function PlatformOrganizationsPage() {
                     ) : null}
                     <button
                       type="button"
+                      onClick={() => setReviewingPurge(entry)}
+                      className="border border-red-900 px-3 py-2 text-sm font-semibold text-red-900"
+                    >
+                      {purgeCopy.open}
+                    </button>
+                    <button
+                      type="button"
                       onClick={() => setConfirmingDelete(entry)}
                       className="border border-red-900 bg-red-50 px-3 py-2 text-sm font-semibold text-red-900"
                     >
@@ -444,9 +469,11 @@ export function PlatformOrganizationsPage() {
 
       {editing?.settings ? (
         <SettingsDialog
+          accessToken={accessToken}
           copy={copy}
           organization={editing}
           onCancel={() => setEditing(null)}
+          onLogoChanged={() => void organizationsQuery.refetch()}
           onSave={saveSettings}
         />
       ) : null}
@@ -479,6 +506,27 @@ export function PlatformOrganizationsPage() {
           submitting={lifecycleSubmitting === `${confirmingArchive.organization.id}:archived`}
           onCancel={() => setConfirmingArchive(null)}
           onConfirm={() => void updateLifecycle(confirmingArchive.organization.id, "archived")}
+        />
+      ) : null}
+      {reviewingPurge ? (
+        <OrganizationPurgeDialog
+          accessToken={accessToken}
+          locale={locale}
+          organization={reviewingPurge}
+          onClose={() => setReviewingPurge(null)}
+          onChanged={() => void organizationsQuery.refetch()}
+        />
+      ) : null}
+      {renamingSlug ? (
+        <OrganizationSlugRenameDialog
+          accessToken={accessToken}
+          locale={locale}
+          organization={renamingSlug}
+          onClose={() => setRenamingSlug(null)}
+          onRenamed={() => {
+            void organizationsQuery.refetch();
+            void myMembershipsQuery.refetch();
+          }}
         />
       ) : null}
       {confirmingDelete ? (
@@ -845,15 +893,21 @@ function DeleteDialog({ copy, organization, submitting, onCancel, onConfirm }: {
   );
 }
 
-function SettingsDialog({ copy, organization, onCancel, onSave }: {
+function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onLogoChanged }: {
+  accessToken: string | undefined;
   copy: ReturnType<typeof platformOrganizationsCopy>;
   organization: PlatformOrganization;
   onCancel: () => void;
   onSave: (name: string, settings: OrganizationSettings) => Promise<void>;
+  onLogoChanged: () => void;
 }) {
   const [name, setName] = useState(organization.organization.name);
   const [settings, setSettings] = useState(organization.settings!);
   const [saving, setSaving] = useState(false);
+  const logoApi = useMemo(
+    () => (accessToken ? platformLogoApi(accessToken, organization.organization.id) : null),
+    [accessToken, organization.organization.id],
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.settings}>
@@ -873,7 +927,26 @@ function SettingsDialog({ copy, organization, onCancel, onSave }: {
           <TextField label={copy.locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
           <TextField label={copy.invitationLifetime} type="number" min={1} value={String(settings.invitation_lifetime_seconds / 3600)} required onChange={(hours) => setSettings({ ...settings, invitation_lifetime_seconds: Number(hours) * 3600 })} />
           <TextField label={copy.brandName} value={settings.brand_name ?? ""} onChange={(brand_name) => setSettings({ ...settings, brand_name })} />
-          <TextField label={copy.brandLogo} type="url" value={settings.brand_logo_url ?? ""} onChange={(brand_logo_url) => setSettings({ ...settings, brand_logo_url })} />
+          {logoApi ? (
+            <div>
+              <span className="text-sm font-semibold text-[var(--text)]">{copy.brandLogoUpload}</span>
+              <div className="mt-2">
+                <TenantLogoUploader
+                  api={logoApi}
+                  currentUrl={settings.brand_logo_url}
+                  uploaded={Boolean(settings.brand_logo_uploaded)}
+                  onChange={(branding) => {
+                    setSettings((current) => ({
+                      ...current,
+                      brand_logo_url: branding.brand_logo_url ?? null,
+                      brand_logo_uploaded: branding.brand_logo_uploaded,
+                    }));
+                    onLogoChanged();
+                  }}
+                />
+              </div>
+            </div>
+          ) : null}
           <TextField label={copy.brandColor} value={settings.brand_primary_color ?? ""} onChange={(brand_primary_color) => setSettings({ ...settings, brand_primary_color })} />
         </div>
         <div className="mt-6 flex justify-end gap-3">

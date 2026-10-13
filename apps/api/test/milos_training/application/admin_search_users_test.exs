@@ -58,7 +58,7 @@ defmodule MilosTraining.Application.AdminSearchUsersTest do
              AdminSearchUsers.call(%{
                "role" => "all",
                "membership_status" => "active",
-               "package_family" => "hybrid"
+               "package_family" => "membership"
              })
 
     assert Enum.map(users, & &1.id) == [member.id]

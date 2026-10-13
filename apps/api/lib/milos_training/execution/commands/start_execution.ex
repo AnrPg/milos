@@ -7,7 +7,11 @@ defmodule MilosTraining.Execution.Commands.StartExecution do
     workout_id = Params.get(params, :master_workout_id)
     scale_slug = Params.get(params, :scale_level_slug)
 
-    with :ok <- validate_workout(workout_id, scale_slug),
+    # The workout is read in the execution's organization (ADR-133); the
+    # caller derived it server-side before this command runs.
+    workout_scope = %{organization_id: Params.get(params, :organization_id), user_id: user_id}
+
+    with :ok <- validate_workout(workout_scope, workout_id, scale_slug),
          started_at_utc <- DateTime.utc_now(),
          execution_params <- %{
            # Always server-derived by AuthorizeWorkoutExecutionSource, which
@@ -30,11 +34,11 @@ defmodule MilosTraining.Execution.Commands.StartExecution do
     end
   end
 
-  defp validate_workout(nil, _scale_slug), do: {:error, :bad_request}
+  defp validate_workout(_scope, nil, _scale_slug), do: {:error, :bad_request}
 
-  defp validate_workout(workout_id, scale_slug) do
-    case Workouts.get_workout(workout_id) do
-      nil ->
+  defp validate_workout(scope, workout_id, scale_slug) do
+    case Workouts.get_workout(scope, workout_id) do
+      missing when not is_map(missing) ->
         {:error, :workout_not_found}
 
       workout when not is_nil(scale_slug) ->

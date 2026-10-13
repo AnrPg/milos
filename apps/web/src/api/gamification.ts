@@ -32,6 +32,8 @@ export type PRSupportingMetrics = Partial<{
 export type PRRecord = {
   id: string;
   user_id: string;
+  /** ADR-129 provenance: the gym the PR was set in, or null for a personal PR. */
+  organization_id?: string | null;
   name: string;
   current_score: number;
   unit: PRUnit;
@@ -92,6 +94,8 @@ export async function createPR(
     beaten_on: string;
     supporting_metrics?: PRSupportingMetrics;
     notes?: string | null;
+    /** ADR-129: the gym the PR was set in; omit or null for a personal PR. */
+    organization_slug?: string | null;
   },
 ): Promise<PRRecord> {
   const data = await apiRequest<{ pr: PRRecord }>("/prs", {

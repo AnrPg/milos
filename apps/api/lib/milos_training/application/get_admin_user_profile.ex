@@ -3,6 +3,7 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
 
   alias MilosTraining.Application.TenantUserAccess
   alias MilosTraining.Identity.Domain.AdminProfilePolicy
+  alias MilosTraining.Organizations
 
   def call(user_id, tenant_context, organization_slug \\ nil) do
     case TenantUserAccess.fetch_active_user(tenant_context, user_id) do
@@ -18,6 +19,8 @@ defmodule MilosTraining.Application.GetAdminUserProfile do
                joined_at: timestamp(user.inserted_at)
              },
              account_status: "active",
+             membership:
+               Organizations.membership_summary(tenant_context.organization_id, user.id),
              available_sections: AdminProfilePolicy.sections(user.role),
              attention: [],
              operational_links: AdminProfilePolicy.operational_links(user, organization_slug)

@@ -19,11 +19,12 @@ import {
 } from "@/api/workouts";
 import { AuthGuard } from "@/components/auth-guard";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
-import { isFreeTextWorkout, storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { storeFreeTextExecutionWorkout } from "@/lib/free-text-execution";
+import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 import { useExecutionStore } from "@/stores/execution";
+import { PageHeader } from "@/components/PageHeader";
 
 type Step = "type" | "week" | "preview";
 
@@ -278,7 +279,7 @@ function WorkoutsPageContent() {
     setError(null);
 
     try {
-      if (isFreeTextWorkout(selectedWorkout)) {
+      if (usesManualTimer(selectedWorkout)) {
         const execution = await startExecution(tokens.access_token, {
           master_workout_id: selectedWorkout.id,
           scale_level_slug: selectedScale,
@@ -365,14 +366,7 @@ function WorkoutsPageContent() {
         style={{ background: "var(--bg)", color: "var(--text)" }}
       >
         <div className="mx-auto max-w-lg">
-          <TransientHero label={i18n("workoutSelectionIntroductionb11d827")}>
-            <div className="mb-5">
-              <h1 className="text-2xl font-bold">{i18n("startWorkoutd1072dd")}</h1>
-              <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-                {i18n("pickAClassTypeThenChooseADayd4c9a74")}
-              </p>
-            </div>
-          </TransientHero>
+          <PageHeader title={i18n("startWorkoutd1072dd")} />
           <div className="grid grid-cols-2 gap-3">
             {classTypes.map((classType) => (
               <button

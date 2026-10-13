@@ -1,6 +1,11 @@
 defmodule MilosTraining.Application.UpdateAdminSettings do
-  alias MilosTraining.Application.{BroadcastUserSync, InvalidateLandingPages}
-  alias MilosTraining.{Finance, Gamification, Identity, Notifications, Scheduling}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    InvalidateLandingPages,
+    TenantStaffRecipients
+  }
+
+  alias MilosTraining.{Finance, Gamification, Notifications, Scheduling}
 
   def call(context, params) do
     do_call(context, params)
@@ -15,11 +20,11 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     scheduling_params = scheduling_params(params)
 
     with {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
-         {:ok, finance_settings} <- maybe_update_finance(finance_params),
+         {:ok, finance_settings} <- maybe_update_finance(context, finance_params),
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
       InvalidateLandingPages.for_all_users()
-      admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+      admin_ids = TenantStaffRecipients.user_ids(context)
       BroadcastUserSync.for_users(admin_ids, ["admin_settings"], reason: "admin_settings_updated")
 
       {:ok,
@@ -32,19 +37,22 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     end
   end
 
-  defp maybe_update_gamification(_context, params) when map_size(params) == 0 do
-    {:ok, Gamification.get_settings()}
+  # TD-092: read in the gym's scope - unscoped the defaults came back.
+  defp maybe_update_gamification(context, params) when map_size(params) == 0 do
+    {:ok, Gamification.with_tenant_context(context, &Gamification.get_settings/0)}
   end
 
   defp maybe_update_gamification(context, params) do
     Gamification.with_tenant_context(context, fn -> Gamification.update_settings(params) end)
   end
 
-  defp maybe_update_finance(params) when map_size(params) == 0 do
-    {:ok, Finance.get_finance_settings()}
+  # Finance settings are tenant rows: without the context the write has no
+  # organization and the first save for a gym fails.
+  defp maybe_update_finance(context, params) when map_size(params) == 0 do
+    {:ok, Finance.get_finance_settings(context)}
   end
 
-  defp maybe_update_finance(params), do: Finance.update_finance_settings(params)
+  defp maybe_update_finance(context, params), do: Finance.update_finance_settings(context, params)
 
   defp maybe_update_notifications(params) when map_size(params) == 0 do
     {:ok, Notifications.get_push_settings()}

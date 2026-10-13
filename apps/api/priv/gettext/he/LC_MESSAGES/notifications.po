@@ -135,3 +135,114 @@ msgstr "הוקצו אימונים חדשים"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "המאמן שלך הקצה לך אימון אחד או יותר."
+
+msgid "You got a spot"
+msgstr "התפנה לך מקום"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "התפנה מקום ב-%{class}. ההזמנה אושרה או ממתינה לאישור."
+
+msgid "Your package ends soon"
+msgstr "החבילה מסתיימת בקרוב"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} מסתיימת ב-%{date}."
+
+msgid "New form review request"
+msgstr "בקשה חדשה לבדיקת טכניקה"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} שלח/ה סרטון לקבלת משוב."
+
+msgid "Your form review is ready"
+msgstr "בדיקת הטכניקה שלך מוכנה"
+
+msgid "Your coach left feedback on your video."
+msgstr "המאמן השאיר משוב על הסרטון שלך."
+
+msgid "A client is waiting for a reply"
+msgstr "לקוח מחכה לתשובה"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} מחכה יותר מזמן התגובה שהובטח."
+
+msgid "Your nutrition plan was updated"
+msgstr "תוכנית התזונה שלך עודכנה"
+
+msgid "Open it to see what changed."
+msgstr "פתח/י כדי לראות מה השתנה."
+
+msgid "New appointment booked"
+msgstr "נקבעה פגישה חדשה"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} קבע/ה מפגש ל-%{time}."
+
+msgid "Appointment cancelled"
+msgstr "הפגישה בוטלה"
+
+msgid "The session on %{time} was cancelled."
+msgstr "המפגש ב-%{time} בוטל."
+
+msgid "A coach took a new athlete"
+msgstr "מאמן לקח אתלט חדש"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} מאמן/ת כעת את %{client}."
+
+msgid "An admin read your note"
+msgstr "מנהל קרא את ההערה שלך"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} קרא/ה את ההערה שלך על %{client} ב-%{time}."
+
+msgid "A machine needs attention"
+msgstr "מכשיר דורש תשומת לב"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "דווח על מלאי נמוך"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "המלאי היום"
+
+msgid "Needs attention: %{items}"
+msgstr "דורש תשומת לב: %{items}"
+
+msgid "Running low"
+msgstr "מלאי נמוך"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: נותרו %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "המנוי שלך מסתיים בקרוב"
+
+msgid "Your subscription has ended"
+msgstr "המנוי שלך הסתיים"
+
+msgid "your subscription"
+msgstr "המנוי שלך"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} מסתיים ב־%{date} (בעוד %{days} ימים). חדשו כדי להמשיך להזמין שיעורים."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} הסתיים. הגישה נשמרת עד %{date}; חדשו עד אז כדי להמשיך להזמין שיעורים."
+
+msgid "Your access has ended"
+msgstr "הגישה שלך הסתיימה"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "הגישה שלך מושהית בגלל תשלום באיחור. שלמו את היתרה כדי להזמין שיעורים שוב."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "הגישה שלך הסתיימה. חדשו את המנוי כדי להזמין שיעורים שוב."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "ההזמנות הקרובות שלך בוטלו: %{count}."

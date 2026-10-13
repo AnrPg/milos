@@ -1,13 +1,13 @@
 defmodule MilosTraining.Application.DeleteWorkout do
   require Logger
 
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Identity, Scheduling, Workouts}
+  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
+  alias MilosTraining.{Scheduling, Workouts}
   alias MilosTraining.Notifications
 
   def call(%{organization_id: _} = context, id) do
     with %{id: ^id} = workout <- Workouts.get_workout_for_admin(context, id),
-         assignment_targets <- Workouts.list_workout_change_targets(id),
+         assignment_targets <- Workouts.list_workout_change_targets(context, id),
          booking_targets <- Scheduling.list_workout_change_targets(context, id),
          {:ok, deleted_slot_ids} <- Scheduling.delete_slots_for_workout(context, id),
          :ok <- Scheduling.delete_class_series_for_workout(context, id),
@@ -17,8 +17,17 @@ defmodule MilosTraining.Application.DeleteWorkout do
       broadcast_deleted_slots(deleted_slot_ids, organization_id)
       notify_assignment_targets(assignment_targets)
       notify_booking_targets(booking_targets)
-      broadcast_assignment_refresh(assignment_targets, id)
-      broadcast_admin_workout_refresh(id)
+      broadcast_assignment_refresh(context, assignment_targets, id)
+      broadcast_admin_workout_refresh(context, id)
+
+      TrackAnalyticsEvent.call("workout_deleted", context, workout, %{
+        metadata: %{
+          affected_assignment_count: length(assignment_targets),
+          affected_booking_count: length(booking_targets),
+          deleted_slot_count: length(deleted_slot_ids)
+        }
+      })
+
       :ok
     else
       nil -> {:error, :not_found}
@@ -26,22 +35,7 @@ defmodule MilosTraining.Application.DeleteWorkout do
     end
   end
 
-  def call(id) do
-    case Workouts.get_workout_for_admin(id) do
-      %{organization_id: organization_id} ->
-        with {:ok, context} <-
-               MilosTraining.Organizations.resolve_system_tenant_context(
-                 organization_id,
-                 :workout_deletion,
-                 %{service: __MODULE__}
-               ) do
-          call(context, id)
-        end
-
-      nil ->
-        {:error, :not_found}
-    end
-  end
+  def call(_context, _id), do: {:error, :organization_context_required}
 
   defp broadcast_deleted_slots(slot_ids, organization_id) do
     Enum.each(slot_ids, fn slot_id ->
@@ -88,8 +82,8 @@ defmodule MilosTraining.Application.DeleteWorkout do
     end)
   end
 
-  defp broadcast_assignment_refresh(targets, workout_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_assignment_refresh(context, targets, workout_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     targets
     |> Enum.map(&Map.get(&1, :user_id))
@@ -101,8 +95,8 @@ defmodule MilosTraining.Application.DeleteWorkout do
     )
   end
 
-  defp broadcast_admin_workout_refresh(workout_id) do
-    admin_ids = Identity.list_by_role(:admin) |> Enum.map(& &1.id)
+  defp broadcast_admin_workout_refresh(context, workout_id) do
+    admin_ids = TenantStaffRecipients.user_ids(context)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_workouts"],
       reason: "workout_deleted",

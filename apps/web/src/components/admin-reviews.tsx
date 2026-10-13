@@ -14,8 +14,8 @@ import {
   type UpdateReviewStatusRequest,
 } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
+import { PageHeader } from "@/components/PageHeader";
 
 type ReviewAnswer = {
   question_key?: unknown;
@@ -57,15 +57,7 @@ export function AdminReviews() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <TransientHero label={i18n("feedbackAdministrationIntroduction1d7858c")} timeoutMs={3000}>
-        <section className="rounded-[2rem] border border-[color:var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("feedbackAdmind2508e3")}</p>
-          <h1 className="mt-2 text-3xl font-black">{i18n("reviewsAndSatisfactionSignalsd3cab61")}</h1>
-          <p className="mt-3 text-sm leading-6 text-[var(--muted)]">
-            {i18n("mvpModerationViewForWorkoutExerciseGymAnd18da3ff")}
-          </p>
-        </section>
-        </TransientHero>
+        <PageHeader title={i18n("reviewsAndSatisfactionSignalsd3cab61")} />
 
         <section className="grid gap-4">
           {reviews.length === 0 ? <p className="rounded-2xl bg-[var(--panel)]/5 p-5 text-sm">{i18n("noReviewsYet739e4b6")}</p> : null}

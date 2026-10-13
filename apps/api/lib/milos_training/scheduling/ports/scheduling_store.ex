@@ -40,6 +40,10 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback get_booking(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
   @callback get_booking_execution_access(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               map() | nil
+  @callback list_class_history(TenantContext.t(), Ecto.UUID.t(), map()) :: %{
+              entries: [map()],
+              total: non_neg_integer()
+            }
   @callback record_attendance(TenantContext.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_attendance_for_user_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
@@ -48,6 +52,34 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
               map() | nil
   @callback create_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), pos_integer()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback create_booking(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              Ecto.UUID.t(),
+              pos_integer(),
+              keyword()
+            ) ::
+              {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @callback get_booking_by_client_operation(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
+              map() | nil
+  @callback resolve_booking_operation(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              %{
+                required(:status) => :approved | :rejected,
+                required(:admin_message) => String.t() | nil,
+                required(:resolution_operation_id) => Ecto.UUID.t() | nil
+              },
+              map() | nil
+            ) ::
+              {:ok, map(), :resolved | :replayed}
+              | {:error, Ecto.Changeset.t()}
+              | {:error,
+                 :not_found | :booking_not_pending | :slot_full | :idempotency_key_conflict}
+  @callback create_approved_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), keyword()) ::
+              {:ok, map()}
+              | {:error, Ecto.Changeset.t()}
+              | {:error, :not_found | :slot_full}
   @callback create_approved_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()}
               | {:error, Ecto.Changeset.t()}
@@ -82,4 +114,21 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback substitute_slot_workout(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found}
   @callback count_classes_today(TenantContext.t()) :: non_neg_integer()
+
+  # Phase B (ADR-097)
+  @callback create_booking_with(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              Ecto.UUID.t(),
+              pos_integer(),
+              map()
+            ) ::
+              {:ok, map()} | {:error, term()}
+  @callback create_approved_booking_with(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback create_waitlisted_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback list_waitlist(TenantContext.t(), Ecto.UUID.t()) :: [map()]
+  @callback promote_waitlisted_booking(TenantContext.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
 end

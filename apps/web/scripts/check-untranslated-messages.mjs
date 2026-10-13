@@ -13,9 +13,13 @@ function flatten(value, prefix = "") {
   });
 }
 
+// Keeps the text of plural/select branches (it is what gets translated) and
+// drops argument names, ICU headers and branch selectors.
 function normalize(value) {
   return value
-    .replace(/\{[^}]+\}/g, "")
+    .replace(/\{\s*\w+\s*,\s*(?:plural|select|selectordinal)\s*,/g, " ")
+    .replace(/(?<=[,}]\s*)(?:=\d+|\w+)\s*\{/g, " ")
+    .replace(/\{[^{}]*\}/g, "")
     .replace(/[^\p{L}\p{N}]+/gu, " ")
     .replace(/\s+/g, " ")
     .trim()

@@ -3,14 +3,32 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
 
   @ready_tenant_tables ~w(
     class_types scheduling_settings class_series scheduled_classes bookings
-    class_attendance_records
+    class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
-    exercise_variations assigned_workouts assigned_workout_athletes
+    exercise_variations assigned_workouts assigned_workout_athletes scale_levels
     membership_packages memberships membership_package_subscriptions
     membership_payments promotion_campaigns promotion_codes promotion_redemptions
     referral_programs referral_events referral_rewards finance_invoices
     finance_invoice_lines finance_payment_reversals finance_credit_ledger_entries
     finance_entitlement_usage_entries finance_settings
+    finance_document_counters finance_refund_receipts finance_reconciliation_records
+    finance_accounting_exports
+    finance_entitlement_usage_entries finance_settings finance_subscription_freezes
+    facility_locations facility_check_ins content_videos
+    coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
+    appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
+    finance_corporate_invoices
+    finance_corporate_payments
+    coaching_relationships
+    coaching_notes
+    coaching_note_reads
+    housekeeping_areas
+    housekeeping_entries
+    inventory_machines
+    inventory_machine_events
+    inventory_supplies
+    inventory_supply_movements
+    inventory_supply_reports
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges
@@ -19,6 +37,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     communication_messages analytics_events notification_click_events
     push_dispatch_attempts
     user_pr_history
+    training_log_entries
   )
 
   @transitional_tenant_tables []
@@ -30,8 +49,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   # explicitly so the exemption is a claim on the record, not an absence.
   @platform_administered_tables ~w(
     organizations organization_memberships organization_settings
-    organization_domains registration_invitations vendors users
-    organization_provisioning_events
+    organization_domains organization_slug_aliases registration_invitations vendors users
+    organization_provisioning_events organization_purges
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS
@@ -44,7 +63,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
     user_pr_records user_stats user_achievements user_gamification_preferences
-    injury_reports
+    injury_reports user_pr_sharing_preferences user_pr_share_grants
   )
 
   def report do

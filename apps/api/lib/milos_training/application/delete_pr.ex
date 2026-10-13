@@ -2,6 +2,10 @@ defmodule MilosTraining.Application.DeletePR do
   alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
   alias MilosTraining.Pantheon
 
+  # Owner-only under RLS: runs in the acting user's scope (ADR-129).
+  def call(%{user_id: user_id} = context, id),
+    do: Pantheon.with_user_context(context, fn -> call(id, user_id) end)
+
   def call(id, user_id) do
     case Pantheon.delete_record(id, user_id) do
       :ok ->

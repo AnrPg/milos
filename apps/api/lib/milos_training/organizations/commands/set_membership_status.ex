@@ -14,23 +14,32 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipStatus do
 
   alias MilosTraining.Organizations.Domain.{MembershipPolicy, TenantAuthorization}
   alias MilosTraining.Application.BroadcastUserSync
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Organizations.OrganizationStore
 
   @settable_statuses [:active, :suspended, :revoked]
 
+  # organization_memberships is a root tenant table: the lookup and update run
+  # in the acting owner/admin's tenant scope (TD-046).
   def call(context, membership_id, status) when is_binary(membership_id) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]),
-         {:ok, status} <- normalize_status(status),
+    case TenantAuthorization.authorize_capability(context, :manage_memberships) do
+      :ok -> RepoContext.run(context, fn -> change_status(context, membership_id, status) end)
+      error -> error
+    end
+  end
+
+  def call(_context, _membership_id, _status), do: {:error, :not_found}
+
+  defp change_status(context, membership_id, status) do
+    with {:ok, status} <- normalize_status(status),
          {:ok, membership} <- fetch_membership(context, membership_id),
          :ok <- refuse_self_change(context, membership),
-         :ok <- authorize_role_ceiling(context.role, membership.role) do
+         :ok <- authorize_role_ceiling(TenantAuthorization.roles(context), membership.roles) do
       context.organization_id
       |> OrganizationStore.update_membership_status(membership_id, status)
       |> broadcast_change(context)
     end
   end
-
-  def call(_context, _membership_id, _status), do: {:error, :not_found}
 
   # A suspended or revoked member keeps a valid access token until it expires;
   # TenantAuthorization will refuse them on the next request, but the client
@@ -68,8 +77,8 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipStatus do
 
   # Same ceiling as IssueInvitation (F-06): an account may never act on a
   # membership more privileged than its own.
-  defp authorize_role_ceiling(actor_role, target_role) do
-    if MembershipPolicy.can_grant_role?(actor_role, target_role) do
+  defp authorize_role_ceiling(actor_roles, target_roles) do
+    if Enum.all?(target_roles, &MembershipPolicy.can_grant_role?(actor_roles, &1)) do
       :ok
     else
       {:error, :role_ceiling_exceeded}

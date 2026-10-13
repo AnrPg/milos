@@ -9,14 +9,14 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
       member_conn = authenticate_as_member(conn, "member_view_workout")
 
       {:ok, _levels} =
-        MilosTraining.Workouts.replace_scale_levels([
+        MilosTraining.Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1},
           %{slug: "rx", label: "Rx", sort_order: 2},
           %{slug: "competition", label: "Competition", sort_order: 3}
         ])
 
       {:ok, workout} =
-        MilosTraining.Workouts.create_workout(admin, %{
+        MilosTraining.Workouts.create_workout(legacy_scope!(), admin, %{
           title: "Pull-up Sprint",
           type: "gymnastics",
           sections: [
@@ -86,12 +86,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
       athlete_conn = authenticate_as_athlete(conn, "athlete_blocked_workout")
 
       {:ok, _levels} =
-        MilosTraining.Workouts.replace_scale_levels([
+        MilosTraining.Workouts.replace_scale_levels(legacy_scope!(), [
           %{slug: "scaled", label: "Scaled", sort_order: 1}
         ])
 
       {:ok, workout} =
-        MilosTraining.Workouts.create_workout(admin, %{
+        MilosTraining.Workouts.create_workout(legacy_scope!(), admin, %{
           title: "Members Only",
           type: "gymnastics",
           sections: [
@@ -168,5 +168,12 @@ defmodule MilosTrainingWeb.WorkoutControllerTest do
 
     {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(athlete)
     put_bearer_token(conn, athlete)
+  end
+
+  # ADR-128: scale levels are tenant-owned; these workouts live in the legacy
+  # organization, so its set is the one configured.
+  defp legacy_scope! do
+    {:ok, organization} = MilosTraining.Organizations.ensure_legacy_organization_for_migration()
+    %{organization_id: organization.id}
   end
 end

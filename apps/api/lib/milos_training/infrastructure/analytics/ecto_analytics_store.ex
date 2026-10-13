@@ -18,19 +18,103 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   alias MilosTraining.Workouts.MasterWorkout
   alias MilosTraining.Repo
 
+  @dedupe_conflict_target {:unsafe_fragment,
+                           "(organization_id, event_name, dedupe_key) WHERE dedupe_key IS NOT NULL"}
+
   @impl true
   def record_event(params) do
-    params =
-      params
-      |> string_key_map()
-      |> Map.put_new("occurred_at", DateTime.utc_now())
-      |> normalize_context_id()
-      |> put_organization_id()
+    case record_events([params]) do
+      {:ok, %{inserted: 0}} -> {:ok, :duplicate}
+      {:ok, %{events: [event]}} -> {:ok, event}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
 
-    %AnalyticsEvent{}
-    |> AnalyticsEvent.changeset(params)
-    |> Repo.insert()
-    |> normalize_result(&normalize_event/1)
+  # ADR-123: rows carrying a dedupe_key are inserted with ON CONFLICT DO
+  # NOTHING against the partial (organization_id, event_name, dedupe_key)
+  # unique index, so replays/retries are no-ops rather than errors. insert_all
+  # is used because a client-generated binary_id makes Repo.insert/2 report a
+  # conflicted row as if it had been written.
+  @impl true
+  def record_events(params_list) when is_list(params_list) do
+    with {:ok, rows} <- validated_rows(params_list) do
+      {count, events} =
+        Repo.insert_all(AnalyticsEvent, rows,
+          on_conflict: :nothing,
+          conflict_target: @dedupe_conflict_target,
+          returning: true
+        )
+
+      {:ok,
+       %{
+         inserted: count,
+         duplicates: length(rows) - count,
+         events: Enum.map(events, &normalize_event/1)
+       }}
+    end
+  end
+
+  @impl true
+  def list_recorded_dedupe_keys(_event_name, []), do: []
+
+  def list_recorded_dedupe_keys(event_name, keys) when is_list(keys) do
+    AnalyticsEvent
+    |> scoped_to_tenant()
+    |> where([event], event.event_name == ^event_name and event.dedupe_key in ^keys)
+    |> select([event], event.dedupe_key)
+    |> Repo.all()
+  end
+
+  # TD-088: which of `source_context_ids` have at least one of `event_names`
+  # recorded in the current tenant, as `{event_name, source_context_id}`.
+  @impl true
+  def list_events_for_source_contexts(_event_names, []), do: []
+
+  def list_events_for_source_contexts(event_names, source_context_ids)
+      when is_list(event_names) and is_list(source_context_ids) do
+    AnalyticsEvent
+    |> scoped_to_tenant()
+    |> where([event], event.event_name in ^event_names)
+    |> where(
+      [event],
+      fragment("?->>'source_context_id'", event.metadata) in ^source_context_ids
+    )
+    |> select([event], {event.event_name, fragment("?->>'source_context_id'", event.metadata)})
+    |> distinct(true)
+    |> Repo.all()
+  end
+
+  defp validated_rows(params_list) do
+    now = DateTime.utc_now()
+    organization_id = RepoContext.current_setting("app.organization_id")
+
+    Enum.reduce_while(params_list, {:ok, []}, fn params, {:ok, rows} ->
+      params =
+        params
+        |> string_key_map()
+        |> Map.put_new("occurred_at", now)
+        |> normalize_context_id()
+        |> put_organization_id(organization_id)
+
+      changeset = AnalyticsEvent.changeset(%AnalyticsEvent{}, params)
+
+      if changeset.valid? do
+        row =
+          changeset
+          |> Ecto.Changeset.apply_changes()
+          |> Map.from_struct()
+          |> Map.drop([:__meta__])
+          |> Map.put(:id, Ecto.UUID.generate())
+
+        {:cont, {:ok, [row | rows]}}
+      else
+        {:halt, {:error, changeset}}
+      end
+    end)
+    |> case do
+      {:ok, rows} -> {:ok, Enum.reverse(rows)}
+      error -> error
+    end
   end
 
   @impl true
@@ -72,13 +156,13 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
   # distinct from NULL, so the dedup silently stopped working.
   #
   # An explicit caller-supplied value (if one is ever added) still wins.
-  defp put_organization_id(params) do
-    case Map.get(params, "organization_id") do
-      nil ->
-        Map.put(params, "organization_id", RepoContext.current_setting("app.organization_id"))
+  defp put_organization_id(params),
+    do: put_organization_id(params, RepoContext.current_setting("app.organization_id"))
 
-      _present ->
-        params
+  defp put_organization_id(params, session_organization_id) do
+    case Map.get(params, "organization_id") do
+      nil -> Map.put(params, "organization_id", session_organization_id)
+      _present -> params
     end
   end
 
@@ -386,7 +470,8 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
       context_type: event.context_type,
       context_id: event.context_id,
       occurred_at: event.occurred_at,
-      metadata: event.metadata || %{}
+      metadata: event.metadata || %{},
+      dedupe_key: event.dedupe_key
     }
   end
 

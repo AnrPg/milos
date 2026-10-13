@@ -5,11 +5,19 @@ import { useQuery } from "@tanstack/react-query";
 import { fetchOrganizationMemberships, type OrganizationMembership } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
 import { useOrganizationSlug } from "@/lib/organization-slug";
+import { surfaceRole, type View } from "@/lib/role-navigation";
+import { useView } from "@/lib/view-mode";
 
-export type TenantMembershipRole = "owner" | "admin" | "coach" | "member" | "athlete";
+export type TenantMembershipRole =
+  | "owner"
+  | "admin"
+  | "coach"
+  | "front_desk"
+  | "accountant"
+  | "janitor"
+  | "member"
+  | "athlete";
 export type SurfaceRole = "admin" | "member" | "athlete";
-
-const ADMIN_MEMBERSHIP_ROLES = new Set<TenantMembershipRole>(["owner", "admin", "coach"]);
 
 export function selectedMembership(
   memberships: OrganizationMembership[],
@@ -22,18 +30,19 @@ export function selectedMembership(
   );
 }
 
-export function surfaceRoleForMembership(membership: OrganizationMembership | null): SurfaceRole {
-  const membershipRole = membership?.role as TenantMembershipRole | undefined;
-
-  if (membershipRole && ADMIN_MEMBERSHIP_ROLES.has(membershipRole)) return "admin";
-  if (membershipRole === "athlete") return "athlete";
-  if (membershipRole === "member") return "member";
-  return "member";
+// Any staff role opens the staff pages; "My training" switches a staff member
+// who is also a client to the client pages (ADR-103).
+export function surfaceRoleForMembership(
+  membership: OrganizationMembership | null,
+  view: View = "staff",
+): SurfaceRole {
+  return surfaceRole(membership, view);
 }
 
 export function useSelectedMembershipRole() {
   const { status, tokens } = useSession();
   const selectedOrganizationSlug = useOrganizationSlug();
+  const view = useView();
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token);
 
   const membershipsQuery = useQuery({
@@ -45,7 +54,7 @@ export function useSelectedMembershipRole() {
 
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const membership = selectedMembership(memberships, selectedOrganizationSlug);
-  const role = surfaceRoleForMembership(membership);
+  const role = surfaceRoleForMembership(membership, view);
 
   return {
     role,

@@ -135,3 +135,113 @@ msgstr ""
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr ""
+
+msgid "You got a spot"
+msgstr ""
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr ""
+
+msgid "Your package ends soon"
+msgstr ""
+
+msgid "%{package} ends on %{date}."
+msgstr ""
+
+msgid "New form review request"
+msgstr ""
+
+msgid "%{client} sent a video for feedback."
+msgstr ""
+
+msgid "Your form review is ready"
+msgstr ""
+
+msgid "Your coach left feedback on your video."
+msgstr ""
+
+msgid "A client is waiting for a reply"
+msgstr ""
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr ""
+
+msgid "Your nutrition plan was updated"
+msgstr ""
+
+msgid "Open it to see what changed."
+msgstr ""
+
+msgid "New appointment booked"
+msgstr ""
+
+msgid "%{client} booked a session for %{time}."
+msgstr ""
+
+msgid "Appointment cancelled"
+msgstr ""
+
+msgid "The session on %{time} was cancelled."
+msgstr ""
+
+msgid "A coach took a new athlete"
+msgstr ""
+
+msgid "%{coach} is now coaching %{client}."
+msgstr ""
+
+msgid "An admin read your note"
+msgstr ""
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr ""
+
+msgid "A machine needs attention"
+msgstr ""
+
+msgid "%{machine}: %{note}"
+msgstr ""
+
+msgid "Reported running low"
+msgstr ""
+
+msgid "%{item}: %{note}"
+msgstr ""
+
+msgid "Inventory today"
+msgstr ""
+
+msgid "Needs attention: %{items}"
+msgstr ""
+
+msgid "Running low"
+msgstr ""
+
+msgid "%{item}: %{quantity} left."
+
+msgid "Your subscription ends soon"
+msgstr ""
+
+msgid "Your subscription has ended"
+msgstr ""
+
+msgid "your subscription"
+msgstr ""
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr ""
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr ""
+
+msgid "Your access has ended"
+msgstr ""
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr ""
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr ""
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr ""

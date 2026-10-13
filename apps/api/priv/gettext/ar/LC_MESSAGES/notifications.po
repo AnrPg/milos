@@ -135,3 +135,114 @@ msgstr "تم تعيين تمارين جديدة"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "عيّن لك مدربك تمرينًا واحدًا أو أكثر."
+
+msgid "You got a spot"
+msgstr "حصلت على مكان"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "توفر مكان في %{class}. حجزك مؤكد أو بانتظار الموافقة."
+
+msgid "Your package ends soon"
+msgstr "باقتك تنتهي قريبًا"
+
+msgid "%{package} ends on %{date}."
+msgstr "تنتهي %{package} في %{date}."
+
+msgid "New form review request"
+msgstr "طلب جديد لمراجعة الأداء"
+
+msgid "%{client} sent a video for feedback."
+msgstr "أرسل %{client} فيديو للحصول على ملاحظات."
+
+msgid "Your form review is ready"
+msgstr "مراجعة أدائك جاهزة"
+
+msgid "Your coach left feedback on your video."
+msgstr "ترك مدربك ملاحظات على الفيديو الخاص بك."
+
+msgid "A client is waiting for a reply"
+msgstr "عميل ينتظر الرد"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "ينتظر %{client} أكثر من وقت الرد الموعود."
+
+msgid "Your nutrition plan was updated"
+msgstr "تم تحديث خطتك الغذائية"
+
+msgid "Open it to see what changed."
+msgstr "افتحها لمعرفة ما تغيّر."
+
+msgid "New appointment booked"
+msgstr "تم حجز موعد جديد"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "حجز %{client} جلسة في %{time}."
+
+msgid "Appointment cancelled"
+msgstr "تم إلغاء الموعد"
+
+msgid "The session on %{time} was cancelled."
+msgstr "تم إلغاء الجلسة في %{time}."
+
+msgid "A coach took a new athlete"
+msgstr "تولّى مدرب رياضيًا جديدًا"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "يدرّب %{coach} الآن %{client}."
+
+msgid "An admin read your note"
+msgstr "قرأ مسؤول ملاحظتك"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "قرأ %{reader} ملاحظتك عن %{client} في %{time}."
+
+msgid "A machine needs attention"
+msgstr "جهاز يحتاج إلى انتباه"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "تم الإبلاغ عن انخفاض المخزون"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "المخزون اليوم"
+
+msgid "Needs attention: %{items}"
+msgstr "يحتاج إلى انتباه: %{items}"
+
+msgid "Running low"
+msgstr "المخزون منخفض"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: تبقّى %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "اشتراكك ينتهي قريبًا"
+
+msgid "Your subscription has ended"
+msgstr "انتهى اشتراكك"
+
+msgid "your subscription"
+msgstr "اشتراكك"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "ينتهي %{package} في %{date} (بعد %{days} أيام). جدّد لتواصل حجز الحصص."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "انتهى %{package}. يبقى وصولك متاحًا حتى %{date}؛ جدّد قبل ذلك لتواصل حجز الحصص."
+
+msgid "Your access has ended"
+msgstr "انتهى وصولك"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "تم إيقاف وصولك مؤقتًا بسبب دفعة متأخرة. ادفع الرصيد المستحق لتحجز الحصص مجددًا."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "انتهى وصولك. جدّد اشتراكك لتحجز الحصص مجددًا."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "أُلغيت حجوزاتك القادمة: %{count}."

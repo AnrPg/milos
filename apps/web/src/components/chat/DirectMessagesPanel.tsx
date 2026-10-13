@@ -81,7 +81,15 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
     return () => clearTimeout(timeout);
   }, [searchQuery, accessToken, currentUserId, threads]);
 
-  const { messages, typingUsers, sendMessage, sendTypingStart, sendTypingStop } = useChat({
+  const {
+    messages,
+    typingUsers,
+    sendMessage,
+    retryMessage,
+    discardMessage,
+    sendTypingStart,
+    sendTypingStop,
+  } = useChat({
     threadId: view === "thread" ? (activeThread?.id ?? null) : null,
     accessToken,
     currentUserId,
@@ -275,6 +283,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                 key={msg.id}
                 message={msg}
                 isOwnMessage={msg.sender_id === currentUserId}
+                onRetry={retryMessage}
+                onDiscard={discardMessage}
               />
             ))}
             <TypingIndicator typingUsers={typingUsers} />

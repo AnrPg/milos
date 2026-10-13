@@ -263,6 +263,26 @@ Append to `docs/technical_debt.md`:
 | Database | PostgreSQL 16 |
 | Deployment | Docker Compose + Caddy (auto TLS) |
 
+### Backend test runs and the BEAM literal area (ADR-134)
+
+- `cd apps/api && mix test` (and `mix precommit`) run on the VM defaults. No
+  emulator flag is needed; `+MIscs 4096` is no longer required.
+- `:persistent_term.put/2` copies its value into the VM's literal area (1 GB
+  by default). Replaced values are freed only lazily, so re-putting a large
+  term over and over aborts the VM with `literal_alloc: Cannot allocate …`.
+  That is how OpenApiSpex's default cache crashed full test runs: it re-put
+  the ~23 MB spec once per controller action. `MilosTrainingWeb.OpenApiSpecCache`
+  stores it once (a test checks this). Do not switch back to the default
+  adapter, and never re-put large or frequently changing values into
+  `:persistent_term`.
+- If you need a larger literal area to diagnose a regression, set
+  `ELIXIR_ERL_OPTIONS="+MIscs 4096"` in the shell. `mix.exs`, `config/*.exs`
+  and aliases cannot set emulator flags, because the VM has already booted
+  when Mix reads them. Treat needing the flag as a bug to fix.
+- `mix milos.export_openapi` (run by `npm run generate:api`) writes JSON with
+  object keys sorted recursively. That keeps generated-client diffs limited
+  to real contract changes.
+
 ---
 
 ## Project Structure

@@ -1,4 +1,6 @@
 defmodule MilosTrainingWeb.ExecutionControllerTest do
+  # TD-046: /api/executions is user-scoped, so tenant derivation must work
+  # under the RLS-enforcing runtime role, not only as a superuser.
   use MilosTrainingWeb.ConnCase, async: false
 
   import MilosTraining.TestFixtures, only: [slot_fixture: 2]
@@ -446,6 +448,45 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       assert updated["lock_version"] == execution["lock_version"] + 1
 
+      counted =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: updated["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 2, skips: 1, bogus: 7}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert %{"pauses" => 2, "skips" => 1, "position" => %{"format" => "for_time"}} =
+               counted["kpi_counters"]
+
+      refute Map.has_key?(counted["kpi_counters"], "bogus")
+
+      stale_counters =
+        athlete_conn
+        |> recycle()
+        |> patch(
+          "/api/executions/#{execution["id"]}/progress",
+          valid
+          |> Map.merge(%{
+            expected_version: counted["lock_version"],
+            operation_id: Ecto.UUID.generate(),
+            kpi_counters: %{pauses: 1}
+          })
+        )
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert stale_counters["kpi_counters"]["pauses"] == 2
+      assert stale_counters["duration_adjustments"] == %{}
+      updated = stale_counters
+
       replayed =
         athlete_conn
         |> recycle()
@@ -477,6 +518,63 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
           segment_cycle_counts: %{forged: 42}
       })
       |> json_response(400)
+    end
+
+    test "progress stores clock adjustments for timed segments with authored context", %{
+      conn: conn
+    } do
+      admin = create_admin!("execution_adjust_admin")
+      athlete_conn = authenticate_as_member(conn, "execution_adjust_athlete")
+      :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
+
+      {:ok, workout} =
+        Workouts.create_workout(legacy_context!(admin), admin, %{
+          title: "Adjustable AMRAP",
+          type: "crossfit",
+          sections: [
+            %{
+              name: "AMRAP 10",
+              order: 1,
+              scoreable: false,
+              timer_config: %{type: "amrap", duration_seconds: 600},
+              exercises: [%{name: "Burpee", order: 1, prescription_value: 10}]
+            }
+          ]
+        })
+
+      execution =
+        athlete_conn
+        |> post("/api/executions", %{master_workout_id: workout.id, source: "self_selected"})
+        |> json_response(201)
+        |> Map.fetch!("execution")
+
+      updated =
+        athlete_conn
+        |> recycle()
+        |> patch("/api/executions/#{execution["id"]}/progress", %{
+          expected_version: execution["lock_version"],
+          operation_id: Ecto.UUID.generate(),
+          checked_exercise_ids: [],
+          current_segment_index: 0,
+          status: "paused",
+          paused_elapsed_ms: 1_000,
+          total_elapsed_ms: 1_000,
+          section_elapsed_ms: %{},
+          segment_cycle_counts: %{},
+          duration_adjustments: %{"segment:0" => 120, "segment:7" => 30}
+        })
+        |> json_response(200)
+        |> Map.fetch!("execution")
+
+      assert %{
+               "segment:0" => %{
+                 "delta_seconds" => 120,
+                 "authored_seconds" => 600,
+                 "section_name" => "AMRAP 10"
+               }
+             } = updated["duration_adjustments"]
+
+      refute Map.has_key?(updated["duration_adjustments"], "segment:7")
     end
 
     test "completion persists measured fallback scores when none are submitted manually", %{
@@ -666,8 +764,74 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
   defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
 
+  describe "workout vault and repeats (ADR-098)" do
+    test "a client repeats a completed workout as a new dated entry and sees it in the vault",
+         %{conn: conn} do
+      admin = create_admin!("vault_admin")
+      member = create_user!(:member, "vault_member")
+      other_conn = authenticate_as_member(conn, "vault_other")
+      workout = workout_with_scale!(admin)
+      member_conn = put_bearer_token(conn, member)
+
+      start = fn source, reference ->
+        member_conn
+        |> recycle()
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          scale_level_slug: "scaled",
+          source: source,
+          source_reference_id: reference
+        })
+      end
+
+      first = start.("self_selected", nil) |> json_response(201) |> Map.fetch!("execution")
+
+      # Only completed executions can be done again.
+      assert start.("repeat", first["id"]) |> json_response(403)
+
+      member_conn
+      |> recycle()
+      |> patch("/api/executions/#{first["id"]}/complete", %{section_scores: []})
+      |> json_response(200)
+
+      again = start.("repeat", first["id"]) |> json_response(201) |> Map.fetch!("execution")
+      assert again["source"] == "repeat"
+      assert again["source_reference_id"] == first["id"]
+      refute again["id"] == first["id"]
+
+      # Someone else's history is not a source.
+      assert other_conn
+             |> post("/api/executions", %{
+               master_workout_id: workout.id,
+               scale_level_slug: "scaled",
+               source: "repeat",
+               source_reference_id: first["id"]
+             })
+             |> json_response(403)
+
+      member_conn
+      |> recycle()
+      |> patch("/api/executions/#{again["id"]}/complete", %{section_scores: []})
+      |> json_response(200)
+
+      [entry] =
+        member_conn
+        |> recycle()
+        |> get("/api/executions/vault")
+        |> json_response(200)
+        |> Map.fetch!("workouts")
+
+      assert entry["master_workout_id"] == workout.id
+      assert entry["workout_title"] == "Execution Workout"
+      assert entry["completed_count"] == 2
+
+      assert Enum.map(entry["entries"], & &1["id"]) |> Enum.sort() ==
+               Enum.sort([first["id"], again["id"]])
+    end
+  end
+
   defp workout_with_scale!(admin) do
-    :ok = ensure_scale_level!("scaled", "Scaled")
+    :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 
     {:ok, workout} =
       Workouts.create_workout(legacy_context!(admin), admin, %{
@@ -700,7 +864,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
   end
 
   defp scoreable_for_time_workout!(admin) do
-    :ok = ensure_scale_level!("scaled", "Scaled")
+    :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 
     {:ok, workout} =
       Workouts.create_workout(legacy_context!(admin), admin, %{
@@ -735,8 +899,8 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     workout
   end
 
-  defp ensure_scale_level!(slug, label) do
-    levels = Workouts.list_scale_levels()
+  defp ensure_scale_level!(context, slug, label) do
+    levels = Workouts.list_scale_levels(context)
 
     if Enum.any?(levels, &(&1.slug == slug)) do
       :ok
@@ -745,6 +909,7 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
       {:ok, _levels} =
         Workouts.replace_scale_levels(
+          context,
           levels
           |> Enum.map(fn level ->
             %{slug: level.slug, label: level.label, sort_order: level.sort_order}

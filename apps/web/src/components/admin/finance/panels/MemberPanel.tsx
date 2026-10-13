@@ -36,6 +36,10 @@ import {
 } from "@/components/admin-finance-receipt";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { sharedSubscriptions } from "@/components/staff/staff-helpers";
+import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBeneficiaries";
+import { ChargeCategorySelect } from "@/components/admin/finance/shared/ChargeCategorySelect";
+import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
@@ -180,6 +184,7 @@ export function MemberPanel({
     description: "",
     due_date: "",
     membership_package_subscription_id: "",
+    charge_category: "",
   });
   const [selectedPackageId, setSelectedPackageId] = useState("");
 
@@ -298,12 +303,18 @@ export function MemberPanel({
 
   const createInvoiceMutation = useMutation({
     mutationFn: () =>
-      createFinanceInvoice(token, userId, {
-        amount_cents: Math.round(Number(invoiceForm.amount_cents || 0) * 100),
-        description: invoiceForm.description || undefined,
-        due_date: invoiceForm.due_date || undefined,
-        membership_package_subscription_id: invoiceForm.membership_package_subscription_id || undefined,
-      }),
+      createFinanceInvoice(
+        token,
+        userId,
+        manualInvoiceBody({
+          amountCents: Math.round(Number(invoiceForm.amount_cents || 0) * 100),
+          description: invoiceForm.description,
+          dueDate: invoiceForm.due_date,
+          subscriptionId: invoiceForm.membership_package_subscription_id,
+          chargeCategory: invoiceForm.charge_category,
+          fallbackDescription: isChargeCategory(invoiceForm.charge_category) ? i18n(CHARGE_CATEGORY_LABEL_KEYS[invoiceForm.charge_category]) : "",
+        }),
+      ),
     onSuccess: async () => {
       setShowInvoiceForm(false);
       setInvoiceForm({
@@ -311,6 +322,7 @@ export function MemberPanel({
         description: "",
         due_date: "",
         membership_package_subscription_id: "",
+        charge_category: "",
       });
       await invalidateFinanceSurfaces();
     },
@@ -472,6 +484,9 @@ export function MemberPanel({
                     <p className="text-xs mt-0.5" style={{ color: "var(--dim)" }}>
                       {field(sub, "billing_period_snapshot")} · {money(uiLocale, sub.price_cents_snapshot)} {i18n("ends74f5b4d")} {field(sub, "ends_on") || "—"}
                     </p>
+                    {sharedSubscriptions([sub]).length > 0 ? (
+                      <SubscriptionBeneficiaries payerUserId={userId} subscription={sub} />
+                    ) : null}
                   </div>
                 ))}
               </div>
@@ -690,6 +705,16 @@ export function MemberPanel({
                       onChange={(e) => setInvoiceForm({ ...invoiceForm, description: e.target.value })}
                     />
                   </FormField>
+                  {!invoiceForm.membership_package_subscription_id ? (
+                    <FormField label={i18n("admChargeCategory")}>
+                      <ChargeCategorySelect
+                        className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
+                        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+                        value={invoiceForm.charge_category}
+                        onChange={(charge_category) => setInvoiceForm({ ...invoiceForm, charge_category })}
+                      />
+                    </FormField>
+                  ) : null}
                   <FormField label={i18n("dueDate4c1aeeb")}>
                     <input
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"

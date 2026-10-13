@@ -18,6 +18,13 @@ import {
   type PRSupportingMetrics,
   type PRUnit,
 } from "@/api/gamification";
+import {
+  PERSONAL_PR_GYM,
+  PRGymField,
+  prGymSlugForSubmit,
+  usePRGymOptions,
+  type PRGymOption,
+} from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
@@ -112,11 +119,21 @@ function timeFieldsToSeconds(t: TimeFields): number {
   return h * 3600 + m * 60 + s + ms / 1000;
 }
 
+/** A new PR, offering the caller's gyms as its provenance (ADR-129). */
+export function NewPRFormModal({ onClose }: { onClose: () => void }) {
+  const { gyms, defaultGymSlug } = usePRGymOptions();
+  return <PRFormModal pr={null} gyms={gyms} defaultGymSlug={defaultGymSlug} onClose={onClose} />;
+}
+
 export function PRFormModal({
   pr,
+  gyms = [],
+  defaultGymSlug = PERSONAL_PR_GYM,
   onClose,
 }: {
   pr?: PRRecord | null;
+  gyms?: PRGymOption[];
+  defaultGymSlug?: string;
   onClose: () => void;
 }) {
   const i18n = useUiTranslations();
@@ -147,6 +164,8 @@ export function PRFormModal({
   const [details, setDetails] = useState<Partial<Record<PRSupportingMetricKey, string>>>(() => rawMetrics(pr?.supporting_metrics));
   const [detailToAdd, setDetailToAdd] = useState<PRSupportingMetricKey | "">("");
   const [notes, setNotes] = useState(pr?.notes ?? "");
+  const [gymChoice, setGymChoice] = useState<string | undefined>(undefined);
+  const gymSlug = gymChoice ?? defaultGymSlug;
   const [error, setError] = useState<string | null>(null);
 
   const mutation = useMutation({
@@ -169,7 +188,10 @@ export function PRFormModal({
       if (mode === "update" && pr) {
         return updatePR(tokens.access_token, pr.id, params);
       }
-      return createPR(tokens.access_token, params);
+      return createPR(tokens.access_token, {
+        ...params,
+        organization_slug: prGymSlugForSubmit(gymSlug),
+      });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["prs"] });
@@ -357,6 +379,8 @@ export function PRFormModal({
               </select>
             )}
           </div>
+
+          {isExisting ? null : <PRGymField gyms={gyms} value={gymSlug} onChange={setGymChoice} />}
 
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>{i18n("notesOptional4d56ca9")}</label>

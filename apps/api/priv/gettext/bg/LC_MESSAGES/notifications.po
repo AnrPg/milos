@@ -135,3 +135,114 @@ msgstr "Зададени са нови тренировки"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Вашият треньор ви зададе една или повече тренировки."
+
+msgid "You got a spot"
+msgstr "Получи място"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Освободи се място в %{class}. Резервацията ти е потвърдена или чака одобрение."
+
+msgid "Your package ends soon"
+msgstr "Пакетът ти изтича скоро"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} изтича на %{date}."
+
+msgid "New form review request"
+msgstr "Нова заявка за преглед на техника"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} изпрати видео за обратна връзка."
+
+msgid "Your form review is ready"
+msgstr "Прегледът на техниката ви е готов"
+
+msgid "Your coach left feedback on your video."
+msgstr "Треньорът ви остави обратна връзка за видеото."
+
+msgid "A client is waiting for a reply"
+msgstr "Клиент чака отговор"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} чака повече от обещаното време за отговор."
+
+msgid "Your nutrition plan was updated"
+msgstr "Хранителният ви план е обновен"
+
+msgid "Open it to see what changed."
+msgstr "Отворете го, за да видите промените."
+
+msgid "New appointment booked"
+msgstr "Нов записан час"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} запази сесия за %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Часът е отменен"
+
+msgid "The session on %{time} was cancelled."
+msgstr "Сесията на %{time} е отменена."
+
+msgid "A coach took a new athlete"
+msgstr "Треньор пое нов атлет"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} вече тренира %{client}."
+
+msgid "An admin read your note"
+msgstr "Администратор прочете бележката ви"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} прочете бележката ви за %{client} в %{time}."
+
+msgid "A machine needs attention"
+msgstr "Уред се нуждае от внимание"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Съобщено за ниска наличност"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Инвентар днес"
+
+msgid "Needs attention: %{items}"
+msgstr "Нуждае се от внимание: %{items}"
+
+msgid "Running low"
+msgstr "Ниска наличност"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: остават %{quantity}."
+
+msgid "Your subscription ends soon"
+msgstr "Абонаментът ви изтича скоро"
+
+msgid "Your subscription has ended"
+msgstr "Абонаментът ви изтече"
+
+msgid "your subscription"
+msgstr "абонаментът ви"
+
+msgid "%{package} ends on %{date} (in %{days} days). Renew to keep booking classes."
+msgstr "%{package} изтича на %{date} (след %{days} дни). Подновете, за да продължите да записвате часове."
+
+msgid "%{package} has ended. You keep access until %{date}; renew before then to keep booking classes."
+msgstr "%{package} изтече. Запазвате достъп до %{date}; подновете дотогава, за да продължите да записвате часове."
+
+msgid "Your access has ended"
+msgstr "Достъпът ви изтече"
+
+msgid "Your access is paused because a payment is overdue. Pay the outstanding balance to book classes again."
+msgstr "Достъпът ви е спрян заради просрочено плащане. Платете дължимото, за да записвате отново часове."
+
+msgid "Your access has ended. Renew your subscription to book classes again."
+msgstr "Достъпът ви изтече. Подновете абонамента си, за да записвате отново часове."
+
+msgid "Your upcoming bookings were cancelled: %{count}."
+msgstr "Предстоящите ви записвания бяха отменени: %{count}."

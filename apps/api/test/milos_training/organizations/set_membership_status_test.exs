@@ -100,7 +100,7 @@ defmodule MilosTraining.Organizations.SetMembershipStatusTest do
              Organizations.set_membership_status(admin_context, member_membership.id, :suspended)
   end
 
-  test "a coach cannot change membership status at all", %{
+  test "a coach cannot suspend or revoke memberships (ADR-099)", %{
     organization: organization,
     member_membership: member_membership
   } do

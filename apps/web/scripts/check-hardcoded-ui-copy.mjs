@@ -40,7 +40,8 @@ const technicalProperties = new Set([
   "currency", "d", "dateStyle", "day", "event", "format", "height", "hour", "href", "icon", "id",
   "inputMode", "inputType", "key", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
   "padding", "pattern", "rel", "role", "scope", "second", "slug", "source", "status", "style",
-  "step", "target", "timeStyle", "type", "unit", "value", "variant", "weekday", "width", "year",
+  "step", "target", "timeStyle", "tone", "type", "unit", "value", "variant", "weekday", "width", "year",
+  "aria-current",
 ]);
 const technicalCalls = new Set([
   "addEventListener", "endsWith", "get", "getItem", "getPropertyValue", "includes", "join",

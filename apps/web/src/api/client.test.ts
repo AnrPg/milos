@@ -26,6 +26,24 @@ describe("apiRequest tenant headers", () => {
     );
   });
 
+  it("replaces a remembered retired slug with the canonical slug the API names (ADR-122)", async () => {
+    window.history.replaceState(null, "", "/admin/users");
+    window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "old-gym");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), {
+        status: 200,
+        headers: { "x-organization-canonical-slug": "new-gym" },
+      }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
+    expect(fetchMock).toHaveBeenLastCalledWith("/api/org/old-gym/admin/users", expect.anything());
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("new-gym");
+
+    await apiRequest<{ ok: boolean }>("/admin/users", { token: "token" });
+    expect(fetchMock).toHaveBeenLastCalledWith("/api/org/new-gym/admin/users", expect.anything());
+  });
+
   it("falls back to the selected organization for global admin pages", async () => {
     window.history.replaceState(null, "", "/admin/users");
     window.localStorage.setItem(SELECTED_ORGANIZATION_SLUG_KEY, "selected-gym");
@@ -174,11 +192,20 @@ describe("apiRequest tenant headers", () => {
   it.each([
     ["/schedule?days=7", "/api/org/atlas-gym/schedule?days=7"],
     ["/bookings", "/api/org/atlas-gym/bookings"],
+    [
+      "/me/workouts/w-1/injury-warnings?surface=pre_start",
+      "/api/org/atlas-gym/me/workouts/w-1/injury-warnings?surface=pre_start",
+    ],
+    ["/locations", "/api/org/atlas-gym/locations"],
+    ["/check-ins", "/api/org/atlas-gym/check-ins"],
     ["/my-workouts?start_date=2026-08-08", "/api/org/atlas-gym/my-workouts?start_date=2026-08-08"],
     ["/workouts/workout-1", "/api/org/atlas-gym/workouts/workout-1"],
     ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],
     ["/me/finance", "/api/org/atlas-gym/me/finance"],
     ["/me/entitlement", "/api/org/atlas-gym/me/entitlement"],
+    ["/challenges/c-1/leaderboard", "/api/org/atlas-gym/challenges/c-1/leaderboard"],
+    ["/challenges/c-1/opt_in", "/api/org/atlas-gym/challenges/c-1/opt_in"],
+    ["/landing/leaderboard-opt-in", "/api/org/atlas-gym/landing/leaderboard-opt-in"],
   ])("scopes org-only member path %s", async (path, expectedPath) => {
     window.history.replaceState(null, "", "/org/atlas-gym/schedule");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

@@ -16,8 +16,8 @@ import {
   type ReportInjuryRequest,
 } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
-import { TransientHero } from "@/components/TransientHero";
 import { SemanticLabel } from "@/components/semantic-label";
+import { PageHeader } from "@/components/PageHeader";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -54,12 +54,7 @@ export function MyWellbeing() {
   return (
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
-        <TransientHero label={i18n("wellbeingIntroduction1ce0469")}>
-        <section className="rounded-[2rem] border border-[var(--border)] bg-[var(--panel)] p-5">
-          <p className="text-xs font-bold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("myWellbeing1916377")}</p>
-          <h1 className="mt-2 text-3xl font-black">{i18n("reportInjuriesAndMarkHealing3fce6b4")}</h1>
-        </section>
-        </TransientHero>
+        <PageHeader title={i18n("myWellbeing1916377")} />
 
         <form
           className="space-y-4 rounded-[1.6rem] border border-[var(--border)] bg-[var(--panel)] p-6"

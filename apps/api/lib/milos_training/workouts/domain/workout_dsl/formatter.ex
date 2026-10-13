@@ -361,6 +361,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
 
     case Vocabulary.timer_value_kind(field) do
       :duration -> duration_line(key, value)
+      :duration_list -> scalar_line(key, Enum.map_join(value, ", ", &Values.format_duration/1))
       :distance -> distance_line(key, value)
       :integer -> scalar_line(key, value)
       :enum -> scalar_line(key, value |> to_string() |> String.replace("_", "-"))

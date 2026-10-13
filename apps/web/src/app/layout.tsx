@@ -7,10 +7,12 @@ import { getLocale, getMessages } from "next-intl/server";
 import { QueryProvider } from "@/components/query-provider";
 import { RealtimeSyncBridge } from "@/components/realtime-sync-bridge";
 import { OfflineMessageSyncBridge } from "@/components/offline-message-sync-bridge";
+import { OutboxStatusPanel } from "@/components/outbox/OutboxStatusPanel";
 import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
+import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { APP_THEMES, cssVariablesForTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY } from "@/lib/theme";
 import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "./globals.css";
@@ -86,9 +88,11 @@ export default async function RootLayout({
               <SessionProvider>
                 <RealtimeSyncBridge />
                 <OfflineMessageSyncBridge />
+                <OutboxStatusPanel />
                 <ServiceWorkerBootstrap />
                 <TopNav />
                 {children}
+                <OnboardingHost />
               </SessionProvider>
             </ThemeProvider>
           </QueryProvider>

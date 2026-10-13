@@ -6,8 +6,9 @@ defmodule MilosTraining.Application.GetAdminSettings do
   def call(context) do
     {:ok,
      %{
-       gamification: Gamification.get_settings(),
-       finance: Finance.get_finance_settings(),
+       # TD-092: gamification settings are a tenant row (defaults otherwise).
+       gamification: Gamification.with_tenant_context(context, &Gamification.get_settings/0),
+       finance: Finance.get_finance_settings(context),
        notifications: Notifications.get_push_settings(),
        scheduling: Scheduling.get_settings(context)
      }}

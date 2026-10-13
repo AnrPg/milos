@@ -28,6 +28,9 @@ defmodule MilosTraining.Identity.UserStore do
   def update_profile(user_id, params), do: impl().update_profile(user_id, params)
 
   @impl true
+  def mark_tour_completed(user_id, audience), do: impl().mark_tour_completed(user_id, audience)
+
+  @impl true
   def update_avatar(user_id, avatar_url), do: impl().update_avatar(user_id, avatar_url)
 
   @impl true

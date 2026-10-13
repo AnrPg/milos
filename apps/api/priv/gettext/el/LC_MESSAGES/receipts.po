@@ -1,0 +1,68 @@
+msgid ""
+msgstr ""
+"Language: el\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Refund receipt"
+msgstr "Απόδειξη επιστροφής χρημάτων"
+
+msgid "Receipt number"
+msgstr "Αριθμός απόδειξης"
+
+msgid "Issued on"
+msgstr "Ημερομηνία έκδοσης"
+
+msgid "Issued by"
+msgstr "Εκδότης"
+
+msgid "Issued to"
+msgstr "Παραλήπτης"
+
+msgid "Refund details"
+msgstr "Στοιχεία επιστροφής"
+
+msgid "Refund type"
+msgstr "Τύπος επιστροφής"
+
+msgid "Refunded amount"
+msgstr "Ποσό επιστροφής"
+
+msgid "Reason"
+msgstr "Αιτιολογία"
+
+msgid "Original payment"
+msgstr "Αρχική πληρωμή"
+
+msgid "Payment date"
+msgstr "Ημερομηνία πληρωμής"
+
+msgid "Payment method"
+msgstr "Τρόπος πληρωμής"
+
+msgid "Original amount"
+msgstr "Αρχικό ποσό"
+
+msgid "Invoice"
+msgstr "Τιμολόγιο"
+
+msgid "Previously refunded"
+msgstr "Προηγούμενες επιστροφές"
+
+msgid "Remaining paid amount"
+msgstr "Υπόλοιπο καταβληθέν ποσό"
+
+msgid "Refund"
+msgstr "Επιστροφή χρημάτων"
+
+msgid "Payment reversal"
+msgstr "Αντιλογισμός πληρωμής"
+
+msgid "This receipt is an immutable record of an audited payment reversal. Keep it with your payment records."
+msgstr "Η απόδειξη αυτή είναι αμετάβλητη εγγραφή ενός ελεγμένου αντιλογισμού πληρωμής. Φύλαξέ τη μαζί με τα αρχεία πληρωμών σου."
+
+msgid "Document fingerprint (SHA-256)"
+msgstr "Ψηφιακό αποτύπωμα εγγράφου (SHA-256)"
+
+msgid "Not provided"
+msgstr "Δεν δόθηκε"

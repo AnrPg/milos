@@ -13,6 +13,7 @@ export function SidePanel({
   children,
   footer,
   width = "md:max-w-[520px]",
+  bare = false,
 }: {
   title: string;
   subtitle?: string;
@@ -20,6 +21,8 @@ export function SidePanel({
   children: ReactNode;
   footer?: ReactNode;
   width?: string;
+  /** Children manage their own scrolling and footer (for example a wizard). */
+  bare?: boolean;
 }) {
   const i18n = useUiTranslations();
   useEffect(() => {
@@ -63,7 +66,7 @@ export function SidePanel({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+        <div className={bare ? "flex min-h-0 flex-1 flex-col" : "flex-1 overflow-y-auto px-6 py-6 space-y-6"}>
           {children}
         </div>
 

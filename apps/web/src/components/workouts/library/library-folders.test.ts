@@ -30,6 +30,8 @@ describe("library folders", () => {
     expect(folderKind(folder("d", "10", "classes:2026-10"))).toBe("month");
     expect(folderKind(folder("e", "2026-10-12", "classes:2026-10-12"))).toBe("day");
     expect(folderKind(folder("f", "Athletes"))).toBe("custom");
+    expect(folderKind(folder("v", "Variations for member", "member_variations"))).toBe("memberVariations");
+    expect(folderKind(folder("w", "Maria", "member_variations:123"))).toBe("memberVariation");
   });
 
   it("localises untouched system folder names and keeps coach renames", () => {

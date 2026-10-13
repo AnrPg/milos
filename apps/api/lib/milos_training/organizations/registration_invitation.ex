@@ -18,9 +18,13 @@ defmodule MilosTraining.Organizations.RegistrationInvitation do
     field :issued_by_user_id, :binary_id
     field :redeemed_by_user_id, :binary_id
     field :intended_email_digest, :binary
+    # A coach's client invitation: the redeemed client becomes theirs (ADR-100).
+    field :coach_user_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
+
+  @type t :: %__MODULE__{}
 
   def issue_changeset(invitation \\ %__MODULE__{}, params, issued_at) do
     invitation
@@ -30,7 +34,8 @@ defmodule MilosTraining.Organizations.RegistrationInvitation do
       :role,
       :expires_at,
       :issued_by_user_id,
-      :intended_email_digest
+      :intended_email_digest,
+      :coach_user_id
     ])
     |> validate_required([:organization_id, :token_digest, :role, :expires_at])
     |> validate_digest(:token_digest)

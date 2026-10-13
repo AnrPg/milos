@@ -1,16 +1,44 @@
 defmodule MilosTraining.Application.AssignWorkout do
-  alias MilosTraining.Application.BroadcastUserSync
-  alias MilosTraining.{Finance, Identity, Notifications, Organizations, Workouts}
+  @moduledoc """
+  Assigns a published workout to athletes and - ADR-125 - members.
 
-  def call(context, params) do
-    with {:ok, athletes} <- fetch_tenant_athletes(context, athlete_ids(params)) do
-      do_assign(context, params, athletes)
+  Assignees are classified by their active membership role in the acting
+  organization. Members additionally need an explicit `personal_programming`
+  package grant, checked before any write. A `source_slot_id` makes the
+  assignment a class variant: one member's version of a class they booked.
+  Every assignee then goes through the ADR-040 coaching-touchpoint saga.
+  """
+
+  alias MilosTraining.Application.{
+    AuthorizeMemberProgramming,
+    BroadcastUserSync,
+    TenantAssigneeRoles,
+    TenantStaffRecipients,
+    TrackAnalyticsEvent
+  }
+
+  alias MilosTraining.{Finance, Identity, Notifications, Scheduling, Workouts}
+  alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy
+
+  def call(%{organization_id: organization_id} = context, params)
+      when is_binary(organization_id) do
+    assignee_ids = athlete_ids(params)
+    source_slot_id = source_slot_id(params)
+
+    with {:ok, roles} <- TenantAssigneeRoles.call(context, assignee_ids),
+         {:ok, classified} <- AssignmentAudiencePolicy.classify(assignee_ids, roles),
+         :ok <- AssignmentAudiencePolicy.validate_class_variant(source_slot_id, classified),
+         {:ok, params} <- attach_source_slot(context, params, source_slot_id, classified),
+         :ok <- AuthorizeMemberProgramming.call(context, classified.members) do
+      do_assign(context, params, Identity.list_by_ids(assignee_ids), classified)
     end
   end
 
+  def call(_context, _params), do: {:error, :organization_context_required}
+
   def call(_params), do: {:error, :organization_context_required}
 
-  defp do_assign(context, params, athletes) do
+  defp do_assign(context, params, athletes, classified) do
     athlete_ids =
       params
       |> athlete_ids()
@@ -23,6 +51,15 @@ defmodule MilosTraining.Application.AssignWorkout do
            :ok <- finalize_touchpoints(context, reservations, assignment, delivery_id) do
         broadcast_assignment_refresh(context, assignment)
         dispatch_assignment_notification(context, assignment)
+
+        TrackAnalyticsEvent.call("workout_assignment_created", context, assignment, %{
+          metadata: %{
+            athlete_count: length(classified.athletes),
+            member_count: length(classified.members),
+            kind: Map.get(assignment, :assignment_kind, "personal")
+          }
+        })
+
         {:ok, assignment}
       end
     else
@@ -30,36 +67,58 @@ defmodule MilosTraining.Application.AssignWorkout do
     end
   end
 
+  defp source_slot_id(params) do
+    case Map.get(params, :source_slot_id, Map.get(params, "source_slot_id")) do
+      value when is_binary(value) and value != "" -> value
+      _ -> nil
+    end
+  end
+
+  # A class variant is linked to a class the single targeted member actually
+  # holds an active (pending or approved) booking for. Its date defaults to
+  # the class's day.
+  defp attach_source_slot(_context, params, nil, _classified),
+    do: {:ok, drop_keys(params, [:source_slot_id, "source_slot_id"])}
+
+  defp attach_source_slot(context, params, slot_id, %{members: [member_id]}) do
+    with {:ok, slot_id} <- cast_uuid(slot_id),
+         %{scheduled_at: %DateTime{} = scheduled_at} <-
+           Scheduling.get_slot(context, slot_id) || {:error, :slot_not_found},
+         :ok <- booked_by_member(context, member_id, slot_id, scheduled_at) do
+      scheduled_for =
+        Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for") ||
+          DateTime.to_date(scheduled_at)
+
+      {:ok,
+       params
+       |> drop_keys([:source_slot_id, "source_slot_id", "scheduled_for"])
+       |> Map.put(:scheduled_for, scheduled_for)
+       |> Map.put(:source_scheduled_class_id, slot_id)}
+    end
+  end
+
+  defp booked_by_member(context, member_id, slot_id, scheduled_at) do
+    context
+    |> Scheduling.list_member_slots(member_id, scheduled_at, DateTime.add(scheduled_at, 1))
+    |> Enum.any?(&(&1.id == slot_id))
+    |> if(do: :ok, else: {:error, :slot_not_booked_by_member})
+  end
+
+  defp cast_uuid(value) do
+    case Ecto.UUID.cast(value) do
+      {:ok, uuid} -> {:ok, uuid}
+      :error -> {:error, :slot_not_found}
+    end
+  end
+
+  defp drop_keys(params, keys), do: Map.drop(params, keys)
+
   defp athlete_ids(params) do
     params
     |> Map.get(:athlete_ids, Map.get(params, "athlete_ids", []))
     |> List.wrap()
     |> Enum.uniq()
   end
-
-  defp fetch_tenant_athletes(%{organization_id: organization_id}, athlete_ids) do
-    memberships_by_user =
-      athlete_ids
-      |> Map.new(fn user_id ->
-        membership =
-          user_id
-          |> Organizations.list_memberships()
-          |> Enum.find(fn %{membership: membership, organization: organization} ->
-            organization.id == organization_id and membership.role == :athlete
-          end)
-
-        {user_id, membership}
-      end)
-
-    if Enum.all?(athlete_ids, &Map.has_key?(memberships_by_user, &1)) and
-         Enum.all?(memberships_by_user, fn {_user_id, membership} -> not is_nil(membership) end) do
-      {:ok, Identity.list_by_ids(athlete_ids)}
-    else
-      {:error, :invalid_athletes}
-    end
-  end
-
-  defp fetch_tenant_athletes(_context, _athlete_ids), do: {:error, :organization_context_required}
 
   defp reserve_touchpoints(context, athletes, delivery_id) do
     Enum.reduce_while(athletes, {:ok, []}, fn athlete, {:ok, reservations} ->
@@ -134,8 +193,8 @@ defmodule MilosTraining.Application.AssignWorkout do
     MapSet.new(athlete_ids) == MapSet.new(Enum.map(athletes, & &1.id))
   end
 
-  defp broadcast_assignment_refresh(%{organization_id: organization_id}, assignment) do
-    admin_ids = Organizations.list_staff_user_ids(organization_id)
+  defp broadcast_assignment_refresh(context, assignment) do
+    admin_ids = TenantStaffRecipients.user_ids([context, assignment])
 
     BroadcastUserSync.for_users(
       (Map.get(assignment, :athlete_ids, []) || []) ++ admin_ids,

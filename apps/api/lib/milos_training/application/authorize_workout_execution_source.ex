@@ -9,7 +9,8 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   execution could be attributed to any organization the caller named.
   """
 
-  alias MilosTraining.{Organizations, Scheduling, Workouts}
+  alias MilosTraining.{Execution, Organizations, Scheduling, Workouts}
+  alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy
   alias MilosTraining.Workouts.WorkoutStore
 
   def call(context, actor, workout_id, source, source_reference_id) do
@@ -17,6 +18,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
       "self_selected" -> authorize_self_selected(actor, workout_id, source_reference_id)
       "assigned" -> authorize_assignment(context, actor, workout_id, source_reference_id)
       "class_booking" -> authorize_booking(context, actor, workout_id, source_reference_id)
+      "repeat" -> authorize_repeat(actor, workout_id, source_reference_id)
       _source -> {:error, :invalid_execution_source}
     end
   end
@@ -28,7 +30,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
     # The organization comes from the workout being executed, and the actor must
     # actually be an active member of it. Nothing here is client-supplied.
     with organization_id when is_binary(organization_id) <-
-           WorkoutStore.workout_organization_id(workout_id),
+           workout_organization_id(actor, workout_id),
          true <- may_self_select?(actor, organization_id) do
       {:ok,
        %{
@@ -62,17 +64,61 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp may_self_select?(_actor, _organization_id), do: false
 
-  defp authorize_assignment(context, %{id: athlete_id}, workout_id, assignment_id)
+  # ADR-098: a client may do again any workout they completed, from their own
+  # history. The earlier execution is the proof of access; the new execution is
+  # a separate, dated entry.
+  defp authorize_repeat(%{id: user_id} = actor, workout_id, execution_id)
+       when is_binary(execution_id) do
+    case Execution.get_execution_for_user(execution_id, user_id) do
+      %{master_workout_id: ^workout_id, status: "completed", organization_id: organization_id}
+      when is_binary(organization_id) ->
+        if active_member?(actor, organization_id),
+          do:
+            {:ok,
+             %{
+               source: "repeat",
+               source_reference_id: execution_id,
+               organization_id: organization_id
+             }},
+          else: {:error, :execution_source_forbidden}
+
+      %{master_workout_id: other} when other != workout_id ->
+        {:error, :execution_source_mismatch}
+
+      _other ->
+        {:error, :execution_source_forbidden}
+    end
+  end
+
+  defp authorize_repeat(_actor, _workout_id, _execution_id),
+    do: {:error, :execution_source_forbidden}
+
+  defp active_member?(%{id: user_id}, organization_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.any?(fn %{membership: membership, organization: organization} ->
+      organization.id == organization_id and membership.status == :active
+    end)
+  end
+
+  # ADR-125: an assignment may be addressed to an athlete or a member. The link
+  # alone is not enough - the assignee must still hold an active athlete or
+  # member membership in the assignment's organization.
+  defp authorize_assignment(context, %{id: assignee_id} = actor, workout_id, assignment_id)
        when is_binary(assignment_id) do
-    case assignment_execution_access(context, assignment_id, athlete_id) do
+    case assignment_execution_access(context, actor, workout_id, assignment_id, assignee_id) do
       %{master_workout_id: ^workout_id, athlete_status: status} = access
       when status in [nil, "accepted"] ->
-        {:ok,
-         %{
-           source: "assigned",
-           source_reference_id: assignment_id,
-           organization_id: access.organization_id
-         }}
+        if may_execute_assignment?(actor, access.organization_id) do
+          {:ok,
+           %{
+             source: "assigned",
+             source_reference_id: assignment_id,
+             organization_id: access.organization_id
+           }}
+        else
+          {:error, :execution_source_forbidden}
+        end
 
       %{master_workout_id: ^workout_id, athlete_status: "rejected"} ->
         {:error, :execution_source_forbidden}
@@ -87,6 +133,15 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
 
   defp authorize_assignment(_context, _actor, _workout_id, _assignment_id),
     do: {:error, :execution_source_forbidden}
+
+  defp may_execute_assignment?(%{id: user_id}, organization_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.any?(fn %{membership: membership, organization: organization} ->
+      organization.id == organization_id and membership.status == :active and
+        AssignmentAudiencePolicy.may_execute_assignment?(membership.role)
+    end)
+  end
 
   defp authorize_booking(%{organization_id: _} = context, %{id: user_id}, workout_id, booking_id)
        when is_binary(booking_id) do
@@ -119,7 +174,7 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   defp authorize_booking(_context, %{id: _user_id} = actor, workout_id, booking_id)
        when is_binary(booking_id) do
     with organization_id when is_binary(organization_id) <-
-           WorkoutStore.workout_organization_id(workout_id),
+           workout_organization_id(actor, workout_id),
          {:ok, tenant_context} <-
            Organizations.resolve_system_tenant_context(
              organization_id,
@@ -135,11 +190,51 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
   defp authorize_booking(_context, _actor, _workout_id, _booking_id),
     do: {:error, :execution_source_forbidden}
 
-  defp assignment_execution_access(%{organization_id: _} = context, assignment_id, athlete_id),
-    do: Workouts.get_assignment_execution_access(context, assignment_id, athlete_id)
+  defp assignment_execution_access(
+         %{organization_id: organization_id} = context,
+         _actor,
+         _workout_id,
+         assignment_id,
+         athlete_id
+       )
+       when is_binary(organization_id),
+       do: Workouts.get_assignment_execution_access(context, assignment_id, athlete_id)
 
-  defp assignment_execution_access(_context, assignment_id, athlete_id),
-    do: Workouts.get_assignment_execution_access(assignment_id, athlete_id)
+  # User-scoped /api/executions requests carry no organization; derive it from
+  # the workout within the athlete's own memberships, then read the assignment
+  # inside that tenant scope (an unscoped read returns nothing under RLS).
+  defp assignment_execution_access(_context, actor, workout_id, assignment_id, athlete_id) do
+    case workout_organization_id(actor, workout_id) do
+      organization_id when is_binary(organization_id) ->
+        Workouts.get_assignment_execution_access(
+          %{organization_id: organization_id, user_id: athlete_id},
+          assignment_id,
+          athlete_id
+        )
+
+      nil ->
+        nil
+    end
+  end
+
+  # Finds which of the actor's active organizations owns the workout by reading
+  # it inside each membership's tenant scope. RLS on master_workouts admits only
+  # the session's organization, so an unscoped lookup always misses under the
+  # production runtime role (TD-046); scoping per membership also means a
+  # workout in an organization the actor does not belong to is never resolved.
+  defp workout_organization_id(%{id: user_id}, workout_id) when is_binary(workout_id) do
+    user_id
+    |> Organizations.list_memberships()
+    |> Enum.filter(fn %{membership: membership} -> membership.status == :active end)
+    |> Enum.find_value(fn %{organization: %{id: organization_id}} ->
+      Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
+        if WorkoutStore.workout_organization_id(workout_id) == organization_id,
+          do: organization_id
+      end)
+    end)
+  end
+
+  defp workout_organization_id(_actor, _workout_id), do: nil
 
   defp normalize_source(source) when is_atom(source), do: Atom.to_string(source)
   defp normalize_source(source) when is_binary(source), do: source

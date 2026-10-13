@@ -75,7 +75,12 @@ export function organizationTopic(token: string, suffix: string) {
 }
 
 function topicNeedsTenantContext(topic: string) {
-  return topic.startsWith("schedule:") || topic.startsWith("chat:") || topic.startsWith("org:");
+  return (
+    topic.startsWith("schedule:") ||
+    topic.startsWith("chat:") ||
+    topic.startsWith("org:") ||
+    topic.startsWith("class_timer:")
+  );
 }
 
 function ensureSocket(token: string, needsTenantContext: boolean) {

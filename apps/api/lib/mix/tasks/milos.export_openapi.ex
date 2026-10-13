@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Milos.ExportOpenapi do
   use Mix.Task
 
-  @shortdoc "Exports the OpenAPI spec to a JSON file"
+  @shortdoc "Exports the OpenAPI spec to a JSON file (sorted keys, see ADR-134)"
 
   @impl Mix.Task
   def run([output_path]) do
@@ -11,7 +11,7 @@ defmodule Mix.Tasks.Milos.ExportOpenapi do
     output_path
     |> Path.expand()
     |> tap(&File.mkdir_p!(Path.dirname(&1)))
-    |> File.write!(Jason.encode_to_iodata!(MilosTrainingWeb.ApiSpec.spec(), pretty: true))
+    |> File.write!(MilosTrainingWeb.OpenApiExport.encode!(MilosTrainingWeb.ApiSpec.spec()))
   end
 
   def run(_args) do

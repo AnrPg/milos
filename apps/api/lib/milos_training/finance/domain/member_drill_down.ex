@@ -326,11 +326,8 @@ defmodule MilosTraining.Finance.Domain.MemberDrillDown do
   end
 
   defp action(key, true), do: %{key: key, available: true, reason: nil}
+  defp action(key, true, _reason), do: action(key, true)
   defp action(key, false, reason), do: %{key: key, available: false, reason: reason}
-
-  defp action(key, available, reason) do
-    if available, do: action(key, true), else: action(key, false, reason)
-  end
 
   defp status_reason("cancelled", _entitlement_status, _entitlement_source),
     do: "membership_cancelled"
