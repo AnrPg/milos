@@ -77,6 +77,51 @@ defmodule MilosTraining.DataCase do
     end
   end
 
+  @session_settings ~w(
+    app.organization_id
+    app.user_id
+    app.admin_mode
+    app.execution_authorization_check
+    app.invitation_redemption
+    app.slug_alias_lookup
+  )
+
+  @doc """
+  TD-092: runs `fun` with every RLS session setting (`app.*`) cleared, the way
+  a production request or Oban job starts on a pooled connection, and restores
+  the test's own settings afterwards.
+
+  Tests often set `app.organization_id`/`app.user_id` on the sandbox
+  connection for fixtures. Without this, a request issued afterwards inherited
+  that ambient scope, so a code path missing `RepoContext.run/2` still passed.
+  """
+  def with_clean_session(fun) when is_function(fun, 0) do
+    previous =
+      Enum.map(@session_settings, fn name ->
+        %{rows: [[value]]} =
+          MilosTraining.Repo.query!("SELECT current_setting($1, true)", [name])
+
+        {name, value || ""}
+      end)
+
+    clear_session!()
+
+    try do
+      fun.()
+    after
+      Enum.each(previous, fn {name, value} -> set_session!(name, value) end)
+    end
+  end
+
+  @doc "Clears every RLS session setting (`app.*`) on the sandbox connection."
+  def clear_session! do
+    Enum.each(@session_settings, &set_session!(&1, ""))
+    :ok
+  end
+
+  defp set_session!(name, value),
+    do: MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [name, value])
+
   @doc """
   Runs `fun` as the superuser test role and restores the previous role.
   Only for fixtures: assertions about tenant isolation must run enforced.
