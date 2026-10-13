@@ -17,9 +17,13 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
   end
 
   # ADR-097: late cancellations consume the visit; everything else releases it.
+  # TD-092: the job has no session scope of its own; the ledger transition runs
+  # in the booking's organization (unscoped, RLS hid the reservation and the
+  # retry silently did nothing).
   defp transition(%{"finalize" => true} = args),
     do:
       Finance.finalize_entitlement_source(
+        tenant(args),
         args["user_id"],
         "scheduling",
         args["scheduled_class_id"],
@@ -30,6 +34,7 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
   defp transition(args),
     do:
       Finance.release_entitlement_source(
+        tenant(args),
         args["user_id"],
         "scheduling",
         args["scheduled_class_id"],
@@ -37,14 +42,17 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
         %{reason: args["reason"], idempotency_key: args["idempotency_key"]}
       )
 
+  defp tenant(args), do: %{organization_id: args["organization_id"]}
+
   defp allowance(args),
     do: BookingEntitlement.allowance(%{"entitlement_allowance" => args["allowance"]})
 
   defp maybe_delete_pending_notification(%{
          "delete_pending_notification" => true,
+         "organization_id" => organization_id,
          "booking_id" => id
        }),
-       do: Notifications.delete_booking_pending_notifications(id)
+       do: Notifications.delete_booking_pending_notifications(organization_id, id)
 
   defp maybe_delete_pending_notification(_args), do: :ok
 end

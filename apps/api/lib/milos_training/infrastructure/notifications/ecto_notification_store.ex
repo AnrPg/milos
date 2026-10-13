@@ -121,7 +121,7 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
   @impl true
   def delete_booking_pending_for_booking(booking_id) do
     Notification
-    |> scoped_to_organization()
+    |> scoped_to_organization_or_unattributed()
     |> where(
       [n],
       n.type == :booking_pending and
@@ -269,10 +269,16 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     end
   end
 
-  defp scoped_to_organization(query) do
+  # Booking notices written before TD-092 carry no organization; booking ids are
+  # globally unique, so such a row can only belong to this booking.
+  defp scoped_to_organization_or_unattributed(query) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->
-        where(query, [row], row.organization_id == ^organization_id)
+        where(
+          query,
+          [row],
+          row.organization_id == ^organization_id or is_nil(row.organization_id)
+        )
 
       _missing_scope ->
         where(query, [row], false)

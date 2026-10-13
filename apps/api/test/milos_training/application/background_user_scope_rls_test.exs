@@ -17,13 +17,21 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
   import MilosTraining.TestFixtures
 
-  alias MilosTraining.Application.LogTrainingEntry
+  alias MilosTraining.Application.{
+    AdminRecordAttendance,
+    LogTrainingEntry,
+    ResolveBooking,
+    SubmitBooking,
+    WithdrawBooking
+  }
 
   alias MilosTraining.{
     Execution,
     Finance,
     Gamification,
+    Notifications,
     Organizations,
+    Scheduling,
     Workouts
   }
 
@@ -39,6 +47,7 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
     PackageExpiryReminderJob,
     PaymentReminderJob,
     ProcessWorkoutCompletionJob,
+    ReconcileBookingReleaseJob,
     ReconcileEntitlementReservationsJob,
     SubscriptionExpiryJob
   }
@@ -240,6 +249,157 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
         assert :ok = worker.perform(%Oban.Job{args: %{}}), "#{inspect(worker)} failed"
       end
     end
+  end
+
+  describe "class-visit entitlement reconciliation" do
+    setup do
+      bypass_rls(fn ->
+        owner = user_fixture()
+        member = user_fixture()
+        {:ok, gym} = Organizations.create_organization(%{name: "Visits Gym"})
+        add!(gym, owner, :owner)
+        add!(gym, member, :member)
+        owner_ctx = tenant!(owner, gym)
+        member_ctx = tenant!(member, gym)
+
+        {:ok, _settings} =
+          Finance.update_finance_settings(owner_ctx, %{
+            entitlement_enforcement_mode: "enforce_managed",
+            entitlement_timezone: "Europe/Athens"
+          })
+
+        {:ok, package} =
+          Finance.create_package(owner_ctx, %{
+            name: "One visit #{System.unique_integer([:positive])}",
+            package_type: "class_pack",
+            fields: %{
+              "group_classes.visits" => %{"limit" => 1, "period" => "subscription_period"},
+              "booking.no_show_penalty_waived" => true
+            }
+          })
+
+        {:ok, membership} =
+          Finance.upsert_membership(owner_ctx, member.id, %{
+            user_type_snapshot: "member",
+            status: "active",
+            signup_source: "direct"
+          })
+
+        {:ok, _subscription} =
+          Finance.assign_package(owner_ctx, membership.id, package.id, %{})
+
+        {:ok, class_type} =
+          Scheduling.create_class_type(owner_ctx, %{
+            name: "Visits type",
+            slug: "visits-type-#{System.unique_integer([:positive])}",
+            sort_order: 1
+          })
+
+        workout = workout_fixture(owner, %{tenant_context: owner_ctx})
+
+        slot = fn attrs ->
+          slot_fixture(
+            workout,
+            Map.merge(
+              %{tenant_context: owner_ctx, class_type_id: class_type.id, auto_approve: true},
+              attrs
+            )
+          )
+        end
+
+        %{owner: owner, member: member, owner_ctx: owner_ctx, member_ctx: member_ctx, slot: slot}
+      end)
+    end
+
+    test "withdrawing on time returns the visit and clears the staff's pending notice", ctx do
+      booking = book!(ctx, ctx.slot.(%{auto_approve: false}))
+
+      {:ok, _notification} =
+        bypass_rls(fn ->
+          Notifications.create_notification(%{
+            user_id: ctx.owner.id,
+            organization_id: ctx.owner_ctx.organization_id,
+            type: :booking_pending,
+            payload: %{"booking_id" => booking.id}
+          })
+        end)
+
+      clear_session!()
+
+      assert {:ok, %{late_cancellation: false}} =
+               WithdrawBooking.call(ctx.member_ctx, ctx.member.id, booking.id)
+
+      assert_visit_available!(ctx)
+
+      assert bypass_rls(fn -> Notifications.list_for_user(ctx.owner.id) end)
+             |> Enum.filter(&(to_string(&1.type) == "booking_pending")) == []
+    end
+
+    test "rejecting a pending booking returns the visit", ctx do
+      booking = book!(ctx, ctx.slot.(%{auto_approve: false}))
+      clear_session!()
+
+      assert {:ok, %{status: :rejected}, :resolved} =
+               ResolveBooking.call(ctx.owner_ctx, booking.id, %{action: "reject"})
+
+      assert_visit_available!(ctx)
+    end
+
+    test "a waived no-show returns the visit", ctx do
+      slot = ctx.slot.(%{})
+      _booking = book!(ctx, slot)
+      clear_session!()
+
+      assert {:ok, %{status: "no_show"}} =
+               AdminRecordAttendance.call(ctx.owner_ctx, slot.id, ctx.member.id, ctx.owner.id, %{
+                 "status" => "no_show"
+               })
+
+      assert_visit_available!(ctx)
+    end
+
+    test "the reconcile job releases a reservation it is retried for", ctx do
+      slot = ctx.slot.(%{})
+      booking = book!(ctx, slot)
+      clear_session!()
+
+      assert :ok =
+               ReconcileBookingReleaseJob.perform(%Oban.Job{
+                 args: %{
+                   "organization_id" => ctx.owner_ctx.organization_id,
+                   "booking_id" => booking.id,
+                   "user_id" => ctx.member.id,
+                   "scheduled_class_id" => slot.id,
+                   "allowance" => "class_visits",
+                   "finalize" => false,
+                   "reason" => "Booking withdrawn",
+                   "idempotency_key" => "booking-withdrawn:#{booking.id}"
+                 }
+               })
+
+      assert_visit_available!(ctx)
+    end
+  end
+
+  defp book!(ctx, slot) do
+    bypass_rls(fn ->
+      {:ok, booking} = SubmitBooking.call(ctx.member_ctx, ctx.member, slot.id)
+      booking
+    end)
+  end
+
+  # With a one-visit package, a second booking only succeeds once the first
+  # reservation was released.
+  defp assert_visit_available!(ctx) do
+    bypass_rls(fn ->
+      later =
+        ctx.slot.(%{
+          scheduled_at:
+            DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.add(72 * 3600, :second)
+        })
+
+      assert {:ok, _booking} = SubmitBooking.call(ctx.member_ctx, ctx.member, later.id)
+    end)
   end
 
   describe "materialized view refresh as the runtime (non-owner) role" do

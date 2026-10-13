@@ -15,7 +15,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
          late? = late_cancellation?(context, booking),
          {:ok, withdrawn_booking} <-
            Scheduling.withdraw_booking(context, booking_id, reconciliation(booking, late?)) do
-      reconcile_now(booking, late?)
+      reconcile_now(context, booking, late?)
       PromoteClassWaitlist.call(context, booking.scheduled_class_id)
 
       TrackAnalyticsEvent.call("class_booking_cancelled", context, withdrawn_booking, %{
@@ -71,9 +71,12 @@ defmodule MilosTraining.Application.WithdrawBooking do
     }
   end
 
-  defp reconcile_now(%{status: :waitlisted}, _late?), do: :ok
+  defp reconcile_now(_context, %{status: :waitlisted}, _late?), do: :ok
 
-  defp reconcile_now(booking, late?) do
+  # TD-092: the ledger transition runs in the tenant's scope and the staff's
+  # pending-booking notifications are removed in each recipient's scope -
+  # unscoped, RLS hid both and the visit was silently never returned.
+  defp reconcile_now(context, booking, late?) do
     params = %{reason: reason(late?), idempotency_key: "booking-withdrawn:#{booking.id}"}
     allowance = BookingEntitlement.allowance(booking)
 
@@ -81,6 +84,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
       if late?,
         do:
           Finance.finalize_entitlement_source(
+            context,
             booking.user_id,
             "scheduling",
             booking.scheduled_class_id,
@@ -89,6 +93,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
           ),
         else:
           Finance.release_entitlement_source(
+            context,
             booking.user_id,
             "scheduling",
             booking.scheduled_class_id,
@@ -96,7 +101,9 @@ defmodule MilosTraining.Application.WithdrawBooking do
             params
           )
 
-    _result = Notifications.delete_booking_pending_notifications(booking.id)
+    _result =
+      Notifications.delete_booking_pending_notifications(booking.organization_id, booking.id)
+
     :ok
   end
 
