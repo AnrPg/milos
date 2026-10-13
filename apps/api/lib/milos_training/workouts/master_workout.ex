@@ -38,6 +38,8 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :last_dsl_diagnostics, {:array, :map}, default: []
     field :free_text_body, :string
     field :free_text_document, :map
+    field :icon, :string
+    field :icon_source, :string
 
     has_many :sections, WorkoutSection, preload_order: [asc: :order]
     belongs_to :folder, WorkoutFolder

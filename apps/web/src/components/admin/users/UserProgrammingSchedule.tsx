@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useLocale } from "next-intl";
 
 import {
   fetchAdminUserSchedule,
@@ -9,7 +10,6 @@ import {
   type MemberProgrammingMode,
 } from "@/api/admin-users";
 import {
-  createWorkoutFolder,
   duplicateWorkout,
   listAdminWorkouts,
   listWorkoutFolders,
@@ -17,6 +17,7 @@ import {
   type WorkoutRecord,
 } from "@/api/workouts";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
+import { compareFolders, folderDisplayName } from "@/components/workouts/library/library-folders";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import {
@@ -30,6 +31,9 @@ type Props = {
   token: string;
   userId: string;
   role: "member" | "athlete" | "admin";
+  /** When set, opens the assignment dialog for this day (used by the profile's quick action). */
+  assignRequestDate?: string | null;
+  onAssignRequestHandled?: () => void;
 };
 
 const MODE_LABEL_KEYS: Record<MemberProgrammingMode, string> = {
@@ -73,8 +77,9 @@ function isClassVariantItem(item: Record<string, unknown>) {
   return item.kind === "assignment" && item.assignment_kind === "class_variant";
 }
 
-export function UserProgrammingSchedule({ token, userId, role }: Props) {
+export function UserProgrammingSchedule({ token, userId, role, assignRequestDate, onAssignRequestHandled }: Props) {
   const i18n = useUiTranslations();
+  const locale = useLocale();
   const isMember = role === "member";
   const [startDate, setStartDate] = useState(() => isoDate(new Date()));
   const [schedule, setSchedule] = useState<AdminUserSchedule | null>(null);
@@ -93,6 +98,16 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
   const [error, setError] = useState<string | null>(null);
 
   const needsClass = isMember && modeRequiresBookedClass(memberMode);
+  const automaticFolderLabel = !isMember
+    ? i18n("featureAutoAthleteFolder")
+    : memberMode === "class_workout"
+      ? i18n("featureAutoClassFolder")
+      : i18n("featureAutoMemberVariationFolder");
+  const folderLabels = {
+    athletes: i18n("featureAthletesFolder"),
+    classes: i18n("featureClassesFolder"),
+    memberVariations: i18n("featureMemberVariationsFolder"),
+  };
 
   const endDate = useMemo(() => {
     const date = new Date(`${startDate}T12:00:00`);
@@ -125,23 +140,22 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, userId, startDate, endDate, i18n]);
 
+  useEffect(() => {
+    if (!assignRequestDate) return;
+    const frame = window.requestAnimationFrame(() => {
+      setSelectedDate(assignRequestDate);
+      setSelectedSlotId("");
+      setAssignmentModalOpen(true);
+      onAssignRequestHandled?.();
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [assignRequestDate, onAssignRequestHandled]);
+
   const dayItems = (schedule?.items ?? []).filter((item) => itemDate(item) === selectedDate);
   const selectedDaySlots = isMember ? dayItems.filter(isClassItem) : [];
   const selectedSlot = selectedDaySlots.find((item) => itemId(item) === selectedSlotId);
 
-  async function createFolder() {
-    const name = window.prompt(i18n("featureFolderName"))?.trim();
-    if (!name) return;
-    const folder = await createWorkoutFolder(token, { name, parent_id: null });
-    setFolders((current) => [...current, folder]);
-    setSelectedFolderId(folder.id);
-  }
-
   function validateTarget() {
-    if (!selectedFolderId) {
-      setError(i18n("featureChooseLibraryFolder"));
-      return false;
-    }
     if (needsClass && !selectedSlotId) {
       setError(i18n("featureChooseBookedClass"));
       return false;
@@ -157,7 +171,8 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
     try {
       await programAdminUserWorkout(token, userId, {
         ...(masterWorkoutId ? { master_workout_id: masterWorkoutId } : {}),
-        folder_id: selectedFolderId,
+        // Empty = file automatically in the athlete's, class-day or member variations folder.
+        folder_id: selectedFolderId || null,
         scheduled_for: selectedDate,
         slot_id: needsClass ? selectedSlotId : undefined,
         copy_source: copySource,
@@ -175,10 +190,6 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
   }
 
   function openCreator() {
-    if (!selectedFolderId) {
-      setError(i18n("featureChooseFolderBeforeCreating"));
-      return;
-    }
     useWorkoutCreationStore.getState().resetDraft();
     setEditingDraftId(null);
     setCreating(true);
@@ -265,8 +276,12 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs font-semibold">{i18n("featureSaveInFolder")}
             <select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedFolderId} onChange={(event) => setSelectedFolderId(event.target.value)}>
-              <option value="">{i18n("featureChooseFolder")}</option>
-              {folders.map((folder) => <option key={folder.id} value={folder.id}>{folder.name}</option>)}
+              <option value="">{automaticFolderLabel}</option>
+              {[...folders].sort(compareFolders).map((folder) => (
+                <option key={folder.id} value={folder.id}>
+                  {folderDisplayName(folder, folderLabels, locale)}
+                </option>
+              ))}
             </select>
           </label>
           <label className="text-xs font-semibold">{i18n("featureExistingWod")}
@@ -289,7 +304,6 @@ export function UserProgrammingSchedule({ token, userId, role }: Props) {
           </> : null}
           <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: isMember && memberMode === "class_variant" ? "var(--panel)" : "var(--primary)", color: isMember && memberMode === "class_variant" ? "var(--text)" : "var(--primary-contrast)", border: "1px solid var(--border)" }} disabled={busy || !selectedWorkoutId} onClick={() => void program(selectedWorkoutId, true)}>{i18n("featureCopyAndAssign")}</button>
           <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={openCreator}>{i18n("featureCreateNewWod")}</button>
-          <button type="button" className="rounded-full px-4 py-2 text-sm" style={{ background: "var(--panel)" }} onClick={() => void createFolder()}>{i18n("featureNewFolder")}</button>
         </div>
         {isMember ? <p className="mt-3 text-xs" style={{ color: "var(--muted)" }}>{i18n(MODE_HINT_KEYS[memberMode])}</p> : null}
         {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}

@@ -214,6 +214,10 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           free_text_body: workout.free_text_body,
           free_text_document: workout.free_text_document,
           draft_data: workout.draft_data,
+          folder_id: workout.folder_id,
+          source_workout_id: workout.source_workout_id,
+          icon: workout.icon,
+          icon_source: workout.icon_source,
           sections: draft_sections
         }
 
@@ -255,6 +259,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   @impl true
   def list_folders do
     WorkoutFolder
+    |> scoped_to_tenant()
     |> order_by([folder], asc: folder.name)
     |> Repo.all()
     |> Enum.map(&normalize_folder/1)
@@ -270,6 +275,109 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       {:ok, normalize_folder(folder)}
     end
   end
+
+  @impl true
+  def set_workout_icon(id, icon, icon_source) do
+    case MasterWorkout |> scoped_to_tenant() |> Repo.get(id) do
+      nil ->
+        {:error, :not_found}
+
+      workout ->
+        workout
+        |> Ecto.Changeset.change(icon: icon, icon_source: icon_source)
+        |> Repo.update()
+        |> case do
+          {:ok, updated} ->
+            {:ok, %{id: updated.id, icon: updated.icon, icon_source: updated.icon_source}}
+
+          error ->
+            error
+        end
+    end
+  end
+
+  @impl true
+  def find_filed_copy(source_id, folder_id) do
+    MasterWorkout
+    |> scoped_to_tenant()
+    |> where(
+      [workout],
+      workout.source_workout_id == ^source_id and workout.folder_id == ^folder_id and
+        workout.status == :published
+    )
+    |> order_by([workout], asc: workout.inserted_at)
+    |> limit(1)
+    |> select([workout], workout.id)
+    |> Repo.one()
+  end
+
+  @impl true
+  def ensure_system_folder(system_key, name, parent_id) do
+    case system_folder(system_key) do
+      %WorkoutFolder{} = folder -> {:ok, normalize_folder(folder)}
+      nil -> adopt_or_create_system_folder(system_key, name, parent_id)
+    end
+  end
+
+  defp system_folder(system_key) do
+    WorkoutFolder
+    |> scoped_to_tenant()
+    |> where([folder], folder.system_key == ^system_key)
+    |> Repo.one()
+  end
+
+  # A coach may already have a plain folder with the default name (e.g. their own
+  # "Athletes"); adopt it instead of creating a confusing near-duplicate.
+  defp adopt_or_create_system_folder(system_key, name, parent_id) do
+    sibling =
+      WorkoutFolder
+      |> scoped_to_tenant()
+      |> where([folder], folder.name == ^name)
+      |> where_parent(parent_id)
+      |> Repo.one()
+
+    case sibling do
+      %WorkoutFolder{system_key: nil} = folder ->
+        folder
+        |> Ecto.Changeset.change(system_key: system_key)
+        |> Repo.update()
+        |> case do
+          {:ok, adopted} -> {:ok, normalize_folder(adopted)}
+          {:error, _changeset} -> refetch_system_folder(system_key)
+        end
+
+      %WorkoutFolder{} ->
+        insert_system_folder(
+          system_key,
+          "#{name} (#{:erlang.phash2(system_key, 10_000)})",
+          parent_id
+        )
+
+      nil ->
+        insert_system_folder(system_key, name, parent_id)
+    end
+  end
+
+  defp insert_system_folder(system_key, name, parent_id) do
+    %{name: name, parent_id: parent_id, system_key: system_key}
+    |> WorkoutFolder.system_changeset()
+    |> Repo.insert()
+    |> case do
+      {:ok, folder} -> {:ok, normalize_folder(folder)}
+      # Lost a race with a concurrent request creating the same system folder.
+      {:error, _changeset} -> refetch_system_folder(system_key)
+    end
+  end
+
+  defp refetch_system_folder(system_key) do
+    case system_folder(system_key) do
+      %WorkoutFolder{} = folder -> {:ok, normalize_folder(folder)}
+      nil -> {:error, :system_folder_unavailable}
+    end
+  end
+
+  defp where_parent(query, nil), do: where(query, [folder], is_nil(folder.parent_id))
+  defp where_parent(query, parent_id), do: where(query, [folder], folder.parent_id == ^parent_id)
 
   @impl true
   def update_folder(id, params) do
@@ -943,6 +1051,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       created_by_id: workout.created_by_id,
       folder_id: workout.folder_id,
       source_workout_id: workout.source_workout_id,
+      icon: workout.icon,
+      icon_source: workout.icon_source,
       inserted_at: workout.inserted_at,
       updated_at: workout.updated_at,
       sections: sections
@@ -1947,7 +2057,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         {:error, :not_found}
 
       %MasterWorkout{} = source ->
-        title = (source.title || "Untitled") <> " " <> title_suffix
+        title = String.trim("#{source.title || "Untitled"} #{title_suffix}")
         draft_data = build_duplicate_draft_data(source, title)
 
         params = %{
@@ -1960,7 +2070,11 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           draft_data: draft_data
         }
 
-        case %MasterWorkout{} |> MasterWorkout.draft_changeset(params) |> Repo.insert() do
+        # Copies keep the original's icon, whoever chose it.
+        %MasterWorkout{icon: source.icon, icon_source: source.icon_source}
+        |> MasterWorkout.draft_changeset(params)
+        |> Repo.insert()
+        |> case do
           {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
           {:error, changeset} -> {:error, changeset}
         end
@@ -1989,6 +2103,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       name: folder.name,
       parent_id: folder.parent_id,
       created_by_id: folder.created_by_id,
+      system_key: folder.system_key,
       inserted_at: folder.inserted_at,
       updated_at: folder.updated_at
     }

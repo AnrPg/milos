@@ -88,6 +88,15 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def update_folder(context, id, params),
     do: within_tenant(context, fn -> update_folder(id, params) end)
 
+  def set_workout_icon(context, id, icon, icon_source),
+    do: within_tenant(context, fn -> set_workout_icon(id, icon, icon_source) end)
+
+  def find_filed_copy(context, source_id, folder_id),
+    do: within_tenant(context, fn -> find_filed_copy(source_id, folder_id) end)
+
+  def ensure_system_folder(context, system_key, name, parent_id),
+    do: within_tenant(context, fn -> ensure_system_folder(system_key, name, parent_id) end)
+
   def delete_folder(context, id), do: within_tenant(context, fn -> delete_folder(id) end)
 
   def update_library_metadata(context, id, params),
@@ -160,6 +169,14 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def update_folder(id, params), do: adapter().update_folder(id, params)
   def delete_folder(id), do: adapter().delete_folder(id)
   def update_library_metadata(id, params), do: adapter().update_library_metadata(id, params)
+
+  def set_workout_icon(id, icon, icon_source),
+    do: adapter().set_workout_icon(id, icon, icon_source)
+
+  def find_filed_copy(source_id, folder_id), do: adapter().find_filed_copy(source_id, folder_id)
+
+  def ensure_system_folder(system_key, name, parent_id),
+    do: adapter().ensure_system_folder(system_key, name, parent_id)
 
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do: adapter().reject_assignment_for_athlete(assignment_id, athlete_id)

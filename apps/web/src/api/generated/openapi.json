@@ -11813,16 +11813,24 @@
                     "assignment": {
                       "additionalProperties": true,
                       "type": "object"
+                    },
+                    "assignments": {
+                      "items": {
+                        "additionalProperties": true,
+                        "type": "object"
+                      },
+                      "type": "array"
                     }
                   },
                   "required": [
-                    "assignment"
+                    "assignment",
+                    "assignments"
                   ],
                   "type": "object"
                 }
               }
             },
-            "description": "Assigned workout"
+            "description": "Assigned workouts (one per athlete)"
           }
         },
         "security": [
@@ -26482,6 +26490,74 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminUserController.place_in_class",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "from_booking_id": {
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
+                  },
+                  "slot_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "slot_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class placement result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Book a member into a class, optionally moving them out of an existing booking",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/coach-scope": {
       "patch": {
         "callbacks": {},
@@ -27612,7 +27688,7 @@
     "/api/org/{organization_slug}/admin/users/{id}/programming": {
       "post": {
         "callbacks": {},
-        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
+        "description": "Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
         "operationId": "MilosTrainingWeb.AdminUserController.program_workout",
         "parameters": [
           {
@@ -27640,8 +27716,13 @@
                     "type": "boolean"
                   },
                   "folder_id": {
-                    "format": "uuid",
-                    "type": "string"
+                    "allOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    ],
+                    "nullable": true
                   },
                   "master_workout_id": {
                     "format": "uuid",
@@ -27671,7 +27752,6 @@
                   }
                 },
                 "required": [
-                  "folder_id",
                   "scheduled_for",
                   "copy_source"
                 ],
@@ -29751,10 +29831,15 @@
                         "properties": {
                           "created_by_id": {
                             "format": "uuid",
+                            "nullable": true,
                             "type": "string"
                           },
                           "id": {
                             "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
                             "type": "string"
                           },
                           "name": {
@@ -29764,12 +29849,20 @@
                             "format": "uuid",
                             "nullable": true,
                             "type": "string"
+                          },
+                          "system_key": {
+                            "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
                           }
                         },
                         "required": [
                           "id",
-                          "name",
-                          "created_by_id"
+                          "name"
                         ],
                         "type": "object"
                       },
@@ -29791,7 +29884,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "List nested workout-library folders",
+        "summary": "List nested workout-library folders (system folders are created on demand)",
         "tags": [
           "Admin Workouts"
         ]
@@ -29835,10 +29928,15 @@
                   "properties": {
                     "created_by_id": {
                       "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
                       "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
                       "type": "string"
                     },
                     "name": {
@@ -29848,12 +29946,20 @@
                       "format": "uuid",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "system_key": {
+                      "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
-                    "name",
-                    "created_by_id"
+                    "name"
                   ],
                   "type": "object"
                 }
@@ -29952,10 +30058,15 @@
                   "properties": {
                     "created_by_id": {
                       "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
                       "format": "uuid",
+                      "type": "string"
+                    },
+                    "inserted_at": {
+                      "format": "date-time",
                       "type": "string"
                     },
                     "name": {
@@ -29965,12 +30076,20 @@
                       "format": "uuid",
                       "nullable": true,
                       "type": "string"
+                    },
+                    "system_key": {
+                      "description": "Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
                     }
                   },
                   "required": [
                     "id",
-                    "name",
-                    "created_by_id"
+                    "name"
                   ],
                   "type": "object"
                 }
@@ -30069,6 +30188,24 @@
         "callbacks": {},
         "operationId": "MilosTrainingWeb.AdminWorkoutController.create",
         "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "folder_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "201": {
             "content": {
@@ -30095,7 +30232,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Create an empty workout draft",
+        "summary": "Create an empty workout draft, optionally inside a library folder",
         "tags": [
           "Admin Workouts"
         ]
@@ -33103,6 +33240,71 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/{id}/copy": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutController.copy",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "folder_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "workout": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "workout"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Copied workout"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Copy a workout into a library folder (published workouts stay published)",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/{id}/draft": {
       "patch": {
         "callbacks": {},
@@ -35482,6 +35684,90 @@
           }
         ],
         "summary": "Duplicate a workout as a new draft",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/workouts/{id}/icon": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutController.update_icon",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "icon": {
+                    "description": "A single emoji; null resets the icon to automatic",
+                    "maxLength": 32,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "icon"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "icon": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "icon_source": {
+                      "enum": [
+                        "ai",
+                        "coach",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "icon",
+                    "icon_source"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Icon"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a workout's library icon, or reset it to automatic (rules + AI suggestion)",
         "tags": [
           "Admin Workouts"
         ]

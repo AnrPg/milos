@@ -189,6 +189,17 @@ export type AdminUserPRs = {
   prs: AdminUserPR[];
 };
 
+export function placeAdminUserInClass(
+  token: string,
+  userId: string,
+  body: { slot_id: string; from_booking_id?: string | null },
+) {
+  return apiRequest<{ booking: Record<string, unknown>; previous_booking_id: string | null }>(
+    `/admin/users/${userId}/class-placement`,
+    { token, method: "POST", body },
+  );
+}
+
 export function fetchAdminUserPRs(token: string, userId: string) {
   // ADR-129: only the gym's coaches read members' PRs; other staff receive
   // `coach_role_required` and no records.

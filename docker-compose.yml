@@ -17,6 +17,7 @@ services:
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       GEMINI_MODEL: ${GEMINI_MODEL:-gemini-3.8-flash}
       GEMINI_THINKING_LEVEL: ${GEMINI_THINKING_LEVEL:-low}
+      GEMINI_ICON_MODEL: ${GEMINI_ICON_MODEL:-gemini-2.5-flash-lite}
       MINIO_ENDPOINT: http://minio:9000
       MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
       MINIO_ACCESS_KEY: ${MINIO_ROOT_USER:-milos_minio}

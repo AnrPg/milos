@@ -357,6 +357,58 @@ defmodule MilosTrainingWeb.PersonalizedMemberProgrammingControllerTest do
       assert [%{"kind" => "assignment", "workout" => %{"id" => copy_id}}] = schedule["items"]
       assert copy_id == programmed["workout"]["id"]
     end
+
+    test "without a folder a member's personal copy is filed in their variations folder", %{
+      conn: conn
+    } do
+      gym = tenant("pm_variation_folder")
+
+      member =
+        gym
+        |> customer(:member, "pm_variation_member")
+        |> then(&give_package(gym, &1, @programming_plan))
+
+      wod = workout(gym, "Variation template")
+
+      programmed =
+        conn
+        |> api(gym.admin)
+        |> post(
+          "/api/org/#{slug(gym)}/admin/users/#{member.id}/programming",
+          Jason.encode!(%{
+            master_workout_id: wod.id,
+            scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
+            copy_source: true,
+            mode: "personal"
+          })
+        )
+        |> json_response(201)
+
+      folders =
+        conn
+        |> api(gym.admin)
+        |> get("/api/org/#{slug(gym)}/admin/workout-folders")
+        |> json_response(200)
+        |> Map.fetch!("folders")
+
+      by_key = Map.new(folders, &{&1["system_key"], &1})
+      member_folder = by_key["member_variations:#{member.id}"]
+
+      assert member_folder["parent_id"] == by_key["member_variations"]["id"]
+      assert programmed["workout"]["folder_id"] == member_folder["id"]
+      assert programmed["workout"]["source_workout_id"] == wod.id
+
+      # ADR-125: the copy stays out of the shared library listing.
+      library_ids =
+        conn
+        |> api(gym.admin)
+        |> get("/api/org/#{slug(gym)}/admin/workouts")
+        |> json_response(200)
+        |> Map.fetch!("workouts")
+        |> Enum.map(& &1["id"])
+
+      refute programmed["workout"]["id"] in library_ids
+    end
   end
 
   describe "class variants" do

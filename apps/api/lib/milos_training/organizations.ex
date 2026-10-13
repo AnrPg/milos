@@ -76,6 +76,14 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
+  @doc "IANA timezone the organization operates in (defaults to UTC)."
+  def organization_timezone(organization_id) when is_binary(organization_id) do
+    case OrganizationStore.get_organization_settings(organization_id) do
+      %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
+      _missing -> "Etc/UTC"
+    end
+  end
+
   @doc "Whether the tenant context holds any of `roles` (ADR-099)."
   defdelegate any_role?(context, roles),
     to: MilosTraining.Organizations.Domain.TenantAuthorization

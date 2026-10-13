@@ -64,6 +64,7 @@ const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
 
 type Props = {
   draftId: string | null;
+  folderId?: string | null;
   onDraftReady: (id: string) => void;
   onSwitchToStructured: (id: string) => void;
 };
@@ -79,6 +80,7 @@ type SuggestionAnchor = {
 
 export function QuickTextWorkoutEditor({
   draftId,
+  folderId = null,
   onDraftReady,
   onSwitchToStructured,
 }: Props) {
@@ -241,7 +243,7 @@ export function QuickTextWorkoutEditor({
     if (!tokens?.access_token || draftId || loadedDraftRef.current === "creating") return;
 
     loadedDraftRef.current = "creating";
-    createDraftWorkout(tokens.access_token)
+    createDraftWorkout(tokens.access_token, folderId)
       .then((draft) => {
         const revision = draft.dsl_source_revision ?? 0;
         revisionRef.current = revision;
@@ -252,7 +254,7 @@ export function QuickTextWorkoutEditor({
         loadedDraftRef.current = null;
         setSaveStatus("error");
       });
-  }, [draftId, onDraftReady, tokens?.access_token]);
+  }, [draftId, folderId, onDraftReady, tokens?.access_token]);
 
   useEffect(() => {
     if (!tokens?.access_token || !draftId || loadedDraftRef.current === draftId || !editor) return;

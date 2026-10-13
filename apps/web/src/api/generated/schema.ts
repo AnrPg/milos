@@ -2359,6 +2359,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/users/{id}/class-placement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Book a member into a class, optionally moving them out of an existing booking */
+        post: operations["MilosTrainingWeb.AdminUserController.place_in_class"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}/coach-scope": {
         parameters: {
             query?: never;
@@ -2524,7 +2541,7 @@ export interface paths {
         put?: never;
         /**
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
-         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
+         * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
          */
         post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
         delete?: never;
@@ -2785,7 +2802,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List nested workout-library folders */
+        /** List nested workout-library folders (system folders are created on demand) */
         get: operations["MilosTrainingWeb.AdminWorkoutFolderController.index"];
         put?: never;
         /** Create a workout-library folder */
@@ -2824,7 +2841,7 @@ export interface paths {
         /** List master workouts */
         get: operations["MilosTrainingWeb.AdminWorkoutController.index"];
         put?: never;
-        /** Create an empty workout draft */
+        /** Create an empty workout draft, optionally inside a library folder */
         post: operations["MilosTrainingWeb.AdminWorkoutController.create"];
         delete?: never;
         options?: never;
@@ -2918,6 +2935,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/{id}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Copy a workout into a library folder (published workouts stay published) */
+        post: operations["MilosTrainingWeb.AdminWorkoutController.copy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}/draft": {
         parameters: {
             query?: never;
@@ -2984,6 +3018,23 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/workouts/{id}/icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Set a workout's library icon, or reset it to automatic (rules + AI suggestion) */
+        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_icon"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts/{id}/library": {
@@ -9174,7 +9225,7 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Assigned workout */
+            /** @description Assigned workouts (one per athlete) */
             201: {
                 headers: {
                     [name: string]: unknown;
@@ -9184,6 +9235,9 @@ export interface operations {
                         assignment: {
                             [key: string]: unknown;
                         };
+                        assignments: {
+                            [key: string]: unknown;
+                        }[];
                     };
                 };
             };
@@ -15194,6 +15248,38 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.place_in_class": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    from_booking_id?: string | null;
+                    /** Format: uuid */
+                    slot_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Class placement result */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.update_coach_scope": {
         parameters: {
             query?: never;
@@ -15696,8 +15782,7 @@ export interface operations {
                     admin_notes?: string | null;
                     /** @default true */
                     copy_source: boolean;
-                    /** Format: uuid */
-                    folder_id: string;
+                    folder_id?: string | null;
                     /** Format: uuid */
                     master_workout_id?: string;
                     /**
@@ -16550,12 +16635,18 @@ export interface operations {
                     "application/json": {
                         folders: {
                             /** Format: uuid */
-                            created_by_id: string;
+                            created_by_id?: string | null;
                             /** Format: uuid */
                             id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
                             name: string;
                             /** Format: uuid */
                             parent_id?: string | null;
+                            /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                            system_key?: string | null;
+                            /** Format: date-time */
+                            updated_at?: string;
                         }[];
                     };
                 };
@@ -16587,12 +16678,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** Format: uuid */
-                        created_by_id: string;
+                        created_by_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
                         name: string;
                         /** Format: uuid */
                         parent_id?: string | null;
+                        /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                        system_key?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string;
                     };
                 };
             };
@@ -16645,12 +16742,18 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** Format: uuid */
-                        created_by_id: string;
+                        created_by_id?: string | null;
                         /** Format: uuid */
                         id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
                         name: string;
                         /** Format: uuid */
                         parent_id?: string | null;
+                        /** @description Set on folders the app maintains (athletes, athlete:<id>, classes, classes:<yyyy>, classes:<yyyy-mm>, classes:<yyyy-mm-dd>) */
+                        system_key?: string | null;
+                        /** Format: date-time */
+                        updated_at?: string;
                     };
                 };
             };
@@ -16709,7 +16812,14 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id?: string | null;
+                };
+            };
+        };
         responses: {
             /** @description Draft */
             201: {
@@ -17677,6 +17787,39 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutController.copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    folder_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Copied workout */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        workout: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutController.update_draft": {
         parameters: {
             query?: never;
@@ -18392,6 +18535,41 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutController.update_icon": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description A single emoji; null resets the icon to automatic */
+                    icon: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Icon */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        icon: string | null;
+                        /** @enum {string|null} */
+                        icon_source: "ai" | "coach" | null;
+                        /** Format: uuid */
+                        id: string;
                     };
                 };
             };

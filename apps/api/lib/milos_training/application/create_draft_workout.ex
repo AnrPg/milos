@@ -10,11 +10,33 @@ defmodule MilosTraining.Application.CreateDraftWorkout do
     end
   end
 
-  def call(context, admin) do
-    with {:ok, draft} <- Workouts.create_draft(context, admin) do
+  def call(context, admin), do: call(context, admin, nil)
+
+  @doc "Creates an empty draft, filed in `folder_id` when given (`nil` = library root)."
+  def call(context, admin, folder_id) do
+    with :ok <- validate_folder(context, folder_id),
+         {:ok, draft} <- Workouts.create_draft(context, admin),
+         {:ok, draft} <- file_draft(context, draft, folder_id) do
       broadcast_admin_refresh([context, draft], "draft_created", draft.id)
       TrackAnalyticsEvent.call("workout_created", context, draft)
       {:ok, draft}
+    end
+  end
+
+  defp validate_folder(_context, nil), do: :ok
+
+  defp validate_folder(context, folder_id) do
+    if Enum.any?(Workouts.list_folders(context), &(&1.id == folder_id)),
+      do: :ok,
+      else: {:error, :folder_parent_not_found}
+  end
+
+  defp file_draft(_context, draft, nil), do: {:ok, draft}
+
+  defp file_draft(context, draft, folder_id) do
+    with {:ok, _metadata} <-
+           Workouts.update_library_metadata(context, draft.id, %{folder_id: folder_id}) do
+      {:ok, Map.put(draft, :folder_id, folder_id)}
     end
   end
 

@@ -16,6 +16,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     ListAdminUsers,
     ListAthletes,
     ListPRDossierMembers,
+    PlaceMemberInClass,
     ProgramUserWorkout,
     RevokeUserAllowance
   }
@@ -177,7 +178,7 @@ defmodule MilosTrainingWeb.AdminUserController do
           additionalProperties: false,
           properties: %{
             master_workout_id: @user_id,
-            folder_id: @user_id,
+            folder_id: %Schema{allOf: [@user_id], nullable: true},
             scheduled_for: %Schema{type: :string, format: :date},
             slot_id: %Schema{allOf: [@user_id], nullable: true},
             copy_source: %Schema{type: :boolean, default: true},
@@ -194,7 +195,24 @@ defmodule MilosTrainingWeb.AdminUserController do
                   "modes require the member's package to include personal programming."
             }
           },
-          required: [:folder_id, :scheduled_for, :copy_source]
+          required: [:scheduled_for, :copy_source]
+        }
+      }
+    }
+  }
+
+  @class_placement_body %RequestBody{
+    required: true,
+    content: %{
+      "application/json" => %MediaType{
+        schema: %Schema{
+          type: :object,
+          additionalProperties: false,
+          properties: %{
+            slot_id: @user_id,
+            from_booking_id: %Schema{allOf: [@user_id], nullable: true}
+          },
+          required: [:slot_id]
         }
       }
     }
@@ -207,6 +225,7 @@ defmodule MilosTrainingWeb.AdminUserController do
               :grant_allowance,
               :revoke_allowance,
               :program_workout,
+              :place_in_class,
               :freezes,
               :create_freeze,
               :cancel_freeze
@@ -281,6 +300,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     training_history: [:view_client_training],
     schedule: [:view_client_training, :run_classes],
     program_workout: [:manage_coaching],
+    place_in_class: [:book_for_clients, :manage_schedule],
     incidents: [:view_health],
     messages: [:message_clients],
     coaching_context: [:view_client_training]
@@ -292,6 +312,7 @@ defmodule MilosTrainingWeb.AdminUserController do
               :training_history,
               :schedule,
               :program_workout,
+              :place_in_class,
               :incidents,
               :messages,
               :coaching_context
@@ -406,11 +427,21 @@ defmodule MilosTrainingWeb.AdminUserController do
       "Copy or save a workout and associate it with this user's assignment, class variant or booked class",
     description:
       "Athletes receive a personal assignment. Members follow `mode` (ADR-125). " <>
+        "Without folder_id, copies are filed automatically (ADR-136): athletes in their " <>
+        "folder, class workouts in the class-day folder, member variations in the " <>
+        "member's variations folder. " <>
         "Member assignment modes fail with 403 `member_programming_not_entitled` when the " <>
         "member's package lacks the personal_programming channel or execute_assigned_workouts capability.",
     parameters: [@id_parameter],
     request_body: @program_body,
     responses: [created: {"Programming result", "application/json", @summary_object}]
+  )
+
+  operation(:place_in_class,
+    summary: "Book a member into a class, optionally moving them out of an existing booking",
+    parameters: [@id_parameter],
+    request_body: @class_placement_body,
+    responses: [created: {"Class placement result", "application/json", @summary_object}]
   )
 
   operation(:prs,
@@ -999,6 +1030,17 @@ defmodule MilosTrainingWeb.AdminUserController do
            ProgramUserWorkout.call(
              conn.assigns.tenant_context,
              admin,
+             params["id"] || params[:id],
+             conn.body_params
+           ) do
+      conn |> put_status(:created) |> json(payload)
+    end
+  end
+
+  def place_in_class(conn, params) do
+    with {:ok, payload} <-
+           PlaceMemberInClass.call(
+             conn.assigns.tenant_context,
              params["id"] || params[:id],
              conn.body_params
            ) do

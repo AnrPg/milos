@@ -150,6 +150,9 @@ export type WorkoutRecord = {
   created_by_id?: string;
   folder_id?: string | null;
   source_workout_id?: string | null;
+  /** Emoji chosen by a coach or suggested by AI; null = keyword rules apply. */
+  icon?: string | null;
+  icon_source?: "ai" | "coach" | null;
   inserted_at?: string;
   updated_at?: string;
   scale_level?: ScaleLevel;
@@ -171,7 +174,9 @@ export type WorkoutFolder = {
   id: string;
   name: string;
   parent_id: string | null;
-  created_by_id: string;
+  created_by_id?: string | null;
+  /** Set on folders the app maintains: athletes, athlete:<id>, classes, classes:<yyyy>[-mm[-dd]]. */
+  system_key?: string | null;
 };
 
 export type MaterializedWorkoutResponse = {
@@ -370,6 +375,7 @@ export async function createWorkout(token: string, payload: CreateWorkoutRequest
 
 export async function createDraftWorkout(
   token: string,
+  folderId?: string | null,
 ): Promise<{
   id: string;
   status?: string;
@@ -386,6 +392,7 @@ export async function createDraftWorkout(
   }>("/admin/workouts", {
     method: "POST",
     token,
+    ...(folderId ? { body: { folder_id: folderId } } : {}),
   });
 
   return response.draft;
@@ -472,6 +479,23 @@ export async function reopenWorkout(token: string, id: string): Promise<{ id: st
     { method: "POST", token, body: {} },
   );
   return response.draft;
+}
+
+export function setWorkoutIcon(token: string, id: string, icon: string | null) {
+  return apiRequest<{ id: string; icon: string | null; icon_source: "ai" | "coach" | null }>(`/admin/workouts/${id}/icon`, {
+    method: "PATCH",
+    token,
+    body: { icon },
+  });
+}
+
+export async function copyWorkoutToFolder(token: string, id: string, folderId: string | null) {
+  const response = await apiRequest<{ workout: WorkoutRecord }>(`/admin/workouts/${id}/copy`, {
+    method: "POST",
+    token,
+    body: { folder_id: folderId },
+  });
+  return response.workout;
 }
 
 export async function duplicateWorkout(

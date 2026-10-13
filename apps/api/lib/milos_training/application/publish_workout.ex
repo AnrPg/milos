@@ -1,7 +1,13 @@
 defmodule MilosTraining.Application.PublishWorkout do
   require Logger
 
-  alias MilosTraining.Application.{BroadcastUserSync, TenantStaffRecipients, TrackAnalyticsEvent}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    SuggestWorkoutIcon,
+    TenantStaffRecipients,
+    TrackAnalyticsEvent
+  }
+
   alias MilosTraining.{Notifications, Scheduling, Workouts}
 
   def call(%{organization_id: _} = context, id, params) do
@@ -16,6 +22,7 @@ defmodule MilosTraining.Application.PublishWorkout do
     with {:ok, workout} <- Workouts.publish_workout(context, id, params),
          :ok <- apply_substitution(context, substitute_for, workout.id) do
       Workouts.delete_superseded_drafts(context, id, workout.created_by_id)
+      SuggestWorkoutIcon.enqueue(context, workout.id)
       maybe_notify(is_republish, substitute_for, assignment_targets, booking_targets, workout)
       broadcast_admin_workout_refresh(context, workout.id)
 

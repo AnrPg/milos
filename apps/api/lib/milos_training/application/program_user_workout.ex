@@ -12,21 +12,35 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
     source defaults to the class's workout.
   - `personal`: the copy is assigned to the member without any class.
 
+  Without an explicit folder, copies are filed automatically (ADR-136): athlete
+  copies in `Athletes/<nickname>`, class workouts in the class's
+  `Classes/<year>/<month>/<date>` folder, and a member's personal copies and
+  class variants in `Variations for member/<nickname>` (still hidden from the
+  shared library, ADR-125).
+
   The two member assignment modes require the explicit personal-programming
   grant, checked before the library copy is made so a denial leaves no orphan.
   """
 
-  alias MilosTraining.Application.{AssignWorkout, AuthorizeMemberProgramming, DuplicateWorkout}
+  alias MilosTraining.Application.{
+    AssignWorkout,
+    AuthorizeMemberProgramming,
+    DuplicateWorkout,
+    FileWorkoutCopy,
+    WorkoutLibraryFolders
+  }
+
   alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
   alias MilosTraining.Workouts.Domain.AssignmentAudiencePolicy
 
-  def call(context, admin, user_id, params) do
+  def call(context, _admin, user_id, params) do
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
          {:ok, role} <- tenant_role(context, user.id),
          {:ok, mode} <- programming_mode(role, params),
          :ok <- validate_target(context, mode, user, params),
          {:ok, params} <- resolve_source_workout(context, mode, params),
-         {:ok, workout} <- prepare_workout(context, admin, user, params),
+         {:ok, folder_id} <- target_folder_id(context, mode, user, params),
+         {:ok, workout} <- prepare_workout(context, mode, user, folder_id, params),
          :ok <- keep_member_copy_personal(context, mode, workout, params),
          {:ok, association} <- associate(context, mode, user, workout.id, params) do
       {:ok, %{workout: workout, association: association, mode: to_string(mode)}}
@@ -97,27 +111,73 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
     end
   end
 
-  defp prepare_workout(context, _admin, user, params) do
-    source_id = value(params, :master_workout_id)
-    folder_id = value(params, :folder_id)
-    copy? = value(params, :copy_source) != false
+  # Without an explicit folder the workout is filed automatically: in the
+  # athlete's own folder, the class's Classes/<year>/<month>/<date> folder, or
+  # the member's Variations for member/<nickname> folder.
+  defp target_folder_id(context, mode, user, params) do
+    case value(params, :folder_id) do
+      folder_id when is_binary(folder_id) and folder_id != "" -> {:ok, folder_id}
+      _automatic -> default_folder_id(context, mode, user, params)
+    end
+  end
 
-    if copy? do
+  defp default_folder_id(context, :athlete, user, _params) do
+    with {:ok, folder} <- WorkoutLibraryFolders.athlete_folder(context, user),
+         do: {:ok, folder.id}
+  end
+
+  defp default_folder_id(context, :class_workout, _user, params) do
+    with %{scheduled_at: scheduled_at} <-
+           Scheduling.get_slot(context, value(params, :slot_id)) || {:error, :not_found},
+         {:ok, folder} <- WorkoutLibraryFolders.class_day_folder(context, scheduled_at) do
+      {:ok, folder.id}
+    end
+  end
+
+  defp default_folder_id(context, _personal_mode, user, _params) do
+    with {:ok, folder} <- WorkoutLibraryFolders.member_variation_folder(context, user),
+         do: {:ok, folder.id}
+  end
+
+  # A member's personal copy is always a fresh copy, so hiding it from the
+  # library (keep_member_copy_personal/4) never hides a shared workout.
+  defp prepare_workout(context, mode, user, folder_id, params)
+       when mode in [:personal, :class_variant] do
+    if value(params, :copy_source) != false do
+      source_id = value(params, :master_workout_id)
       suffix = "(#{user.nickname} #{value(params, :scheduled_for)})"
 
       with {:ok, draft} <-
-             DuplicateWorkout.call(context, source_id, folder_id: folder_id, title_suffix: suffix),
-           {:ok, published} <-
-             Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0}) do
-        {:ok, published}
+             DuplicateWorkout.call(context, source_id,
+               folder_id: folder_id,
+               title_suffix: suffix
+             ) do
+        Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0})
       end
     else
-      with %{} = workout <-
-             Workouts.get_workout(context, source_id) || {:error, :workout_not_found},
-           {:ok, _metadata} <-
-             Workouts.update_library_metadata(context, source_id, %{folder_id: folder_id}) do
-        {:ok, Map.put(workout, :folder_id, folder_id)}
-      end
+      file_original(context, folder_id, params)
+    end
+  end
+
+  defp prepare_workout(context, mode, _user, folder_id, params) do
+    if value(params, :copy_source) != false do
+      # Classes on the same day share one filed copy; athletes each get their own.
+      FileWorkoutCopy.ensure_in_folder(context, value(params, :master_workout_id), folder_id,
+        reuse_copy: mode == :class_workout
+      )
+    else
+      file_original(context, folder_id, params)
+    end
+  end
+
+  defp file_original(context, folder_id, params) do
+    source_id = value(params, :master_workout_id)
+
+    with %{} = workout <-
+           Workouts.get_workout(context, source_id) || {:error, :workout_not_found},
+         {:ok, _metadata} <-
+           Workouts.update_library_metadata(context, source_id, %{folder_id: folder_id}) do
+      {:ok, Map.put(workout, :folder_id, folder_id)}
     end
   end
 

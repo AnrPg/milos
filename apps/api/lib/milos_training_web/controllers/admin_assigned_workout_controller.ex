@@ -2,7 +2,12 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{AssignWorkout, DeleteAssignedWorkout, UpdateAssignedWorkout}
+  alias MilosTraining.Application.{
+    AssignWorkoutToAthletes,
+    DeleteAssignedWorkout,
+    UpdateAssignedWorkout
+  }
+
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
   action_fallback MilosTrainingWeb.FallbackController
@@ -52,11 +57,17 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
     },
     responses: [
       created:
-        {"Assigned workout", "application/json",
+        {"Assigned workouts (one per athlete)", "application/json",
          %Schema{
            type: :object,
-           properties: %{assignment: %Schema{type: :object, additionalProperties: true}},
-           required: [:assignment]
+           properties: %{
+             assignment: %Schema{type: :object, additionalProperties: true},
+             assignments: %Schema{
+               type: :array,
+               items: %Schema{type: :object, additionalProperties: true}
+             }
+           },
+           required: [:assignment, :assignments]
          }}
     ]
   )
@@ -117,11 +128,11 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
   )
 
   def create(conn, _params) do
-    case AssignWorkout.call(conn.assigns.tenant_context, conn.body_params) do
-      {:ok, assignment} ->
+    case AssignWorkoutToAthletes.call(conn.assigns.tenant_context, conn.body_params) do
+      {:ok, [first | _] = assignments} ->
         conn
         |> put_status(:created)
-        |> json(%{assignment: assignment})
+        |> json(%{assignment: first, assignments: assignments})
 
       error ->
         error

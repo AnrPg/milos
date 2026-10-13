@@ -49,6 +49,9 @@ export function WorkoutAuthoringModes() {
       ? legacyEditorFor(draftQuery.data)
       : "free-text";
   const resolvingDraft = !SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending;
+
+  // New workouts started from inside a library folder are created in that folder.
+  const folderId = searchParams.get("folder");
   const [modeBarVisible, setModeBarVisible] = useState(false);
   const hideTimerRef = useRef<number | null>(null);
 
@@ -161,12 +164,14 @@ export function WorkoutAuthoringModes() {
         {mode === "quick-text" ? (
           <QuickTextWorkoutEditor
             draftId={draftId}
+            folderId={folderId}
             onDraftReady={(id) => selectMode("quick-text", id)}
             onSwitchToStructured={(id) => selectMode("structured", id)}
           />
         ) : mode === "free-text" ? (
           <FreeTextWorkoutEditor
             draftId={draftId}
+            folderId={folderId}
             onDraftReady={(id) => selectMode("free-text", id)}
           />
         ) : (

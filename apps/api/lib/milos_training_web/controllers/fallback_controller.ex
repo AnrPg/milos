@@ -1505,6 +1505,33 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :folder_parent_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "folder_not_found", error: "The chosen library folder does not exist"})
+  end
+
+  def call(conn, {:error, :invalid_workout_icon}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_workout_icon", error: "Choose a single emoji as the icon"})
+  end
+
+  def call(conn, {:error, :folder_cycle}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "folder_cycle", error: "A folder cannot be moved inside itself"})
+  end
+
+  def call(conn, {:error, :class_placement_requires_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "class_placement_requires_member",
+      error: "Only active members of this organization can be placed in a class"
+    })
+  end
+
   def call(conn, {:error, :idempotency_key_conflict}) do
     conn
     |> put_status(:conflict)

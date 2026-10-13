@@ -54,6 +54,10 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
   secret_key: {MilosTraining.Infrastructure.Auth.Guardian, :fetch_secret, []},
   token_ttl: %{"access" => {15, :minutes}, "refresh" => {30, :days}}
 
+config :milos_training,
+       :workout_icon_suggester,
+       MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester
+
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
 # ADR-123: a started execution not completed within this many hours is recorded
