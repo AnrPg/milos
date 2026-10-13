@@ -339,6 +339,10 @@ defmodule MilosTrainingWeb.Router do
 
     get("/class-timers/:slot_id", ClassTimerController, :show)
     post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+    # TD-092: challenges are tenant rows; these run in the gym's scope.
+    get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
+    post("/challenges/:id/opt_in", ChallengeController, :opt_in)
+    delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -834,9 +838,6 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
-    get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
-    post("/challenges/:id/opt_in", ChallengeController, :opt_in)
-    delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
