@@ -43,7 +43,25 @@ defmodule MilosTraining.Application.CompleteWorkout do
     end
   end
 
-  def process_completion(%{user_id: user_id} = execution) do
+  # TD-092: the projection runs from `ProcessWorkoutCompletionJob`, outside any
+  # request, so it opens its own session scope: the member (user_stats,
+  # achievements and preferences are owner-only under RLS) inside the
+  # completion's organization (settings, challenges and challenge progress are
+  # tenant tables). Without it every read is empty and the first write is
+  # rejected by the runtime role in production.
+  def process_completion(%{user_id: _user_id} = execution) do
+    execution
+    |> projection_scope()
+    |> Gamification.with_tenant_context(fn -> project_completion(execution) end)
+  end
+
+  defp projection_scope(%{user_id: user_id, organization_id: organization_id})
+       when is_binary(organization_id),
+       do: %{organization_id: organization_id, user_id: user_id}
+
+  defp projection_scope(%{user_id: user_id}), do: %{user_id: user_id}
+
+  defp project_completion(%{user_id: user_id} = execution) do
     account = Identity.find_by_id(user_id)
     settings = Gamification.get_settings()
 
