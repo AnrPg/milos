@@ -12,6 +12,16 @@ defmodule MilosTrainingWeb.Schemas.InjuryWarnings do
   @staff_surfaces ~w(assign_dialog class_roster member_dossier)
   @self_surfaces ~w(assignment_detail class_detail pre_start)
 
+  # TD-088: the scale level the athlete will run; its exercises are
+  # evaluated instead of only the Rx ones. Same shape as `ScaleLevel.slug`.
+  @scale %Schema{
+    type: :string,
+    pattern: "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+    maxLength: 64,
+    nullable: true,
+    description: "Scale level slug whose exercises are evaluated; omitted or null means Rx."
+  }
+
   @exercise %Schema{
     type: :object,
     properties: %{
@@ -94,6 +104,7 @@ defmodule MilosTrainingWeb.Schemas.InjuryWarnings do
     type: :object,
     properties: %{
       workout_id: %Schema{type: :string, format: :uuid},
+      scale_level_slug: @scale,
       level: @level,
       warnings: %Schema{type: :array, items: @warning}
     },
@@ -123,7 +134,8 @@ defmodule MilosTrainingWeb.Schemas.InjuryWarnings do
     type: :object,
     properties: %{
       surface: %Schema{type: :string, enum: @self_surfaces, nullable: true},
-      source_context_id: %Schema{type: :string, format: :uuid, nullable: true}
+      source_context_id: %Schema{type: :string, format: :uuid, nullable: true},
+      scale: @scale
     },
     additionalProperties: false
   }
@@ -146,6 +158,7 @@ defmodule MilosTrainingWeb.Schemas.InjuryWarnings do
 
   def staff_surfaces, do: @staff_surfaces
   def self_surfaces, do: @self_surfaces
+  def scale, do: @scale
   def staff_result, do: @staff_result
   def slot_result, do: @slot_result
   def self_result, do: @self_result

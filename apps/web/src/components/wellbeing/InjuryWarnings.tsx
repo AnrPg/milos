@@ -325,27 +325,31 @@ export function RosterInjuryWarningsPanel({
 
 /**
  * The athlete/member's own warnings for a workout they are about to start
- * (assignment detail, class detail). Includes their personal injuries.
+ * (assignment detail, class detail, the execution ready screen). Includes
+ * their personal injuries. `scale` evaluates the exercises of the scale level
+ * they will run instead of only the Rx ones (TD-088).
  */
 export function MyInjuryWarningsPanel({
   accessToken,
   workoutId,
   surface,
   sourceContextId,
+  scale,
   api = defaultSelfApi,
 }: {
   accessToken: string;
   workoutId: string;
   surface: SelfInjuryWarningSurface;
   sourceContextId?: string;
+  scale?: string | null;
   api?: SelfInjuryWarningApi;
 }) {
   const i18n = useUiTranslations();
   const [acknowledged, setAcknowledged] = useState(false);
-  const options = { surface, source_context_id: sourceContextId ?? null };
+  const options = { surface, source_context_id: sourceContextId ?? null, ...(scale ? { scale } : {}) };
 
   const query = useQuery({
-    queryKey: ["injury-warnings", "self", workoutId, surface, sourceContextId ?? null],
+    queryKey: ["injury-warnings", "self", workoutId, surface, sourceContextId ?? null, scale ?? null],
     queryFn: () => api.fetch(accessToken, workoutId, options),
     enabled: Boolean(accessToken && workoutId),
     staleTime: 60_000,

@@ -20,11 +20,73 @@ defmodule MilosTraining.Application.InjuryWarningsTest do
     GetMyWorkoutInjuryWarnings,
     InjuryWarningEvaluation,
     ListClassSlotInjuryWarnings,
+    LogTrainingEntry,
     ReportInjury,
-    StartWorkoutExecution
+    StartWorkoutExecution,
+    SweepAbandonedExecutions
   }
 
-  alias MilosTraining.{Organizations, Scheduling, TestFixtures, Workouts}
+  alias MilosTraining.Execution.WorkoutExecution
+  alias MilosTraining.{Organizations, Repo, Scheduling, TestFixtures, Workouts}
+
+  import Ecto.Query, only: [where: 3]
+
+  # TD-088: Box Jump and Back Squat load the knee at Rx; the "scaled" level
+  # swaps the jump for a plank and drops the squat.
+  defp scaled_workout!(context, owner) do
+    {:ok, _levels} = Workouts.seed_default_scale_levels(context)
+
+    {:ok, workout} =
+      Workouts.create_workout(context, owner, %{
+        title: "Scaled injury WOD #{System.unique_integer([:positive])}",
+        type: :crossfit,
+        sections: [
+          %{
+            name: "Main",
+            order: 1,
+            scoreable: false,
+            exercises: [
+              %{
+                name: "Box Jump",
+                order: 1,
+                prescription_value: 10,
+                prescription_unit: "reps",
+                variations: [%{scale_level_slug: "scaled", exercise_name_override: "Plank"}]
+              },
+              %{
+                name: "Back Squat",
+                order: 2,
+                prescription_value: 5,
+                prescription_unit: "reps",
+                variations: [%{scale_level_slug: "scaled", excluded: true}]
+              },
+              %{name: "Strict Press", order: 3, prescription_value: 5, prescription_unit: "reps"}
+            ]
+          }
+        ]
+      })
+
+    workout
+  end
+
+  defp backdate!(execution_id, hours) do
+    started_at = DateTime.add(DateTime.utc_now(), -hours * 3_600, :second)
+
+    bypass_rls(fn ->
+      {1, _} =
+        WorkoutExecution
+        |> where([e], e.id == ^execution_id)
+        |> Repo.update_all(set: [started_at_utc: started_at])
+    end)
+  end
+
+  defp knee_member!(ctx) do
+    bypass_rls(fn ->
+      {member, member_context} = member_context(ctx.org_a)
+      admin_injury!(ctx.staff_a, ctx.owner_a, member, %{"body_area" => "knee"})
+      {member, member_context}
+    end)
+  end
 
   defp workout!(context, owner, exercises) do
     {:ok, workout} =
@@ -365,6 +427,166 @@ defmodule MilosTraining.Application.InjuryWarningsTest do
       event = bypass_rls(fn -> analytics_event!(ctx.org_a.id, "workout_execution_completed") end)
       assert event.metadata["had_active_injury"] == true
       assert event.metadata["injury_warning_level"] == "avoid"
+    end
+  end
+
+  describe "scaled variations (TD-088)" do
+    test "the athlete's scale is evaluated, not only the Rx exercises", ctx do
+      workout = bypass_rls(fn -> scaled_workout!(ctx.staff_a, ctx.owner_a) end)
+      {_member, member_context} = knee_member!(ctx)
+
+      assert {:ok, rx} = GetMyWorkoutInjuryWarnings.call(member_context, workout.id)
+      assert rx.level == :avoid
+      assert rx.scale_level_slug == nil
+      assert [%{exercises: rx_exercises}] = rx.warnings
+
+      assert rx_exercises |> Enum.map(& &1.name) |> Enum.sort() == ["Back Squat", "Box Jump"]
+
+      assert {:ok, scaled} =
+               GetMyWorkoutInjuryWarnings.call(member_context, workout.id, %{
+                 "surface" => "pre_start",
+                 "scale" => "scaled"
+               })
+
+      assert scaled.scale_level_slug == "scaled"
+      assert scaled.level == :none
+      assert scaled.warnings == []
+
+      # A malformed scale falls back to Rx instead of erroring.
+      assert {:ok, %{level: :avoid, scale_level_slug: nil}} =
+               GetMyWorkoutInjuryWarnings.call(member_context, workout.id, %{
+                 "scale" => "Not A Slug!"
+               })
+    end
+
+    test "completion facts follow the executed scale", ctx do
+      workout = bypass_rls(fn -> scaled_workout!(ctx.staff_a, ctx.owner_a) end)
+      {member, member_context} = knee_member!(ctx)
+
+      {:ok, execution} =
+        StartWorkoutExecution.call(member_context, member, %{
+          "master_workout_id" => workout.id,
+          "source" => "self_selected",
+          "scale_level_slug" => "scaled"
+        })
+
+      assert execution.scale_level_slug == "scaled"
+
+      {:ok, _completed} =
+        CompleteWorkout.call(member_context, execution.id, member.id, %{"section_scores" => []})
+
+      event = bypass_rls(fn -> analytics_event!(ctx.org_a.id, "workout_execution_completed") end)
+      assert event.metadata["had_active_injury"] == true
+      assert event.metadata["injury_warning_level"] == "none"
+    end
+  end
+
+  describe "abandoned executions and training-log entries (TD-088)" do
+    test "the ready screen's shown/acknowledged warnings are joined to the abandoned execution",
+         ctx do
+      {member, member_context} = knee_member!(ctx)
+
+      start = fn ->
+        {:ok, execution} =
+          StartWorkoutExecution.call(member_context, member, %{
+            "master_workout_id" => ctx.workout_a.id,
+            "source" => "self_selected"
+          })
+
+        execution
+      end
+
+      warned = start.()
+      unwarned = start.()
+      params = %{"surface" => "pre_start", "source_context_id" => warned.id}
+
+      {:ok, _} = GetMyWorkoutInjuryWarnings.call(member_context, ctx.workout_a.id, params)
+      {:ok, _} = AcknowledgeMyInjuryWarnings.call(member_context, ctx.workout_a.id, params)
+
+      # Ready-screen events are recorded once per execution, not once per day.
+      {:ok, _} =
+        GetMyWorkoutInjuryWarnings.call(member_context, ctx.workout_a.id, %{
+          "surface" => "pre_start",
+          "source_context_id" => Ecto.UUID.generate()
+        })
+
+      shown = bypass_rls(fn -> analytics_events(ctx.org_a.id, "injury_warning_shown") end)
+      assert length(Enum.filter(shown, &(&1.user_id == member.id))) == 2
+
+      backdate!(warned.id, 7)
+      backdate!(unwarned.id, 7)
+
+      assert {:ok, 2} = SweepAbandonedExecutions.call(ctx.org_a.id)
+
+      events =
+        bypass_rls(fn -> analytics_events(ctx.org_a.id, "workout_execution_abandoned") end)
+
+      by_execution = Map.new(events, &{&1.context_id, &1.metadata})
+
+      assert %{
+               "had_active_injury" => true,
+               "injury_warning_level" => "avoid",
+               "injury_warning_shown" => true,
+               "injury_warning_acknowledged" => true
+             } = by_execution[warned.id]
+
+      assert %{
+               "had_active_injury" => true,
+               "injury_warning_level" => "avoid",
+               "injury_warning_shown" => false,
+               "injury_warning_acknowledged" => false
+             } = by_execution[unwarned.id]
+    end
+
+    test "abandonment facts never reflect a personal-only injury", ctx do
+      {member, member_context} =
+        bypass_rls(fn ->
+          {member, member_context} = member_context(ctx.org_a)
+          personal_injury!(member_context, member, %{"body_area" => "knee"})
+          {member, member_context}
+        end)
+
+      {:ok, execution} =
+        StartWorkoutExecution.call(member_context, member, %{
+          "master_workout_id" => ctx.workout_a.id,
+          "source" => "self_selected"
+        })
+
+      params = %{"surface" => "pre_start", "source_context_id" => execution.id}
+
+      {:ok, %{level: :avoid}} =
+        GetMyWorkoutInjuryWarnings.call(member_context, ctx.workout_a.id, params)
+
+      backdate!(execution.id, 7)
+      assert {:ok, 1} = SweepAbandonedExecutions.call(ctx.org_a.id)
+
+      event = bypass_rls(fn -> analytics_event!(ctx.org_a.id, "workout_execution_abandoned") end)
+
+      assert %{
+               "had_active_injury" => false,
+               "injury_warning_level" => "none",
+               "injury_warning_shown" => false
+             } = event.metadata
+    end
+
+    test "training_log_entry_logged carries the injury facts of the logged workout", ctx do
+      {member, member_context} = knee_member!(ctx)
+
+      assert {:ok, entry, :created} =
+               LogTrainingEntry.call(member_context, member, %{
+                 "source_type" => "library_workout",
+                 "source_reference_id" => ctx.workout_a.id,
+                 "performed_at" =>
+                   DateTime.utc_now() |> DateTime.add(-3_600) |> DateTime.to_iso8601(),
+                 "duration_seconds" => 1_200,
+                 "idempotency_key" => Ecto.UUID.generate()
+               })
+
+      logged = bypass_rls(fn -> analytics_event!(ctx.org_a.id, "training_log_entry_logged") end)
+      assert logged.context_id == entry.id
+      assert logged.metadata["had_active_injury"] == true
+      assert logged.metadata["injury_warning_level"] == "avoid"
+      refute Map.has_key?(logged.metadata, "body_area")
     end
   end
 end

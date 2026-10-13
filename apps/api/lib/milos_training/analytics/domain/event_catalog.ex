@@ -112,19 +112,25 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
 
   # ADR-124: health-adjacent events keep ONLY these metadata keys - enums,
   # counts and ids. Body areas, limitations, tags and any other free text are
-  # dropped even when short enough to pass `sanitize/1`.
+  # dropped even when short enough to pass `sanitize/1`. `scale_level_slug`
+  # (TD-088) is the scale whose exercises were evaluated.
   @injury_warning_metadata_keys ~w(
     audience surface warning_level injury_warning_count avoid_exercise_count
-    caution_exercise_count athlete_id source_context_id
+    caution_exercise_count athlete_id source_context_id scale_level_slug
   )
   @metadata_allowlists %{
     "injury_warning_shown" => @injury_warning_metadata_keys,
     "injury_warning_acknowledged" => @injury_warning_metadata_keys
   }
 
-  # ADR-124 segmentation facts added to `workout_execution_completed`:
+  # ADR-124 segmentation facts added to `workout_execution_completed` and
+  # (TD-088) `workout_execution_abandoned` and `training_log_entry_logged`:
   # booleans/enums derived from organization-provenance injuries only.
-  @injury_segmentation_keys ~w(had_active_injury injury_warning_level)
+  # `injury_warning_shown` / `injury_warning_acknowledged` (abandonment only)
+  # say whether the ready-screen warning was recorded for that execution.
+  @injury_segmentation_keys ~w(
+    had_active_injury injury_warning_level injury_warning_shown injury_warning_acknowledged
+  )
 
   @max_string_length 64
 

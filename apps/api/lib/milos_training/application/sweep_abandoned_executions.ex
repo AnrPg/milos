@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
   Returns `{:ok, recorded_count}`.
   """
 
-  alias MilosTraining.Application.TrackAnalyticsEvent
+  alias MilosTraining.Application.{InjuryWarningEvaluation, TrackAnalyticsEvent}
   alias MilosTraining.{Analytics, Execution, Workouts}
 
   @default_threshold_hours 6
@@ -43,14 +43,16 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
       |> Enum.filter(&Execution.execution_abandoned?(&1, now, threshold))
 
     recorded = already_recorded(tenant, candidates)
+    pending = Enum.reject(candidates, &MapSet.member?(recorded, &1.id))
+    warnings = ready_screen_warnings(tenant, pending)
 
     count =
-      candidates
-      |> Enum.reject(&MapSet.member?(recorded, &1.id))
-      |> Enum.reduce({0, %{}}, fn execution, {count, segment_cache} ->
-        {segments, segment_cache} = segments_for(execution, segment_cache)
-        record(execution, segments, now, threshold)
-        {count + 1, segment_cache}
+      pending
+      |> Enum.reduce({0, %{}}, fn execution, {count, workout_cache} ->
+        {{segments, workout}, workout_cache} = workout_for(execution, workout_cache)
+        injury_facts = InjuryWarningEvaluation.abandonment_facts(execution, workout, warnings)
+        record(execution, segments, injury_facts, now, threshold)
+        {count + 1, workout_cache}
       end)
       |> elem(0)
 
@@ -70,7 +72,22 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
     |> MapSet.new()
   end
 
-  defp record(execution, segments, now, threshold) do
+  # TD-088: one tenant-scoped read for every pending execution's ready-screen
+  # injury warning events.
+  defp ready_screen_warnings(_tenant, []), do: MapSet.new()
+
+  defp ready_screen_warnings(tenant, executions) do
+    tenant
+    |> Analytics.with_tenant_context(fn ->
+      InjuryWarningEvaluation.ready_screen_events(Enum.map(executions, & &1.id))
+    end)
+    |> case do
+      %MapSet{} = events -> events
+      _error -> MapSet.new()
+    end
+  end
+
+  defp record(execution, segments, injury_facts, now, threshold) do
     last_progress_at =
       Execution.with_execution_context(
         %{organization_id: execution.organization_id, user_id: execution.user_id},
@@ -82,6 +99,7 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
       |> Map.put(:last_progress_at, normalize_datetime(last_progress_at))
       |> Execution.abandonment_analytics_facts(segments, now)
       |> Map.put(:threshold_hours, threshold)
+      |> Map.merge(injury_facts)
 
     TrackAnalyticsEvent.call(@event, nil, execution, %{
       user_id: execution.user_id,
@@ -90,25 +108,27 @@ defmodule MilosTraining.Application.SweepAbandonedExecutions do
     })
   end
 
-  defp segments_for(%{master_workout_id: nil}, cache), do: {[], cache}
+  # The (scale-materialized) workout and its timer sequence, cached per
+  # workout and scale for the run.
+  defp workout_for(%{master_workout_id: nil}, cache), do: {{[], nil}, cache}
 
-  defp segments_for(execution, cache) do
+  defp workout_for(execution, cache) do
     key = {execution.master_workout_id, execution.scale_level_slug}
 
     case Map.fetch(cache, key) do
-      {:ok, segments} ->
-        {segments, cache}
+      {:ok, resolved} ->
+        {resolved, cache}
 
       :error ->
         context = %{organization_id: execution.organization_id}
 
-        segments =
+        resolved =
           case resolve_workout(context, execution.master_workout_id, execution.scale_level_slug) do
-            %{} = workout -> Execution.build_timer_sequence(workout)
-            _missing -> []
+            %{} = workout -> {Execution.build_timer_sequence(workout), workout}
+            _missing -> {[], nil}
           end
 
-        {segments, Map.put(cache, key, segments)}
+        {resolved, Map.put(cache, key, resolved)}
     end
   end
 

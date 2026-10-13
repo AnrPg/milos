@@ -42,6 +42,7 @@ export async function fetchMyWorkoutInjuryWarnings(
   const params = new URLSearchParams();
   if (options.surface) params.set("surface", options.surface);
   if (options.source_context_id) params.set("source_context_id", options.source_context_id);
+  if (options.scale) params.set("scale", options.scale);
   const suffix = params.toString() ? `?${params.toString()}` : "";
 
   return apiRequest<MyWorkoutInjuryWarnings>(`/me/workouts/${workoutId}/injury-warnings${suffix}`, { token });

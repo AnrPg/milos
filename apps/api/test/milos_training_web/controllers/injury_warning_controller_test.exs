@@ -169,6 +169,49 @@ defmodule MilosTrainingWeb.InjuryWarningControllerTest do
     assert event.metadata["injury_warning_count"] == 1
   end
 
+  test "the ready screen evaluates the athlete's scale and records it per execution (TD-088)",
+       %{conn: conn} = ctx do
+    source_context_id = Ecto.UUID.generate()
+
+    response =
+      conn
+      |> put_bearer_token(ctx.athlete)
+      |> get(
+        "/api/org/#{ctx.org.slug}/me/workouts/#{ctx.workout.id}/injury-warnings" <>
+          "?surface=pre_start&scale=scaled&source_context_id=#{source_context_id}"
+      )
+      |> json_response(200)
+
+    # No variation exists for "scaled", so the Rx exercises still apply.
+    assert response["scale_level_slug"] == "scaled"
+    assert response["level"] == "avoid"
+
+    [shown] = analytics_events(ctx.org.id, "injury_warning_shown")
+    assert shown.metadata["surface"] == "pre_start"
+    assert shown.metadata["scale_level_slug"] == "scaled"
+    assert shown.metadata["source_context_id"] == source_context_id
+
+    ack =
+      conn
+      |> recycle()
+      |> put_bearer_token(ctx.athlete)
+      |> post(
+        "/api/org/#{ctx.org.slug}/me/workouts/#{ctx.workout.id}/injury-warnings/acknowledge",
+        %{surface: "pre_start", scale: "scaled", source_context_id: source_context_id}
+      )
+      |> json_response(200)
+
+    assert ack["level"] == "avoid"
+
+    conn
+    |> recycle()
+    |> put_bearer_token(ctx.athlete)
+    |> get(
+      "/api/org/#{ctx.org.slug}/me/workouts/#{ctx.workout.id}/injury-warnings?scale=Not%20A%20Slug"
+    )
+    |> json_response(422)
+  end
+
   test "athletes cannot use the staff endpoints", %{conn: conn} = ctx do
     conn
     |> put_bearer_token(ctx.athlete)

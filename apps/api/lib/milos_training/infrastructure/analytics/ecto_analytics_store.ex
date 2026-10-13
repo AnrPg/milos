@@ -65,6 +65,25 @@ defmodule MilosTraining.Infrastructure.Analytics.EctoAnalyticsStore do
     |> Repo.all()
   end
 
+  # TD-088: which of `source_context_ids` have at least one of `event_names`
+  # recorded in the current tenant, as `{event_name, source_context_id}`.
+  @impl true
+  def list_events_for_source_contexts(_event_names, []), do: []
+
+  def list_events_for_source_contexts(event_names, source_context_ids)
+      when is_list(event_names) and is_list(source_context_ids) do
+    AnalyticsEvent
+    |> scoped_to_tenant()
+    |> where([event], event.event_name in ^event_names)
+    |> where(
+      [event],
+      fragment("?->>'source_context_id'", event.metadata) in ^source_context_ids
+    )
+    |> select([event], {event.event_name, fragment("?->>'source_context_id'", event.metadata)})
+    |> distinct(true)
+    |> Repo.all()
+  end
+
   defp validated_rows(params_list) do
     now = DateTime.utc_now()
     organization_id = RepoContext.current_setting("app.organization_id")
