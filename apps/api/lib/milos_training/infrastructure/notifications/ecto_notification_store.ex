@@ -132,17 +132,14 @@ defmodule MilosTraining.Infrastructure.Notifications.EctoNotificationStore do
     :ok
   end
 
+  # TD-092 / ADR-131: the rows belong to many recipients and RLS is owner-only,
+  # so the rewrite goes through the rename-gated SECURITY DEFINER helper.
   @impl true
   def propagate_nickname_change(old_nickname, new_nickname) do
-    Repo.query!(
-      "UPDATE notifications SET payload = jsonb_set(payload, '{sender_nickname}', to_jsonb($1::text)) WHERE payload->>'sender_nickname' = $2",
-      [new_nickname, old_nickname]
-    )
-
-    Repo.query!(
-      "UPDATE notifications SET payload = jsonb_set(payload, '{athlete_nickname}', to_jsonb($1::text)) WHERE payload->>'athlete_nickname' = $2",
-      [new_nickname, old_nickname]
-    )
+    Repo.query!("SELECT milos_propagate_notification_nickname($1, $2)", [
+      old_nickname,
+      new_nickname
+    ])
 
     :ok
   end

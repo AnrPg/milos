@@ -437,6 +437,66 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
     end
   end
 
+  describe "nickname propagation (PropagateNicknameJob)" do
+    test "other users' notifications pick up a sender's new nickname" do
+      suffix = System.unique_integer([:positive])
+      old_nickname = "oldnick#{suffix}"
+      new_nickname = "newnick#{suffix}"
+
+      recipient =
+        bypass_rls(fn ->
+          sender = user_fixture(%{nickname: old_nickname})
+          recipient = user_fixture()
+
+          {:ok, _notification} =
+            Notifications.create_notification(%{
+              user_id: recipient.id,
+              type: :athlete_message,
+              payload: %{"sender_nickname" => old_nickname, "body" => "hi"}
+            })
+
+          {:ok, _renamed} =
+            MilosTraining.Identity.update_profile(sender.id, %{nickname: new_nickname})
+
+          recipient
+        end)
+
+      clear_session!()
+      assert :ok = Notifications.propagate_nickname_change(old_nickname, new_nickname)
+
+      assert [%{payload: %{"sender_nickname" => ^new_nickname}}] =
+               bypass_rls(fn -> Notifications.list_for_user(recipient.id) end)
+    end
+
+    test "a nickname still held by an account is never rewritten" do
+      held = "heldnick#{System.unique_integer([:positive])}"
+
+      recipient =
+        bypass_rls(fn ->
+          _holder = user_fixture(%{nickname: held})
+          other = user_fixture()
+          recipient = user_fixture()
+
+          {:ok, _notification} =
+            Notifications.create_notification(%{
+              user_id: recipient.id,
+              type: :athlete_message,
+              payload: %{"sender_nickname" => held, "body" => "hi"}
+            })
+
+          _ = other
+          recipient
+        end)
+
+      clear_session!()
+      other_nickname = bypass_rls(fn -> user_fixture().nickname end)
+      assert :ok = Notifications.propagate_nickname_change(held, other_nickname)
+
+      assert [%{payload: %{"sender_nickname" => ^held}}] =
+               bypass_rls(fn -> Notifications.list_for_user(recipient.id) end)
+    end
+  end
+
   describe "materialized view refresh as the runtime (non-owner) role" do
     test "the leaderboard refresh succeeds and reflects new opt-ins" do
       {gym, member} =
