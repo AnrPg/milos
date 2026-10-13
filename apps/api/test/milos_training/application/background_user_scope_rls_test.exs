@@ -21,6 +21,7 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
   alias MilosTraining.{
     Execution,
+    Finance,
     Gamification,
     Organizations,
     Workouts
@@ -162,6 +163,45 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
       # Both the finished execution and the logged entry count.
       assert %{total_workouts: 2} =
                bypass_rls(fn -> GamificationStore.get_user_stats(ctx.member.id) end)
+    end
+  end
+
+  describe "materialized view refresh as the runtime (non-owner) role" do
+    test "the leaderboard refresh succeeds and reflects new opt-ins" do
+      {gym, member} =
+        bypass_rls(fn ->
+          member = user_fixture()
+          {:ok, gym} = Organizations.create_organization(%{name: "Refresh Gym"})
+          add!(gym, member, :member)
+
+          {:ok, true} =
+            Gamification.with_tenant_context(%{organization_id: gym.id, user_id: member.id}, fn ->
+              GamificationStore.set_leaderboard_opt_in(member.id, true)
+            end)
+
+          {gym, member}
+        end)
+
+      clear_session!()
+      assert :ok = Gamification.refresh_leaderboard()
+
+      leaderboard =
+        Gamification.with_tenant_context(%{organization_id: gym.id, user_id: member.id}, fn ->
+          Gamification.get_leaderboard("weekly", 5)
+        end)
+
+      assert Enum.any?(leaderboard, &(&1.user_id == member.id))
+    end
+
+    test "the coaching and finance aggregate refreshes succeed" do
+      clear_session!()
+      assert :ok = MilosTraining.Coaching.refresh_aggregates()
+      assert :ok = MilosTraining.Finance.refresh_aggregates()
+    end
+
+    test "only the allow-listed views can be refreshed through the definer function" do
+      assert {:error, %Postgrex.Error{postgres: %{code: :insufficient_privilege}}} =
+               Repo.query("SELECT milos_refresh_materialized_view('users')")
     end
   end
 
