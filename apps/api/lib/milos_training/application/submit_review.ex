@@ -93,7 +93,7 @@ defmodule MilosTraining.Application.SubmitReview do
         end
 
       {"exercise", id} ->
-        case {Workouts.exercise_exists?(id), exercise_execution_status(user_id, id)} do
+        case {exercise_exists?(context, id), exercise_execution_status(user_id, id)} do
           {false, _status} -> {:error, :review_target_not_found}
           {_exists?, :missing} -> {:error, :review_target_not_found}
           {_exists?, :incomplete} -> {:error, :review_target_not_completed}
@@ -227,8 +227,23 @@ defmodule MilosTraining.Application.SubmitReview do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
 
-  defp get_workout(%{organization_id: _} = context, id), do: Workouts.get_workout(context, id)
-  defp get_workout(_context, id), do: Workouts.get_workout(id)
+  # Workouts and their exercises are tenant data: without a tenant context a
+  # workout or exercise target is not found (ADR-133).
+  defp get_workout(%{organization_id: organization_id} = context, id)
+       when is_binary(organization_id) do
+    case Workouts.get_workout(context, id) do
+      %{} = workout -> workout
+      _missing -> nil
+    end
+  end
+
+  defp get_workout(_context, _id), do: nil
+
+  defp exercise_exists?(%{organization_id: organization_id} = context, id)
+       when is_binary(organization_id),
+       do: Workouts.exercise_exists?(context, id) == true
+
+  defp exercise_exists?(_context, _id), do: false
 
   defp get_slot(%{organization_id: _} = context, id), do: Scheduling.get_slot(context, id)
   defp get_slot(_context, _id), do: nil

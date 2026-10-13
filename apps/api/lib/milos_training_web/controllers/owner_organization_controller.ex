@@ -4,6 +4,7 @@ defmodule MilosTrainingWeb.OwnerOrganizationController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
+  alias MilosTraining.Application.CreateOwnedOrganization
   alias MilosTraining.Organizations
   alias Guardian.Plug, as: GuardianPlug
   alias MilosTrainingWeb.Schemas.OwnerOrganization, as: S
@@ -26,7 +27,7 @@ defmodule MilosTrainingWeb.OwnerOrganizationController do
     account = GuardianPlug.current_resource(conn)
 
     with {:ok, organization} <-
-           Organizations.create_owned_organization(account, %{name: conn.body_params.name}) do
+           CreateOwnedOrganization.call(account, %{name: conn.body_params.name}) do
       conn |> put_status(:created) |> json(serialize(organization))
     end
   end

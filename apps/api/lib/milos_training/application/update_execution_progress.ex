@@ -41,19 +41,19 @@ defmodule MilosTraining.Application.UpdateExecutionProgress do
     # carries an organization_id, so the workout lookup below would otherwise
     # silently see nothing (F-03 scoping) and this progress update would be
     # validated against zero timer segments.
-    Workouts.with_tenant_context(%{organization_id: organization_id, user_id: user_id}, fn ->
-      case resolve_workout(workout_id, scale_slug) do
-        nil -> {:ok, []}
-        workout -> {:ok, Execution.build_timer_sequence(workout)}
-      end
-    end)
+    context = %{organization_id: organization_id, user_id: user_id}
+
+    case resolve_workout(context, workout_id, scale_slug) do
+      %{} = workout -> {:ok, Execution.build_timer_sequence(workout)}
+      _missing -> {:ok, []}
+    end
   end
 
-  defp resolve_workout(workout_id, nil), do: Workouts.get_workout(workout_id)
-  defp resolve_workout(workout_id, ""), do: Workouts.get_workout(workout_id)
+  defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
+    do: Workouts.get_workout(context, workout_id)
 
-  defp resolve_workout(workout_id, scale_slug),
-    do: Workouts.materialize_workout_for_scale(workout_id, scale_slug)
+  defp resolve_workout(context, workout_id, scale_slug),
+    do: Workouts.materialize_workout_for_scale(context, workout_id, scale_slug)
 
   defp broadcast_progress_updated(execution) do
     Phoenix.PubSub.broadcast(

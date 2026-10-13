@@ -220,14 +220,10 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
     |> json_response(200)
 
     athlete_assignments =
-      RepoContext.run(context, fn ->
-        Workouts.list_assigned_workouts_for_athlete(athlete.id, new_date, new_date)
-      end)
+      Workouts.list_assigned_workouts_for_athlete(context, athlete.id, new_date, new_date)
 
     other_assignments =
-      RepoContext.run(context, fn ->
-        Workouts.list_assigned_workouts_for_athlete(other.id, original_date, original_date)
-      end)
+      Workouts.list_assigned_workouts_for_athlete(context, other.id, original_date, original_date)
 
     assert Enum.any?(athlete_assignments, &(&1.id == assignment.id))
     assert Enum.any?(other_assignments, &(&1.id == assignment.id))
@@ -401,7 +397,12 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
 
         {:ok, _completed} = Execution.complete_execution(execution.id, athlete.id, %{})
 
-        Workouts.list_assigned_workouts_for_athlete(athlete.id, first_date, second_date)
+        Workouts.list_assigned_workouts_for_athlete(
+          athlete_execution_context,
+          athlete.id,
+          first_date,
+          second_date
+        )
       end)
 
     assert Enum.find(assignments, &(&1.id == first.id)).execution_status == "completed"

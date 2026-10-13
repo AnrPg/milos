@@ -41,18 +41,22 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
   end
 
   # The workout belongs to the gym where it was done; the user-scoped history
-  # cannot see it without that gym's tenant context.
+  # cannot see it without that gym's tenant context. Without one it is
+  # unreachable and shows as deleted (ADR-133).
   defp fetch_workout(%{organization_id: organization_id, master_workout_id: workout_id})
        when is_binary(organization_id) do
-    case Organizations.resolve_system_tenant_context(organization_id, :execution_history, %{
-           service: __MODULE__
-         }) do
-      {:ok, context} -> Workouts.get_workout(context, workout_id)
-      _error -> Workouts.get_workout(workout_id)
+    with {:ok, context} <-
+           Organizations.resolve_system_tenant_context(organization_id, :execution_history, %{
+             service: __MODULE__
+           }),
+         %{} = workout <- Workouts.get_workout(context, workout_id) do
+      workout
+    else
+      _unreachable -> nil
     end
   end
 
-  defp fetch_workout(execution), do: Workouts.get_workout(execution.master_workout_id)
+  defp fetch_workout(_execution), do: nil
 
   defp attach_section_names(section_scores, lookup) do
     Enum.map(section_scores, fn score ->

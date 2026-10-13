@@ -5,14 +5,6 @@ defmodule MilosTraining.Application.DuplicateWorkout do
   alias MilosTraining.Workouts
 
   def call(context, id, opts) do
-    do_call(context, id, opts)
-  end
-
-  def call(id, opts \\ []) do
-    do_call(nil, id, opts)
-  end
-
-  defp do_call(context, id, opts) do
     title_suffix = resolve_title_suffix(context, opts)
 
     attrs = opts |> Keyword.take([:folder_id]) |> Map.new()
@@ -84,17 +76,11 @@ defmodule MilosTraining.Application.DuplicateWorkout do
     )
   end
 
-  defp duplicate_workout(nil, id, title_suffix, attrs),
-    do: Workouts.duplicate_workout(id, title_suffix, attrs)
-
   defp duplicate_workout(context, id, title_suffix, attrs),
     do: Workouts.duplicate_workout(context, id, title_suffix, attrs)
-
-  defp get_assigned_workout(nil, assignment_id), do: Workouts.get_assigned_workout(assignment_id)
 
   defp get_assigned_workout(context, assignment_id),
     do: Workouts.get_assigned_workout(context, assignment_id)
 
-  defp get_slot(nil, slot_id), do: Scheduling.get_slot(slot_id)
   defp get_slot(context, slot_id), do: Scheduling.get_slot(context, slot_id)
 end

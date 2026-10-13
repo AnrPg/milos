@@ -34,7 +34,7 @@ defmodule MilosTraining.Application.DeleteWorkoutPreservesExecutionTest do
                status: :completed
              })
 
-    assert :ok = DeleteWorkout.call(workout.id)
+    assert :ok = DeleteWorkout.call(context, workout.id)
 
     preserved = Execution.get_execution(execution.id)
     assert preserved.status == "completed"
@@ -68,7 +68,7 @@ defmodule MilosTraining.Application.DeleteWorkoutPreservesExecutionTest do
     assert Repo.get(ClassSeries, series.id)
     assert slot_count(workout.id) > 0
 
-    assert :ok = DeleteWorkout.call(workout.id)
+    assert :ok = DeleteWorkout.call(context, workout.id)
 
     refute Repo.get(ClassSeries, series.id)
     assert slot_count(workout.id) == 0

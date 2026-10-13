@@ -218,7 +218,7 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
       assert {:ok, _} = Organizations.set_membership_role(other_context, athlete.id, :member)
 
       # The legacy organization's assignment must survive: it was never in scope.
-      assert Workouts.get_assignment_execution_access(assignment.id, athlete.id)
+      assert Workouts.get_assignment_execution_access(home_context, assignment.id, athlete.id)
     end
 
     test "leaving :athlete archives assignment access while retaining history" do
@@ -256,12 +256,12 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
                  admin_notes: "Role transition coverage"
                })
 
-      assert Workouts.get_assignment_execution_access(assignment.id, athlete.id)
+      assert Workouts.get_assignment_execution_access(context, assignment.id, athlete.id)
 
       assert {:ok, updated} = Organizations.set_membership_role(context, athlete.id, :member)
       assert updated.role == :member
-      assert Workouts.get_assignment_execution_access(assignment.id, athlete.id) == nil
-      assert Workouts.get_assigned_workout(assignment.id).athlete_ids == [athlete.id]
+      assert Workouts.get_assignment_execution_access(context, assignment.id, athlete.id) == nil
+      assert Workouts.get_assigned_workout(context, assignment.id).athlete_ids == [athlete.id]
     end
   end
 

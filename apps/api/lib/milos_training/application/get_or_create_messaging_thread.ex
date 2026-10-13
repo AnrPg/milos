@@ -21,27 +21,38 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
     end
   end
 
-  def call(actor, %{context_type: :assignment, context_id: assignment_id}) do
-    with {:ok, assignment} <- authorize_assignment(actor, assignment_id) do
+  # Assignments and class slots are tenant data (ADR-133): they are only
+  # reachable through a tenant context.
+  def call(_actor, %{context_type: context_type})
+      when context_type in [:assignment, :class_slot],
+      do: {:error, :organization_context_required}
+
+  def call(_actor, _params), do: {:error, :bad_request}
+
+  def call(%{organization_id: organization_id} = context, actor, %{
+        context_type: :assignment,
+        context_id: assignment_id
+      })
+      when is_binary(organization_id) do
+    with {:ok, assignment} <- authorize_assignment(context, actor, assignment_id) do
       participant_ids =
         assignment.athlete_links
         |> Enum.reject(&(&1.athlete_status == :archived))
         |> Enum.map(& &1.athlete_id)
         |> add_org_staff_and_actor(actor.id, assignment.organization_id)
 
-      Messaging.get_or_create_thread(%{
-        context_type: :assignment,
-        context_id: assignment_id,
-        actor_id: actor.id,
-        participants: participant_ids
-      })
+      context
+      |> Messaging.with_tenant_context(fn ->
+        Messaging.get_or_create_thread(%{
+          context_type: :assignment,
+          context_id: assignment_id,
+          actor_id: actor.id,
+          participants: participant_ids
+        })
+      end)
       |> TrackMessagingAnalytics.call()
     end
   end
-
-  def call(_actor, %{context_type: :class_slot}), do: {:error, :organization_context_required}
-
-  def call(_actor, _params), do: {:error, :bad_request}
 
   def call(%{organization_id: _} = context, actor, %{
         context_type: :class_slot,
@@ -83,8 +94,8 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
   # a (non-archived) participant on it, or as owner/admin/coach staff of that
   # same organization - never by the account's global role (that let any
   # platform-wide admin into any organization's thread, a cross-tenant IDOR).
-  defp authorize_assignment(actor, assignment_id) do
-    with {:ok, assignment} <- Workouts.get_assignment(assignment_id) do
+  defp authorize_assignment(context, actor, assignment_id) do
+    with {:ok, assignment} <- Workouts.get_assignment(context, assignment_id) do
       participant? =
         Enum.any?(
           assignment.athlete_links,

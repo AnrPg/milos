@@ -33,10 +33,16 @@ defmodule MilosTrainingWeb.OwnerOrganizationControllerTest do
   end
 
   test "only owners create gyms, and they own the new one", ctx do
-    assert %{"slug" => "second-gym"} =
+    assert %{"slug" => "second-gym", "id" => second_gym_id} =
              ctx.owner_conn
              |> send_json("/api/organizations", %{name: "Second Gym"})
              |> json_response(201)
+
+    # ADR-133: the new gym starts with the default scale levels (ADR-128).
+    assert ["scaled", "rx", "rx-plus"] ==
+             %{organization_id: second_gym_id, user_id: ctx.owner.id}
+             |> MilosTraining.Workouts.list_scale_levels()
+             |> Enum.map(& &1.slug)
 
     slugs =
       ctx.owner_conn

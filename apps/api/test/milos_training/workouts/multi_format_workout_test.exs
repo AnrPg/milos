@@ -99,7 +99,12 @@ defmodule MilosTraining.Workouts.MultiFormatWorkoutTest do
     }
 
     assert {:ok, created} = Workouts.publish_workout(draft.id, params)
-    workout = Workouts.get_workout(created.id)
+
+    workout =
+      Workouts.get_workout(
+        %{organization_id: created.organization_id, user_id: admin.id},
+        created.id
+      )
 
     assert Enum.map(workout.sections, &(&1.timer_config["type"] || &1.timer_config[:type])) ==
              ~w(untimed complex_emom tabata rest ladder_descending)

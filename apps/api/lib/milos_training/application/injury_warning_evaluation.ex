@@ -38,7 +38,7 @@ defmodule MilosTraining.Application.InjuryWarningEvaluation do
 
     context
     |> Wellbeing.with_tenant_context(fn ->
-      with {:ok, workout} <- fetch_workout(workout_id) do
+      with {:ok, workout} <- fetch_workout(context, workout_id) do
         injuries = Wellbeing.list_active_injuries_for_users(user_ids)
         {:ok, workout, injuries}
       end
@@ -79,7 +79,7 @@ defmodule MilosTraining.Application.InjuryWarningEvaluation do
       when is_binary(organization_id) and is_binary(user_id) do
     context
     |> Wellbeing.with_tenant_context(fn ->
-      with {:ok, workout} <- fetch_workout(workout_id) do
+      with {:ok, workout} <- fetch_workout(context, workout_id) do
         {:ok, workout, Wellbeing.list_active_injuries_for_user(user_id)}
       end
     end)
@@ -195,16 +195,16 @@ defmodule MilosTraining.Application.InjuryWarningEvaluation do
 
   def source_context_id(_value), do: nil
 
-  defp fetch_workout(workout_id) when is_binary(workout_id) do
+  defp fetch_workout(context, workout_id) when is_binary(workout_id) do
     with {:ok, _uuid} <- cast_uuid(workout_id),
-         %{} = workout <- Workouts.get_workout(workout_id) do
+         %{} = workout <- Workouts.get_workout(context, workout_id) do
       {:ok, workout}
     else
       _missing -> {:error, :not_found}
     end
   end
 
-  defp fetch_workout(_workout_id), do: {:error, :not_found}
+  defp fetch_workout(_context, _workout_id), do: {:error, :not_found}
 
   defp cast_uuid(value) do
     case Ecto.UUID.cast(value) do
