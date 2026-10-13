@@ -79,6 +79,87 @@ defmodule MilosTraining.Wellbeing.Domain.InjuryRiskPolicyTest do
       assert InjuryRiskPolicy.regions_for("knee and ankle") == [:knee, :ankle]
       assert InjuryRiskPolicy.regions_for("spleen") == []
     end
+
+    # TD-088: every UI locale (ar bg de el en es fr he it nl pt-PT ru).
+    test "body areas resolve in every supported UI locale" do
+      cases = [
+        # Spanish
+        {"Rodilla derecha", [:knee]},
+        {"hombro izquierdo", [:shoulder]},
+        {"Muñeca", [:wrist]},
+        {"dolor de espalda baja", [:back]},
+        {"tobillo", [:ankle]},
+        {"isquiotibiales", [:hamstring]},
+        # French
+        {"Épaule droite", [:shoulder]},
+        {"genou", [:knee]},
+        {"cheville", [:ankle]},
+        {"bas du dos", [:back]},
+        {"poignet", [:wrist]},
+        # German
+        {"Schulter", [:shoulder]},
+        {"Rücken", [:back]},
+        {"Kniescheibe", [:knee]},
+        {"Sprunggelenk", [:ankle]},
+        {"Hüfte", [:hip]},
+        {"Ellenbogen", [:elbow]},
+        # Italian
+        {"Ginocchio sinistro", [:knee]},
+        {"spalla", [:shoulder]},
+        {"caviglia", [:ankle]},
+        {"gomito", [:elbow]},
+        # Portuguese
+        {"Joelho", [:knee]},
+        {"ombro", [:shoulder]},
+        {"tornozelo", [:ankle]},
+        {"cotovelo", [:elbow]},
+        {"pescoço", [:neck]},
+        # Dutch
+        {"Knie", [:knee]},
+        {"schouder", [:shoulder]},
+        {"enkel", [:ankle]},
+        {"pols", [:wrist]},
+        {"onderrug", [:back]},
+        # Russian
+        {"Колено", [:knee]},
+        {"плечо", [:shoulder]},
+        {"поясница", [:back]},
+        {"голеностоп", [:ankle]},
+        {"шея", [:neck]},
+        # Bulgarian
+        {"Коляно", [:knee]},
+        {"рамо", [:shoulder]},
+        {"глезен", [:ankle]},
+        {"кръст", [:back]},
+        # Arabic (with and without the definite article)
+        {"الركبة", [:knee]},
+        {"ركبة", [:knee]},
+        {"الكتف", [:shoulder]},
+        {"أسفل الظهر", [:back]},
+        {"الكاحل", [:ankle]},
+        # Hebrew (with and without the definite article)
+        {"הברך", [:knee]},
+        {"כתף", [:shoulder]},
+        {"גב תחתון", [:back]},
+        {"קרסול", [:ankle]}
+      ]
+
+      for {body_area, regions} <- cases do
+        assert InjuryRiskPolicy.regions_for(body_area) == regions,
+               "#{body_area} should resolve to #{inspect(regions)}"
+      end
+    end
+
+    test "short or ambiguous synonyms only match whole words" do
+      # "pie" (es: foot) must not match "pierna" (leg); "dos" (fr: back) must
+      # not match "dose"; "main" (fr: hand) must not match "maintenance".
+      assert InjuryRiskPolicy.regions_for("pierna") == []
+      assert InjuryRiskPolicy.regions_for("dose") == []
+      assert InjuryRiskPolicy.regions_for("maintenance") == []
+      assert InjuryRiskPolicy.regions_for("pie izquierdo") == [:ankle]
+      assert InjuryRiskPolicy.regions_for("dos") == [:back]
+      assert InjuryRiskPolicy.regions_for("main droite") == [:wrist]
+    end
   end
 
   describe "evaluate/2" do
