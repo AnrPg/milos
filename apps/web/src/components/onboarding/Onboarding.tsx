@@ -63,7 +63,12 @@ function useAdminOnboarding(enabled: boolean) {
   const query = useQuery({
     queryKey,
     enabled: enabled && Boolean(token && slug),
-    queryFn: () => fetchAdminOnboarding(token!),
+    // A response without steps (an older API, a proxy error page) shows no
+    // checklist instead of breaking the page it is mounted on.
+    queryFn: async () => {
+      const checklist = await fetchAdminOnboarding(token!);
+      return Array.isArray(checklist?.steps) ? checklist : null;
+    },
     staleTime: 30_000,
   });
 

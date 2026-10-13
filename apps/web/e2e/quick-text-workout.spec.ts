@@ -156,6 +156,7 @@ async function mockWorkoutApi(
           status: "draft",
           title: "Quick Strength",
           type: "strength",
+          authoring_mode: "quick_text",
           available_scale_levels: [],
           sections: [],
           draft_data: { authoring_mode: "quick_text", dsl_source: source },
