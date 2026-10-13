@@ -131,7 +131,8 @@ defmodule MilosTrainingWeb.LandingController do
     user = GuardianPlug.current_resource(conn)
     body = normalize_body_params(conn, params)
 
-    with {:ok, payload} <- SetLeaderboardPreference.call(user, body) do
+    with {:ok, payload} <-
+           SetLeaderboardPreference.call(conn.assigns[:tenant_context], user, body) do
       json(conn, payload)
     end
   end
