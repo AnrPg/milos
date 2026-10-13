@@ -55,6 +55,16 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
     end
   end
 
+  # TD-092 / ADR-131: the public theme has no session scope; the narrow
+  # SECURITY DEFINER helper answers only an active gym's theme slug.
+  @impl true
+  def get_public_theme_slug(organization_slug) when is_binary(organization_slug) do
+    case Repo.query("SELECT milos_public_theme_slug($1)", [organization_slug]) do
+      {:ok, %{rows: [[slug]]}} when is_binary(slug) -> slug
+      _missing_or_error -> nil
+    end
+  end
+
   @impl true
   def update_settings(params) do
     case Repo.one(from settings in scoped_to_tenant(GamificationSetting), limit: 1) do

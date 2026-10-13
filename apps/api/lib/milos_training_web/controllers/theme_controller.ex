@@ -27,7 +27,9 @@ defmodule MilosTrainingWeb.ThemeController do
   )
 
   def show(conn, _params) do
-    with {:ok, payload} <- GetPublicTheme.call() do
+    organization_slug = conn |> get_req_header("x-organization-slug") |> List.first()
+
+    with {:ok, payload} <- GetPublicTheme.call(organization_slug) do
       json(conn, payload)
     end
   end
