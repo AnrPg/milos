@@ -175,7 +175,13 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     assert training["class_participation"] == []
 
     prs = get_as_admin(build_conn(), admin, slug, member.id, "prs")
-    assert prs == %{"prs" => [], "user_id" => member.id, "visibility" => "coach_role_required"}
+
+    assert prs == %{
+             "prs" => [],
+             "user_id" => member.id,
+             "visibility" => "coach_role_required",
+             "member" => %{"id" => member.id, "nickname" => "dossier_member", "avatar_url" => nil}
+           }
 
     incidents = get_as_admin(build_conn(), admin, slug, member.id, "incidents")
 
@@ -267,6 +273,93 @@ defmodule MilosTrainingWeb.AdminUserDirectoryControllerTest do
     [message_thread] = get_as_admin(build_conn(), admin, slug, athlete.id, "messages")["threads"]
     assert message_thread["id"] == thread.id
     assert message_thread["latest_message"]["body"] == "Keep the next session easy"
+  end
+
+  # ADR-132 (TD-091): a coach whose client scope (ADR-100) does not reach a
+  # member still finds them and opens their PR panel; coach scope never
+  # narrows PR visibility. An owner who also coaches is a coach.
+  test "coaches list the gym's members for the PR dossier regardless of client scope", %{
+    conn: conn
+  } do
+    owner = admin_fixture()
+    coach = user_fixture(%{nickname: "pr_members_coach"})
+    athlete = user_fixture(%{role: :athlete, nickname: "pr_members_athlete"})
+    member = user_fixture(%{role: :member, nickname: "pr_members_member"})
+    {_organization, context} = tenant_fixture(owner, "PR Dossier Members")
+    member_of(context.organization_id, coach, :coach)
+    member_of(context.organization_id, athlete, :athlete)
+    member_of(context.organization_id, member, :member)
+    slug = context.organization.slug
+
+    {:ok, _pr} =
+      MilosTraining.Application.CreatePR.call(MilosTraining.Identity.UserContext.new(athlete), %{
+        "name" => "Deadlift",
+        "current_score" => 180,
+        "unit" => "kg",
+        "beaten_on" => Date.to_iso8601(Date.utc_today()),
+        "organization_slug" => slug
+      })
+
+    listing =
+      conn
+      |> put_bearer_token(coach)
+      |> get("/api/org/#{slug}/admin/pr-members")
+      |> json_response(200)
+
+    assert listing["visibility"] == "coach"
+    ids = Enum.map(listing["members"], & &1["id"])
+    assert athlete.id in ids
+    assert member.id in ids
+    refute coach.id in ids
+
+    # The coach has no coaching relationship with the athlete: the profile
+    # stays closed (ADR-100), the PR panel does not (ADR-129).
+    assert build_conn()
+           |> put_bearer_token(coach)
+           |> get("/api/org/#{slug}/admin/users/#{athlete.id}")
+           |> json_response(403)
+
+    assert %{
+             "visibility" => "coach",
+             "member" => %{"id" => athlete_id, "nickname" => "pr_members_athlete"},
+             "prs" => [%{"name" => "Deadlift"}]
+           } = get_as_admin(build_conn(), coach, slug, athlete.id, "prs")
+
+    assert athlete_id == athlete.id
+
+    # Owners who are not coaches get the role-safe empty state ...
+    assert %{"visibility" => "coach_role_required", "members" => []} =
+             build_conn()
+             |> put_bearer_token(owner)
+             |> get("/api/org/#{slug}/admin/pr-members")
+             |> json_response(200)
+
+    # ... unless they also hold the coach role (multi-role, ADR-099).
+    owner_coach = user_fixture(%{nickname: "pr_members_owner_coach"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: context.organization_id,
+        user_id: owner_coach.id,
+        roles: [:owner, :coach],
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    assert %{"visibility" => "coach", "members" => [_ | _]} =
+             build_conn()
+             |> put_bearer_token(owner_coach)
+             |> get("/api/org/#{slug}/admin/pr-members")
+             |> json_response(200)
+
+    assert %{"visibility" => "coach", "prs" => [%{"name" => "Deadlift"}]} =
+             get_as_admin(build_conn(), owner_coach, slug, athlete.id, "prs")
+
+    # Clients never reach the list.
+    assert build_conn()
+           |> put_bearer_token(member)
+           |> get("/api/org/#{slug}/admin/pr-members")
+           |> json_response(403)
   end
 
   test "athlete coaching context is available while other roles receive a role-safe empty state",

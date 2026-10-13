@@ -179,13 +179,36 @@ export function programAdminUserWorkout(
   );
 }
 
+/** ADR-132: the PR owner's public identity when they are active in this gym. */
+export type AdminUserPRMember = { id: string; nickname: string; avatar_url?: string | null };
+
+export type AdminUserPRs = {
+  user_id: string;
+  visibility: AdminUserPRVisibility;
+  member?: AdminUserPRMember | null;
+  prs: AdminUserPR[];
+};
+
 export function fetchAdminUserPRs(token: string, userId: string) {
   // ADR-129: only the gym's coaches read members' PRs; other staff receive
   // `coach_role_required` and no records.
-  return apiRequest<{ user_id: string; visibility: AdminUserPRVisibility; prs: AdminUserPR[] }>(
-    `/admin/users/${userId}/prs`,
-    { token },
-  );
+  return apiRequest<AdminUserPRs>(`/admin/users/${userId}/prs`, { token });
+}
+
+export type PRDossierMember = {
+  id: string;
+  nickname: string;
+  avatar_url?: string | null;
+  role: string;
+  joined_at?: string | null;
+};
+
+/**
+ * ADR-132: the gym's active members whose PR panel a coach may open. Coach
+ * client scope (ADR-100) does not narrow it; non-coach staff get an empty list.
+ */
+export function fetchPRDossierMembers(token: string) {
+  return apiRequest<{ visibility: AdminUserPRVisibility; members: PRDossierMember[] }>("/admin/pr-members", { token });
 }
 
 export function fetchAdminUserIncidents(token: string, userId: string) {

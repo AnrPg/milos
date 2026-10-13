@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  dossierMode,
+  filterDossierMembers,
   grantableAllowances,
   packageSubscriptionLabel,
   prSectionContentCount,
@@ -13,6 +15,37 @@ describe("prSectionContentCount", () => {
     expect(prSectionContentCount({ visibility: "coach_role_required", prs: [] })).toBe(1);
     expect(prSectionContentCount({ visibility: "coach", prs: [] })).toBe(0);
     expect(prSectionContentCount({ visibility: "coach", prs: [{}, {}] })).toBe(2);
+  });
+});
+
+describe("dossierMode", () => {
+  const base = { profileLoading: false, profileLoaded: false, actorCoaches: true, prsLoading: false, prs: undefined };
+  const member = { id: "m1", nickname: "ana" };
+
+  it("renders the full dossier whenever the profile loads", () => {
+    expect(dossierMode({ ...base, profileLoading: true })).toBe("loading");
+    expect(dossierMode({ ...base, profileLoaded: true })).toBe("full");
+  });
+
+  it("falls back to the PR dossier for a coach outside their client scope", () => {
+    expect(dossierMode({ ...base, prsLoading: true })).toBe("loading");
+    expect(dossierMode({ ...base, prs: { visibility: "coach", member } })).toBe("prs_only");
+  });
+
+  it("does not fall back for non-coaches or people who are not active in the gym", () => {
+    expect(dossierMode({ ...base, actorCoaches: false, prs: { visibility: "coach", member } })).toBe("unavailable");
+    expect(dossierMode({ ...base, prs: { visibility: "coach", member: null } })).toBe("unavailable");
+    expect(dossierMode({ ...base, prs: { visibility: "coach_role_required", member } })).toBe("unavailable");
+  });
+});
+
+describe("filterDossierMembers", () => {
+  const members = [{ nickname: "Ana" }, { nickname: "bruno" }, { nickname: "Anastasia" }];
+
+  it("matches nicknames case-insensitively and caps the list", () => {
+    expect(filterDossierMembers(members, " an ")).toEqual([{ nickname: "Ana" }, { nickname: "Anastasia" }]);
+    expect(filterDossierMembers(members, "", 2)).toEqual([{ nickname: "Ana" }, { nickname: "bruno" }]);
+    expect(filterDossierMembers(members, "zz")).toEqual([]);
   });
 });
 

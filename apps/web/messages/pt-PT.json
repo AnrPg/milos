@@ -4229,7 +4229,18 @@
     "sharedBy": "Partilhado por {name}",
     "ownerHasNoPrs": "Ainda não há PR registados.",
     "earlierResults": "Resultados anteriores: {count}",
-    "dossierCoachOnly": "Os recordes pessoais só são visíveis para os treinadores deste ginásio."
+    "dossierCoachOnly": "Os recordes pessoais só são visíveis para os treinadores deste ginásio.",
+    "exactLookup": "Procurar pela alcunha exata",
+    "exactLookupHint": "Não está nos teus ginásios? Escreve a alcunha exata.",
+    "exactLookupEmpty": "Nenhuma conta tem exatamente essa alcunha.",
+    "membersTitle": "PR dos membros",
+    "membersHint": "Como treinador podes abrir os PR que cada membro ativo registou neste ginásio, a menos que tenha desativado a visibilidade para treinadores.",
+    "membersSearch": "Procurar membros",
+    "membersEmpty": "Nenhum membro corresponde.",
+    "membersLoadError": "Não foi possível carregar os membros.",
+    "openPrs": "Ver PR",
+    "dossierCoachScope": "Vês os PR deste membro como treinador deste ginásio. Os restantes dados são para os seus próprios treinadores e para a gestão do ginásio.",
+    "dossierBack": "Voltar ao início"
   },
   "FinanceAccounting": {
     "tab": "Contabilidade",

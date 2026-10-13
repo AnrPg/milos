@@ -4229,7 +4229,18 @@
     "sharedBy": "Partagé par {name}",
     "ownerHasNoPrs": "Aucun PR enregistré pour l'instant.",
     "earlierResults": "Résultats précédents : {count}",
-    "dossierCoachOnly": "Les records personnels ne sont visibles que par les coachs de cette salle."
+    "dossierCoachOnly": "Les records personnels ne sont visibles que par les coachs de cette salle.",
+    "exactLookup": "Chercher par pseudo exact",
+    "exactLookupHint": "Pas dans tes salles ? Saisis son pseudo exact.",
+    "exactLookupEmpty": "Aucun compte n'a exactement ce pseudo.",
+    "membersTitle": "PR des membres",
+    "membersHint": "En tant que coach, tu peux ouvrir les PR que chaque membre actif a enregistrés dans cette salle, sauf s'il a désactivé la visibilité pour les coachs.",
+    "membersSearch": "Rechercher des membres",
+    "membersEmpty": "Aucun membre correspondant.",
+    "membersLoadError": "Les membres n'ont pas pu être chargés.",
+    "openPrs": "Voir les PR",
+    "dossierCoachScope": "Tu vois les PR de ce membre en tant que coach de cette salle. Ses autres informations sont réservées à ses propres coachs et à la direction de la salle.",
+    "dossierBack": "Retour à l'accueil"
   },
   "FinanceAccounting": {
     "tab": "Comptabilité",

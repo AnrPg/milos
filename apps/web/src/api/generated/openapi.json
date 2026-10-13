@@ -4470,6 +4470,13 @@
       "MyInjuryWarningsAcknowledgement": {
         "additionalProperties": false,
         "properties": {
+          "scale": {
+            "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+            "maxLength": 64,
+            "nullable": true,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
           "source_context_id": {
             "format": "uuid",
             "nullable": true,
@@ -4497,6 +4504,13 @@
               "caution",
               "avoid"
             ],
+            "type": "string"
+          },
+          "scale_level_slug": {
+            "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+            "maxLength": 64,
+            "nullable": true,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
             "type": "string"
           },
           "warnings": {
@@ -10228,129 +10242,6 @@
         "summary": "Read API health",
         "tags": [
           "Health"
-        ]
-      }
-    },
-    "/api/landing/leaderboard-opt-in": {
-      "post": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.LandingController.update_leaderboard_preference",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "opted_in": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "opted_in"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "description": "Leaderboard opt-in",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "monthly": {
-                      "items": {
-                        "properties": {
-                          "nickname": {
-                            "type": "string"
-                          },
-                          "prs_this_month": {
-                            "type": "integer"
-                          },
-                          "rank": {
-                            "type": "integer"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "workouts_this_week": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "rank",
-                          "user_id",
-                          "nickname",
-                          "workouts_this_week",
-                          "prs_this_month"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "opted_in": {
-                      "type": "boolean"
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "weekly": {
-                      "items": {
-                        "properties": {
-                          "nickname": {
-                            "type": "string"
-                          },
-                          "prs_this_month": {
-                            "type": "integer"
-                          },
-                          "rank": {
-                            "type": "integer"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "workouts_this_week": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "rank",
-                          "user_id",
-                          "nickname",
-                          "workouts_this_week",
-                          "prs_this_month"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "opted_in",
-                    "visible",
-                    "weekly",
-                    "monthly"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Leaderboard preference"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Update leaderboard opt-in preference",
-        "tags": [
-          "Landing"
         ]
       }
     },
@@ -23929,6 +23820,81 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/pr-members": {
+      "get": {
+        "callbacks": {},
+        "description": "Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.",
+        "operationId": "MilosTrainingWeb.AdminUserController.pr_members",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "members": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "joined_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nickname",
+                          "role"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "visibility": {
+                      "description": "ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed.",
+                      "enum": [
+                        "coach",
+                        "coach_role_required"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "visibility",
+                    "members"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR dossier members"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Active members whose PR dossier a coach may open (ADR-132)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/reviews": {
       "get": {
         "callbacks": {},
@@ -27760,6 +27726,28 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "member": {
+                      "description": "ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier.",
+                      "nullable": true,
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname"
+                      ],
+                      "type": "object"
+                    },
                     "prs": {
                       "items": {
                         "additionalProperties": true,
@@ -40850,6 +40838,129 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/landing/leaderboard-opt-in": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.LandingController.update_leaderboard_preference",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "opted_in": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "opted_in"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leaderboard opt-in",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "monthly": {
+                      "items": {
+                        "properties": {
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "prs_this_month": {
+                            "type": "integer"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workouts_this_week": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "nickname",
+                          "workouts_this_week",
+                          "prs_this_month"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "opted_in": {
+                      "type": "boolean"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "weekly": {
+                      "items": {
+                        "properties": {
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "prs_this_month": {
+                            "type": "integer"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workouts_this_week": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "nickname",
+                          "workouts_this_week",
+                          "prs_this_month"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "opted_in",
+                    "visible",
+                    "weekly",
+                    "monthly"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leaderboard preference"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update leaderboard opt-in preference",
+        "tags": [
+          "Landing"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/locations": {
       "get": {
         "callbacks": {},
@@ -47407,6 +47518,18 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "scale",
+            "required": false,
+            "schema": {
+              "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+              "maxLength": 64,
+              "nullable": true,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -47422,6 +47545,13 @@
                         "caution",
                         "avoid"
                       ],
+                      "type": "string"
+                    },
+                    "scale_level_slug": {
+                      "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+                      "maxLength": 64,
+                      "nullable": true,
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                       "type": "string"
                     },
                     "warnings": {
@@ -47598,6 +47728,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "scale": {
+                    "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+                    "maxLength": 64,
+                    "nullable": true,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "type": "string"
+                  },
                   "source_context_id": {
                     "format": "uuid",
                     "nullable": true,
@@ -62712,6 +62849,82 @@
           }
         ],
         "summary": "Allow or stop gym coaches reading my PRs",
+        "tags": [
+          "Pantheon"
+        ]
+      }
+    },
+    "/api/pr-sharing/grantee-lookup": {
+      "get": {
+        "callbacks": {},
+        "description": "Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.",
+        "operationId": "MilosTrainingWeb.PRSharingController.lookup_grantee",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "nickname",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "grantee": {
+                      "nullable": true,
+                      "properties": {
+                        "display_nickname": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "display_nickname"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "grantee"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Grantee lookup"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Find an account to share my PRs with by its exact nickname (ADR-132)",
         "tags": [
           "Pantheon"
         ]

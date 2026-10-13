@@ -420,23 +420,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/landing/leaderboard-opt-in": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Update leaderboard opt-in preference */
-        post: operations["MilosTrainingWeb.LandingController.update_leaderboard_preference"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/me/avatar": {
         parameters: {
             query?: never;
@@ -2080,6 +2063,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/pr-members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Active members whose PR dossier a coach may open (ADR-132)
+         * @description Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.
+         */
+        get: operations["MilosTrainingWeb.AdminUserController.pr_members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/reviews": {
         parameters: {
             query?: never;
@@ -3220,6 +3223,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.LandingController.show"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/landing/leaderboard-opt-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update leaderboard opt-in preference */
+        post: operations["MilosTrainingWeb.LandingController.update_leaderboard_preference"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4811,6 +4831,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/pr-sharing/grantee-lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find an account to share my PRs with by its exact nickname (ADR-132)
+         * @description Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.
+         */
+        get: operations["MilosTrainingWeb.PRSharingController.lookup_grantee"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/pr-sharing/grants": {
         parameters: {
             query?: never;
@@ -6349,6 +6389,8 @@ export interface components {
         };
         /** MyInjuryWarningsAcknowledgement */
         MyInjuryWarningsAcknowledgement: {
+            /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+            scale?: string | null;
             /** Format: uuid */
             source_context_id?: string | null;
             /** @enum {string|null} */
@@ -6358,6 +6400,8 @@ export interface components {
         MyWorkoutInjuryWarnings: {
             /** @enum {string} */
             level: "none" | "caution" | "avoid";
+            /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+            scale_level_slug?: string | null;
             warnings: {
                 body_area: string;
                 exercises: {
@@ -8418,52 +8462,6 @@ export interface operations {
                         status: string;
                         /** @example 0.1.0 */
                         version: string;
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.LandingController.update_leaderboard_preference": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Leaderboard opt-in */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    opted_in: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description Leaderboard preference */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        monthly: {
-                            nickname: string;
-                            prs_this_month: number;
-                            rank: number;
-                            /** Format: uuid */
-                            user_id: string;
-                            workouts_this_week: number;
-                        }[];
-                        opted_in: boolean;
-                        visible: boolean;
-                        weekly: {
-                            nickname: string;
-                            prs_this_month: number;
-                            rank: number;
-                            /** Format: uuid */
-                            user_id: string;
-                            workouts_this_week: number;
-                        }[];
                     };
                 };
             };
@@ -14152,6 +14150,41 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.pr_members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR dossier members */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        members: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            joined_at?: string | null;
+                            nickname: string;
+                            role: string;
+                        }[];
+                        /**
+                         * @description ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed.
+                         * @enum {string}
+                         */
+                        visibility: "coach" | "coach_role_required";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminReviewController.index": {
         parameters: {
             query?: {
@@ -15710,6 +15743,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier. */
+                        member?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        } | null;
                         prs: ({
                             /** Format: date */
                             beaten_on: string;
@@ -20165,6 +20205,52 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.LandingController.update_leaderboard_preference": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Leaderboard opt-in */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    opted_in: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Leaderboard preference */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        monthly: {
+                            nickname: string;
+                            prs_this_month: number;
+                            rank: number;
+                            /** Format: uuid */
+                            user_id: string;
+                            workouts_this_week: number;
+                        }[];
+                        opted_in: boolean;
+                        visible: boolean;
+                        weekly: {
+                            nickname: string;
+                            prs_this_month: number;
+                            rank: number;
+                            /** Format: uuid */
+                            user_id: string;
+                            workouts_this_week: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ScheduleController.locations": {
         parameters: {
             query?: never;
@@ -22580,6 +22666,7 @@ export interface operations {
             query?: {
                 surface?: "assignment_detail" | "class_detail" | "pre_start";
                 source_context_id?: string;
+                scale?: string | null;
             };
             header?: never;
             path: {
@@ -22598,6 +22685,8 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         level: "none" | "caution" | "avoid";
+                        /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+                        scale_level_slug?: string | null;
                         warnings: {
                             body_area: string;
                             exercises: {
@@ -22642,6 +22731,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+                    scale?: string | null;
                     /** Format: uuid */
                     source_context_id?: string | null;
                     /** @enum {string|null} */
@@ -27966,6 +28057,46 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                         }[];
+                    };
+                };
+            };
+            /** @description Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRSharingController.lookup_grantee": {
+        parameters: {
+            query: {
+                nickname: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Grantee lookup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        grantee: {
+                            display_nickname: string;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        } | null;
                     };
                 };
             };

@@ -27,6 +27,35 @@ export function prSectionContentCount(
   return data.visibility === "coach_role_required" ? 1 : data.prs.length;
 }
 
+export type DossierMode = "loading" | "full" | "prs_only" | "unavailable";
+
+/**
+ * ADR-132: which dossier to render. A coach's client scope (ADR-100) can close
+ * the full profile, but every coach of the gym reads members' PRs (ADR-129),
+ * so a coach falls back to a PR-only dossier when the profile is refused and
+ * the PR endpoint names the person as an active member of the gym.
+ */
+export function dossierMode(input: {
+  profileLoading: boolean;
+  profileLoaded: boolean;
+  actorCoaches: boolean;
+  prsLoading: boolean;
+  prs: { visibility: "coach" | "coach_role_required"; member?: unknown } | undefined;
+}): DossierMode {
+  if (input.profileLoading) return "loading";
+  if (input.profileLoaded) return "full";
+  if (!input.actorCoaches) return "unavailable";
+  if (input.prsLoading) return "loading";
+  return input.prs?.visibility === "coach" && input.prs.member ? "prs_only" : "unavailable";
+}
+
+/** ADR-132: members matching a nickname search, for the coach's PR shortcut. */
+export function filterDossierMembers<T extends { nickname: string }>(members: T[], query: string, limit = 8): T[] {
+  const needle = query.trim().toLocaleLowerCase();
+  const matches = needle ? members.filter((member) => member.nickname.toLocaleLowerCase().includes(needle)) : members;
+  return matches.slice(0, limit);
+}
+
 export function visibleAdminProfileSections(
   availableSections: string[],
   contentCounts: Record<string, number>,

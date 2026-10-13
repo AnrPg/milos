@@ -46,6 +46,14 @@ export function revokePRAccess(token: string, grantId: string) {
   return apiRequest<void>(`/pr-sharing/grants/${grantId}`, { method: "DELETE", token });
 }
 
+export type PRGranteeLookup =
+  paths["/api/pr-sharing/grantee-lookup"]["get"]["responses"]["200"]["content"]["application/json"];
+
+/** ADR-132: an account outside one's gyms, by its exact nickname only. */
+export function lookupPRGrantee(token: string, nickname: string) {
+  return apiRequest<PRGranteeLookup>(`/pr-sharing/grantee-lookup?nickname=${encodeURIComponent(nickname)}`, { token });
+}
+
 export function fetchPRsSharedWithMe(token: string) {
   return apiRequest<PRsSharedWithMe>("/pr-sharing/shared-with-me", { token });
 }
