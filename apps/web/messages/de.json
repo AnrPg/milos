@@ -4229,7 +4229,18 @@
     "sharedBy": "Geteilt von {name}",
     "ownerHasNoPrs": "Noch keine PRs erfasst.",
     "earlierResults": "Frühere Ergebnisse: {count}",
-    "dossierCoachOnly": "Persönliche Rekorde sind nur für die Coaches dieses Studios sichtbar."
+    "dossierCoachOnly": "Persönliche Rekorde sind nur für die Coaches dieses Studios sichtbar.",
+    "exactLookup": "Nach genauem Spitznamen suchen",
+    "exactLookupHint": "Nicht in deinen Studios? Gib den genauen Spitznamen ein.",
+    "exactLookupEmpty": "Kein Konto hat genau diesen Spitznamen.",
+    "membersTitle": "PRs der Mitglieder",
+    "membersHint": "Als Coach kannst du die PRs öffnen, die jedes aktive Mitglied in diesem Studio erfasst hat, sofern es die Sichtbarkeit für Coaches nicht ausgeschaltet hat.",
+    "membersSearch": "Mitglieder suchen",
+    "membersEmpty": "Keine passenden Mitglieder.",
+    "membersLoadError": "Die Mitglieder konnten nicht geladen werden.",
+    "openPrs": "PRs ansehen",
+    "dossierCoachScope": "Du siehst die PRs dieses Mitglieds als Coach dieses Studios. Die übrigen Angaben sind seinen eigenen Coaches und der Studioleitung vorbehalten.",
+    "dossierBack": "Zurück zur Startseite"
   },
   "FinanceAccounting": {
     "tab": "Buchhaltung",

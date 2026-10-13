@@ -1,10 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { useState, type ReactNode } from "react";
 
 import { fetchAthletes } from "@/api/admin";
+import { fetchPRDossierMembers } from "@/api/admin-users";
+import { filterDossierMembers } from "@/components/admin/users/admin-user-profile";
 import { fetchCleaningAreas, fetchCoachingRelationships, startCoachingRelationship } from "@/api/roles";
 import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { fetchAppointmentSlots } from "@/api/staff";
@@ -69,6 +72,9 @@ export function StaffHome() {
           <div className="px-4 pb-10 md:px-10" style={{ background: "var(--bg)" }}>
             <div className="mx-auto max-w-6xl">
               <MyClientsSection membership={membership} />
+              <div className="mt-4">
+                <MemberPRsSection />
+              </div>
             </div>
           </div>
         ) : null}
@@ -224,6 +230,7 @@ function CoachSections({ membership }: { membership: Membership }) {
     <>
       <MyClassesToday />
       <MyClientsSection membership={membership} />
+      <MemberPRsSection />
       {has("manage_coaching") ? <ReplyQueue /> : null}
       {has("manage_coaching") ? <FormReviewQueue /> : null}
       {has("manage_appointments") ? <MyAppointments /> : null}
@@ -414,6 +421,66 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
             {take.isSuccess ? <StatusText tone="success">{i18n("rhAthleteTaken")}</StatusText> : null}
           </div>
         ) : null}
+      </div>
+    </HomeSection>
+  );
+}
+
+/**
+ * ADR-132: every coach of the gym reads members' PRs (ADR-129), while "My
+ * clients" lists only their own clients (ADR-100). This finds any active
+ * member and opens their PR panel.
+ */
+function MemberPRsSection() {
+  const t = useTranslations("PrSharing");
+  const i18n = useUiTranslations();
+  const { tokens } = useSession();
+  const token = tokens?.access_token;
+  const organizationSlug = useOrganizationSlug();
+  const [search, setSearch] = useState("");
+
+  const members = useQuery({
+    queryKey: ["admin", "pr-members"],
+    enabled: Boolean(token),
+    queryFn: () => fetchPRDossierMembers(token!),
+    staleTime: 60_000,
+  });
+  const matches = filterDossierMembers(members.data?.members ?? [], search);
+
+  return (
+    <HomeSection id="home-member-prs" title={t("membersTitle")}>
+      <div className="space-y-3">
+        <p className="text-xs" style={{ color: "var(--dim)" }}>{t("membersHint")}</p>
+        <input
+          aria-label={t("membersSearch")}
+          placeholder={t("membersSearch")}
+          className={inputClass}
+          style={inputStyle}
+          value={search}
+          onChange={(event) => setSearch(event.target.value)}
+        />
+        {members.isPending ? (
+          <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
+        ) : members.isError ? (
+          <StatusText tone="error">{t("membersLoadError")}</StatusText>
+        ) : matches.length === 0 ? (
+          <StatusText tone="muted">{t("membersEmpty")}</StatusText>
+        ) : (
+          <ul className="grid gap-2">
+            {matches.map((member) => (
+              <li key={member.id}>
+                <Link
+                  href={`${adminHref(`/admin/users/${member.id}`, organizationSlug)}#prs`}
+                  className="flex items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+                >
+                  <span className="min-w-0 truncate font-semibold" style={{ color: "var(--text)" }}>{member.nickname}</span>
+                  <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("openPrs")}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
     </HomeSection>
   );

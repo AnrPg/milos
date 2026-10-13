@@ -4229,7 +4229,18 @@
     "sharedBy": "Condiviso da {name}",
     "ownerHasNoPrs": "Nessun PR registrato finora.",
     "earlierResults": "Risultati precedenti: {count}",
-    "dossierCoachOnly": "I record personali sono visibili solo ai coach di questa palestra."
+    "dossierCoachOnly": "I record personali sono visibili solo ai coach di questa palestra.",
+    "exactLookup": "Cerca per nickname esatto",
+    "exactLookupHint": "Non è nelle tue palestre? Inserisci il suo nickname esatto.",
+    "exactLookupEmpty": "Nessun account ha esattamente questo nickname.",
+    "membersTitle": "PR dei membri",
+    "membersHint": "Come coach puoi aprire i PR che ogni membro attivo ha registrato in questa palestra, a meno che non abbia disattivato la visibilità per i coach.",
+    "membersSearch": "Cerca membri",
+    "membersEmpty": "Nessun membro corrispondente.",
+    "membersLoadError": "Impossibile caricare i membri.",
+    "openPrs": "Vedi PR",
+    "dossierCoachScope": "Vedi i PR di questo membro come coach di questa palestra. Gli altri dettagli sono riservati ai suoi coach e alla gestione della palestra.",
+    "dossierBack": "Torna alla home"
   },
   "FinanceAccounting": {
     "tab": "Contabilità",

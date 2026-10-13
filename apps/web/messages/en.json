@@ -4229,7 +4229,18 @@
     "sharedBy": "Shared by {name}",
     "ownerHasNoPrs": "No PRs recorded yet.",
     "earlierResults": "Earlier results: {count}",
-    "dossierCoachOnly": "Personal records are visible to this gym's coaches only."
+    "dossierCoachOnly": "Personal records are visible to this gym's coaches only.",
+    "exactLookup": "Find by exact nickname",
+    "exactLookupHint": "Not in your gyms? Enter their exact nickname.",
+    "exactLookupEmpty": "No account has that exact nickname.",
+    "membersTitle": "Members' PRs",
+    "membersHint": "As a coach you can open the PRs every active member recorded in this gym, unless they turned coach visibility off.",
+    "membersSearch": "Search members",
+    "membersEmpty": "No matching members.",
+    "membersLoadError": "Members could not be loaded.",
+    "openPrs": "View PRs",
+    "dossierCoachScope": "You see this member's PRs as a coach of this gym. Their other details are for their own coaches and the gym's managers.",
+    "dossierBack": "Back to home"
   },
   "FinanceAccounting": {
     "tab": "Accounting",

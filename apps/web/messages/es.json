@@ -4229,7 +4229,18 @@
     "sharedBy": "Compartido por {name}",
     "ownerHasNoPrs": "Aún no hay PR registrados.",
     "earlierResults": "Resultados anteriores: {count}",
-    "dossierCoachOnly": "Los récords personales solo son visibles para los entrenadores de este gimnasio."
+    "dossierCoachOnly": "Los récords personales solo son visibles para los entrenadores de este gimnasio.",
+    "exactLookup": "Buscar por apodo exacto",
+    "exactLookupHint": "¿No está en tus gimnasios? Escribe su apodo exacto.",
+    "exactLookupEmpty": "Ninguna cuenta tiene exactamente ese apodo.",
+    "membersTitle": "PR de los miembros",
+    "membersHint": "Como entrenador puedes abrir los PR que cada miembro activo registró en este gimnasio, salvo que haya desactivado la visibilidad para entrenadores.",
+    "membersSearch": "Buscar miembros",
+    "membersEmpty": "No hay miembros que coincidan.",
+    "membersLoadError": "No se pudieron cargar los miembros.",
+    "openPrs": "Ver PR",
+    "dossierCoachScope": "Ves los PR de este miembro como entrenador de este gimnasio. El resto de sus datos es para sus propios entrenadores y la dirección del gimnasio.",
+    "dossierBack": "Volver al inicio"
   },
   "FinanceAccounting": {
     "tab": "Contabilidad",

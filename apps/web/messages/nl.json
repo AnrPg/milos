@@ -4229,7 +4229,18 @@
     "sharedBy": "Gedeeld door {name}",
     "ownerHasNoPrs": "Nog geen PR's vastgelegd.",
     "earlierResults": "Eerdere resultaten: {count}",
-    "dossierCoachOnly": "Persoonlijke records zijn alleen zichtbaar voor de coaches van deze gym."
+    "dossierCoachOnly": "Persoonlijke records zijn alleen zichtbaar voor de coaches van deze gym.",
+    "exactLookup": "Zoeken op exacte bijnaam",
+    "exactLookupHint": "Niet in jouw sportscholen? Vul de exacte bijnaam in.",
+    "exactLookupEmpty": "Geen account heeft precies deze bijnaam.",
+    "membersTitle": "PR's van leden",
+    "membersHint": "Als coach kun je de PR's openen die elk actief lid in deze sportschool heeft vastgelegd, tenzij het lid zichtbaarheid voor coaches heeft uitgezet.",
+    "membersSearch": "Leden zoeken",
+    "membersEmpty": "Geen overeenkomende leden.",
+    "membersLoadError": "De leden konden niet worden geladen.",
+    "openPrs": "PR's bekijken",
+    "dossierCoachScope": "Je ziet de PR's van dit lid als coach van deze sportschool. De overige gegevens zijn voor de eigen coaches van het lid en het management van de sportschool.",
+    "dossierBack": "Terug naar start"
   },
   "FinanceAccounting": {
     "tab": "Boekhouding",

@@ -21,12 +21,13 @@ import {
   type AdminUserDirectoryEntry,
   type AdminUserFinance,
   type AdminUserPR,
+  type AdminUserPRMember,
 } from "@/api/admin-users";
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlement-visibility";
-import { grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
 import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
@@ -44,7 +45,7 @@ import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
-import { can } from "@/lib/role-navigation";
+import { can, membershipRoles } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
@@ -461,6 +462,37 @@ function arrayCount(value: unknown) {
   return Array.isArray(value) ? value.length : 0;
 }
 
+/**
+ * ADR-132: what a coach sees of a member outside their client scope - the PRs
+ * the member recorded in this gym (ADR-129), nothing else.
+ */
+function PRDossier({ member, prs }: { member: AdminUserPRMember; prs: AdminUserPR[] }) {
+  const i18n = useUiTranslations();
+  const tPrSharing = useTranslations("PrSharing");
+  const organizationSlug = useOrganizationSlug();
+
+  return (
+    <main className="min-h-screen px-6 py-10 md:px-10 md:py-14" style={{ background: "var(--bg)" }}>
+      <div className="mx-auto max-w-6xl space-y-6">
+        <Link href={adminHref("/admin", organizationSlug)} className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {tPrSharing("dossierBack")}</Link>
+        <section className="flex flex-col gap-6 rounded-[2.4rem] p-8 md:flex-row md:items-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <Avatar user={{ nickname: member.nickname, avatar_url: member.avatar_url ?? null }} />
+          <div className="min-w-0 flex-1">
+            <h1 className="truncate text-4xl font-semibold tracking-tight md:text-5xl" style={{ color: "var(--text)" }}>{member.nickname}</h1>
+            <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>{tPrSharing("dossierCoachScope")}</p>
+          </div>
+        </section>
+        <article id="prs" className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>{i18n("personalRecords05223a0")}</p>
+          <div className="mt-4 grid gap-3">
+            {prs.length ? prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}
+          </div>
+        </article>
+      </div>
+    </main>
+  );
+}
+
 export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const tPrSharing = useTranslations("PrSharing");
@@ -474,7 +506,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
   const training = useDossierQuery(token, userId, "training", fetchAdminUserTraining, Boolean(profile?.available_sections.includes("training_history")));
-  const prs = useDossierQuery(token, userId, "prs", fetchAdminUserPRs, Boolean(profile?.available_sections.includes("prs")));
+  // ADR-132: a coach always fetches the PR panel - it is their fallback when
+  // client scope (ADR-100) refuses the full profile.
+  const actorCoaches = membershipRoles(actor).includes("coach");
+  const prs = useDossierQuery(token, userId, "prs", fetchAdminUserPRs, Boolean(profile?.available_sections.includes("prs")) || actorCoaches);
   const incidents = useDossierQuery(token, userId, "incidents", fetchAdminUserIncidents, Boolean(profile?.available_sections.includes("health_incidents")));
   const messages = useDossierQuery(token, userId, "messages", fetchAdminUserMessages, Boolean(profile?.available_sections.includes("messages")));
   const coaching = useDossierQuery(token, userId, "coaching", fetchAdminUserCoachingContext, Boolean(profile?.available_sections.includes("coaching_context")));
@@ -505,7 +540,15 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     return () => window.removeEventListener(USER_SYNC_EVENT, handleUserSync as EventListener);
   }, [queryClient, userId]);
 
-  if (profileQuery.isLoading) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
+  const mode = dossierMode({
+    profileLoading: profileQuery.isLoading,
+    profileLoaded: Boolean(profile),
+    actorCoaches,
+    prsLoading: prs.isLoading,
+    prs: prs.data,
+  });
+  if (mode === "loading") return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--muted)" }}>{i18n("loadingProfile548faad")}</main>;
+  if (mode === "prs_only" && prs.data?.member) return <PRDossier member={prs.data.member} prs={prs.data.prs} />;
   if (!profile) return <main className="min-h-screen p-10" style={{ background: "var(--bg)", color: "var(--danger)" }}>{i18n("userProfileCouldNotBeLoaded7bc2d73")}</main>;
 
   const executions = training.data?.executions ?? [];
