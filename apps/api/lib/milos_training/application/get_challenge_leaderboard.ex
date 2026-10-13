@@ -2,6 +2,12 @@ defmodule MilosTraining.Application.GetChallengeLeaderboard do
   alias MilosTraining.{Gamification, Identity}
   alias MilosTraining.Gamification.Domain.{ChallengeLeaderboard, ChallengeProgress}
 
+  # TD-092: challenges, progress and opt-ins are tenant rows, so the board is
+  # read in the member's tenant scope.
+  def call(context, challenge_id, requesting_user_id),
+    do:
+      Gamification.with_tenant_context(context, fn -> call(challenge_id, requesting_user_id) end)
+
   def call(challenge_id, requesting_user_id) do
     case Gamification.get_challenge(challenge_id) do
       nil ->

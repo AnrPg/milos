@@ -203,6 +203,9 @@ describe("apiRequest tenant headers", () => {
     ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],
     ["/me/finance", "/api/org/atlas-gym/me/finance"],
     ["/me/entitlement", "/api/org/atlas-gym/me/entitlement"],
+    ["/challenges/c-1/leaderboard", "/api/org/atlas-gym/challenges/c-1/leaderboard"],
+    ["/challenges/c-1/opt_in", "/api/org/atlas-gym/challenges/c-1/opt_in"],
+    ["/landing/leaderboard-opt-in", "/api/org/atlas-gym/landing/leaderboard-opt-in"],
   ])("scopes org-only member path %s", async (path, expectedPath) => {
     window.history.replaceState(null, "", "/org/atlas-gym/schedule");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

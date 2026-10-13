@@ -8,9 +8,8 @@ defmodule MilosTraining.Application.CorporateInvoicing do
 
   require Logger
 
-  alias MilosTraining.{Finance, Localization, Mailer}
+  alias MilosTraining.{Finance, Localization, Mailer, Organizations}
   alias MilosTraining.Finance.Emails.CorporateInvoiceEmail
-  alias MilosTraining.Organizations.OrganizationStore
 
   @doc "The daily run for one organization; returns what it did."
   def run(%{organization: organization, settings: settings}, %Date{} = today) do
@@ -83,7 +82,9 @@ defmodule MilosTraining.Application.CorporateInvoicing do
     }
   end
 
-  defp settings(organization_id), do: OrganizationStore.get_organization_settings(organization_id)
+  # TD-092: read in the organization's scope (unscoped it was always nil under
+  # the production runtime role, so emails fell back to the raw name in English).
+  defp settings(organization_id), do: Organizations.get_organization_settings(organization_id)
 
   # A mail provider outage must not crash the run or the request (see
   # SendOwnerInvitationEmail): Swoosh exits rather than returning an error.

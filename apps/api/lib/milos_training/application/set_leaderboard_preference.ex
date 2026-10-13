@@ -3,13 +3,21 @@ defmodule MilosTraining.Application.SetLeaderboardPreference do
   alias MilosTraining.Application.InvalidateLandingPages
   alias MilosTraining.Gamification
 
-  def call(user, params) do
-    with {:ok, opted_in} <- extract_opt_in(params),
-         {:ok, %{opted_in: persisted_opted_in}} <-
-           Gamification.set_leaderboard_opt_in(user.id, opted_in) do
-      build_response(user, persisted_opted_in)
-    end
+  # TD-092: opt-ins are tenant rows (one per organization), so the write and
+  # the snippet read run in the member's tenant scope. The former unscoped
+  # entry point could only fail under the production runtime role.
+  def call(%{organization_id: organization_id} = context, user, params)
+      when is_binary(organization_id) do
+    Gamification.with_tenant_context(context, fn ->
+      with {:ok, opted_in} <- extract_opt_in(params),
+           {:ok, %{opted_in: persisted_opted_in}} <-
+             Gamification.set_leaderboard_opt_in(user.id, opted_in) do
+        build_response(user, persisted_opted_in)
+      end
+    end)
   end
+
+  def call(_context, _user, _params), do: {:error, :organization_context_required}
 
   defp extract_opt_in(%{opted_in: opted_in}) when is_boolean(opted_in), do: {:ok, opted_in}
   defp extract_opt_in(%{"opted_in" => opted_in}) when is_boolean(opted_in), do: {:ok, opted_in}

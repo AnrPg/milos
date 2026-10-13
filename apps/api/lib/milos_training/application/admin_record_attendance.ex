@@ -21,7 +21,7 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
       waived? = no_show_waived?(context, approved_booking)
 
       with {:ok, attendance} <- Scheduling.record_attendance(context, attendance_params),
-           {:ok, _transition} <- reconcile_visit(attendance, allowance, waived?) do
+           {:ok, _transition} <- reconcile_visit(context, attendance, allowance, waived?) do
         TrackAnalyticsEvent.call("class_attendance_recorded", context, attendance, %{
           metadata: %{member_id: user_id}
         })
@@ -39,8 +39,11 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
 
   def call(_slot_id, _user_id, _admin_id), do: {:error, :organization_context_required}
 
-  defp reconcile_visit(%{status: "cancelled"} = attendance, allowance, _waived?) do
+  # TD-092: every ledger transition runs in the tenant's scope - unscoped, RLS
+  # hid the reservation and the visit was silently never finalized/returned.
+  defp reconcile_visit(context, %{status: "cancelled"} = attendance, allowance, _waived?) do
     Finance.release_entitlement_source(
+      context,
       attendance.user_id,
       "scheduling",
       attendance.scheduled_class_id,
@@ -53,8 +56,9 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
   end
 
   # ADR-097: packages that waive the no-show penalty return the visit.
-  defp reconcile_visit(%{status: "no_show"} = attendance, allowance, true) do
+  defp reconcile_visit(context, %{status: "no_show"} = attendance, allowance, true) do
     Finance.release_entitlement_source(
+      context,
       attendance.user_id,
       "scheduling",
       attendance.scheduled_class_id,
@@ -66,8 +70,9 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
     )
   end
 
-  defp reconcile_visit(attendance, allowance, _waived?) do
+  defp reconcile_visit(context, attendance, allowance, _waived?) do
     Finance.finalize_entitlement_source(
+      context,
       attendance.user_id,
       "scheduling",
       attendance.scheduled_class_id,

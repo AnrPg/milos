@@ -8,14 +8,12 @@ defmodule MilosTraining.Workers.CoachingReplyOverdueJob do
 
   alias MilosTraining.Application.ListCoachingReplyQueue
   alias MilosTraining.{Coaching, Notifications, Organizations}
-  alias MilosTraining.Organizations.OrganizationStore
 
   @impl Oban.Worker
   def perform(_job) do
     now = DateTime.utc_now()
 
-    OrganizationStore.list_organizations()
-    |> Enum.filter(fn %{organization: organization} -> organization.status == :active end)
+    Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} -> alert(organization.id, now) end)
 
     :ok

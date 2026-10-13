@@ -788,6 +788,9 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
     assert [credit_entry] = profile_response["credit_ledger_entries"]
     assert credit_entry["referral_reward_id"] == reward_response["referral_reward"]["id"]
 
+    # TD-092: an account that is not a member of this gym is never listed.
+    outsider = user_fixture(%{role: :member})
+
     members_response =
       conn
       |> recycle()
@@ -800,6 +803,7 @@ defmodule MilosTrainingWeb.Phase8FinanceControllerTest do
 
     assert referrer_row["credit_balance"] == 1750
     assert referrer_row["credit_balance_cents"] == 1750
+    refute Enum.any?(members_response["members"], &(&1["id"] == outsider.id))
   end
 
   test "admin finance package and referral actions stay inside the selected org", %{conn: conn} do

@@ -3,3 +3,5 @@ ExUnit.start()
 MilosTraining.RLSCase.ensure_runtime_role!()
 Ecto.Adapters.SQL.Sandbox.mode(MilosTraining.Repo, :manual)
 MilosTraining.TestSupport.MemoryObjectStore.start()
+
+if MilosTraining.UnscopedQueryDetector.enabled?(), do: MilosTraining.UnscopedQueryDetector.start()

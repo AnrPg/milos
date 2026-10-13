@@ -14,7 +14,8 @@ defmodule MilosTrainingWeb.ChallengeController do
   def leaderboard(conn, %{"id" => id}) do
     current_user = GuardianPlug.current_resource(conn)
 
-    with {:ok, payload} <- GetChallengeLeaderboard.call(id, current_user.id) do
+    with {:ok, payload} <-
+           GetChallengeLeaderboard.call(conn.assigns.tenant_context, id, current_user.id) do
       json(conn, payload)
     end
   end
@@ -22,14 +23,18 @@ defmodule MilosTrainingWeb.ChallengeController do
   def opt_in(conn, %{"id" => id}) do
     current_user = GuardianPlug.current_resource(conn)
 
-    with {:ok, _} <- OptInChallengeLeaderboard.call(current_user.id, id) do
+    with {:ok, _} <-
+           OptInChallengeLeaderboard.call(conn.assigns.tenant_context, current_user.id, id) do
       json(conn, %{opted_in: true})
     end
   end
 
   def opt_out(conn, %{"id" => id}) do
     current_user = GuardianPlug.current_resource(conn)
-    :ok = OptOutChallengeLeaderboard.call(current_user.id, id)
-    json(conn, %{opted_in: false})
+
+    with :ok <-
+           OptOutChallengeLeaderboard.call(conn.assigns.tenant_context, current_user.id, id) do
+      json(conn, %{opted_in: false})
+    end
   end
 end

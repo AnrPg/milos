@@ -317,6 +317,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/schedule", ScheduleController, :index)
     get("/landing", LandingController, :show)
+    post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     post("/bookings", ScheduleController, :create_booking)
     post("/bookings/waitlist", ScheduleController, :join_waitlist)
     post("/bookings/guests", ScheduleController, :create_guest_booking)
@@ -338,6 +339,10 @@ defmodule MilosTrainingWeb.Router do
 
     get("/class-timers/:slot_id", ClassTimerController, :show)
     post("/class-timers/:slot_id/commands", ClassTimerController, :command)
+    # TD-092: challenges are tenant rows; these run in the gym's scope.
+    get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
+    post("/challenges/:id/opt_in", ChallengeController, :opt_in)
+    delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -816,7 +821,6 @@ defmodule MilosTrainingWeb.Router do
 
     get("/calendar/export-links", CalendarFeedController, :links)
     post("/calendar/export-links/regenerate", CalendarFeedController, :regenerate_links)
-    post("/landing/leaderboard-opt-in", LandingController, :update_leaderboard_preference)
     get("/notifications", NotificationController, :index)
     post("/notifications/read-all", NotificationController, :mark_all_read)
     post("/notifications/:id/read", NotificationController, :mark_read)
@@ -834,9 +838,6 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
-    get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
-    post("/challenges/:id/opt_in", ChallengeController, :opt_in)
-    delete("/challenges/:id/opt_in", ChallengeController, :opt_out)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

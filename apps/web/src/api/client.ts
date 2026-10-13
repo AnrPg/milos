@@ -95,6 +95,7 @@ export function currentOrganizationSlug(token?: string | null) {
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",
+  "/challenges",
   "/class-timers",
   "/check-ins",
   "/landing",

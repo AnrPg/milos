@@ -26,7 +26,7 @@ defmodule MilosTrainingWeb.AdminAnalyticsController do
   )
 
   def summary(conn, params) do
-    with {:ok, payload} <- GetAdminAnalyticsSummary.call(params) do
+    with {:ok, payload} <- GetAdminAnalyticsSummary.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end

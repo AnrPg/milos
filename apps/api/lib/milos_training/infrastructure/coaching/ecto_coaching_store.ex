@@ -42,25 +42,14 @@ defmodule MilosTraining.Infrastructure.Coaching.EctoCoachingStore do
     end
   end
 
+  # TD-092: the runtime role does not own the view, so the refresh goes
+  # through the allow-listed SECURITY DEFINER helper (ADR-131).
   @impl true
   def refresh_aggregates do
-    case Repo.query("REFRESH MATERIALIZED VIEW CONCURRENTLY coaching_aggregates") do
-      {:ok, _result} ->
-        :ok
-
-      {:error, %Postgrex.Error{postgres: %{message: message}}} when is_binary(message) ->
-        if String.contains?(message, "cannot run inside a transaction block") do
-          Repo.query("REFRESH MATERIALIZED VIEW coaching_aggregates")
-          |> case do
-            {:ok, _result} -> :ok
-            {:error, reason} -> {:error, reason}
-          end
-        else
-          {:error, message}
-        end
-
-      {:error, reason} ->
-        {:error, reason}
+    case Repo.query("SELECT milos_refresh_materialized_view($1)", ["coaching_aggregates"]) do
+      {:ok, _result} -> :ok
+      {:error, %Postgrex.Error{postgres: %{message: message}}} -> {:error, message}
+      {:error, reason} -> {:error, reason}
     end
   end
 

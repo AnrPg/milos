@@ -432,6 +432,15 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> Repo.all()
   end
 
+  # TD-092 / ADR-131: the only cross-tenant listing a job may make. The
+  # SECURITY DEFINER helper returns ids of active organizations and nothing
+  # else; callers then enter each organization through its own scope.
+  @impl true
+  def list_active_organization_ids do
+    %{rows: rows} = Repo.query!("SELECT id FROM milos_active_organization_ids() AS id")
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
   @impl true
   def delete_organization(organization_id, platform_user_id, deleted_at) do
     Repo.transaction(fn ->

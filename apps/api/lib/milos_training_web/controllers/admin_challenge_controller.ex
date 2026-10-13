@@ -194,7 +194,7 @@ defmodule MilosTrainingWeb.AdminChallengeController do
   end
 
   def show(conn, %{"id" => id}) do
-    with {:ok, payload} <- GetAdminChallenge.call(id) do
+    with {:ok, payload} <- GetAdminChallenge.call(conn.assigns.tenant_context, id) do
       json(conn, payload)
     end
   end

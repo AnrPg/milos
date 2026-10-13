@@ -729,7 +729,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   )
 
   def members(conn, params) do
-    with {:ok, payload} <- ListFinanceMembers.call(params) do
+    with {:ok, payload} <- ListFinanceMembers.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end

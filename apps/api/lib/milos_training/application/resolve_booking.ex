@@ -58,7 +58,7 @@ defmodule MilosTraining.Application.ResolveBooking do
   defp resolution_event(:rejected), do: "class_booking_rejected"
 
   defp announce(context, status, booking, admin_message) do
-    maybe_reconcile_now(status, booking)
+    maybe_reconcile_now(context, status, booking)
 
     if status == :rejected,
       do: PromoteClassWaitlist.call(context, booking.scheduled_class_id)
@@ -96,9 +96,12 @@ defmodule MilosTraining.Application.ResolveBooking do
     }
   end
 
-  defp maybe_reconcile_now(:rejected, booking) do
+  # TD-092: the release runs in the tenant's scope - unscoped, RLS hid the
+  # reservation and the visit was silently never returned.
+  defp maybe_reconcile_now(context, :rejected, booking) do
     _result =
       Finance.release_entitlement_source(
+        context,
         booking.user_id,
         "scheduling",
         booking.scheduled_class_id,
@@ -112,7 +115,7 @@ defmodule MilosTraining.Application.ResolveBooking do
     :ok
   end
 
-  defp maybe_reconcile_now(_status, _booking), do: :ok
+  defp maybe_reconcile_now(_context, _status, _booking), do: :ok
 
   defp plain_map(%_{} = struct), do: Map.from_struct(struct)
   defp plain_map(map) when is_map(map), do: map

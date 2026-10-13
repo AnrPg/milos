@@ -4,9 +4,15 @@ defmodule MilosTraining.Application.GetLandingPage do
   alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
   alias MilosTraining.Application.LandingCache
 
+  # TD-092: the whole payload is read inside the member's tenant scope. Without
+  # it every gamification, execution and messaging read here was empty under
+  # the production runtime role (tests only passed on an inherited ambient
+  # session scope).
   def call(context, user) do
     cached =
-      LandingCache.get_or_fetch(context, user.id, fn -> build_cached_payload(context, user) end)
+      LandingCache.get_or_fetch(context, user.id, fn ->
+        Gamification.with_tenant_context(context, fn -> build_cached_payload(context, user) end)
+      end)
 
     quote = training_quote(user)
     {:ok, Map.put(cached, "quote", quote)}

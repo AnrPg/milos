@@ -737,12 +737,31 @@ defmodule MilosTraining.Notifications do
 
   defp dedupe_key(type, payload), do: "#{type}:#{field(payload, :subscription_id)}"
 
-  def delete_booking_pending_notifications(booking_id) do
-    case NotificationStore.delete_booking_pending_for_booking(booking_id) do
-      :ok -> :ok
-      {:error, reason} -> {:error, reason}
-    end
+  @doc """
+  Removes the staff's `booking_pending` notifications for a booking that is no
+  longer pending (withdrawn by the member).
+
+  TD-092: notifications are owner-only under RLS, so a delete issued in the
+  member's (or a job's) session never reached the staff's rows. The staff of
+  the booking's organization are resolved server-side and each recipient's
+  rows are removed in that recipient's own scope, limited to the organization.
+  """
+  def delete_booking_pending_notifications(organization_id, booking_id)
+      when is_binary(organization_id) do
+    organization_id
+    |> Organizations.list_staff_user_ids()
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case NotificationStore.with_user_context(
+             %{organization_id: organization_id, user_id: staff_id},
+             fn -> NotificationStore.delete_booking_pending_for_booking(booking_id) end
+           ) do
+        :ok -> {:cont, :ok}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
   end
+
+  def delete_booking_pending_notifications(_organization_id, _booking_id), do: :ok
 
   def create_booking_notification_once(user_id, type, booking) do
     case deliver_notification(user_id, type, booking_payload(user_id, type, booking)) do
@@ -774,6 +793,9 @@ defmodule MilosTraining.Notifications do
 
     payload = %{
       booking_id: field(booking, :id),
+      # TD-092: tenant provenance, so the row can be found again in the
+      # organization's scope (pending-notice cleanup) and push links are org-scoped.
+      organization_id: field(booking, :organization_id),
       scheduled_class_id: field(booking, :scheduled_class_id),
       scheduled_at: scheduled_class && field(scheduled_class, :scheduled_at),
       class_type_id: scheduled_class && field(scheduled_class, :class_type_id),

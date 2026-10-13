@@ -34,6 +34,11 @@ defmodule MilosTraining.Gamification do
   defdelegate delete_seasonal_challenge(id), to: DeleteSeasonalChallenge, as: :call
   defdelegate set_leaderboard_opt_in(user_id, opted_in), to: SetLeaderboardOptIn, as: :call
   defdelegate get_settings(), to: GetSettings, as: :call
+
+  defdelegate public_theme_slug(organization_slug),
+    to: GamificationStore,
+    as: :get_public_theme_slug
+
   defdelegate update_settings(params), to: UpdateSettings, as: :call
   defdelegate get_challenge(id), to: GetChallenge, as: :call
   defdelegate get_user_stats(user_id), to: GetUserStats, as: :call

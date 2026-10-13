@@ -18,14 +18,12 @@ defmodule MilosTraining.Workers.SubscriptionExpiryJob do
   """
   use Oban.Worker, queue: :analytics, max_attempts: 3
 
-  alias MilosTraining.{Finance, Notifications, Scheduling}
+  alias MilosTraining.{Finance, Notifications, Organizations, Scheduling}
   alias MilosTraining.Finance.Domain.InvoiceLifecycle
-  alias MilosTraining.Organizations.OrganizationStore
 
   @impl Oban.Worker
   def perform(_job) do
-    OrganizationStore.list_organizations()
-    |> Enum.filter(fn %{organization: organization} -> organization.status == :active end)
+    Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} -> run(%{organization_id: organization.id}) end)
 
     :ok

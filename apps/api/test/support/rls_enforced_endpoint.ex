@@ -22,7 +22,12 @@ defmodule MilosTrainingWeb.RLSEnforcedEndpoint do
 
   def call(conn, opts) do
     if Process.get(@enforced_key, true),
-      do: DataCase.with_runtime_role(fn -> Endpoint.call(conn, opts) end),
+      do:
+        DataCase.with_runtime_role(fn ->
+          DataCase.with_clean_session(fn ->
+            MilosTraining.UnscopedQueryDetector.watch(fn -> Endpoint.call(conn, opts) end)
+          end)
+        end),
       else: Endpoint.call(conn, opts)
   end
 

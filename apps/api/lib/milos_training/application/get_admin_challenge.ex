@@ -1,14 +1,22 @@
 defmodule MilosTraining.Application.GetAdminChallenge do
-  alias MilosTraining.{Gamification, Identity}
+  alias MilosTraining.{Gamification, Identity, Organizations}
   alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
 
-  def call(id) do
+  # TD-092: the challenge and its progress are tenant rows, read in the gym's
+  # scope (unscoped, the detail was a 404 under the production runtime role),
+  # and the participants are the gym's own active members - not every account
+  # on the platform.
+  def call(context, id) do
+    Gamification.with_tenant_context(context, fn -> call_scoped(context, id) end)
+  end
+
+  defp call_scoped(context, id) do
     with challenge when not is_nil(challenge) <- Gamification.get_challenge(id) do
       progress_rows =
         Gamification.list_challenge_progress(id)
         |> Map.new(&{&1.user_id, &1})
 
-      users = tracked_users()
+      users = tracked_users(context)
 
       participants =
         users
@@ -32,8 +40,10 @@ defmodule MilosTraining.Application.GetAdminChallenge do
     end
   end
 
-  defp tracked_users do
-    Identity.list_all_users()
+  defp tracked_users(context) do
+    context
+    |> Organizations.list_active_membership_user_ids()
+    |> Identity.list_by_ids()
   end
 
   defp normalize_participant(user, progress_rows, challenge) do
