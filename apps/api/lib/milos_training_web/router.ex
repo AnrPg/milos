@@ -91,6 +91,11 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
 
+  # ADR-132: exact-nickname grantee lookup; a tight budget bounds guessing.
+  pipeline :grantee_lookup_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "pr-grantee-lookup")
+  end
+
   pipeline :slug_alias_rate_limited do
     # Called by the web proxy (one client address for every browser) and
     # cached there, so the budget is generous; it only bounds enumeration.
@@ -926,6 +931,18 @@ defmodule MilosTrainingWeb.Router do
     post("/grants", PRSharingController, :create_grant)
     delete("/grants/:id", PRSharingController, :revoke_grant)
     get("/shared-with-me", PRSharingController, :shared_with_me)
+  end
+
+  scope "/api/pr-sharing", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :grantee_lookup_rate_limited
+    ])
+
+    get("/grantee-lookup", PRSharingController, :lookup_grantee)
   end
 
   if Application.compile_env(:milos_training, :dev_routes) do

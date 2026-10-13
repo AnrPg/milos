@@ -127,6 +127,42 @@ defmodule MilosTrainingWeb.PRControllerTest do
              |> json_response(200)
   end
 
+  # ADR-132 (TD-091): grantees outside one's gyms, by exact nickname only.
+  test "grantee lookup finds an account by exact nickname and nothing more", %{conn: conn} do
+    owner = user_fixture(%{nickname: "lookup_owner"})
+    stranger = user_fixture(%{nickname: "lookup_stranger"})
+
+    lookup = fn nickname ->
+      build_conn()
+      |> put_bearer_token(owner)
+      |> get("/api/pr-sharing/grantee-lookup", %{"nickname" => nickname})
+    end
+
+    assert %{"grantee" => grantee} =
+             conn
+             |> put_bearer_token(owner)
+             |> get("/api/pr-sharing/grantee-lookup", %{"nickname" => " Lookup_Stranger "})
+             |> json_response(200)
+
+    assert grantee == %{
+             "id" => stranger.id,
+             "nickname" => "lookup_stranger",
+             "display_nickname" => "lookup_stranger"
+           }
+
+    # No prefix matches, no self, no unknowns: all answer the same way.
+    assert %{"grantee" => nil} = "lookup_str" |> lookup.() |> json_response(200)
+    assert %{"grantee" => nil} = "lookup_owner" |> lookup.() |> json_response(200)
+    assert %{"grantee" => nil} = "nobody_by_this_name" |> lookup.() |> json_response(200)
+    assert "" |> lookup.() |> json_response(400)
+
+    # The id is enough to grant, without sharing a gym.
+    assert build_conn()
+           |> put_bearer_token(owner)
+           |> post("/api/pr-sharing/grants", %{"grantee_user_id" => stranger.id})
+           |> json_response(201)
+  end
+
   defp pr_body(name) do
     %{
       "name" => name,

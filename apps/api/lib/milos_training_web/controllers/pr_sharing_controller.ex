@@ -10,6 +10,7 @@ defmodule MilosTrainingWeb.PRSharingController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{
+    FindPRGrantee,
     GetPRSharing,
     GrantPRAccess,
     ListPRsSharedWithMe,
@@ -184,6 +185,47 @@ defmodule MilosTrainingWeb.PRSharingController do
   def revoke_grant(conn, %{"id" => id}) do
     with :ok <- RevokePRAccess.call(conn.assigns.user_context, id) do
       send_resp(conn, :no_content, "")
+    end
+  end
+
+  operation(:lookup_grantee,
+    summary: "Find an account to share my PRs with by its exact nickname (ADR-132)",
+    description:
+      "Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.",
+    parameters: [
+      %Parameter{
+        name: :nickname,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, maxLength: 64}
+      }
+    ],
+    responses: [
+      ok:
+        {"Grantee lookup", "application/json",
+         %Schema{
+           type: :object,
+           required: [:grantee],
+           properties: %{
+             grantee: %Schema{
+               type: :object,
+               nullable: true,
+               required: [:id, :nickname, :display_nickname],
+               properties: %{
+                 id: @uuid,
+                 nickname: %Schema{type: :string},
+                 display_nickname: %Schema{type: :string}
+               }
+             }
+           }
+         }},
+      bad_request: {"Error", "application/json", @error}
+    ]
+  )
+
+  def lookup_grantee(conn, params) do
+    with {:ok, result} <- FindPRGrantee.call(conn.assigns.user_context, params["nickname"]) do
+      json(conn, result)
     end
   end
 
