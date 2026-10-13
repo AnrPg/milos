@@ -131,6 +131,45 @@ defmodule MilosTraining.Application.PRVisibilityRLSTest do
     end
   end
 
+  # TD-091: the multi-role seam swap (`'coach' = ANY(om.roles)`, migration
+  # 20261015100000). An owner or admin whose role set includes coach passes
+  # the seam in both the service and the database; coach client scope
+  # (ADR-100) never narrows PR visibility.
+  test "an owner or admin who also coaches sees the gym's PRs", ctx do
+    owner_coach = user_fixture()
+    admin_coach = user_fixture()
+
+    bypass_rls(fn ->
+      add_roles!(ctx.gym_a, owner_coach, [:owner, :coach])
+      add_roles!(ctx.gym_a, admin_coach, [:admin, :coach])
+    end)
+
+    for user <- [owner_coach, admin_coach] do
+      staff_ctx = tenant!(user, ctx.gym_a)
+      assert Organizations.acting_user_coaches?(staff_ctx)
+
+      assert {:ok, %{visibility: "coach", prs: [%{id: pr_id}]}} =
+               GetAdminUserPRs.call(staff_ctx, ctx.member.id)
+
+      assert pr_id == ctx.pr_a.id
+
+      assert [%{id: ^pr_id}] =
+               Pantheon.with_tenant_context(staff_ctx, fn ->
+                 Pantheon.list_organization_records(ctx.member.id, ctx.gym_a.id)
+               end)
+    end
+  end
+
+  test "coach client scope does not narrow PR visibility", ctx do
+    # The gym-A coach has `coach_scope: :own` and no coaching relationship
+    # with the member, yet reads the member's gym-A PR.
+    assert %{coach_scope: "own"} =
+             bypass_rls(fn -> Organizations.membership_summary(ctx.gym_a.id, ctx.coach.id) end)
+
+    assert {:ok, %{visibility: "coach", prs: [_pr]}} =
+             GetAdminUserPRs.call(ctx.coach_ctx, ctx.member.id)
+  end
+
   test "opting out hides PRs from coaches but not from explicit grantees", ctx do
     assert {:ok, %{coach_visibility: true}} = GetPRSharing.call(ctx.member_ctx)
     {:ok, _grant} = GrantPRAccess.call(ctx.member_ctx, %{"grantee_user_id" => ctx.friend.id})
@@ -263,6 +302,19 @@ defmodule MilosTraining.Application.PRVisibilityRLSTest do
         organization_id: organization.id,
         user_id: user.id,
         role: role,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    membership
+  end
+
+  defp add_roles!(organization, user, roles) do
+    {:ok, membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: user.id,
+        roles: roles,
         status: :active,
         joined_at: DateTime.utc_now()
       })
