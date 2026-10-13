@@ -5,10 +5,12 @@ defmodule MilosTraining.Application.GetAdminUserMessages do
 
   def call(context, user_id) do
     with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
-      threads =
+      # TD-092: the unread count is a tenant read too (it was always 0 outside
+      # the gym's scope under the production runtime role).
+      {threads, unread_thread_count} =
         Messaging.with_tenant_context(context, fn ->
-          Messaging.list_threads_for_user(user_id)
-          |> Enum.map(&serialize_thread(&1, user_id))
+          {Messaging.list_threads_for_user(user_id) |> Enum.map(&serialize_thread(&1, user_id)),
+           Messaging.count_unread_threads(user_id)}
         end)
 
       {:ok,
@@ -17,7 +19,7 @@ defmodule MilosTraining.Application.GetAdminUserMessages do
          threads: threads,
          summary: %{
            thread_count: length(threads),
-           unread_thread_count: Messaging.count_unread_threads(user_id)
+           unread_thread_count: unread_thread_count
          },
          operational_links: %{workspace: "/account/activity/chats"}
        }}
