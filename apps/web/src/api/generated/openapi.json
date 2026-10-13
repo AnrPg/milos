@@ -37599,129 +37599,6 @@
         ]
       }
     },
-    "/api/landing/leaderboard-opt-in": {
-      "post": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.LandingController.update_leaderboard_preference",
-        "parameters": [],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "opted_in": {
-                    "type": "boolean"
-                  }
-                },
-                "required": [
-                  "opted_in"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "description": "Leaderboard opt-in",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "monthly": {
-                      "items": {
-                        "properties": {
-                          "nickname": {
-                            "type": "string"
-                          },
-                          "prs_this_month": {
-                            "type": "integer"
-                          },
-                          "rank": {
-                            "type": "integer"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "workouts_this_week": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "rank",
-                          "user_id",
-                          "nickname",
-                          "workouts_this_week",
-                          "prs_this_month"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    },
-                    "opted_in": {
-                      "type": "boolean"
-                    },
-                    "visible": {
-                      "type": "boolean"
-                    },
-                    "weekly": {
-                      "items": {
-                        "properties": {
-                          "nickname": {
-                            "type": "string"
-                          },
-                          "prs_this_month": {
-                            "type": "integer"
-                          },
-                          "rank": {
-                            "type": "integer"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "workouts_this_week": {
-                            "type": "integer"
-                          }
-                        },
-                        "required": [
-                          "rank",
-                          "user_id",
-                          "nickname",
-                          "workouts_this_week",
-                          "prs_this_month"
-                        ],
-                        "type": "object"
-                      },
-                      "type": "array"
-                    }
-                  },
-                  "required": [
-                    "opted_in",
-                    "visible",
-                    "weekly",
-                    "monthly"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Leaderboard preference"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Update leaderboard opt-in preference",
-        "tags": [
-          "Landing"
-        ]
-      }
-    },
     "/api/org/{organization_slug}/admin/finance/packages": {
       "get": {
         "callbacks": {},
@@ -50304,6 +50181,129 @@
         "summary": "List assigned workouts for the current athlete or member, or all assignments for staff",
         "tags": [
           "Assigned Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/landing/leaderboard-opt-in": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.LandingController.update_leaderboard_preference",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "opted_in": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "opted_in"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "description": "Leaderboard opt-in",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "monthly": {
+                      "items": {
+                        "properties": {
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "prs_this_month": {
+                            "type": "integer"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workouts_this_week": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "nickname",
+                          "workouts_this_week",
+                          "prs_this_month"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "opted_in": {
+                      "type": "boolean"
+                    },
+                    "visible": {
+                      "type": "boolean"
+                    },
+                    "weekly": {
+                      "items": {
+                        "properties": {
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "prs_this_month": {
+                            "type": "integer"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "workouts_this_week": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "nickname",
+                          "workouts_this_week",
+                          "prs_this_month"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "opted_in",
+                    "visible",
+                    "weekly",
+                    "monthly"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Leaderboard preference"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update leaderboard opt-in preference",
+        "tags": [
+          "Landing"
         ]
       }
     },

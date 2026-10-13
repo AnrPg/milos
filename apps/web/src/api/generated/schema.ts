@@ -2380,23 +2380,6 @@ export interface paths {
         patch: operations["MilosTrainingWeb.PRController.update"];
         trace?: never;
     };
-    "/api/landing/leaderboard-opt-in": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Update leaderboard opt-in preference */
-        post: operations["MilosTrainingWeb.LandingController.update_leaderboard_preference"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/org/{organization_slug}/admin/finance/packages": {
         parameters: {
             query?: never;
@@ -3693,6 +3676,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MyWorkoutController.index"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/landing/leaderboard-opt-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Update leaderboard opt-in preference */
+        post: operations["MilosTrainingWeb.LandingController.update_leaderboard_preference"];
         delete?: never;
         options?: never;
         head?: never;
@@ -18398,52 +18398,6 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.LandingController.update_leaderboard_preference": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** @description Leaderboard opt-in */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    opted_in: boolean;
-                };
-            };
-        };
-        responses: {
-            /** @description Leaderboard preference */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        monthly: {
-                            nickname: string;
-                            prs_this_month: number;
-                            rank: number;
-                            /** Format: uuid */
-                            user_id: string;
-                            workouts_this_week: number;
-                        }[];
-                        opted_in: boolean;
-                        visible: boolean;
-                        weekly: {
-                            nickname: string;
-                            prs_this_month: number;
-                            rank: number;
-                            /** Format: uuid */
-                            user_id: string;
-                            workouts_this_week: number;
-                        }[];
-                    };
-                };
-            };
-        };
-    };
     "MilosTrainingWeb.AdminFinanceController.packages": {
         parameters: {
             query?: never;
@@ -23345,6 +23299,52 @@ export interface operations {
                         end_date: string;
                         /** Format: date */
                         start_date: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.LandingController.update_leaderboard_preference": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Leaderboard opt-in */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    opted_in: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Leaderboard preference */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        monthly: {
+                            nickname: string;
+                            prs_this_month: number;
+                            rank: number;
+                            /** Format: uuid */
+                            user_id: string;
+                            workouts_this_week: number;
+                        }[];
+                        opted_in: boolean;
+                        visible: boolean;
+                        weekly: {
+                            nickname: string;
+                            prs_this_month: number;
+                            rank: number;
+                            /** Format: uuid */
+                            user_id: string;
+                            workouts_this_week: number;
+                        }[];
                     };
                 };
             };
