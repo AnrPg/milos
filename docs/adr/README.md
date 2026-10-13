@@ -140,3 +140,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-132 | Coach PR dossier, legacy PR provenance backfill and grantee lookup | Accepted |
 | ADR-133 | Atomic organization provisioning and tenant-scoped workout reads | Accepted |
 | ADR-134 | BEAM literal area root cause and deterministic OpenAPI export | Accepted |
+| ADR-135 | One staff dashboard for every role | Accepted |

@@ -4202,7 +4202,8 @@
     "historyNoResult": "لم تُسجَّل نتيجة لهذه الحصة.",
     "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
     "accessEndedTitle": "انتهى وصولك",
-    "accessEndedCancelledBookings": "{count, plural, one {أُلغي حجزك القادم.} other {أُلغيت حجوزاتك القادمة (#).}}"
+    "accessEndedCancelledBookings": "{count, plural, one {أُلغي حجزك القادم.} other {أُلغيت حجوزاتك القادمة (#).}}",
+    "dashNoClassesToday": "لا توجد حصص اليوم"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

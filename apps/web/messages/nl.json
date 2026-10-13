@@ -4202,7 +4202,8 @@
     "historyNoResult": "Geen resultaat gelogd.",
     "workoutCount": "{count, plural, one {# workout} other {# workouts}}",
     "accessEndedTitle": "Je toegang is afgelopen",
-    "accessEndedCancelledBookings": "{count, plural, one {Je komende boeking is geannuleerd.} other {Je # komende boekingen zijn geannuleerd.}}"
+    "accessEndedCancelledBookings": "{count, plural, one {Je komende boeking is geannuleerd.} other {Je # komende boekingen zijn geannuleerd.}}",
+    "dashNoClassesToday": "Vandaag geen lessen"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

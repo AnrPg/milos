@@ -4202,7 +4202,8 @@
     "historyNoResult": "לא נרשמה תוצאה.",
     "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}",
     "accessEndedTitle": "הגישה שלך הסתיימה",
-    "accessEndedCancelledBookings": "{count, plural, one {ההזמנה הקרובה שלך בוטלה.} other {# ההזמנות הקרובות שלך בוטלו.}}"
+    "accessEndedCancelledBookings": "{count, plural, one {ההזמנה הקרובה שלך בוטלה.} other {# ההזמנות הקרובות שלך בוטלו.}}",
+    "dashNoClassesToday": "אין שיעורים היום"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

@@ -3,16 +3,26 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 
 import { fetchAthletes } from "@/api/admin";
 import { fetchPRDossierMembers } from "@/api/admin-users";
 import { filterDossierMembers } from "@/components/admin/users/admin-user-profile";
 import { fetchCleaningAreas, fetchCoachingRelationships, startCoachingRelationship } from "@/api/roles";
-import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { fetchAppointmentSlots } from "@/api/staff";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
-import { classesCoachedToday, roleErrorKey, staffHomeLayout, takeableAthletes } from "@/components/admin/staff-home";
+import {
+  ActionTiles,
+  AvatarChips,
+  CardLink,
+  ClassTimeline,
+  CountBadge,
+  DashboardCard,
+  EmptyNote,
+  StatusList,
+  type ActionTile,
+} from "@/components/admin/DashboardWidgets";
+import { roleErrorKey, staffHomeLayout, takeableAthletes } from "@/components/admin/staff-home";
 import { formatDateTime } from "@/components/client/format";
 import { useSession } from "@/components/session-provider";
 import { CleaningLog } from "@/components/staff/CleaningLog";
@@ -21,7 +31,6 @@ import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import {
   inputClass,
   inputStyle,
-  Pill,
   secondaryButtonClass,
   secondaryButtonStyle,
   StatusText,
@@ -33,12 +42,11 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
 
-// The staff home (ADR-103, docs/architecture/navigation-by-role.md): owners
-// and admins keep the dashboard; a janitor gets the cleaning log; everyone
-// else gets small sections for the roles they hold, linking to the full pages.
+// The staff home (ADR-103, ADR-135): every staff role gets the dashboard,
+// trimmed to what its capabilities open, with role cards under the metrics.
+// A janitor's home stays the cleaning log.
 
 type Membership = ReturnType<typeof useSelectedMembershipRole>["membership"];
-type HomeLink = { label: string; href: string; hint?: ReactNode };
 
 const RELATIONSHIPS_KEY = ["staff", "coaching-relationships"] as const;
 
@@ -64,58 +72,22 @@ export function StaffHome() {
     );
   }
 
-  if (layout.kind === "admin") {
-    return (
-      <>
-        <AdminDashboard />
-        {layout.coach ? (
-          <div className="px-4 pb-10 md:px-10" style={{ background: "var(--bg)" }}>
-            <div className="mx-auto max-w-6xl">
-              <MyClientsSection membership={membership} />
-              <div className="mt-4">
-                <MemberPRsSection />
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </>
-    );
-  }
+  const coach = layout.kind === "admin" ? layout.coach : layout.sections.includes("coach");
+  const frontDesk = layout.kind === "sections" && layout.sections.includes("front_desk");
+  const accountant = layout.kind === "sections" && layout.sections.includes("accountant");
+  const has = (capability: string) => can(membership, capability);
 
   return (
-    <main className="min-h-screen px-4 py-8 md:px-10 md:py-10" style={{ background: "var(--bg)" }}>
-      <div className="mx-auto flex max-w-5xl flex-col gap-4">
-        <header>
-          <p className="text-sm font-semibold uppercase tracking-[0.28em]" style={{ color: "var(--primary)" }}>
-            {membership?.organization.name}
-          </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
-            {i18n("rhStaffHomeTitle")}
-          </h1>
-        </header>
-        {layout.sections.includes("coach") ? <CoachSections membership={membership} /> : null}
-        {layout.sections.includes("front_desk") ? <FrontDeskSections membership={membership} /> : null}
-        {layout.sections.includes("accountant") ? <AccountantSections membership={membership} /> : null}
-        {layout.sections.includes("cleaning") ? (
-          <HomeSection id="home-cleaning" title={i18n("rhCleaning")}>
-            <LinkList links={[{ label: i18n("rhOpenCleaningLog"), href: "/admin/cleaning" }]} />
-          </HomeSection>
-        ) : null}
-        {can(membership, "report_inventory") || can(membership, "manage_inventory") ? (
-          <HomeSection id="home-inventory" title={i18n("invEyebrow")}>
-            <LinkList
-              links={[
-                { label: i18n("invTabMachines"), href: "/admin/inventory?tab=machines" },
-                { label: i18n("invTabSupplies"), href: "/admin/inventory?tab=supplies" },
-              ]}
-            />
-          </HomeSection>
-        ) : null}
-        {layout.sections.length === 0 && !can(membership, "report_inventory") && !can(membership, "manage_inventory") ? (
-          <StatusText tone="muted">{i18n("rhNothingHere")}</StatusText>
-        ) : null}
-      </div>
-    </main>
+    <AdminDashboard membership={membership}>
+      {frontDesk ? <FrontDeskCard membership={membership} /> : null}
+      {accountant ? <AccountsCard membership={membership} /> : null}
+      {coach ? <MyClientsSection membership={membership} /> : null}
+      {coach && has("manage_appointments") ? <MyAppointments /> : null}
+      {coach && has("manage_coaching") ? <ReplyQueue /> : null}
+      {coach && has("manage_coaching") ? <FormReviewQueue /> : null}
+      {coach ? <MemberPRsSection /> : null}
+      {frontDesk && (has("review_cleaning") || has("record_cleaning")) ? <CleaningStatus /> : null}
+    </AdminDashboard>
   );
 }
 
@@ -134,167 +106,7 @@ function InventoryShortcut() {
   );
 }
 
-/** A collapsible panel in the style of the user profile sections. */
-export function HomeSection({
-  id,
-  title,
-  badge,
-  defaultOpen = false,
-  children,
-}: {
-  id: string;
-  title: string;
-  badge?: ReactNode;
-  defaultOpen?: boolean;
-  children: ReactNode;
-}) {
-  const i18n = useUiTranslations();
-  const [open, setOpen] = useState(defaultOpen);
-  return (
-    <article id={id} className="overflow-hidden rounded-[2rem]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-controls={`${id}-content`}
-        onClick={() => setOpen((value) => !value)}
-        className="flex w-full items-center justify-between gap-3 px-5 py-4 text-start"
-      >
-        <span className="flex min-w-0 items-center gap-2">
-          <span className="truncate text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>
-            {title}
-          </span>
-          {badge}
-        </span>
-        <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--dim)" }}>
-          {open ? i18n("hide34d8b60") : i18n("showd97d1ee")}
-        </span>
-      </button>
-      {open ? (
-        <div id={`${id}-content`} className="border-t px-5 pb-5 pt-4 text-sm" style={{ borderColor: "var(--border)", color: "var(--text-soft)" }}>
-          {children}
-        </div>
-      ) : null}
-    </article>
-  );
-}
-
-function LinkList({ links }: { links: HomeLink[] }) {
-  const organizationSlug = useOrganizationSlug();
-  if (links.length === 0) return null;
-  return (
-    <ul className="space-y-2">
-      {links.map((link) => (
-        <li key={link.href + link.label}>
-          <Link
-            href={adminHref(link.href, organizationSlug)}
-            className="flex items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3"
-            style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-          >
-            <span className="min-w-0">
-              <span className="block truncate font-semibold" style={{ color: "var(--text)" }}>{link.label}</span>
-              {link.hint ? <span className="mt-0.5 block text-xs" style={{ color: "var(--dim)" }}>{link.hint}</span> : null}
-            </span>
-            <span aria-hidden className="shrink-0" style={{ color: "var(--primary)" }}>→</span>
-          </Link>
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function QuickActions({ links }: { links: HomeLink[] }) {
-  const organizationSlug = useOrganizationSlug();
-  if (links.length === 0) return null;
-  return (
-    <div className="flex flex-wrap gap-2">
-      {links.map((link) => (
-        <Link key={link.href + link.label} href={adminHref(link.href, organizationSlug)} className={secondaryButtonClass} style={secondaryButtonStyle}>
-          {link.label}
-        </Link>
-      ))}
-    </div>
-  );
-}
-
-function CoachSections({ membership }: { membership: Membership }) {
-  const i18n = useUiTranslations();
-  const has = (capability: string) => can(membership, capability);
-  const tools: HomeLink[] = [
-    ...(has("manage_coaching") ? [{ label: i18n("rhNutritionPlans"), href: "/admin/coaching?tab=nutrition" }] : []),
-    ...(has("view_coaching_analytics") ? [{ label: i18n("rhCoachingReports"), href: "/admin/metrics/coaching" }] : []),
-    ...(has("manage_content") ? [{ label: i18n("rhContent"), href: "/admin/content" }] : []),
-    ...(has("manage_challenges") ? [{ label: i18n("rhChallenges"), href: "/admin/challenges" }] : []),
-  ];
-
-  return (
-    <>
-      <MyClassesToday />
-      <MyClientsSection membership={membership} />
-      <MemberPRsSection />
-      {has("manage_coaching") ? <ReplyQueue /> : null}
-      {has("manage_coaching") ? <FormReviewQueue /> : null}
-      {has("manage_appointments") ? <MyAppointments /> : null}
-      {tools.length > 0 ? (
-        <HomeSection id="home-coach-tools" title={i18n("rhCoachingTools")}>
-          <LinkList links={tools} />
-        </HomeSection>
-      ) : null}
-    </>
-  );
-}
-
-function MyClassesToday() {
-  const i18n = useUiTranslations();
-  const locale = useUiLocale();
-  const { tokens, currentUser } = useSession();
-  const token = tokens?.access_token;
-  const query = useQuery({
-    queryKey: ["staff", "home", "classes-today"],
-    enabled: Boolean(token),
-    queryFn: () => {
-      const start = new Date();
-      start.setHours(0, 0, 0, 0);
-      const end = new Date(start);
-      end.setDate(start.getDate() + 1);
-      return fetchSchedule(token!, { startAt: start.toISOString(), endAt: end.toISOString(), days: 3, classTypeIds: [] });
-    },
-  });
-  // ADR-100: a class carries its coach; the schedule payload includes it.
-  const slots = (query.data?.slots ?? []) as Array<ScheduleSlot & { coach_user_id?: string | null }>;
-  const mine = classesCoachedToday(slots, currentUser?.id);
-  const time = (iso: string) => new Intl.DateTimeFormat(locale, { timeStyle: "short" }).format(new Date(iso));
-
-  return (
-    <HomeSection
-      id="home-classes-today"
-      title={i18n("rhMyClassesToday")}
-      badge={query.data ? <Pill tone={mine.length ? "primary" : "neutral"}>{mine.length}</Pill> : null}
-      defaultOpen
-    >
-      {query.isPending ? (
-        <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
-      ) : query.isError ? (
-        <StatusText tone="error">{localizeError(query.error, i18n)}</StatusText>
-      ) : (
-        <div className="space-y-3">
-          <p style={{ color: "var(--muted)" }}>{i18n("rhClassesTodayCount", { count: mine.length })}</p>
-          <LinkList
-            links={[
-              ...mine.map((slot) => ({
-                label: `${time(slot.scheduled_at)} · ${slot.name}`,
-                href: `/admin/class-schedule?open_slot=${slot.id}`,
-                hint: i18n("rhBookedCount", { count: slot.approved_booking_count, capacity: slot.capacity }),
-              })),
-              { label: i18n("rhOpenCoaching"), href: "/admin/class-schedule" },
-            ]}
-          />
-        </div>
-      )}
-    </HomeSection>
-  );
-}
-
-/** The coach's own clients (ADR-100), with "Take an athlete". */
+/** The coach's own clients (ADR-100) as avatar chips, with "Take an athlete". */
 export function MyClientsSection({ membership }: { membership: Membership }) {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
@@ -328,13 +140,27 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
   const candidates = takeableAthletes(athletes.data?.athletes ?? [], relationships.map((item) => item.client_user_id)).slice(0, 8);
   const canTake = can(membership, "self_assign_athletes");
   const takeError = take.isError ? (roleErrorKey(take.error) ? i18n(roleErrorKey(take.error)!) : localizeError(take.error, i18n)) : null;
+  const takeButton = canTake ? (
+    <button
+      type="button"
+      aria-expanded={taking}
+      className={secondaryButtonClass}
+      style={secondaryButtonStyle}
+      onClick={() => {
+        setTaking((value) => !value);
+        take.reset();
+      }}
+    >
+      {taking ? i18n("cancel77dfd21") : i18n("rhTakeAthlete")}
+    </button>
+  ) : null;
 
   return (
-    <HomeSection
+    <DashboardCard
       id="home-my-clients"
-      title={i18n("rhMyClients")}
-      badge={clients.data ? <Pill tone="neutral">{relationships.length}</Pill> : null}
-      defaultOpen
+      eyebrow={i18n("rhMyClients")}
+      badge={clients.data ? <CountBadge value={relationships.length} /> : null}
+      action={takeButton}
     >
       <div className="space-y-3">
         {clients.isPending ? (
@@ -342,46 +168,21 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
         ) : clients.isError ? (
           <StatusText tone="error">{localizeError(clients.error, i18n)}</StatusText>
         ) : relationships.length === 0 ? (
-          <StatusText tone="muted">{i18n("rhNoClients")}</StatusText>
+          <EmptyNote>{i18n("rhNoClients")}</EmptyNote>
         ) : (
-          <ul className="grid gap-2">
-            {visible.map((item) => (
-              <li key={item.id}>
-                <Link
-                  href={adminHref(`/admin/users/${item.client_user_id}`, organizationSlug)}
-                  className="flex items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3"
-                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-                >
-                  <span className="min-w-0 truncate font-semibold" style={{ color: "var(--text)" }}>
-                    {item.client_nickname ?? i18n("stfUnknownMember")}
-                  </span>
-                  <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--primary)" }}>{i18n("open6f4789b")}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <AvatarChips
+            people={visible.map((item) => ({
+              id: item.id,
+              name: item.client_nickname ?? i18n("stfUnknownMember"),
+              href: adminHref(`/admin/users/${item.client_user_id}`, organizationSlug),
+            }))}
+          />
         )}
-        <div className="flex flex-wrap gap-2">
-          {relationships.length > 8 ? (
-            <button type="button" className={secondaryButtonClass} style={secondaryButtonStyle} onClick={() => setShowAll((value) => !value)}>
-              {showAll ? i18n("rhShowFewer") : i18n("rhShowAllClients", { count: relationships.length })}
-            </button>
-          ) : null}
-          {canTake ? (
-            <button
-              type="button"
-              aria-expanded={taking}
-              className={secondaryButtonClass}
-              style={secondaryButtonStyle}
-              onClick={() => {
-                setTaking((value) => !value);
-                take.reset();
-              }}
-            >
-              {taking ? i18n("cancel77dfd21") : i18n("rhTakeAthlete")}
-            </button>
-          ) : null}
-        </div>
+        {relationships.length > 8 ? (
+          <button type="button" className={secondaryButtonClass} style={secondaryButtonStyle} onClick={() => setShowAll((value) => !value)}>
+            {showAll ? i18n("rhShowFewer") : i18n("rhShowAllClients", { count: relationships.length })}
+          </button>
+        ) : null}
         {taking ? (
           <div className="space-y-2 rounded-[1.2rem] p-3" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
             <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("rhTakeAthleteHelp")}</p>
@@ -422,14 +223,14 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
           </div>
         ) : null}
       </div>
-    </HomeSection>
+    </DashboardCard>
   );
 }
 
 /**
  * ADR-132: every coach of the gym reads members' PRs (ADR-129), while "My
- * clients" lists only their own clients (ADR-100). This finds any active
- * member and opens their PR panel.
+ * clients" lists only their own clients (ADR-100). Search first, then the
+ * matches as chips — nothing long until the coach asks for it.
  */
 function MemberPRsSection() {
   const t = useTranslations("PrSharing");
@@ -445,10 +246,11 @@ function MemberPRsSection() {
     queryFn: () => fetchPRDossierMembers(token!),
     staleTime: 60_000,
   });
-  const matches = filterDossierMembers(members.data?.members ?? [], search);
+  // Nobody is listed until the coach types: the card stays short.
+  const matches = search.trim() ? filterDossierMembers(members.data?.members ?? [], search).slice(0, 8) : [];
 
   return (
-    <HomeSection id="home-member-prs" title={t("membersTitle")}>
+    <DashboardCard id="home-member-prs" eyebrow={t("membersTitle")}>
       <div className="space-y-3">
         <p className="text-xs" style={{ color: "var(--dim)" }}>{t("membersHint")}</p>
         <input
@@ -463,26 +265,19 @@ function MemberPRsSection() {
           <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
         ) : members.isError ? (
           <StatusText tone="error">{t("membersLoadError")}</StatusText>
-        ) : matches.length === 0 ? (
-          <StatusText tone="muted">{t("membersEmpty")}</StatusText>
+        ) : !search.trim() ? null : matches.length === 0 ? (
+          <EmptyNote>{t("membersEmpty")}</EmptyNote>
         ) : (
-          <ul className="grid gap-2">
-            {matches.map((member) => (
-              <li key={member.id}>
-                <Link
-                  href={`${adminHref(`/admin/users/${member.id}`, organizationSlug)}#prs`}
-                  className="flex items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3"
-                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-                >
-                  <span className="min-w-0 truncate font-semibold" style={{ color: "var(--text)" }}>{member.nickname}</span>
-                  <span className="shrink-0 text-sm font-semibold" style={{ color: "var(--primary)" }}>{t("openPrs")}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          <AvatarChips
+            people={matches.map((member) => ({
+              id: member.id,
+              name: member.nickname,
+              href: `${adminHref(`/admin/users/${member.id}`, organizationSlug)}#prs`,
+            }))}
+          />
         )}
       </div>
-    </HomeSection>
+    </DashboardCard>
   );
 }
 
@@ -491,6 +286,7 @@ function MyAppointments() {
   const locale = useUiLocale();
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
+  const organizationSlug = useOrganizationSlug();
   const query = useQuery({
     queryKey: ["staff", "home", "appointments", currentUser?.id],
     enabled: Boolean(token && currentUser?.id),
@@ -503,61 +299,54 @@ function MyAppointments() {
   });
   const slots = (query.data ?? []).filter((slot) => !slot.cancelled_at).sort((a, b) => a.starts_at.localeCompare(b.starts_at));
   const booked = (slot: (typeof slots)[number]) => (slot.bookings ?? []).filter((booking) => booking.status === "booked").length;
+  const href = adminHref("/admin/appointments", organizationSlug);
 
   return (
-    <HomeSection
+    <DashboardCard
       id="home-appointments"
-      title={i18n("rhMyAppointments")}
-      badge={query.data ? <Pill tone="neutral">{slots.length}</Pill> : null}
+      eyebrow={i18n("rhMyAppointments")}
+      badge={query.data ? <CountBadge value={slots.length} /> : null}
+      action={<CardLink href={href}>{i18n("open6f4789b")}</CardLink>}
     >
       {query.isPending ? (
         <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
       ) : query.isError ? (
         <StatusText tone="error">{localizeError(query.error, i18n)}</StatusText>
+      ) : slots.length === 0 ? (
+        <EmptyNote>{i18n("rhAppointmentsThisWeek", { count: 0 })}</EmptyNote>
       ) : (
-        <div className="space-y-3">
-          <p style={{ color: "var(--muted)" }}>{i18n("rhAppointmentsThisWeek", { count: slots.length })}</p>
-          <LinkList
-            links={[
-              ...slots.slice(0, 5).map((slot) => ({
-                label: formatDateTime(slot.starts_at, locale),
-                href: "/admin/appointments",
-                hint: i18n("rhBookedCount", { count: booked(slot), capacity: slot.capacity }),
-              })),
-              { label: i18n("rhOpenAppointments"), href: "/admin/appointments" },
-            ]}
-          />
-        </div>
+        <ClassTimeline
+          entries={slots.slice(0, 4).map((slot) => ({
+            id: slot.id,
+            time: new Intl.DateTimeFormat(locale, { weekday: "short" }).format(new Date(slot.starts_at)),
+            title: formatDateTime(slot.starts_at, locale),
+            href,
+            caption: i18n("rhBookedCount", { count: booked(slot), capacity: slot.capacity }),
+            filled: booked(slot),
+            capacity: slot.capacity,
+          }))}
+        />
       )}
-    </HomeSection>
+    </DashboardCard>
   );
 }
 
-function FrontDeskSections({ membership }: { membership: Membership }) {
+function FrontDeskCard({ membership }: { membership: Membership }) {
   const i18n = useUiTranslations();
+  const organizationSlug = useOrganizationSlug();
   const has = (capability: string) => can(membership, capability);
-  const today: HomeLink[] = [
-    ...(has("check_in") ? [{ label: i18n("rhArrivalsNow"), href: "/admin/check-in" }] : []),
-    ...(has("run_classes") ? [{ label: i18n("rhTodaysClasses"), href: "/admin/class-schedule" }] : []),
+  const href = (path: string) => adminHref(path, organizationSlug);
+  const tiles: ActionTile[] = [
+    ...(has("check_in") ? [{ label: i18n("rhArrivalsNow"), href: href("/admin/check-in"), icon: "check" as const }] : []),
+    ...(has("invite_clients") ? [{ label: i18n("rhNewClient"), href: href("/admin/finance?tab=members"), icon: "plus" as const }] : []),
+    ...(has("take_payments") ? [{ label: i18n("rhSellPackage"), href: href("/admin/finance"), icon: "card" as const }] : []),
+    ...(has("take_payments") ? [{ label: i18n("rhTakePayment"), href: href("/admin/finance?tab=queues"), icon: "wallet" as const }] : []),
   ];
-  const actions: HomeLink[] = [
-    ...(has("invite_clients") ? [{ label: i18n("rhNewClient"), href: "/admin/finance?tab=members" }] : []),
-    ...(has("take_payments") ? [{ label: i18n("rhSellPackage"), href: "/admin/finance" }] : []),
-    ...(has("take_payments") ? [{ label: i18n("rhTakePayment"), href: "/admin/finance?tab=queues" }] : []),
-  ];
-
+  if (tiles.length === 0) return null;
   return (
-    <>
-      {today.length > 0 || actions.length > 0 ? (
-        <HomeSection id="home-front-desk" title={i18n("rhFrontDesk")} defaultOpen>
-          <div className="space-y-3">
-            <LinkList links={today} />
-            <QuickActions links={actions} />
-          </div>
-        </HomeSection>
-      ) : null}
-      {has("review_cleaning") || has("record_cleaning") ? <CleaningStatus /> : null}
-    </>
+    <DashboardCard id="home-front-desk" eyebrow={i18n("rhFrontDesk")}>
+      <ActionTiles tiles={tiles} />
+    </DashboardCard>
   );
 }
 
@@ -566,6 +355,7 @@ function CleaningStatus() {
   const locale = useUiLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token;
+  const organizationSlug = useOrganizationSlug();
   const areas = useQuery({
     queryKey: ["staff", "cleaning", "areas"],
     enabled: Boolean(token),
@@ -574,52 +364,52 @@ function CleaningStatus() {
   const active = (areas.data ?? []).filter((area) => !area.archived_at);
 
   return (
-    <HomeSection id="home-cleaning-status" title={i18n("rhCleaningStatus")}>
+    <DashboardCard
+      id="home-cleaning-status"
+      eyebrow={i18n("rhCleaningStatus")}
+      action={<CardLink href={adminHref("/admin/cleaning", organizationSlug)}>{i18n("open6f4789b")}</CardLink>}
+    >
       {areas.isPending ? (
         <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
       ) : areas.isError ? (
         <StatusText tone="error">{localizeError(areas.error, i18n)}</StatusText>
       ) : active.length === 0 ? (
-        <StatusText tone="muted">{i18n("cleanNoAreas")}</StatusText>
+        <EmptyNote>{i18n("cleanNoAreas")}</EmptyNote>
       ) : (
-        <ul className="grid gap-2">
-          {active.map((area) => (
-            <li
-              key={area.id}
-              className="flex flex-wrap items-center justify-between gap-2 rounded-[1.2rem] px-4 py-3"
-              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-            >
-              <span className="min-w-0 truncate font-semibold" style={{ color: "var(--text)" }}>{area.name}</span>
-              <span className="text-xs" style={{ color: area.last_cleaned_at ? "var(--dim)" : "var(--warning)" }}>
-                {area.last_cleaned_at
-                  ? i18n("rhLastCleaned", { time: formatDateTime(area.last_cleaned_at, locale) })
-                  : i18n("rhNeverCleaned")}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <StatusList
+          rows={active.map((area) => ({
+            id: area.id,
+            label: area.name,
+            status: area.last_cleaned_at
+              ? i18n("rhLastCleaned", { time: formatDateTime(area.last_cleaned_at, locale) })
+              : i18n("rhNeverCleaned"),
+            tone: area.last_cleaned_at ? "ok" : "warn",
+          }))}
+        />
       )}
-    </HomeSection>
+    </DashboardCard>
   );
 }
 
-function AccountantSections({ membership }: { membership: Membership }) {
+function AccountsCard({ membership }: { membership: Membership }) {
   const i18n = useUiTranslations();
+  const organizationSlug = useOrganizationSlug();
   const has = (capability: string) => can(membership, capability);
-  const links: HomeLink[] = [
+  const href = (path: string) => adminHref(path, organizationSlug);
+  const tiles: ActionTile[] = [
     ...(has("take_payments") || has("manage_billing")
       ? [
-          { label: i18n("rhOverdue"), href: "/admin/finance?tab=queues", hint: i18n("rhOverdueHint") },
-          { label: i18n("rhCorporateBalances"), href: "/admin/finance?tab=corporate" },
-          { label: i18n("rhDeskPayments"), href: "/admin/finance?tab=members", hint: i18n("rhDeskPaymentsHint") },
+          { label: i18n("rhOverdue"), href: href("/admin/finance?tab=queues"), icon: "file" as const, hint: i18n("rhOverdueHint") },
+          { label: i18n("rhCorporateBalances"), href: href("/admin/finance?tab=corporate"), icon: "users" as const },
+          { label: i18n("rhDeskPayments"), href: href("/admin/finance?tab=members"), icon: "card" as const, hint: i18n("rhDeskPaymentsHint") },
         ]
       : []),
-    ...(has("view_finance_reports") ? [{ label: i18n("rhFinanceReports"), href: "/admin/metrics/finance" }] : []),
+    ...(has("view_finance_reports") ? [{ label: i18n("rhFinanceReports"), href: href("/admin/metrics/finance"), icon: "chart" as const }] : []),
   ];
-  if (links.length === 0) return null;
+  if (tiles.length === 0) return null;
   return (
-    <HomeSection id="home-accounts" title={i18n("rhAccounts")} defaultOpen>
-      <LinkList links={links} />
-    </HomeSection>
+    <DashboardCard id="home-accounts" eyebrow={i18n("rhAccounts")}>
+      <ActionTiles tiles={tiles} />
+    </DashboardCard>
   );
 }

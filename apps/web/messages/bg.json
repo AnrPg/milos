@@ -4202,7 +4202,8 @@
     "historyNoResult": "Няма записан резултат.",
     "workoutCount": "{count, plural, one {# тренировка} other {# тренировки}}",
     "accessEndedTitle": "Достъпът ви изтече",
-    "accessEndedCancelledBookings": "{count, plural, one {Предстоящото ви записване беше отменено.} other {# предстоящи записвания бяха отменени.}}"
+    "accessEndedCancelledBookings": "{count, plural, one {Предстоящото ви записване беше отменено.} other {# предстоящи записвания бяха отменени.}}",
+    "dashNoClassesToday": "Няма класове днес"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",

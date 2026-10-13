@@ -4202,7 +4202,8 @@
     "historyNoResult": "Δεν καταγράφηκε αποτέλεσμα.",
     "workoutCount": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}",
     "accessEndedTitle": "Η πρόσβασή σας έληξε",
-    "accessEndedCancelledBookings": "{count, plural, one {Η επερχόμενη κράτησή σας ακυρώθηκε.} other {Οι # επερχόμενες κρατήσεις σας ακυρώθηκαν.}}"
+    "accessEndedCancelledBookings": "{count, plural, one {Η επερχόμενη κράτησή σας ακυρώθηκε.} other {Οι # επερχόμενες κρατήσεις σας ακυρώθηκαν.}}",
+    "dashNoClassesToday": "Δεν υπάρχουν μαθήματα σήμερα"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",

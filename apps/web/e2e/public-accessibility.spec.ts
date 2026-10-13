@@ -11,7 +11,7 @@ const pages = [
   },
   {
     path: "/admin",
-    heading: /^today$/i,
+    heading: /^dashboard$/i,
     user: { id: "admin-1", nickname: "Ada Admin", role: "admin" },
   },
 ];

@@ -4202,7 +4202,8 @@
     "historyNoResult": "Aucun résultat enregistré.",
     "workoutCount": "{count, plural, one {# séance} other {# séances}}",
     "accessEndedTitle": "Votre accès est terminé",
-    "accessEndedCancelledBookings": "{count, plural, one {Votre prochaine réservation a été annulée.} other {Vos # prochaines réservations ont été annulées.}}"
+    "accessEndedCancelledBookings": "{count, plural, one {Votre prochaine réservation a été annulée.} other {Vos # prochaines réservations ont été annulées.}}",
+    "dashNoClassesToday": "Aucun cours aujourd’hui"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
