@@ -109,6 +109,18 @@ defmodule MilosTraining.Workouts do
   @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-124)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
 
+  @doc """
+  Descriptors of the exercises an athlete runs at `scale_slug` (TD-088): the
+  tenant-fetched workout is materialized for the scale first, so excluded
+  exercises drop out and substituted movements are matched by their own name.
+  A blank scale means the Rx workout.
+  """
+  def exercise_descriptors(workout, scale_slug) when scale_slug in [nil, ""],
+    do: exercise_descriptors(workout)
+
+  def exercise_descriptors(workout, scale_slug) when is_binary(scale_slug),
+    do: workout |> materialize_for_scale(scale_slug) |> exercise_descriptors()
+
   def reject_assignment_for_athlete(assignment_id, athlete_id),
     do:
       MilosTraining.Workouts.WorkoutStore.reject_assignment_for_athlete(assignment_id, athlete_id)
