@@ -6,15 +6,14 @@ defmodule MilosTraining.Workers.CorporateInvoicingJob do
 
   use Oban.Worker, queue: :analytics, max_attempts: 3, unique: [period: 3_600]
 
+  alias MilosTraining.Organizations
   alias MilosTraining.Application.CorporateInvoicing
-  alias MilosTraining.Organizations.OrganizationStore
 
   @impl Oban.Worker
   def perform(_job) do
     today = Date.utc_today()
 
-    OrganizationStore.list_organizations()
-    |> Enum.filter(fn %{organization: organization} -> organization.status == :active end)
+    Organizations.list_active_organizations_for_system()
     |> Enum.each(&CorporateInvoicing.run(&1, today))
 
     :ok

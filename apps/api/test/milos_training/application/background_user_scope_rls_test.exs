@@ -30,7 +30,18 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
   alias MilosTraining.Gamification.GamificationStore
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
-  alias MilosTraining.Workers.ProcessWorkoutCompletionJob
+  alias MilosTraining.Workers.{
+    CoachingReplyOverdueJob,
+    CorporateInvoicingJob,
+    ExecutionAbandonmentSweepJob,
+    InventoryDigestJob,
+    MarkOverdueInvoicesJob,
+    PackageExpiryReminderJob,
+    PaymentReminderJob,
+    ProcessWorkoutCompletionJob,
+    ReconcileEntitlementReservationsJob,
+    SubscriptionExpiryJob
+  }
 
   describe "workout completion projection (ProcessWorkoutCompletionJob)" do
     setup do
@@ -163,6 +174,71 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
       # Both the finished execution and the logged entry count.
       assert %{total_workouts: 2} =
                bypass_rls(fn -> GamificationStore.get_user_stats(ctx.member.id) end)
+    end
+  end
+
+  describe "per-tenant cron jobs" do
+    test "a cron job reaches each active organization (MarkOverdueInvoicesJob)" do
+      {context, invoice} =
+        bypass_rls(fn ->
+          owner = user_fixture()
+          member = user_fixture()
+          {:ok, gym} = Organizations.create_organization(%{name: "Cron Gym"})
+          add!(gym, owner, :owner)
+          context = tenant!(owner, gym)
+
+          {:ok, membership} =
+            Finance.upsert_membership(context, member.id, %{
+              user_type_snapshot: "member",
+              status: "active",
+              signup_source: "direct"
+            })
+
+          {:ok, invoice} =
+            Finance.create_invoice(context, membership.id, %{
+              amount_cents: 5_000,
+              description: "Cron overdue invoice",
+              due_date: Date.add(Date.utc_today(), 7)
+            })
+
+          {:ok, _issued} = Finance.issue_invoice(context, invoice.id, %{})
+
+          {:ok, _backdated} =
+            Finance.update_invoice(context, invoice.id, %{
+              due_date: Date.add(Date.utc_today(), -7)
+            })
+
+          {context, invoice}
+        end)
+
+      clear_session!()
+      assert :ok = MarkOverdueInvoicesJob.perform(%Oban.Job{args: %{}})
+
+      assert {:ok, %{status: "overdue"}} =
+               bypass_rls(fn -> Finance.get_invoice(context, invoice.id) end)
+    end
+
+    test "every per-tenant cron worker runs under the runtime role without a session scope" do
+      bypass_rls(fn ->
+        owner = user_fixture()
+        {:ok, gym} = Organizations.create_organization(%{name: "Smoke Gym"})
+        add!(gym, owner, :owner)
+      end)
+
+      for worker <- [
+            CoachingReplyOverdueJob,
+            CorporateInvoicingJob,
+            ExecutionAbandonmentSweepJob,
+            InventoryDigestJob,
+            MarkOverdueInvoicesJob,
+            PackageExpiryReminderJob,
+            PaymentReminderJob,
+            ReconcileEntitlementReservationsJob,
+            SubscriptionExpiryJob
+          ] do
+        clear_session!()
+        assert :ok = worker.perform(%Oban.Job{args: %{}}), "#{inspect(worker)} failed"
+      end
     end
   end
 

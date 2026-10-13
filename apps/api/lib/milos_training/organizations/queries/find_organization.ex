@@ -13,6 +13,16 @@ defmodule MilosTraining.Organizations.Queries.FindOrganization do
 
   def by_id(_id), do: nil
 
+  # TD-092: same scoped self-read for the organization's settings row (brand
+  # name, locale), e.g. for server-side email senders.
+  def settings_by_id(id) when is_binary(id),
+    do:
+      RepoContext.run(%{organization_id: id}, fn ->
+        OrganizationStore.get_organization_settings(id)
+      end)
+
+  def settings_by_id(_id), do: nil
+
   def by_slug(slug), do: OrganizationStore.get_organization_by_slug(slug)
   def by_domain(host), do: OrganizationStore.get_organization_by_domain(host)
 end

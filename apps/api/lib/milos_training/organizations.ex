@@ -55,6 +55,18 @@ defmodule MilosTraining.Organizations do
   defdelegate get_by_id(id), to: FindOrganization, as: :by_id
   defdelegate get_by_slug(slug), to: FindOrganization, as: :by_slug
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
+  defdelegate get_organization_settings(id), to: FindOrganization, as: :settings_by_id
+
+  @doc """
+  TD-092 / ADR-131: the active organizations a per-tenant cron job visits, as
+  `%{organization: organization, settings: settings}`. Works without any
+  session scope (an Oban job); each row is read inside its own organization's
+  scope.
+  """
+  defdelegate list_active_organizations_for_system(),
+    to: MilosTraining.Organizations.Queries.ListActiveOrganizationsForSystem,
+    as: :call
+
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
 
   defdelegate list_active_membership_user_ids(context_or_organization_id),

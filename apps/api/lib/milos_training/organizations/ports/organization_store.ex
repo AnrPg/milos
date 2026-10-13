@@ -63,6 +63,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback provision_organization(map(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
   @callback list_organizations() :: [map()]
+  @callback list_active_organization_ids() :: [Ecto.UUID.t()]
   @callback delete_organization(Ecto.UUID.t(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, Organization.t()} | {:error, term()}
   @callback update_organization_lifecycle(Ecto.UUID.t(), atom(), Ecto.UUID.t(), DateTime.t()) ::

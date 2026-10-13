@@ -10,15 +10,14 @@ defmodule MilosTraining.Workers.ExecutionAbandonmentSweepJob do
     max_attempts: 3,
     unique: [period: 3_000, states: [:available, :scheduled, :executing]]
 
+  alias MilosTraining.Organizations
   alias MilosTraining.Application.SweepAbandonedExecutions
-  alias MilosTraining.Organizations.OrganizationStore
 
   @impl Oban.Worker
   def perform(_job) do
     now = DateTime.utc_now()
 
-    OrganizationStore.list_organizations()
-    |> Enum.filter(fn %{organization: organization} -> organization.status == :active end)
+    Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} ->
       SweepAbandonedExecutions.call(organization.id, now)
     end)

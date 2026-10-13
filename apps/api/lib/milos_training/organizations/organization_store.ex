@@ -119,6 +119,9 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def list_organizations, do: impl().list_organizations()
 
   @impl true
+  def list_active_organization_ids, do: impl().list_active_organization_ids()
+
+  @impl true
   def delete_organization(organization_id, platform_user_id, deleted_at),
     do: impl().delete_organization(organization_id, platform_user_id, deleted_at)
 

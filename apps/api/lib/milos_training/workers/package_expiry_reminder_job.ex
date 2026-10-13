@@ -7,15 +7,13 @@ defmodule MilosTraining.Workers.PackageExpiryReminderJob do
 
   use Oban.Worker, queue: :analytics, max_attempts: 3, unique: [period: 3_600]
 
-  alias MilosTraining.{Finance, Notifications}
-  alias MilosTraining.Organizations.OrganizationStore
+  alias MilosTraining.{Finance, Notifications, Organizations}
 
   @impl Oban.Worker
   def perform(_job) do
     today = Date.utc_today()
 
-    OrganizationStore.list_organizations()
-    |> Enum.filter(fn %{organization: organization} -> organization.status == :active end)
+    Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} ->
       %{organization_id: organization.id}
       |> Finance.subscriptions_due_for_expiry_reminder(today)
