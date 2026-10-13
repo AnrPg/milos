@@ -37,6 +37,12 @@ defmodule MilosTrainingWeb.MyInjuryWarningController do
         in: :query,
         required: false,
         schema: %Schema{type: :string, format: :uuid}
+      },
+      %Parameter{
+        name: :scale,
+        in: :query,
+        required: false,
+        schema: InjuryWarnings.scale()
       }
     ],
     responses: [
@@ -49,7 +55,7 @@ defmodule MilosTrainingWeb.MyInjuryWarningController do
            GetMyWorkoutInjuryWarnings.call(
              conn.assigns.tenant_context,
              workout_id(params),
-             Map.take(params, [:surface, :source_context_id])
+             Map.take(params, [:surface, :source_context_id, :scale])
            ) do
       json(conn, result)
     end
