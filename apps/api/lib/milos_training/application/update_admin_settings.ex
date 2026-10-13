@@ -37,8 +37,9 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     end
   end
 
-  defp maybe_update_gamification(_context, params) when map_size(params) == 0 do
-    {:ok, Gamification.get_settings()}
+  # TD-092: read in the gym's scope - unscoped the defaults came back.
+  defp maybe_update_gamification(context, params) when map_size(params) == 0 do
+    {:ok, Gamification.with_tenant_context(context, &Gamification.get_settings/0)}
   end
 
   defp maybe_update_gamification(context, params) do
