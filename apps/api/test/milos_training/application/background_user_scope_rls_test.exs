@@ -18,6 +18,7 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
   import MilosTraining.TestFixtures
 
   alias MilosTraining.Application.{
+    AdminMemberSearchDocuments,
     AdminRecordAttendance,
     AssignWorkout,
     DeleteWorkout,
@@ -402,6 +403,35 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
       assert {:ok, _booking} = SubmitBooking.call(ctx.member_ctx, ctx.member, later.id)
     end)
+  end
+
+  describe "admin member search index rebuild (RebuildMemberSearchIndexJob)" do
+    test "documents carry the member's gyms and finance summary" do
+      {gym, member} =
+        bypass_rls(fn ->
+          owner = user_fixture()
+          member = user_fixture()
+          {:ok, gym} = Organizations.create_organization(%{name: "Search Gym"})
+          add!(gym, owner, :owner)
+          add!(gym, member, :member)
+
+          {:ok, _membership} =
+            Finance.upsert_membership(tenant!(owner, gym), member.id, %{
+              user_type_snapshot: "member",
+              status: "active",
+              signup_source: "direct"
+            })
+
+          {gym, member}
+        end)
+
+      clear_session!()
+      documents = AdminMemberSearchDocuments.build_all()
+      document = Enum.find(documents, &(&1.id == member.id))
+
+      assert document.organization_ids == [gym.id]
+      assert document.membership_status == "active"
+    end
   end
 
   describe "workout change fanout to assigned athletes" do
