@@ -6,11 +6,19 @@ defmodule MilosTraining.Organizations.Commands.OwnerOrganizationActions do
   """
 
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
+  alias MilosTraining.Organizations.Commands.SeedTenantDefaults
   alias MilosTraining.Organizations.Domain.TenantAuthorization
   alias MilosTraining.Organizations.OrganizationStore
 
-  @doc "An account that owns a gym creates another one and owns it."
-  def create(%{id: user_id}, params, now \\ DateTime.utc_now()) do
+  @doc """
+  An account that owns a gym creates another one and owns it. The gym, its
+  settings, the owner membership and `opts[:seed_defaults]` (run in the new
+  gym's tenant scope) commit or roll back together (ADR-133).
+  """
+  def create(%{id: user_id}, params, opts \\ []) do
+    now = Keyword.get(opts, :now, DateTime.utc_now())
+    seed_defaults = SeedTenantDefaults.seed_option(opts)
+
     if owns_a_gym?(user_id) do
       # The organization row is written as a system insert: its RLS policy only
       # admits members of the row (none exist yet) or a session without a user.
@@ -29,7 +37,8 @@ defmodule MilosTraining.Organizations.Commands.OwnerOrganizationActions do
                    status: :active,
                    joined_at: now
                  })
-               end) do
+               end),
+             {:ok, _defaults} <- SeedTenantDefaults.run(organization.id, user_id, seed_defaults) do
           {:ok, organization}
         end
       end)

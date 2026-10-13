@@ -235,8 +235,15 @@ defmodule MilosTraining.Organizations do
 
   def revoke_vendor(user_id), do: OrganizationStore.revoke_vendor(user_id)
 
-  def provision_organization(context, params, issued_at \\ DateTime.utc_now()),
-    do: ProvisionOrganization.call(context, params, issued_at)
+  @doc """
+  Vendor provisioning. `opts`: `:issued_at`, and `:seed_defaults` - a
+  `(%{organization_id, user_id} -> {:ok, term} | {:error, term})` that writes
+  another context's defaults in the new tenant's scope, in the same
+  transaction (ADR-133). `Application.ProvisionOrganization` supplies the
+  platform defaults.
+  """
+  def provision_organization(context, params, opts \\ []),
+    do: ProvisionOrganization.call(context, params, opts)
 
   def list_provisioned_organizations(context),
     do: ListProvisionedOrganizations.call(context)
@@ -269,8 +276,14 @@ defmodule MilosTraining.Organizations do
         role_grants: role_grants
       )
 
-  def create_owned_organization(account, params),
-    do: MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params)
+  @doc """
+  An owner creates another gym. Takes the same `:seed_defaults` option as
+  `provision_organization/3`; `Application.CreateOwnedOrganization` supplies
+  the platform defaults.
+  """
+  def create_owned_organization(account, params, opts \\ []),
+    do:
+      MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params, opts)
 
   def transfer_ownership(context, to_user_id),
     do:

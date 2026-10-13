@@ -1,8 +1,20 @@
 defmodule MilosTraining.Organizations.Commands.ProvisionOrganization do
   alias MilosTraining.Organizations.Domain.{InvitationToken, MembershipPolicy}
   alias MilosTraining.Organizations.{OrganizationStore, PlatformContext}
+  alias MilosTraining.Organizations.Commands.SeedTenantDefaults
 
-  def call(%PlatformContext{} = context, params, issued_at) do
+  @doc """
+  Provisions the organization, its settings, the initial admin invitation and
+  the audit event, then runs `opts[:seed_defaults]` in the new organization's
+  tenant scope - all in one transaction (ADR-133). `opts[:issued_at]` pins the
+  invitation clock.
+  """
+  def call(context, params, opts \\ [])
+
+  def call(%PlatformContext{} = context, params, opts) do
+    issued_at = Keyword.get(opts, :issued_at, DateTime.utc_now())
+    seed_defaults = SeedTenantDefaults.seed_option(opts)
+
     with {:ok, owner_email} <- require_owner_email(value(params, :initial_owner_email)),
          true <- :admin in MembershipPolicy.roles() do
       token = InvitationToken.generate()
@@ -15,22 +27,28 @@ defmodule MilosTraining.Organizations.Commands.ProvisionOrganization do
         intended_email_digest: intended_email_digest(owner_email)
       }
 
-      with {:ok, result} <-
-             OrganizationStore.provision_organization(
-               params,
-               invitation_params,
-               context.user_id,
-               issued_at
-             ) do
-        {:ok, Map.put(result, :initial_owner_token, token)}
-      end
+      # The organization row is a system insert (there is no tenant session
+      # yet); the seeded defaults are written in the new organization's scope.
+      OrganizationStore.transaction(fn ->
+        with {:ok, result} <-
+               OrganizationStore.provision_organization(
+                 params,
+                 invitation_params,
+                 context.user_id,
+                 issued_at
+               ),
+             {:ok, _defaults} <-
+               SeedTenantDefaults.run(result.organization.id, context.user_id, seed_defaults) do
+          {:ok, Map.put(result, :initial_owner_token, token)}
+        end
+      end)
     else
       false -> {:error, :admin_role_unavailable}
       error -> error
     end
   end
 
-  def call(_context, _params, _issued_at), do: {:error, :vendor_required}
+  def call(_context, _params, _opts), do: {:error, :vendor_required}
 
   # Provisioning is how an invitation goes out; an organization with no one
   # to invite has no way for anyone but the vendor to ever access it.
