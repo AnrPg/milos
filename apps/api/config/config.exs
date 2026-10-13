@@ -33,7 +33,12 @@ config :milos_training, Oban,
        {"0 2 * * *", MilosTraining.Workers.MarkOverdueInvoicesJob},
        {"17 * * * *", MilosTraining.Workers.ReconcileEntitlementReservationsJob},
        {"0 9 * * *", MilosTraining.Workers.PaymentReminderJob},
-       {"41 * * * *", MilosTraining.Workers.ExecutionAbandonmentSweepJob}
+       {"41 * * * *", MilosTraining.Workers.ExecutionAbandonmentSweepJob},
+       {"*/30 * * * *", MilosTraining.Workers.RebuildMemberSearchIndexJob},
+       {"0 8 * * *", MilosTraining.Workers.PackageExpiryReminderJob},
+       {"23 * * * *", MilosTraining.Workers.CoachingReplyOverdueJob},
+       {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob},
+       {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob}
      ]}
   ],
   queues: [
@@ -62,6 +67,43 @@ config :milos_training,
        MilosTraining.Infrastructure.Organizations.EctoOrganizationStore
 
 config :milos_training, :coaching_store, MilosTraining.Infrastructure.Coaching.EctoCoachingStore
+
+config :milos_training,
+       :facility_store,
+       MilosTraining.Infrastructure.Facility.EctoFacilityStore
+
+config :milos_training, :content_store, MilosTraining.Infrastructure.Content.EctoContentStore
+
+# Stores the API spec once instead of once per first-seen action (literal area).
+config :open_api_spex, :cache_adapter, MilosTrainingWeb.ApiSpecCache
+
+config :milos_training,
+       :appointment_store,
+       MilosTraining.Infrastructure.Appointments.EctoAppointmentStore
+
+config :milos_training,
+       :coaching_form_review_store,
+       MilosTraining.Infrastructure.Coaching.EctoFormReviewStore
+
+config :milos_training,
+       :housekeeping_store,
+       MilosTraining.Infrastructure.Housekeeping.EctoHousekeepingStore
+
+config :milos_training,
+       :inventory_store,
+       MilosTraining.Infrastructure.Inventory.EctoInventoryStore
+
+config :milos_training,
+       :coaching_note_store,
+       MilosTraining.Infrastructure.Coaching.EctoNoteStore
+
+config :milos_training,
+       :coaching_relationship_store,
+       MilosTraining.Infrastructure.Coaching.EctoRelationshipStore
+
+config :milos_training,
+       :nutrition_store,
+       MilosTraining.Infrastructure.Nutrition.EctoNutritionStore
 
 config :milos_training,
        :execution_store,

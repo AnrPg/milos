@@ -140,6 +140,23 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
     |> Enum.map(&normalize_history/1)
   end
 
+  # Every history entry of the user's PRs with its record's name and unit, for
+  # the progress timeline (ADR-098).
+  @impl true
+  def list_user_pr_history(user_id) do
+    PRHistory
+    |> join(:inner, [h], r in PRRecord, on: r.id == h.pr_record_id)
+    |> where([_h, r], r.user_id == ^user_id)
+    |> order_by([h], asc: h.beaten_on, asc: h.inserted_at)
+    |> select([h, r], {h, r.name, r.unit, r.higher_is_better})
+    |> Repo.all()
+    |> Enum.map(fn {history, name, unit, higher_is_better} ->
+      history
+      |> normalize_history()
+      |> Map.merge(%{name: name, unit: unit, higher_is_better: higher_is_better})
+    end)
+  end
+
   @impl true
   def count_user_prs(user_id) do
     PRRecord

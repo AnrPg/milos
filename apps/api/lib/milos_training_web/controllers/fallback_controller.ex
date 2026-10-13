@@ -621,6 +621,148 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-096 package contract errors. `params` carry the catalog field or lock
+  # path so clients can localize and focus the offending input.
+  def call(conn, {:error, {:package_type_invariant_violated, path}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_invariant_violated",
+      "This value is defined by the package type",
+      %{field: path}
+    )
+  end
+
+  def call(conn, {:error, {:entitlement_not_available, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "entitlement_not_available",
+      "This benefit is not available yet",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:invalid_package_field, field, reason}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package field value",
+      %{field: field, reason: to_string(reason)}
+    )
+  end
+
+  def call(conn, {:error, {:unknown_package_field, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "unknown_package_field",
+      "Unknown package field",
+      %{field: field}
+    )
+  end
+
+  def call(conn, {:error, {:package_rule_violated, rule, field}}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_rule_violated",
+      "Package rule violated",
+      %{rule: to_string(rule), field: field}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_fields}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_field",
+      "Invalid package fields",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :invalid_package_type}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "invalid_package_type",
+      "Invalid package type",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_not_available}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_type_not_available",
+      "This package type is not available yet",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_type_change_requires_copy}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_type_change_requires_copy",
+      "A sold package cannot change type; create a copy instead",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_already_used}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_already_used",
+      "This package can be used only once per person",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_new_members_only}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_new_members_only",
+      "This package is only for new members",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :package_not_renewable}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "package_not_renewable",
+      "This package does not renew",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      %{}
+    )
+  end
+
+  def call(conn, {:error, :finance_class_type_not_included, details}) do
+    package_contract_error(
+      conn,
+      :forbidden,
+      "finance_class_type_not_included",
+      "This class type is not included in the package",
+      details
+    )
+  end
+
   def call(conn, {:error, :package_inactive}) do
     conn
     |> put_status(:conflict)
@@ -1534,6 +1676,114 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-097 Phase B: booking rules, perks, freezes and facility.
+  @phase_b_errors %{
+    finance_membership_frozen: {:forbidden, "The membership is frozen"},
+    finance_time_window_not_included: {:forbidden, "This time is outside the package's hours"},
+    finance_location_not_included: {:forbidden, "This location is not included in the package"},
+    invalid_freeze_dates: {:unprocessable_entity, "The freeze dates are invalid"},
+    freeze_in_past: {:unprocessable_entity, "A freeze cannot start in the past"},
+    freeze_not_included: {:unprocessable_entity, "The package does not include freezes"},
+    freeze_overlaps: {:conflict, "The freeze overlaps another freeze"},
+    freeze_allowance_exceeded:
+      {:unprocessable_entity, "The freeze exceeds the yearly freeze days"},
+    freeze_already_cancelled: {:conflict, "The freeze is already cancelled"},
+    slot_not_full: {:conflict, "The class still has free spots"},
+    invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},
+    guest_already_booked: {:conflict, "A guest is already booked for this class"},
+    booking_not_waitlisted: {:conflict, "The booking is not on the waitlist"},
+    location_not_found: {:not_found, "Location not found"},
+    location_archived: {:unprocessable_entity, "The location is archived"},
+    # ADR-098
+    form_review_closed: {:conflict, "The form review is already closed"},
+    appointment_slot_cancelled: {:conflict, "The appointment was cancelled"},
+    appointment_slot_in_past: {:unprocessable_entity, "The appointment has already started"},
+    appointment_slot_full: {:conflict, "The appointment is full"},
+    appointment_format_not_included:
+      {:forbidden, "This session format is not included in the package"},
+    appointment_coach_not_included: {:forbidden, "This coach is not included in the package"},
+    appointment_not_active: {:conflict, "The appointment is no longer active"},
+    appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
+    invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"},
+    add_on_base_required:
+      {:unprocessable_entity, "The member needs a compatible membership first"},
+    corporate_package_requires_enrollment:
+      {:unprocessable_entity, "Corporate seats are added through the corporate client"},
+    beneficiary_is_payer: {:unprocessable_entity, "The payer is already on the membership"},
+    not_a_shared_membership: {:unprocessable_entity, "This membership is not shared"},
+    beneficiary_limit_reached: {:conflict, "The membership has no room for more people"},
+    minor_beneficiaries_not_allowed:
+      {:unprocessable_entity, "This package does not allow minors"},
+    not_a_corporate_package: {:unprocessable_entity, "Choose a corporate package"},
+    already_enrolled: {:conflict, "The member already has a seat"},
+    corporate_seats_full: {:conflict, "All seats are taken"},
+    corporate_invoice_closed: {:conflict, "The invoice is already paid or void"},
+    invalid_invoice_status: {:unprocessable_entity, "Status must be paid or void"},
+    corporate_enrollment_not_found: {:not_found, "No corporate plan matches"},
+    corporate_seat_billed_to_company: {:unprocessable_entity, "The company pays for this seat"},
+    add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
+    last_owner: {:conflict, "A gym needs at least one owner"},
+    owner_required: {:forbidden, "Only gym owners can create gyms"},
+    machine_retired: {:unprocessable_entity, "This machine is retired"},
+    invalid_machine_event: {:unprocessable_entity, "Unknown machine log entry"},
+    not_enough_stock: {:unprocessable_entity, "There is not that much in stock"},
+    invalid_movement: {:unprocessable_entity, "Unknown stock change"},
+    confirmation_mismatch: {:unprocessable_entity, "Type the gym's slug to confirm"},
+    cleaning_area_archived: {:unprocessable_entity, "That area is archived"},
+    cleaning_already_finished: {:conflict, "This cleaning is already finished"},
+    cleaning_finished_before_start: {:unprocessable_entity, "Finish cannot be before start"},
+    not_a_coach: {:unprocessable_entity, "That person is not a coach here"},
+    not_a_client: {:unprocessable_entity, "That person is not a member or athlete here"},
+    only_athletes_self_assigned: {:unprocessable_entity, "Coaches can take athletes only"},
+    not_your_client: {:forbidden, "Not one of your clients"},
+    roles_required: {:unprocessable_entity, "Choose at least one role"},
+    invalid_role: {:unprocessable_entity, "Unknown role"},
+    invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},
+    payment_exceeds_balance: {:unprocessable_entity, "The payment is more than the balance due"},
+    corporate_invoice_has_payments: {:conflict, "Reverse the payments before voiding"},
+    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, %{})
+  end
+
+  def call(conn, {:error, reason, details}) when is_map_key(@phase_b_errors, reason) do
+    {status, message} = Map.fetch!(@phase_b_errors, reason)
+    package_contract_error(conn, status, to_string(reason), message, details)
+  end
+
+  def call(conn, {:error, :booking_window_closed, details}) do
+    package_contract_error(
+      conn,
+      :unprocessable_entity,
+      "booking_window_closed",
+      "Booking for this class is not open yet",
+      details
+    )
+  end
+
+  def call(conn, {:error, {:package_commitment_active, details}}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      details
+    )
+  end
+
+  def call(conn, {:error, :package_commitment_active}) do
+    package_contract_error(
+      conn,
+      :conflict,
+      "package_commitment_active",
+      "The minimum commitment has not ended",
+      %{}
+    )
+  end
+
   def call(conn, {:error, _reason}) do
     conn
     |> put_status(:internal_server_error)
@@ -1568,5 +1818,11 @@ defmodule MilosTrainingWeb.FallbackController do
       %{count: 1},
       %{context: "invoice", reason: reason}
     )
+  end
+
+  defp package_contract_error(conn, status, code, message, params) do
+    conn
+    |> put_status(status)
+    |> json(%{code: code, error: message, params: params})
   end
 end

@@ -266,6 +266,8 @@ describe("PlatformOrganizationsPage", () => {
       {
         id: "membership-vendor-1",
         role: "admin",
+        roles: ["admin"],
+        capabilities: {},
         organization: { id: "org-1", slug: "north-harbor", name: "North Harbor Strength" },
       },
     ]);

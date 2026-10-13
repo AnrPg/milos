@@ -6,7 +6,7 @@ defmodule MilosTraining.Organizations.Commands.RevokeInvitation do
   # registration_invitations is a root tenant table: RLS admits the row only in
   # the acting owner/admin's tenant scope (TD-046).
   def call(context, invitation_id, revoked_at) do
-    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]) do
+    with :ok <- TenantAuthorization.authorize_capability(context, :invite_clients) do
       RepoContext.run(context, fn ->
         OrganizationStore.revoke_invitation(context.organization_id, invitation_id, revoked_at)
       end)

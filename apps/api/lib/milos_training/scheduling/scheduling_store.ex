@@ -235,4 +235,24 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def count_classes_today, do: missing_tenant()
 
   defp missing_tenant, do: {:error, :organization_context_required}
+
+  # Phase B (ADR-097)
+  @impl true
+  def create_booking_with(context, user_id, slot_id, timeout_minutes, attrs),
+    do: tenant_call(context, :create_booking_with, [user_id, slot_id, timeout_minutes, attrs])
+
+  @impl true
+  def create_approved_booking_with(context, user_id, slot_id, attrs),
+    do: tenant_call(context, :create_approved_booking_with, [user_id, slot_id, attrs])
+
+  @impl true
+  def create_waitlisted_booking(context, user_id, slot_id, attrs),
+    do: tenant_call(context, :create_waitlisted_booking, [user_id, slot_id, attrs])
+
+  @impl true
+  def list_waitlist(context, slot_id), do: tenant_call(context, :list_waitlist, [slot_id])
+
+  @impl true
+  def promote_waitlisted_booking(context, booking_id),
+    do: tenant_call(context, :promote_waitlisted_booking, [booking_id])
 end

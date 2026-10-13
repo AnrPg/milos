@@ -96,11 +96,18 @@ const TENANT_SCOPED_PREFIXES = [
   "/admin",
   "/bookings",
   "/class-timers",
+  "/check-ins",
   "/landing",
+  "/locations",
+  "/me/appointments",
+  "/me/corporate-enrollment",
   "/me/entitlement",
   "/me/finance",
+  "/me/form-reviews",
   "/me/invoices",
   "/me/refund-receipts",
+  "/me/nutrition-plan",
+  "/me/progress",
   "/me/reviews",
   "/me/search/users",
   "/me/threads",
@@ -108,6 +115,8 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/workouts",
   "/my-workouts",
   "/schedule",
+  "/staff",
+  "/me/videos",
 ];
 
 function pathMatchesPrefix(path: string, prefix: string) {

@@ -81,10 +81,18 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       role: %Schema{type: :string},
+      roles: %Schema{type: :array, items: %Schema{type: :string}},
+      coach_scope: %Schema{type: :string, enum: ["own", "all"]},
+      notes_visible_to_admins: %Schema{type: :boolean, description: "ADR-101"},
+      capabilities: %Schema{
+        type: :object,
+        description: "capability => scope (all, own, status), ADR-099",
+        additionalProperties: %Schema{type: :string}
+      },
       organization: @organization_schema,
       settings: @organization_settings_schema
     },
-    required: [:id, :role, :organization]
+    required: [:id, :role, :roles, :capabilities, :organization]
   }
 
   # Keep CastAndValidate on the body-only unauthenticated invitation endpoints.
@@ -211,10 +219,23 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     %{
       id: membership.id,
       role: to_string(membership.role),
+      roles: Enum.map(membership.roles, &to_string/1),
+      coach_scope: to_string(membership.coach_scope),
+      notes_visible_to_admins: membership.notes_visible_to_admins != false,
+      capabilities:
+        membership.roles
+        |> MilosTraining.Organizations.capabilities_for(
+          membership.coach_scope,
+          role_grants(Map.get(entry, :settings))
+        )
+        |> Map.new(fn {capability, scope} -> {to_string(capability), to_string(scope)} end),
       organization: %{id: organization.id, name: organization.name, slug: organization.slug},
       settings: serialize_settings(Map.get(entry, :settings))
     }
   end
+
+  defp role_grants(%{settings: %{"role_grants" => grants}}) when is_map(grants), do: grants
+  defp role_grants(_settings), do: %{}
 
   defp serialize_settings(nil), do: nil
 

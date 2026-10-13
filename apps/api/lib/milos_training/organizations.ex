@@ -1,6 +1,7 @@
 defmodule MilosTraining.Organizations do
   alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, TenantAuthorization}
   alias MilosTraining.Organizations.OrganizationStore
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
   alias MilosTraining.Organizations.Commands.{
     AddMembership,
@@ -18,6 +19,7 @@ defmodule MilosTraining.Organizations do
     RequestOrganizationPurge,
     RevokeInvitation,
     SendOwnerInvitationEmail,
+    SetCoachScope,
     SetMembershipRole,
     SetMembershipStatus,
     UpdateOrganizationLifecycle,
@@ -37,6 +39,7 @@ defmodule MilosTraining.Organizations do
     ListMemberships,
     ListOrganizationMemberships,
     ListProvisionedOrganizations,
+    ListMemberRoles,
     ListStaffUserIds,
     ResolvePlatformContext,
     ResolveSlugAlias,
@@ -61,7 +64,117 @@ defmodule MilosTraining.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
+  @doc "Whether the tenant context holds any of `roles` (ADR-099)."
+  defdelegate any_role?(context, roles),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  defdelegate staff?(context), to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  defdelegate roles_in(context),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization,
+    as: :roles
+
+  defdelegate can?(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  defdelegate capability_scope(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization,
+    as: :scope
+
+  defdelegate authorize_capability(context, capability),
+    to: MilosTraining.Organizations.Domain.TenantAuthorization
+
+  @doc "Roles that run a gym: owner and admin (ADR-099)."
+  defdelegate admin_roles(), to: MilosTraining.Organizations.Domain.MembershipPolicy
+
+  @doc "Every membership role (ADR-099)."
+  defdelegate roles(), to: MilosTraining.Organizations.Domain.MembershipPolicy
+
+  @doc "Roles of an active member of the gym, or [] (ADR-099)."
+  def member_roles(organization_id, user_id) when is_binary(user_id) do
+    case member(organization_id, user_id) do
+      %{roles: roles} -> roles
+      nil -> []
+    end
+  end
+
+  def member_roles(_organization_id, _user_id), do: []
+
+  @doc "A member's roles and coach scope in the gym, or nil (ADR-099, ADR-100)."
+  def membership_summary(organization_id, user_id) do
+    case member(organization_id, user_id) do
+      %{} = membership ->
+        %{
+          roles: Enum.map(membership.roles, &to_string/1),
+          coach_scope: to_string(membership.coach_scope || :own)
+        }
+
+      nil ->
+        nil
+    end
+  end
+
+  @doc "Whether a coach lets admins read their private notes (ADR-101)."
+  def notes_visible_to_admins?(organization_id, user_id) do
+    case member(organization_id, user_id) do
+      %{notes_visible_to_admins: visible} -> visible != false
+      nil -> true
+    end
+  end
+
+  @doc "A coach sets whether admins may read their private notes (ADR-101)."
+  def set_notes_visibility(context, visible) when is_boolean(visible) do
+    with :ok <- authorize_capability(context, :write_coach_notes) do
+      RepoContext.run(context, fn ->
+        OrganizationStore.update_membership_settings(
+          context.organization_id,
+          context.membership_id,
+          %{notes_visible_to_admins: visible}
+        )
+      end)
+    end
+  end
+
+  def set_notes_visibility(_context, _visible), do: {:error, [visible: "must be true or false"]}
+
+  @doc "Active owners and admins of a gym (ADR-099)."
+  def list_manager_user_ids(organization_id) do
+    organization_id
+    |> ListMemberRoles.call(roles: [:owner, :admin])
+    |> Enum.map(& &1.user_id)
+  end
+
+  @doc "Active members whose roles carry `capability` (role defaults, ADR-099)."
+  def list_user_ids_with_capability(organization_id, capability) do
+    organization_id
+    |> ListMemberRoles.call()
+    |> Enum.filter(fn membership ->
+      membership.roles
+      |> MilosTraining.Organizations.Domain.AccessPolicy.capabilities(
+        coach_scope: membership.coach_scope
+      )
+      |> Map.has_key?(capability)
+    end)
+    |> Enum.map(& &1.user_id)
+  end
+
   defdelegate list_staff_user_ids(organization_id), to: ListStaffUserIds, as: :call
+
+  @doc """
+  Active owners, admins and coaches of a gym, with their primary role and
+  role set there (coach pickers, ADR-098/099).
+  """
+  def list_staff(organization_id) do
+    organization_id
+    |> ListMemberRoles.call(roles: [:owner, :admin, :coach])
+    |> Enum.map(&Map.take(&1, [:user_id, :role, :roles]))
+  end
+
+  defp member(organization_id, user_id) do
+    organization_id
+    |> ListMemberRoles.call(user_id: user_id)
+    |> List.first()
+  end
 
   def issue_invitation(context, params, issued_at \\ DateTime.utc_now()),
     do: IssueInvitation.call(context, params, issued_at)
@@ -119,6 +232,38 @@ defmodule MilosTraining.Organizations do
 
   def set_membership_role(context, user_id, role),
     do: SetMembershipRole.call(context, user_id, role)
+
+  def set_membership_roles(context, user_id, roles),
+    do: SetMembershipRole.set_roles(context, user_id, roles)
+
+  def set_coach_scope(context, user_id, scope), do: SetCoachScope.call(context, user_id, scope)
+
+  @doc "Capabilities of a role set in a gym (ADR-099), for session payloads."
+  def capabilities_for(roles, coach_scope, role_grants),
+    do:
+      MilosTraining.Organizations.Domain.AccessPolicy.capabilities(roles,
+        coach_scope: coach_scope,
+        role_grants: role_grants
+      )
+
+  def create_owned_organization(account, params),
+    do: MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params)
+
+  def transfer_ownership(context, to_user_id),
+    do:
+      MilosTraining.Organizations.Commands.OwnerOrganizationActions.transfer(context, to_user_id)
+
+  def archive_organization(context, confirm),
+    do: MilosTraining.Organizations.Commands.OwnerOrganizationActions.archive(context, confirm)
+
+  def get_role_grants(context),
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.get(context)
+
+  def set_role_grants(context, role, capabilities),
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.call(context, role, capabilities)
+
+  def grantable_capabilities,
+    do: MilosTraining.Organizations.Commands.SetRoleGrants.grantable()
 
   def delete_organization(context, organization_id, deleted_at \\ DateTime.utc_now()),
     do: DeleteOrganization.call(context, organization_id, deleted_at)

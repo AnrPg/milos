@@ -4,6 +4,7 @@ import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
   visibleBillingChannels,
+  visibleBillingFreezes,
 } from "@/app/account/billing/billing-entitlement-visibility";
 
 describe("customer billing entitlement visibility", () => {
@@ -29,5 +30,15 @@ describe("customer billing entitlement visibility", () => {
     expect(shouldShowAllowanceQuota({ remaining: "unlimited", limit: "unlimited" })).toBe(false);
     expect(shouldShowAllowanceQuota({ remaining: 4, limit: "unlimited" })).toBe(true);
     expect(shouldShowAllowanceQuota({ remaining: "unlimited", limit: 12 })).toBe(true);
+  });
+
+  it("lists active freezes newest first and hides cancelled ones", () => {
+    expect(
+      visibleBillingFreezes([
+        { starts_on: "2026-03-01", cancelled_at: null },
+        { starts_on: "2026-06-01", cancelled_at: "2026-05-20T10:00:00Z" },
+        { starts_on: "2026-08-01", cancelled_at: null },
+      ]).map((freeze) => freeze.starts_on),
+    ).toEqual(["2026-08-01", "2026-03-01"]);
   });
 });

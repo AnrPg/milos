@@ -234,6 +234,23 @@ defmodule MilosTraining.Scheduling do
   def update_settings(params),
     do: MilosTraining.Scheduling.SchedulingStore.update_settings(params)
 
+  # Phase B (ADR-097): bookings that carry guest and allowance attributes, and waitlists.
+  alias MilosTraining.Scheduling.SchedulingStore
+
+  def submit_booking_with(context, user_id, slot_id, timeout_minutes, attrs),
+    do: SchedulingStore.create_booking_with(context, user_id, slot_id, timeout_minutes, attrs)
+
+  def submit_auto_approved_booking_with(context, user_id, slot_id, attrs),
+    do: SchedulingStore.create_approved_booking_with(context, user_id, slot_id, attrs)
+
+  def join_waitlist(context, user_id, slot_id, attrs),
+    do: SchedulingStore.create_waitlisted_booking(context, user_id, slot_id, attrs)
+
+  def list_waitlist(context, slot_id), do: SchedulingStore.list_waitlist(context, slot_id)
+
+  def promote_waitlisted_booking(context, booking_id),
+    do: SchedulingStore.promote_waitlisted_booking(context, booking_id)
+
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.

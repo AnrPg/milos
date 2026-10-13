@@ -4,7 +4,7 @@ defmodule MilosTraining.Execution.WorkoutExecution do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  @sources [:class_booking, :assigned, :self_selected]
+  @sources [:class_booking, :assigned, :self_selected, :repeat]
   @statuses [:active, :paused, :completed]
 
   schema "workout_executions" do

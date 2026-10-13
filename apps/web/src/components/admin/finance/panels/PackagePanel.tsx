@@ -7,7 +7,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { localizeError } from "@/i18n/presentation";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -21,12 +21,21 @@ import {
 } from "@/api/finance";
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { BasicsStep, IncludedStep } from "@/components/admin/finance/packages/PackageWizard";
+import { AdvancedSettings, LockStrip, MemberPreview, PackageContractDetails, previewContext, useT } from "@/components/admin/finance/packages/package-ui";
+import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
 import {
-  EntitlementEditor,
-  entitlementDraft,
-  entitlementParams,
-  type EntitlementDraft,
-} from "@/components/admin/finance/shared/EntitlementEditor";
+  applyLocks,
+  changedFields,
+  draftFromPackage,
+  draftIssues,
+  findType,
+  resetAll,
+  toPackageRequest,
+  typeLabelKey,
+  wizardSteps,
+  type PackageDraft,
+} from "@/components/admin/finance/packages/package-catalog";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -43,13 +52,16 @@ export function PackagePanel({
   packageId,
   packages,
   onClose,
+  onDuplicate,
 }: {
   packageId: string;
   packages: FinanceRecord[];
   onClose: () => void;
+  onDuplicate: (draft: PackageDraft) => void;
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const t = useT();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
   const queryClient = useQueryClient();
@@ -61,9 +73,11 @@ export function PackagePanel({
   });
 
   const pkg = packageQuery.data?.package ?? null;
+  const { catalog, classTypes, locations } = usePackageAuthoring(token);
 
   const [form, setForm] = useState<FinanceRecord | null>(null);
-  const [entitlement, setEntitlement] = useState<EntitlementDraft | null>(null);
+  const [draft, setDraft] = useState<PackageDraft | null>(null);
+  const [attempted, setAttempted] = useState(false);
   const [showReconciliation, setShowReconciliation] = useState(false);
   const [replacements, setReplacements] = useState<Record<string, string>>({});
   const editing = form !== null;
@@ -88,36 +102,41 @@ export function PackagePanel({
   const affectedRoles = Object.keys(affectedByRole);
   const replacementOptions = packages.filter((candidate) => candidate.active !== false && field(candidate, "id") !== packageId);
 
+  const type = catalog && draft ? findType(catalog, draft.packageType) : undefined;
+
   function startEdit() {
-    if (!pkg) return;
-    setForm({
-      name: field(pkg, "name"),
-      description: field(pkg, "description"),
-      family: field(pkg, "family"),
-      billing_period: field(pkg, "billing_period"),
-      base_price_cents: pkg.base_price_cents ?? 0,
-      tags: Array.isArray(pkg.tags) ? (pkg.tags as string[]).join(", ") : "",
-      active: pkg.active !== false,
+    if (!pkg || !catalog) return;
+    setForm({ active: pkg.active !== false });
+    setDraft(draftFromPackage(catalog, pkg));
+    setAttempted(false);
+  }
+
+  function cancelEdit() {
+    setForm(null);
+    setDraft(null);
+    setShowReconciliation(false);
+  }
+
+  function setField(key: string, value: unknown) {
+    setDraft((previous) => {
+      if (!previous || !catalog) return previous;
+      const current = findType(catalog, previous.packageType);
+      const fields = { ...previous.fields, [key]: value };
+      return { ...previous, fields: current ? applyLocks(current, fields) : fields };
     });
-    setEntitlement(entitlementDraft(pkg.params));
   }
 
   const updateMutation = useMutation({
     mutationFn: () => {
-      if (!form) throw new Error(i18n("noForm2807394"));
-      const tags = typeof form.tags === "string"
-        ? (form.tags as string).split(",").map((t) => t.trim()).filter(Boolean)
-        : [];
-      if (!entitlement) throw new Error(i18n("noEntitlementContract1f18377"));
+      if (!form || !draft || !catalog) throw new Error(i18n("noForm2807394"));
       return updateFinancePackage(token, packageId, {
-        ...form,
-        tags,
-        params: entitlementParams(entitlement),
+        ...toPackageRequest(catalog, draft),
+        active: form.active !== false,
       });
     },
     onSuccess: async () => {
       setForm(null);
-      setEntitlement(null);
+      setDraft(null);
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "package", packageId] });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] });
     },
@@ -129,7 +148,7 @@ export function PackagePanel({
       setShowReconciliation(false);
       setReplacements({});
       setForm(null);
-      setEntitlement(null);
+      setDraft(null);
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["admin", "finance", "package", packageId] }),
         queryClient.invalidateQueries({ queryKey: ["admin", "finance", "packages"] }),
@@ -139,6 +158,8 @@ export function PackagePanel({
   });
 
   function saveChanges() {
+    setAttempted(true);
+    if (draft && draftIssues(draft).length > 0) return;
     if (retiring && !impactQuery.isSuccess) return;
 
     if (retiring && affectedMembers.length > 0) {
@@ -154,6 +175,7 @@ export function PackagePanel({
       title={pkg ? field(pkg, "name", field(pkg, "code")) : i18n("package7431e3d")}
       subtitle={i18n("membershipPackage4602237")}
       onClose={onClose}
+      width="md:max-w-[680px]"
       footer={
         editing ? (
           <div className="flex gap-3">
@@ -169,21 +191,37 @@ export function PackagePanel({
             <button
               className="rounded-full px-5 py-2 text-sm font-semibold"
               style={{ background: "var(--border)", color: "var(--text-soft)" }}
-              onClick={() => { setForm(null); setEntitlement(null); setShowReconciliation(false); }}
+              onClick={cancelEdit}
               type="button"
             >
               {i18n("cancel77dfd21")}
             </button>
           </div>
         ) : (
-          <button
-            className="rounded-full px-5 py-2 text-sm font-semibold"
-            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            onClick={startEdit}
-            type="button"
-          >
-            {i18n("editPackage77c0543")}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
+              disabled={!catalog}
+              onClick={startEdit}
+              type="button"
+            >
+              {i18n("editPackage77c0543")}
+            </button>
+            <button
+              className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
+              style={{ color: "var(--primary)" }}
+              disabled={!catalog || !pkg}
+              onClick={() => {
+                if (!catalog || !pkg) return;
+                const copy = draftFromPackage(catalog, pkg);
+                onDuplicate({ ...copy, name: t("pkgCopyName", { name: copy.name }) });
+              }}
+              type="button"
+            >
+              {t("pkgDuplicate")}
+            </button>
+          </div>
         )
       }
     >
@@ -191,68 +229,42 @@ export function PackagePanel({
         <p style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>
       ) : !pkg ? (
         <p style={{ color: "var(--primary-strong)" }}>{i18n("packageNotFound764673f")}</p>
-      ) : editing && form ? (
-        <div className="space-y-4">
-          <Field label={i18n("name709a232")}>
-            <input
-              className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={String(form.name ?? "")}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-            />
-          </Field>
-          <Field label={i18n("description55f8ebc")}>
-            <input
-              className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={String(form.description ?? "")}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
-          </Field>
-          <div className="grid gap-4 md:grid-cols-2">
-            <Field label={i18n("family4efb6cb")}>
-              <select
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                value={String(form.family ?? "")}
-                onChange={(e) => setForm({ ...form, family: e.target.value })}
-              >
-                {["unlimited", "limited-visits", "personal-programming", "hybrid"].map((v) => (
-                  <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label={i18n("billingPeriodda59f5a")}>
-              <select
-                className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                value={String(form.billing_period ?? "")}
-                onChange={(e) => setForm({ ...form, billing_period: e.target.value })}
-              >
-                {["monthly", "quarterly", "annual", "custom"].map((v) => (
-                  <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
-                ))}
-              </select>
-            </Field>
+      ) : editing && form && draft && catalog && type ? (
+        <div className="space-y-6">
+          <p className="rounded-2xl px-4 py-3 text-sm" style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)", color: "var(--text-soft)" }}>
+            {t("pkgEditSnapshotNotice")}
+          </p>
+          <div className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--bg-soft)" }}>
+            <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("pkgStep_type")}: {t(typeLabelKey(draft.packageType))}</span>
+            <span className="text-xs" style={{ color: "var(--dim)" }}>{t("pkgTypeChangeHint")}</span>
           </div>
-          <Field label={i18n("basePriceEuree0693f")}>
-            <input
-              className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              type="number"
-              value={Number(form.base_price_cents ?? 0) / 100}
-              onChange={(e) => setForm({ ...form, base_price_cents: Math.round(Number(e.target.value) * 100) })}
-            />
-          </Field>
-          <Field label={i18n("tagsCommaSeparated32bf672")}>
-            <input
-              className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={String(form.tags ?? "")}
-              onChange={(e) => setForm({ ...form, tags: e.target.value })}
-            />
-          </Field>
-          {entitlement ? <EntitlementEditor value={entitlement} onChange={setEntitlement} /> : null}
+          <section className="space-y-4">
+            <h3 className="text-base font-semibold" style={{ color: "var(--text)" }}>{t("pkgStep_basics")}</h3>
+            <BasicsStep draft={draft} catalog={catalog} attempted={attempted} issues={draftIssues(draft)} onChange={(next) => setDraft({ ...next, fields: applyLocks(type, next.fields) })} packages={packages} locale={uiLocale} />
+          </section>
+          {wizardSteps(draft.packageType).includes("included") ? (
+            <section className="space-y-4">
+              <h3 className="text-base font-semibold" style={{ color: "var(--text)" }}>{t("pkgStep_included")}</h3>
+              <IncludedStep draft={draft} catalog={catalog} attempted={attempted} issues={draftIssues(draft)} onField={setField} classTypes={classTypes} />
+            </section>
+          ) : null}
+          <details className="rounded-2xl" style={{ border: "1px solid var(--border)" }}>
+            <summary className="cursor-pointer px-4 py-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
+              ⚙ {t("pkgAdvancedSettings")}{changedFields(catalog, draft).length > 0 ? ` · ${changedFields(catalog, draft).length}` : ""}
+            </summary>
+            <div className="px-4 pb-4">
+              <AdvancedSettings
+                catalog={catalog}
+                type={type}
+                draft={draft}
+                context={{ classTypes, packages, locations }}
+                changedCount={changedFields(catalog, draft).length}
+                onFieldChange={setField}
+                onResetAll={() => setDraft(resetAll(catalog, draft))}
+              />
+            </div>
+          </details>
+          <MemberPreview draft={draft} classTypes={classTypes} compact {...previewContext(catalog, draft, packages)} />
           <label className="flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             <input
               type="checkbox"
@@ -273,13 +285,16 @@ export function PackagePanel({
         </div>
       ) : (
         <div className="space-y-4">
-          <Stat label={i18n("codeadac693")} value={field(pkg, "code")} />
-          <Stat label={i18n("name709a232")} value={field(pkg, "name")} />
-          <Stat label={i18n("family4efb6cb")} value={<SemanticLabel value={field(pkg, "family")} />} />
-          <Stat label={i18n("billingPeriodda59f5a")} value={<SemanticLabel value={field(pkg, "billing_period")} />} />
-          <Stat label={i18n("basePrice708f3d8")} value={money(uiLocale, pkg.base_price_cents)} />
-          <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
-          <EntitlementSummary params={pkg.params} />
+          {catalog ? <MemberPreview draft={draftFromPackage(catalog, pkg)} classTypes={classTypes} {...previewContext(catalog, draftFromPackage(catalog, pkg), packages)} /> : null}
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Stat label={t("pkgStep_type")} value={t(typeLabelKey(field(pkg, "package_type", "membership")))} />
+            <Stat label={i18n("codeadac693")} value={field(pkg, "code")} />
+            <Stat label={i18n("billingPeriodda59f5a")} value={t(`pkgBilling_${field(pkg, "billing_period", "monthly")}`)} />
+            <Stat label={i18n("basePrice708f3d8")} value={money(uiLocale, pkg.base_price_cents)} />
+            <Stat label={i18n("statusbae7d5b")} value={pkg.active !== false ? i18n("activea733b80") : i18n("inactive09af574")} />
+            <Stat label={t("pkgAdvancedSettings")} value={Array.isArray(pkg.changed_fields) && pkg.changed_fields.length > 0 ? t("pkgChangesFromSuggested", { count: pkg.changed_fields.length }) : t("pkgNoChangesFromSuggested")} />
+          </div>
+          {catalog ? <PackageContractDetails catalog={catalog} draft={draftFromPackage(catalog, pkg)} packages={packages} /> : null}
           {Array.isArray(pkg.tags) && (pkg.tags as string[]).length > 0 && (
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>{i18n("tags848eed0")}</p>
@@ -290,6 +305,11 @@ export function PackagePanel({
               </div>
             </div>
           )}
+          {catalog && findType(catalog, field(pkg, "package_type", "membership")) ? (
+            <div className="pt-6">
+              <LockStrip type={findType(catalog, field(pkg, "package_type", "membership"))!} />
+            </div>
+          ) : null}
         </div>
       )}
       {showReconciliation ? (
@@ -343,36 +363,11 @@ export function PackagePanel({
   );
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <label className="block space-y-1">
-      <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</span>
-      {children}
-    </label>
-  );
-}
-
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div>
       <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{label}</p>
       <p className="mt-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{value || "—"}</p>
-    </div>
-  );
-}
-
-function EntitlementSummary({ params }: { params: unknown }) {
-  const i18n = useUiTranslations();
-  const draft = entitlementDraft(params);
-  return (
-    <div className="space-y-2 rounded-xl p-4" style={{ background: "var(--bg-soft)" }}>
-      <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("entitlements7de7578")}</p>
-      <p className="text-sm"><strong>{i18n("channelsb727b80")}</strong> {draft.channels.length ? draft.channels.map((value, index) => <span key={value}>{index ? ", " : ""}<SemanticLabel value={value} /></span>) : i18n("none6eef664")}</p>
-      <p className="text-sm"><strong>{i18n("capabilities92761fd")}</strong> {draft.capabilities.length ? draft.capabilities.map((value, index) => <span key={value}>{index ? ", " : ""}<SemanticLabel value={value} /></span>) : i18n("none6eef664")}</p>
-      <p className="text-sm"><strong>{i18n("classVisits6c6fff6")}</strong> {draft.classVisitLimit} / <SemanticLabel value={draft.classVisitPeriod} /></p>
-      {draft.capabilities.includes("receive_coaching_touchpoints") ? (
-        <p className="text-sm"><strong>{i18n("coachingTouchpoints4a9fb40")}</strong> {draft.coachingTouchpointLimit} / <SemanticLabel value={draft.coachingTouchpointPeriod} /></p>
-      ) : null}
     </div>
   );
 }

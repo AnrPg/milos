@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: en\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr ""
+
+msgid "Period"
+msgstr ""
+
+msgid "Seats"
+msgstr ""
+
+msgid "Price per seat"
+msgstr ""
+
+msgid "Total"
+msgstr ""
+
+msgid "Paid"
+msgstr ""
+
+msgid "Balance due"
+msgstr ""
+
+msgid "Due date"
+msgstr ""
+
+msgid "Hello %{name},"
+msgstr ""
+
+msgid "Thank you."
+msgstr ""
+
+msgid "Invoice %{number} from %{gym}"
+msgstr ""
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr ""
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr ""
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr ""
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr ""
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr ""

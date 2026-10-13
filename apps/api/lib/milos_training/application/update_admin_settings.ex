@@ -20,7 +20,7 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     scheduling_params = scheduling_params(params)
 
     with {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
-         {:ok, finance_settings} <- maybe_update_finance(finance_params),
+         {:ok, finance_settings} <- maybe_update_finance(context, finance_params),
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
       InvalidateLandingPages.for_all_users()
@@ -45,11 +45,13 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     Gamification.with_tenant_context(context, fn -> Gamification.update_settings(params) end)
   end
 
-  defp maybe_update_finance(params) when map_size(params) == 0 do
-    {:ok, Finance.get_finance_settings()}
+  # Finance settings are tenant rows: without the context the write has no
+  # organization and the first save for a gym fails.
+  defp maybe_update_finance(context, params) when map_size(params) == 0 do
+    {:ok, Finance.get_finance_settings(context)}
   end
 
-  defp maybe_update_finance(params), do: Finance.update_finance_settings(params)
+  defp maybe_update_finance(context, params), do: Finance.update_finance_settings(context, params)
 
   defp maybe_update_notifications(params) when map_size(params) == 0 do
     {:ok, Notifications.get_push_settings()}

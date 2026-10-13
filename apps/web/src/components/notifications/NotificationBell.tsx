@@ -165,6 +165,33 @@ function NotificationCard({
       return [nickname, requestedFor, note].filter(Boolean).join(" · ");
     }
 
+    if (notification.type === "booking_waitlist_promoted") {
+      const className =
+        typeof notification.payload.class_name === "string" ? notification.payload.class_name : "";
+      const scheduledAt =
+        typeof notification.payload.scheduled_at === "string" ? notification.payload.scheduled_at : null;
+      const when = scheduledAt && !Number.isNaN(new Date(scheduledAt).getTime())
+        ? formatTimestamp(uiLocale, scheduledAt)
+        : "";
+      const detail = [className, when].filter(Boolean).join(" · ");
+      return notification.payload.status === "pending"
+        ? i18n("mbNotifWaitlistPromotedPendingBody", { class: detail })
+        : i18n("mbNotifWaitlistPromotedBody", { class: detail });
+    }
+
+    if (notification.type === "package_expiring") {
+      const packageName =
+        typeof notification.payload.package_name === "string" ? notification.payload.package_name : "";
+      const endsOn = typeof notification.payload.ends_on === "string" ? notification.payload.ends_on : null;
+      const date = endsOn && !Number.isNaN(new Date(endsOn).getTime())
+        ? new Intl.DateTimeFormat(uiLocale, { day: "numeric", month: "short", year: "numeric" }).format(new Date(endsOn))
+        : "";
+      return i18n("mbNotifPackageExpiringBody", { package: packageName, date });
+    }
+
+    const phaseCBody = coachingNotificationBody(notification);
+    if (phaseCBody !== null) return phaseCBody;
+
     if (notification.type === "review_submitted") {
       const rating =
         typeof notification.payload.rating === "number"
@@ -189,7 +216,62 @@ function NotificationCard({
     return parts.length > 0 ? parts.join(" · ") : i18n("openTheScheduleToReviewTheLatestBooking36c10aa");
   }
 
+  // ADR-098 coaching and appointment notifications.
+  function coachingNotificationBody(notification: NotificationRecord): string | null {
+    const text = (key: string) =>
+      typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "";
+    const when = (key: string) => {
+      const value = text(key);
+      return value && !Number.isNaN(new Date(value).getTime()) ? formatTimestamp(uiLocale, value) : "";
+    };
+    const kind = () =>
+      text("kind") === "assessment" ? i18n("stfKindAssessment") : i18n("stfKindPtSession");
+    const client = () => text("client_nickname") || i18n("stfAMember");
+
+    switch (notification.type) {
+      case "form_review_submitted":
+        return [i18n("stfNotifFormReviewSubmittedBody", { client: client() }), text("exercise_name")]
+          .filter(Boolean)
+          .join(" · ");
+      case "form_review_completed":
+        return [i18n("stfNotifFormReviewCompletedBody"), text("exercise_name")].filter(Boolean).join(" · ");
+      case "coaching_reply_overdue":
+        return i18n("stfNotifReplyOverdueBody", { client: client(), time: when("due_at") || "—" });
+      case "nutrition_plan_updated":
+        return text("title") || i18n("stfNotifNutritionPlanBody");
+      case "appointment_booked":
+        return i18n("stfNotifAppointmentBookedBody", { client: client(), kind: kind(), time: when("starts_at") || "—" });
+      case "appointment_cancelled":
+        return i18n("stfNotifAppointmentCancelledBody", { kind: kind(), time: when("starts_at") || "—" });
+      // ADR-100, ADR-101, ADR-104.
+      case "coach_client_assigned":
+        return i18n("ntfCoachClientAssignedBody", { coach: text("coach_nickname") || "—", client: client() });
+      case "coach_note_viewed":
+        return i18n("ntfCoachNoteViewedBody", {
+          reader: text("reader_nickname") || "—",
+          client: client(),
+          time: when("read_at") || "—",
+        });
+      case "inventory_repair_needed":
+        return [text("machine_name"), text("body")].filter(Boolean).join(" · ");
+      case "inventory_stock_low":
+        return text("status") === "reported"
+          ? [text("supply_name"), text("place"), text("note")].filter(Boolean).join(" · ")
+          : i18n("ntfStockLowBody", { item: text("supply_name") || "—", quantity: String(notification.payload.quantity ?? "—") });
+      case "inventory_digest": {
+        const items = Array.isArray(notification.payload.highlights)
+          ? (notification.payload.highlights as unknown[]).filter((item): item is string => typeof item === "string")
+          : [];
+        return items.length > 0 ? i18n("ntfDigestBody", { items: items.join(", ") }) : i18n("ntfDigestEmptyBody");
+      }
+      default:
+        return null;
+    }
+  }
+
   function titleFromPayload(notification: NotificationRecord) {
+    // The nutrition plan's own title is the body, not the notification title.
+    if (notification.type === "nutrition_plan_updated") return notificationTitle(notification.type);
     if (typeof notification.payload.title === "string") return notification.payload.title;
   
     if (notification.type === "chat_message") {
@@ -241,6 +323,32 @@ function NotificationCard({
         return i18n("invoiceIssued6a8d8fa");
       case "payment_reminder":
         return i18n("outstandingBalancee9fd5bb");
+      case "booking_waitlist_promoted":
+        return i18n("mbNotifWaitlistPromotedTitle");
+      case "package_expiring":
+        return i18n("mbNotifPackageExpiringTitle");
+      case "form_review_submitted":
+        return i18n("stfNotifFormReviewSubmittedTitle");
+      case "form_review_completed":
+        return i18n("stfNotifFormReviewCompletedTitle");
+      case "coaching_reply_overdue":
+        return i18n("stfNotifReplyOverdueTitle");
+      case "nutrition_plan_updated":
+        return i18n("stfNotifNutritionPlanTitle");
+      case "appointment_booked":
+        return i18n("stfNotifAppointmentBookedTitle");
+      case "appointment_cancelled":
+        return i18n("stfNotifAppointmentCancelledTitle");
+      case "coach_client_assigned":
+        return i18n("ntfCoachClientAssignedTitle");
+      case "coach_note_viewed":
+        return i18n("ntfCoachNoteViewedTitle");
+      case "inventory_repair_needed":
+        return i18n("ntfRepairNeededTitle");
+      case "inventory_stock_low":
+        return i18n("ntfStockLowTitle");
+      case "inventory_digest":
+        return i18n("ntfDigestTitle");
       default:
         return i18n("notificationc18f8f2");
     }
@@ -331,11 +439,46 @@ type FilterTab = "all" | "workouts" | "bookings";
 
 const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   all: null,
-  workouts: ["workout_note", "workout_changed", "workout_deleted", "workout_rejected", "workout_moved", "workout_assignment_requested", "admin_note"],
-  bookings: ["booking_pending", "booking_approved", "booking_rejected", "booking_timeout"],
+  workouts: [
+    "workout_note",
+    "workout_changed",
+    "workout_deleted",
+    "workout_rejected",
+    "workout_moved",
+    "workout_assignment_requested",
+    "admin_note",
+    // ADR-098 coaching
+    "form_review_submitted",
+    "form_review_completed",
+    "coaching_reply_overdue",
+    "nutrition_plan_updated",
+  ],
+  bookings: [
+    "booking_pending",
+    "booking_approved",
+    "booking_rejected",
+    "booking_timeout",
+    "booking_waitlist_promoted",
+    // ADR-098 appointments
+    "appointment_booked",
+    "appointment_cancelled",
+  ],
 };
 
-export function NotificationBell() {
+const OPEN_EVENT = "milos:open-notifications";
+
+/** Opens the inbox from elsewhere, e.g. the avatar menu on phones (ADR-103). */
+export function openNotifications() {
+  window.dispatchEvent(new Event(OPEN_EVENT));
+}
+
+export function NotificationBell({
+  onUnreadChange,
+  triggerClassName = "flex",
+}: {
+  onUnreadChange?: (count: number) => void;
+  triggerClassName?: string;
+} = {}) {
   const i18n = useUiTranslations();
   const FILTER_TABS: { key: FilterTab; label: string }[] = [
     { key: "all", label: i18n("all6a72085") },
@@ -523,6 +666,19 @@ export function NotificationBell() {
     return i18n("noNotificationsYet5537c60");
   }, [i18n, markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
+  useEffect(() => {
+    onUnreadChange?.(typeof unreadCount === "number" ? unreadCount : 0);
+  }, [onUnreadChange, unreadCount]);
+
+  useEffect(() => {
+    const handler = () => {
+      setOpen(true);
+      void notificationQuery.refetch();
+    };
+    window.addEventListener(OPEN_EVENT, handler);
+    return () => window.removeEventListener(OPEN_EVENT, handler);
+  }, [notificationQuery]);
+
   if (status !== "authenticated" || !tokens?.access_token) return null;
 
   function openPanel() {
@@ -557,7 +713,7 @@ export function NotificationBell() {
       <button
         aria-expanded={open}
         aria-label={i18n("openNotificationsac4735e")}
-        className="flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors"
+        className={`${triggerClassName} shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors`}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         onClick={openPanel}
         type="button"

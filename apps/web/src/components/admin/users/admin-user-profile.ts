@@ -35,3 +35,21 @@ export function visibleAdminProfileSections(
     (section) => OPERATIONAL_SECTIONS.has(section) || (contentCounts[section] ?? 0) > 0,
   );
 }
+
+// ADR-097: perk allowances an admin can top up, in the order they are offered.
+const PERK_ALLOWANCES = ["event_visits", "guest_passes", "open_gym_visits"] as const;
+
+/**
+ * Allowances a personal extension can be granted for: general class visits,
+ * per-class-type limits (ADR-096) and the perks the member's plan has (ADR-097).
+ * Falls back to class visits when the plan reports no allowance at all.
+ */
+export function grantableAllowances(allowances: Record<string, unknown> | null | undefined): string[] {
+  const keys = Object.keys(allowances ?? {});
+  const classKeys = keys
+    .filter((key) => key === "class_visits" || key.startsWith("class_visits:"))
+    .sort((a, b) => (a === "class_visits" ? -1 : b === "class_visits" ? 1 : a.localeCompare(b)));
+  const perkKeys = PERK_ALLOWANCES.filter((key) => keys.includes(key));
+  const result = [...classKeys, ...perkKeys];
+  return result.length > 0 ? result : ["class_visits"];
+}

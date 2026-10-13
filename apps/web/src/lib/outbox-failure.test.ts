@@ -52,7 +52,7 @@ describe("describeOutboxFailure", () => {
 
   it("uses the API error catalog for known codes and statuses", () => {
     expect(describeOutboxFailure({ category: "conflict", status: 409, code: "slot_full" }, translate)).toBe(
-      "apiErrorSlotFull",
+      "mbErrSlotFull",
     );
     expect(
       describeOutboxFailure({ category: "conflict", status: 409, code: "booking_not_pending" }, translate),

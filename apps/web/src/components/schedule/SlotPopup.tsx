@@ -10,12 +10,18 @@ import { useState } from "react";
 import { useLocale } from "next-intl";
 
 import { ApiError } from "@/api/client";
-import { cancelBooking, sendSlotMessage, type ScheduleBooking, type ScheduleSlot } from "@/api/schedule";
+import {
+  cancelBooking,
+  joinWaitlist,
+  sendSlotMessage,
+  type ScheduleBooking,
+  type ScheduleLocation,
+  type ScheduleSlot,
+} from "@/api/schedule";
 import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
-import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
 import {
@@ -25,6 +31,16 @@ import {
   useSlotInjuryWarnings,
 } from "@/components/wellbeing/InjuryWarnings";
 import { warningLevelFor, warningLevelsByUser } from "@/lib/injury-warnings";
+import { AdminSlotRoster } from "@/components/schedule/AdminSlotRoster";
+import { GuestBookingPanel } from "@/components/schedule/GuestBookingPanel";
+import {
+  isEventSlot,
+  localizeMemberBookingError,
+  memberSlotState,
+  slotCreditCost,
+  slotLocationName,
+  waitlistPositionLabel,
+} from "@/components/schedule/member-booking";
 
 function formatDateTime(locale: string, isoString: string) {
   return new Intl.DateTimeFormat(locale, {
@@ -63,7 +79,13 @@ type SlotPopupProps = {
   onDelete?: () => void;
   onApproveBooking: (booking: ScheduleBooking) => void;
   onRejectBooking: (booking: ScheduleBooking) => void;
-  onCancelBooking?: () => void;
+  /** Called after the member withdraws their own booking (the popup closes). */
+  onCancelBooking?: (result: { lateCancellation: boolean }) => void;
+  /** Called after a waitlist or guest change; the popup stays open. */
+  onSlotChanged?: () => void;
+  locations?: ScheduleLocation[];
+  /** The member's package includes guest passes (ADR-097). */
+  guestsIncluded?: boolean;
 };
 
 export function SlotPopup({
@@ -77,12 +99,21 @@ export function SlotPopup({
   onApproveBooking,
   onRejectBooking,
   onCancelBooking,
+  onSlotChanged,
+  locations,
+  guestsIncluded = false,
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
   const organizationSlug = useOrganizationSlug();
   const isPast = new Date(slot.scheduled_at) <= new Date();
-  const canBook = !isAdmin && !slot.current_user_booking && slot.spots_remaining > 0 && !isPast;
+  const memberState = memberSlotState(slot);
+  const canBook = !isAdmin && memberState.kind === "bookable";
+  const canJoinWaitlist = !isAdmin && memberState.kind === "waitlist_open";
+  const locationName = slotLocationName(slot, locations);
+  const creditCost = slotCreditCost(slot);
+  const [waitlistBusy, setWaitlistBusy] = useState(false);
+  const [waitlistError, setWaitlistError] = useState<string | null>(null);
   const [messageText, setMessageText] = useState("");
   const [messageSending, setMessageSending] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
@@ -150,8 +181,8 @@ export function SlotPopup({
     setCancelling(true);
     setCancelError(null);
     try {
-      await cancelBooking(accessToken, slot.current_user_booking.id);
-      onCancelBooking?.();
+      const result = await cancelBooking(accessToken, slot.current_user_booking.id);
+      onCancelBooking?.(result);
       onClose();
     } catch (err) {
       if (err instanceof ApiError && err.status === 422) {
@@ -164,7 +195,35 @@ export function SlotPopup({
     }
   }
 
-  const unavailableReason = canBook
+  async function handleJoinWaitlist() {
+    setWaitlistBusy(true);
+    setWaitlistError(null);
+    try {
+      await joinWaitlist(accessToken, slot.id);
+      onSlotChanged?.();
+    } catch (err) {
+      setWaitlistError(localizeMemberBookingError(err, i18n, locale, "waitlist"));
+    } finally {
+      setWaitlistBusy(false);
+    }
+  }
+
+  async function handleLeaveWaitlist() {
+    if (!slot.current_user_booking) return;
+    if (!window.confirm(i18n("mbLeaveWaitlistConfirm"))) return;
+    setWaitlistBusy(true);
+    setWaitlistError(null);
+    try {
+      await cancelBooking(accessToken, slot.current_user_booking.id);
+      onSlotChanged?.();
+    } catch (err) {
+      setWaitlistError(localizeMemberBookingError(err, i18n, locale, "withdraw"));
+    } finally {
+      setWaitlistBusy(false);
+    }
+  }
+
+  const unavailableReason = canBook || canJoinWaitlist
     ? null
     : slot.current_user_booking
       ? null
@@ -290,6 +349,38 @@ export function SlotPopup({
               >
                 {i18n("value0SpotsLeft3ff0ef6", { value0: slot.spots_remaining })}
               </span>
+              {slot.waitlist_count ? (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {i18n("mbWaitlistCount", { count: slot.waitlist_count })}
+                </span>
+              ) : null}
+              {isEventSlot(slot) ? (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--primary) 14%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 30%, transparent)", color: "var(--primary-strong)" }}
+                >
+                  {i18n("mbEventMarker")}
+                </span>
+              ) : null}
+              {locationName ? (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {i18n("mbLocationAt", { location: locationName })}
+                </span>
+              ) : null}
+              {creditCost ? (
+                <span
+                  className="rounded-full px-3 py-1 text-xs font-semibold"
+                  style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
+                >
+                  {i18n("mbUsesVisits", { count: creditCost })}
+                </span>
+              ) : null}
               <span
                 className="rounded-full px-3 py-1 text-xs font-semibold"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}
@@ -364,6 +455,45 @@ export function SlotPopup({
                 {isAdmin ? i18n("classTimerDisplayLink") : i18n("classTimerFollowLink")}
               </Link>
             </div>
+          ) : null}
+
+          {/* Waitlist place — never shown as a booking */}
+          {memberState.kind === "waitlisted" && !isAdmin ? (
+            <div
+              className="mt-5 rounded-[1.4rem] px-5 py-4 text-sm"
+              style={{
+                background: "color-mix(in srgb, var(--info) 12%, transparent)",
+                border: "1px solid color-mix(in srgb, var(--info) 30%, transparent)",
+              }}
+            >
+              <p className="font-semibold" style={{ color: "var(--info)" }}>
+                {waitlistPositionLabel(memberState.position, i18n)}
+              </p>
+              <p className="mt-1" style={{ color: "var(--muted)" }}>
+                {i18n("mbWaitlistExplainer")}
+              </p>
+              {waitlistError ? (
+                <p className="mt-2 text-xs" style={{ color: "var(--danger)" }}>{waitlistError}</p>
+              ) : null}
+              <button
+                className="mt-3 rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--card)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                disabled={waitlistBusy}
+                onClick={() => void handleLeaveWaitlist()}
+                type="button"
+              >
+                {i18n("mbLeaveWaitlist")}
+              </button>
+            </div>
+          ) : null}
+
+          {!isAdmin ? (
+            <GuestBookingPanel
+              accessToken={accessToken}
+              guestsIncluded={guestsIncluded}
+              onChanged={() => onSlotChanged?.()}
+              slot={slot}
+            />
           ) : null}
 
           {/* Cancel booking action */}
@@ -539,6 +669,24 @@ export function SlotPopup({
               >
                 {i18n("bookThisClass4d08b11")}
               </button>
+            ) : canJoinWaitlist ? (
+              <div className="mt-5">
+                <p className="mb-2 text-sm" style={{ color: "var(--muted)" }}>
+                  {i18n("mbClassFullWaitlistHint")}
+                </p>
+                {waitlistError ? (
+                  <p className="mb-2 text-xs" style={{ color: "var(--danger)" }}>{waitlistError}</p>
+                ) : null}
+                <button
+                  className="w-full rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
+                  style={{ background: "var(--text)", color: "var(--bg)" }}
+                  disabled={waitlistBusy}
+                  onClick={() => void handleJoinWaitlist()}
+                  type="button"
+                >
+                  {i18n("mbJoinWaitlist")}
+                </button>
+              </div>
             ) : unavailableReason ? (
               <p
                 className="mt-5 rounded-[1.2rem] px-4 py-3 text-sm"
@@ -613,15 +761,12 @@ export function SlotPopup({
 
           {/* Admin: bookings list */}
           {isAdmin ? (
-            <section
-              className="mt-8 rounded-[1.8rem] p-5"
-              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
-            >
-              <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-                {i18n("bookings135229c")}
-              </h3>
-              <div className="mt-4 space-y-3">
-                {slotInjuryWarnings.data ? (
+            <AdminSlotRoster
+              slot={slot}
+              onApproveBooking={onApproveBooking}
+              onRejectBooking={onRejectBooking}
+              header={
+                slotInjuryWarnings.data ? (
                   <RosterInjuryWarningsPanel
                     accessToken={accessToken}
                     slotId={slot.id}
@@ -634,87 +779,10 @@ export function SlotPopup({
                   <p className="text-xs" style={{ color: "var(--dim)" }}>
                     {i18n("injuryWarningLoadFailed")}
                   </p>
-                ) : null}
-                {slot.bookings.length === 0 ? (
-                  <p className="text-sm" style={{ color: "var(--dim)" }}>
-                    {i18n("noBookingsYetdb81e7a")}
-                  </p>
-                ) : null}
-                {slot.bookings.map((booking) => (
-                  <div
-                    className="rounded-[1.2rem] p-4"
-                    style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-                    key={booking.id}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="flex flex-wrap items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {booking.user_nickname ?? booking.user_id}
-                          <InjuryWarningBadge level={warningLevelFor(injuryLevels, booking.user_id)} />
-                        </p>
-                        <p
-                          className="mt-1 text-xs uppercase tracking-[0.18em]"
-                          style={{ color: "var(--dim)" }}
-                        >
-                          <SemanticLabel value={booking.status} />
-                        </p>
-                        {booking.admin_message ? (
-                          <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                            {booking.admin_message}
-                          </p>
-                        ) : null}
-                      </div>
-
-                      {booking.status === "pending" ? (
-                        <div className="flex gap-2">
-                          <button
-                            className="rounded-full px-3 py-2 text-xs font-semibold"
-                            style={{ background: "var(--text)", color: "var(--bg)" }}
-                            onClick={() => onApproveBooking(booking)}
-                            type="button"
-                          >
-                            {i18n("approve7b2c7f1")}
-                          </button>
-                          <button
-                            className="rounded-full px-3 py-2 text-xs font-semibold"
-                            style={{
-                              background: "color-mix(in srgb, var(--danger) 12%, transparent)",
-                              border: "1px solid color-mix(in srgb, var(--danger) 25%, transparent)",
-                              color: "var(--danger)",
-                            }}
-                            onClick={() => onRejectBooking(booking)}
-                            type="button"
-                          >
-                            {i18n("reject2b03b59")}
-                          </button>
-                        </div>
-                      ) : null}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              {(slot.member_versions ?? []).length > 0 ? (
-                <div className="mt-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                    {i18n("memberProgrammingMemberVersions")}
-                  </p>
-                  <ul className="mt-2 space-y-2">
-                    {(slot.member_versions ?? []).map((version) => (
-                      <li
-                        key={version.assignment_id}
-                        className="flex flex-wrap items-center justify-between gap-2 rounded-[1rem] px-4 py-2 text-sm"
-                        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-                      >
-                        <span className="font-semibold" style={{ color: "var(--text)" }}>
-                          {version.user_nickname ?? version.user_id}
-                        </span>
-                        <span style={{ color: "var(--muted)" }}>{version.workout_title}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
-            </section>
+                ) : null
+              }
+              badgeFor={(booking) => <InjuryWarningBadge level={warningLevelFor(injuryLevels, booking.user_id)} />}
+            />
           ) : null}
         </div>
       </div>

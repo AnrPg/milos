@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: nl\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "Factuurnummer"
+
+msgid "Period"
+msgstr "Periode"
+
+msgid "Seats"
+msgstr "Plaatsen"
+
+msgid "Price per seat"
+msgstr "Prijs per plaats"
+
+msgid "Total"
+msgstr "Totaal"
+
+msgid "Paid"
+msgstr "Betaald"
+
+msgid "Balance due"
+msgstr "Openstaand bedrag"
+
+msgid "Due date"
+msgstr "Vervaldatum"
+
+msgid "Hello %{name},"
+msgstr "Beste %{name},"
+
+msgid "Thank you."
+msgstr "Dank u wel."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "Factuur %{number} van %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "%{gym} heeft factuur %{number} aan %{company} uitgereikt voor de periode %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "Gelieve te betalen vóór %{due} met vermelding van het factuurnummer."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "Herinnering: factuur %{number} van %{gym} is vervallen"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "Factuur %{number} aan %{company} moest op %{due} betaald zijn en staat nog open."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "Hebt u al betaald, dan kunt u deze herinnering negeren."

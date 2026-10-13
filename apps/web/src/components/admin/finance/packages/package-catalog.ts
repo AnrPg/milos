@@ -1,0 +1,504 @@
+import type { FinanceRecord } from "@/api/finance";
+
+// ADR-096: the package catalog is served by the API. These helpers never
+// duplicate presets or lock rules; they only apply what the catalog says.
+
+export type QuotaPeriod = "calendar_week" | "calendar_month" | "subscription_period";
+export type QuotaValue = { limit: number | "unlimited"; period: QuotaPeriod };
+export type DurationValue = { amount: number; unit: "day" | "week" | "month" };
+export type ClassTypeLimit = { id: string; limit: number; period: QuotaPeriod };
+export type PackageFields = Record<string, unknown>;
+
+export type CatalogField = {
+  key: string;
+  section: string;
+  kind: string;
+  phase: string;
+  available: boolean;
+  options?: Array<string | number>;
+  min?: number;
+  max?: number;
+};
+
+export type CatalogLock = { path: string; field: string; value: unknown; reason: string };
+
+export type CatalogType = {
+  key: string;
+  available: boolean;
+  enabled: boolean;
+  billing_model: "recurring" | "one_off" | "with_base";
+  billing_periods: string[];
+  default_billing_period: string;
+  preset: PackageFields;
+  billing_period_overrides: Record<string, PackageFields>;
+  locks: CatalogLock[];
+};
+
+export type PackageCatalog = {
+  version: number;
+  implemented_phases: string[];
+  modules: Array<{ key: string; available: boolean; enabled: boolean }>;
+  sections: string[];
+  fields: CatalogField[];
+  types: CatalogType[];
+};
+
+export type PackageDraft = {
+  packageType: string;
+  billingPeriod: string;
+  name: string;
+  description: string;
+  price: string;
+  tags: string[];
+  fields: PackageFields;
+};
+
+export type DraftIssue = { field: string; message: string };
+
+export const ONE_OFF_TYPES = new Set(["class_pack", "drop_in", "trial", "pt_pack"]);
+
+export function equal(left: unknown, right: unknown): boolean {
+  return JSON.stringify(normalize(left)) === JSON.stringify(normalize(right));
+}
+
+function normalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(normalize);
+  if (value && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, child]) => [key, normalize(child)]),
+    );
+  }
+  return value;
+}
+
+export function findType(catalog: PackageCatalog, key: string): CatalogType | undefined {
+  return catalog.types.find((type) => type.key === key);
+}
+
+export function selectableTypes(catalog: PackageCatalog): CatalogType[] {
+  return catalog.types.filter((type) => type.available && type.enabled);
+}
+
+export function moduleEnabled(catalog: PackageCatalog, key: string): boolean {
+  return catalog.modules.some((module) => module.key === key && module.available && module.enabled);
+}
+
+export function presetFor(type: CatalogType, billingPeriod: string): PackageFields {
+  return { ...type.preset, ...(type.billing_period_overrides[billingPeriod] ?? {}) };
+}
+
+export function fieldSpec(catalog: PackageCatalog, key: string): CatalogField | undefined {
+  return catalog.fields.find((field) => field.key === key);
+}
+
+export function fieldLocks(type: CatalogType, fieldKey: string): CatalogLock[] {
+  return type.locks.filter((lock) => lock.field === fieldKey);
+}
+
+/** The whole field is pinned by the type. */
+export function isFieldLocked(type: CatalogType, fieldKey: string): boolean {
+  return type.locks.some((lock) => lock.path === fieldKey);
+}
+
+/** One key of a map-valued field (for example `limit` of a quota) is pinned. */
+export function isPartLocked(type: CatalogType, fieldKey: string, part: string): boolean {
+  return isFieldLocked(type, fieldKey) || type.locks.some((lock) => lock.path === `${fieldKey}.${part}`);
+}
+
+export function applyLocks(type: CatalogType, fields: PackageFields): PackageFields {
+  const next = { ...fields };
+  for (const lock of type.locks) {
+    if (lock.path === lock.field) {
+      next[lock.field] = lock.value;
+    } else {
+      const part = lock.path.slice(lock.field.length + 1);
+      next[lock.field] = { ...((next[lock.field] as Record<string, unknown>) ?? {}), [part]: lock.value };
+    }
+  }
+  return next;
+}
+
+export function newDraft(catalog: PackageCatalog, typeKey: string): PackageDraft {
+  const type = findType(catalog, typeKey);
+  if (!type) throw new Error(`Unknown package type ${typeKey}`);
+  return {
+    packageType: type.key,
+    billingPeriod: type.default_billing_period,
+    name: "",
+    description: "",
+    price: type.key === "trial" ? "0" : "",
+    tags: [],
+    fields: applyLocks(type, presetFor(type, type.default_billing_period)),
+  };
+}
+
+/** Switching type keeps the basics and restarts the contract from the new preset. */
+export function switchType(catalog: PackageCatalog, draft: PackageDraft, typeKey: string): PackageDraft {
+  const fresh = newDraft(catalog, typeKey);
+  return { ...fresh, name: draft.name, description: draft.description, tags: draft.tags, price: draft.price || fresh.price };
+}
+
+/**
+ * Changing the billing period re-applies period-dependent preset values only
+ * where the administrator kept the previous suggestion.
+ */
+export function changeBillingPeriod(type: CatalogType, draft: PackageDraft, billingPeriod: string): PackageDraft {
+  const previous = presetFor(type, draft.billingPeriod);
+  const next = presetFor(type, billingPeriod);
+  const fields = { ...draft.fields };
+  for (const key of Object.keys(type.billing_period_overrides[billingPeriod] ?? {})) {
+    if (equal(fields[key], previous[key])) fields[key] = next[key];
+  }
+  return { ...draft, billingPeriod, fields };
+}
+
+export function changedFields(catalog: PackageCatalog, draft: PackageDraft): string[] {
+  const type = findType(catalog, draft.packageType);
+  if (!type) return [];
+  const preset = presetFor(type, draft.billingPeriod);
+  return catalog.fields
+    .filter((field) => field.available && !equal(draft.fields[field.key], preset[field.key]))
+    .map((field) => field.key);
+}
+
+export function resetField(catalog: PackageCatalog, draft: PackageDraft, key: string): PackageDraft {
+  const type = findType(catalog, draft.packageType);
+  if (!type) return draft;
+  return { ...draft, fields: { ...draft.fields, [key]: presetFor(type, draft.billingPeriod)[key] } };
+}
+
+export function resetAll(catalog: PackageCatalog, draft: PackageDraft): PackageDraft {
+  const type = findType(catalog, draft.packageType);
+  if (!type) return draft;
+  return { ...draft, fields: applyLocks(type, presetFor(type, draft.billingPeriod)) };
+}
+
+export function priceCents(price: string): number | null {
+  const normalized = price.trim().replace(",", ".");
+  if (normalized === "") return null;
+  const value = Number(normalized);
+  return Number.isFinite(value) && value >= 0 ? Math.round(value * 100) : null;
+}
+
+/** Mirrors the backend's "at least one service" rule (ADR-098 adds PT, nutrition and content). */
+export const SERVICE_FIELDS = [
+  "group_classes.included",
+  "online_coaching.included",
+  "personal_training.included",
+  "facility.open_gym",
+  "content.on_demand_video",
+  "content.advanced_analytics",
+  "online_coaching.nutrition_plan",
+  "perks.events",
+] as const;
+
+export function anyServiceIncluded(fields: PackageFields): boolean {
+  return SERVICE_FIELDS.some((key) => fields[key] === true);
+}
+
+/** Semi-private sessions are for 2–4 people; one-to-one is always 1 (backend rule). */
+export function groupSizeForFormat(format: unknown, current: unknown): number {
+  if (format !== "semi_private") return 1;
+  return typeof current === "number" && current >= 2 && current <= 4 ? current : 2;
+}
+
+/** Light client-side checks; the API remains the source of truth. */
+export function draftIssues(draft: PackageDraft): DraftIssue[] {
+  const issues: DraftIssue[] = [];
+  if (draft.name.trim() === "") issues.push({ field: "name", message: "pkgErrorNameRequired" });
+  if (priceCents(draft.price) === null) issues.push({ field: "price", message: "pkgErrorPriceRequired" });
+  if (!anyServiceIncluded(draft.fields)) {
+    issues.push({ field: "group_classes.included", message: "pkgErrorServiceRequired" });
+  }
+  if (ONE_OFF_TYPES.has(draft.packageType) && !draft.fields["terms.validity"]) {
+    issues.push({ field: "terms.validity", message: "pkgErrorValidityRequired" });
+  }
+  const visits = draft.fields["group_classes.visits"] as QuotaValue | undefined;
+  if (
+    draft.fields["group_classes.included"] === true &&
+    visits &&
+    typeof visits.limit === "number" &&
+    visits.limit < 1
+  ) {
+    issues.push({ field: "group_classes.visits", message: "pkgErrorVisitsPositive" });
+  }
+  const coaching = draft.fields["online_coaching.included"] === true;
+  if (coaching && !draft.fields["online_coaching.assigned_programming"] && !draft.fields["online_coaching.messaging"]) {
+    issues.push({ field: "online_coaching.included", message: "pkgErrorCoachingChannel" });
+  }
+  const sessions = draft.fields["personal_training.sessions"] as QuotaValue | undefined;
+  if (draft.fields["personal_training.included"] === true && sessions && typeof sessions.limit === "number" && sessions.limit < 1) {
+    issues.push({ field: "personal_training.sessions", message: "pkgErrorSessionsPositive" });
+  }
+  if (draft.packageType === "shared" && typeof draft.fields["terms.beneficiaries"] === "number" && (draft.fields["terms.beneficiaries"] as number) < 2) {
+    issues.push({ field: "terms.beneficiaries", message: "pkgErrorBeneficiariesMin" });
+  }
+  if (
+    draft.packageType === "corporate" &&
+    draft.fields["terms.enrollment"] === "email_domain" &&
+    !String(draft.fields["terms.enrollment_domain"] ?? "").trim()
+  ) {
+    issues.push({ field: "terms.enrollment_domain", message: "pkgErrorEnrollmentDomainRequired" });
+  }
+  return issues;
+}
+
+export function toPackageRequest(catalog: PackageCatalog, draft: PackageDraft) {
+  const fields = Object.fromEntries(
+    catalog.fields.filter((field) => field.available).map((field) => [field.key, draft.fields[field.key]]),
+  );
+  return {
+    name: draft.name.trim(),
+    description: draft.description.trim() || null,
+    package_type: draft.packageType,
+    billing_period: draft.billingPeriod,
+    base_price_cents: priceCents(draft.price) ?? 0,
+    tags: draft.tags,
+    fields,
+  };
+}
+
+export function draftFromPackage(catalog: PackageCatalog, pkg: FinanceRecord): PackageDraft {
+  const typeKey = String(pkg.package_type ?? "membership");
+  const type = findType(catalog, typeKey);
+  const billingPeriod = String(pkg.billing_period ?? type?.default_billing_period ?? "monthly");
+  const fields = (pkg.fields as PackageFields | undefined) ?? (type ? presetFor(type, billingPeriod) : {});
+  const cents = typeof pkg.base_price_cents === "number" ? pkg.base_price_cents : Number(pkg.base_price_cents ?? 0);
+  return {
+    packageType: typeKey,
+    billingPeriod,
+    name: String(pkg.name ?? ""),
+    description: String(pkg.description ?? ""),
+    price: (cents / 100).toFixed(2).replace(/\.00$/, ""),
+    tags: Array.isArray(pkg.tags) ? pkg.tags.map(String) : [],
+    fields,
+  };
+}
+
+/** Monthly equivalent shown under recurring prices that are not monthly. */
+export function monthlyEquivalentCents(billingPeriod: string, cents: number | null): number | null {
+  const months: Record<string, number> = { quarterly: 3, semiannual: 6, annual: 12 };
+  if (cents === null || !months[billingPeriod]) return null;
+  return Math.round(cents / months[billingPeriod]);
+}
+
+export function perVisitCents(draft: PackageDraft): number | null {
+  const cents = priceCents(draft.price);
+  const visits = draft.fields[draft.packageType === "pt_pack" ? "personal_training.sessions" : "group_classes.visits"] as QuotaValue | undefined;
+  if (cents === null || !visits || typeof visits.limit !== "number" || visits.limit < 1) return null;
+  if (!ONE_OFF_TYPES.has(draft.packageType)) return null;
+  return Math.round(cents / visits.limit);
+}
+
+/** Wizard steps for a type (relevant steps only). */
+export function wizardSteps(typeKey: string): Array<"type" | "basics" | "included" | "review"> {
+  return typeKey === "drop_in" ? ["type", "basics", "review"] : ["type", "basics", "included", "review"];
+}
+
+/** Message key for a catalog field label, for example `pkgFieldGroupClassesVisits`. */
+export function fieldLabelKey(fieldKey: string): string {
+  return "pkgField" + fieldKey.split(/[._]/).map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+}
+
+export function sectionLabelKey(section: string): string {
+  return "pkgSection" + section.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+}
+
+export function typeLabelKey(typeKey: string): string {
+  return "pkgType" + typeKey.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+}
+
+export function lockReasonKey(reason: string): string {
+  return "pkgLockReason" + reason.split("_").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+}
+
+export type SummaryLine = { key: string; params?: Record<string, string | number> };
+
+/** Names the summary cannot look up itself (coach, compatible memberships). */
+export type SummaryNames = {
+  coachName?: string;
+  compatibleNames?: string[];
+  /** False when the gym does not offer personal training: preset assessments are then not advertised. */
+  showAssessments?: boolean;
+};
+
+/**
+ * Member-facing description of a draft. Core benefits are always listed;
+ * advanced values are listed only when they differ from the type preset and
+ * read like any other benefit (members never see that they were "advanced").
+ */
+export function memberSummary(
+  draft: PackageDraft,
+  classTypeNames: Map<string, string>,
+  preset: PackageFields | null = null,
+  conversionName?: string,
+  names: SummaryNames = {},
+): SummaryLine[] {
+  const lines: SummaryLine[] = [];
+  const fields = draft.fields;
+  const changed = (key: string) => preset === null || !equal(fields[key], preset[key]);
+
+  for (const line of paymentModelSummary(draft, names)) lines.push(line);
+
+  if (fields["group_classes.included"] === true) {
+    const visits = fields["group_classes.visits"] as QuotaValue;
+    if (visits.limit === "unlimited") {
+      lines.push({ key: "pkgSummaryVisitsUnlimited" });
+    } else {
+      lines.push({
+        key: visits.period === "subscription_period" ? "pkgSummaryVisitsTotal" : `pkgSummaryVisitsPer_${visits.period}`,
+        params: { count: visits.limit },
+      });
+    }
+
+    const scope = fields["group_classes.class_types"];
+    if (Array.isArray(scope)) {
+      lines.push({
+        key: "pkgSummaryClassTypesList",
+        params: { names: scope.map((id) => classTypeNames.get(String(id)) ?? "?").join(", ") },
+      });
+    } else {
+      lines.push({ key: "pkgSummaryClassTypesAll" });
+    }
+
+    for (const limit of (fields["group_classes.class_type_limits"] as ClassTypeLimit[] | undefined) ?? []) {
+      lines.push({
+        key: `pkgSummaryClassTypeLimit_${limit.period}`,
+        params: { name: classTypeNames.get(limit.id) ?? "?", count: limit.limit },
+      });
+    }
+  }
+
+  if (fields["online_coaching.included"] === true) {
+    if (fields["online_coaching.assigned_programming"] === true) lines.push({ key: "pkgSummaryAssignedProgramming" });
+    if (fields["online_coaching.messaging"] === true) lines.push({ key: "pkgSummaryCoachMessaging" });
+    const touchpoints = fields["online_coaching.touchpoints"] as QuotaValue | undefined;
+    if (touchpoints && touchpoints.limit !== "unlimited" && changed("online_coaching.touchpoints")) {
+      lines.push({ key: `pkgSummaryCheckIns_${touchpoints.period}`, params: { count: touchpoints.limit } });
+    }
+  }
+
+  for (const line of phaseCServiceSummary(fields, names)) lines.push(line);
+
+  const amenities = (fields["facility.amenities"] as string[] | undefined) ?? [];
+  if (amenities.length > 0) lines.push({ key: "pkgSummaryAmenities", params: { list: amenities.join("|") } });
+  if (typeof fields["facility.amenities_note"] === "string" && fields["facility.amenities_note"]) {
+    lines.push({ key: "pkgSummaryAmenitiesNote", params: { note: String(fields["facility.amenities_note"]) } });
+  }
+
+  for (const line of phaseBSummary(fields, changed)) lines.push(line);
+
+  const validity = fields["terms.validity"] as DurationValue | null | undefined;
+  if (validity) lines.push({ key: `pkgSummaryValidity_${validity.unit}`, params: { count: validity.amount } });
+  if (fields["terms.stacking"] === true && changed("terms.stacking")) lines.push({ key: "pkgSummaryStacking" });
+  if (fields["terms.once_per_person"] === true && changed("terms.once_per_person")) lines.push({ key: "pkgSummaryOncePerPerson" });
+  if (fields["terms.new_members_only"] === true) lines.push({ key: "pkgSummaryNewMembersOnly" });
+  if (draft.packageType === "membership" && fields["terms.auto_renew"] === false) lines.push({ key: "pkgSummaryNoAutoRenew" });
+  if (conversionName) lines.push({ key: "pkgSummaryConversion", params: { name: conversionName } });
+  return lines;
+}
+
+/** Member-facing lines for booking privileges, perks and facility terms (Phase B). */
+function phaseBSummary(fields: PackageFields, changed: (key: string) => boolean): SummaryLine[] {
+  const lines: SummaryLine[] = [];
+  const number = (key: string) => (typeof fields[key] === "number" ? (fields[key] as number) : null);
+
+  const window = number("booking.window_days");
+  if (window !== null && changed("booking.window_days")) lines.push({ key: "pkgSummaryBookingWindow", params: { count: window } });
+  if (fields["booking.waitlist_priority"] === "high" && changed("booking.waitlist_priority")) lines.push({ key: "pkgSummaryWaitlistPriority" });
+  const cutoff = number("booking.cancellation_cutoff_hours");
+  if (cutoff !== null && changed("booking.cancellation_cutoff_hours")) lines.push({ key: "pkgSummaryCancellation", params: { count: cutoff } });
+  if (fields["booking.no_show_penalty_waived"] === true && changed("booking.no_show_penalty_waived")) lines.push({ key: "pkgSummaryNoShowWaived" });
+  const rollover = number("group_classes.rollover_max");
+  if (rollover !== null && rollover > 0) lines.push({ key: "pkgSummaryRollover", params: { count: rollover } });
+  const windows = (fields["group_classes.time_windows"] as unknown[] | undefined) ?? [];
+  if (windows.length > 0) lines.push({ key: "pkgSummaryTimeWindows" });
+
+  if (fields["facility.open_gym"] === true) {
+    const visits = fields["facility.open_gym_visits"] as QuotaValue | undefined;
+    if (!visits || visits.limit === "unlimited") lines.push({ key: "pkgSummaryOpenGymUnlimited" });
+    else lines.push({ key: `pkgSummaryOpenGym_${visits.period}`, params: { count: visits.limit } });
+  }
+  if (Array.isArray(fields["facility.location_ids"])) lines.push({ key: "pkgSummaryLocations", params: { count: (fields["facility.location_ids"] as unknown[]).length } });
+
+  const guests = fields["perks.guest_passes"] as QuotaValue | undefined;
+  if (guests && guests.limit !== 0) {
+    lines.push(guests.limit === "unlimited" ? { key: "pkgSummaryGuestPassesUnlimited" } : { key: `pkgSummaryGuestPasses_${guests.period}`, params: { count: guests.limit } });
+  }
+  const freeze = number("perks.freeze_days_per_year");
+  if (freeze !== null && freeze > 0) lines.push({ key: "pkgSummaryFreeze", params: { count: freeze } });
+  const discount = number("perks.member_discount_percent");
+  if (discount !== null && discount > 0) lines.push({ key: "pkgSummaryDiscount", params: { percent: discount } });
+  if (fields["perks.events"] === true) lines.push({ key: "pkgSummaryEvents" });
+
+  const commitment = number("terms.minimum_commitment_months");
+  if (commitment !== null && commitment > 0) lines.push({ key: "pkgSummaryCommitment", params: { count: commitment } });
+  const fee = number("terms.joining_fee_cents");
+  if (fee !== null && fee > 0) lines.push({ key: "pkgSummaryJoiningFee", params: { cents: fee } });
+  if (fields["terms.validity_starts"] === "first_use" && changed("terms.validity_starts")) lines.push({ key: "pkgSummaryValidityFromFirstUse" });
+  return lines;
+}
+
+/** Member-facing lines for personal training, coaching extras and digital content (ADR-098). */
+function phaseCServiceSummary(fields: PackageFields, names: SummaryNames): SummaryLine[] {
+  const lines: SummaryLine[] = [];
+  if (fields["personal_training.included"] === true) {
+    const sessions = fields["personal_training.sessions"] as QuotaValue | undefined;
+    const details = {
+      minutes: typeof fields["personal_training.session_minutes"] === "number" ? (fields["personal_training.session_minutes"] as number) : 60,
+      format: String(fields["personal_training.format"] ?? "one_to_one"),
+      size: typeof fields["personal_training.group_size"] === "number" ? (fields["personal_training.group_size"] as number) : 1,
+    };
+    if (!sessions || sessions.limit === "unlimited") lines.push({ key: "pkgSummaryPtSessionsUnlimited", params: details });
+    else if (sessions.limit > 0) lines.push({ key: `pkgSummaryPtSessions_${sessions.period}`, params: { count: sessions.limit, ...details } });
+    if (typeof fields["personal_training.coach_id"] === "string") {
+      lines.push(names.coachName ? { key: "pkgSummaryPtCoach", params: { name: names.coachName } } : { key: "pkgSummaryPtCoachAssigned" });
+    }
+  }
+  const assessments = fields["personal_training.assessments"];
+  if (names.showAssessments !== false && typeof assessments === "number" && assessments > 0) lines.push({ key: "pkgSummaryAssessments", params: { count: assessments } });
+
+  if (fields["online_coaching.included"] === true) {
+    const reviews = fields["online_coaching.form_reviews"] as QuotaValue | undefined;
+    if (reviews && reviews.limit === "unlimited") lines.push({ key: "pkgSummaryFormReviewsUnlimited" });
+    else if (reviews && typeof reviews.limit === "number" && reviews.limit > 0) lines.push({ key: `pkgSummaryFormReviews_${reviews.period}`, params: { count: reviews.limit } });
+    const sla = fields["online_coaching.response_sla_hours"];
+    if (typeof sla === "number" && fields["online_coaching.messaging"] === true) lines.push({ key: "pkgSummaryResponseSla", params: { hours: sla } });
+  }
+  if (fields["online_coaching.nutrition_plan"] === true) lines.push({ key: "pkgSummaryNutritionPlan" });
+  if (fields["content.on_demand_video"] === true) lines.push({ key: "pkgSummaryOnDemandVideo" });
+  if (fields["content.advanced_analytics"] === true) lines.push({ key: "pkgSummaryAdvancedAnalytics" });
+  return lines;
+}
+
+/** How the package is held and paid for: add-on, shared or company plan (ADR-098). */
+function paymentModelSummary(draft: PackageDraft, names: SummaryNames): SummaryLine[] {
+  const fields = draft.fields;
+  const lines: SummaryLine[] = [];
+  switch (draft.packageType) {
+    case "add_on":
+      lines.push({ key: "pkgSummaryAddOn" });
+      if (Array.isArray(fields["terms.compatible_package_ids"]) && names.compatibleNames && names.compatibleNames.length > 0) {
+        lines.push({ key: "pkgSummaryAddOnFor", params: { names: names.compatibleNames.join(", ") } });
+      }
+      break;
+    case "shared": {
+      const people = typeof fields["terms.beneficiaries"] === "number" ? (fields["terms.beneficiaries"] as number) : 2;
+      lines.push({ key: "pkgSummaryShared", params: { count: people } });
+      lines.push({ key: fields["terms.quota_sharing"] === "shared" ? "pkgSummaryQuotaShared" : "pkgSummaryQuotaPerPerson" });
+      if (fields["terms.allow_minor_beneficiaries"] === true) lines.push({ key: "pkgSummaryMinorsAllowed" });
+      break;
+    }
+    case "corporate":
+      lines.push({ key: "pkgSummaryCorporate" });
+      if (fields["terms.enrollment"] === "email_domain" && typeof fields["terms.enrollment_domain"] === "string" && fields["terms.enrollment_domain"]) {
+        lines.push({ key: "pkgSummaryEnrollDomain", params: { domain: String(fields["terms.enrollment_domain"]) } });
+      } else {
+        lines.push({ key: "pkgSummaryEnrollCode" });
+      }
+      break;
+  }
+  return lines;
+}

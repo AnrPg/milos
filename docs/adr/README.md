@@ -101,6 +101,15 @@ must have an ADR. See `template.md` for the format.
 | ADR-093 | Tenant delete purges eligible client accounts | Accepted |
 | ADR-094 | Temporary clean slate production purge | Accepted |
 | ADR-095 | Align account role with membership | Accepted |
+| ADR-096 | Package types and entitlement catalog v2 | Accepted |
+| ADR-097 | Package Phase B: booking rules, perks and facility | Accepted |
+| ADR-098 | Package Phase C: new services and payment models | Accepted |
+| ADR-099 | Role sets and capability authorization | Accepted |
+| ADR-100 | Coach client scope and head coaches | Accepted |
+| ADR-101 | Private coach notes and their access log | Accepted |
+| ADR-102 | Front desk, accountant and janitor roles; housekeeping log | Accepted |
+| ADR-103 | Role-aware navigation on today's UI | Accepted |
+| ADR-104 | Gym inventory: machines and consumables | Accepted |
 | ADR-114 | Tenant-scoped admin fanout replaces global admin lookups | Accepted |
 | ADR-115 | Dialyzer baseline paid down to zero | Accepted |
 | ADR-116 | Observability dashboards and alerting | Accepted |

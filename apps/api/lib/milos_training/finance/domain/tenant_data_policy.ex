@@ -32,10 +32,17 @@ defmodule MilosTraining.Finance.Domain.TenantDataPolicy do
               %{table: "referral_programs"},
               %{table: "promotion_codes"},
               %{table: "promotion_campaigns"},
+              # ADR-098 corporate billing: payments -> invoices -> clients;
+              # subscriptions reference corporate clients, so clients follow them.
+              %{table: "finance_corporate_payments"},
+              %{table: "finance_corporate_invoices"},
               %{table: "finance_invoice_lines"},
               %{table: "membership_payments"},
               %{table: "finance_invoices"},
+              %{table: "finance_subscription_freezes"},
+              %{table: "finance_subscription_beneficiaries"},
               %{table: "membership_package_subscriptions"},
+              %{table: "finance_corporate_clients"},
               %{table: "membership_packages"},
               %{table: "memberships"},
               %{table: "finance_settings"}

@@ -100,7 +100,7 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
              Organizations.set_membership_role(admin_context, owner.id, :member)
   end
 
-  test "a coach cannot change roles at all", %{member: member, org_a: org_a} do
+  test "a coach cannot change roles (ADR-099)", %{member: member, org_a: org_a} do
     coach = TestFixtures.user_fixture(%{role: :member})
 
     {:ok, _} =
@@ -115,7 +115,10 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
     {:ok, coach_context} = Organizations.resolve_tenant_context(coach, org_a.slug)
 
     assert {:error, :forbidden} =
-             Organizations.set_membership_role(coach_context, member.id, :admin)
+             Organizations.set_membership_role(coach_context, member.id, :owner)
+
+    assert {:error, :forbidden} =
+             Organizations.set_membership_role(coach_context, member.id, :athlete)
   end
 
   test "an account cannot change its own role", %{owner: owner, context_a: context_a} do

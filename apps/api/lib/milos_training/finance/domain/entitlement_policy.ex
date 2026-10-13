@@ -89,7 +89,10 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
              request_value(request, :capability),
              :capability,
              mode
-           ) do
+           ),
+         :ok <- require_class_type(plan, request),
+         :ok <- require_time_window(plan, request),
+         :ok <- require_location(plan, request_value(request, :location_id)) do
       authorize_allowance(plan, request)
     else
       {:error, _reason} = error -> error
@@ -104,6 +107,32 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
     else
       missing_member_error(kind, mode)
     end
+  end
+
+  # Class-type scope and time windows govern group classes; events and the
+  # facility have their own access rules (ADR-097).
+  defp require_class_type(plan, request) do
+    if request_value(request, :channel) in [nil, :in_person] and
+         not EntitlementPlan.class_type_included?(plan, request_value(request, :class_type_id)),
+       do: {:error, :finance_class_type_not_included},
+       else: :ok
+  end
+
+  defp require_time_window(plan, request) do
+    if request_value(request, :channel) in [nil, :in_person] and
+         not EntitlementPlan.within_time_windows?(
+           plan,
+           request_value(request, :local_weekday),
+           request_value(request, :local_time)
+         ),
+       do: {:error, :finance_time_window_not_included},
+       else: :ok
+  end
+
+  defp require_location(plan, location_id) do
+    if EntitlementPlan.location_included?(plan, location_id),
+      do: :ok,
+      else: {:error, :finance_location_not_included}
   end
 
   defp missing_member_error(kind, :observe), do: {:error, observed_error(kind)}

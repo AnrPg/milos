@@ -71,6 +71,10 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def list_staff_user_ids(organization_id), do: impl().list_staff_user_ids(organization_id)
 
   @impl true
+  def list_member_roles(organization_id, roles, user_id),
+    do: impl().list_member_roles(organization_id, roles, user_id)
+
+  @impl true
   def list_membership_organization_ids(user_ids),
     do: impl().list_membership_organization_ids(user_ids)
 
@@ -152,6 +156,22 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   @impl true
   def update_membership_role(organization_id, membership_id, role),
     do: impl().update_membership_role(organization_id, membership_id, role)
+
+  @impl true
+  def set_organization_status(organization_id, status),
+    do: impl().set_organization_status(organization_id, status)
+
+  @impl true
+  def put_organization_setting(organization_id, key, value),
+    do: impl().put_organization_setting(organization_id, key, value)
+
+  @impl true
+  def update_membership_roles(organization_id, membership_id, roles),
+    do: impl().update_membership_roles(organization_id, membership_id, roles)
+
+  @impl true
+  def update_membership_settings(organization_id, membership_id, settings),
+    do: impl().update_membership_settings(organization_id, membership_id, settings)
 
   @impl true
   def update_membership_status(organization_id, membership_id, status),

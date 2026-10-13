@@ -54,7 +54,7 @@ defmodule MilosTraining.Finance.FinanceEntitlementUsageEntry do
       :source_context,
       :idempotency_key
     ])
-    |> validate_inclusion(:allowance_key, ["class_visits", "coaching_touchpoints"])
+    |> validate_allowance_key()
     |> validate_inclusion(:event_type, ["reserve", "finalize", "release", "consume", "adjustment"])
     |> validate_reason_for_adjustment()
     |> foreign_key_constraint(:membership_id)
@@ -71,4 +71,23 @@ defmodule MilosTraining.Finance.FinanceEntitlementUsageEntry do
       changeset
     end
   end
+
+  # ADR-097 adds event visits, guest passes and open-gym visits.
+  @allowance_keys ~w(
+    class_visits coaching_touchpoints event_visits guest_passes open_gym_visits
+    pt_sessions assessments form_reviews
+  )
+
+  defp validate_allowance_key(changeset) do
+    validate_change(changeset, :allowance_key, fn :allowance_key, key ->
+      cond do
+        key in @allowance_keys -> []
+        class_type_key?(key) -> []
+        true -> [allowance_key: "is invalid"]
+      end
+    end)
+  end
+
+  defp class_type_key?("class_visits:" <> id), do: match?({:ok, _}, Ecto.UUID.cast(id))
+  defp class_type_key?(_), do: false
 end

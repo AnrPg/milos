@@ -1,5 +1,6 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
-  alias MilosTraining.{Identity, Scheduling, Workouts}
+  alias MilosTraining.{Facility, Identity, Scheduling, Workouts}
+  alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, actor, params) do
     with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params) do
@@ -19,6 +20,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
          end_date: DateTime.to_date(DateTime.add(end_at, -1, :second)),
          days: days,
          class_types: class_types,
+         locations: Facility.list_locations(context, include_archived: true),
          slots: slots
        }}
     end
@@ -48,6 +50,12 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     Enum.map(slots, fn slot ->
       workout = Map.get(workout_cache, slot.master_workout_id)
       current_booking = Enum.find(slot.bookings, &active_booking_for_user?(&1, actor.id))
+      current_guest = Enum.find(slot.bookings, &active_guest_for_user?(&1, actor.id))
+
+      waitlist =
+        slot.bookings
+        |> Enum.filter(&(&1.status == :waitlisted))
+        |> BookingPolicy.waitlist_order()
 
       base = %{
         id: slot.id,
@@ -64,8 +72,16 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         booking_timeout_minutes: slot.booking_timeout_minutes,
         approved_booking_count: slot.approved_booking_count,
         spots_remaining: slot.spots_remaining,
+        location_id: Map.get(slot, :location_id),
+        coach_user_id: Map.get(slot, :coach_user_id),
+        waitlist_count: length(waitlist),
         workout: preview_workout(workout),
-        current_user_booking: current_booking && enrich_booking(current_booking, nickname_cache)
+        current_user_booking:
+          current_booking &&
+            current_booking
+            |> enrich_booking(nickname_cache)
+            |> Map.put(:waitlist_position, waitlist_position(waitlist, current_booking)),
+        current_user_guest: current_guest && enrich_booking(current_guest, nickname_cache)
       }
 
       if admin_role?(context, actor) do
@@ -212,6 +228,9 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       user_id: booking.user_id,
       user_nickname: Map.get(nickname_cache, booking.user_id),
       status: to_string(booking.status),
+      guest_name: Map.get(booking, :guest_name),
+      entitlement_allowance: Map.get(booking, :entitlement_allowance),
+      waitlist_priority: Map.get(booking, :waitlist_priority),
       admin_message: booking.admin_message,
       inserted_at: booking.inserted_at
     }
@@ -232,7 +251,19 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
   end
 
   defp active_booking_for_user?(booking, user_id),
-    do: booking.user_id == user_id and booking.status in [:pending, :approved]
+    do:
+      booking.user_id == user_id and is_nil(Map.get(booking, :guest_name)) and
+        booking.status in [:pending, :approved, :waitlisted]
+
+  defp active_guest_for_user?(booking, user_id),
+    do:
+      booking.user_id == user_id and not is_nil(Map.get(booking, :guest_name)) and
+        booking.status in [:pending, :approved, :waitlisted]
+
+  defp waitlist_position(waitlist, %{status: :waitlisted, id: id}),
+    do: Enum.find_index(waitlist, &(&1.id == id)) + 1
+
+  defp waitlist_position(_waitlist, _booking), do: nil
 
   defp schedule_class_types(context, slots) do
     active =

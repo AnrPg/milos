@@ -90,3 +90,12 @@ describe("tenantBrandLogoUrl", () => {
     expect(tenantBrandLogoUrl([], null)).toBeNull();
   });
 });
+
+describe("pathActive for my workouts", () => {
+  it("keeps My Workouts inactive on history and pantheon pages", () => {
+    expect(pathActive("/my-workouts", "/my-workouts")).toBe(true);
+    expect(pathActive("/my-workouts/history", "/my-workouts")).toBe(false);
+    expect(pathActive("/my-workouts/history", "/my-workouts/history")).toBe(true);
+    expect(pathActive("/my-workouts/pantheon", "/my-workouts")).toBe(false);
+  });
+});

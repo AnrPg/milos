@@ -47,6 +47,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback list_organization_memberships(Ecto.UUID.t()) :: [OrganizationMembership.t()]
   @callback list_active_membership_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback list_staff_user_ids(Ecto.UUID.t()) :: [Ecto.UUID.t()]
+  @callback list_member_roles(Ecto.UUID.t(), [String.t()] | nil, Ecto.UUID.t() | nil) :: [map()]
   @callback list_membership_organization_ids([Ecto.UUID.t()]) :: %{
               Ecto.UUID.t() => [Ecto.UUID.t()]
             }
@@ -92,6 +93,13 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, OrganizationMembership.t()} | {:error, term()}
   @callback update_membership_role(Ecto.UUID.t(), Ecto.UUID.t(), atom()) ::
               {:ok, OrganizationMembership.t()} | {:error, term()}
+  @callback set_organization_status(Ecto.UUID.t(), atom()) :: {:ok, struct()} | {:error, term()}
+  @callback put_organization_setting(Ecto.UUID.t(), String.t(), term()) ::
+              {:ok, struct()} | {:error, term()}
+  @callback update_membership_roles(Ecto.UUID.t(), Ecto.UUID.t(), [atom()]) ::
+              {:ok, struct()} | {:error, term()}
+  @callback update_membership_settings(Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, struct()} | {:error, term()}
   @callback transaction((-> {:ok, term()} | {:error, term()})) :: {:ok, term()} | {:error, term()}
 
   # ADR-117 reviewed tenant purge records (platform-level, survive the purge).

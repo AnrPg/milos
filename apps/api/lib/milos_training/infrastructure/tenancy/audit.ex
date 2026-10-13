@@ -13,6 +13,22 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_entitlement_usage_entries finance_settings
     finance_document_counters finance_refund_receipts finance_reconciliation_records
     finance_accounting_exports
+    finance_entitlement_usage_entries finance_settings finance_subscription_freezes
+    facility_locations facility_check_ins content_videos
+    coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
+    appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
+    finance_corporate_invoices
+    finance_corporate_payments
+    coaching_relationships
+    coaching_notes
+    coaching_note_reads
+    housekeeping_areas
+    housekeeping_entries
+    inventory_machines
+    inventory_machine_events
+    inventory_supplies
+    inventory_supply_movements
+    inventory_supply_reports
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

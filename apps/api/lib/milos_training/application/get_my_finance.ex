@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.GetMyFinance do
+  alias MilosTraining.Application.EntitlementClassTypeNames
   alias MilosTraining.Finance
 
   @non_draft_statuses ~w[issued partially_paid paid overdue void]
@@ -6,12 +7,12 @@ defmodule MilosTraining.Application.GetMyFinance do
 
   def call(%{organization_id: organization_id} = context, user_id)
       when is_binary(organization_id),
-      do: Finance.with_tenant_context(context, fn -> run(user_id) end)
+      do: Finance.with_tenant_context(context, fn -> run(context, user_id) end)
 
   def call(_context, _user_id), do: {:error, :organization_context_required}
   def call(_user_id), do: {:error, :organization_context_required}
 
-  defp run(user_id) do
+  defp run(context, user_id) do
     packages = Finance.list_packages()
 
     case Finance.get_member_profile(user_id) do
@@ -58,7 +59,8 @@ defmodule MilosTraining.Application.GetMyFinance do
              Enum.filter(profile.credit_ledger_entries, &(&1.referral_reward_id != nil)),
            promotion_redemptions: profile.promotion_redemptions,
            available_packages: packages,
-           effective_entitlement: Finance.get_effective_entitlement(user_id)
+           effective_entitlement:
+             EntitlementClassTypeNames.put(context, Finance.get_effective_entitlement(user_id))
          }}
     end
   end

@@ -8,7 +8,7 @@ defmodule MilosTraining.Messaging do
     GetThread
   }
 
-  alias MilosTraining.Messaging.ThreadStore
+  alias MilosTraining.Messaging.{MessageStore, ThreadStore}
 
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: ThreadStore.with_tenant_context(context, fun)
@@ -41,6 +41,10 @@ defmodule MilosTraining.Messaging do
 
   def count_unread_threads(user_id),
     do: MilosTraining.Messaging.ThreadStore.count_unread_threads(user_id)
+
+  @doc "Direct threads whose latest message is from a client (ADR-098)."
+  def list_awaiting_staff_reply(context, staff_ids),
+    do: MessageStore.list_awaiting_staff_reply(context, staff_ids)
 
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,

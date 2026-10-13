@@ -10,12 +10,19 @@ defmodule MilosTraining.Application.TenantDataContexts do
 
   alias MilosTraining.{
     Analytics,
+    Appointments,
+    Coaching,
+    Content,
     Execution,
+    Facility,
     Feedback,
     Finance,
     Gamification,
+    Housekeeping,
+    Inventory,
     Messaging,
     Notifications,
+    Nutrition,
     Pantheon,
     Scheduling,
     Wellbeing,
@@ -35,7 +42,14 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Gamification,
     Finance,
     Scheduling,
-    Workouts
+    Workouts,
+    Coaching,
+    Nutrition,
+    Content,
+    Housekeeping,
+    Inventory,
+    Appointments,
+    Facility
   ]
 
   @doc "Purgeable contexts as `{module, policy}` in dependency order (dependents first)."

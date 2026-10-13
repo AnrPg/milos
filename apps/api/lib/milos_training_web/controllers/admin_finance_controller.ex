@@ -20,6 +20,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     GetAdminFinanceSummary,
     GetFinanceOperationalQueues,
     GetFinancePackage,
+    GetFinancePackageCatalog,
     GetFinanceMemberProfile,
     GenerateFinanceRenewalInvoice,
     IssueFinanceInvoice,
@@ -47,6 +48,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
   }
 
   alias MilosTraining.Application.DocumentStorage
+  alias MilosTraining.Finance
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
   alias MilosTrainingWeb.Schemas.AdminDrillDown
 
@@ -80,75 +82,90 @@ defmodule MilosTrainingWeb.AdminFinanceController do
     required: true,
     content: %{"application/json" => %MediaType{schema: @open_object}}
   }
-  @allowance_config_schema %Schema{
+  @package_quota_schema %Schema{
     type: :object,
     additionalProperties: false,
     required: [:limit, :period],
     properties: %{
       limit: %Schema{
-        oneOf: [
-          %Schema{type: :integer, minimum: 0},
-          %Schema{type: :string, enum: ["unlimited"]}
-        ]
+        oneOf: [%Schema{type: :integer, minimum: 0}, %Schema{type: :string, enum: ["unlimited"]}]
       },
-      period: %Schema{
-        type: :string,
-        enum: ["calendar_week", "calendar_month", "subscription_period"]
-      },
-      counted_kinds: %Schema{type: :array, items: %Schema{type: :string}}
+      period: %Schema{type: :string, enum: Finance.package_quota_periods()}
     }
   }
-  @entitlement_params_schema %Schema{
-    type: :object,
-    additionalProperties: false,
-    required: [:entitlement_version, :channels, :capabilities, :allowances],
-    properties: %{
-      entitlement_version: %Schema{type: :integer, enum: [1]},
-      channels: %Schema{
-        type: :array,
-        uniqueItems: true,
-        items: %Schema{
-          type: :string,
-          enum: ["in_person", "workout_library", "personal_programming", "coach_messaging"]
-        }
-      },
-      capabilities: %Schema{
-        type: :array,
-        uniqueItems: true,
-        items: %Schema{
-          type: :string,
-          enum: [
-            "book_classes",
-            "execute_class_workouts",
-            "execute_library_workouts",
-            "execute_assigned_workouts",
-            "receive_coaching_touchpoints"
-          ]
-        }
-      },
-      allowances: %Schema{
+  @package_field_schemas %{
+    "boolean" => %Schema{type: :boolean},
+    "integer" => %Schema{type: :integer},
+    "gym_default_integer" => %Schema{type: :integer, nullable: true},
+    "integer_option" => %Schema{type: :integer},
+    "integer_option_or_null" => %Schema{type: :integer, nullable: true},
+    "enum" => %Schema{type: :string},
+    "enum_list" => %Schema{type: :array, items: %Schema{type: :string}},
+    "string_or_null" => %Schema{type: :string, nullable: true},
+    "uuid_or_null" => %Schema{type: :string, format: :uuid, nullable: true},
+    "scope_ids" => %Schema{
+      oneOf: [
+        %Schema{type: :string, enum: ["all"]},
+        %Schema{type: :array, items: %Schema{type: :string, format: :uuid}}
+      ]
+    },
+    "quota" => @package_quota_schema,
+    "quota_by_id" => %Schema{
+      type: :array,
+      items: %Schema{
         type: :object,
         additionalProperties: false,
+        required: [:id, :limit, :period],
         properties: %{
-          class_visits: @allowance_config_schema,
-          coaching_touchpoints: @allowance_config_schema
+          id: %Schema{type: :string, format: :uuid},
+          limit: %Schema{type: :integer, minimum: 0},
+          period: %Schema{type: :string, enum: Finance.package_quota_periods()}
+        }
+      }
+    },
+    "duration" => %Schema{
+      type: :object,
+      nullable: true,
+      additionalProperties: false,
+      required: [:amount, :unit],
+      properties: %{
+        amount: %Schema{type: :integer, minimum: 1},
+        unit: %Schema{type: :string, enum: ["day", "week", "month"]}
+      }
+    },
+    "time_windows" => %Schema{
+      type: :array,
+      items: %Schema{
+        type: :object,
+        additionalProperties: false,
+        required: [:days, :from, :to],
+        properties: %{
+          days: %Schema{type: :array, items: %Schema{type: :integer, minimum: 1, maximum: 7}},
+          from: %Schema{type: :string},
+          to: %Schema{type: :string}
         }
       }
     }
+  }
+  @package_fields_schema %Schema{
+    type: :object,
+    additionalProperties: false,
+    description: "Entitlement catalog v2 field values keyed by catalog field key (ADR-096)",
+    properties:
+      Map.new(Finance.package_catalog_fields(), fn field ->
+        {field.key, Map.fetch!(@package_field_schemas, Atom.to_string(field.kind))}
+      end)
   }
   @package_properties %{
     code: %Schema{type: :string, nullable: true},
     name: %Schema{type: :string},
     description: %Schema{type: :string, nullable: true},
-    family: %Schema{type: :string},
-    billing_period: %Schema{
-      type: :string,
-      enum: ["monthly", "quarterly", "annual", "custom"]
-    },
+    package_type: %Schema{type: :string, enum: Finance.package_type_keys()},
+    billing_period: %Schema{type: :string, enum: Finance.package_billing_periods()},
     base_price_cents: %Schema{type: :integer, minimum: 0},
     currency: %Schema{type: :string},
     tags: %Schema{type: :array, items: %Schema{type: :string}},
-    params: @entitlement_params_schema,
+    fields: @package_fields_schema,
     active: %Schema{type: :boolean}
   }
   @create_package_request_body %RequestBody{
@@ -158,7 +175,7 @@ defmodule MilosTrainingWeb.AdminFinanceController do
         schema: %Schema{
           type: :object,
           properties: @package_properties,
-          required: [:name, :family, :billing_period],
+          required: [:name, :package_type],
           additionalProperties: false
         }
       }
@@ -429,6 +446,12 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       quantity: %Schema{type: :integer, minimum: 1, nullable: true},
       unit_amount_cents: %Schema{type: :integer, minimum: 0},
       discount_cents: %Schema{type: :integer, minimum: 0, nullable: true},
+      charge_category: %Schema{
+        type: :string,
+        enum: ["product", "personal_training", "event", "other"],
+        nullable: true,
+        description: "Manual charges in the member's discount scope get the member discount"
+      },
       membership_package_subscription_id: %Schema{
         type: :string,
         format: :uuid,
@@ -617,6 +640,17 @@ defmodule MilosTrainingWeb.AdminFinanceController do
 
   def operational_queues(conn, params) do
     with {:ok, payload} <- GetFinanceOperationalQueues.call(params) do
+      json(conn, payload)
+    end
+  end
+
+  operation(:package_catalog,
+    summary: "Describe package types, presets, locks and catalog fields",
+    responses: [ok: {"Package catalog", "application/json", @open_object}]
+  )
+
+  def package_catalog(conn, _params) do
+    with {:ok, payload} <- GetFinancePackageCatalog.call() do
       json(conn, payload)
     end
   end

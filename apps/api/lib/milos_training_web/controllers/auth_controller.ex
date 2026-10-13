@@ -372,7 +372,7 @@ defmodule MilosTrainingWeb.AuthController do
   end
 
   def register_member(conn, _params) do
-    register_invited(conn, [:owner, :admin, :coach, :member, :athlete])
+    register_invited(conn, MilosTraining.Organizations.roles())
   end
 
   defp register_invited(conn, allowed_roles) do

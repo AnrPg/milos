@@ -190,6 +190,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
               organization_id: organization_id,
               master_workout_id: series.master_workout_id,
               class_type_id: series.class_type_id,
+              location_id: series.location_id,
+              coach_user_id: series.coach_user_id,
               class_series_id: series.id,
               name: series.name,
               duration_minutes: series.duration_minutes,
@@ -441,7 +443,9 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         %{
           default_capacity: 12,
           default_auto_approve: false,
-          default_booking_timeout_minutes: 60
+          default_booking_timeout_minutes: 60,
+          default_booking_window_days: nil,
+          default_cancellation_cutoff_hours: nil
         }
 
       settings ->
@@ -574,7 +578,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       [booking],
       booking.organization_id == ^organization_id and booking.user_id == ^user_id and
         booking.scheduled_class_id == ^scheduled_class_id and
-        booking.status == :approved
+        booking.status == :approved and is_nil(booking.guest_name)
     )
     |> order_by([booking], desc: booking.inserted_at)
     |> limit(1)
@@ -585,7 +589,16 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
   @impl true
   def create_booking(context, user_id, slot_id, timeout_minutes),
-    do: create_booking(context, user_id, slot_id, timeout_minutes, [])
+    do: create_booking_with(context, user_id, slot_id, timeout_minutes, %{})
+
+  # ADR-120 offline replay: keyword options carry the client operation id
+  # into the attrs-based write path (ADR-097).
+  @impl true
+  def create_booking(context, user_id, slot_id, timeout_minutes, opts) when is_list(opts),
+    do:
+      create_booking_with(context, user_id, slot_id, timeout_minutes, %{
+        client_operation_id: Keyword.get(opts, :client_operation_id)
+      })
 
   @impl true
   def get_booking_by_client_operation(
@@ -605,12 +618,12 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
-  def create_booking(
+  def create_booking_with(
         %{organization_id: organization_id},
         user_id,
         slot_id,
         timeout_minutes,
-        opts
+        attrs
       ) do
     Multi.new()
     |> Multi.run(:slot, fn repo, _changes ->
@@ -621,13 +634,15 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     end)
     |> Multi.insert(
       :booking,
-      Booking.create_changeset(%Booking{}, %{
-        organization_id: organization_id,
-        scheduled_class_id: slot_id,
-        user_id: user_id,
-        status: :pending,
-        client_operation_id: Keyword.get(opts, :client_operation_id)
-      })
+      Booking.create_changeset(
+        %Booking{},
+        Map.merge(booking_attrs(attrs), %{
+          organization_id: organization_id,
+          scheduled_class_id: slot_id,
+          user_id: user_id,
+          status: :pending
+        })
+      )
     )
     |> Multi.run(:timeout_job, fn repo, %{booking: booking} ->
       booking
@@ -652,10 +667,17 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
   @impl true
   def create_approved_booking(context, user_id, slot_id),
-    do: create_approved_booking(context, user_id, slot_id, [])
+    do: create_approved_booking_with(context, user_id, slot_id, %{})
 
   @impl true
-  def create_approved_booking(%{organization_id: organization_id}, user_id, slot_id, opts) do
+  def create_approved_booking(context, user_id, slot_id, opts) when is_list(opts),
+    do:
+      create_approved_booking_with(context, user_id, slot_id, %{
+        client_operation_id: Keyword.get(opts, :client_operation_id)
+      })
+
+  @impl true
+  def create_approved_booking_with(%{organization_id: organization_id}, user_id, slot_id, attrs) do
     tenant_transaction(fn ->
       slot =
         ScheduledClass
@@ -676,13 +698,14 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
         true ->
           %Booking{}
-          |> Booking.create_changeset(%{
-            organization_id: organization_id,
-            scheduled_class_id: slot_id,
-            user_id: user_id,
-            status: :approved,
-            client_operation_id: Keyword.get(opts, :client_operation_id)
-          })
+          |> Booking.create_changeset(
+            Map.merge(booking_attrs(attrs), %{
+              organization_id: organization_id,
+              scheduled_class_id: slot_id,
+              user_id: user_id,
+              status: :approved
+            })
+          )
           |> Repo.insert()
           |> case do
             {:ok, booking} -> booking
@@ -778,7 +801,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       nil ->
         {:error, :not_found}
 
-      %Booking{status: status} = booking when status in [:pending, :approved] ->
+      %Booking{status: status} = booking when status in [:pending, :approved, :waitlisted] ->
         maybe_cancel_timeout_job(booking.timeout_job_id)
         normalized = booking |> preload_booking() |> normalize_booking()
 
@@ -803,7 +826,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
         nil ->
           Repo.rollback(:not_found)
 
-        %Booking{status: status} when status not in [:pending, :approved] ->
+        %Booking{status: status} when status not in [:pending, :approved, :waitlisted] ->
           Repo.rollback(:booking_not_withdrawable)
 
         %Booking{} = booking ->
@@ -825,6 +848,112 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       {:error, reason} ->
         {:error, reason}
     end
+  end
+
+  # ── Waitlist (ADR-097) ──────────────────────────────────────────────────
+
+  @impl true
+  def create_waitlisted_booking(%{organization_id: organization_id}, user_id, slot_id, attrs) do
+    tenant_transaction(fn ->
+      slot =
+        ScheduledClass
+        |> where([slot], slot.id == ^slot_id and slot.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      if approved_booking_count(organization_id, slot.id) < slot.capacity,
+        do: Repo.rollback(:slot_not_full)
+
+      %Booking{}
+      |> Booking.create_changeset(
+        Map.merge(booking_attrs(attrs), %{
+          organization_id: organization_id,
+          scheduled_class_id: slot.id,
+          user_id: user_id,
+          status: :waitlisted,
+          waitlisted_at: DateTime.utc_now()
+        })
+      )
+      |> Repo.insert()
+      |> case do
+        {:ok, booking} -> booking
+        {:error, changeset} -> Repo.rollback(changeset)
+      end
+    end)
+    |> case do
+      {:ok, booking} -> {:ok, booking |> preload_booking() |> normalize_booking()}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @impl true
+  def list_waitlist(%{organization_id: organization_id}, slot_id) do
+    Booking
+    |> where([booking], booking.organization_id == ^organization_id)
+    |> where([booking], booking.scheduled_class_id == ^slot_id and booking.status == :waitlisted)
+    |> Repo.all()
+    |> Enum.map(&normalize_booking_summary/1)
+  end
+
+  @impl true
+  def promote_waitlisted_booking(%{organization_id: organization_id}, booking_id) do
+    tenant_transaction(fn ->
+      booking =
+        Booking
+        |> where(
+          [booking],
+          booking.id == ^booking_id and booking.organization_id == ^organization_id
+        )
+        |> lock("FOR UPDATE")
+        |> Repo.one() || Repo.rollback(:not_found)
+
+      if booking.status != :waitlisted, do: Repo.rollback(:booking_not_waitlisted)
+
+      slot =
+        ScheduledClass
+        |> where([slot], slot.id == ^booking.scheduled_class_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if approved_booking_count(organization_id, slot.id) >= slot.capacity,
+        do: Repo.rollback(:slot_full)
+
+      status = if slot.auto_approve, do: :approved, else: :pending
+
+      promoted =
+        booking
+        |> Booking.promotion_changeset(status)
+        |> Repo.update()
+        |> case do
+          {:ok, promoted} -> promoted
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+
+      if status == :pending do
+        {:ok, job} =
+          promoted |> timeout_job_changeset(slot.booking_timeout_minutes) |> Repo.insert()
+
+        promoted |> Booking.timeout_job_changeset(job.id) |> Repo.update!()
+      else
+        promoted
+      end
+    end)
+    |> case do
+      {:ok, booking} -> {:ok, booking |> preload_booking() |> normalize_booking()}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp booking_attrs(attrs) do
+    attrs
+    |> Map.new(fn {key, value} -> {to_string(key), value} end)
+    |> Map.take([
+      "guest_name",
+      "entitlement_allowance",
+      "waitlist_priority",
+      "client_operation_id"
+    ])
+    |> Map.new(fn {key, value} -> {String.to_existing_atom(key), value} end)
   end
 
   @impl true
@@ -1128,12 +1257,15 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       duration_minutes: slot.duration_minutes,
       class_type_id: slot.class_type_id,
       class_type: normalize_loaded_class_type(slot.class_type),
+      location_id: slot.location_id,
+      coach_user_id: slot.coach_user_id,
       scheduled_at: slot.scheduled_at,
       capacity: slot.capacity,
       auto_approve: slot.auto_approve,
       booking_timeout_minutes: slot.booking_timeout_minutes,
       approved_booking_count: approved_booking_count,
       spots_remaining: max(slot.capacity - approved_booking_count, 0),
+      waitlist_count: Enum.count(bookings, &(&1.status == :waitlisted)),
       bookings: bookings,
       inserted_at: slot.inserted_at,
       updated_at: slot.updated_at
@@ -1154,6 +1286,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       timeout_job_id: booking.timeout_job_id,
       client_operation_id: booking.client_operation_id,
       resolution_operation_id: booking.resolution_operation_id,
+      waitlist_priority: booking.waitlist_priority,
+      waitlisted_at: booking.waitlisted_at,
+      guest_name: booking.guest_name,
+      entitlement_allowance: booking.entitlement_allowance,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }
@@ -1167,6 +1303,10 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       status: booking.status,
       admin_message: booking.admin_message,
       timeout_job_id: booking.timeout_job_id,
+      waitlist_priority: booking.waitlist_priority,
+      waitlisted_at: booking.waitlisted_at,
+      guest_name: booking.guest_name,
+      entitlement_allowance: booking.entitlement_allowance,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }
@@ -1207,6 +1347,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       slug: class_type.slug,
       sort_order: class_type.sort_order,
       archived_at: class_type.archived_at,
+      credit_cost: class_type.credit_cost,
+      kind: class_type.kind,
       inserted_at: class_type.inserted_at,
       updated_at: class_type.updated_at
     }
@@ -1222,6 +1364,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       organization_id: series.organization_id,
       master_workout_id: series.master_workout_id,
       class_type_id: series.class_type_id,
+      location_id: series.location_id,
+      coach_user_id: series.coach_user_id,
       name: series.name,
       duration_minutes: series.duration_minutes,
       timezone: series.timezone,
@@ -1270,6 +1414,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
             organization_id: series.organization_id,
             master_workout_id: series.master_workout_id,
             class_type_id: series.class_type_id,
+            location_id: series.location_id,
+            coach_user_id: series.coach_user_id,
             class_series_id: series.id,
             name: series.name,
             duration_minutes: series.duration_minutes,
@@ -1356,6 +1502,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       default_capacity: settings.default_capacity,
       default_auto_approve: settings.default_auto_approve,
       default_booking_timeout_minutes: settings.default_booking_timeout_minutes,
+      default_booking_window_days: settings.default_booking_window_days,
+      default_cancellation_cutoff_hours: settings.default_cancellation_cutoff_hours,
       inserted_at: settings.inserted_at,
       updated_at: settings.updated_at
     }

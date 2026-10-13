@@ -1,14 +1,10 @@
 "use client";
 
-
-
-
-
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -22,62 +18,32 @@ import { subscribeToTopic } from "@/lib/realtime";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { adminHref, membershipWorkspaceHref, rememberSelectedOrganization, useOrganizationSlug } from "@/lib/organization-slug";
 import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-role";
+import {
+  activeItemId,
+  can,
+  clientNavItems,
+  clientRole,
+  hasStaffRole,
+  sectionGroupFor,
+  staffNavItems,
+} from "@/lib/role-navigation";
+import { setView, useView } from "@/lib/view-mode";
+import { PriorityNav } from "@/components/nav/PriorityNav";
+import { SectionTabs } from "@/components/nav/SectionTabs";
+import { MobileNavMenu } from "@/components/nav/MobileNavMenu";
+import { openNotifications } from "@/components/notifications/NotificationBell";
 import { SemanticLabel } from "@/components/semantic-label";
+import { entitledFeatures } from "@/components/client/entitlement";
+import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { OrganizationSelector } from "@/components/organization-selector";
 
 export { adminHref } from "@/lib/organization-slug";
 
 const CANVAS_PATHS = ["/login"];
 
-type UserRole = "member" | "athlete" | "admin";
-
-type NavLink = { href: string; labelKey: string; roles: UserRole[] };
-type AdminNavLink = { href: string; labelKey: string; mobileVisible: boolean };
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
   settings?: { brand_name?: string | null; brand_logo_url?: string | null } | null;
-};
-
-const NAV_LINKS: NavLink[] = [
-  { href: "/", labelKey: "home", roles: ["member", "athlete"] },
-  { href: "/schedule", labelKey: "schedule", roles: ["member"] },
-  // ADR-125: members receive personal workouts and class versions too.
-  { href: "/my-workouts", labelKey: "myWorkouts", roles: ["athlete", "member"] },
-  { href: "/my-workouts/pantheon", labelKey: "pantheon", roles: ["athlete", "member"] },
-  { href: "/account/billing", labelKey: "billing", roles: ["member", "athlete"] },
-];
-
-const ADMIN_NAV_LINKS: AdminNavLink[] = [
-  { href: "/", labelKey: "home", mobileVisible: true },
-  { href: "/admin/users", labelKey: "users", mobileVisible: false },
-  { href: "/admin/finance", labelKey: "finance", mobileVisible: false },
-  { href: "/admin/class-schedule", labelKey: "classes", mobileVisible: true },
-  { href: "/admin/coaching-assignments", labelKey: "personalCoaching", mobileVisible: true },
-  { href: "/admin/workouts", labelKey: "workouts", mobileVisible: false },
-  { href: "/admin/metrics", labelKey: "analyticsMarketing", mobileVisible: false },
-];
-
-type DashboardCategory = {
-  labelKey: string;
-  items: { href: string; labelKey?: string; label?: string; description: string }[];
-};
-
-const ADMIN_NAV_ICONS: Record<string, string> = {
-  "/": "⌂",
-  "/admin/users": "◎",
-  "/admin/finance": "$",
-  "/admin/class-schedule": "▦",
-  "/admin/coaching-assignments": "◇",
-  "/admin/workouts": "▣",
-  "/admin/metrics": "⌁",
-};
-
-const MEMBER_NAV_ICONS: Record<string, string> = {
-  "/": "⌂",
-  "/schedule": "▦",
-  "/my-workouts": "▣",
-  "/my-workouts/pantheon": "★",
-  "/account/billing": "$",
 };
 
 function stripOrganizationPrefix(pathname: string) {
@@ -90,6 +56,12 @@ export function pathActive(pathname: string, href: string) {
 
   if (relativeHref === "/") return relativePathname === "/";
   if (relativeHref === "/admin") return relativePathname === "/admin";
+  if (relativeHref === "/my-workouts") {
+    return (
+      relativePathname.startsWith("/my-workouts") &&
+      !["/my-workouts/history", "/my-workouts/pantheon"].some((path) => relativePathname.startsWith(path))
+    );
+  }
   if (relativeHref === "/admin/metrics") {
     return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(
       (path) => relativePathname.startsWith(path),
@@ -121,245 +93,17 @@ export function tenantBrandLogoUrl(
   return membership?.settings?.brand_logo_url?.trim() || null;
 }
 
-function DashboardDropdown({
-  pathname,
-  organizationSlug,
-}: {
-  pathname: string;
-  organizationSlug: string | null;
-}) {
-  const i18n = useUiTranslations();
-  const DASHBOARD_CATEGORIES: DashboardCategory[] = [
-    {
-      labelKey: "operations",
-      items: [
-        { href: "/admin/users", labelKey: "users", description: i18n("directoryAndPersonProfiles103196f") },
-        { href: "/admin/finance", labelKey: "finance", description: i18n("invoicesPaymentsAndCredits3671159") },
-        { href: "/admin/class-schedule", labelKey: "classes", description: i18n("slotsBookingsAndAttendanced9c2596") },
-        { href: "/admin/coaching-assignments", labelKey: "personalCoaching", description: i18n("athleteProgrammingBoard954ac27") },
-      ],
-    },
-    {
-      labelKey: "contentGrowth",
-      items: [
-        { href: "/admin/workouts", labelKey: "workouts", description: i18n("masterWorkoutDefinitions09554e6") },
-        { href: "/admin/metrics", labelKey: "analyticsMarketing", description: i18n("reportingEngagementAndGrowth37e1707") },
-        { href: "/admin/challenges", label: i18n("challengesff38765"), description: i18n("seasonalEngagementCampaignsd11b07e") },
-      ],
-    },
-    {
-      labelKey: "utility",
-      items: [
-        { href: "/admin/settings", labelKey: "appConfigurations", description: i18n("appearanceRulesAndLevelTaxonomyc970499") },
-      ],
-    },
-  ];
-
-  const t = useTranslations("Navigation");
-  const [open, setOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
-
-  const isAdminActive = stripOrganizationPrefix(pathname) === "/admin";
-  const openMenu = () => {
-    setOpen(true);
-    setActiveCategory((current) => current ?? DASHBOARD_CATEGORIES[0]?.labelKey ?? null);
-  };
-
-  useEffect(() => {
-    if (!open) return;
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-        setActiveCategory(null);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  return (
-    <div ref={ref} className="relative shrink-0" onFocus={openMenu} onMouseEnter={openMenu}>
-      <div
-        className="flex items-center rounded-full"
-        style={{ background: isAdminActive ? "var(--border)" : "transparent" }}
-      >
-        <Link
-          href={adminHref("/admin", organizationSlug)}
-          className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
-          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
-          aria-label={t("dashboard")}
-          title={t("dashboard")}
-        >
-          <span aria-hidden="true" className="sm:hidden">⌂</span>
-          <span className="hidden sm:inline">{t("dashboard")}</span>
-        </Link>
-        <button
-          aria-expanded={open}
-          aria-label={t("openDashboard")}
-          className="h-8 px-1.5 text-xs sm:h-auto sm:py-1 sm:pe-2"
-          style={{ color: isAdminActive ? "var(--text)" : "var(--dim)" }}
-          onClick={() => setOpen((value) => !value)}
-          type="button"
-        >
-          ▾
-        </button>
-      </div>
-
-      {open ? (
-        <div
-          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-          onMouseLeave={() => { setOpen(false); setActiveCategory(null); }}
-        >
-          {/* Category list */}
-          <div className="w-32 border-e py-1.5 sm:w-40" style={{ borderColor: "var(--border)" }}>
-            {DASHBOARD_CATEGORIES.map((cat) => (
-              <button
-                key={cat.labelKey}
-                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
-                style={{
-                  color: activeCategory === cat.labelKey ? "var(--text)" : "var(--muted)",
-                  background: activeCategory === cat.labelKey ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
-                }}
-                onMouseEnter={() => setActiveCategory(cat.labelKey)}
-                onClick={() => setActiveCategory(cat.labelKey)}
-                type="button"
-              >
-                {t(cat.labelKey)}
-                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
-              </button>
-            ))}
-          </div>
-
-          {/* Sub-items */}
-          {activeCategory ? (
-            <div className="w-48 py-1.5 sm:w-56">
-              {DASHBOARD_CATEGORIES.find((c) => c.labelKey === activeCategory)?.items.map((item) => (
-                <Link
-                  key={item.href}
-                  href={adminHref(item.href, organizationSlug)}
-                  className="block px-4 py-2.5 transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
-                  onClick={() => { setOpen(false); setActiveCategory(null); }}
-                >
-                  <p className="text-sm font-semibold" style={{ color: pathActive(pathname, item.href) ? "var(--primary)" : "var(--text)" }}>
-                    {item.labelKey ? t(item.labelKey) : item.label}
-                  </p>
-                  <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>{item.description}</p>
-                </Link>
-              ))}
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
-function MobileMemberNavDropdown({
-  links,
-  outstandingCents,
-}: {
-  links: NavLink[];
-  outstandingCents: number;
-}) {
-  const t = useTranslations("Navigation");
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<"training" | "account">("training");
-  const ref = useRef<HTMLDivElement>(null);
-  const trainingLinks = links.filter((link) => link.href !== "/account/billing");
-  const accountLinks = links.filter((link) => link.href === "/account/billing");
-  const categories = [
-    { id: "training" as const, label: t("myWorkouts"), items: trainingLinks },
-    { id: "account" as const, label: t("profile"), items: accountLinks },
-  ].filter((category) => category.items.length > 0);
-  const activeItems = categories.find((category) => category.id === activeCategory)?.items ?? categories[0]?.items ?? [];
-
-  useEffect(() => {
-    if (!open) return;
-    function handler(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [open]);
-
-  if (categories.length === 0) return null;
-
-  return (
-    <div ref={ref} className="relative shrink-0 sm:hidden">
-      <button
-        type="button"
-        aria-expanded={open}
-        aria-label={t("openDashboard")}
-        title={t("openDashboard")}
-        className="grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold"
-        style={{ background: open ? "var(--border)" : "transparent", color: open ? "var(--text)" : "var(--dim)" }}
-        onClick={() => setOpen((value) => !value)}
-      >
-        ☰
-      </button>
-      {open ? (
-        <div
-          className="absolute start-0 top-full mt-1 flex max-w-[calc(100vw-1rem)] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-        >
-          <div className="w-32 border-e py-1.5" style={{ borderColor: "var(--border)" }}>
-            {categories.map((category) => (
-              <button
-                key={category.id}
-                type="button"
-                className="flex w-full items-center justify-between gap-2 px-4 py-2 text-start text-xs font-semibold transition-colors"
-                style={{
-                  color: activeCategory === category.id ? "var(--text)" : "var(--muted)",
-                  background: activeCategory === category.id ? "color-mix(in srgb, var(--text) 5%, transparent)" : "transparent",
-                }}
-                onMouseEnter={() => setActiveCategory(category.id)}
-                onClick={() => setActiveCategory(category.id)}
-              >
-                {category.label}
-                <span className="rtl:rotate-180" style={{ color: "var(--dim)" }}>›</span>
-              </button>
-            ))}
-          </div>
-          <div className="w-48 py-1.5">
-            {activeItems.map((link) => {
-              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center justify-between gap-3 px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
-                  style={{ color: pathActive(pathname, link.href) ? "var(--primary)" : "var(--text)" }}
-                  onClick={() => setOpen(false)}
-                >
-                  <span>{t(link.labelKey)}</span>
-                  {showBalanceBadge ? (
-                    <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
-                      !
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export function TopNav() {
   const i18n = useUiTranslations();
   const t = useTranslations("Navigation");
   const pathname = usePathname();
+  const router = useRouter();
+  const view = useView();
   const { status, tokens, currentUser, signOut } = useSession();
   const queryClient = useQueryClient();
   const [menuOpen, setMenuOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
   const menuRef = useRef<HTMLDivElement>(null);
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
@@ -378,7 +122,11 @@ export function TopNav() {
   const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
   const selectedOrganizationSlug = useOrganizationSlug();
   const currentMembership = selectedMembership(memberships, selectedOrganizationSlug);
-  const role = surfaceRoleForMembership(currentMembership) as UserRole;
+  const role = surfaceRoleForMembership(currentMembership, view);
+  const canSwitchView =
+    hasStaffRole(currentMembership) &&
+    clientRole(currentMembership) !== null &&
+    surfaceRoleForMembership(currentMembership, "staff") === "admin";
   const showSelfServiceSurfaces =
     role !== "admin" && Boolean(currentUser) && showsTenantSelfServiceSurfaces(currentUser);
   const financeQuery = useQuery({
@@ -388,11 +136,22 @@ export function TopNav() {
     staleTime: 2 * 60 * 1000,
   });
   const outstandingCents = financeQuery.data?.total_outstanding_balance_cents ?? 0;
+  const { entitlement } = useClientEntitlement(authenticated && showSelfServiceSurfaces);
+  const features = entitledFeatures(entitlement);
+  const staffItems = role === "admin" ? staffNavItems(currentMembership) : [];
+  const navItems = role === "admin" ? staffItems : clientNavItems(role, currentMembership);
+  const hrefFor = (href: string, scoped?: boolean) => (scoped ? adminHref(href, selectedOrganizationSlug) : href);
+  const navLinks = navItems.map((item) => ({ id: item.id, href: hrefFor(item.href, item.scoped), label: t(item.labelKey) }));
+  const activeNavId = activeItemId(pathname, navItems);
+  const sectionGroup = sectionGroupFor(pathname, { surface: role, staffItems, features });
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
+  const mobileLinks = isVendor
+    ? [{ id: "platform", href: "/platform/organizations", label: t("platform") }, ...(showTenantShell ? navLinks : [])]
+    : navLinks;
   const unreadQuery = useQuery({
     queryKey: ["messages", "unread", selectedOrganizationSlug],
     enabled: authenticated && showTenantShell && Boolean(selectedOrganizationSlug),
@@ -430,14 +189,17 @@ export function TopNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 flex items-center overflow-x-clip"
+      className="sticky top-0 z-50 flex flex-col overflow-x-clip"
       style={{
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
         minHeight: "3.25rem",
       }}
     >
-      <div className="grid w-full grid-cols-[minmax(0,1fr)_auto] items-center gap-x-2 gap-y-1 px-2 py-1 sm:flex sm:flex-wrap sm:gap-x-4 sm:px-5">
+      <div className="flex w-full items-center gap-2 px-2 py-1 sm:flex-wrap sm:gap-x-4 sm:px-5">
+        {showTenantShell || isVendor ? (
+          <MobileNavMenu links={mobileLinks} activeId={activeNavId} label={t("menu")} />
+        ) : null}
         <Link
           href="/"
           className="col-span-2 flex min-w-0 items-center gap-2 whitespace-normal break-words text-xs font-bold uppercase leading-tight sm:col-span-1 sm:max-w-[32rem] sm:shrink-0"
@@ -458,11 +220,11 @@ export function TopNav() {
           <span className="min-w-0">{brandName}</span>
         </Link>
 
-        <nav className="order-3 col-start-1 row-start-2 flex min-w-0 flex-1 flex-wrap items-center gap-0.5 overflow-visible sm:order-none sm:col-span-1 sm:row-start-auto sm:gap-1">
+        <nav className="hidden min-w-0 flex-1 items-center gap-1 overflow-visible sm:flex">
           {isVendor ? (
             <Link
               href="/platform/organizations"
-              className="whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold transition-colors sm:px-3 sm:text-sm"
+              className="whitespace-nowrap rounded-full px-3 py-1 text-sm font-semibold transition-colors"
               style={{
                 background: pathActive(pathname, "/platform") ? "var(--border)" : "transparent",
                 color: pathActive(pathname, "/platform") ? "var(--text)" : "var(--dim)",
@@ -471,71 +233,14 @@ export function TopNav() {
               {t("platform")}
             </Link>
           ) : null}
-          {showTenantShell && role === "admin" ? (
-            <DashboardDropdown pathname={pathname} organizationSlug={selectedOrganizationSlug} />
+          {showTenantShell ? (
+            <PriorityNav links={navLinks} activeId={activeNavId} moreLabel={t("more")} />
           ) : null}
-          {showTenantShell && showSelfServiceSurfaces ? (
-            <MobileMemberNavDropdown
-              links={NAV_LINKS.filter((link) => link.roles.includes(role))}
-              outstandingCents={outstandingCents}
-            />
-          ) : null}
-          <div className="hidden min-w-0 flex-wrap items-center gap-0.5 overflow-visible sm:flex sm:gap-1">
-            {showTenantShell && role === "admin"
-              ? ADMIN_NAV_LINKS.map((link) => {
-                  const active = pathActive(pathname, link.href);
-                  const icon = ADMIN_NAV_ICONS[link.href] ?? "•";
-                  return (
-                    <Link
-                      key={link.href}
-                      href={adminHref(link.href, selectedOrganizationSlug)}
-                      className={(link.mobileVisible ? "" : "hidden md:block") + " grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"}
-                      style={{
-                        background: active ? "var(--border)" : "transparent",
-                        color: active ? "var(--text)" : "var(--dim)",
-                      }}
-                      aria-label={t(link.labelKey)}
-                      title={t(link.labelKey)}
-                    >
-                      <span aria-hidden="true" className="sm:hidden">{icon}</span>
-                      <span className="hidden sm:inline">{t(link.labelKey)}</span>
-                    </Link>
-                  );
-                })
-              : null}
-            {showTenantShell && showSelfServiceSurfaces && NAV_LINKS.filter((link) => link.roles.includes(role)).map((link) => {
-              const active = pathActive(pathname, link.href);
-              const showBalanceBadge = link.href === "/account/billing" && outstandingCents > 0;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="relative grid h-8 min-w-8 place-items-center rounded-full px-2 text-xs font-semibold transition-colors sm:h-auto sm:min-w-0 sm:px-3 sm:py-1 sm:text-sm"
-                  style={{
-                    background: active ? "var(--border)" : "transparent",
-                    color: active ? "var(--text)" : "var(--dim)",
-                  }}
-                  aria-label={t(link.labelKey)}
-                  title={t(link.labelKey)}
-                >
-                  <span aria-hidden="true" className="sm:hidden">{MEMBER_NAV_ICONS[link.href] ?? "•"}</span>
-                  <span className="hidden sm:inline">{t(link.labelKey)}</span>
-                  {showBalanceBadge ? (
-                    <span
-                      className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                      style={{ background: "var(--danger)", color: "#fff" }}
-                    >
-                      !
-                    </span>
-                  ) : null}
-                </Link>
-              );
-            })}
-          </div>
         </nav>
 
-        <div className="col-start-2 row-start-2 ms-auto flex shrink-0 items-center gap-1 justify-self-end sm:row-start-auto sm:gap-2">
-          {showTenantShell ? <NotificationBell /> : null}
+        <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
+          {/* Phones open notifications from the avatar menu (ADR-103). */}
+          {showTenantShell ? <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName="hidden sm:flex" /> : null}
 
           {showTenantShell ? (
             <div className="relative shrink-0">
@@ -567,7 +272,7 @@ export function TopNav() {
 
           <div ref={menuRef} className="relative shrink-0">
             <button
-              className="flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
+              className="relative flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
               style={{ background: "var(--panel)", color: "var(--text)" }}
               onClick={() => setMenuOpen((value) => !value)}
               type="button"
@@ -590,9 +295,19 @@ export function TopNav() {
               <span className="hidden max-w-[7rem] truncate sm:block" style={{ color: "var(--text-soft)" }}>
                 {currentUser.nickname}
               </span>
-              <span className="text-[10px]" style={{ color: "var(--dim)" }}>
+              <span className="relative text-[10px]" style={{ color: "var(--dim)" }}>
                 ▾
+                {role !== "admin" && outstandingCents > 0 ? (
+                  <span aria-hidden="true" className="absolute -end-1.5 -top-1.5 h-2 w-2 rounded-full" style={{ background: "var(--danger)" }} />
+                ) : null}
               </span>
+              {unreadNotifications > 0 ? (
+                <span
+                  aria-label={t("unreadNotifications", { count: unreadNotifications })}
+                  className="absolute -end-0.5 -top-0.5 h-3 w-3 rounded-full sm:hidden"
+                  style={{ background: "var(--danger)", border: "2px solid var(--bg)" }}
+                />
+              ) : null}
             </button>
 
             {menuOpen ? (
@@ -611,6 +326,24 @@ export function TopNav() {
                     {isVendor ? t("platform") : <SemanticLabel value={currentMembership?.role ?? currentUser.role} />}
                   </p>
                 </div>
+                {showTenantShell ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)] sm:hidden"
+                    style={{ color: "var(--text-soft)" }}
+                    onClick={() => {
+                      setMenuOpen(false);
+                      openNotifications();
+                    }}
+                  >
+                    {t("notifications")}
+                    {unreadNotifications > 0 ? (
+                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                        {unreadNotifications > 99 ? "99+" : unreadNotifications}
+                      </span>
+                    ) : null}
+                  </button>
+                ) : null}
                 <Link
                   href="/profile"
                   className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
@@ -656,6 +389,31 @@ export function TopNav() {
                 ) : (
                   <>
                     <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
+                    {role === "admin" && can(currentMembership, "manage_settings") ? (
+                      <Link
+                        href={adminHref("/admin/settings", selectedOrganizationSlug)}
+                        className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                        style={{ color: "var(--text-soft)" }}
+                        onClick={() => setMenuOpen(false)}
+                      >
+                        {t("settings")}
+                      </Link>
+                    ) : null}
+                    {canSwitchView ? (
+                      <button
+                        type="button"
+                        className="block w-full px-4 py-2.5 text-start text-sm font-semibold transition-colors hover:bg-[var(--border)]"
+                        style={{ color: "var(--text-soft)" }}
+                        onClick={() => {
+                          const next = role === "admin" ? "client" : "staff";
+                          setView(next);
+                          setMenuOpen(false);
+                          router.push(next === "client" ? "/" : adminHref("/admin", selectedOrganizationSlug));
+                        }}
+                      >
+                        {role === "admin" ? t("myTraining") : t("staffView")}
+                      </button>
+                    ) : null}
                     {role !== "admin" && showSelfServiceSurfaces ? (
                       <Link
                         href="/account/billing"
@@ -663,7 +421,14 @@ export function TopNav() {
                         style={{ color: "var(--text-soft)" }}
                         onClick={() => setMenuOpen(false)}
                       >
-                        {t("billing")}
+                        <span className="flex items-center justify-between gap-2">
+                          {t("billing")}
+                          {outstandingCents > 0 ? (
+                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                              !
+                            </span>
+                          ) : null}
+                        </span>
                       </Link>
                     ) : null}
                   </>
@@ -684,6 +449,9 @@ export function TopNav() {
           </div>
         </div>
       </div>
+      {showTenantShell && sectionGroup ? (
+        <SectionTabs group={sectionGroup} pathname={pathname} hrefFor={hrefFor} labelFor={(key) => t(key)} />
+      ) : null}
     </header>
   );
 }

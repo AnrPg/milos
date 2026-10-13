@@ -1,8 +1,9 @@
 defmodule MilosTraining.Application.RegisterInvitedUser do
-  alias MilosTraining.Application.TokenIssuer
+  alias MilosTraining.Application.{ManageCoachingRelationships, TokenIssuer}
+  alias MilosTraining.Organizations.Domain.MembershipPolicy
   alias MilosTraining.{Identity, Organizations}
 
-  def call(params, allowed_roles \\ [:owner, :admin, :coach, :member, :athlete])
+  def call(params, allowed_roles \\ MembershipPolicy.roles())
       when is_map(params) and is_list(allowed_roles) do
     token = value(params, :invitation_token)
 
@@ -11,6 +12,7 @@ defmodule MilosTraining.Application.RegisterInvitedUser do
          account_role = account_role_for_invitation(invitation.role),
          {:ok, user} <- Identity.register(registration_params(params, account_role)),
          {:ok, redemption} <- redeem_or_cleanup(token, user),
+         :ok <- start_invited_coaching(redemption, user),
          {:ok, user} <- align_account_role(user, account_role),
          {:ok, tokens} <- TokenIssuer.issue_pair(user) do
       {:ok,
@@ -37,7 +39,14 @@ defmodule MilosTraining.Application.RegisterInvitedUser do
     }
   end
 
-  defp account_role_for_invitation(role) when role in [:owner, :admin, :coach], do: :admin
+  defp start_invited_coaching(%{invitation: invitation, organization: organization}, user),
+    do: ManageCoachingRelationships.start_invited(organization.id, invitation, user.id)
+
+  # ADR-095 surface role: every staff role works in the staff shell.
+  defp account_role_for_invitation(role)
+       when role in [:owner, :admin, :coach, :front_desk, :accountant, :janitor],
+       do: :admin
+
   defp account_role_for_invitation(:athlete), do: :athlete
   defp account_role_for_invitation(_role), do: :member
 

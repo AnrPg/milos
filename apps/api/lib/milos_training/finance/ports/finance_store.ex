@@ -79,4 +79,37 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback memberships_needing_payment_reminder(non_neg_integer()) :: [map()]
   @callback total_outstanding_balance_cents() :: non_neg_integer()
   @callback count_pending_referral_approvals() :: non_neg_integer()
+
+  @callback create_freeze(binary(), binary() | nil, map()) :: {:ok, map()} | {:error, term()}
+  @callback cancel_freeze(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback list_freezes(binary()) :: [map()]
+  @callback booking_terms(binary(), Date.t()) :: map()
+  @callback allowance_terms(binary(), atom(), Date.t()) :: map() | nil
+  # ADR-098 payment models
+  @callback list_beneficiaries(binary()) :: [map()]
+  @callback add_beneficiary(binary(), binary(), binary(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback remove_beneficiary(binary(), binary()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_clients() :: [map()]
+  @callback get_corporate_client(binary()) :: map() | nil
+  @callback find_corporate_client(map()) :: map() | nil
+  @callback create_corporate_client(map()) :: {:ok, map()} | {:error, term()}
+  @callback update_corporate_client(binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback enroll_corporate_seat(binary(), binary(), map()) :: {:ok, map()} | {:error, term()}
+  @callback end_corporate_seat(binary(), binary()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_seats(binary()) :: [map()]
+  @callback generate_corporate_invoice(binary(), Date.t()) :: {:ok, map()} | {:error, term()}
+  @callback list_corporate_invoices(binary()) :: [map()]
+  @callback set_corporate_invoice_status(binary(), String.t()) :: {:ok, map()} | {:error, term()}
+  @callback get_corporate_invoice(String.t()) :: map() | nil
+  @callback record_corporate_payment(String.t(), String.t() | nil, map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback reverse_corporate_payment(String.t(), String.t(), String.t() | nil, map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback issue_due_corporate_invoices(Date.t()) :: [map()]
+  @callback mark_overdue_corporate_invoices(Date.t()) :: non_neg_integer()
+  @callback corporate_invoices_needing_reminder(Date.t(), pos_integer()) :: [map()]
+  @callback mark_corporate_invoice_reminded(String.t(), Date.t()) ::
+              {:ok, map()} | {:error, term()}
+  @callback subscriptions_due_for_expiry_reminder(Date.t()) :: [map()]
 end

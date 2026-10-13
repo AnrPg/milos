@@ -110,4 +110,21 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback substitute_slot_workout(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, :not_found}
   @callback count_classes_today(TenantContext.t()) :: non_neg_integer()
+
+  # Phase B (ADR-097)
+  @callback create_booking_with(
+              TenantContext.t(),
+              Ecto.UUID.t(),
+              Ecto.UUID.t(),
+              pos_integer(),
+              map()
+            ) ::
+              {:ok, map()} | {:error, term()}
+  @callback create_approved_booking_with(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback create_waitlisted_booking(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t(), map()) ::
+              {:ok, map()} | {:error, term()}
+  @callback list_waitlist(TenantContext.t(), Ecto.UUID.t()) :: [map()]
+  @callback promote_waitlisted_booking(TenantContext.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
 end

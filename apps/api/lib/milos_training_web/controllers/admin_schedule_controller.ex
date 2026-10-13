@@ -33,6 +33,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     properties: %{
       master_workout_id: %Schema{type: :string, format: :uuid},
       class_type_id: %Schema{type: :string, format: :uuid},
+      location_id: %Schema{type: :string, format: :uuid, nullable: true},
+      coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
       name: %Schema{type: :string, minLength: 1, maxLength: 120},
       duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
       scheduled_at: %Schema{type: :string, format: :"date-time"},
@@ -106,6 +108,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
             additionalProperties: false,
             properties: %{
               class_type_id: %Schema{type: :string, format: :uuid},
+              location_id: %Schema{type: :string, format: :uuid, nullable: true},
+              coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
               master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
               name: %Schema{type: :string, minLength: 1, maxLength: 120},
               duration_minutes: %Schema{type: :integer, minimum: 1, maximum: 1440},
@@ -233,7 +237,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   def create_slot(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, slot} <- CreateScheduledSlot.call(conn.assigns.tenant_context, body) do
       conn
       |> put_status(:created)
       |> json(%{slot: slot})
@@ -243,7 +248,8 @@ defmodule MilosTrainingWeb.AdminScheduleController do
   def create_series(conn, params) do
     body = normalize_body_params(conn, params)
 
-    with {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, series} <- CreateRecurringClassSeries.call(conn.assigns.tenant_context, body) do
       conn |> put_status(:created) |> json(%{series: series})
     end
   end
@@ -252,8 +258,22 @@ defmodule MilosTrainingWeb.AdminScheduleController do
     id = params["id"] || params[:id]
     body = normalize_body_params(conn, params)
 
-    with {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
+    with :ok <- valid_coach(conn.assigns.tenant_context, body),
+         {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
       json(conn, %{slot: slot})
+    end
+  end
+
+  # A class's coach must be a coach of this gym (ADR-100).
+  defp valid_coach(context, body) do
+    case body["coach_user_id"] || body[:coach_user_id] do
+      coach_id when is_binary(coach_id) and coach_id != "" ->
+        if :coach in MilosTraining.Organizations.member_roles(context.organization_id, coach_id),
+          do: :ok,
+          else: {:error, :not_a_coach}
+
+      _none ->
+        :ok
     end
   end
 

@@ -86,7 +86,7 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :invalid_invitation} = Organizations.inspect_invitation(second_token, now)
   end
 
-  test "only owner and admin memberships may manage invitations", context do
+  test "only staff memberships may manage invitations", context do
     {:ok, membership} =
       Organizations.add_membership(%{
         organization_id: context.organization.id,
@@ -110,11 +110,12 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :forbidden} =
              Organizations.issue_invitation(member_context, %{role: :member})
 
-    assert {:error, :forbidden} =
+    # Coaches hold admin rights until a rights-per-role report separates them (ADR-098).
+    assert {:ok, _invitation} =
              Organizations.issue_invitation(%{member_context | role: :coach}, %{role: :member})
   end
 
-  test "an admin cannot invite someone to owner, but can invite up to admin", context do
+  test "an admin invites staff and clients, but never an owner or another admin", context do
     {:ok, admin_membership} =
       Organizations.add_membership(%{
         organization_id: context.organization.id,
@@ -138,10 +139,13 @@ defmodule MilosTraining.OrganizationsTest do
     assert {:error, :role_ceiling_exceeded} =
              Organizations.issue_invitation(admin_context, %{role: :owner})
 
-    assert {:ok, %{invitation: invitation}} =
+    assert {:error, :role_ceiling_exceeded} =
              Organizations.issue_invitation(admin_context, %{role: :admin})
 
-    assert invitation.role == :admin
+    assert {:ok, %{invitation: invitation}} =
+             Organizations.issue_invitation(admin_context, %{role: :front_desk})
+
+    assert invitation.role == :front_desk
   end
 
   test "an owner can invite a peer owner" do

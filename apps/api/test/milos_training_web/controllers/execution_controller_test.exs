@@ -764,6 +764,72 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
 
   defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
 
+  describe "workout vault and repeats (ADR-098)" do
+    test "a client repeats a completed workout as a new dated entry and sees it in the vault",
+         %{conn: conn} do
+      admin = create_admin!("vault_admin")
+      member = create_user!(:member, "vault_member")
+      other_conn = authenticate_as_member(conn, "vault_other")
+      workout = workout_with_scale!(admin)
+      member_conn = put_bearer_token(conn, member)
+
+      start = fn source, reference ->
+        member_conn
+        |> recycle()
+        |> post("/api/executions", %{
+          master_workout_id: workout.id,
+          scale_level_slug: "scaled",
+          source: source,
+          source_reference_id: reference
+        })
+      end
+
+      first = start.("self_selected", nil) |> json_response(201) |> Map.fetch!("execution")
+
+      # Only completed executions can be done again.
+      assert start.("repeat", first["id"]) |> json_response(403)
+
+      member_conn
+      |> recycle()
+      |> patch("/api/executions/#{first["id"]}/complete", %{section_scores: []})
+      |> json_response(200)
+
+      again = start.("repeat", first["id"]) |> json_response(201) |> Map.fetch!("execution")
+      assert again["source"] == "repeat"
+      assert again["source_reference_id"] == first["id"]
+      refute again["id"] == first["id"]
+
+      # Someone else's history is not a source.
+      assert other_conn
+             |> post("/api/executions", %{
+               master_workout_id: workout.id,
+               scale_level_slug: "scaled",
+               source: "repeat",
+               source_reference_id: first["id"]
+             })
+             |> json_response(403)
+
+      member_conn
+      |> recycle()
+      |> patch("/api/executions/#{again["id"]}/complete", %{section_scores: []})
+      |> json_response(200)
+
+      [entry] =
+        member_conn
+        |> recycle()
+        |> get("/api/executions/vault")
+        |> json_response(200)
+        |> Map.fetch!("workouts")
+
+      assert entry["master_workout_id"] == workout.id
+      assert entry["workout_title"] == "Execution Workout"
+      assert entry["completed_count"] == 2
+
+      assert Enum.map(entry["entries"], & &1["id"]) |> Enum.sort() ==
+               Enum.sort([first["id"], again["id"]])
+    end
+  end
+
   defp workout_with_scale!(admin) do
     :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
 

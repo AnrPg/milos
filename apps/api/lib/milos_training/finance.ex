@@ -51,6 +51,7 @@ defmodule MilosTraining.Finance do
     GetEffectiveEntitlement,
     GetMemberProfile,
     GetPackage,
+    GetPackageCatalog,
     ListExpiringMemberships,
     ListPackages,
     ListPromotionCampaigns,
@@ -78,6 +79,15 @@ defmodule MilosTraining.Finance do
   defdelegate list_packages(), to: ListPackages, as: :call
   def list_packages(context), do: scoped(context, fn -> list_packages() end)
   defdelegate get_package(id), to: GetPackage, as: :call
+  defdelegate get_package_catalog(), to: GetPackageCatalog, as: :call
+
+  # Closed package vocabularies used by interface contracts (ADR-096).
+  def package_type_keys, do: MilosTraining.Finance.Domain.PackageType.keys()
+  def package_billing_periods, do: MilosTraining.Finance.Domain.PackageType.all_billing_periods()
+  def package_catalog_fields, do: MilosTraining.Finance.Domain.PackageCatalog.fields()
+  def package_module_keys, do: MilosTraining.Finance.Domain.PackageType.module_keys()
+  def package_quota_periods, do: MilosTraining.Finance.Domain.PackageCatalog.quota_periods()
+  def get_package_catalog(context), do: scoped(context, fn -> get_package_catalog() end)
   def get_package(context, id), do: scoped(context, fn -> get_package(id) end)
   defdelegate upsert_membership(user_id, params), to: UpsertMembership, as: :call
 
@@ -478,4 +488,110 @@ defmodule MilosTraining.Finance do
 
   def purge_tenant_data(context),
     do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # Phase B (ADR-097)
+  defdelegate create_freeze(user_id, admin_id, params), to: FinanceStore
+
+  def create_freeze(context, user_id, admin_id, params),
+    do: scoped(context, fn -> create_freeze(user_id, admin_id, params) end)
+
+  defdelegate cancel_freeze(user_id, freeze_id, params), to: FinanceStore
+
+  def cancel_freeze(context, user_id, freeze_id, params),
+    do: scoped(context, fn -> cancel_freeze(user_id, freeze_id, params) end)
+
+  defdelegate list_freezes(user_id), to: FinanceStore
+  def list_freezes(context, user_id), do: scoped(context, fn -> list_freezes(user_id) end)
+
+  defdelegate booking_terms(user_id, occurred_on), to: FinanceStore
+
+  def booking_terms(context, user_id, occurred_on),
+    do: scoped(context, fn -> booking_terms(user_id, occurred_on) end)
+
+  @doc """
+  Terms of the package that would pay for `allowance` on that day (ADR-098),
+  or nil when no held package includes it.
+  """
+  def allowance_terms(context, user_id, allowance, occurred_on),
+    do: scoped(context, fn -> FinanceStore.allowance_terms(user_id, allowance, occurred_on) end)
+
+  # ADR-098 payment models: shared beneficiaries and corporate clients.
+  def list_beneficiaries(context, subscription_id),
+    do: scoped(context, fn -> FinanceStore.list_beneficiaries(subscription_id) end)
+
+  def add_beneficiary(context, subscription_id, user_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.add_beneficiary(subscription_id, user_id, admin_id, params)
+      end)
+
+  def remove_beneficiary(context, subscription_id, beneficiary_id),
+    do:
+      scoped(context, fn -> FinanceStore.remove_beneficiary(subscription_id, beneficiary_id) end)
+
+  def list_corporate_clients(context),
+    do: scoped(context, fn -> FinanceStore.list_corporate_clients() end)
+
+  def get_corporate_client(context, id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_client(id) end)
+
+  def find_corporate_client(context, criteria),
+    do: scoped(context, fn -> FinanceStore.find_corporate_client(criteria) end)
+
+  def create_corporate_client(context, params),
+    do: scoped(context, fn -> FinanceStore.create_corporate_client(params) end)
+
+  def update_corporate_client(context, id, params),
+    do: scoped(context, fn -> FinanceStore.update_corporate_client(id, params) end)
+
+  def enroll_corporate_seat(context, client_id, user_id, params),
+    do: scoped(context, fn -> FinanceStore.enroll_corporate_seat(client_id, user_id, params) end)
+
+  def end_corporate_seat(context, client_id, subscription_id),
+    do: scoped(context, fn -> FinanceStore.end_corporate_seat(client_id, subscription_id) end)
+
+  def list_corporate_seats(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_seats(client_id) end)
+
+  def generate_corporate_invoice(context, client_id, on),
+    do: scoped(context, fn -> FinanceStore.generate_corporate_invoice(client_id, on) end)
+
+  def list_corporate_invoices(context, client_id),
+    do: scoped(context, fn -> FinanceStore.list_corporate_invoices(client_id) end)
+
+  def set_corporate_invoice_status(context, invoice_id, status),
+    do: scoped(context, fn -> FinanceStore.set_corporate_invoice_status(invoice_id, status) end)
+
+  def get_corporate_invoice(context, invoice_id),
+    do: scoped(context, fn -> FinanceStore.get_corporate_invoice(invoice_id) end)
+
+  def record_corporate_payment(context, invoice_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.record_corporate_payment(invoice_id, admin_id, params)
+      end)
+
+  def reverse_corporate_payment(context, invoice_id, payment_id, admin_id, params),
+    do:
+      scoped(context, fn ->
+        FinanceStore.reverse_corporate_payment(invoice_id, payment_id, admin_id, params)
+      end)
+
+  def issue_due_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.issue_due_corporate_invoices(today) end)
+
+  def mark_overdue_corporate_invoices(context, today),
+    do: scoped(context, fn -> FinanceStore.mark_overdue_corporate_invoices(today) end)
+
+  def corporate_invoices_needing_reminder(context, today, interval_days),
+    do:
+      scoped(context, fn ->
+        FinanceStore.corporate_invoices_needing_reminder(today, interval_days)
+      end)
+
+  def mark_corporate_invoice_reminded(context, invoice_id, on),
+    do: scoped(context, fn -> FinanceStore.mark_corporate_invoice_reminded(invoice_id, on) end)
+
+  def subscriptions_due_for_expiry_reminder(context, today),
+    do: scoped(context, fn -> FinanceStore.subscriptions_due_for_expiry_reminder(today) end)
 end

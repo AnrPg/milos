@@ -29,7 +29,10 @@ import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
 import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlement-visibility";
-import { packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
+import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
+import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
+import { commitmentConflict } from "@/components/admin/finance/shared/membership-commitment";
 import {
   ADMIN_PROFILE_SECTION_REQUEST,
   type AdminProfileSectionRequest,
@@ -39,7 +42,12 @@ import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { localizeError, semanticLabel } from "@/i18n/presentation";
+import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
+import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
+import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
+import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammingSchedule";
@@ -253,7 +261,7 @@ function GenericRecordCard({ title, meta, detail, value, href }: { title: React.
 
 function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: string; userId: string; entitlement: EffectiveEntitlement | null | undefined; onRefresh: () => Promise<unknown> }) {
   const i18n = useUiTranslations();
-  const [form, setForm] = useState({ allowance: "class_visits" as const, quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
+  const [form, setForm] = useState({ allowance: "class_visits" as string, quantity: 1, period: "calendar_month" as "calendar_week" | "calendar_month" | "subscription_period", reason: "" });
   const [revokeTarget, setRevokeTarget] = useState<string | null>(null);
   const [revokeReason, setRevokeReason] = useState("");
   const grant = useMutation({ mutationFn: () => grantAdminUserAllowance(token, userId, form), onSuccess: async () => { setForm((value) => ({ ...value, quantity: 1, reason: "" })); await onRefresh(); } });
@@ -264,13 +272,13 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{semanticLabel(key, i18n)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
       <div className="mt-5 space-y-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
         <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <select value={form.allowance} onChange={() => setForm({ ...form, allowance: "class_visits" })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="class_visits">{i18n("classVisits142b3b0")}</option></select>
+            <select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</select>
             <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
             <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
           </div>
@@ -280,7 +288,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
         </form>
         <div className="mt-5 space-y-2">
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
-          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {semanticLabel(entry.allowance_key, i18n)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
+          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {allowanceLabel(entry.allowance_key, i18n, entitlement?.class_type_names)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
           {entries.every((entry) => entry.allowance_key === "coaching_touchpoints" || entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
         </div>
       </div>
@@ -317,11 +325,18 @@ function FinanceDetails({
     signup_source: valueText(membership?.signup_source) === "—" ? "" : valueText(membership?.signup_source),
     notes: valueText(membership?.notes) === "—" ? "" : valueText(membership?.notes),
   }));
+  const [commitment, setCommitment] = useState<{ patch: Record<string, unknown>; endsOn: string | null } | null>(null);
   const updateMembership = useMutation({
     mutationFn: (patch: Record<string, unknown>) => updateFinanceMember(token, userId, patch),
     onSuccess: async () => {
       setEditing(null);
+      setCommitment(null);
       await onRefresh();
+    },
+    // ADR-097: ending a membership inside its minimum commitment needs a reason.
+    onError: (error, patch) => {
+      const conflict = commitmentConflict(error);
+      if (conflict) setCommitment({ patch, endsOn: conflict.endsOn });
     },
   });
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
@@ -353,7 +368,20 @@ function FinanceDetails({
             ))}
             <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />
             {updateMembership.isPending ? <p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("quickTextSaving")}</p> : null}
-            {updateMembership.isError ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+            {updateMembership.isError && !commitment ? <p className="text-xs" style={{ color: "var(--danger)" }}>{i18n("quickTextSaveError")}</p> : null}
+            {commitment ? (
+              <CommitmentOverridePrompt
+                endsOn={commitment.endsOn}
+                pending={updateMembership.isPending}
+                onConfirm={(reason) => updateMembership.mutate({ ...commitment.patch, commitment_override_reason: reason })}
+                onCancel={() => {
+                  setCommitment(null);
+                  updateMembership.reset();
+                  setDraft((current) => ({ ...current, status: valueText(membership.status) === "—" ? "active" : valueText(membership.status) }));
+                }}
+              />
+            ) : null}
+            <MembershipFreezes token={token} userId={userId} subscriptions={subscriptions} onRefresh={onRefresh} />
           </div>
         ) : <Empty>{i18n("noMembershipRecord741b5d9")}</Empty>}
       </div>
@@ -490,6 +518,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const organizationSlug = useOrganizationSlug();
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { membership: actor } = useSelectedMembershipRole();
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
@@ -549,6 +578,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   });
   const sections = new Set(visibleSections);
   if (profile.identity.role === "member" || profile.identity.role === "athlete") sections.add("schedule");
+  // ADR-100/101: coaches and private coach notes belong to client profiles.
+  const isClient = profile.membership?.roles?.length
+    ? profile.membership.roles.some((role) => role === "member" || role === "athlete")
+    : profile.identity.role === "member" || profile.identity.role === "athlete";
+  const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
+  const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -596,6 +631,10 @@ export function AdminUserProfile({ userId }: { userId: string }) {
 
           {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
 
+          {token && showCoaches ? <Panel id="coaching_relationships" title={i18n("rhCoaches")}><CoachAssignmentPanel userId={userId} /></Panel> : null}
+
+          {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
+
           {sections.has("class_participation") ? <Panel id="class_participation" title={i18n("classParticipation9ef4001")} href={adminHref("/admin/class-schedule", organizationSlug)}><div className="grid gap-3">{training.data?.class_participation.length ? training.data.class_participation.map((item) => <ExecutionCard key={item.id} item={item} href={adminHref("/admin/class-schedule", organizationSlug)} />) : <Empty>{i18n("noClassLinkedWorkoutExecutionsRecordedf8ca7a6")}</Empty>}</div></Panel> : null}
 
           {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
@@ -603,6 +642,9 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {sections.has("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>
               <div className="space-y-5">
+                {profile.membership && token ? (
+                  <MemberRolesEditor token={token} userId={userId} membership={profile.membership} />
+                ) : (
                 <div>
                   <span className="block text-xs uppercase tracking-wider" style={{ color: "var(--muted)" }}>{i18n("accountRole39514a0")}</span>
                   <div className="mt-2 flex flex-wrap gap-2">
@@ -624,6 +666,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                   </div>
                   {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
                 </div>
+                )}
                 <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
                   <button
                     type="button"

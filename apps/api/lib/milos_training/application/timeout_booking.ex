@@ -2,7 +2,9 @@ defmodule MilosTraining.Application.TimeoutBooking do
   require Logger
 
   alias MilosTraining.Application.{
+    BookingEntitlement,
     BroadcastUserSync,
+    PromoteClassWaitlist,
     ResolveJobTenantContext,
     ScheduleRealtime,
     TrackAnalyticsEvent
@@ -15,6 +17,7 @@ defmodule MilosTraining.Application.TimeoutBooking do
            ResolveJobTenantContext.call(organization_id, __MODULE__ |> Atom.to_string()),
          {:ok, timed_out_booking} <- Scheduling.timeout_booking(context, booking_id) do
       reconcile_entitlement(context, timed_out_booking)
+      PromoteClassWaitlist.call(context, timed_out_booking.scheduled_class_id)
       dispatch_timeout_notification(timed_out_booking)
       broadcast_timeout(timed_out_booking)
 
@@ -38,7 +41,7 @@ defmodule MilosTraining.Application.TimeoutBooking do
         booking.user_id,
         "scheduling",
         booking.scheduled_class_id,
-        :class_visits,
+        BookingEntitlement.allowance(booking),
         %{
           reason: "Booking request timed out",
           idempotency_key: "booking-timeout-release:#{booking.id}"

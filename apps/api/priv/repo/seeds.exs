@@ -76,13 +76,14 @@ for organization <- Repo.all(MilosTraining.Organizations.Organization) do
   {:ok, _levels} = Workouts.seed_default_scale_levels(%{organization_id: organization.id})
 end
 
-ensure_admin = fn admin_nickname, admin_password ->
+ensure_admin = fn admin_nickname, admin_password, admin_email ->
   admin =
     case Identity.find_by_nickname(admin_nickname) do
       nil ->
         {:ok, user} =
           Identity.register(%{
             nickname: admin_nickname,
+            email: admin_email,
             password: admin_password,
             role: :member
           })
@@ -107,14 +108,16 @@ case Mix.env() do
   :dev ->
     admin_nickname = System.get_env("DEV_ADMIN_NICKNAME", "admin")
     admin_password = System.get_env("DEV_ADMIN_PASSWORD", "AdminPass123!")
+    admin_email = System.get_env("DEV_ADMIN_EMAIL", "admin@example.com")
 
-    ensure_admin.(admin_nickname, admin_password)
+    ensure_admin.(admin_nickname, admin_password, admin_email)
 
   :prod ->
     admin_nickname = System.get_env("PROD_ADMIN_NICKNAME", "xristoforos_coach")
     admin_password = System.get_env("PROD_ADMIN_PASSWORD", "ChangeMeProdAdmin123!")
+    admin_email = System.get_env("PROD_ADMIN_EMAIL") || raise("PROD_ADMIN_EMAIL is required")
 
-    ensure_admin.(admin_nickname, admin_password)
+    ensure_admin.(admin_nickname, admin_password, admin_email)
 
   _env ->
     :ok

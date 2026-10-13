@@ -1,6 +1,8 @@
 defmodule MilosTrainingWeb.Router do
   use MilosTrainingWeb, :router
 
+  @all_roles MilosTraining.Organizations.Domain.MembershipPolicy.roles()
+
   pipeline :api do
     plug(:accepts, ["json"])
     plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
@@ -108,9 +110,11 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # Staff routes need the capability RouteCapabilities lists for the action
+  # (ADR-099); data scope is enforced by the application services.
   pipeline :admin_only do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
   end
 
   pipeline :tenant_staff do
@@ -118,9 +122,10 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach])
   end
 
+  # Members and staff; athletes have their own programming instead.
   pipeline :member_or_admin do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :member])
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: @all_roles -- [:athlete])
   end
 
   pipeline :athlete_or_admin do
@@ -128,12 +133,14 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin, :coach, :athlete])
   end
 
+  pipeline :staff_only do
+    plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
+  end
+
   pipeline :tenant_member do
     plug(MilosTrainingWeb.Plugs.ResolveTenantContext)
-
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole,
-      roles: [:owner, :admin, :coach, :athlete, :member]
-    )
+    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: @all_roles)
   end
 
   pipeline :user_only do
@@ -145,7 +152,7 @@ defmodule MilosTrainingWeb.Router do
   end
 
   pipeline :organization_admin do
-    plug(MilosTrainingWeb.Plugs.RequireTenantRole, roles: [:owner, :admin])
+    plug(MilosTrainingWeb.Plugs.RequireRouteCapability)
   end
 
   pipeline :vendor do
@@ -196,6 +203,7 @@ defmodule MilosTrainingWeb.Router do
     pipe_through([:api, :authenticated, :authenticated_rate_limited])
 
     get("/memberships", OrganizationAccessController, :memberships)
+    post("/organizations", OwnerOrganizationController, :create)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -230,6 +238,18 @@ defmodule MilosTrainingWeb.Router do
 
     get("/finance", MyFinanceController, :index)
     get("/entitlement", MyFinanceController, :entitlement)
+    get("/videos", MyContentController, :videos)
+    get("/form-reviews", CoachingExtrasController, :my_form_reviews)
+    post("/form-reviews", CoachingExtrasController, :submit_form_review)
+    post("/form-reviews/:id/withdraw", CoachingExtrasController, :withdraw_form_review)
+    get("/nutrition-plan", CoachingExtrasController, :my_nutrition_plan)
+    get("/corporate-enrollment", PaymentModelsController, :enrollment_offer)
+    post("/corporate-enrollment", PaymentModelsController, :enroll)
+    get("/appointments/slots", AppointmentsController, :offered_slots)
+    get("/appointments", AppointmentsController, :my_appointments)
+    post("/appointments", AppointmentsController, :book)
+    post("/appointments/:id/cancel", AppointmentsController, :cancel)
+    get("/progress", MyContentController, :progress)
     get("/invoices/:id/download-url", MyFinanceController, :invoice_download_url)
     get("/refund-receipts", MyFinanceController, :refund_receipts)
     get("/refund-receipts/:id", MyFinanceController, :refund_receipt)
@@ -292,7 +312,11 @@ defmodule MilosTrainingWeb.Router do
     get("/schedule", ScheduleController, :index)
     get("/landing", LandingController, :show)
     post("/bookings", ScheduleController, :create_booking)
+    post("/bookings/waitlist", ScheduleController, :join_waitlist)
+    post("/bookings/guests", ScheduleController, :create_guest_booking)
     delete("/bookings/:id", ScheduleController, :delete_booking)
+    get("/locations", ScheduleController, :locations)
+    post("/check-ins", ScheduleController, :check_in)
     get("/workouts/:id", WorkoutController, :show)
     get("/workouts/:id/scales", WorkoutController, :scales)
   end
@@ -354,6 +378,61 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/prs", AdminUserController, :prs)
   end
 
+  # Staff work that coaches share with owners and admins (ADR-098).
+  scope "/api/org/:organization_slug/staff", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :staff_only,
+      :tenant_write_rate_limited
+    ])
+
+    get("/members", StaffController, :index)
+    get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    post("/clients/:user_id/coach-notes", CoachNotesController, :create)
+    patch("/coach-notes/:id", CoachNotesController, :update)
+    delete("/coach-notes/:id", CoachNotesController, :delete)
+    get("/coach-notes/reads", CoachNotesController, :reads)
+    put("/me/notes-visibility", CoachNotesController, :visibility)
+    get("/cleaning/areas", CleaningController, :areas)
+    post("/cleaning/areas", CleaningController, :create_area)
+    patch("/cleaning/areas/:id", CleaningController, :update_area)
+    post("/cleaning/areas/:id/archive", CleaningController, :archive_area)
+    get("/cleaning/entries", CleaningController, :entries)
+    post("/cleaning/entries", CleaningController, :start)
+    post("/cleaning/entries/:id/finish", CleaningController, :finish)
+    get("/inventory/machines", InventoryController, :machines)
+    post("/inventory/machines", InventoryController, :create_machine)
+    patch("/inventory/machines/:id", InventoryController, :update_machine)
+    post("/inventory/machines/:id/archive", InventoryController, :archive_machine)
+    get("/inventory/machines/:id/events", InventoryController, :machine_events)
+    post("/inventory/machines/:id/events", InventoryController, :log_machine_event)
+    get("/inventory/supplies", InventoryController, :supplies)
+    post("/inventory/supplies", InventoryController, :create_supply)
+    patch("/inventory/supplies/:id", InventoryController, :update_supply)
+    post("/inventory/supplies/:id/archive", InventoryController, :archive_supply)
+    get("/inventory/supplies/:id/low-reports", InventoryController, :supply_reports)
+    post("/inventory/supplies/:id/low-reports", InventoryController, :report_low)
+    get("/inventory/supplies/:id/movements", InventoryController, :movements)
+    post("/inventory/supplies/:id/movements", InventoryController, :record_movement)
+    get("/inventory/report", InventoryController, :report)
+    get("/coaching-relationships", CoachingRelationshipsController, :index)
+    post("/coaching-relationships", CoachingRelationshipsController, :create)
+    post("/coaching-relationships/:id/end", CoachingRelationshipsController, :finish)
+    get("/form-reviews", CoachingExtrasController, :form_review_queue)
+    post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
+    get("/reply-queue", CoachingExtrasController, :reply_queue)
+    get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
+    put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
+    get("/appointment-slots", AppointmentsController, :slots)
+    post("/appointment-slots", AppointmentsController, :create_slot)
+    post("/appointment-slots/:id/cancel", AppointmentsController, :cancel_slot)
+    post("/appointment-slots/:id/bookings", AppointmentsController, :book_for_client)
+    post("/appointments/:id/attendance", AppointmentsController, :attendance)
+    post("/appointments/:id/cancel", AppointmentsController, :cancel)
+  end
+
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -375,6 +454,9 @@ defmodule MilosTrainingWeb.Router do
     get("/users/:id/messages", AdminUserController, :messages)
     get("/users/:id/coaching-context", AdminUserController, :coaching_context)
     post("/users/:id/allowance-extensions", AdminUserController, :grant_allowance)
+    get("/users/:id/freezes", AdminUserController, :freezes)
+    post("/users/:id/freezes", AdminUserController, :create_freeze)
+    post("/users/:id/freezes/:freeze_id/cancel", AdminUserController, :cancel_freeze)
     delete("/users/:id", AdminUserController, :delete)
 
     post(
@@ -384,12 +466,30 @@ defmodule MilosTrainingWeb.Router do
     )
 
     patch("/users/:id/role", AdminUserController, :update_role)
+    put("/users/:id/roles", AdminUserController, :update_roles)
+    get("/role-access", RoleAccessController, :show)
+    put("/role-access/:role", RoleAccessController, :update)
+    post("/organization/transfer", OwnerOrganizationController, :transfer)
+    post("/organization/archive", OwnerOrganizationController, :archive)
+    patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
     get("/athletes", AdminUserController, :index_athletes)
     get("/scale-levels", AdminScaleLevelController, :index)
     put("/scale-levels", AdminScaleLevelController, :update)
     get("/class-types", AdminClassTypeController, :index)
+    get("/videos", AdminContentController, :index)
+    post("/videos", AdminContentController, :create)
+    patch("/videos/:id", AdminContentController, :update)
+    post("/videos/:id/publish", AdminContentController, :publish)
+    post("/videos/:id/archive", AdminContentController, :archive)
+    get("/locations", AdminFacilityController, :index_locations)
+    post("/locations", AdminFacilityController, :create_location)
+    patch("/locations/:id", AdminFacilityController, :update_location)
+    post("/locations/:id/archive", AdminFacilityController, :archive_location)
+    get("/check-ins", AdminFacilityController, :index_check_ins)
+    post("/check-ins", AdminFacilityController, :create_check_in)
     post("/class-types", AdminClassTypeController, :create)
     patch("/class-types/:id", AdminClassTypeController, :update)
     delete("/class-types/:id", AdminClassTypeController, :delete)
@@ -444,6 +544,41 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
     get("/finance/packages", AdminFinanceController, :packages)
+    get("/finance/package-catalog", AdminFinanceController, :package_catalog)
+    get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)
+    post("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :add_beneficiary)
+
+    post(
+      "/finance/subscriptions/:id/beneficiaries/:beneficiary_id/remove",
+      PaymentModelsController,
+      :remove_beneficiary
+    )
+
+    get("/finance/corporate-clients", PaymentModelsController, :clients)
+    post("/finance/corporate-clients", PaymentModelsController, :create_client)
+    patch("/finance/corporate-clients/:id", PaymentModelsController, :update_client)
+    get("/finance/corporate-clients/:id/seats", PaymentModelsController, :seats)
+    post("/finance/corporate-clients/:id/seats", PaymentModelsController, :add_seat)
+
+    post(
+      "/finance/corporate-clients/:id/seats/:subscription_id/end",
+      PaymentModelsController,
+      :end_seat
+    )
+
+    get("/finance/corporate-clients/:id/invoices", PaymentModelsController, :invoices)
+    post("/finance/corporate-clients/:id/invoices", PaymentModelsController, :create_invoice)
+    post("/finance/corporate-invoices/:id/status", PaymentModelsController, :invoice_status)
+    get("/finance/corporate-invoices/:id", PaymentModelsController, :invoice)
+    post("/finance/corporate-invoices/:id/payments", PaymentModelsController, :record_payment)
+
+    post(
+      "/finance/corporate-invoices/:id/payments/:payment_id/reverse",
+      PaymentModelsController,
+      :reverse_payment
+    )
+
+    post("/finance/corporate-invoices/:id/send", PaymentModelsController, :send_invoice)
     post("/finance/packages", AdminFinanceController, :create_package)
     get("/finance/packages/:id", AdminFinanceController, :package)
     patch("/finance/packages/:id", AdminFinanceController, :update_package)
@@ -710,6 +845,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/", ExecutionController, :index)
     post("/", ExecutionController, :create)
+    get("/vault", ExecutionController, :vault)
     get("/:id", ExecutionController, :show)
     patch("/:id/progress", ExecutionController, :update_progress)
     post("/:id/notes", ExecutionController, :submit_note)

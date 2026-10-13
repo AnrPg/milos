@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 
 import { AuthGuard } from "@/components/auth-guard";
 import { AdminCoaching } from "@/components/admin-coaching";
@@ -5,10 +6,11 @@ import { AdminCoaching } from "@/components/admin-coaching";
 export const dynamic = "force-dynamic";
 
 export default function AdminCoachingPage() {
-  
   return (
     <AuthGuard roles={["admin"]}>
-      <AdminCoaching />
+      <Suspense>
+        <AdminCoaching />
+      </Suspense>
     </AuthGuard>
   );
 }

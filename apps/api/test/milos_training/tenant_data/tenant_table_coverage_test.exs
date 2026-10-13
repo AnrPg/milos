@@ -32,6 +32,7 @@ defmodule MilosTraining.TenantData.TenantTableCoverageTest do
 
     tenant_tables = List.flatten(rows) -- @not_tenant_data
 
-    assert tenant_tables -- declared == [], "undeclared tenant tables"
+    assert tenant_tables -- declared == [],
+           "undeclared tenant tables: #{inspect(tenant_tables -- declared)}"
   end
 end

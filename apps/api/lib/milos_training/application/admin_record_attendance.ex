@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.AdminRecordAttendance do
-  alias MilosTraining.Application.TrackAnalyticsEvent
+  alias MilosTraining.Application.{BookingEntitlement, BookingTerms, TrackAnalyticsEvent}
   alias MilosTraining.Scheduling.Domain.AttendancePolicy
   alias MilosTraining.{Finance, Scheduling}
 
@@ -17,8 +17,11 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
           "status" => params["status"] || params[:status] || "attended"
         })
 
+      allowance = BookingEntitlement.allowance(approved_booking)
+      waived? = no_show_waived?(context, approved_booking)
+
       with {:ok, attendance} <- Scheduling.record_attendance(context, attendance_params),
-           {:ok, _transition} <- reconcile_visit(attendance) do
+           {:ok, _transition} <- reconcile_visit(attendance, allowance, waived?) do
         TrackAnalyticsEvent.call("class_attendance_recorded", context, attendance, %{
           metadata: %{member_id: user_id}
         })
@@ -36,12 +39,12 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
 
   def call(_slot_id, _user_id, _admin_id), do: {:error, :organization_context_required}
 
-  defp reconcile_visit(%{status: "cancelled"} = attendance) do
+  defp reconcile_visit(%{status: "cancelled"} = attendance, allowance, _waived?) do
     Finance.release_entitlement_source(
       attendance.user_id,
       "scheduling",
       attendance.scheduled_class_id,
-      :class_visits,
+      allowance,
       %{
         reason: "Attendance cancelled",
         idempotency_key: "attendance-cancelled:#{attendance.id}"
@@ -49,18 +52,37 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
     )
   end
 
-  defp reconcile_visit(attendance) do
+  # ADR-097: packages that waive the no-show penalty return the visit.
+  defp reconcile_visit(%{status: "no_show"} = attendance, allowance, true) do
+    Finance.release_entitlement_source(
+      attendance.user_id,
+      "scheduling",
+      attendance.scheduled_class_id,
+      allowance,
+      %{
+        reason: "No-show penalty waived by package",
+        idempotency_key: "attendance-no-show-waived:#{attendance.id}"
+      }
+    )
+  end
+
+  defp reconcile_visit(attendance, allowance, _waived?) do
     Finance.finalize_entitlement_source(
       attendance.user_id,
       "scheduling",
       attendance.scheduled_class_id,
-      :class_visits,
+      allowance,
       %{
         reason: "Attendance recorded as #{attendance.status}",
         idempotency_key: "attendance-finalized:#{attendance.id}"
       }
     )
   end
+
+  defp no_show_waived?(context, %{scheduled_class: %{scheduled_at: _} = slot, user_id: user_id}),
+    do: BookingTerms.for_slot(context, user_id, slot).no_show_penalty_waived
+
+  defp no_show_waived?(_context, _booking), do: false
 
   defp string_key_map(params) when is_map(params) do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)

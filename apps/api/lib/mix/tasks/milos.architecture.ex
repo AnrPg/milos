@@ -74,6 +74,15 @@ defmodule Mix.Tasks.Milos.Architecture do
     notifications/notification_store
     coaching/coaching_store
     pantheon/pr_store
+    coaching/form_review_store
+    coaching/relationship_store
+    coaching/note_store
+    housekeeping/housekeeping_store
+    inventory/inventory_store
+    facility/facility_store
+    content/content_store
+    appointments/appointment_store
+    nutrition/nutrition_store
   )
 
   defp tenant_scope_violations do

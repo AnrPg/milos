@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  grantableAllowances,
   packageSubscriptionLabel,
   prSectionContentCount,
   visibleAdminProfileSections,
@@ -51,5 +52,30 @@ describe("visibleAdminProfileSections", () => {
       "Live Coaching",
     );
     expect(packageSubscriptionLabel({})).toBe("");
+  });
+});
+
+describe("grantableAllowances", () => {
+  it("offers class visits first, then per-class-type limits and the plan's perks", () => {
+    expect(
+      grantableAllowances({
+        open_gym_visits: {},
+        "class_visits:b": {},
+        coaching_touchpoints: {},
+        guest_passes: {},
+        class_visits: {},
+        "class_visits:a": {},
+        event_visits: {},
+      }),
+    ).toEqual(["class_visits", "class_visits:a", "class_visits:b", "event_visits", "guest_passes", "open_gym_visits"]);
+  });
+
+  it("offers perks alone when the plan has no class visits", () => {
+    expect(grantableAllowances({ open_gym_visits: {} })).toEqual(["open_gym_visits"]);
+  });
+
+  it("falls back to class visits for an empty plan", () => {
+    expect(grantableAllowances({})).toEqual(["class_visits"]);
+    expect(grantableAllowances(null)).toEqual(["class_visits"]);
   });
 });

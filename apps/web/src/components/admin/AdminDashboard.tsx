@@ -9,6 +9,7 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -133,6 +134,7 @@ function AdminChallengeCard({ challenge }: { challenge: AdminChallengeRecord }) 
 export function AdminDashboard() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const nav = useTranslations("Navigation");
   const NAV_GROUPS: Array<{ label: string; items: Array<{ label: string; href: string }> }> = [
     {
       label: i18n("operationsa1fdaa6"),
@@ -140,13 +142,18 @@ export function AdminDashboard() {
         { label: i18n("users57f2b18"), href: "/admin/users" },
         { label: i18n("finance1b48d3f"), href: "/admin/finance" },
         { label: i18n("classesed1846a"), href: "/admin/class-schedule" },
+        { label: i18n("admCheckInTitle"), href: "/admin/check-in" },
         { label: i18n("personalCoaching6accdcd"), href: "/admin/coaching-assignments" },
+        { label: nav("appointments"), href: "/admin/appointments" },
+        { label: nav("cleaningLog"), href: "/admin/cleaning" },
+        { label: nav("inventory"), href: "/admin/inventory" },
       ],
     },
     {
       label: i18n("content4f9be05"),
       items: [
         { label: i18n("workoutsccb58b2"), href: "/admin/workouts" },
+        { label: nav("onDemandContent"), href: "/admin/content" },
       ],
     },
     {

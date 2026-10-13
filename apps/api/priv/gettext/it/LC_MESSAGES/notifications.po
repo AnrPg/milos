@@ -135,3 +135,87 @@ msgstr "Nuovi allenamenti assegnati"
 
 msgid "Your coach assigned one or more workouts to you."
 msgstr "Il tuo coach ti ha assegnato uno o più allenamenti."
+
+msgid "You got a spot"
+msgstr "Hai ottenuto un posto"
+
+msgid "A place opened up in %{class}. Your booking is confirmed or awaiting approval."
+msgstr "Si è liberato un posto in %{class}. La tua prenotazione è confermata o in attesa di approvazione."
+
+msgid "Your package ends soon"
+msgstr "Il tuo pacchetto sta per scadere"
+
+msgid "%{package} ends on %{date}."
+msgstr "%{package} scade il %{date}."
+
+msgid "New form review request"
+msgstr "Nuova richiesta di revisione tecnica"
+
+msgid "%{client} sent a video for feedback."
+msgstr "%{client} ha inviato un video per un feedback."
+
+msgid "Your form review is ready"
+msgstr "La tua revisione tecnica è pronta"
+
+msgid "Your coach left feedback on your video."
+msgstr "Il tuo coach ha lasciato un feedback sul tuo video."
+
+msgid "A client is waiting for a reply"
+msgstr "Un cliente attende una risposta"
+
+msgid "%{client} has been waiting longer than the promised reply time."
+msgstr "%{client} attende da più del tempo di risposta promesso."
+
+msgid "Your nutrition plan was updated"
+msgstr "Il tuo piano alimentare è stato aggiornato"
+
+msgid "Open it to see what changed."
+msgstr "Aprilo per vedere cosa è cambiato."
+
+msgid "New appointment booked"
+msgstr "Nuovo appuntamento prenotato"
+
+msgid "%{client} booked a session for %{time}."
+msgstr "%{client} ha prenotato una sessione per %{time}."
+
+msgid "Appointment cancelled"
+msgstr "Appuntamento annullato"
+
+msgid "The session on %{time} was cancelled."
+msgstr "La sessione del %{time} è stata annullata."
+
+msgid "A coach took a new athlete"
+msgstr "Un coach ha preso in carico un nuovo atleta"
+
+msgid "%{coach} is now coaching %{client}."
+msgstr "%{coach} ora allena %{client}."
+
+msgid "An admin read your note"
+msgstr "Un amministratore ha letto la tua nota"
+
+msgid "%{reader} read your note about %{client} at %{time}."
+msgstr "%{reader} ha letto la tua nota su %{client} alle %{time}."
+
+msgid "A machine needs attention"
+msgstr "Un macchinario richiede attenzione"
+
+msgid "%{machine}: %{note}"
+msgstr "%{machine}: %{note}"
+
+msgid "Reported running low"
+msgstr "Segnalato in esaurimento"
+
+msgid "%{item}: %{note}"
+msgstr "%{item}: %{note}"
+
+msgid "Inventory today"
+msgstr "Inventario di oggi"
+
+msgid "Needs attention: %{items}"
+msgstr "Richiede attenzione: %{items}"
+
+msgid "Running low"
+msgstr "In esaurimento"
+
+msgid "%{item}: %{quantity} left."
+msgstr "%{item}: ne restano %{quantity}."

@@ -15,6 +15,8 @@ defmodule MilosTraining.Finance.FinanceInvoiceLine do
     field :unit_amount_cents, :integer, default: 0
     field :discount_cents, :integer, default: 0
     field :total_cents, :integer, default: 0
+    field :charge_category, :string
+    field :member_discount_percent, :integer
     field :package_code_snapshot, :string
     field :package_family_snapshot, :string
     field :params, :map, default: %{}
@@ -35,7 +37,9 @@ defmodule MilosTraining.Finance.FinanceInvoiceLine do
       :total_cents,
       :package_code_snapshot,
       :package_family_snapshot,
-      :params
+      :params,
+      :charge_category,
+      :member_discount_percent
     ])
     |> validate_required([
       :finance_invoice_id,
@@ -52,6 +56,8 @@ defmodule MilosTraining.Finance.FinanceInvoiceLine do
       "discount",
       "adjustment"
     ])
+    |> validate_inclusion(:charge_category, ["product", "personal_training", "event", "other"])
+    |> validate_number(:member_discount_percent, greater_than: 0, less_than_or_equal_to: 100)
     |> validate_number(:quantity, greater_than: 0)
     |> validate_number(:unit_amount_cents, greater_than_or_equal_to: 0)
     |> validate_number(:discount_cents, greater_than_or_equal_to: 0)

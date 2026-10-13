@@ -18,7 +18,7 @@ describe("OutboxFailureControls", () => {
       />,
     );
 
-    expect(screen.getByText(/apiErrorSlotFull/)).toBeInTheDocument();
+    expect(screen.getByText(/mbErrSlotFull/)).toBeInTheDocument();
     expect(screen.getByText(/outboxConflictHint/)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "outboxRetry" }));

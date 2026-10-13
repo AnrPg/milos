@@ -26,19 +26,32 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
       name: %Schema{type: :string},
       slug: %Schema{type: :string},
       sort_order: %Schema{type: :integer},
+      credit_cost: %Schema{type: :integer, minimum: 1, maximum: 10},
+      kind: %Schema{type: :string, enum: ["class", "event"]},
       archived_at: %Schema{type: :string, format: :"date-time", nullable: true},
       inserted_at: %Schema{type: :string, format: :"date-time"},
       updated_at: %Schema{type: :string, format: :"date-time"},
       future_classes_reassigned: %Schema{type: :integer}
     },
-    required: [:id, :name, :slug, :sort_order, :archived_at]
+    required: [:id, :name, :slug, :sort_order, :credit_cost, :kind, :archived_at]
   }
 
   @write_schema %Schema{
     type: :object,
     properties: %{
       name: %Schema{type: :string, minLength: 2, maxLength: 80},
-      sort_order: %Schema{type: :integer, minimum: 0, default: 0}
+      sort_order: %Schema{type: :integer, minimum: 0, default: 0},
+      credit_cost: %Schema{
+        type: :integer,
+        minimum: 1,
+        maximum: 10,
+        description: "Visits one booking of this class type uses (ADR-097)"
+      },
+      kind: %Schema{
+        type: :string,
+        enum: ["class", "event"],
+        description: "Events draw on event visits instead of class visits (ADR-097)"
+      }
     },
     required: [:name]
   }

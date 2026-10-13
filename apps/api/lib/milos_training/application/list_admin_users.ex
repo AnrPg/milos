@@ -2,7 +2,7 @@ defmodule MilosTraining.Application.ListAdminUsers do
   @moduledoc false
 
   alias MilosTraining.{Finance, Identity.RegistrationPolicy}
-  alias MilosTraining.Application.TenantUserAccess
+  alias MilosTraining.Application.{AuthorizeClientAccess, TenantUserAccess}
 
   def call(params \\ %{}, tenant_context \\ nil) do
     query = params |> field(:q) |> normalize_query()
@@ -13,6 +13,7 @@ defmodule MilosTraining.Application.ListAdminUsers do
     users =
       tenant_context
       |> TenantUserAccess.list_active_users()
+      |> filter_scope(tenant_context)
       |> filter_role(role)
       |> filter_query(query)
       |> Enum.sort_by(&String.downcase(&1.nickname))
@@ -35,6 +36,22 @@ defmodule MilosTraining.Application.ListAdminUsers do
          has_more: offset + limit < length(users)
        }
      }}
+  end
+
+  # A coach with scope `:own` sees only their own clients (ADR-100).
+  defp filter_scope(users, nil), do: users
+
+  defp filter_scope(users, context) do
+    case directory_scope(context) do
+      :all -> users
+      ids -> Enum.filter(users, &(&1.id in ids))
+    end
+  end
+
+  defp directory_scope(context) do
+    if MilosTraining.Organizations.can?(context, :view_directory),
+      do: AuthorizeClientAccess.client_ids(context, :view_directory),
+      else: :all
   end
 
   defp finance_summaries(nil, _users), do: %{}

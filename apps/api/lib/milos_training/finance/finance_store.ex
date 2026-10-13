@@ -198,4 +198,98 @@ defmodule MilosTraining.Finance.FinanceStore do
 
   @impl true
   def count_pending_referral_approvals, do: adapter().count_pending_referral_approvals()
+
+  @impl true
+  def create_freeze(user_id, admin_id, params),
+    do: adapter().create_freeze(user_id, admin_id, params)
+
+  @impl true
+  def cancel_freeze(user_id, freeze_id, params),
+    do: adapter().cancel_freeze(user_id, freeze_id, params)
+
+  @impl true
+  def list_freezes(user_id), do: adapter().list_freezes(user_id)
+  @impl true
+  def booking_terms(user_id, occurred_on), do: adapter().booking_terms(user_id, occurred_on)
+
+  @impl true
+  def allowance_terms(user_id, allowance, occurred_on),
+    do: adapter().allowance_terms(user_id, allowance, occurred_on)
+
+  @impl true
+  def list_beneficiaries(subscription_id), do: adapter().list_beneficiaries(subscription_id)
+
+  @impl true
+  def add_beneficiary(subscription_id, user_id, admin_id, params),
+    do: adapter().add_beneficiary(subscription_id, user_id, admin_id, params)
+
+  @impl true
+  def remove_beneficiary(subscription_id, beneficiary_id),
+    do: adapter().remove_beneficiary(subscription_id, beneficiary_id)
+
+  @impl true
+  def list_corporate_clients(), do: adapter().list_corporate_clients()
+
+  @impl true
+  def get_corporate_client(id), do: adapter().get_corporate_client(id)
+
+  @impl true
+  def find_corporate_client(criteria), do: adapter().find_corporate_client(criteria)
+
+  @impl true
+  def create_corporate_client(params), do: adapter().create_corporate_client(params)
+
+  @impl true
+  def update_corporate_client(id, params), do: adapter().update_corporate_client(id, params)
+
+  @impl true
+  def enroll_corporate_seat(client_id, user_id, params),
+    do: adapter().enroll_corporate_seat(client_id, user_id, params)
+
+  @impl true
+  def end_corporate_seat(client_id, subscription_id),
+    do: adapter().end_corporate_seat(client_id, subscription_id)
+
+  @impl true
+  def list_corporate_seats(client_id), do: adapter().list_corporate_seats(client_id)
+
+  @impl true
+  def generate_corporate_invoice(client_id, on),
+    do: adapter().generate_corporate_invoice(client_id, on)
+
+  @impl true
+  def list_corporate_invoices(client_id), do: adapter().list_corporate_invoices(client_id)
+
+  @impl true
+  def set_corporate_invoice_status(invoice_id, status),
+    do: adapter().set_corporate_invoice_status(invoice_id, status)
+
+  @impl true
+  def get_corporate_invoice(id), do: adapter().get_corporate_invoice(id)
+
+  @impl true
+  def record_corporate_payment(invoice_id, admin_id, params),
+    do: adapter().record_corporate_payment(invoice_id, admin_id, params)
+
+  @impl true
+  def reverse_corporate_payment(invoice_id, payment_id, admin_id, params),
+    do: adapter().reverse_corporate_payment(invoice_id, payment_id, admin_id, params)
+
+  @impl true
+  def issue_due_corporate_invoices(today), do: adapter().issue_due_corporate_invoices(today)
+
+  @impl true
+  def mark_overdue_corporate_invoices(today), do: adapter().mark_overdue_corporate_invoices(today)
+
+  @impl true
+  def corporate_invoices_needing_reminder(today, interval_days),
+    do: adapter().corporate_invoices_needing_reminder(today, interval_days)
+
+  @impl true
+  def mark_corporate_invoice_reminded(id, on),
+    do: adapter().mark_corporate_invoice_reminded(id, on)
+
+  @impl true
+  def subscriptions_due_for_expiry_reminder(today),
+    do: adapter().subscriptions_due_for_expiry_reminder(today)
 end

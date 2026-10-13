@@ -153,6 +153,144 @@ defmodule MilosTraining.Notifications do
   def process_event("review_submitted", payload), do: enqueue_review_submitted(payload)
   def process_event("invoice_issued", payload), do: enqueue_invoice_issued(payload)
   def process_event("payment_reminder", payload), do: enqueue_payment_reminder(payload)
+
+  def process_event("booking_waitlist_promoted", payload),
+    do:
+      enqueue_simple(:booking_waitlist_promoted, payload, %{
+        class_name: field(payload, :class_name),
+        scheduled_at: field(payload, :scheduled_at),
+        booking_id: field(payload, :booking_id),
+        scheduled_class_id: field(payload, :scheduled_class_id),
+        status: field(payload, :status),
+        url: "/schedule"
+      })
+
+  def process_event("package_expiring", payload),
+    do:
+      enqueue_simple(:package_expiring, payload, %{
+        package_name: field(payload, :package_name),
+        ends_on: field(payload, :ends_on),
+        days: field(payload, :days),
+        subscription_id: field(payload, :subscription_id),
+        url: "/account/billing"
+      })
+
+  # ADR-098 coaching notifications.
+  def process_event("form_review_submitted", payload),
+    do:
+      enqueue_simple(:form_review_submitted, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        client_nickname: field(payload, :client_nickname),
+        exercise_name: field(payload, :exercise_name),
+        url: "/admin/coaching?tab=form-reviews"
+      })
+
+  def process_event("form_review_completed", payload),
+    do:
+      enqueue_simple(:form_review_completed, payload, %{
+        form_review_id: field(payload, :form_review_id),
+        exercise_name: field(payload, :exercise_name),
+        url: "/coaching"
+      })
+
+  def process_event("coaching_reply_overdue", payload),
+    do:
+      enqueue_simple(:coaching_reply_overdue, payload, %{
+        thread_id: field(payload, :thread_id),
+        client_nickname: field(payload, :client_nickname),
+        due_at: field(payload, :due_at),
+        url: "/admin/coaching?tab=replies"
+      })
+
+  def process_event("nutrition_plan_updated", payload),
+    do:
+      enqueue_simple(:nutrition_plan_updated, payload, %{
+        title: field(payload, :title),
+        url: "/coaching"
+      })
+
+  def process_event("appointment_booked", payload),
+    do:
+      enqueue_simple(:appointment_booked, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        client_nickname: field(payload, :client_nickname),
+        url: "/admin/appointments"
+      })
+
+  def process_event("appointment_cancelled", payload),
+    do:
+      enqueue_simple(:appointment_cancelled, payload, %{
+        slot_id: field(payload, :slot_id),
+        kind: field(payload, :kind),
+        starts_at: field(payload, :starts_at),
+        url: field(payload, :url) || "/appointments"
+      })
+
+  # ADR-100: owners and admins see when a coach takes an athlete.
+  def process_event("coach_client_assigned", payload),
+    do:
+      enqueue_simple(:coach_client_assigned, payload, %{
+        coach_nickname: field(payload, :coach_nickname),
+        client_nickname: field(payload, :client_nickname),
+        client_user_id: field(payload, :client_user_id),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  # ADR-101: a coach learns which admin read which note, and when.
+  def process_event("coach_note_viewed", payload),
+    do:
+      enqueue_simple(:coach_note_viewed, payload, %{
+        note_id: field(payload, :note_id),
+        reader_nickname: field(payload, :reader_nickname),
+        client_nickname: field(payload, :client_nickname),
+        read_at: field(payload, :read_at),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  # ADR-104: a machine needs a repair, or a consumable is running out.
+  def process_event("inventory_repair_needed", payload),
+    do:
+      enqueue_simple(:inventory_repair_needed, payload, %{
+        machine_id: field(payload, :machine_id),
+        machine_name: field(payload, :machine_name),
+        kind: field(payload, :kind),
+        severity: field(payload, :severity),
+        symptom: field(payload, :symptom),
+        body: field(payload, :body),
+        url: "/admin/inventory?tab=machines"
+      })
+
+  def process_event("inventory_stock_low", payload),
+    do:
+      enqueue_simple(:inventory_stock_low, payload, %{
+        supply_id: field(payload, :supply_id),
+        supply_name: field(payload, :supply_name),
+        status: field(payload, :status),
+        quantity: field(payload, :quantity),
+        days_left: field(payload, :days_left),
+        note: field(payload, :note),
+        level: field(payload, :level),
+        place: field(payload, :place),
+        url: "/admin/inventory?tab=supplies"
+      })
+
+  def process_event("inventory_digest", payload),
+    do:
+      enqueue_simple(:inventory_digest, payload, %{
+        date: field(payload, :date),
+        reported_low: field(payload, :reported_low),
+        low_stock: field(payload, :low_stock),
+        critical_stock: field(payload, :critical_stock),
+        service_due: field(payload, :service_due),
+        service_soon: field(payload, :service_soon),
+        machines_down: field(payload, :machines_down),
+        machine_notes: field(payload, :machine_notes),
+        highlights: field(payload, :highlights),
+        url: "/admin/inventory"
+      })
+
   def process_event(_event, _payload), do: {:error, :bad_request}
 
   def propagate_nickname_change(old_nickname, new_nickname),
@@ -514,6 +652,39 @@ defmodule MilosTraining.Notifications do
 
         error
     end
+  end
+
+  # ADR-097 notifications with a fixed payload shape.
+  defp enqueue_simple(type, payload, notification_payload) do
+    user_id = field(payload, :user_id)
+
+    case deliver_notification(user_id, type, stringify_values(notification_payload)) do
+      {:ok, _notification} ->
+        :ok
+
+      :ok ->
+        :ok
+
+      {:error, reason} = error ->
+        Logger.error("#{type} delivery failed user_id=#{user_id} reason=#{inspect(reason)}")
+        error
+    end
+  end
+
+  defp stringify_values(payload) do
+    Map.new(payload, fn
+      {key, %DateTime{} = value} ->
+        {key, DateTime.to_iso8601(value)}
+
+      {key, %Date{} = value} ->
+        {key, Date.to_iso8601(value)}
+
+      {key, value} when is_atom(value) and not is_nil(value) and not is_boolean(value) ->
+        {key, Atom.to_string(value)}
+
+      pair ->
+        pair
+    end)
   end
 
   def delete_booking_pending_notifications(booking_id) do

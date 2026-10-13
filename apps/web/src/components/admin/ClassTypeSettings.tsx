@@ -66,6 +66,17 @@ export function ClassTypeSettings({ token }: { token: string }) {
     onError: (cause) => setError(cause instanceof Error ? localizeError(cause, i18n) : i18n("couldNotUpdateClassType039b007")),
   });
 
+  // ADR-097: visits one booking uses, and whether bookings count as events.
+  const ruleMutation = useMutation({
+    mutationFn: ({ type, patch }: { type: ClassTypeRecord; patch: { credit_cost?: number; kind?: "class" | "event" } }) =>
+      updateClassType(token, type.id, { name: type.name, sort_order: type.sort_order, ...patch }),
+    onSuccess: async () => {
+      setError(null);
+      await refresh();
+    },
+    onError: (cause) => setError(cause instanceof Error ? localizeError(cause, i18n) : i18n("couldNotUpdateClassType039b007")),
+  });
+
   const archiveMutation = useMutation({
     mutationFn: async ({ source, replacementId }: { source: ClassTypeRecord; replacementId?: string }) => {
       try {
@@ -118,6 +129,8 @@ export function ClassTypeSettings({ token }: { token: string }) {
 
       {query.isLoading ? <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loadingClassTypesacb2cdf")}</p> : null}
 
+      {activeTypes.length > 0 ? <p className="text-xs leading-5" style={{ color: "var(--dim)" }}>{i18n("admClassTypeRulesHint")}</p> : null}
+
       <div className="space-y-2">
         {activeTypes.map((type) => (
           <div
@@ -136,7 +149,11 @@ export function ClassTypeSettings({ token }: { token: string }) {
             ) : (
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{type.name}</p>
-                <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{type.slug}</p>
+                <ClassTypeRules
+                  type={type}
+                  disabled={ruleMutation.isPending}
+                  onChange={(patch) => ruleMutation.mutate({ type, patch })}
+                />
               </div>
             )}
 
@@ -246,6 +263,58 @@ export function ClassTypeSettings({ token }: { token: string }) {
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+function ClassTypeRules({
+  type,
+  disabled,
+  onChange,
+}: {
+  type: ClassTypeRecord;
+  disabled: boolean;
+  onChange: (patch: { credit_cost?: number; kind?: "class" | "event" }) => void;
+}) {
+  const i18n = useUiTranslations();
+  const cost = type.credit_cost ?? 1;
+  const stepStyle = { background: "var(--border)", color: "var(--text-soft)" };
+
+  return (
+    <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs" style={{ color: "var(--muted)" }}>
+      <span className="flex items-center gap-2">
+        {i18n("admVisitsPerBooking")}
+        <button
+          aria-label={i18n("admDecrease")}
+          className="h-6 w-6 rounded-full font-semibold disabled:opacity-40"
+          disabled={disabled || cost <= 1}
+          onClick={() => onChange({ credit_cost: cost - 1 })}
+          style={stepStyle}
+          type="button"
+        >
+          −
+        </button>
+        <span className="w-4 text-center font-semibold tabular-nums" style={{ color: "var(--text)" }}>{cost}</span>
+        <button
+          aria-label={i18n("admIncrease")}
+          className="h-6 w-6 rounded-full font-semibold disabled:opacity-40"
+          disabled={disabled || cost >= 10}
+          onClick={() => onChange({ credit_cost: cost + 1 })}
+          style={stepStyle}
+          type="button"
+        >
+          +
+        </button>
+      </span>
+      <label className="flex items-center gap-2">
+        <input
+          checked={type.kind === "event"}
+          disabled={disabled}
+          onChange={(event) => onChange({ kind: event.target.checked ? "event" : "class" })}
+          type="checkbox"
+        />
+        {i18n("admClassTypeEvent")}
+      </label>
     </div>
   );
 }

@@ -18,30 +18,66 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   alias MilosTraining.Organizations.OrganizationStore
   alias MilosTraining.{Finance, Scheduling, Workouts}
 
-  # organization_memberships is a root tenant table: the lookup and update run
-  # in the acting owner/admin's tenant scope (TD-046).
+  @doc "Replaces the target's roles with one role (single-role callers)."
   def call(context, user_id, role) when is_binary(user_id) do
-    case TenantAuthorization.authorize(context, [:owner, :admin]) do
-      :ok -> RepoContext.run(context, fn -> change_role(context, user_id, role) end)
+    case normalize_role(role) do
+      {:ok, role} -> set_roles(context, user_id, [role])
       error -> error
     end
   end
 
   def call(_context, _user_id, _role), do: {:error, :not_found}
 
-  defp change_role(context, user_id, role) do
-    with {:ok, role} <- normalize_role(role),
+  @doc """
+  Sets the full role set of an account in the context's gym (ADR-099). The
+  actor needs to be allowed to grant every role added or removed, so an admin
+  can neither promote anyone to admin or owner nor demote an owner, and a gym
+  always keeps an owner.
+  """
+  def set_roles(context, user_id, roles) when is_binary(user_id) do
+    case TenantAuthorization.authorize_capability(context, :grant_staff_roles) do
+      # organization_memberships is a root tenant table: lookups, the update and
+      # the staff broadcast run in the acting member's tenant scope (TD-046).
+      :ok -> RepoContext.run(context, fn -> change_roles(context, user_id, roles) end)
+      error -> error
+    end
+  end
+
+  def set_roles(_context, _user_id, _roles), do: {:error, :not_found}
+
+  defp change_roles(context, user_id, roles) do
+    with {:ok, roles} <- MembershipPolicy.normalize_roles(roles),
          {:ok, membership} <- fetch_membership(context, user_id),
          :ok <- refuse_self_change(context, membership),
-         :ok <- authorize_role_ceiling(context.role, role),
-         :ok <- authorize_role_ceiling(context.role, membership.role) do
+         changed = symmetric_difference(roles, membership.roles),
+         :ok <- authorize_role_ceiling(TenantAuthorization.roles(context), changed),
+         :ok <- keep_an_owner(context, membership, roles) do
       OrganizationStore.transaction(fn ->
-        with :ok <- reconcile_role_owned_state(context, membership, role) do
-          OrganizationStore.update_membership_role(context.organization_id, membership.id, role)
+        with :ok <- reconcile_role_owned_state(context, membership, roles) do
+          OrganizationStore.update_membership_roles(
+            context.organization_id,
+            membership.id,
+            roles
+          )
         end
       end)
       |> broadcast_change(context)
     end
+  end
+
+  defp symmetric_difference(a, b), do: Enum.uniq((a -- b) ++ (b -- a))
+
+  defp keep_an_owner(context, membership, roles) do
+    losing_owner? = :owner in membership.roles and :owner not in roles
+
+    other_owner? =
+      context.organization_id
+      |> OrganizationStore.list_organization_memberships()
+      |> Enum.any?(
+        &(&1.id != membership.id and &1.status == :active and :owner in (&1.roles || [&1.role]))
+      )
+
+    if losing_owner? and not other_owner?, do: {:error, :last_owner}, else: :ok
   end
 
   # Restores the notification UpdateUserRole used to send, now carrying the
@@ -52,6 +88,7 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
       reason: "role_changed",
       payload: %{
         role: to_string(membership.role),
+        roles: Enum.map(membership.roles, &to_string/1),
         organization_id: context.organization_id
       }
     )
@@ -59,7 +96,9 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
     admin_ids =
       context.organization_id
       |> OrganizationStore.list_organization_memberships()
-      |> Enum.filter(&(&1.role in [:owner, :admin] and &1.status == :active))
+      |> Enum.filter(
+        &(&1.status == :active and Enum.any?(&1.roles, fn role -> role in [:owner, :admin] end))
+      )
       |> Enum.map(& &1.user_id)
 
     BroadcastUserSync.for_users(admin_ids, ["admin_athletes", "admin_finance"],
@@ -87,11 +126,18 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
   # old global-role path, but now scoped to the organization the change was
   # made in, so losing :athlete at one gym cannot archive assignments at
   # another.
-  defp reconcile_role_owned_state(_context, %{role: role}, role), do: :ok
+  defp reconcile_role_owned_state(context, membership, roles) do
+    Enum.reduce_while(membership.roles -- roles, :ok, fn lost, :ok ->
+      case abandon_role_state(context, lost, membership.user_id) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
 
   # ADR-125: members may also hold personal assignments and class variants;
   # leaving the role archives them like leaving :athlete does.
-  defp reconcile_role_owned_state(context, %{role: :member, user_id: user_id}, _new_role) do
+  defp abandon_role_state(context, :member, user_id) do
     with {:ok, release_facts} <-
            Scheduling.cancel_active_future_bookings_for_user(context, user_id),
          :ok <- release_booking_entitlements(context, release_facts),
@@ -101,14 +147,14 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
     end
   end
 
-  defp reconcile_role_owned_state(context, %{role: :athlete, user_id: user_id}, _new_role) do
+  defp abandon_role_state(context, :athlete, user_id) do
     case Workouts.archive_active_assignments_for_athlete(context, user_id) do
       {:ok, _assignment_ids} -> :ok
       error -> error
     end
   end
 
-  defp reconcile_role_owned_state(_context, _membership, _new_role), do: :ok
+  defp abandon_role_state(_context, _role, _user_id), do: :ok
 
   defp release_booking_entitlements(context, release_facts) do
     Enum.reduce_while(release_facts, :ok, fn fact, :ok ->
@@ -137,10 +183,10 @@ defmodule MilosTraining.Organizations.Commands.SetMembershipRole do
     end
   end
 
-  # Checked against both the requested role and the target's current role: an
-  # admin may neither promote someone above themselves nor demote an owner.
-  defp authorize_role_ceiling(actor_role, subject_role) do
-    if MembershipPolicy.can_grant_role?(actor_role, subject_role) do
+  # Every added or removed role must be one the actor may grant: an admin may
+  # neither promote someone to admin or owner nor demote an owner.
+  defp authorize_role_ceiling(actor_roles, changed_roles) do
+    if Enum.all?(changed_roles, &MembershipPolicy.can_grant_role?(actor_roles, &1)) do
       :ok
     else
       {:error, :role_ceiling_exceeded}

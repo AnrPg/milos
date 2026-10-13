@@ -57,6 +57,24 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
     assert push_config == %{"enabled" => true, "vapid_public_key" => "public-key"}
   end
 
+  test "a gym's first finance settings save is stored for that gym", %{conn: conn} do
+    admin = admin_fixture()
+    organization = org_with_owner!(admin)
+    MilosTraining.Repo.query!("SELECT set_config('app.organization_id', '', false)")
+
+    payload =
+      conn
+      |> put_bearer_token(admin)
+      |> patch(
+        "/api/org/#{organization.slug}/admin/settings",
+        %{finance: %{package_modules: ["group_classes", "open_gym"]}}
+      )
+      |> json_response(200)
+
+    assert get_in(payload, ["finance", "package_modules"]) == ["group_classes", "open_gym"]
+    assert get_in(payload, ["finance", "organization_id"]) == organization.id
+  end
+
   defp org_with_owner!(owner) do
     {:ok, organization} =
       Organizations.create_organization(%{

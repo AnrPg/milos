@@ -7,6 +7,55 @@ function payloadUrl(notification: LinkableNotification) {
   return typeof notification.payload.url === "string" ? notification.payload.url : null;
 }
 
+// ADR-097: a promoted waitlist place opens its class; an expiring package
+// opens Billing even when the payload carries no explicit URL.
+function preferredUrl(notification: LinkableNotification) {
+  const slotId = notification.payload.scheduled_class_id;
+  if (notification.type === "booking_waitlist_promoted" && typeof slotId === "string" && slotId) {
+    return `/schedule?open_slot=${encodeURIComponent(slotId)}`;
+  }
+  return null;
+}
+
+const STAFF_ROLES = new Set(["admin", "coach", "owner", "front_desk", "accountant", "janitor"]);
+
+function isStaffRole(role: string | null | undefined) {
+  return Boolean(role && STAFF_ROLES.has(role));
+}
+
+// ADR-098: coaching and appointment notifications open the Phase C screens.
+// The API stores generic URLs, so the web app picks the screen by type and by
+// whether the reader is staff (appointment_cancelled reaches both sides).
+function phaseCUrl(notification: LinkableNotification, role: string | null | undefined) {
+  switch (notification.type) {
+    case "form_review_submitted":
+      return "/admin/coaching?tab=form-reviews";
+    case "coaching_reply_overdue":
+      return "/admin/coaching?tab=replies";
+    case "form_review_completed":
+    case "nutrition_plan_updated":
+      return "/coaching";
+    case "appointment_booked":
+    case "appointment_cancelled":
+      return isStaffRole(role) ? "/admin/appointments" : "/appointments";
+    // ADR-104: inventory alerts and the daily summary open the right tab.
+    case "inventory_repair_needed":
+      return "/admin/inventory?tab=machines";
+    case "inventory_stock_low":
+      return "/admin/inventory?tab=supplies";
+    case "inventory_digest":
+      return "/admin/inventory";
+    default:
+      return null;
+  }
+}
+
+function fallbackUrl(notification: LinkableNotification) {
+  if (notification.type === "booking_waitlist_promoted") return "/schedule";
+  if (notification.type === "package_expiring") return "/account/billing";
+  return null;
+}
+
 function localTarget(rawUrl: string) {
   const origin = "http://milos.local";
 
@@ -24,8 +73,11 @@ export function notificationTargetUrl(
   notification: LinkableNotification,
   role: string | null | undefined,
 ) {
-  const rawUrl = payloadUrl(notification);
-  const isAdmin = role === "admin" || role === "coach";
+  const phaseC = phaseCUrl(notification, role);
+  if (phaseC) return phaseC;
+
+  const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
+  const isAdmin = isStaffRole(role);
 
   if (
     notification.type === "chat_message" &&

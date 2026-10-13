@@ -196,6 +196,8 @@ describe("apiRequest tenant headers", () => {
       "/me/workouts/w-1/injury-warnings?surface=pre_start",
       "/api/org/atlas-gym/me/workouts/w-1/injury-warnings?surface=pre_start",
     ],
+    ["/locations", "/api/org/atlas-gym/locations"],
+    ["/check-ins", "/api/org/atlas-gym/check-ins"],
     ["/my-workouts?start_date=2026-08-08", "/api/org/atlas-gym/my-workouts?start_date=2026-08-08"],
     ["/workouts/workout-1", "/api/org/atlas-gym/workouts/workout-1"],
     ["/workouts/workout-1/scales", "/api/org/atlas-gym/workouts/workout-1/scales"],

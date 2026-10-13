@@ -151,6 +151,34 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     end
   end
 
+  # ADR-098: direct threads whose latest message is a client's, i.e. the
+  # client is waiting for staff to answer.
+  @impl true
+  def list_awaiting_staff_reply(staff_ids) do
+    latest =
+      Message
+      |> scoped_to_tenant()
+      |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
+      |> where(
+        [message, thread],
+        thread.context_type == :direct and message.message_type != :system
+      )
+      |> distinct([message], message.thread_id)
+      |> order_by([message], asc: message.thread_id, desc: message.sequence_number)
+      |> select([message], %{
+        message_id: message.id,
+        thread_id: message.thread_id,
+        sender_id: message.sender_id,
+        sent_at: message.inserted_at
+      })
+
+    from(latest_message in subquery(latest),
+      where: latest_message.sender_id not in ^staff_ids,
+      order_by: [asc: latest_message.sent_at]
+    )
+    |> Repo.all()
+  end
+
   defp scoped_to_tenant(query) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->

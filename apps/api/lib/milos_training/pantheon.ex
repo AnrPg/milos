@@ -21,6 +21,10 @@ defmodule MilosTraining.Pantheon do
   # operations expose Pantheon capabilities without leaking its store port.
   defdelegate list_records(user_id), to: MilosTraining.Pantheon.PRStore, as: :list_user_prs
 
+  defdelegate list_user_record_history(user_id),
+    to: MilosTraining.Pantheon.PRStore,
+    as: :list_user_pr_history
+
   defdelegate search_records(user_id, query),
     to: MilosTraining.Pantheon.PRStore,
     as: :search_user_prs

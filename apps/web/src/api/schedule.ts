@@ -21,6 +21,16 @@ export type ClassTypeRecord = {
   inserted_at?: string;
   updated_at?: string;
   future_classes_reassigned?: number;
+  /** Visits one booking uses (1..10, ADR-097). */
+  credit_cost?: number;
+  kind?: "class" | "event";
+};
+
+export type ScheduleLocation = {
+  id: string;
+  name: string;
+  address: string | null;
+  archived_at: string | null;
 };
 
 export type WorkoutPreviewExercise = {
@@ -78,9 +88,15 @@ export type ScheduleBooking = {
   id: string;
   user_id: string;
   user_nickname?: string | null;
-  status: "pending" | "approved" | "rejected" | "cancelled";
+  status: "pending" | "approved" | "rejected" | "cancelled" | "waitlisted";
   admin_message?: string | null;
   inserted_at: string;
+  /** Set on a guest booking made on the member's guest passes (ADR-097). */
+  guest_name?: string | null;
+  entitlement_allowance?: string | null;
+  waitlist_priority?: number | null;
+  /** 1-based place in the queue, only while waitlisted. */
+  waitlist_position?: number | null;
 };
 
 export type ScheduleSlot = {
@@ -99,6 +115,10 @@ export type ScheduleSlot = {
   spots_remaining: number;
   workout: WorkoutPreview | null;
   current_user_booking?: ScheduleBooking | null;
+  /** The member's own guest booking for this class, if any. */
+  current_user_guest?: ScheduleBooking | null;
+  location_id?: string | null;
+  waitlist_count?: number;
   bookings: ScheduleBooking[];
   /** ADR-125: the acting member's own version of this class (members only). */
   my_version?: MemberClassVersion | null;
@@ -129,6 +149,7 @@ export type ScheduleWindow = {
   days: number;
   class_types: ClassTypeRecord[];
   slots: ScheduleSlot[];
+  locations?: ScheduleLocation[];
 };
 
 export type ScheduleSlotPayload = {
@@ -140,6 +161,8 @@ export type ScheduleSlotPayload = {
   capacity: number;
   auto_approve: boolean;
   booking_timeout_minutes: number;
+  /** Optional gym location (ADR-097); null for single-site gyms. */
+  location_id?: string | null;
 };
 
 export async function fetchSchedule(
@@ -167,7 +190,14 @@ export async function listAdminClassTypes(token: string) {
   return response.class_types;
 }
 
-export async function createClassType(token: string, payload: { name: string; sort_order?: number }) {
+export type ClassTypePayload = {
+  name: string;
+  sort_order?: number;
+  credit_cost?: number;
+  kind?: "class" | "event";
+};
+
+export async function createClassType(token: string, payload: ClassTypePayload) {
   const response = await apiRequest<{ class_type: ClassTypeRecord }>("/admin/class-types", {
     method: "POST",
     token,
@@ -179,7 +209,7 @@ export async function createClassType(token: string, payload: { name: string; so
 export async function updateClassType(
   token: string,
   id: string,
-  payload: { name: string; sort_order?: number },
+  payload: ClassTypePayload,
 ) {
   const response = await apiRequest<{ class_type: ClassTypeRecord }>(`/admin/class-types/${id}`, {
     method: "PATCH",
@@ -227,6 +257,26 @@ export async function createBooking(token: string, slotId: string, options?: Com
   return response.booking;
 }
 
+export async function joinWaitlist(token: string, slotId: string) {
+  const response = await apiRequest<{ booking: ScheduleBooking }>("/bookings/waitlist", {
+    method: "POST",
+    token,
+    body: { slot_id: slotId },
+  });
+
+  return response.booking;
+}
+
+export async function createGuestBooking(token: string, slotId: string, guestName: string) {
+  const response = await apiRequest<{ booking: ScheduleBooking }>("/bookings/guests", {
+    method: "POST",
+    token,
+    body: { slot_id: slotId, guest_name: guestName },
+  });
+
+  return response.booking;
+}
+
 export async function createScheduleSlot(token: string, payload: ScheduleSlotPayload) {
   const response = await apiRequest<{ slot: ScheduleSlot }>("/admin/schedule/slots", {
     method: "POST",
@@ -252,6 +302,7 @@ export async function createScheduleSeries(
     capacity: number;
     auto_approve: boolean;
     booking_timeout_minutes: number;
+    location_id?: string | null;
   },
 ) {
   return apiRequest<{ series: { id: string; occurrence_count: number } }>(
@@ -312,11 +363,15 @@ function resolutionBody(adminMessage: string | undefined, options?: CommandRepla
   return body;
 }
 
+/** Withdraws a booking, a guest booking or a waitlist place. `late_cancellation`
+ * is true when the visit was still counted because of the cancellation cutoff. */
 export async function cancelBooking(token: string, bookingId: string) {
-  await apiRequest(`/bookings/${bookingId}`, {
-    method: "DELETE",
-    token,
-  });
+  const response = await apiRequest<{ ok?: boolean; late_cancellation?: boolean } | null>(
+    `/bookings/${bookingId}`,
+    { method: "DELETE", token },
+  );
+
+  return { lateCancellation: response?.late_cancellation === true };
 }
 
 export async function sendSlotMessage(token: string, slotId: string, body: string) {

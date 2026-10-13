@@ -51,7 +51,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     %OrganizationMembership{}
     |> OrganizationMembership.changeset(params)
     |> Repo.insert(
-      on_conflict: {:replace, [:role, :status, :joined_at, :invited_by_user_id, :updated_at]},
+      on_conflict:
+        {:replace, [:role, :roles, :status, :joined_at, :invited_by_user_id, :updated_at]},
       conflict_target: [:organization_id, :user_id],
       returning: true
     )
@@ -248,6 +249,37 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
       select: type(member.user_id, :binary_id)
     )
     |> Repo.all()
+  end
+
+  # Role facts of active members (TD-092), through the narrow
+  # `milos_organization_member_roles/3` SECURITY DEFINER function for the same
+  # reason as `organization_user_ids/2`.
+  @impl true
+  def list_member_roles(organization_id, roles, user_id) do
+    from(
+      member in fragment(
+        "SELECT * FROM milos_organization_member_roles(?, ?, ?)",
+        type(^organization_id, :binary_id),
+        type(^roles, {:array, :string}),
+        type(^user_id, :binary_id)
+      ),
+      select: %{
+        user_id: type(member.user_id, :binary_id),
+        role: member.role,
+        roles: member.roles,
+        coach_scope: member.coach_scope,
+        notes_visible_to_admins: member.notes_visible_to_admins
+      }
+    )
+    |> Repo.all()
+    |> Enum.map(fn member ->
+      %{
+        member
+        | role: String.to_existing_atom(member.role),
+          roles: Enum.map(member.roles, &String.to_existing_atom/1),
+          coach_scope: member.coach_scope && String.to_existing_atom(member.coach_scope)
+      }
+    end)
   end
 
   @impl true
@@ -719,6 +751,57 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     |> flatten_transaction()
   end
 
+  # A tenant owner archives their gym (ADR-099); the vendor purges it later.
+  @impl true
+  def set_organization_status(organization_id, status) do
+    case Repo.get(Organization, organization_id) do
+      nil -> {:error, :not_found}
+      organization -> organization |> Organization.changeset(%{status: status}) |> Repo.update()
+    end
+  end
+
+  # One key of the gym's free-form settings map, e.g. role grants (ADR-099).
+  @impl true
+  def put_organization_setting(organization_id, key, value) do
+    case Repo.get_by(OrganizationSetting, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      settings ->
+        settings
+        |> Ecto.Changeset.change(settings: Map.put(settings.settings || %{}, key, value))
+        |> Repo.update()
+    end
+  end
+
+  @impl true
+  def update_membership_roles(organization_id, membership_id, roles) do
+    update_membership(organization_id, membership_id, %{roles: roles})
+  end
+
+  # Coach scope (ADR-100) and notes visibility (ADR-101).
+  @impl true
+  def update_membership_settings(organization_id, membership_id, settings) do
+    update_membership(
+      organization_id,
+      membership_id,
+      Map.take(settings, [:coach_scope, :notes_visible_to_admins])
+    )
+  end
+
+  defp update_membership(organization_id, membership_id, params) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(params)
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
   @impl true
   def update_membership_status(organization_id, membership_id, status) do
     Repo.transaction(fn ->
@@ -874,9 +957,16 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         |> Repo.insert()
         |> unwrap_or_rollback()
 
+      # An existing member gains the invited role (ADR-099); an inactive
+      # membership restarts with it.
       membership ->
+        roles =
+          if membership.status == :active,
+            do: Enum.uniq([invitation.role | membership.roles]),
+            else: [invitation.role]
+
         membership
-        |> OrganizationMembership.changeset(params)
+        |> OrganizationMembership.changeset(params |> Map.delete(:role) |> Map.put(:roles, roles))
         |> Repo.update()
         |> unwrap_or_rollback()
     end

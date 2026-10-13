@@ -1,0 +1,53 @@
+msgid ""
+msgstr ""
+"Language: ar\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Invoice number"
+msgstr "رقم الفاتورة"
+
+msgid "Period"
+msgstr "الفترة"
+
+msgid "Seats"
+msgstr "المقاعد"
+
+msgid "Price per seat"
+msgstr "السعر لكل مقعد"
+
+msgid "Total"
+msgstr "الإجمالي"
+
+msgid "Paid"
+msgstr "المدفوع"
+
+msgid "Balance due"
+msgstr "المبلغ المستحق"
+
+msgid "Due date"
+msgstr "تاريخ الاستحقاق"
+
+msgid "Hello %{name},"
+msgstr "مرحبًا %{name}،"
+
+msgid "Thank you."
+msgstr "شكرًا لكم."
+
+msgid "Invoice %{number} from %{gym}"
+msgstr "الفاتورة %{number} من %{gym}"
+
+msgid "%{gym} has issued invoice %{number} to %{company} for the period %{start} – %{end}."
+msgstr "أصدر %{gym} الفاتورة %{number} إلى %{company} عن الفترة %{start} – %{end}."
+
+msgid "Please pay by %{due} and quote the invoice number."
+msgstr "يرجى الدفع قبل %{due} مع ذكر رقم الفاتورة."
+
+msgid "Reminder: invoice %{number} from %{gym} is overdue"
+msgstr "تذكير: الفاتورة %{number} من %{gym} متأخرة السداد"
+
+msgid "Invoice %{number} to %{company} was due on %{due} and is still unpaid."
+msgstr "كان موعد استحقاق الفاتورة %{number} الصادرة إلى %{company} في %{due} ولا تزال غير مدفوعة."
+
+msgid "If you have already paid, please ignore this reminder."
+msgstr "إذا كنتم قد دفعتم بالفعل، يرجى تجاهل هذا التذكير."
