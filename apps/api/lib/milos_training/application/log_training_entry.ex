@@ -15,10 +15,11 @@ defmodule MilosTraining.Application.LogTrainingEntry do
   alias MilosTraining.Application.{
     AuthorizeTrainingLogSource,
     CompleteWorkout,
+    InjuryWarningEvaluation,
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.Execution
+  alias MilosTraining.{Execution, Workouts}
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
 
   def call(%{organization_id: _} = context, %{id: user_id}, params) when is_map(params) do
@@ -57,11 +58,30 @@ defmodule MilosTraining.Application.LogTrainingEntry do
            ),
          :ok <- process_inline_if_needed(entry, outcome) do
       TrackAnalyticsEvent.call("training_log_entry_logged", context, entry, %{
-        metadata: %{section_score_count: length(entry.section_scores || [])}
+        metadata:
+          %{section_score_count: length(entry.section_scores || [])}
+          |> Map.merge(injury_facts(context, user_id, source, entry))
       })
 
       {:ok, entry, outcome}
     end
+  end
+
+  # TD-088: the same organization-provenance segmentation facts as execution
+  # completion, against the logged workout at the logged scale. A freeform
+  # entry has no workout: only `had_active_injury` is meaningful there.
+  defp injury_facts(%{organization_id: organization_id}, user_id, source, entry) do
+    workout =
+      case {Map.get(source, :workout), entry.scale_level_slug} do
+        {nil, _scale} -> nil
+        {workout, scale} when scale in [nil, ""] -> workout
+        {workout, scale} -> Workouts.materialize_for_scale(workout, scale)
+      end
+
+    InjuryWarningEvaluation.completion_facts(
+      %{organization_id: organization_id, user_id: user_id},
+      workout
+    )
   end
 
   defp allowed_section_ids(source) do

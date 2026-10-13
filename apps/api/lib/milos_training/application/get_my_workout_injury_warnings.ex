@@ -15,7 +15,10 @@ defmodule MilosTraining.Application.GetMyWorkoutInjuryWarnings do
       |> param(:surface)
       |> InjuryWarningEvaluation.surface(InjuryWarningEvaluation.self_surfaces())
 
-    with {:ok, result, tenant_evaluation} <- InjuryWarningEvaluation.for_self(context, workout_id) do
+    scale = InjuryWarningEvaluation.scale_slug(param(params, :scale))
+
+    with {:ok, result, tenant_evaluation} <-
+           InjuryWarningEvaluation.for_self(context, workout_id, scale: scale) do
       InjuryWarningEvaluation.track(
         "injury_warning_shown",
         context,
@@ -23,6 +26,7 @@ defmodule MilosTraining.Application.GetMyWorkoutInjuryWarnings do
         result.workout_id,
         tenant_evaluation,
         surface: surface,
+        scale_level_slug: scale,
         source_context_id:
           InjuryWarningEvaluation.source_context_id(param(params, :source_context_id))
       )
