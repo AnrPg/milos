@@ -115,6 +115,13 @@
             ],
             "type": "string"
           },
+          "scale_level_slug": {
+            "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+            "maxLength": 64,
+            "nullable": true,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
           "warnings": {
             "items": {
               "additionalProperties": false,
@@ -1819,6 +1826,13 @@
       "MyInjuryWarningsAcknowledgement": {
         "additionalProperties": false,
         "properties": {
+          "scale": {
+            "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+            "maxLength": 64,
+            "nullable": true,
+            "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+            "type": "string"
+          },
           "source_context_id": {
             "format": "uuid",
             "nullable": true,
@@ -50875,6 +50889,13 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "scale": {
+                    "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+                    "maxLength": 64,
+                    "nullable": true,
+                    "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+                    "type": "string"
+                  },
                   "source_context_id": {
                     "format": "uuid",
                     "nullable": true,
@@ -55236,6 +55257,18 @@
               "format": "uuid",
               "type": "string"
             }
+          },
+          {
+            "in": "query",
+            "name": "scale",
+            "required": false,
+            "schema": {
+              "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+              "maxLength": 64,
+              "nullable": true,
+              "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -55251,6 +55284,13 @@
                         "caution",
                         "avoid"
                       ],
+                      "type": "string"
+                    },
+                    "scale_level_slug": {
+                      "description": "Scale level slug whose exercises are evaluated; omitted or null means Rx.",
+                      "maxLength": 64,
+                      "nullable": true,
+                      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$",
                       "type": "string"
                     },
                     "warnings": {

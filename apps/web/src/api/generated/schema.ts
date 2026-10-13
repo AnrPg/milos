@@ -5059,6 +5059,8 @@ export interface components {
         MyWorkoutInjuryWarnings: {
             /** @enum {string} */
             level: "none" | "caution" | "avoid";
+            /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+            scale_level_slug?: string | null;
             warnings: {
                 body_area: string;
                 exercises: {
@@ -5500,6 +5502,8 @@ export interface components {
         };
         /** MyInjuryWarningsAcknowledgement */
         MyInjuryWarningsAcknowledgement: {
+            /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+            scale?: string | null;
             /** Format: uuid */
             source_context_id?: string | null;
             /** @enum {string|null} */
@@ -23596,6 +23600,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+                    scale?: string | null;
                     /** Format: uuid */
                     source_context_id?: string | null;
                     /** @enum {string|null} */
@@ -25238,6 +25244,7 @@ export interface operations {
             query?: {
                 surface?: "assignment_detail" | "class_detail" | "pre_start";
                 source_context_id?: string;
+                scale?: string | null;
             };
             header?: never;
             path: {
@@ -25256,6 +25263,8 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         level: "none" | "caution" | "avoid";
+                        /** @description Scale level slug whose exercises are evaluated; omitted or null means Rx. */
+                        scale_level_slug?: string | null;
                         warnings: {
                             body_area: string;
                             exercises: {
