@@ -75,9 +75,6 @@ config :milos_training,
 
 config :milos_training, :content_store, MilosTraining.Infrastructure.Content.EctoContentStore
 
-# Stores the API spec once instead of once per first-seen action (literal area).
-config :open_api_spex, :cache_adapter, MilosTrainingWeb.ApiSpecCache
-
 config :milos_training,
        :appointment_store,
        MilosTraining.Infrastructure.Appointments.EctoAppointmentStore
@@ -234,8 +231,8 @@ config :phoenix, :json_library, Jason
 
 config :open_api_spex, :json_render_error_v2, true
 
-# Cache the API spec once; see MilosTrainingWeb.OpenApiSpecCache for why the
-# default adapter exhausts the VM's literal area.
+# Cache the API spec once; see MilosTrainingWeb.OpenApiSpecCache (ADR-134) for
+# why the default adapter exhausts the VM's literal area.
 config :open_api_spex, :cache_adapter, MilosTrainingWeb.OpenApiSpecCache
 
 # Import environment specific config. This must remain at the bottom
