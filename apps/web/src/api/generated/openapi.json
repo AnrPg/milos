@@ -13441,6 +13441,81 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/pr-members": {
+      "get": {
+        "callbacks": {},
+        "description": "Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.",
+        "operationId": "MilosTrainingWeb.AdminUserController.pr_members",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "members": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "joined_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nickname",
+                          "role"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "visibility": {
+                      "description": "ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed.",
+                      "enum": [
+                        "coach",
+                        "coach_role_required"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "visibility",
+                    "members"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "PR dossier members"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Active members whose PR dossier a coach may open (ADR-132)",
+        "tags": [
+          "Admin Users"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/incidents": {
       "get": {
         "callbacks": {},
@@ -22850,6 +22925,28 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "member": {
+                      "description": "ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier.",
+                      "nullable": true,
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname"
+                      ],
+                      "type": "object"
+                    },
                     "prs": {
                       "items": {
                         "additionalProperties": true,
@@ -45375,6 +45472,82 @@
         "summary": "Add a cleaning area",
         "tags": [
           "Cleaning log"
+        ]
+      }
+    },
+    "/api/pr-sharing/grantee-lookup": {
+      "get": {
+        "callbacks": {},
+        "description": "Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.",
+        "operationId": "MilosTrainingWeb.PRSharingController.lookup_grantee",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "nickname",
+            "required": true,
+            "schema": {
+              "maxLength": 64,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "grantee": {
+                      "nullable": true,
+                      "properties": {
+                        "display_nickname": {
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "display_nickname"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "grantee"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Grantee lookup"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Find an account to share my PRs with by its exact nickname (ADR-132)",
+        "tags": [
+          "Pantheon"
         ]
       }
     },

@@ -717,6 +717,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/pr-members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Active members whose PR dossier a coach may open (ADR-132)
+         * @description Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.
+         */
+        get: operations["MilosTrainingWeb.AdminUserController.pr_members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/users/{id}/incidents": {
         parameters: {
             query?: never;
@@ -2985,6 +3005,26 @@ export interface paths {
         put?: never;
         /** Add a cleaning area */
         post: operations["MilosTrainingWeb.CleaningController.create_area"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/pr-sharing/grantee-lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find an account to share my PRs with by its exact nickname (ADR-132)
+         * @description Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.
+         */
+        get: operations["MilosTrainingWeb.PRSharingController.lookup_grantee"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9660,6 +9700,41 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminUserController.pr_members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description PR dossier members */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        members: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            joined_at?: string | null;
+                            nickname: string;
+                            role: string;
+                        }[];
+                        /**
+                         * @description ADR-132: `coach` - the gym's active members, whose PR panels the caller may open; `coach_role_required` - the caller is staff but not a coach, so no members are listed.
+                         * @enum {string}
+                         */
+                        visibility: "coach" | "coach_role_required";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.incidents": {
         parameters: {
             query?: never;
@@ -13413,6 +13488,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-132: the PR owner's public identity when they are an active member of this gym, so a coach outside their client scope can still title the PR dossier. */
+                        member?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        } | null;
                         prs: ({
                             /** Format: date */
                             beaten_on: string;
@@ -21243,6 +21325,46 @@ export interface operations {
                             name: string;
                             tasks: string[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PRSharingController.lookup_grantee": {
+        parameters: {
+            query: {
+                nickname: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Grantee lookup */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        grantee: {
+                            display_nickname: string;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Error */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
