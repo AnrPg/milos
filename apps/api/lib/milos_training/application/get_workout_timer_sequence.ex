@@ -78,10 +78,7 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
     # The workout was already read in the execution's tenant; materialize it
     # in place rather than reading it again (ADR-128).
     if scale_slug in available_slugs do
-      case Workouts.materialize_for_scale(workout, scale_slug) do
-        nil -> {:error, :invalid_scale_level}
-        materialized -> {:ok, materialized}
-      end
+      {:ok, Workouts.materialize_for_scale(workout, scale_slug)}
     else
       {:error, :invalid_scale_level}
     end
