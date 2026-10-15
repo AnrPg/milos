@@ -101,6 +101,7 @@ input[type=range] { width:100%; accent-color:#2F5BFF; }
   <header>
     <span class="lbl">Thumoa · Frost Graphite · working board</span>
     <h1>The eye, and the app in colour</h1>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 12px"><button type="button" id="lockBtn" style="font:800 15px Commissioner,sans-serif;border:0;border-radius:999px;padding:12px 20px;background:#2F5BFF;color:#fff;cursor:pointer">🔒 Lock my choices</button><span id="lockMsg" class="muted" role="status" style="font-size:14px">Set the mark, wordmark and palette below, then lock them so Claude can read them.</span></div>
     <p class="muted">The chosen board. Part one tests your idea: a small eye inside the head, low on the right, as if the dancer is looking down, which brings a third colour into the mark. Part two lets you change the palette live, and part three shows six app screens using it.</p>
   </header>
 
@@ -360,5 +361,35 @@ input[type=range] { width:100%; accent-color:#2F5BFF; }
     ].map(l => '<div><i style="background:' + l[0] + '"></i><span>' + l[1] + '</span></div>').join('');
   }
   drawTokens(); drawMark();
+
+  // ---------- lock: saves the full state to db (choices/locked), restores it on load ----------
+  const lockBtn = document.getElementById('lockBtn'), lockMsg = document.getElementById('lockMsg');
+  let db = null;
+  const restore = (d) => {
+    if (d.mark) Object.assign(M, d.mark);
+    if (d.word) Object.assign(W, d.word);
+    if (d.palette) T = Object.assign({}, T, d.palette);
+    ['size', 'ang', 'dist'].forEach(k => document.getElementById('r-' + k).value = M[k]);
+    palEl.querySelectorAll('.pchip').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    drawTokens(); drawMark();
+  };
+  window.claude && window.claude.use && window.claude.use('db').then(async (ns) => {
+    db = ns;
+    if (!db) { lockBtn.disabled = true; lockBtn.style.opacity = .5; lockMsg.textContent = 'Locking needs you to be signed in on claude.ai.'; return; }
+    try {
+      const snap = await db.doc('choices/locked').get();
+      if (snap.exists) { const d = snap.data(); restore(d); lockMsg.textContent = 'Loaded your locked choices (' + (d.lockedAt || '') + '). Change anything and lock again to update.'; }
+    } catch (e) { /* empty or unreadable: keep defaults */ }
+  });
+  lockBtn.addEventListener('click', async () => {
+    if (!db) { lockMsg.textContent = 'Locking is not available in this view.'; return; }
+    lockBtn.disabled = true; lockMsg.textContent = 'Saving…';
+    try {
+      const lockedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      await db.doc('choices/locked').set({ mark: Object.assign({}, M), word: Object.assign({}, W), palette: Object.assign({}, T), lockedAt });
+      lockMsg.textContent = '✓ Locked at ' + lockedAt + '. Tell Claude "locked" and it will apply them.';
+    } catch (e) { lockMsg.textContent = 'Could not save (' + (e && e.code || 'error') + ').'; }
+    lockBtn.disabled = false;
+  });
 })();
 </script>
