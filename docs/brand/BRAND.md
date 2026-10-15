@@ -1,6 +1,6 @@
 ---
 name: "Thumoa"
-tagline: "The spirit that moves you."
+tagline: "Thumo up."
 specVersion: "0.3.0"
 version: 1
 language: en
@@ -162,11 +162,29 @@ Essence: Nobody moves alone.
 
 ### Tagline & Slogans
 
-Primary: **"The spirit that moves you."** Greek: **«Η ψυχή που σε κινεί.»**
+Primary: **"Thumo up."** Greek: **«Ψηλά το κεφάλι.»**
 
-Alternatives:
-- "Move together."
-- "Find your people. Find your pace."
+"Thumo up" carries the name and two meanings: "stand up, get moving" and
+"thumbs up, be positive". The Greek line means "keep your chin up", and the
+mark's head is literally up. The Greek market does not get a literal
+translation, because in modern Greek θυμός means anger.
+
+Tagline system (decided Oct 2026):
+
+| Role | English | Greek |
+|---|---|---|
+| Primary tagline | Thumo up. | Ψηλά το κεφάλι. |
+| In-app verb | thumo (the kudos): "3 thumos", "she thumo'd your PR" | thumo |
+| Campaign template | Raise one for… ("Raise one for the 7am crew.", "Raise one for Maria's comeback.") | stays English |
+| Onboarding / name explainer | Bring your thumos. + *thumos (θυμός): the ancient Greek word for the spirit that gets you moving.* | Βάλε ψυχή. |
+| Owners / B2B | Every club has a spirit. Now it has a home. | Κάθε ομάδα έχει ψυχή. Τώρα έχει και σπίτι. |
+| Merch / social | Get your thumos on. | none |
+
+Rules:
+- Put "thumo" on the kudos button and let members adopt the verb. Never force it into body copy.
+- "Raise one" is always a toast to a person or a crew. Never show alcohol with it.
+- Never use "thumos" alone in Greek-language copy, because Greek readers hear "anger". Use «ψυχή».
+- Retired: "The spirit that moves you." (not ownable), "Spirit is a team sport." (cliché).
 
 Slogans by context:
 - App store: "Your club, your people, your progress."
@@ -237,9 +255,9 @@ Voice by channel (same identity, different energy):
 | Sensitive moments (cravings, injury) | Quiet | No exclamation marks, no advice beyond our role |
 | Errors | Plain | Own it, say what to do next |
 
-Open decision: the primary tagline "The spirit that moves you" fails the ownability
-test (it would still work with a competitor's name). Candidates under review:
-"Nobody moves alone." / «Κανείς δεν κινείται μόνος.» / "Move with your people."
+Taglines by channel: see the tagline system under Tagline & Slogans. App store and
+social lead with "Thumo up."; owner sales pages use the B2B line; campaigns use
+"Raise one for…".
 
 | We Say | We Never Say |
 |---|---|
