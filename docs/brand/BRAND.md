@@ -258,10 +258,14 @@ Avoid: neon greens and electric blues ("beast mode"), and orange as a primary
   Bartsokas, with full Greek and Latin support. The flair axis lets headlines
   turn expressive while the interface stays calm.
   Fallback: `system-ui, -apple-system, "Segoe UI", sans-serif`.
-  Licensing: SIL Open Font License 1.1 per Google Fonts. Not yet verified.
+  Licensing: SIL Open Font License 1.1. Verified against the project repository
+  (github.com/kosbarts/Commissioner, `OFL.txt`) on 2026-10-15. Free for commercial use,
+  embedding and self-hosting. The font may not be sold on its own.
 - **JetBrains Mono**, for numbers the system knows: scores, times, weights,
   dates. Fallback: `ui-monospace, SFMono-Regular, monospace`.
-  Licensing: SIL Open Font License 1.1 per Google Fonts. Not yet verified.
+  Licensing: SIL Open Font License 1.1, free for commercial use (per license mirrors;
+  confirm in github.com/JetBrains/JetBrainsMono before shipping). "JetBrains Mono" is a
+  reserved name, so a modified copy must be renamed.
 
 Split: Commissioner carries anything a person says. Mono carries anything that
 was measured.
@@ -311,6 +315,15 @@ Nothing glossy, nothing that glows, nothing that shouts.
 
 Features are named plainly in sentence case: "journal", "clubs", "check-in",
 "partners". No coined suffixes (Pro, Plus, AI, Max).
+
+### Trademark status
+
+Preliminary web search (2026-10-15), **not a legal clearance**: no registered mark or
+live product named "Thumoa" was found. Nearby marks: THUMA (furniture, Class 20,
+US/CA), THUM (pharmaceuticals, US), THAUMA (food, ES), and the "Thumo" food-delivery
+app (Eswatini). None is in software or fitness services. Before launch, run a
+professional clearance in EUIPO/TMview, WIPO Global Brand Database, USPTO and the Greek
+registry for Classes 9, 41, 42 and 44, and file in the EU and Greece first.
 
 ### Claims
 
