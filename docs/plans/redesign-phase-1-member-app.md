@@ -203,7 +203,7 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Messages (direct, threads, search) → Αρχική ✈; Box › Coach filtered (M2/M3)
 - [x] Notifications, web push → Αρχική ♡ (M2)
 - [ ] Seasonal challenges + opt-in leaderboard → Club #challenges (M8); own progress → Πρόοδος (M4)
-- [ ] Global leaderboard opt-in → Εγώ › Κοινοποίηση & ορατότητα (M9)
+- [x] Global leaderboard opt-in → Εγώ › Κοινοποίηση & ορατότητα (M9)
 - [ ] "Κοινοποίηση στο Milos" → ⊕ with attachment (M7); until then, kept in Vault/Ροή (M4)
 - [x] Shared-with-me PRs → Ημερολόγιο › Πρόοδος › Pantheon (M4)
 - [x] WOD of the day, scale levels → Box card (M3)
@@ -227,13 +227,13 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Pantheon (PRs, history, correction, share text) → Πρόοδος (M4)
 - [x] Progress stats (Motivation, Perseverance, Volume, streak) from landing → Πρόοδος (M4)
 - [x] History export → Πρόοδος (M4)
-- [ ] Profile, avatar, language, theme → Εγώ (M2/M9)
-- [ ] PR sharing grants, coach visibility → Εγώ › Κοινοποίηση & ορατότητα (M9)
-- [ ] Gamification preferences → Εγώ › Κοινοποίηση & ορατότητα (M9)
+- [x] Profile, avatar, language, theme → Εγώ (M2/M9)
+- [x] PR sharing grants, coach visibility → Εγώ › Κοινοποίηση & ορατότητα (M9)
+- [x] Gamification preferences → Εγώ › Κοινοποίηση & ορατότητα (M9)
 - [ ] Org memberships, join link (`/join/[slug]`), invitations → Εγώ › Τα box και τα clubs μου (M2)
 - [x] Chats activity (`/account/activity/chats`) → Αρχική ✈ (M2)
 - [ ] Offline outbox status → Εγώ › Ρυθμίσεις (M9); global panel stays
-- [ ] Onboarding/tours → Εγώ › Βοήθεια (M9)
+- [x] Onboarding/tours → Εγώ › Βοήθεια (M9)
 - [x] Staff: console → Εγώ › Διαχείριση (M2)
 
 ## 7. Open questions
@@ -253,4 +253,4 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Step 1 explore
 - [x] Step 2 decisions (cards posted; defaults recorded in §3)
 - [x] Step 3 plan (this file)
-- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [ ] M5 · [ ] M6 · [ ] M7 · [ ] M8 · [ ] M9
+- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [ ] M5 · [ ] M6 · [ ] M7 · [ ] M8 · [~] M9 (Κοινοποίηση & ορατότητα page; Ρυθμίσεις slimmed; Vault, history and reviews moved to Ημερολόγιο)

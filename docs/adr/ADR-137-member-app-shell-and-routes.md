@@ -101,3 +101,11 @@ lost from today's features.
 - `MembershipEntitlement.tsx` was extracted from the billing page so Box and
   Πληρωμές share one entitlement card; `TrainingLogDialog` and
   `useWorkoutLauncher` were extracted for the same reason.
+- Εγώ › Κοινοποίηση & ορατότητα (`/me/sharing`) gathers PR sharing, the
+  leaderboard opt-in and weekly rest days. Ρυθμίσεις keeps language,
+  security, personal info and avatar; its Vault tab, training history and
+  review list moved to Ημερολόγιο (`/journal/vault`, `/journal/reviews`), so
+  each exists once. Old `#vault`, `#history`, `#pr-sharing`,
+  `#training-schedule` and `#account-activity` anchors redirect on the client.
+  The rest-day picker now allows the five days the API accepts (it stopped
+  at three).

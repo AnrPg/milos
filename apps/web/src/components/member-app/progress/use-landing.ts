@@ -1,8 +1,8 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
-import { fetchLandingPayload } from "@/api/landing";
+import { fetchLandingPayload, updateLeaderboardOptIn, type LandingPayload } from "@/api/landing";
 import { useSession } from "@/components/session-provider";
 
 /**
@@ -18,5 +18,33 @@ export function useLanding() {
     queryKey: LANDING_QUERY_KEY,
     enabled: Boolean(tokens?.access_token),
     queryFn: () => fetchLandingPayload(tokens!.access_token),
+  });
+}
+
+/** Join or leave the gym's opt-in leaderboard; the landing cache updates in place. */
+export function useLeaderboardOptIn() {
+  const { tokens } = useSession();
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (optedIn: boolean) => updateLeaderboardOptIn(tokens!.access_token, optedIn),
+    onSuccess: (result) => {
+      queryClient.setQueryData<LandingPayload>(LANDING_QUERY_KEY, (current) =>
+        current
+          ? {
+              ...current,
+              gamification: {
+                ...current.gamification,
+                leaderboard: {
+                  ...current.gamification.leaderboard,
+                  opted_in: result.opted_in,
+                  visible: result.visible,
+                  weekly: result.weekly,
+                  monthly: result.monthly,
+                },
+              },
+            }
+          : current,
+      );
+    },
   });
 }

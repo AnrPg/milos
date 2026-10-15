@@ -201,6 +201,14 @@ async function stubMemberApi(page: Page) {
       }),
     ),
   );
+  await page.route(/\/api(?:\/org\/[^/]+)?\/pr-sharing$/, (route) =>
+    route.fulfill(json({ coach_visibility: true, grants: [] })),
+  );
+  await page.route(/\/api(?:\/org\/[^/]+)?\/gamification\/preferences$/, (route) =>
+    route.fulfill(
+      json({ preferences: route.request().method() === "GET" ? { off_days: [0] } : JSON.parse(route.request().postData() ?? "{}") }),
+    ),
+  );
   await page.route("**/api/org/*/me/entitlement", (route) =>
     route.fulfill(
       json({
@@ -287,5 +295,25 @@ test.describe("member app shell", () => {
     await expect(page.getByText("10 workouts")).toBeVisible();
     await expect(page.getByRole("button", { name: "Export workout history" })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/progress.png", fullPage: true });
+  });
+
+  test("Sharing & visibility gathers PR sharing, the leaderboard and rest days; old anchors follow them", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.goto("/me");
+    await page.getByRole("link", { name: /Sharing & visibility/ }).click();
+    await expect(page).toHaveURL(/\/me\/sharing$/);
+    await expect(page.getByRole("button", { name: "Join leaderboard" })).toBeVisible();
+
+    const sunday = page.locator("#training-schedule").getByRole("button", { pressed: true });
+    await expect(sunday).toHaveCount(1);
+    const saved = page.waitForRequest((request) => request.url().includes("/gamification/preferences") && request.method() !== "GET");
+    await page.locator("#training-schedule").getByRole("button", { name: "Mon", exact: true }).click();
+    expect(JSON.parse((await saved).postData() ?? "{}").off_days).toHaveLength(2);
+    await page.screenshot({ path: "test-results/member-app/sharing.png", fullPage: true });
+
+    await page.goto("/profile#vault");
+    await expect(page).toHaveURL(/\/journal\/vault$/);
+    await page.goto("/me/settings#pr-sharing");
+    await expect(page).toHaveURL(/\/me\/sharing#pr-sharing$/);
   });
 });

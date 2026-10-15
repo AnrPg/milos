@@ -59,7 +59,7 @@ export function MeHub() {
 
       <HubList>
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
-        <HubListRow href="/me/settings#pr-sharing" label={t("meSharing")} detail={t("meSharingHint")} />
+        <HubListRow href="/me/sharing" label={t("meSharing")} detail={t("meSharingHint")} />
         <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />
         <HubListRow href="/me/activity/chats" label={t("meChats")} />
         <HubListRow href="/me/settings" label={t("meSettings")} detail={t("meSettingsHint")} />

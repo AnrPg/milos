@@ -1,12 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { updateLeaderboardOptIn, type LandingPayload, type LeaderboardEntry } from "@/api/landing";
+import type { LandingPayload, LeaderboardEntry } from "@/api/landing";
 import { HelpIcon, InfoModal } from "@/components/InfoModal";
-import { LANDING_QUERY_KEY } from "@/components/member-app/progress/use-landing";
-import { useSession } from "@/components/session-provider";
+import { useLeaderboardOptIn } from "@/components/member-app/progress/use-landing";
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
@@ -16,8 +14,6 @@ import { useUiTranslations } from "@/i18n/ui";
  */
 export function LeaderboardCard({ leaderboard }: { leaderboard: LandingPayload["gamification"]["leaderboard"] }) {
   const i18n = useUiTranslations();
-  const { tokens } = useSession();
-  const queryClient = useQueryClient();
   const [leaderboardMode, setLeaderboardMode] = useState<"weekly" | "monthly">("weekly");
   const [activeInfoModal, setActiveInfoModal] = useState<"leaderboard" | null>(null);
   const leaderboardVisible = leaderboard.visible;
@@ -27,28 +23,7 @@ export function LeaderboardCard({ leaderboard }: { leaderboard: LandingPayload["
     [leaderboard.weekly, leaderboard.monthly, leaderboardMode],
   );
 
-  const toggleLeaderboard = useMutation({
-    mutationFn: (optedIn: boolean) => updateLeaderboardOptIn(tokens!.access_token, optedIn),
-    onSuccess: (result) => {
-      queryClient.setQueryData<LandingPayload>(LANDING_QUERY_KEY, (current) =>
-        current
-          ? {
-              ...current,
-              gamification: {
-                ...current.gamification,
-                leaderboard: {
-                  ...current.gamification.leaderboard,
-                  opted_in: result.opted_in,
-                  visible: result.visible,
-                  weekly: result.weekly,
-                  monthly: result.monthly,
-                },
-              },
-            }
-          : current,
-      );
-    },
-  });
+  const toggleLeaderboard = useLeaderboardOptIn();
 
   return (
     <section className="rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
