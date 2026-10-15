@@ -87,8 +87,17 @@ lost from today's features.
 ## Implementation Notes
 - The Journal hub's Ροή is the former history page; the former `/journal`
   (vault) moved to `/journal/vault`.
-- Αρχική still renders the existing member landing until the Community feed
-  (ADR-138, M7) lands; its stats move to Πρόοδος in M4.
+- The 1.4k-line member landing (`landing-page.tsx`) was split by owner and
+  deleted. Αρχική (`HomeHub`) keeps greeting and quote, the gym's WOD of the
+  day, challenges, the opt-in leaderboard (now a full card, which also ends
+  the 360 px popover overflow of TD-103 (4)) and an empty club-posts slot that
+  ADR-138 fills. Πρόοδος is no longer package-gated: streak, badges and
+  scores, Pantheon and the history export are for everyone; only the detailed
+  statistics stay behind `view_advanced_analytics`, and `/journal/pantheon`
+  lights the Πρόοδος segment. Ροή merges finished executions and training-log
+  entries per day (`journal-flow.ts`; ADR-118 keeps them disjoint) and keeps
+  "Share in Milos" from the old landing. The landing's "Log workout" pill
+  (`workout-cta.ts`) is replaced by Box's today card.
 - `MembershipEntitlement.tsx` was extracted from the billing page so Box and
   Πληρωμές share one entitlement card; `TrainingLogDialog` and
   `useWorkoutLauncher` were extracted for the same reason.

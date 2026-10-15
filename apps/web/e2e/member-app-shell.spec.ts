@@ -40,6 +40,41 @@ function localToday() {
 
 const json = (body: unknown) => ({ status: 200, contentType: "application/json", body: JSON.stringify(body) });
 
+function daysAgoAt(days: number, hour: number) {
+  const date = new Date();
+  date.setDate(date.getDate() - days);
+  date.setHours(hour, 0, 0, 0);
+  return date.toISOString();
+}
+
+const landing = {
+  role: "member",
+  admin_metrics: null,
+  quote: { body: "Strength grows in the moments you think you can't go on.", author: "Coach Nikos" },
+  gamification: {
+    settings: { weekly_workout_target: 3, streak_shield_reset_day: null, leaderboard_enabled: true },
+    stats: {
+      current_streak: 4,
+      longest_streak: 9,
+      total_workouts: 42,
+      total_prs: 6,
+      current_streak_shields: 0,
+      consistency_score: 80,
+      motivation_score: 76,
+      perseverance_score: 91,
+      advancement_count: 2,
+      last_workout_at: null,
+    },
+    preferences: { off_days: [] },
+    badges: [{ id: "badge-1", badge_key: "workouts_10", label: "10 workouts" }],
+    active_challenges: [],
+    leaderboard: { visible: true, opted_in: false, weekly: [], monthly: [] },
+  },
+  coach_notes: [],
+  membership: null,
+  recent_executions: [],
+};
+
 async function stubMemberApi(page: Page) {
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: tokenFor(), refresh_token: "refresh" })));
@@ -118,6 +153,54 @@ async function stubMemberApi(page: Page) {
   await page.route("**/api/org/*/me/workouts/*/injury-warnings**", (route) =>
     route.fulfill(json({ level: "none", warnings: [], warning_count: 0 })),
   );
+  await page.route(/\/api(?:\/org\/[^/]+)?\/landing$/, (route) => route.fulfill(json(landing)));
+  await page.route(/\/api(?:\/org\/[^/]+)?\/prs$/, (route) => route.fulfill(json({ prs: [] })));
+  await page.route(/\/api(?:\/org\/[^/]+)?\/executions\/vault$/, (route) =>
+    route.fulfill(
+      json({
+        workouts: [
+          {
+            master_workout_id: "wod-1",
+            workout_title: "Fran",
+            workout_type: "for_time",
+            entries: [
+              {
+                id: "execution-1",
+                completed_at_utc: daysAgoAt(1, 18),
+                completed_at_tz: "UTC",
+                source: "class_booking",
+                total_elapsed_ms: 312_000,
+                scale_level_slug: null,
+              },
+            ],
+          },
+        ],
+      }),
+    ),
+  );
+  await page.route("**/api/org/*/me/training-log/entries", (route) =>
+    route.fulfill(
+      json({
+        entries: [
+          {
+            id: "log-1",
+            source_type: "freeform",
+            title: "Park run",
+            performed_at_utc: daysAgoAt(1, 8),
+            performed_at_tz: "UTC",
+            duration_seconds: 1800,
+            perceived_effort: 6,
+            notes: null,
+            status: "logged",
+            lock_version: 1,
+            section_scores: [],
+            exercise_modifications: [],
+            performed_exercises: [],
+          },
+        ],
+      }),
+    ),
+  );
   await page.route("**/api/org/*/me/entitlement", (route) =>
     route.fulfill(
       json({
@@ -176,5 +259,33 @@ test.describe("member app shell", () => {
 
     await page.goto("/profile");
     await expect(page).toHaveURL(/\/me\/settings$/);
+  });
+
+  test("Home shows the gym's day: greeting, today's WOD, challenges, leaderboard and club posts", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.goto("/");
+
+    await expect(page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByText("Strength grows in the moments you think you can't go on.")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Open in Box" })).toHaveAttribute("href", "/box");
+    await expect(page.getByText("Posts from your club will show up here.")).toBeVisible();
+    await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
+  });
+
+  test("Journal's flow merges finished workouts and logged ones; Progress holds stats and PRs", async ({ page }) => {
+    await stubMemberApi(page);
+    await page.goto("/journal");
+    const flow = page.getByRole("main").last();
+    await expect(flow.getByText("Fran")).toBeVisible();
+    await expect(flow.getByText("Park run")).toBeVisible();
+    await expect(flow.getByRole("button", { name: /Share in Milos: Fran/ })).toBeVisible();
+    await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
+
+    await page.goto("/journal/progress");
+    await expect(page.getByText("76%")).toBeVisible();
+    await expect(page.getByText("10 workouts")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Export workout history" })).toBeVisible();
+    await page.screenshot({ path: "test-results/member-app/progress.png", fullPage: true });
   });
 });
