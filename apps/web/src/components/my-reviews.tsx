@@ -108,6 +108,7 @@ export function ReviewForm() {
 
   return (
     <form
+      id="new-review"
       className="space-y-4 rounded-[1.6rem] border border-[var(--border)] bg-[var(--panel)] p-6"
       onSubmit={(event) => {
         event.preventDefault();

@@ -33,7 +33,8 @@ import {
 } from "@/lib/training-log";
 
 const ENTRIES_KEY = ["training-log", "entries"] as const;
-const SOURCES_KEY = ["training-log", "sources"] as const;
+export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
+const SOURCES_KEY = TRAINING_LOG_SOURCES_KEY;
 
 const SOURCE_LABEL_KEYS: Record<TrainingLogSourceType, string> = {
   class: "trainingLogSourceClass",
@@ -57,7 +58,7 @@ const inputClass = "mt-1 w-full rounded-xl px-3 py-2 text-sm";
 const inputStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 const labelClass = "block text-xs font-semibold tracking-[0.16em]";
 
-type DialogState =
+export type TrainingLogDialogState =
   | { mode: "closed" }
   | { mode: "pick" }
   | { mode: "create"; source: SelectedTrainingSource }
@@ -77,7 +78,7 @@ export function TrainingLogSection() {
   const uiLocale = useUiLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const [dialog, setDialog] = useState<DialogState>({ mode: "closed" });
+  const [dialog, setDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
 
   const entriesQuery = useQuery({
     queryKey: ENTRIES_KEY,
@@ -230,15 +231,16 @@ function TrainingLogEntryCard({
   );
 }
 
-function TrainingLogDialog({
+/** The log/edit/void dialog; Box › Καταγραφή opens it on a chosen source (ADR-137). */
+export function TrainingLogDialog({
   state,
   token,
   onNavigate,
   onClose,
 }: {
-  state: Exclude<DialogState, { mode: "closed" }>;
+  state: Exclude<TrainingLogDialogState, { mode: "closed" }>;
   token: string;
-  onNavigate: (state: DialogState) => void;
+  onNavigate: (state: TrainingLogDialogState) => void;
   onClose: () => void;
 }) {
   const i18n = useUiTranslations();

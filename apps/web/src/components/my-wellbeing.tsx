@@ -57,6 +57,7 @@ export function MyWellbeing() {
         <PageHeader title={i18n("myWellbeing1916377")} />
 
         <form
+          id="report-injury"
           className="space-y-4 rounded-[1.6rem] border border-[var(--border)] bg-[var(--panel)] p-6"
           onSubmit={(event) => {
             event.preventDefault();
