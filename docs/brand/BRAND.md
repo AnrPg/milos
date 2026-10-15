@@ -171,7 +171,7 @@ Alternatives:
 Slogans by context:
 - App store: "Your club, your people, your progress."
 - Owner sales page: "Your members stay because they belong."
-- Open event poster: "Come move with us. Everyone's welcome."
+- Open event poster: "Open training. Everyone's welcome." (no discipline jargon on public posters)
 - Journal empty state: "Day one counts. Write it down."
 - Craving support screen: "Hard moment? Someone's here."
 
@@ -223,6 +223,23 @@ Slogans by context:
 - One exclamation mark per screen at most, saved for real wins.
 - Plain words over jargon. Explain "WOD", "RPE" and similar the first time.
 - Owners get numbers only when they are measured.
+
+Voice by channel (same identity, different energy):
+
+| Channel | Energy | Rule |
+|---|---|---|
+| Push notifications | Short, warm | One idea, name a person when possible |
+| Empty states | Gentle | Invite one first step |
+| Social (IG/TikTok) | Playful, highest flair | People first, never bodies first |
+| Public event posters | Welcoming | Zero discipline jargon |
+| Owner sales | Confident, concrete | Only measured numbers |
+| Investors and press | Calm, precise | Same promise, no hype |
+| Sensitive moments (cravings, injury) | Quiet | No exclamation marks, no advice beyond our role |
+| Errors | Plain | Own it, say what to do next |
+
+Open decision: the primary tagline "The spirit that moves you" fails the ownability
+test (it would still work with a competitor's name). Candidates under review:
+"Nobody moves alone." / «Κανείς δεν κινείται μόνος.» / "Move with your people."
 
 | We Say | We Never Say |
 |---|---|
@@ -279,6 +296,8 @@ was measured.
   head.
 - **The marker test:** the mark must be drawable by a child with one marker in
   under five seconds. No gradients, no outlines, no inner detail.
+- One allowed exception, the **heart dot**: in the wordmark the dot above the "u" may
+  be Pomegranate while the letters are Ink. Nothing else may mix colours.
 - Single colour only (Pomegranate, Ink or Chalk). Never multicolour, never
   gradient, never rotated so that the raised arm points downward.
 

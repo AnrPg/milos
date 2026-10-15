@@ -97,6 +97,10 @@ ul.rules b { color:var(--fg); }
 .saynot th { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); }
 .saynot td:first-child { font-weight:700; }
 .saynot td:last-child { color:var(--muted); text-decoration:line-through; text-decoration-color:var(--pom); }
+.saynot.ch td, .saynot.audit td { text-decoration:none; color:var(--fg); vertical-align:top; }
+.saynot.ch td:first-child, .saynot.audit td:first-child { white-space:nowrap; }
+.saynot.audit td:last-child { font-weight:700; white-space:nowrap; }
+.saynot.ch { min-width:760px; } .saynot.audit { min-width:620px; }
 .pillars { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr)); gap:10px; margin-top:16px; }
 .pillars div { border-left:4px solid var(--pom); padding:4px 0 4px 12px; }
 .pillars b { display:block; font-size:16px; }
@@ -245,7 +249,7 @@ footer { font-size:13px; color:var(--muted); text-align:center; }
       </div>
       <div style="display:grid;gap:14px">
         <div class="scale">
-          <div><span class="k">display · flair 100</span><span style="font-size:40px;font-weight:900;font-variation-settings:'FLAR' 100,'VOLM' 80;letter-spacing:-.02em">Open WOD</span></div>
+          <div><span class="k">display · flair 100</span><span style="font-size:40px;font-weight:900;font-variation-settings:'FLAR' 100,'VOLM' 80;letter-spacing:-.02em">Open training</span></div>
           <div><span class="k">headline · flair 40</span><span style="font-size:28px;font-weight:800;font-variation-settings:'FLAR' 40">Η ομάδα των 07:00</span></div>
           <div><span class="k">body · flair 0</span><span style="font-size:16px">Your journal is yours. Share only what you choose.</span></div>
           <div><span class="k">caption</span><span style="font-size:13px;color:var(--muted)">Ελένη κ. 2 άλλοι αντέδρασαν</span></div>
@@ -287,7 +291,7 @@ footer { font-size:13px; color:var(--muted); text-align:center; }
     <div class="apps">
       <div class="poster">
         <div style="display:flex;align-items:center;gap:8px"><svg viewBox="0 0 200 200" style="width:30px;color:var(--chalk)"><use href="#mark"/></svg><span class="wm">th<span class="du">u</span>moa</span></div>
-        <div><h3>Open WOD.<br>Everyone's welcome.</h3><p style="margin-top:10px">Come move with us. Bring a friend, bring nobody, just come.</p></div>
+        <div><h3>Open training.<br>Everyone's welcome.</h3><p style="margin-top:10px">A free class for every level. Bring a friend, bring nobody, just come.</p></div>
         <div class="meta"><span>ΣΑΒ 18/10 · 09:00</span><span>Box Κυψέλη</span></div>
       </div>
       <div class="phone"><div class="scr">
@@ -321,10 +325,11 @@ footer { font-size:13px; color:var(--muted); text-align:center; }
       <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap">
         <svg class="bounce" viewBox="0 0 200 200" style="width:110px;color:var(--pom)"><use href="#mark"/></svg>
         <svg class="bounce" viewBox="0 0 200 200" style="width:70px;color:var(--ink)"><use href="#mark"/></svg>
+        <span style="background:var(--ink);border-radius:18px;padding:14px;display:inline-grid"><svg viewBox="0 0 200 200" style="width:64px" aria-label="Celebration state on Ink"><circle cx="94" cy="58" r="23" fill="#F4B740"/><path d="M42 56 Q50 156 104 156 Q156 156 160 104" fill="none" stroke="#F6F0E6" stroke-width="27" stroke-linecap="round"/></svg></span>
       </div>
       <ul class="rules">
         <li><b>Signature motion:</b> the dot lifts and lands. Used for loading, check-in success and kudos.</li>
-        <li><b>Celebration:</b> the dot turns Sun for one beat on a PR, and is otherwise never coloured differently.</li>
+        <li><b>Celebration:</b> on Ink surfaces only, the dot turns Sun for one beat on a PR. On Chalk it never changes colour, because Sun on Chalk fails 3:1 non-text contrast.</li>
         <li><b>Respect reduced motion:</b> the dot simply appears.</li>
       </ul>
     </div>
@@ -341,6 +346,38 @@ footer { font-size:13px; color:var(--muted); text-align:center; }
       <div class="tr"><b>Localized systems</b><p>The core stays fixed while language and imagery adapt locally. Thumoa is bilingual by design: Greek copy is written, not translated.</p><a href="https://www.designmonks.co/blog/brand-design-trends-2026" target="_blank" rel="noopener">Design Monks</a></div>
       <div class="tr"><b>Category whitespace</b><p>Strava owns orange, and "beast mode" brands own black and neon. Planet Fitness just refreshed its purple and yellow. A warm red on chalk is free.</p><a href="https://www.healthclubmanagement.co.uk/health-club-management-news/Planet-Fitness-unveils-a-brand-refresh-and-app-update-to-reignite-membership-growth/363608" target="_blank" rel="noopener">Health Club Mgmt</a> · <a href="https://logotyp.us/logo/strava/" target="_blank" rel="noopener">Strava logo</a></div>
     </div>
+  </section>
+
+
+  <section class="plate">
+    <span class="lbl">09 · Voice by channel</span>
+    <h2>One friend, different rooms</h2>
+    <p class="muted" style="margin-bottom:12px">The identity stays the same. What changes per channel is energy, length and how much we explain. Greek copy is written for Greek readers, not translated.</p>
+    <div style="overflow-x:auto"><table class="saynot ch"><thead><tr><th>Channel</th><th>Energy</th><th>Example (EN)</th><th>Example (ΕΛ)</th></tr></thead><tbody>
+      <tr><td>Push notification</td><td>Short, warm, one idea</td><td>Ελένη and 6 others cheered your Fran.</td><td>Η Ελένη και άλλοι 6 χειροκρότησαν το Fran σου.</td></tr>
+      <tr><td>In-app empty state</td><td>Gentle, invites a first step</td><td>Day one counts. Write it down.</td><td>Η πρώτη μέρα μετράει. Γράψ’ την.</td></tr>
+      <tr><td>Instagram / TikTok</td><td>Playful, people-first, highest flair</td><td>Your 7am crew is waiting. Nobody moves alone.</td><td>Η ομάδα των 7 σε περιμένει. Κανείς δεν κινείται μόνος.</td></tr>
+      <tr><td>Open event poster</td><td>Welcoming, zero jargon</td><td>Open training. Everyone's welcome.</td><td>Ανοιχτή προπόνηση. Όλοι είναι ευπρόσδεκτοι.</td></tr>
+      <tr><td>Owner sales page / demo</td><td>Confident, concrete, measured numbers only</td><td>Your members stay because they belong. Grow through open doors, not discounts.</td><td>Τα μέλη σου μένουν επειδή ανήκουν. Μεγάλωσε με ανοιχτές πόρτες, όχι με εκπτώσεις.</td></tr>
+      <tr><td>Investors / press</td><td>Calm and precise. Same promise, no hype</td><td>Thumoa turns independent movement clubs into living communities.</td><td>Το Thumoa κάνει τους ανεξάρτητους χώρους κίνησης ζωντανές κοινότητες.</td></tr>
+      <tr><td>Sensitive moments (cravings, injury)</td><td>Quiet, no exclamation marks, no advice beyond our role</td><td>Hard moment? Someone's here.</td><td>Δύσκολη στιγμή; Κάποιος είναι εδώ.</td></tr>
+      <tr><td>Errors</td><td>Plain, own the problem, say what to do</td><td>We couldn't save that. Check your connection and try again.</td><td>Δεν το αποθηκεύσαμε. Έλεγξε τη σύνδεση και ξαναδοκίμασε.</td></tr>
+    </tbody></table></div>
+  </section>
+
+  <section class="plate">
+    <span class="lbl">10 · Brand audit</span>
+    <h2>What was checked, and what changed</h2>
+    <div style="overflow-x:auto"><table class="saynot audit"><thead><tr><th>Area</th><th>Finding</th><th>Status</th></tr></thead><tbody>
+      <tr><td>Colour</td><td>The motion section let the Sun dot appear on Chalk, but Sun on Chalk is 1.6:1 and fails non-text contrast. Restricted to Ink, and an Ink example was added.</td><td>Fixed</td></tr>
+      <tr><td>Logo</td><td>The board allowed a Pomegranate dot with Ink letters, while BRAND.md said "single colour only". Codified as the one allowed exception, the "heart dot", in BRAND.md.</td><td>Fixed</td></tr>
+      <tr><td>Messaging</td><td>"Open WOD" on a public poster is CrossFit jargon, which breaks the tonal rule and the "dancer and powerlifter" guardrail. Changed to "Open training".</td><td>Fixed</td></tr>
+      <tr><td>Voice</td><td>Channel tone was implicit. Added "Voice by channel" here and in BRAND.md.</td><td>Fixed</td></tr>
+      <tr><td>Tagline</td><td>"The spirit that moves you" fails the ownability test: swap in a competitor's name and it still works, and the phrase is common in ads. Candidates: "Nobody moves alone." · «Κανείς δεν κινείται μόνος.» · "Move with your people."</td><td>Needs founder decision</td></tr>
+      <tr><td>Type</td><td>Commissioner covers Greek and Latin, and Mono is used only for measured values. Hierarchy is consistent across plates.</td><td>Compliant</td></tr>
+      <tr><td>Colour ratio</td><td>Plates respect Chalk 55 / Ink 25 / Pomegranate 12. Pomegranate is never used for long text.</td><td>Compliant</td></tr>
+      <tr><td>Wordmark</td><td>Still set in the font, not custom-drawn. Fine for a draft, but needed before launch.</td><td>Open</td></tr>
+    </tbody></table></div>
   </section>
 
   <footer>Thumoa brand board · draft v1 · source of truth: docs/brand/BRAND.md</footer>
