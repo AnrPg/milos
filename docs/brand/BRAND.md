@@ -12,7 +12,7 @@ Upstream identity for the member app, the gym/owner console and the marketing
 site. Status: **draft v1**, proposed in the product discussion of Oct 2026 and
 awaiting the founder's approval. Product context lives in
 [`../product/2026-10-15-milos-product-vision-and-ia.md`](../product/2026-10-15-milos-product-vision-and-ia.md).
-The visual board is [`brand-board.html`](brand-board.html).
+The visual board is [`brand-board-frost.html`](brand-board-frost.html) (locked); earlier explorations live alongside it.
 
 ## Strategy
 
@@ -271,20 +271,33 @@ social lead with "Thumo up."; owner sales pages use the B2B line; campaigns use
 
 ### Core Colors
 
-- **Pomegranate** `#C8323F` (mandatory). The heart, *thumos* itself. The
-  pomegranate is the Mediterranean symbol of life and vitality. This is the
-  mark's colour. Deliberately not orange, which Strava owns in this category.
-- **Ink** `#16110E` (mandatory). Warm near-black, the floor of every studio. Never
-  pure black.
-- **Chalk** `#F6F0E6` (mandatory). Warm off-white, like lifting chalk and dance-floor
-  dust. Close to the 2026 "Cloud Dancer" mood without being clinical.
-- **Breath** `#0B6B66` (optional). Deep teal for recovery, calm and the journal.
-  Aligned with the 2026 "Transformative Teal" forecast.
-- **Sun** `#F4B740` (optional). Celebration only: PRs, achievements, event
-  highlights. Use on Ink, never as text on Chalk.
+Locked Oct 2026 on the Frost Graphite board ([`brand-board-frost.html`](brand-board-frost.html)).
+Energy comes from three saturated colours; luxury comes only from the finish
+(cool Frost, deep Graphite, restraint, space).
 
-Avoid: neon greens and electric blues ("beast mode"), and orange as a primary
-(Strava territory).
+- **Frost** `#F4F5F7` (mandatory). Cool near-white page. Cards sit on it in pure
+  white `#FFFFFF`; the two whites give the premium depth.
+- **Graphite** `#17181C` (mandatory). Text, the mark's body, deep hero surfaces.
+- **Dojo** `#2F5BFF` (mandatory). The primary: actions, navigation, the mark's
+  head. Glow tone on dark: `#5B7CFF`.
+- **Spark** (Sun Lime) `#E4FF6E`. What is alive right now: LIVE, new, challenges,
+  thumo counts. Always with Graphite text, or on Graphite. Chosen to sit clearly
+  away from Nike Volt.
+- **Heat** `#E0203F`. Emotion: thumo (kudos), PR, Comeback, the wordmark's dot,
+  support moments. Glow tone on dark: `#FF4D6A`.
+- **Plum** `#2A0F2E` (optional). Marketing, merch and the member card only;
+  never in the app UI.
+
+Usage rules:
+- One deep (Graphite) hero surface per screen.
+- Never Spark and Heat touching, and never both in the mark.
+- Never a composition of only Spark and Graphite (reads as AEK yellow-black):
+  Dojo or Heat must be in view. Spark stays a light lime, never pure yellow.
+- Never a surface of only Dojo and white (reads as the national flag).
+- Dark mode is "Graphite Night": Graphite page, `#22242A` cards, Frost text,
+  glow tones.
+
+Retired (draft v1): Pomegranate, Chalk, Breath, Sun.
 
 ### Typefaces
 
@@ -314,10 +327,15 @@ was measured.
   head.
 - **The marker test:** the mark must be drawable by a child with one marker in
   under five seconds. No gradients, no outlines, no inner detail.
-- One allowed exception, the **heart dot**: in the wordmark the dot above the "u" may
-  be Pomegranate while the letters are Ink. Nothing else may mix colours.
-- Single colour only (Pomegranate, Ink or Chalk). Never multicolour, never
-  gradient, never rotated so that the raised arm points downward.
+- **Locked colourway:** mark head Dojo `#2F5BFF`, body Graphite `#17181C`, no
+  eye. Wordmark letters Graphite with the dot above the "u" in Heat `#E0203F`
+  (the heart dot). Lockup: mark left of the wordmark.
+- Reversed (on Graphite): head Dojo glow `#5B7CFF`, body Frost.
+- Single-colour versions (Graphite, Frost or Dojo) for stamps, embroidery and
+  small sizes. Never gradient, never rotated so that the raised arm points
+  downward, never Spark with Heat.
+- Explored and parked: an "eye" in the head and a coloured letter in the
+  wordmark (see the Frost board labs).
 
 ### Photography & Illustration
 
@@ -376,9 +394,10 @@ Any retention percentage not measured on our own data.
 
 ### Accessibility Commitments
 
-Target: WCAG 2.2 AA on every surface. Brand text pairs: Ink on Chalk 16.5:1.
-Pomegranate on Chalk 4.65:1 (AA for normal text). Breath on Chalk 5.6:1. Sun is
-used on Ink only (10.4:1).
+Target: WCAG 2.2 AA on every surface. Brand text pairs: Graphite on Frost
+16.3:1. Dojo on white 5.2:1 and on Frost 4.7:1 (AA). Heat on white 4.7:1 (AA);
+on Frost 4.3:1, so Heat text sits on white cards or is large only. Graphite on
+Spark 15.9:1. White on Dojo 5.2:1, white on Heat 4.7:1.
 
 Beyond the target: every core flow is usable one-handed, and celebration motion
 respects reduced-motion settings.

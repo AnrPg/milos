@@ -167,7 +167,7 @@ input[type=range] { width:100%; accent-color:#2F5BFF; }
   const on = (h) => ratio(h, '#17181C') >= ratio(h, '#FFFFFF') ? '#17181C' : '#FFFFFF';
 
   // ---------- mark ----------
-  const M = { bg: C.frost, head: C.dojo, eye: C.spark, body: C.graphite, size: 6.5, ang: 45, dist: 10 };
+  const M = { bg: C.frost, head: C.dojo, eye: '', body: C.graphite, size: 6.5, ang: 45, dist: 10 };
   function markInner(m) {
     const a = m.ang * Math.PI / 180, ex = 94 + m.dist * Math.cos(a), ey = 58 + m.dist * Math.sin(a);
     return '<path d="M42 56 Q50 156 104 156 Q156 156 160 104" fill="none" stroke="' + m.body + '" stroke-width="27" stroke-linecap="round"/><circle cx="94" cy="58" r="23" fill="' + m.head + '"/>' + (m.eye ? '<circle cx="' + ex.toFixed(1) + '" cy="' + ey.toFixed(1) + '" r="' + m.size + '" fill="' + m.eye + '"/>' : '');
@@ -211,7 +211,7 @@ input[type=range] { width:100%; accent-color:#2F5BFF; }
   document.getElementById('presets').addEventListener('click', e => { const b = e.target.closest('.pre'); if (!b) return; const p = P[+b.dataset.i]; Object.assign(M, { bg: p[1], head: p[2], eye: p[3], body: p[4], size: 6.5, ang: 45, dist: 10 }); ['size', 'ang', 'dist'].forEach(k => document.getElementById('r-' + k).value = M[k]); drawMark(); });
 
   // ---------- wordmark ----------
-  const W = { bg: C.frost, letter: 'o', col: C.dojo, dot: C.spark, mark: 'on' };
+  const W = { bg: C.frost, letter: 'none', col: C.graphite, dot: C.heat, mark: 'on' };
   const LET = ['none', 't', 'h', 'u', 'm', 'o', 'a'];
   const inkFor = (bg) => lum(bg) < .2 ? C.frost : C.graphite;
   function wordmark(w, size) {
