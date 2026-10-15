@@ -142,3 +142,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-134 | BEAM literal area root cause and deterministic OpenAPI export | Accepted |
 | ADR-135 | One staff dashboard for every role | Accepted |
 | ADR-136 | Self-organising workout library and workout icons | Accepted |
+| ADR-137 | Member app shell, four tabs and route moves | Accepted |

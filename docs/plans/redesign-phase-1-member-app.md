@@ -95,9 +95,9 @@ Asked on decision cards on 2026-10-15; work proceeds on the recommended option u
 | # | Decision | Default taken | ADR |
 |---|---|---|---|
 | D1 | Where clubs/channels/posts live | **Chosen 2026-10-15:** new `Community` bounded context (Club, Channel, ClubMembership, Post); Messaging keeps DMs + coach inbox | ADR-138 |
-| D2 | Rollout | Per-gym flag `member_app` (`classic`/`v2`) in `organization_settings.settings`, exposed on the membership JSON; web reads it through one helper | ADR-137 |
-| D3 | URLs | `/` = Feed; new hubs `/box`, `/journal` (re-purposed), `/me`; every existing member page stays at its URL as a sub-page of its tab | ADR-137 |
-| D4 | Visibility storage | `visibility` column on `training_log_entries` (default `private`); reviews/PRs/injuries mapped to the ladder at read time, no backfill | ADR-139 |
+| D2 | Rollout | **Chosen 2026-10-15:** everyone at once. The redesign branch replaces the old member navigation outright; no flag | ADR-137 |
+| D3 | URLs | **Chosen 2026-10-15:** move and redirect. Member pages move under `/box/*`, `/journal/*`, `/me/*`; old URLs redirect (`lib/member-routes.ts` + `next.config.ts`), and legacy notification payload URLs are mapped client-side | ADR-137 |
+| D4 | Visibility storage | **Chosen 2026-10-15:** migrate everything. One `visibility` column on every entry type (training-log entries, reviews, injuries, PRs, coaching notes from the athlete), with a backfill migration from the old flags | ADR-139 |
 | D5 | Staff in "My training" view | Same 4 tabs; `Εγώ › Διαχείριση` links to the console | ADR-137 |
 | D6 | `#wod-σήμερα` leaderboard | Scores = today's class-WOD log entries of members who opted in to leaderboards (existing opt-in), ranked by the WOD's score type | ADR-138 |
 | D7 | Class-slot groups | Auto-created per recurring `class_series`; membership suggested to members with ≥3 bookings of that series in 4 weeks (brief §10 Q3 left open; 3 is the default) | ADR-138 |
@@ -106,17 +106,21 @@ Asked on decision cards on 2026-10-15; work proceeds on the recommended option u
 
 ## 4. Architecture
 
-### ADR-137 Member app v2 shell, routes and rollout flag
-- `lib/member-app.ts`: `memberAppVersion(membership)` → `"classic" | "v2"`; reads
-  `membership.settings.member_app`, falls back to `NEXT_PUBLIC_MEMBER_APP_DEFAULT` (unset = `classic`).
-- `lib/role-navigation.ts`: `memberTabItems()` returns the 4 tabs with `match` prefixes that claim the
+### ADR-137 Member app shell and routes
+- Route moves (D3): `/my-workouts`→`/box/workouts`, `/schedule`→`/box/schedule`, `/appointments`→`/box/appointments`,
+  `/videos`→`/box/videos`, `/coaching`→`/box/coach`, `/my-workouts/history`→`/journal`, old `/journal`→`/journal/vault`,
+  `/my-workouts/pantheon`→`/journal/pantheon`, `/progress`→`/journal/progress`, `/wellbeing`→`/journal/wellbeing`,
+  `/reviews`→`/journal/reviews`, `/profile`→`/me/settings`, `/account/billing`→`/me/payments`,
+  `/account/activity/*`→`/me/activity/*`. Execution, class-timer and `/workouts` stay.
+- No rollout flag (D2): the branch ships the new shell to every member when `v2.0.0` is released.
+- `lib/role-navigation.ts`: `clientNavItems()` returns the 4 tabs with `match` prefixes that claim the
   old pages: Box ← `/box`, `/my-workouts` (not history/pantheon), `/schedule`, `/appointments`,
   `/videos`, `/coaching`, `/class-timer`; Ημερολόγιο ← `/journal`, `/my-workouts/history`,
   `/my-workouts/pantheon`, `/progress`, `/wellbeing`, `/reviews`; Εγώ ← `/me`, `/profile`, `/account`;
   Αρχική ← `/` (exact), `/feed`, `/clubs`.
 - `components/nav/BottomTabBar.tsx`: fixed bottom bar (safe-area inset), icons + labels, active by
-  longest prefix; rendered by the layout for client surfaces when v2 is on. `TopNav` drops its primary
-  links for v2 members and keeps brand/org selector only on hubs that need it.
+  longest prefix; rendered by the layout for client surfaces. `TopNav` drops its primary
+  links for members and keeps brand/org selector only on hubs that need it.
 - Execution and class-timer display routes hide the bar (full-screen).
 
 ### ADR-138 Community context
@@ -135,11 +139,13 @@ public APIs). Realtime: `community:club:<id>` topic for new posts.
 
 ### ADR-139 Journal visibility ladder
 - Enum `private | coach_can_view | coach_reply_requested | rated | posted` (Ecto.Enum, room for later).
-- Migration adds `training_log_entries.visibility` default `private` (non-destructive).
-- Read model `Application.GetJournalFeed` returns entries of all existing kinds with a derived
-  `visibility`: PR → `coach_can_view` when the user's `coach_visibility` is on else `private`; review →
-  `rated`; injury → `coach_can_view` (always visible to coaches, brief §4.5); execution note with reply
-  alert → `coach_reply_requested`; entry attached to a post → `posted`.
+- Migrations add a `visibility` column (same enum) to `training_log_entries`, `feedback_reviews`,
+  `wellbeing_injury_reports` and PR records, then backfill from the old flags: PR → `coach_can_view`
+  when the owner's `coach_visibility` is on, else `private`; review → `rated` (its `admin_only`/
+  `user_visible` stays as the audience of the rating); injury → `coach_can_view` (always visible to
+  coaches, brief §4.5); log entry with a reply alert → `coach_reply_requested`, else `private`.
+  Old columns stay until a later cleanup migration (non-destructive; TD entry).
+- Read model `Application.GetJournalFeed` returns entries of all kinds with their stored `visibility`.
 - Coach reads of sensitive entries reuse the coach-note read audit pattern.
 
 ## 5. Milestones (each one PR into `redesign/social-centered`)
@@ -147,16 +153,16 @@ public APIs). Realtime: `community:club:<id>` topic for new posts.
 Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain (see §8).
 
 ### M1 · Bottom bar and tab mapping (W)
-- Files: `lib/member-app.ts` (+test), `lib/role-navigation.ts` (`memberTabItems`, +tests),
+- Files: `lib/role-navigation.ts` (`clientNavItems` → 4 tabs, +tests),
   `components/nav/BottomTabBar.tsx`, `components/TopNav.tsx`, `app/layout.tsx`, `messages/*.json`.
-- Accept: with v2 on, members/athletes see 4 tabs on every page except execution/class-timer display;
-  the right tab is active on every legacy route (§6.1, mockups 01/08/16/24); classic users see no change.
-- Tests: tab-ownership table test over every legacy member route; flag helper tests.
+- Accept: members/athletes see 4 tabs on every page except execution/class-timer display;
+  the right tab is active on every legacy route (§6.1, mockups 01/08/16/24).
+- Tests: tab-ownership table test over every legacy member route.
 - Verify: `npm run lint && npm run type-check && npm test && npm run i18n:check`.
 
 ### M2 · Hubs as stable pages (W)
-- `/box`, `/me` routes; `/journal` gets the hub layout when v2 is on (classic keeps `JournalWorkouts`);
-  `/` renders `FeedHub` placeholder for v2 (fixed slots + empty states), classic keeps `LandingPage`.
+- `/box`, `/me` routes; `/journal` becomes the hub; `/` renders the Feed hub for members (fixed slots +
+  empty states); the old landing content moves to Ημερολόγιο › Πρόοδος (M4). Admins keep `/admin`.
 - Accept: each hub has fixed card order with empty states (§4.2, §8.5); every row links to an existing page.
 
 ### M3 · Box hub content (W)
@@ -173,8 +179,8 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - Accept: mockups 15–17; visibility badge renders from derived visibility (client-side mapping until M5).
 
 ### M5 · Visibility ladder (A)
-- Migration, schema, `GetJournalFeed`, OpenAPI, generated client, badge from server; set visibility on
-  log entry and note.
+- Migrations + backfill on every entry type, schemas, `GetJournalFeed`, OpenAPI, generated client,
+  badge from server; set visibility on each entry type; tests for every backfill mapping.
 
 ### M6 · Community context: clubs and channels (A)
 - Migrations, schemas, commands/queries, `ProvisionGymClub`, backfill job, membership sync, OpenAPI,
@@ -188,8 +194,8 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - `#ανακοινώσεις` (staff write; Box announcements card reads it), `#wod-σήμερα` card + leaderboard (D6),
   `#challenges` (existing challenges), class-slot groups (D7).
 
-### M9 · Per-gym flag and Εγώ settings (A + W)
-- `member_app` in settings + membership JSON + admin settings toggle; Εγώ › Κοινοποίηση & ορατότητα
+### M9 · Εγώ settings (W)
+- Εγώ › Κοινοποίηση & ορατότητα
   (PR sharing, gamification prefs), Ρυθμίσεις (language, theme, outbox status), Βοήθεια (tours),
   Διαχείριση for staff. Stretch: Box › Πελάτες μου for coaches.
 
@@ -235,7 +241,6 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 2. Brief §10 Q4: moderation minimum for Phase 1 (default: hide/delete, no report queue).
 3. Should `#wod-σήμερα` show members who did not opt in to leaderboards as "Εσύ" only (default yes,
    others hidden)?
-4. When v2.0.0 ships, does the flag default flip to `v2` for all gyms, or stay opt-in?
 
 ## 8. Environment notes
 - The cloud session cannot reach `repo.hex.pm` or `builds.hex.pm`, so `mix` deps and an OTP 27 build
@@ -248,4 +253,4 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Step 1 explore
 - [x] Step 2 decisions (cards posted; defaults recorded in §3)
 - [x] Step 3 plan (this file)
-- [ ] M1 · [ ] M2 · [ ] M3 · [ ] M4 · [ ] M5 · [ ] M6 · [ ] M7 · [ ] M8 · [ ] M9
+- [x] M1 · [x] M2 (Αρχική keeps the landing until M7) · [x] M3 (class-timer link and check-in: TD-105) · [~] M4 (hub, entry sheet and moves done; landing stats and Pantheon into Πρόοδος pending) · [ ] M5 · [ ] M6 · [ ] M7 · [ ] M8 · [ ] M9
