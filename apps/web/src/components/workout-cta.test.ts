@@ -54,7 +54,7 @@ describe("workoutCta", () => {
         ],
         assignments: [],
       }),
-    ).toEqual({ href: "/schedule?open_slot=slot-1", label: "log" });
+    ).toEqual({ href: "/box/schedule?open_slot=slot-1", label: "log" });
   });
 
   it("offers logging for an athlete assignment due today", () => {
@@ -69,7 +69,7 @@ describe("workoutCta", () => {
         ],
       }),
     ).toEqual({
-      href: "/my-workouts?open_assignment=assignment-1&date=2026-07-17",
+      href: "/box/workouts?open_assignment=assignment-1&date=2026-07-17",
       label: "log",
     });
   });
@@ -87,7 +87,7 @@ describe("workoutCta", () => {
         ],
       }),
     ).toEqual({
-      href: "/my-workouts?open_assignment=assignment-2&date=2026-07-17",
+      href: "/box/workouts?open_assignment=assignment-2&date=2026-07-17",
       label: "log",
     });
   });

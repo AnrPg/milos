@@ -1,12 +1,12 @@
 import { AuthGuard } from "@/components/auth-guard";
-import { JournalWorkouts } from "@/components/client/JournalWorkouts";
+import { WorkoutHistory } from "@/components/client/WorkoutHistory";
 
 export const dynamic = "force-dynamic";
 
-export default function JournalPage() {
+export default function WorkoutHistoryPage() {
   return (
     <AuthGuard roles={["member", "athlete"]}>
-      <JournalWorkouts />
+      <WorkoutHistory />
     </AuthGuard>
   );
 }

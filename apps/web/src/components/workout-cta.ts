@@ -53,7 +53,7 @@ export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
       return slot.current_user_booking?.status === "approved" && Math.abs(distance) <= TWO_HOURS_MS;
     });
 
-    if (bookedClass) return { href: `/schedule?open_slot=${bookedClass.id}`, label: "log" };
+    if (bookedClass) return { href: `/box/schedule?open_slot=${bookedClass.id}`, label: "log" };
   }
 
   // ADR-125: members may also have a personal workout or class version due today.
@@ -71,7 +71,7 @@ export function workoutCta(input: WorkoutCtaInput): WorkoutCta | null {
         open_assignment: dueAssignment.id,
         date: dueAssignment.scheduled_for,
       });
-      return { href: `/my-workouts?${params.toString()}`, label: "log" };
+      return { href: `/box/workouts?${params.toString()}`, label: "log" };
     }
   }
 

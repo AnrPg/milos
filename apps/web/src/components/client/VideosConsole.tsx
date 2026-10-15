@@ -11,7 +11,7 @@ import { filterVideosByTag, safeVideoUrl, videoHost, videoTags } from "@/compone
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 
-/** `/videos`: published on-demand videos (needs `watch_on_demand`). */
+/** `/box/videos`: published on-demand videos (needs `watch_on_demand`). */
 export function VideosConsole() {
   const i18n = useUiTranslations();
   return (

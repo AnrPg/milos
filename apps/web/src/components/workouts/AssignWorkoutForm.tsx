@@ -123,7 +123,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         admin_notes: adminNotes.trim() || undefined,
       });
 
-      router.push("/my-workouts");
+      router.push("/box/workouts");
     } catch (requestError) {
       setError(requestError instanceof Error ? localizeAdminAssignmentError(requestError, i18n) : i18n("couldNotAssignWorkout58ad222"));
     } finally {

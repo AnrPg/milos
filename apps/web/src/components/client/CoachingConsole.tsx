@@ -23,7 +23,7 @@ import { useUiTranslations } from "@/i18n/ui";
 
 const FORM_REVIEWS_KEY = ["me", "form-reviews"] as const;
 
-/** `/coaching`: form reviews and the nutrition plan, each shown when included. */
+/** `/box/coach`: form reviews and the nutrition plan, each shown when included. */
 export function CoachingConsole() {
   const i18n = useUiTranslations();
   return (

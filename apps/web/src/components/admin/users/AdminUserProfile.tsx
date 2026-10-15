@@ -26,7 +26,7 @@ import {
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
-import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlement-visibility";
+import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
 import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
@@ -413,7 +413,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
                 key={valueText(assignment.id)}
                 title={valueText((assignment.workout as Record<string, unknown> | undefined)?.title)}
                 meta={<><SemanticLabel value={valueText(assignment.status)} /> · {date(assignment.scheduled_for)}</>}
-                href={`/my-workouts?open_assignment=${valueText(assignment.id)}`}
+                href={`/box/workouts?open_assignment=${valueText(assignment.id)}`}
               />
             ))}
             {assignments.length === 0 ? <Empty>{i18n("none6eef664")}</Empty> : null}
@@ -428,7 +428,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
                 title={<SemanticLabel value={valueText(note.type)} />}
                 meta={date(note.inserted_at)}
                 detail={<p className="line-clamp-3">{valueText(note.body)}</p>}
-                href="/account/activity/chats"
+                href="/me/activity/chats"
               />
             ))}
             {notes.length === 0 ? <Empty>{i18n("noConversationsRecordedd525265")}</Empty> : null}
@@ -685,7 +685,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
 
 
-          {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
+          {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/me/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/me/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
           {sections.has("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>

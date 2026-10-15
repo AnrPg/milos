@@ -41,7 +41,7 @@ describe("notificationTargetUrl", () => {
         { type: "booking_approved", payload: { url: "/schedule" } },
         "member",
       ),
-    ).toBe("/schedule");
+    ).toBe("/box/schedule");
   });
 
   it("rejects protocol-relative notification URLs", () => {
@@ -71,13 +71,13 @@ describe("notificationTargetUrl", () => {
         },
         "member",
       ),
-    ).toBe("/schedule?open_slot=slot-9");
+    ).toBe("/box/schedule?open_slot=slot-9");
   });
 
   it("falls back to the schedule for a waitlist promotion without a class id", () => {
     expect(
       notificationTargetUrl({ type: "booking_waitlist_promoted", payload: {} }, "member"),
-    ).toBe("/schedule");
+    ).toBe("/box/schedule");
   });
 
   it("links an expiring package to billing", () => {
@@ -86,10 +86,10 @@ describe("notificationTargetUrl", () => {
         { type: "package_expiring", payload: { url: "/account/billing", package_name: "Gold" } },
         "member",
       ),
-    ).toBe("/account/billing");
+    ).toBe("/me/payments");
     expect(
       notificationTargetUrl({ type: "package_expiring", payload: { package_name: "Gold" } }, "member"),
-    ).toBe("/account/billing");
+    ).toBe("/me/payments");
   });
 
   it("sends staff coaching notifications to the coaching queues", () => {
@@ -113,10 +113,10 @@ describe("notificationTargetUrl", () => {
         { type: "form_review_completed", payload: { url: "/account/coaching", form_review_id: "r1" } },
         "member",
       ),
-    ).toBe("/coaching");
+    ).toBe("/box/coach");
     expect(
       notificationTargetUrl({ type: "nutrition_plan_updated", payload: { title: "Cut" } }, "athlete"),
-    ).toBe("/coaching");
+    ).toBe("/box/coach");
   });
 
   it("opens appointments on the side of the reader", () => {
@@ -128,7 +128,18 @@ describe("notificationTargetUrl", () => {
     ).toBe("/admin/appointments");
     expect(
       notificationTargetUrl({ type: "appointment_cancelled", payload: { url: "/account/coaching", slot_id: "s1" } }, "member"),
-    ).toBe("/appointments");
-    expect(notificationTargetUrl({ type: "appointment_booked", payload: {} }, null)).toBe("/appointments");
+    ).toBe("/box/appointments");
+    expect(notificationTargetUrl({ type: "appointment_booked", payload: {} }, null)).toBe("/box/appointments");
+  });
+});
+
+describe("notificationTargetUrl after the member-app move", () => {
+  it("maps legacy member links stored in payloads to their new home", () => {
+    expect(
+      notificationTargetUrl({ type: "workout_moved", payload: { url: "/my-workouts?open=a1" } }, "member"),
+    ).toBe("/box/workouts?open=a1");
+    expect(
+      notificationTargetUrl({ type: "pr_shared", payload: { url: "/my-workouts/pantheon" } }, "athlete"),
+    ).toBe("/journal/pantheon");
   });
 });

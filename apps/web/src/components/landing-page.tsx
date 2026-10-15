@@ -187,7 +187,7 @@ function OffDaysBanner({ offDays, preferencesSet }: { offDays: number[]; prefere
             {i18n("yourConsistencyAndPerseveranceScoresExcludeYourSchedulede6962c7")}
           </p>
           <Link
-            href="/profile#training-schedule"
+            href="/me/settings#training-schedule"
             className="mt-2 inline-block text-sm font-semibold underline-offset-2 hover:underline"
             style={{ color: "var(--warning)" }}
           >

@@ -1,3 +1,5 @@
+import { currentMemberPath } from "@/lib/member-routes";
+
 type LinkableNotification = {
   type: string;
   payload: Record<string, unknown>;
@@ -12,7 +14,7 @@ function payloadUrl(notification: LinkableNotification) {
 function preferredUrl(notification: LinkableNotification) {
   const slotId = notification.payload.scheduled_class_id;
   if (notification.type === "booking_waitlist_promoted" && typeof slotId === "string" && slotId) {
-    return `/schedule?open_slot=${encodeURIComponent(slotId)}`;
+    return `/box/schedule?open_slot=${encodeURIComponent(slotId)}`;
   }
   return null;
 }
@@ -34,10 +36,10 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
       return "/admin/coaching?tab=replies";
     case "form_review_completed":
     case "nutrition_plan_updated":
-      return "/coaching";
+      return "/box/coach";
     case "appointment_booked":
     case "appointment_cancelled":
-      return isStaffRole(role) ? "/admin/appointments" : "/appointments";
+      return isStaffRole(role) ? "/admin/appointments" : "/box/appointments";
     // ADR-104: inventory alerts and the daily summary open the right tab.
     case "inventory_repair_needed":
       return "/admin/inventory?tab=machines";
@@ -51,8 +53,8 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
 }
 
 function fallbackUrl(notification: LinkableNotification) {
-  if (notification.type === "booking_waitlist_promoted") return "/schedule";
-  if (notification.type === "package_expiring") return "/account/billing";
+  if (notification.type === "booking_waitlist_promoted") return "/box/schedule";
+  if (notification.type === "package_expiring") return "/me/payments";
   return null;
 }
 
@@ -60,7 +62,8 @@ function localTarget(rawUrl: string) {
   const origin = "http://milos.local";
 
   try {
-    const parsed = new URL(rawUrl, origin);
+    // Payloads stored before the redesign still name the old member pages.
+    const parsed = new URL(rawUrl.startsWith("/") ? currentMemberPath(rawUrl) : rawUrl, origin);
 
     if (parsed.origin !== origin || !parsed.pathname.startsWith("/")) return null;
     return parsed;
@@ -83,7 +86,7 @@ export function notificationTargetUrl(
     notification.type === "chat_message" &&
     typeof notification.payload.thread_id === "string"
   ) {
-    return `/account/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
+    return `/me/activity/chats?thread=${encodeURIComponent(notification.payload.thread_id)}`;
   }
 
   if (!rawUrl) return null;
@@ -96,7 +99,7 @@ export function notificationTargetUrl(
   const params = parsed.searchParams;
 
   if (
-    parsed.pathname === "/my-workouts" ||
+    parsed.pathname === "/box/workouts" ||
     parsed.pathname === "/admin/coaching-assignments"
   ) {
     const assignmentId = params.get("open_assignment") ?? params.get("open");
@@ -111,7 +114,7 @@ export function notificationTargetUrl(
   }
 
   if (
-    parsed.pathname === "/schedule" ||
+    parsed.pathname === "/box/schedule" ||
     parsed.pathname === "/admin/schedule" ||
     parsed.pathname === "/admin/class-schedule"
   ) {

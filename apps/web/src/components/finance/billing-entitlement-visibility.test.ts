@@ -5,7 +5,7 @@ import {
   visibleBillingAllowances,
   visibleBillingChannels,
   visibleBillingFreezes,
-} from "@/app/account/billing/billing-entitlement-visibility";
+} from "@/components/finance/billing-entitlement-visibility";
 
 describe("customer billing entitlement visibility", () => {
   it("omits benefits that do not have a customer-facing product surface", () => {
