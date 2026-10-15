@@ -64,3 +64,13 @@ and the final clickable design `docs/product/mockups/milos-ia-mockup.html`.
 `docs/product/mockups/milos-bottom-bar-exploration.html` is SUPERSEDED — reasoning only, never implement from it.
 To start implementation work, use the kickoff prompt in `docs/product/IMPLEMENTATION_PROMPT.md`.
 If the vexp MCP server is not connected in a session, fall back to the built-in search tools rather than stopping.
+
+## Multi-agent workflow
+Several agents work on this repo at once (local sessions and cloud sessions). They never share a disk, only GitHub.
+- GitHub is the single source of truth. Never rely on files that are not committed and pushed; anything outside the repo (e.g. a local wrapper folder's `.claude/`) is invisible to other agents.
+- Integration branch: `redesign/social-centered`. Branch off it per task (`redesign/p1-<milestone>`, `chore/<topic>`) and merge back via PR. Small `.claude/` or docs-only changes may go straight to the integration branch.
+- Before starting work: `git fetch origin` and bring your branch up to date with the integration branch (merge, don't rewrite shared history).
+- Commit small, push often. Never end a session with unpushed work.
+- Before pushing to a shared branch: `git pull --no-rebase` first; resolve conflicts, never force-push a shared branch.
+- Don't edit files that another open PR is changing without coordinating in that PR.
+- Project-wide Claude config (settings, hooks, skills, this file) lives in `.claude/` in the repo, so every agent loads the same setup.
