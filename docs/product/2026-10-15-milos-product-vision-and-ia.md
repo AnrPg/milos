@@ -5,7 +5,7 @@
 
 **Mockups (open in a browser, fully clickable):**
 - [`mockups/milos-ia-mockup.html`](mockups/milos-ia-mockup.html): **the final design.** 34 navigable phone screens, sitemap, coverage tables, interactive anatomy atlas.
-- [`mockups/milos-bottom-bar-exploration.html`](mockups/milos-bottom-bar-exploration.html): the exploration of 13 alternative bottom-bar options that led to the final design (useful for the reasoning, not to implement).
+- [`mockups/milos-bottom-bar-exploration.html`](mockups/milos-bottom-bar-exploration.html): **SUPERSEDED. Do not implement anything from it.** It records the 13 rejected bottom-bar options (including a «Σήμερα» tab, adaptive screens, an AI-coach tab and a 4-button «⊕» bar) only to explain *why* the final design looks the way it does. Wherever it conflicts with this document or `milos-ia-mockup.html`, those win.
 - [`mockups/screens/`](mockups/screens/): PNG of every screen (2×). The overview is below.
 
 ![Overview of the final mockup](mockups/overview.png)
