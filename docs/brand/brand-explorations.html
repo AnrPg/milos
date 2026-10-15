@@ -1,0 +1,238 @@
+<title>Thumoa explorations</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:FLAR,VOLM,wght@0..100,0..100,100..900&family=Fira+Sans+Extra+Condensed:wght@500;800;900&family=Inter+Tight:wght@400;600;800&family=Noto+Serif+Display:ital,wght@0,500;0,800;1,500&family=Manrope:wght@400;600;800&family=Comfortaa:wght@500;700&family=Geologica:wght@400;700;900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: three parts. 1 tagline lab (scored list + in-context mocks), 2 five switchable brand boards, 3 bold-move cards. Page chrome themes; board colours are fixed by design. */
+:root { --bg:#EEE7DC; --plate:#F7F2EA; --fg:#18120E; --muted:#6B5B50; --line:#DCCFBF; --acc:#C8323F; --mono:"JetBrains Mono",ui-monospace,monospace; --ui:"Commissioner",system-ui,sans-serif; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0E0A08; --plate:#17110E; --fg:#F6F0E6; --muted:#A8978A; --line:#2E241F; --acc:#E0505C; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#0E0A08; --plate:#17110E; --fg:#F6F0E6; --muted:#A8978A; --line:#2E241F; --acc:#E0505C; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--ui); }
+.wrap { max-width:1180px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:32px 72px; display:grid; gap:18px; }
+.plate { background:var(--plate); border:1px solid var(--line); border-radius:26px; padding:clamp(18px,3vw,32px); min-width:0; }
+.lbl { font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+h1 { font-size:clamp(34px,6vw,64px); line-height:1; margin:8px 0 10px; font-weight:900; letter-spacing:-.03em; font-variation-settings:"FLAR" 80; }
+h2 { font-size:clamp(24px,3.4vw,34px); margin:6px 0 12px; font-weight:800; letter-spacing:-.02em; font-variation-settings:"FLAR" 50; text-wrap:balance; }
+p { margin:0; line-height:1.55; max-width:66ch; }
+.muted { color:var(--muted); }
+.du { position:relative; display:inline-block; }
+.du::before { content:""; position:absolute; left:50%; top:-.05em; width:.24em; height:.24em; border-radius:50%; background:var(--dot,currentColor); transform:translateX(-50%); }
+
+/* tagline lab */
+.terr { display:grid; gap:14px; margin-top:16px; }
+.tline { display:grid; grid-template-columns:minmax(0,1.35fr) minmax(0,1.2fr) 92px minmax(0,1fr); gap:12px; align-items:center; padding:12px 0; border-top:1px solid var(--line); }
+@media (max-width:820px) { .tline { grid-template-columns:minmax(0,1fr) 92px; } .tline .gr, .tline .why { grid-column:1 / -1; } }
+.tline b { font-size:19px; font-weight:800; letter-spacing:-.01em; }
+.tline .gr { font-size:16px; color:var(--muted); }
+.tline .why { font-size:13px; color:var(--muted); }
+.tline.top b { color:var(--acc); }
+.score { display:flex; gap:3px; }
+.score i { width:14px; height:8px; border-radius:4px; background:var(--line); }
+.score i.on { background:var(--acc); }
+.tgroup { margin-top:18px; font-family:var(--mono); font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--acc); }
+.mocks { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr)); gap:14px; margin-top:20px; }
+.bill { border-radius:20px; padding:22px; min-height:220px; display:grid; align-content:space-between; gap:16px; overflow:hidden; }
+.bill .t { font-size:clamp(28px,3.4vw,38px); font-weight:900; line-height:1; letter-spacing:-.03em; font-variation-settings:"FLAR" 100,"VOLM" 70; }
+.bill .s { font-size:14px; opacity:.9; }
+.bill .w { display:flex; align-items:center; gap:8px; font-weight:800; font-size:22px; letter-spacing:-.03em; }
+.bill .w svg { width:26px; }
+.rec { background:var(--fg); color:var(--plate); border-radius:18px; padding:16px 18px; margin-top:18px; display:grid; gap:6px; }
+.rec b { font-size:18px; }
+
+/* boards */
+.tabs { display:flex; gap:6px; flex-wrap:wrap; margin:6px 0 16px; }
+.tabs button { font:600 14px var(--ui); border:1px solid var(--line); background:transparent; color:var(--fg); border-radius:999px; padding:8px 14px; cursor:pointer; }
+.tabs button[aria-selected="true"] { background:var(--fg); color:var(--plate); border-color:var(--fg); }
+.tabs button:focus-visible { outline:3px solid var(--acc); outline-offset:2px; }
+.board { border-radius:24px; overflow:hidden; display:grid; gap:0; }
+.bhero { padding:clamp(22px,4vw,40px); display:grid; grid-template-columns:minmax(0,1.4fr) minmax(0,1fr); gap:20px; align-items:center; }
+@media (max-width:760px) { .bhero { grid-template-columns:minmax(0,1fr); } }
+.bhero .wm { font-size:clamp(60px,11vw,132px); line-height:.9; letter-spacing:-.04em; }
+.bhero .tg { font-size:clamp(18px,2.4vw,24px); margin-top:12px; }
+.bhero .story { font-size:15px; margin-top:12px; opacity:.85; max-width:52ch; }
+.bhero .mk { justify-self:center; width:min(70%,240px); }
+.bgrid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr)); gap:1px; }
+.cell { padding:20px; display:grid; gap:10px; align-content:start; min-width:0; }
+.cell .h { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.7; }
+.chips { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:5px; }
+.chip { aspect-ratio:1/1.5; border-radius:10px; display:grid; align-content:end; padding:5px; font-family:var(--mono); font-size:8.5px; line-height:1.2; overflow:hidden; overflow-wrap:anywhere; }
+.spec .a { font-size:46px; line-height:1; }
+.spec .b { font-size:15px; line-height:1.45; }
+.poster { border-radius:16px; padding:18px; aspect-ratio:4/5; display:grid; align-content:space-between; overflow:hidden; }
+.poster .pt { font-size:30px; line-height:.95; }
+.appic { display:flex; gap:10px; align-items:end; flex-wrap:wrap; }
+.appic span { border-radius:22%; display:grid; place-items:center; }
+.appic svg { width:62%; }
+.mood { display:flex; flex-wrap:wrap; gap:6px; }
+.mood span { border-radius:999px; padding:5px 10px; font-size:12.5px; font-weight:600; }
+.pc { font-size:14px; line-height:1.5; }
+.pc b { display:block; }
+
+/* bold moves */
+.moves { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,270px),1fr)); gap:14px; }
+.move { border:1px solid var(--line); border-radius:20px; padding:18px; display:grid; gap:8px; align-content:start; min-width:0; }
+.move .n { font-family:var(--mono); font-size:12px; color:var(--acc); }
+.move h3 { margin:0; font-size:19px; line-height:1.2; font-variation-settings:"FLAR" 60; }
+.move p { font-size:14.5px; color:var(--muted); }
+.risk { display:flex; gap:8px; flex-wrap:wrap; font-family:var(--mono); font-size:11.5px; }
+.risk span { border-radius:999px; padding:3px 9px; border:1px solid var(--line); }
+.risk .hi { border-color:var(--acc); color:var(--acc); }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="6"/></filter>
+  <symbol id="mark" viewBox="0 0 200 200"><circle cx="94" cy="58" r="23" fill="currentColor"/><path d="M42 56 Q50 156 104 156 Q156 156 160 104" fill="none" stroke="currentColor" stroke-width="27" stroke-linecap="round"/></symbol>
+</defs></svg>
+
+<main class="wrap">
+  <header class="plate" style="background:transparent;border:0;padding-inline:0">
+    <span class="lbl">Thumoa · explorations · Oct 2026</span>
+    <h1>Tagline lab, five boards, eight bold moves</h1>
+    <p class="muted">The same mark, «ο χορευτής», carried into five very different worlds, so you can choose by feel. Each tagline is scored for ownability (would it still work for Strava, ClassPass or Nike?), Greek fit and range across disciplines.</p>
+  </header>
+
+  <!-- PART 1 · TAGLINES -->
+  <section class="plate">
+    <span class="lbl">01 · Tagline lab</span>
+    <h2>Five territories, eighteen lines, and how ownable each one is</h2>
+    <p class="muted">The score combines three tests. <b>Ownability:</b> does it break if you put a competitor's name in front of it? <b>Greek fit:</b> does it sound natural in Greek, not translated? <b>Range:</b> does it work for a dancer and a powerlifter alike?</p>
+    <div class="terr" id="tl"></div>
+    <div class="mocks" id="mocks"></div>
+    <div class="rec"><span class="lbl" style="color:inherit;opacity:.7">Recommendation</span><b>Primary: «Με ψυχή. Μαζί.» / "With heart. Together."</b><span style="opacity:.85">It names thumos in plain words ("ψυχή" is the everyday Greek for spirit and heart), adds the club, and is short enough for a stamp or sticker. Keep "Nobody moves alone." as the movement line for campaigns, and "Raise one." as the interaction (the kudos gesture).</span></div>
+  </section>
+
+  <!-- PART 2 · BOARDS -->
+  <section class="plate">
+    <span class="lbl">02 · Brand boards</span>
+    <h2>Five worlds for the same mark</h2>
+    <p class="muted">Pick one, or mix: for example the palette of one with the type of another. Each board has its own palette, type pairing (all with Greek), mood, poster, app icons and a straight pros and cons.</p>
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div id="board" role="tabpanel"></div>
+  </section>
+
+  <!-- PART 3 · BOLD MOVES -->
+  <section class="plate">
+    <span class="lbl">03 · Bold moves</span>
+    <h2>Eight ideas to stretch the brand</h2>
+    <p class="muted">Deliberately provocative, so some will be wrong. Each one has a risk and an upside, so you can see where the brand could go.</p>
+    <div class="moves" id="moves" style="margin-top:14px"></div>
+  </section>
+</main>
+
+<script>
+(function () {
+  const M = (c, w, extra) => '<svg viewBox="0 0 200 200" style="width:' + (w || 26) + 'px;color:' + c + '"' + (extra || '') + '><use href="#mark"/></svg>';
+  const WM = (dot) => '<span style="white-space:nowrap">th<span class="du" style="--dot:' + dot + '">u</span>moa</span>';
+  const sc = (n) => '<span class="score" aria-label="' + n + ' of 5">' + [1, 2, 3, 4, 5].map(i => '<i class="' + (i <= n ? 'on' : '') + '"></i>').join('') + '</span>';
+
+  // ---------- taglines ----------
+  const T = [
+    ['Belonging', [
+      ['Nobody moves alone.', 'Κανείς δεν κινείται μόνος.', 3, 'Strong and warm, but other community brands could say it too.'],
+      ['Move with your people.', 'Κινήσου με τους δικούς σου.', 2, 'Clear but generic. Any gym could say it.'],
+      ['Your people move here.', 'Οι δικοί σου κινούνται εδώ.', 3, 'Puts the club at the centre. A good line for owners.'],
+    ]],
+    ['Thumos, in plain words', [
+      ['With heart. Together.', 'Με ψυχή. Μαζί.', 5, '«Με ψυχή» is the everyday Greek for thumos, and «μαζί» is the club. Very hard to borrow.', true],
+      ['The heart moves first.', 'Πρώτα κινείται η καρδιά.', 4, 'Poetic, and mirrors the raised arm. A bit soft for lifting.'],
+      ['Move from the heart.', 'Κινήσου από καρδιάς.', 3, '«Από καρδιάς» is a lovely Greek idiom. In English it is common.'],
+    ]],
+    ['Coming back', [
+      ['Coming back is the real PR.', 'Το να γυρνάς είναι το αληθινό ρεκόρ.', 4, 'Very ownable insight. Too long for a tagline, better as a campaign line.'],
+      ['Come back. We\'re here.', 'Γύρνα. Είμαστε εδώ.', 4, 'Emotional and ownable, best for re-engagement.'],
+      ['Show up. Together.', 'Έλα. Μαζί.', 2, 'Punchy but generic.'],
+    ]],
+    ['Playful, built on the name', [
+      ['Raise one.', 'Σήκω ένα.', 4, 'Mirrors the mark\'s raised arm and becomes the kudos gesture. Needs the mark next to it to make sense.', true],
+      ['Thumo up.', 'Thumo πάνω.', 3, 'Puns on "thumbs up". Fun in-app, too silly as a tagline.'],
+      ['Get your thumos on.', 'Βάλε ψυχή.', 3, '«Βάλε ψυχή» is great Greek coach-talk. The English is cheesy.'],
+    ]],
+    ['Greek-first, bold', [
+      ['Soul in motion.', 'Ψυχή σε κίνηση.', 3, 'Elegant, a bit perfume-ad.'],
+      ['Every club has a soul.', 'Κάθε χώρος έχει ψυχή.', 4, 'Speaks to owners and members at once.'],
+      ['Spirit is a team sport.', 'Η ψυχή είναι ομαδικό άθλημα.', 4, 'Witty and ownable. Long.'],
+    ]],
+  ];
+  document.getElementById('tl').innerHTML = T.map(g => '<div class="tgroup">' + g[0] + '</div>' + g[1].map(t => '<div class="tline' + (t[4] ? ' top' : '') + '"><b>' + t[0] + '</b><span class="gr">' + t[1] + '</span>' + sc(t[2]) + '<span class="why">' + t[3] + '</span></div>').join('')).join('');
+
+  const mocks = [
+    { bg: '#C8323F', fg: '#F6F0E6', t: 'Με ψυχή.<br>Μαζί.', s: 'Billboard · Athens metro', dot: '#F6F0E6' },
+    { bg: '#16110E', fg: '#F6F0E6', t: 'Nobody<br>moves alone.', s: 'Campaign · Instagram', dot: '#E0505C' },
+    { bg: '#F4B740', fg: '#16110E', t: 'Raise one.', s: 'In-app kudos · sticker', dot: '#C8323F' },
+  ];
+  document.getElementById('mocks').innerHTML = mocks.map(m => '<div class="bill" style="background:' + m.bg + ';color:' + m.fg + '"><div class="w">' + M(m.fg, 26) + '<span>' + WM(m.dot) + '</span></div><div class="t">' + m.t + '</div><div class="s">' + m.s + '</div></div>').join('');
+
+  // ---------- boards ----------
+  const B = [
+    { id: 'chalk', name: 'Chalk & Pomegranate', sub: 'Warm, human, Mediterranean', bg: '#F6F0E6', fg: '#16110E', acc: '#C8323F', dot: '#C8323F', cell: '#EFE6D8',
+      pal: [['#C8323F', 'Pomegranate'], ['#16110E', 'Ink'], ['#F6F0E6', 'Chalk'], ['#0B6B66', 'Breath'], ['#F4B740', 'Sun']],
+      disp: '"Commissioner"', dispCss: 'font-weight:800;font-variation-settings:"FLAR" 40,"VOLM" 40', body: '"Commissioner"', typeName: 'Commissioner (variable, flair) + JetBrains Mono',
+      tag: 'Με ψυχή. Μαζί.', story: 'The moment after class when everyone is still in the room: warm, out of breath, proud.',
+      mood: ['chalk dust', 'warm wood', 'one heartbeat', 'hand-written WOD'], poster: { bg: '#C8323F', fg: '#F6F0E6', t: 'Open training. Everyone\'s welcome.' },
+      pros: 'Ownable colour in the category. Warm and inclusive. Works for every discipline.', cons: 'Safe-ish. Needs strong photography to avoid feeling like a lifestyle brand.' },
+    { id: 'night', name: 'Afterhours', sub: 'Dark-first, electric, the dance floor at 22:00', bg: '#0D0B12', fg: '#F3EEF8', acc: '#FF4D6D', dot: '#FF4D6D', cell: '#16131E',
+      pal: [['#FF4D6D', 'Heat'], ['#0D0B12', 'Night'], ['#F3EEF8', 'Light'], ['#7C5CFF', 'Pulse'], ['#3DDC97', 'Go']],
+      disp: '"Fira Sans Extra Condensed"', dispCss: 'font-weight:900;text-transform:uppercase;letter-spacing:-.01em', body: '"Inter Tight"', typeName: 'Fira Sans Extra Condensed + Inter Tight',
+      tag: 'NOBODY MOVES ALONE.', story: 'Built for the evening class, the dance social, the late WOD. Energy over calm, and the app is dark by default.',
+      mood: ['club lights', 'condensed type', 'bass', 'sweat & glitter'], poster: { bg: '#7C5CFF', fg: '#F3EEF8', t: 'FRIDAY NIGHT MOVES. 21:00.' },
+      pros: 'Bold, very social-media native. Dance and Hyrox crowds will love it.', cons: 'Close to "beast mode" aesthetics. Purple is crowded (Planet Fitness, many SaaS). Harder for 40+ and beginners.' },
+    { id: 'agora', name: 'Agora Sun', sub: 'Editorial, sunlit, a Greek summer poster', bg: '#F7D046', fg: '#1B1A17', acc: '#D2452B', dot: '#D2452B', cell: '#F2C42C',
+      pal: [['#F7D046', 'Sun'], ['#1B1A17', 'Ink'], ['#D2452B', 'Terracotta'], ['#FFF7E3', 'Lime-wash'], ['#2E5E8C', 'Aegean']],
+      disp: '"Noto Serif Display"', dispCss: 'font-weight:800;font-style:italic;letter-spacing:-.02em', body: '"Manrope"', typeName: 'Noto Serif Display (italic) + Manrope',
+      tag: 'Με ψυχή. Μαζί.', story: 'The village festival and the neighbourhood: loud colour, big serif headlines, posters you would pin on a wall.',
+      mood: ['sunlight', 'lime-washed walls', 'festival posters', 'serif swagger'], poster: { bg: '#D2452B', fg: '#FFF7E3', t: 'Το Σάββατο χορεύουμε στην πλατεία.' },
+      pros: 'Instantly distinctive. Nobody in fitness uses an editorial serif. A strong Greek-born story abroad.', cons: 'Yellow grounds are hard in the app UI, so keep them for marketing. Risk of looking like tourism.' },
+    { id: 'breath', name: 'Breath', sub: 'Calm, rounded, wellness-forward', bg: '#E9F1EE', fg: '#0F2A27', acc: '#0B6B66', dot: '#E8735A', cell: '#DDE9E4',
+      pal: [['#0B6B66', 'Breath'], ['#E9F1EE', 'Mist'], ['#0F2A27', 'Deep'], ['#E8735A', 'Coral'], ['#F3E3C6', 'Sand']],
+      disp: '"Comfortaa"', dispCss: 'font-weight:700;letter-spacing:-.02em', body: '"Manrope"', typeName: 'Comfortaa + Manrope',
+      tag: 'Πρώτα κινείται η καρδιά.', story: 'For the yoga studio, the pilates class, the recovery day. Rounded type that echoes the mark\'s round strokes.',
+      mood: ['morning light', 'deep breath', 'rounded forms', 'quiet progress'], poster: { bg: '#0B6B66', fg: '#E9F1EE', t: 'Slow Sunday. Mobility & tea.' },
+      pros: 'Rides the 2026 teal trend. Very kind to beginners and 40+. Pairs well with the journal and wellness features.', cons: 'Loses thumos, the fire. Feels more like wellness than a club. Weak for CrossFit and martial arts.' },
+    { id: 'marker', name: 'Marker Riot', sub: 'Hand-drawn, every club gets its own marker colour', bg: '#FFFFFF', fg: '#151515', acc: '#151515', dot: '#2F6BFF', cell: '#F4F4F2',
+      pal: [['#151515', 'Marker black'], ['#FF5A36', 'Box red'], ['#2F6BFF', 'Dojo blue'], ['#14B86A', 'Run green'], ['#FFB800', 'Dance yellow']],
+      disp: '"Geologica"', dispCss: 'font-weight:900;letter-spacing:-.03em', body: '"Geologica"', typeName: 'Geologica + hand-drawn mark',
+      tag: 'Raise one.', story: 'The whiteboard where the coach writes the WOD. The mark is always drawn by hand, and every club picks its own marker colour, so the brand belongs to them.',
+      mood: ['whiteboard', 'stickers', 'kid drawings', 'one colour per club'], poster: { bg: '#2F6BFF', fg: '#FFFFFF', t: 'Dojo Κολωνού on thumoa.' },
+      pros: 'The most ownable and flexible system. Clubs feel it is theirs. Perfect for stickers and merch.', cons: 'Less control: the core brand colour becomes black. Needs strict rules so it does not look messy.' },
+  ];
+  const tabs = document.getElementById('tabs'), board = document.getElementById('board');
+  tabs.innerHTML = B.map((b, i) => '<button type="button" role="tab" id="tab-' + b.id + '" aria-selected="' + (i === 0) + '" data-i="' + i + '">' + b.name + '</button>').join('');
+  function render(i) {
+    const b = B[i];
+    tabs.querySelectorAll('button').forEach((x, j) => x.setAttribute('aria-selected', String(j === i)));
+    const rough = b.id === 'marker' ? ' filter="url(#rough)"' : '';
+    const icons = [[b.acc, b.bg, 64], [b.fg, b.bg, 46], [b.bg, b.acc, 32]];
+    board.innerHTML = '<div class="board" style="background:' + b.cell + ';color:' + b.fg + ';font-family:' + b.body + ',system-ui,sans-serif">' +
+      '<div class="bhero" style="background:' + b.bg + '"><div><div class="lbl" style="color:' + b.fg + ';opacity:.6">' + b.sub + '</div>' +
+        '<div class="wm" style="font-family:' + b.disp + ',serif;' + b.dispCss + ';margin-top:10px">' + WM(b.dot) + '</div>' +
+        '<div class="tg" style="font-family:' + b.disp + ',serif;' + b.dispCss.replace(/text-transform:uppercase;?/, '') + '">' + b.tag + '</div>' +
+        '<p class="story">' + b.story + '</p></div>' +
+        '<svg class="mk" viewBox="0 0 200 200" style="color:' + b.acc + '"' + rough + '><use href="#mark"/></svg></div>' +
+      '<div class="bgrid">' +
+        '<div class="cell" style="background:' + b.bg + '"><span class="h">Palette</span><div class="chips">' + b.pal.map(p => '<span class="chip" style="background:' + p[0] + ';color:' + (['#F6F0E6', '#F3EEF8', '#FFF7E3', '#E9F1EE', '#F3E3C6', '#FFFFFF', '#F7D046', '#FFB800', '#3DDC97', '#F4B740'].includes(p[0]) ? '#151515' : '#FFFFFF') + ';border:1px solid rgba(0,0,0,.08)">' + p[1] + '<br>' + p[0] + '</span>').join('') + '</div></div>' +
+        '<div class="cell spec" style="background:' + b.bg + '"><span class="h">' + b.typeName + '</span><div class="a" style="font-family:' + b.disp + ',serif;' + b.dispCss + '">Αα Ωω Rr</div><div class="b">Η ομάδα των 07:00 σε περιμένει. Your 7am crew is waiting.</div></div>' +
+        '<div class="cell" style="background:' + b.bg + '"><span class="h">Poster</span><div class="poster" style="background:' + b.poster.bg + ';color:' + b.poster.fg + '"><div style="display:flex;gap:6px;align-items:center;font-family:' + b.disp + ',serif;' + b.dispCss + ';font-size:18px">' + M(b.poster.fg, 20, rough) + WM(b.poster.fg) + '</div><div class="pt" style="font-family:' + b.disp + ',serif;' + b.dispCss + '">' + b.poster.t + '</div><div style="font-family:var(--mono);font-size:11px">ΣΑΒ 18/10 · 09:00</div></div></div>' +
+        '<div class="cell" style="background:' + b.bg + '"><span class="h">App icon · mood</span><div class="appic">' + icons.map(ic => '<span style="width:' + ic[2] + 'px;height:' + ic[2] + 'px;background:' + ic[0] + ';color:' + ic[1] + '">' + M(ic[1], Math.round(ic[2] * 0.62), rough) + '</span>').join('') + '</div><div class="mood">' + b.mood.map(m => '<span style="background:' + b.cell + '">' + m + '</span>').join('') + '</div>' +
+          '<div class="pc"><b>For</b>' + b.pros + '</div><div class="pc"><b>Against</b>' + b.cons + '</div></div>' +
+      '</div></div>';
+  }
+  tabs.addEventListener('click', e => { const t = e.target.closest('button'); if (t) render(+t.dataset.i); });
+  tabs.addEventListener('keydown', e => { if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; const cur = [...tabs.children].findIndex(x => x.getAttribute('aria-selected') === 'true'); const n = (cur + (e.key === 'ArrowRight' ? 1 : B.length - 1)) % B.length; render(n); tabs.children[n].focus(); });
+  render(0);
+
+  // ---------- bold moves ----------
+  const MV = [
+    ['Every club picks its own marker colour', 'The mark stays the same, but each club draws it in its own colour: red for the box, blue for the dojo, yellow for the dance school. Thumoa becomes a platform of clubs, like football club colours.', 'Brand dilution', 'Owners feel ownership, and the brand becomes viral through merch'],
+    ['The kudos gesture is the logo', 'In the app, kudos is "raise one": a tap that raises the mark\'s arm. In real life, a raised arm after class becomes the community\'s signature. The logo turns into a gesture people do.', 'Feels forced if pushed', 'An ownable ritual, like the "Wakanda" salute'],
+    ['Comebacks, not streaks', 'No streak counters and no guilt. Instead a "Comeback" badge and a "Welcome back" ritual in the club feed. We publicly reject streak shaming, the opposite of what Duolingo does.', 'Less addictive retention', 'Press-worthy and kind. Fits the 2026 mental-health trend'],
+    ['Thumoa Day: one open-doors day a year', 'On one Saturday a year, every club on Thumoa opens its doors for free, all at the same time. It works as a national event, a PR moment and an acquisition engine for the owners.', 'Needs a critical mass of clubs', 'Owners get leads, media get a story, and members bring friends'],
+    ['Launch dance-first, not gym-first', 'Every competitor starts with gyms. Start with dance schools and martial-arts dojos, which are community-driven and underserved, and let gyms follow.', 'A smaller first market', 'Instantly distinctive. Proves "any movement" from day one'],
+    ['A sound logo: three claps', 'The end of class in many boxes and dance schools is everyone clapping. Three claps become the sound of a check-in, the end of a timer and a PR.', 'Annoying if overused', 'Recognizable without a screen, and great on TikTok'],
+    ['The QR code lives in the dot', 'The door QR for check-in is drawn as the head of the mark: a big circle sticker at every club entrance. The logo becomes the door.', 'QR inside a circle needs careful design to still scan', 'Every club entrance becomes a billboard'],
+    ['No numbers on bodies, ever', 'A public brand pledge: Thumoa never shows weight, calories or body fat in public, in ads or in feeds. Journal numbers stay private. We write it on the website as a manifesto.', 'Some users want body metrics', 'A clear moral position in a category full of body shaming, and very press-worthy'],
+  ];
+  document.getElementById('moves').innerHTML = MV.map((m, i) => '<article class="move"><span class="n">0' + (i + 1) + '</span><h3>' + m[0] + '</h3><p>' + m[1] + '</p><div class="risk"><span class="hi">Risk: ' + m[2] + '</span><span>Upside: ' + m[3] + '</span></div></article>').join('');
+})();
+</script>
