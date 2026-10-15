@@ -49,7 +49,7 @@ p { margin:0; line-height:1.55; max-width:70ch; }
     <p class="muted">Our current Spark (#C8FF1E) is almost identical to Nike Volt: a colour distance of 4, where under 10 the eye barely sees a difference. Below are seven variants, each placed in the same mockups next to Dojo, Heat, Graphite, Frost and Plum. The bar shows how far each one moves from Volt; above 25, it reads as a different colour.</p>
   </header>
   <div class="grid" id="grid"></div>
-  <div class="rec"><span class="lbl" style="color:#A2A8B3">Recommendation</span><b>Glacier Lime #CFFF7A</b><span style="opacity:.85">It is still electric, but cooler and softer, with a hint of frost. It sits next to Dojo and Frost as if they were made together, it is clearly away from Nike Volt (33) and tennis-ball yellow, and it keeps 15:1 contrast with graphite text. Second choice: Pistachio, if you want it warmer and more "organic".</span></div>
+  <div class="rec"><span class="lbl" style="color:#A2A8B3">Decision</span><b>Sun Lime #E4FF6E</b><span style="opacity:.85">Chosen: sunny, Mediterranean and clearly away from Nike Volt (29). Guardrail against the AEK yellow-black reading: never a composition of only Sun Lime and graphite. Dojo or Heat is always in view, and Sun Lime stays a light lime, never pushed to pure yellow.</span></div>
 </main>
 
 <script>
@@ -59,9 +59,9 @@ p { margin:0; line-height:1.55; max-width:70ch; }
   // [name, hex, ΔE vs Volt (#CEFF00, commonly cited), contrast w/ graphite, note, flags]
   const S = [
     ['Spark (today)', '#C8FF1E', 4, 15.0, '<b>Reference.</b> Practically Nike Volt. Also close to tennis-ball yellow (15).', 'ref'],
-    ['Glacier Lime', '#CFFF7A', 33, 15.4, '<b>Cooler and softer.</b> Clearly ours, harmonises with Frost and Dojo. Still glows on graphite.', 'pick'],
+    ['Glacier Lime', '#CFFF7A', 33, 15.4, '<b>Cooler and softer.</b> Clearly ours, harmonises with Frost and Dojo. Still glows on graphite.', ''],
     ['Pistachio', '#B6F25C', 27, 13.4, '<b>Warmer, more organic.</b> Less "neon", more "fresh". Very good on plum.', ''],
-    ['Sun Lime', '#E4FF6E', 29, 15.9, '<b>Towards yellow.</b> Sunny and Mediterranean, but close to tennis ball (12) and leans towards AEK yellow.', ''],
+    ['Sun Lime', '#E4FF6E', 29, 15.9, '<b>Towards yellow.</b> Sunny and Mediterranean, but close to tennis ball (12) and leans towards AEK yellow.', 'pick'],
     ['Chartreuse', '#9CFF3A', 21, 14.2, '<b>Greener, more aggressive.</b> Very energetic, closer to "gaming" and energy drinks.', ''],
     ['Ice', '#DDFFA8', 55, 16.0, '<b>Almost pastel.</b> The most luxurious and the most distinct, but it loses the "electric" feel on white.', ''],
     ['Mint', '#5CFFB4', 69, 13.9, '<b>Another family.</b> Fresh, but it moves towards Spotify green (28) and away from energy.', ''],
