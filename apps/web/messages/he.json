@@ -51,7 +51,15 @@
     "inventory": "מלאי",
     "menu": "תפריט",
     "notifications": "התראות",
-    "unreadNotifications": "{count, plural, one {התראה אחת שלא נקראה} two {# התראות שלא נקראו} other {# התראות שלא נקראו}}"
+    "unreadNotifications": "{count, plural, one {התראה אחת שלא נקראה} two {# התראות שלא נקראו} other {# התראות שלא נקראו}}",
+    "box": "Box",
+    "me": "אני",
+    "today": "היום",
+    "journalFlow": "רצף",
+    "vault": "ארכיון",
+    "reviews": "ביקורות",
+    "coach": "מאמן",
+    "memberTabs": "מדורים ראשיים"
   },
   "Profile": {
     "eyebrow": "פרופיל",
@@ -4732,6 +4740,70 @@
           "body": "את המנוי רואים ב{billing}. שפה והתראות משנים בפרופיל."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "אני",
+    "journalTitle": "יומן",
+    "loading": "טוען…",
+    "cancel": "ביטול",
+    "signOut": "התנתקות",
+    "todayWorkout": "האימון של היום",
+    "todaySources": "אימוני היום לפי מקור",
+    "todayEmpty": "אין שום דבר מתוכנן להיום. הזמינו שיעור או תעדו אימון משלכם.",
+    "classChip": "שיעור {time}",
+    "programmeChip": "{title} · מהמאמן",
+    "logWorkout": "תיעוד",
+    "logged": "תועד",
+    "startWorkout": "התחלה",
+    "resumeWorkout": "המשך",
+    "nextSession": "האימון הבא שלכם",
+    "noBooking": "עדיין אין הזמנה.",
+    "bookClass": "הזמנת שיעור",
+    "manageBooking": "פתיחת ההזמנה",
+    "todayLabel": "היום",
+    "boxActions": "פעולות הבוקס",
+    "actionSchedule": "לוח זמנים",
+    "actionAppointments": "פגישות",
+    "actionVideos": "סרטונים",
+    "actionCoach": "מאמן",
+    "membership": "מנוי",
+    "membershipNone": "אין חבילה פעילה.",
+    "membershipOpen": "מנוי ותשלומים",
+    "newEntry": "רשומה חדשה",
+    "meSharedPrs": "השיאים שלי",
+    "meSharedPrsHint": "הפנתיאון ושיאים ששותפו איתכם",
+    "meSharing": "שיתוף ונראות",
+    "meSharingHint": "מה המאמן ואחרים יכולים לראות",
+    "mePayments": "תשלומים וקבלות",
+    "mePaymentsHint": "חשבוניות, החזרים והחבילה שלכם",
+    "meChats": "שיחות",
+    "meSettings": "הגדרות",
+    "meSettingsHint": "פרופיל, שפה, ערכת נושא, חשבון",
+    "meTour": "סיור במערכת",
+    "meChecklist": "צעדים ראשונים",
+    "meConsole": "ניהול",
+    "meConsoleHint": "פתיחת מסוף הצוות",
+    "meMyBoxes": "הבוקסים שלי",
+    "bookingStatus": {
+      "approved": "מוזמן",
+      "pending": "ממתין",
+      "waitlisted": "רשימת המתנה"
+    },
+    "entryKind": {
+      "workout": "אימון",
+      "pr": "שיא",
+      "injury": "פציעה",
+      "formReview": "סרטון טכניקה",
+      "review": "ביקורת"
+    },
+    "entryKindHint": {
+      "workout": "תוצאה, RPE, הערות",
+      "pr": "שיא אישי חדש",
+      "injury": "גלוי למאמנים שלכם",
+      "formReview": "בקשו משוב מהמאמן",
+      "review": "דרגו שיעור או אימון"
     }
   }
 }

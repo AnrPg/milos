@@ -51,7 +51,15 @@
     "inventory": "Inventario",
     "menu": "Menú",
     "notifications": "Notificaciones",
-    "unreadNotifications": "{count, plural, one {# notificación sin leer} other {# notificaciones sin leer}}"
+    "unreadNotifications": "{count, plural, one {# notificación sin leer} other {# notificaciones sin leer}}",
+    "box": "Box",
+    "me": "Yo",
+    "today": "Hoy",
+    "journalFlow": "Registro",
+    "vault": "Archivo",
+    "reviews": "Valoraciones",
+    "coach": "Entrenador",
+    "memberTabs": "Secciones principales"
   },
   "Profile": {
     "eyebrow": "Perfil",
@@ -4732,6 +4740,70 @@
           "body": "Consulta tu membresía en {billing}. Cambia el idioma y los avisos en tu perfil."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Yo",
+    "journalTitle": "Diario",
+    "loading": "Cargando…",
+    "cancel": "Cancelar",
+    "signOut": "Cerrar sesión",
+    "todayWorkout": "Entrenamiento de hoy",
+    "todaySources": "Entrenamientos de hoy por origen",
+    "todayEmpty": "No hay nada previsto para hoy. Reserva una clase o registra tu propio entrenamiento.",
+    "classChip": "Clase {time}",
+    "programmeChip": "{title} · de tu entrenador",
+    "logWorkout": "Registrar",
+    "logged": "Registrado",
+    "startWorkout": "Empezar",
+    "resumeWorkout": "Continuar",
+    "nextSession": "Tu próxima sesión",
+    "noBooking": "Aún no hay reservas.",
+    "bookClass": "Reservar clase",
+    "manageBooking": "Abrir reserva",
+    "todayLabel": "Hoy",
+    "boxActions": "Acciones del box",
+    "actionSchedule": "Horario",
+    "actionAppointments": "Citas",
+    "actionVideos": "Vídeos",
+    "actionCoach": "Entrenador",
+    "membership": "Suscripción",
+    "membershipNone": "No hay ningún paquete activo.",
+    "membershipOpen": "Suscripción y pagos",
+    "newEntry": "Nueva entrada",
+    "meSharedPrs": "Mis marcas",
+    "meSharedPrsHint": "Panteón y marcas compartidas contigo",
+    "meSharing": "Compartir y visibilidad",
+    "meSharingHint": "Qué pueden ver tu entrenador y los demás",
+    "mePayments": "Pagos y recibos",
+    "mePaymentsHint": "Facturas, reembolsos y tu paquete",
+    "meChats": "Conversaciones",
+    "meSettings": "Ajustes",
+    "meSettingsHint": "Perfil, idioma, tema, cuenta",
+    "meTour": "Hacer el recorrido",
+    "meChecklist": "Primeros pasos",
+    "meConsole": "Gestión",
+    "meConsoleHint": "Abrir la consola del personal",
+    "meMyBoxes": "Mis boxes",
+    "bookingStatus": {
+      "approved": "Reservado",
+      "pending": "Pendiente",
+      "waitlisted": "Lista de espera"
+    },
+    "entryKind": {
+      "workout": "Entrenamiento",
+      "pr": "Marca personal",
+      "injury": "Lesión",
+      "formReview": "Vídeo de técnica",
+      "review": "Valoración"
+    },
+    "entryKindHint": {
+      "workout": "Resultado, RPE, notas",
+      "pr": "Una nueva marca personal",
+      "injury": "Visible para tus entrenadores",
+      "formReview": "Pide opinión a tu entrenador",
+      "review": "Valora una clase o un entrenamiento"
     }
   }
 }

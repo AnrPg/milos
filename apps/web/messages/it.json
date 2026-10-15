@@ -51,7 +51,15 @@
     "inventory": "Inventario",
     "menu": "Menu",
     "notifications": "Notifiche",
-    "unreadNotifications": "{count, plural, one {# notifica non letta} other {# notifiche non lette}}"
+    "unreadNotifications": "{count, plural, one {# notifica non letta} other {# notifiche non lette}}",
+    "box": "Box",
+    "me": "Io",
+    "today": "Oggi",
+    "journalFlow": "Cronologia",
+    "vault": "Archivio",
+    "reviews": "Recensioni",
+    "coach": "Coach",
+    "memberTabs": "Sezioni principali"
   },
   "Profile": {
     "eyebrow": "Profilo",
@@ -4732,6 +4740,70 @@
           "body": "Vedi il tuo abbonamento in {billing}. Cambia lingua e notifiche nel tuo profilo."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Io",
+    "journalTitle": "Diario",
+    "loading": "Caricamento…",
+    "cancel": "Annulla",
+    "signOut": "Esci",
+    "todayWorkout": "Allenamento del giorno",
+    "todaySources": "Allenamenti di oggi per fonte",
+    "todayEmpty": "Niente in programma per oggi. Prenota una lezione o registra un tuo allenamento.",
+    "classChip": "Lezione {time}",
+    "programmeChip": "{title} · dal tuo coach",
+    "logWorkout": "Registra",
+    "logged": "Registrato",
+    "startWorkout": "Inizia",
+    "resumeWorkout": "Riprendi",
+    "nextSession": "La tua prossima sessione",
+    "noBooking": "Ancora nessuna prenotazione.",
+    "bookClass": "Prenota una lezione",
+    "manageBooking": "Apri prenotazione",
+    "todayLabel": "Oggi",
+    "boxActions": "Azioni del box",
+    "actionSchedule": "Orario",
+    "actionAppointments": "Appuntamenti",
+    "actionVideos": "Video",
+    "actionCoach": "Coach",
+    "membership": "Abbonamento",
+    "membershipNone": "Nessun pacchetto attivo.",
+    "membershipOpen": "Abbonamento e pagamenti",
+    "newEntry": "Nuova voce",
+    "meSharedPrs": "I miei record",
+    "meSharedPrsHint": "Pantheon e record condivisi con te",
+    "meSharing": "Condivisione e visibilità",
+    "meSharingHint": "Cosa vedono il tuo coach e gli altri",
+    "mePayments": "Pagamenti e ricevute",
+    "mePaymentsHint": "Fatture, rimborsi e il tuo pacchetto",
+    "meChats": "Conversazioni",
+    "meSettings": "Impostazioni",
+    "meSettingsHint": "Profilo, lingua, tema, account",
+    "meTour": "Fai il tour",
+    "meChecklist": "Primi passi",
+    "meConsole": "Gestione",
+    "meConsoleHint": "Apri la console dello staff",
+    "meMyBoxes": "I miei box",
+    "bookingStatus": {
+      "approved": "Prenotato",
+      "pending": "In attesa",
+      "waitlisted": "Lista d’attesa"
+    },
+    "entryKind": {
+      "workout": "Allenamento",
+      "pr": "Record",
+      "injury": "Infortunio",
+      "formReview": "Video della tecnica",
+      "review": "Recensione"
+    },
+    "entryKindHint": {
+      "workout": "Punteggio, RPE, note",
+      "pr": "Un nuovo record personale",
+      "injury": "Visibile ai tuoi coach",
+      "formReview": "Chiedi un parere al tuo coach",
+      "review": "Valuta una lezione o un allenamento"
     }
   }
 }

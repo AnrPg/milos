@@ -112,23 +112,34 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   return items;
 }
 
-/** Client links: Home · Training · Journal (plus the janitor's log, if held). */
-export function clientNavItems(role: "member" | "athlete", membership?: MembershipLike | null): NavItem[] {
-  const items: NavItem[] = [
-    { id: "home", href: "/", labelKey: "home", match: ["/"], exact: true },
+/**
+ * The member app's four fixed tabs (redesign Phase 1, ADR-137; brief §6.1):
+ * Αρχική · Box · Ημερολόγιο · Εγώ. Every member page lives under the tab
+ * that is its home (lib/member-routes.ts lists the moves); workout pages
+ * opened from Box stay at /workouts and are claimed by Box.
+ */
+export function clientNavItems(): NavItem[] {
+  return [
+    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs"], exact: true },
     {
-      id: "training",
-      href: role === "athlete" ? "/my-workouts" : "/schedule",
-      labelKey: "training",
-      match: ["/my-workouts", "/schedule", "/appointments", "/videos"],
+      id: "box",
+      href: "/box",
+      labelKey: "box",
+      match: ["/box", "/class-timer", "/workouts"],
     },
     {
       id: "journal",
       href: "/journal",
       labelKey: "journal",
-      match: ["/journal", "/my-workouts/history", "/my-workouts/pantheon", "/progress", "/coaching", "/wellbeing"],
+      match: ["/journal"],
     },
+    { id: "me", href: "/me", labelKey: "me", match: ["/me"] },
   ];
+}
+
+/** Staff links a client may also hold; they live in Εγώ, never in the bar (no "More"). */
+export function clientExtraLinks(membership?: MembershipLike | null): NavItem[] {
+  const items: NavItem[] = [];
   if (can(membership, "record_cleaning") && !can(membership, "manage_cleaning_areas") && !can(membership, "take_payments")) {
     items.push({ id: "cleaning", href: "/admin/cleaning", labelKey: "cleaningLog", match: ["/admin/cleaning"], scoped: true });
   }
@@ -136,6 +147,14 @@ export function clientNavItems(role: "member" | "athlete", membership?: Membersh
     items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
   return items;
+}
+
+/** Full-screen pages where the bottom bar would get in the way. */
+const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/];
+
+export function showsBottomBar(pathname: string) {
+  const path = relativePath(pathname);
+  return !BOTTOM_BAR_HIDDEN.some((pattern) => pattern.test(path));
 }
 
 function relativePath(pathname: string) {
@@ -171,6 +190,8 @@ export function sectionGroupFor(
 ): SectionGroup | null {
   const path = relativePath(pathname);
   const groups: SectionGroup[] = [];
+  // The Box hub carries its own action row (brief §7.4); the strip serves its sub-pages.
+  if (context.surface !== "admin" && path === "/box") return null;
 
   if (context.surface === "admin") {
     if (context.staffItems.some((item) => item.id === "coaching")) {
@@ -185,25 +206,30 @@ export function sectionGroupFor(
     }
   } else {
     const feature = (name: ClientFeature) => context.features.includes(name);
+    // Box's sub-pages (brief §6.2): today, programmes, classes, then what the package unlocks.
     groups.push({
-      id: "training",
+      id: "box",
       tabs: [
+        { id: "boxToday", href: "/box", labelKey: "today", match: ["/box"] },
         // ADR-125: members receive personal workouts and class versions too.
-        { id: "myWorkouts", href: "/my-workouts", labelKey: "myWorkouts", match: ["/my-workouts"] },
-        { id: "classes", href: "/schedule", labelKey: "classes", match: ["/schedule"] },
-        ...(feature("appointments") ? [{ id: "appointments", href: "/appointments", labelKey: "appointments", match: ["/appointments"] }] : []),
-        ...(feature("videos") ? [{ id: "videos", href: "/videos", labelKey: "videos", match: ["/videos"] }] : []),
+        { id: "myWorkouts", href: "/box/workouts", labelKey: "myWorkouts", match: ["/box/workouts"] },
+        { id: "classes", href: "/box/schedule", labelKey: "schedule", match: ["/box/schedule"] },
+        ...(feature("appointments") ? [{ id: "appointments", href: "/box/appointments", labelKey: "appointments", match: ["/box/appointments"] }] : []),
+        ...(feature("videos") ? [{ id: "videos", href: "/box/videos", labelKey: "videos", match: ["/box/videos"] }] : []),
+        ...(feature("coaching") ? [{ id: "coaching", href: "/box/coach", labelKey: "coach", match: ["/box/coach"] }] : []),
       ],
     });
+    // Journal segments (brief §7.7). Σώμα and the new Ευεξία arrive in Phase 2;
+    // Pantheon keeps its own segment until it folds into Πρόοδος.
     groups.push({
       id: "journal",
       tabs: [
-        { id: "workouts", href: "/journal", labelKey: "finishedWorkouts", match: ["/journal"] },
-        { id: "history", href: "/my-workouts/history", labelKey: "history", match: ["/my-workouts/history"] },
-        { id: "pantheon", href: "/my-workouts/pantheon", labelKey: "pantheon", match: ["/my-workouts/pantheon"] },
-        ...(feature("progress") ? [{ id: "progress", href: "/progress", labelKey: "progress", match: ["/progress"] }] : []),
-        ...(feature("coaching") ? [{ id: "coaching", href: "/coaching", labelKey: "coaching", match: ["/coaching"] }] : []),
-        { id: "wellbeing", href: "/wellbeing", labelKey: "wellbeing", match: ["/wellbeing"] },
+        { id: "flow", href: "/journal", labelKey: "journalFlow", match: ["/journal"] },
+        { id: "vault", href: "/journal/vault", labelKey: "vault", match: ["/journal/vault"] },
+        ...(feature("progress") ? [{ id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress"] }] : []),
+        { id: "pantheon", href: "/journal/pantheon", labelKey: "pantheon", match: ["/journal/pantheon"] },
+        { id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] },
+        { id: "reviews", href: "/journal/reviews", labelKey: "reviews", match: ["/journal/reviews"] },
       ],
     });
   }

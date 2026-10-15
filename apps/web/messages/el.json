@@ -51,7 +51,15 @@
     "inventory": "Εξοπλισμός",
     "menu": "Μενού",
     "notifications": "Ειδοποιήσεις",
-    "unreadNotifications": "{count, plural, one {# αδιάβαστη ειδοποίηση} other {# αδιάβαστες ειδοποιήσεις}}"
+    "unreadNotifications": "{count, plural, one {# αδιάβαστη ειδοποίηση} other {# αδιάβαστες ειδοποιήσεις}}",
+    "box": "Box",
+    "me": "Εγώ",
+    "today": "Σήμερα",
+    "journalFlow": "Ροή",
+    "vault": "Vault",
+    "reviews": "Αξιολογήσεις",
+    "coach": "Coach",
+    "memberTabs": "Κύριες ενότητες"
   },
   "Profile": {
     "eyebrow": "Λογαριασμός",
@@ -4732,6 +4740,70 @@
           "body": "Δες τη συνδρομή σου στο {billing}. Άλλαξε γλώσσα και ειδοποιήσεις στο προφίλ σου."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Εγώ",
+    "journalTitle": "Ημερολόγιο",
+    "loading": "Φόρτωση…",
+    "cancel": "Άκυρο",
+    "signOut": "Αποσύνδεση",
+    "todayWorkout": "Η προπόνηση της ημέρας",
+    "todaySources": "Οι σημερινές προπονήσεις ανά πηγή",
+    "todayEmpty": "Τίποτα προγραμματισμένο για σήμερα. Κλείσε θέση σε μάθημα ή κατέγραψε μια δική σου προπόνηση.",
+    "classChip": "WOD {time}",
+    "programmeChip": "{title} · από τον coach",
+    "logWorkout": "Καταγραφή",
+    "logged": "Καταγράφηκε",
+    "startWorkout": "Έναρξη",
+    "resumeWorkout": "Συνέχεια",
+    "nextSession": "Η επόμενη προπόνησή σου",
+    "noBooking": "Καμία κράτηση ακόμη.",
+    "bookClass": "Κλείσε θέση",
+    "manageBooking": "Άνοιγμα κράτησης",
+    "todayLabel": "Σήμερα",
+    "boxActions": "Ενέργειες box",
+    "actionSchedule": "Πρόγραμμα",
+    "actionAppointments": "Ραντεβού",
+    "actionVideos": "Βίντεο",
+    "actionCoach": "Coach",
+    "membership": "Συνδρομή",
+    "membershipNone": "Κανένα ενεργό πακέτο.",
+    "membershipOpen": "Συνδρομή & πληρωμές",
+    "newEntry": "Νέα καταχώρηση",
+    "meSharedPrs": "Τα PRs μου",
+    "meSharedPrsHint": "Pantheon και PRs που μοιράστηκαν μαζί σου",
+    "meSharing": "Κοινοποίηση & ορατότητα",
+    "meSharingHint": "Τι βλέπει ο coach και οι άλλοι",
+    "mePayments": "Πληρωμές & αποδείξεις",
+    "mePaymentsHint": "Τιμολόγια, επιστροφές και το πακέτο σου",
+    "meChats": "Συνομιλίες",
+    "meSettings": "Ρυθμίσεις",
+    "meSettingsHint": "Προφίλ, γλώσσα, θέμα, λογαριασμός",
+    "meTour": "Ξενάγηση",
+    "meChecklist": "Πρώτα βήματα",
+    "meConsole": "Διαχείριση",
+    "meConsoleHint": "Άνοιγμα της κονσόλας προσωπικού",
+    "meMyBoxes": "Τα box μου",
+    "bookingStatus": {
+      "approved": "Κλεισμένο",
+      "pending": "Σε αναμονή έγκρισης",
+      "waitlisted": "Λίστα αναμονής"
+    },
+    "entryKind": {
+      "workout": "Προπόνηση",
+      "pr": "PR",
+      "injury": "Τραυματισμός",
+      "formReview": "Βίντεο τεχνικής",
+      "review": "Αξιολόγηση"
+    },
+    "entryKindHint": {
+      "workout": "Σκορ, RPE, σημειώσεις",
+      "pr": "Ένα νέο προσωπικό ρεκόρ",
+      "injury": "Το βλέπουν οι coaches σου",
+      "formReview": "Ζήτα σχόλια από τον coach",
+      "review": "Βαθμολόγησε μάθημα ή προπόνηση"
     }
   }
 }

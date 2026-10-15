@@ -51,7 +51,15 @@
     "inventory": "Inventar",
     "menu": "Menü",
     "notifications": "Benachrichtigungen",
-    "unreadNotifications": "{count, plural, one {# ungelesene Benachrichtigung} other {# ungelesene Benachrichtigungen}}"
+    "unreadNotifications": "{count, plural, one {# ungelesene Benachrichtigung} other {# ungelesene Benachrichtigungen}}",
+    "box": "Box",
+    "me": "Ich",
+    "today": "Heute",
+    "journalFlow": "Verlauf",
+    "vault": "Archiv",
+    "reviews": "Bewertungen",
+    "coach": "Coach",
+    "memberTabs": "Hauptbereiche"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -4732,6 +4740,70 @@
           "body": "Deine Mitgliedschaft siehst du unter {billing}. Sprache und Benachrichtigungen änderst du im Profil."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Ich",
+    "journalTitle": "Tagebuch",
+    "loading": "Wird geladen…",
+    "cancel": "Abbrechen",
+    "signOut": "Abmelden",
+    "todayWorkout": "Training des Tages",
+    "todaySources": "Heutige Trainings nach Quelle",
+    "todayEmpty": "Für heute ist nichts geplant. Buche einen Kurs oder trage ein eigenes Training ein.",
+    "classChip": "Kurs {time}",
+    "programmeChip": "{title} · von deinem Coach",
+    "logWorkout": "Eintragen",
+    "logged": "Eingetragen",
+    "startWorkout": "Starten",
+    "resumeWorkout": "Fortsetzen",
+    "nextSession": "Deine nächste Einheit",
+    "noBooking": "Noch keine Buchung.",
+    "bookClass": "Kurs buchen",
+    "manageBooking": "Buchung öffnen",
+    "todayLabel": "Heute",
+    "boxActions": "Box-Aktionen",
+    "actionSchedule": "Kursplan",
+    "actionAppointments": "Termine",
+    "actionVideos": "Videos",
+    "actionCoach": "Coach",
+    "membership": "Mitgliedschaft",
+    "membershipNone": "Kein aktives Paket.",
+    "membershipOpen": "Mitgliedschaft & Zahlungen",
+    "newEntry": "Neuer Eintrag",
+    "meSharedPrs": "Meine Bestleistungen",
+    "meSharedPrsHint": "Pantheon und mit dir geteilte Bestleistungen",
+    "meSharing": "Teilen & Sichtbarkeit",
+    "meSharingHint": "Was dein Coach und andere sehen",
+    "mePayments": "Zahlungen & Belege",
+    "mePaymentsHint": "Rechnungen, Erstattungen und dein Paket",
+    "meChats": "Unterhaltungen",
+    "meSettings": "Einstellungen",
+    "meSettingsHint": "Profil, Sprache, Design, Konto",
+    "meTour": "Rundgang starten",
+    "meChecklist": "Erste Schritte",
+    "meConsole": "Verwaltung",
+    "meConsoleHint": "Personalkonsole öffnen",
+    "meMyBoxes": "Meine Boxen",
+    "bookingStatus": {
+      "approved": "Gebucht",
+      "pending": "Ausstehend",
+      "waitlisted": "Warteliste"
+    },
+    "entryKind": {
+      "workout": "Training",
+      "pr": "Bestleistung",
+      "injury": "Verletzung",
+      "formReview": "Technikvideo",
+      "review": "Bewertung"
+    },
+    "entryKindHint": {
+      "workout": "Ergebnis, RPE, Notizen",
+      "pr": "Eine neue persönliche Bestleistung",
+      "injury": "Für deine Coaches sichtbar",
+      "formReview": "Bitte deinen Coach um Feedback",
+      "review": "Bewerte einen Kurs oder ein Training"
     }
   }
 }

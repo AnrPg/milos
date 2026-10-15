@@ -51,7 +51,15 @@
     "inventory": "Inventaire",
     "menu": "Menu",
     "notifications": "Notifications",
-    "unreadNotifications": "{count, plural, one {# notification non lue} other {# notifications non lues}}"
+    "unreadNotifications": "{count, plural, one {# notification non lue} other {# notifications non lues}}",
+    "box": "Box",
+    "me": "Moi",
+    "today": "Aujourd’hui",
+    "journalFlow": "Fil",
+    "vault": "Archives",
+    "reviews": "Avis",
+    "coach": "Coach",
+    "memberTabs": "Sections principales"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -4732,6 +4740,70 @@
           "body": "Consulte ton adhésion dans {billing}. Change la langue et les notifications dans ton profil."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Moi",
+    "journalTitle": "Journal",
+    "loading": "Chargement…",
+    "cancel": "Annuler",
+    "signOut": "Se déconnecter",
+    "todayWorkout": "Séance du jour",
+    "todaySources": "Séances du jour par source",
+    "todayEmpty": "Rien de prévu aujourd’hui. Réservez un cours ou notez votre propre séance.",
+    "classChip": "Cours {time}",
+    "programmeChip": "{title} · de votre coach",
+    "logWorkout": "Noter",
+    "logged": "Noté",
+    "startWorkout": "Démarrer",
+    "resumeWorkout": "Reprendre",
+    "nextSession": "Votre prochaine séance",
+    "noBooking": "Aucune réservation pour l’instant.",
+    "bookClass": "Réserver un cours",
+    "manageBooking": "Ouvrir la réservation",
+    "todayLabel": "Aujourd’hui",
+    "boxActions": "Actions de la salle",
+    "actionSchedule": "Planning",
+    "actionAppointments": "Rendez-vous",
+    "actionVideos": "Vidéos",
+    "actionCoach": "Coach",
+    "membership": "Abonnement",
+    "membershipNone": "Aucune formule active.",
+    "membershipOpen": "Abonnement et paiements",
+    "newEntry": "Nouvelle entrée",
+    "meSharedPrs": "Mes records",
+    "meSharedPrsHint": "Panthéon et records partagés avec vous",
+    "meSharing": "Partage et visibilité",
+    "meSharingHint": "Ce que votre coach et les autres peuvent voir",
+    "mePayments": "Paiements et reçus",
+    "mePaymentsHint": "Factures, remboursements et votre formule",
+    "meChats": "Conversations",
+    "meSettings": "Réglages",
+    "meSettingsHint": "Profil, langue, thème, compte",
+    "meTour": "Visite guidée",
+    "meChecklist": "Premiers pas",
+    "meConsole": "Gestion",
+    "meConsoleHint": "Ouvrir la console du personnel",
+    "meMyBoxes": "Mes salles",
+    "bookingStatus": {
+      "approved": "Réservé",
+      "pending": "En attente",
+      "waitlisted": "Liste d’attente"
+    },
+    "entryKind": {
+      "workout": "Séance",
+      "pr": "Record",
+      "injury": "Blessure",
+      "formReview": "Vidéo de technique",
+      "review": "Avis"
+    },
+    "entryKindHint": {
+      "workout": "Résultat, RPE, remarques",
+      "pr": "Un nouveau record personnel",
+      "injury": "Visible par vos coachs",
+      "formReview": "Demandez l’avis de votre coach",
+      "review": "Notez un cours ou une séance"
     }
   }
 }

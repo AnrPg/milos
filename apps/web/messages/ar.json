@@ -51,7 +51,15 @@
     "inventory": "المخزون",
     "menu": "القائمة",
     "notifications": "الإشعارات",
-    "unreadNotifications": "{count, plural, zero {لا إشعارات غير مقروءة} one {إشعار واحد غير مقروء} two {إشعاران غير مقروءين} few {# إشعارات غير مقروءة} many {# إشعارًا غير مقروء} other {# إشعار غير مقروء}}"
+    "unreadNotifications": "{count, plural, zero {لا إشعارات غير مقروءة} one {إشعار واحد غير مقروء} two {إشعاران غير مقروءين} few {# إشعارات غير مقروءة} many {# إشعارًا غير مقروء} other {# إشعار غير مقروء}}",
+    "box": "Box",
+    "me": "أنا",
+    "today": "اليوم",
+    "journalFlow": "السجل",
+    "vault": "الأرشيف",
+    "reviews": "التقييمات",
+    "coach": "المدرب",
+    "memberTabs": "الأقسام الرئيسية"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -4732,6 +4740,70 @@
           "body": "اطّلع على اشتراكك في {billing}. غيّر اللغة والإشعارات من ملفك الشخصي."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "أنا",
+    "journalTitle": "اليوميات",
+    "loading": "جارٍ التحميل…",
+    "cancel": "إلغاء",
+    "signOut": "تسجيل الخروج",
+    "todayWorkout": "تمرين اليوم",
+    "todaySources": "تمارين اليوم حسب المصدر",
+    "todayEmpty": "لا شيء مخطط لليوم. احجز حصة أو سجّل تمرينًا خاصًا بك.",
+    "classChip": "حصة {time}",
+    "programmeChip": "{title} · من مدربك",
+    "logWorkout": "تسجيل",
+    "logged": "تم التسجيل",
+    "startWorkout": "ابدأ",
+    "resumeWorkout": "متابعة",
+    "nextSession": "حصتك التالية",
+    "noBooking": "لا يوجد حجز بعد.",
+    "bookClass": "احجز حصة",
+    "manageBooking": "فتح الحجز",
+    "todayLabel": "اليوم",
+    "boxActions": "إجراءات النادي",
+    "actionSchedule": "الجدول",
+    "actionAppointments": "المواعيد",
+    "actionVideos": "الفيديوهات",
+    "actionCoach": "المدرب",
+    "membership": "الاشتراك",
+    "membershipNone": "لا توجد باقة نشطة.",
+    "membershipOpen": "الاشتراك والمدفوعات",
+    "newEntry": "إدخال جديد",
+    "meSharedPrs": "أرقامي القياسية",
+    "meSharedPrsHint": "البانثيون والأرقام التي شاركها الآخرون معك",
+    "meSharing": "المشاركة والظهور",
+    "meSharingHint": "ما يمكن لمدربك وللآخرين رؤيته",
+    "mePayments": "المدفوعات والإيصالات",
+    "mePaymentsHint": "الفواتير والمبالغ المستردة وباقتك",
+    "meChats": "المحادثات",
+    "meSettings": "الإعدادات",
+    "meSettingsHint": "الملف الشخصي واللغة والمظهر والحساب",
+    "meTour": "جولة تعريفية",
+    "meChecklist": "البدء",
+    "meConsole": "الإدارة",
+    "meConsoleHint": "فتح لوحة الموظفين",
+    "meMyBoxes": "نواديّ",
+    "bookingStatus": {
+      "approved": "محجوز",
+      "pending": "قيد الانتظار",
+      "waitlisted": "قائمة الانتظار"
+    },
+    "entryKind": {
+      "workout": "تمرين",
+      "pr": "رقم قياسي",
+      "injury": "إصابة",
+      "formReview": "فيديو التقنية",
+      "review": "تقييم"
+    },
+    "entryKindHint": {
+      "workout": "النتيجة وRPE والملاحظات",
+      "pr": "رقم شخصي جديد",
+      "injury": "يراها مدربوك",
+      "formReview": "اطلب ملاحظات من مدربك",
+      "review": "قيّم حصة أو تمرينًا"
     }
   }
 }

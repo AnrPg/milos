@@ -51,7 +51,15 @@
     "inventory": "Инвентарь",
     "menu": "Меню",
     "notifications": "Уведомления",
-    "unreadNotifications": "{count, plural, one {# непрочитанное уведомление} few {# непрочитанных уведомления} many {# непрочитанных уведомлений} other {# непрочитанного уведомления}}"
+    "unreadNotifications": "{count, plural, one {# непрочитанное уведомление} few {# непрочитанных уведомления} many {# непрочитанных уведомлений} other {# непрочитанного уведомления}}",
+    "box": "Box",
+    "me": "Я",
+    "today": "Сегодня",
+    "journalFlow": "Лента",
+    "vault": "Архив",
+    "reviews": "Отзывы",
+    "coach": "Тренер",
+    "memberTabs": "Основные разделы"
   },
   "Profile": {
     "eyebrow": "Профиль",
@@ -4732,6 +4740,70 @@
           "body": "Абонемент — в разделе {billing}. Язык и уведомления меняются в профиле."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Я",
+    "journalTitle": "Дневник",
+    "loading": "Загрузка…",
+    "cancel": "Отмена",
+    "signOut": "Выйти",
+    "todayWorkout": "Тренировка дня",
+    "todaySources": "Тренировки на сегодня по источнику",
+    "todayEmpty": "На сегодня ничего не запланировано. Запишитесь на занятие или запишите свою тренировку.",
+    "classChip": "Занятие {time}",
+    "programmeChip": "{title} · от тренера",
+    "logWorkout": "Записать",
+    "logged": "Записано",
+    "startWorkout": "Начать",
+    "resumeWorkout": "Продолжить",
+    "nextSession": "Ваше следующее занятие",
+    "noBooking": "Пока нет записей.",
+    "bookClass": "Записаться",
+    "manageBooking": "Открыть запись",
+    "todayLabel": "Сегодня",
+    "boxActions": "Действия зала",
+    "actionSchedule": "Расписание",
+    "actionAppointments": "Встречи",
+    "actionVideos": "Видео",
+    "actionCoach": "Тренер",
+    "membership": "Абонемент",
+    "membershipNone": "Нет активного пакета.",
+    "membershipOpen": "Абонемент и платежи",
+    "newEntry": "Новая запись",
+    "meSharedPrs": "Мои рекорды",
+    "meSharedPrsHint": "Пантеон и рекорды, которыми с вами поделились",
+    "meSharing": "Доступ и видимость",
+    "meSharingHint": "Что видят тренер и другие",
+    "mePayments": "Платежи и чеки",
+    "mePaymentsHint": "Счета, возвраты и ваш пакет",
+    "meChats": "Переписка",
+    "meSettings": "Настройки",
+    "meSettingsHint": "Профиль, язык, тема, аккаунт",
+    "meTour": "Обзор приложения",
+    "meChecklist": "Первые шаги",
+    "meConsole": "Управление",
+    "meConsoleHint": "Открыть панель персонала",
+    "meMyBoxes": "Мои залы",
+    "bookingStatus": {
+      "approved": "Записан",
+      "pending": "Ожидает",
+      "waitlisted": "Лист ожидания"
+    },
+    "entryKind": {
+      "workout": "Тренировка",
+      "pr": "Рекорд",
+      "injury": "Травма",
+      "formReview": "Видео техники",
+      "review": "Отзыв"
+    },
+    "entryKindHint": {
+      "workout": "Результат, RPE, заметки",
+      "pr": "Новый личный рекорд",
+      "injury": "Видна вашим тренерам",
+      "formReview": "Попросите тренера оценить",
+      "review": "Оцените занятие или тренировку"
     }
   }
 }

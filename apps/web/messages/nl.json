@@ -51,7 +51,15 @@
     "inventory": "Inventaris",
     "menu": "Menu",
     "notifications": "Meldingen",
-    "unreadNotifications": "{count, plural, one {# ongelezen melding} other {# ongelezen meldingen}}"
+    "unreadNotifications": "{count, plural, one {# ongelezen melding} other {# ongelezen meldingen}}",
+    "box": "Box",
+    "me": "Ik",
+    "today": "Vandaag",
+    "journalFlow": "Tijdlijn",
+    "vault": "Archief",
+    "reviews": "Beoordelingen",
+    "coach": "Coach",
+    "memberTabs": "Hoofdonderdelen"
   },
   "Profile": {
     "eyebrow": "Profiel",
@@ -4732,6 +4740,70 @@
           "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Ik",
+    "journalTitle": "Logboek",
+    "loading": "Laden…",
+    "cancel": "Annuleren",
+    "signOut": "Afmelden",
+    "todayWorkout": "Training van vandaag",
+    "todaySources": "Trainingen van vandaag per bron",
+    "todayEmpty": "Niets gepland voor vandaag. Boek een les of leg je eigen training vast.",
+    "classChip": "Les {time}",
+    "programmeChip": "{title} · van je coach",
+    "logWorkout": "Vastleggen",
+    "logged": "Vastgelegd",
+    "startWorkout": "Starten",
+    "resumeWorkout": "Hervatten",
+    "nextSession": "Je volgende sessie",
+    "noBooking": "Nog geen boeking.",
+    "bookClass": "Les boeken",
+    "manageBooking": "Boeking openen",
+    "todayLabel": "Vandaag",
+    "boxActions": "Box-acties",
+    "actionSchedule": "Rooster",
+    "actionAppointments": "Afspraken",
+    "actionVideos": "Video’s",
+    "actionCoach": "Coach",
+    "membership": "Lidmaatschap",
+    "membershipNone": "Geen actief pakket.",
+    "membershipOpen": "Lidmaatschap en betalingen",
+    "newEntry": "Nieuwe invoer",
+    "meSharedPrs": "Mijn records",
+    "meSharedPrsHint": "Pantheon en met jou gedeelde records",
+    "meSharing": "Delen en zichtbaarheid",
+    "meSharingHint": "Wat je coach en anderen kunnen zien",
+    "mePayments": "Betalingen en bonnen",
+    "mePaymentsHint": "Facturen, terugbetalingen en je pakket",
+    "meChats": "Gesprekken",
+    "meSettings": "Instellingen",
+    "meSettingsHint": "Profiel, taal, thema, account",
+    "meTour": "Rondleiding",
+    "meChecklist": "Aan de slag",
+    "meConsole": "Beheer",
+    "meConsoleHint": "Personeelsconsole openen",
+    "meMyBoxes": "Mijn boxen",
+    "bookingStatus": {
+      "approved": "Geboekt",
+      "pending": "In afwachting",
+      "waitlisted": "Wachtlijst"
+    },
+    "entryKind": {
+      "workout": "Training",
+      "pr": "Record",
+      "injury": "Blessure",
+      "formReview": "Techniekvideo",
+      "review": "Beoordeling"
+    },
+    "entryKindHint": {
+      "workout": "Score, RPE, notities",
+      "pr": "Een nieuw persoonlijk record",
+      "injury": "Zichtbaar voor je coaches",
+      "formReview": "Vraag je coach om feedback",
+      "review": "Beoordeel een les of training"
     }
   }
 }

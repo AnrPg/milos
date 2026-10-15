@@ -21,7 +21,6 @@ import { selectedMembership, surfaceRoleForMembership } from "@/lib/membership-r
 import {
   activeItemId,
   can,
-  clientNavItems,
   clientRole,
   hasStaffRole,
   sectionGroupFor,
@@ -56,12 +55,6 @@ export function pathActive(pathname: string, href: string) {
 
   if (relativeHref === "/") return relativePathname === "/";
   if (relativeHref === "/admin") return relativePathname === "/admin";
-  if (relativeHref === "/my-workouts") {
-    return (
-      relativePathname.startsWith("/my-workouts") &&
-      !["/my-workouts/history", "/my-workouts/pantheon"].some((path) => relativePathname.startsWith(path))
-    );
-  }
   if (relativeHref === "/admin/metrics") {
     return ["/admin/metrics", "/admin/challenges", "/admin/reviews", "/admin/wellbeing"].some(
       (path) => relativePathname.startsWith(path),
@@ -139,7 +132,9 @@ export function TopNav() {
   const { entitlement } = useClientEntitlement(authenticated && showSelfServiceSurfaces);
   const features = entitledFeatures(entitlement);
   const staffItems = role === "admin" ? staffNavItems(currentMembership) : [];
-  const navItems = role === "admin" ? staffItems : clientNavItems(role, currentMembership);
+  // Members and athletes navigate with the fixed bottom bar (ADR-137); the
+  // top bar keeps brand, notifications, messages and the account menu.
+  const navItems = role === "admin" ? staffItems : [];
   const hrefFor = (href: string, scoped?: boolean) => (scoped ? adminHref(href, selectedOrganizationSlug) : href);
   const navLinks = navItems.map((item) => ({ id: item.id, href: hrefFor(item.href, item.scoped), label: t(item.labelKey) }));
   const activeNavId = activeItemId(pathname, navItems);
@@ -197,7 +192,7 @@ export function TopNav() {
       }}
     >
       <div className="flex w-full items-center gap-2 px-2 py-1 sm:flex-wrap sm:gap-x-4 sm:px-5">
-        {showTenantShell || isVendor ? (
+        {(showTenantShell && mobileLinks.length > 0) || isVendor ? (
           <MobileNavMenu links={mobileLinks} activeId={activeNavId} label={t("menu")} />
         ) : null}
         <Link
@@ -233,7 +228,7 @@ export function TopNav() {
               {t("platform")}
             </Link>
           ) : null}
-          {showTenantShell ? (
+          {showTenantShell && navLinks.length > 0 ? (
             <PriorityNav links={navLinks} activeId={activeNavId} moreLabel={t("more")} />
           ) : null}
         </nav>
@@ -345,7 +340,7 @@ export function TopNav() {
                   </button>
                 ) : null}
                 <Link
-                  href="/profile"
+                  href="/me/settings"
                   className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                   style={{ color: "var(--text-soft)" }}
                   onClick={() => setMenuOpen(false)}
@@ -416,7 +411,7 @@ export function TopNav() {
                     ) : null}
                     {role !== "admin" && showSelfServiceSurfaces ? (
                       <Link
-                        href="/account/billing"
+                        href="/me/payments"
                         className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"
                         style={{ color: "var(--text-soft)" }}
                         onClick={() => setMenuOpen(false)}

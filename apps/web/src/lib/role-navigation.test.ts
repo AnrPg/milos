@@ -2,8 +2,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   activeItemId,
+  clientExtraLinks,
   clientNavItems,
   sectionGroupFor,
+  showsBottomBar,
   staffNavItems,
   surfaceRole,
 } from "@/lib/role-navigation";
@@ -62,16 +64,39 @@ describe("surfaceRole", () => {
 });
 
 describe("client navigation", () => {
-  it("gives clients Home · Training · Journal", () => {
-    expect(clientNavItems("member").map((item) => item.id)).toEqual(["home", "training", "journal"]);
-    expect(clientNavItems("athlete")[1].href).toBe("/my-workouts");
+  it("gives clients the four fixed tabs: Αρχική · Box · Ημερολόγιο · Εγώ", () => {
+    expect(clientNavItems().map((item) => item.id)).toEqual(["home", "box", "journal", "me"]);
+    expect(clientNavItems().map((item) => item.href)).toEqual(["/", "/box", "/journal", "/me"]);
   });
 
-  it("marks history under Journal and my workouts under Training", () => {
-    const items = clientNavItems("athlete");
-    expect(activeItemId("/my-workouts/history", items)).toBe("journal");
-    expect(activeItemId("/my-workouts", items)).toBe("training");
-    expect(activeItemId("/", items)).toBe("home");
+  it("lights the tab that is each member page's home", () => {
+    const items = clientNavItems();
+    const owner = (path: string) => activeItemId(path, items);
+    expect(owner("/")).toBe("home");
+    for (const path of ["/box", "/box/workouts", "/box/schedule", "/box/appointments", "/box/videos", "/box/coach", "/workouts", "/class-timer/s1/display"]) {
+      expect(owner(path)).toBe("box");
+    }
+    for (const path of ["/journal", "/journal/vault", "/journal/progress", "/journal/pantheon", "/journal/wellbeing", "/journal/reviews"]) {
+      expect(owner(path)).toBe("journal");
+    }
+    for (const path of ["/me", "/me/settings", "/me/payments", "/me/activity/chats"]) {
+      expect(owner(path)).toBe("me");
+    }
+    expect(owner("/org/kypseli/box/schedule")).toBe("box");
+  });
+
+  it("keeps the cleaning and inventory links out of the bar", () => {
+    const janitorMember = { role: "member", roles: ["member", "janitor"], capabilities: { record_cleaning: "own", report_inventory: "own" } };
+    expect(clientExtraLinks(janitorMember).map((item) => item.id)).toEqual(["cleaning", "inventory"]);
+    expect(clientExtraLinks({ role: "member" })).toEqual([]);
+  });
+
+  it("hides the bar on full-screen workout and class-timer pages only", () => {
+    expect(showsBottomBar("/workouts/w1/execute")).toBe(false);
+    expect(showsBottomBar("/workouts/free-text/execute")).toBe(false);
+    expect(showsBottomBar("/org/kypseli/class-timer/s1/display")).toBe(false);
+    expect(showsBottomBar("/workouts")).toBe(true);
+    expect(showsBottomBar("/box")).toBe(true);
   });
 });
 
@@ -83,10 +108,13 @@ describe("sectionGroupFor", () => {
     expect(sectionGroupFor("/org/gym/admin/finance", { surface: "admin", staffItems, features: [] })).toBeNull();
   });
 
-  it("shows only entitled Training and Journal tabs", () => {
-    const training = sectionGroupFor("/schedule", { surface: "member", staffItems: [], features: ["videos"] });
-    expect(training?.tabs.map((tab) => tab.id)).toEqual(["myWorkouts", "classes", "videos"]);
-    const journal = sectionGroupFor("/my-workouts/pantheon", { surface: "athlete", staffItems: [], features: [] });
-    expect(journal?.id).toBe("journal");
+  it("shows only entitled Box and Journal sub-pages", () => {
+    const box = sectionGroupFor("/box/schedule", { surface: "member", staffItems: [], features: ["videos"] });
+    expect(box?.tabs.map((tab) => tab.id)).toEqual(["boxToday", "myWorkouts", "classes", "videos"]);
+    const journal = sectionGroupFor("/journal/pantheon", { surface: "athlete", staffItems: [], features: [] });
+    expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "pantheon", "wellbeing", "reviews"]);
+    expect(sectionGroupFor("/box", { surface: "member", staffItems: [], features: ["videos"] })).toBeNull();
+    const entitled = sectionGroupFor("/journal", { surface: "athlete", staffItems: [], features: ["progress", "coaching"] });
+    expect(entitled?.tabs.map((tab) => tab.id)).toContain("progress");
   });
 });

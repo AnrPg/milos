@@ -51,7 +51,15 @@
     "inventory": "Inventory",
     "menu": "Menu",
     "notifications": "Notifications",
-    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}"
+    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}",
+    "box": "Box",
+    "me": "Me",
+    "today": "Today",
+    "journalFlow": "Feed",
+    "vault": "Vault",
+    "reviews": "Reviews",
+    "coach": "Coach",
+    "memberTabs": "Main sections"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -4732,6 +4740,70 @@
           "body": "See your membership in {billing}. Change language and notifications in your profile."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "boxTitle": "Box",
+    "meTitle": "Me",
+    "journalTitle": "Journal",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "signOut": "Sign out",
+    "todayWorkout": "Today's workout",
+    "todaySources": "Today's workouts by source",
+    "todayEmpty": "Nothing planned for today. Book a class or log a workout of your own.",
+    "classChip": "Class {time}",
+    "programmeChip": "{title} · from your coach",
+    "logWorkout": "Log",
+    "logged": "Logged",
+    "startWorkout": "Start",
+    "resumeWorkout": "Resume",
+    "nextSession": "Your next session",
+    "noBooking": "No booking yet.",
+    "bookClass": "Book a class",
+    "manageBooking": "Open booking",
+    "todayLabel": "Today",
+    "boxActions": "Box actions",
+    "actionSchedule": "Schedule",
+    "actionAppointments": "Appointments",
+    "actionVideos": "Videos",
+    "actionCoach": "Coach",
+    "membership": "Membership",
+    "membershipNone": "No active package.",
+    "membershipOpen": "Membership & payments",
+    "newEntry": "New entry",
+    "meSharedPrs": "My PRs",
+    "meSharedPrsHint": "Pantheon and PRs shared with you",
+    "meSharing": "Sharing & visibility",
+    "meSharingHint": "What your coach and others can see",
+    "mePayments": "Payments & receipts",
+    "mePaymentsHint": "Invoices, refunds and your package",
+    "meChats": "Conversations",
+    "meSettings": "Settings",
+    "meSettingsHint": "Profile, language, theme, account",
+    "meTour": "Take the tour",
+    "meChecklist": "Getting started",
+    "meConsole": "Management",
+    "meConsoleHint": "Open the staff console",
+    "meMyBoxes": "My boxes",
+    "bookingStatus": {
+      "approved": "Booked",
+      "pending": "Pending",
+      "waitlisted": "Waitlist"
+    },
+    "entryKind": {
+      "workout": "Workout",
+      "pr": "PR",
+      "injury": "Injury",
+      "formReview": "Technique video",
+      "review": "Review"
+    },
+    "entryKindHint": {
+      "workout": "Score, RPE, notes",
+      "pr": "A new personal record",
+      "injury": "Visible to your coaches",
+      "formReview": "Ask your coach for feedback",
+      "review": "Rate a class or workout"
     }
   }
 }
