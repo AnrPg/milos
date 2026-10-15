@@ -1,0 +1,82 @@
+<title>Thumoa Spark lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:FLAR,VOLM,wght@0..100,0..100,100..900&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* One column per Spark candidate, identical mockups in each, so only the green changes. Chrome themes; brand colours fixed. */
+:root { --bg:#F4F5F7; --plate:#FFFFFF; --fg:#17181C; --muted:#5E6470; --line:#E3E5EA; --mono:"JetBrains Mono",ui-monospace,monospace; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0E0F12; --plate:#17181C; --fg:#F4F5F7; --muted:#A2A8B3; --line:#2A2D34; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#0E0F12; --plate:#17181C; --fg:#F4F5F7; --muted:#A2A8B3; --line:#2A2D34; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:"Commissioner",system-ui,sans-serif; }
+.wrap { max-width:1280px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:28px 72px; display:grid; gap:18px; }
+.lbl { font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+h1 { font-size:clamp(30px,5vw,54px); line-height:1; margin:8px 0 10px; font-weight:900; letter-spacing:-.03em; font-variation-settings:"FLAR" 80; }
+p { margin:0; line-height:1.55; max-width:70ch; }
+.muted { color:var(--muted); }
+.du { position:relative; display:inline-block; }
+.du::before { content:""; position:absolute; left:50%; top:-.05em; width:.24em; height:.24em; border-radius:50%; background:var(--dot,currentColor); transform:translateX(-50%); }
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); gap:14px; }
+.col { background:var(--plate); border:1px solid var(--line); border-radius:22px; padding:14px; display:grid; gap:10px; align-content:start; min-width:0; }
+.col.ref { opacity:.8; border-style:dashed; }
+.col.pick { box-shadow:0 0 0 2px #2F5BFF; }
+.hd { display:grid; gap:2px; }
+.hd b { font-size:18px; }
+.hd span { font-family:var(--mono); font-size:11.5px; color:var(--muted); }
+.big { height:84px; border-radius:16px; }
+.meter { display:grid; gap:4px; font-family:var(--mono); font-size:11px; color:var(--muted); }
+.meter i { display:block; height:6px; border-radius:3px; background:var(--line); position:relative; overflow:hidden; }
+.meter i::after { content:""; position:absolute; inset:0 auto 0 0; width:var(--w); background:var(--c); }
+.poster { border-radius:14px; padding:14px; aspect-ratio:4/3.2; display:grid; align-content:space-between; color:#17181C; }
+.poster .t { font-size:30px; font-weight:900; line-height:.95; letter-spacing:-.03em; font-variation-settings:"FLAR" 100; }
+.dark { border-radius:14px; padding:14px; background:#17181C; color:#F4F5F7; display:grid; gap:10px; }
+.row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+.chip { border-radius:999px; padding:5px 10px; font-weight:800; font-size:11.5px; }
+.plum { border-radius:14px; padding:14px; background:#2A0F2E; color:#F4F5F7; display:flex; gap:10px; align-items:center; }
+.strip { display:flex; height:30px; border-radius:10px; overflow:hidden; }
+.strip span { flex:1; }
+.note { font-size:13.5px; line-height:1.45; color:var(--muted); }
+.note b { color:var(--fg); }
+.rec { background:#17181C; color:#F4F5F7; border-radius:20px; padding:18px 20px; display:grid; gap:6px; }
+.rec b { font-size:18px; }
+</style>
+
+<main class="wrap">
+  <header>
+    <span class="lbl">Thumoa · Spark lab</span>
+    <h1>Making the green ours</h1>
+    <p class="muted">Our current Spark (#C8FF1E) is almost identical to Nike Volt: a colour distance of 4, where under 10 the eye barely sees a difference. Below are seven variants, each placed in the same mockups next to Dojo, Heat, Graphite, Frost and Plum. The bar shows how far each one moves from Volt; above 25, it reads as a different colour.</p>
+  </header>
+  <div class="grid" id="grid"></div>
+  <div class="rec"><span class="lbl" style="color:#A2A8B3">Recommendation</span><b>Glacier Lime #CFFF7A</b><span style="opacity:.85">It is still electric, but cooler and softer, with a hint of frost. It sits next to Dojo and Frost as if they were made together, it is clearly away from Nike Volt (33) and tennis-ball yellow, and it keeps 15:1 contrast with graphite text. Second choice: Pistachio, if you want it warmer and more "organic".</span></div>
+</main>
+
+<script>
+(function () {
+  const MK = (head, body, w) => '<svg viewBox="0 0 200 200" style="width:' + w + 'px;flex-shrink:0" aria-hidden="true"><circle cx="94" cy="58" r="23" fill="' + head + '"/><path d="M42 56 Q50 156 104 156 Q156 156 160 104" fill="none" stroke="' + body + '" stroke-width="27" stroke-linecap="round"/></svg>';
+  const WM = (dot) => '<span style="white-space:nowrap">th<span class="du" style="--dot:' + dot + '">u</span>moa</span>';
+  // [name, hex, ΔE vs Volt (#CEFF00, commonly cited), contrast w/ graphite, note, flags]
+  const S = [
+    ['Spark (today)', '#C8FF1E', 4, 15.0, '<b>Reference.</b> Practically Nike Volt. Also close to tennis-ball yellow (15).', 'ref'],
+    ['Glacier Lime', '#CFFF7A', 33, 15.4, '<b>Cooler and softer.</b> Clearly ours, harmonises with Frost and Dojo. Still glows on graphite.', 'pick'],
+    ['Pistachio', '#B6F25C', 27, 13.4, '<b>Warmer, more organic.</b> Less "neon", more "fresh". Very good on plum.', ''],
+    ['Sun Lime', '#E4FF6E', 29, 15.9, '<b>Towards yellow.</b> Sunny and Mediterranean, but close to tennis ball (12) and leans towards AEK yellow.', ''],
+    ['Chartreuse', '#9CFF3A', 21, 14.2, '<b>Greener, more aggressive.</b> Very energetic, closer to "gaming" and energy drinks.', ''],
+    ['Ice', '#DDFFA8', 55, 16.0, '<b>Almost pastel.</b> The most luxurious and the most distinct, but it loses the "electric" feel on white.', ''],
+    ['Mint', '#5CFFB4', 69, 13.9, '<b>Another family.</b> Fresh, but it moves towards Spotify green (28) and away from energy.', ''],
+  ];
+  document.getElementById('grid').innerHTML = S.map(s => {
+    const c = s[1], w = Math.min(100, Math.round(s[2] / 70 * 100));
+    return '<div class="col ' + s[5] + '">' +
+      '<div class="hd"><b>' + s[0] + '</b><span>' + c + ' · ' + s[3] + ':1 on graphite</span></div>' +
+      '<div class="big" style="background:' + c + '"></div>' +
+      '<div class="meter">Distance from Nike Volt: ' + s[2] + '<i style="--w:' + w + '%;--c:' + (s[2] < 15 ? '#E0203F' : s[2] < 25 ? '#E0A020' : '#2F5BFF') + '"></i></div>' +
+      '<div class="poster" style="background:' + c + '"><div class="row" style="font-weight:800;font-size:15px">' + MK('#2F5BFF', '#17181C', 18) + WM('#2F5BFF') + '</div><div class="t">Thumo up.</div><div style="font-family:var(--mono);font-size:10px">ΣΑΒ 18/10 · BOX ΚΥΨΕΛΗ</div></div>' +
+      '<div class="dark"><div class="row">' + MK(c, '#5B7CFF', 34) + '<span style="font-weight:800;font-size:17px">' + WM(c) + '</span></div><div class="row"><span class="chip" style="background:' + c + ';color:#17181C">● LIVE · 14</span><span class="chip" style="background:#5B7CFF;color:#fff">Check-in</span><span class="chip" style="background:#FF4D6A;color:#17181C">Thumo · 48</span></div></div>' +
+      '<div class="plum">' + MK(c, '#F4F5F7', 30) + '<div><div style="font-weight:800;font-size:14px;color:' + c + '">Raise one for the 7am crew.</div><div style="font-size:11px;opacity:.7">story · plum</div></div></div>' +
+      '<div class="strip">' + ['#F4F5F7', '#17181C', '#2F5BFF', c, '#E0203F', '#2A0F2E'].map(x => '<span style="background:' + x + '"></span>').join('') + '</div>' +
+      '<div class="note">' + s[4] + '</div></div>';
+  }).join('');
+})();
+</script>
