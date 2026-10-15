@@ -4804,6 +4804,12 @@
       "injury": "Visível para os seus treinadores",
       "formReview": "Peça feedback ao seu treinador",
       "review": "Avalie uma aula ou um treino"
-    }
+    },
+    "homeTitle": "Início",
+    "wodToday": "O WOD de hoje no box",
+    "wodTodayEmpty": "Hoje não há treino de aula.",
+    "openInBox": "Abrir no Box",
+    "feedPosts": "Do seu clube",
+    "feedPostsEmpty": "As publicações do seu clube aparecerão aqui."
   }
 }

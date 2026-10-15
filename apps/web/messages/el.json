@@ -4804,6 +4804,12 @@
       "injury": "Το βλέπουν οι coaches σου",
       "formReview": "Ζήτα σχόλια από τον coach",
       "review": "Βαθμολόγησε μάθημα ή προπόνηση"
-    }
+    },
+    "homeTitle": "Αρχική",
+    "wodToday": "Το WOD της ημέρας στο box",
+    "wodTodayEmpty": "Δεν υπάρχει WOD μαθήματος σήμερα.",
+    "openInBox": "Άνοιγμα στο Box",
+    "feedPosts": "Από το club σου",
+    "feedPostsEmpty": "Οι αναρτήσεις του club σου θα εμφανίζονται εδώ."
   }
 }

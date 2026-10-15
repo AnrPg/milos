@@ -4804,6 +4804,12 @@
       "injury": "Zichtbaar voor je coaches",
       "formReview": "Vraag je coach om feedback",
       "review": "Beoordeel een les of training"
-    }
+    },
+    "homeTitle": "Home",
+    "wodToday": "De WOD van vandaag in de box",
+    "wodTodayEmpty": "Vandaag is er geen lestraining.",
+    "openInBox": "Openen in Box",
+    "feedPosts": "Uit je club",
+    "feedPostsEmpty": "Berichten uit je club verschijnen hier."
   }
 }

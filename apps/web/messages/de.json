@@ -4804,6 +4804,12 @@
       "injury": "Für deine Coaches sichtbar",
       "formReview": "Bitte deinen Coach um Feedback",
       "review": "Bewerte einen Kurs oder ein Training"
-    }
+    },
+    "homeTitle": "Start",
+    "wodToday": "WOD des Tages in der Box",
+    "wodTodayEmpty": "Heute gibt es kein Kurstraining.",
+    "openInBox": "In Box öffnen",
+    "feedPosts": "Aus deinem Club",
+    "feedPostsEmpty": "Beiträge aus deinem Club erscheinen hier."
   }
 }

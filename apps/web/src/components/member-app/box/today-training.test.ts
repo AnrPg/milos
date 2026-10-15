@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { AssignedWorkoutRecord } from "@/api/assigned-workouts";
 import type { ScheduleSlot } from "@/api/schedule";
 
-import { buildTodayTraining, defaultTodayItem, logSourceFor } from "./today-training";
+import { buildTodayTraining, defaultTodayItem, gymWodToday, logSourceFor } from "./today-training";
 
 const now = new Date(2026, 9, 15, 9, 0);
 const at = (hour: number, day = 15) => new Date(2026, 9, day, hour, 0).toISOString();
@@ -157,5 +157,28 @@ describe("logSourceFor", () => {
     expect(logSourceFor(items[1], sources)).toBeNull();
     expect(logSourceFor(items[2], sources)?.sourceType).toBe("assigned_workout");
     expect(logSourceFor(items[2], undefined)).toBeNull();
+  });
+});
+
+describe("gymWodToday", () => {
+  it("is today's first class WOD, listed with every class of today that runs it, booked or not", () => {
+    const slots = [
+      slot("evening", at(19), { current_user_booking: null, workout: workout("w-fran", "Fran") }),
+      slot("morning", at(7), { current_user_booking: null, workout: workout("w-fran", "Fran") }),
+      slot("open", at(12), { workout: workout("w-open", "Open gym") }),
+      slot("tomorrow", at(7, 16)),
+    ];
+
+    expect(gymWodToday(slots, now)).toEqual({
+      workout: slots[1]!.workout,
+      classes: [
+        { slotId: "morning", scheduledAt: at(7) },
+        { slotId: "evening", scheduledAt: at(19) },
+      ],
+    });
+  });
+
+  it("is null on a day without a class WOD", () => {
+    expect(gymWodToday([slot("tomorrow", at(7, 16)), slot("bare", at(9), { workout: null })], now)).toBeNull();
   });
 });

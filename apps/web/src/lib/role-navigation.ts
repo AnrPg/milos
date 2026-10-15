@@ -219,15 +219,15 @@ export function sectionGroupFor(
         ...(feature("coaching") ? [{ id: "coaching", href: "/box/coach", labelKey: "coach", match: ["/box/coach"] }] : []),
       ],
     });
-    // Journal segments (brief §7.7). Σώμα and the new Ευεξία arrive in Phase 2;
-    // Pantheon keeps its own segment until it folds into Πρόοδος.
+    // Journal segments (brief §7.7). Σώμα and the new Ευεξία arrive in Phase 2.
+    // Πρόοδος is for everyone (its advanced statistics stay package-gated
+    // inside the page) and owns the full Pantheon page.
     groups.push({
       id: "journal",
       tabs: [
         { id: "flow", href: "/journal", labelKey: "journalFlow", match: ["/journal"] },
         { id: "vault", href: "/journal/vault", labelKey: "vault", match: ["/journal/vault"] },
-        ...(feature("progress") ? [{ id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress"] }] : []),
-        { id: "pantheon", href: "/journal/pantheon", labelKey: "pantheon", match: ["/journal/pantheon"] },
+        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
         { id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] },
         { id: "reviews", href: "/journal/reviews", labelKey: "reviews", match: ["/journal/reviews"] },
       ],

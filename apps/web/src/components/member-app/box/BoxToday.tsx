@@ -23,7 +23,7 @@ import {
   TRAINING_LOG_SOURCES_KEY,
   TrainingLogDialog,
   type TrainingLogDialogState,
-} from "@/components/training-log/TrainingLogSection";
+} from "@/components/training-log/TrainingLog";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { localizeError } from "@/i18n/presentation";
@@ -32,7 +32,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
-function useBoxSchedule(token: string | null, now: Date) {
+export function useBoxSchedule(token: string | null, now: Date) {
   const window = useMemo(() => {
     const start = new Date(now);
     start.setHours(0, 0, 0, 0);

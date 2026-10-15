@@ -1,18 +1,15 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import {
   fetchTrainingLogSources,
-  listTrainingLogEntries,
   updateTrainingLogEntry,
   voidTrainingLogEntry,
   type TrainingLogEntry,
   type TrainingLogSourceType,
 } from "@/api/training-log";
-import { HomeDisclosure } from "@/components/home/HomeDisclosure";
-import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useUiTranslations } from "@/i18n/ui";
@@ -25,14 +22,13 @@ import {
   formFromEntry,
   newIdempotencyKey,
   sectionsFromEntryScores,
-  sortEntriesNewestFirst,
   validateTrainingLogForm,
   type SelectedTrainingSource,
   type TrainingLogForm,
   type TrainingLogFormError,
 } from "@/lib/training-log";
 
-const ENTRIES_KEY = ["training-log", "entries"] as const;
+export const TRAINING_LOG_ENTRIES_KEY = ["training-log", "entries"] as const;
 export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
 const SOURCES_KEY = TRAINING_LOG_SOURCES_KEY;
 
@@ -73,71 +69,8 @@ function browserTimezone() {
   }
 }
 
-export function TrainingLogSection() {
-  const i18n = useUiTranslations();
-  const uiLocale = useUiLocale();
-  const { tokens } = useSession();
-  const token = tokens?.access_token ?? null;
-  const [dialog, setDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
-
-  const entriesQuery = useQuery({
-    queryKey: ENTRIES_KEY,
-    enabled: Boolean(token),
-    queryFn: () => listTrainingLogEntries(token!),
-  });
-
-  const entries = useMemo(() => sortEntriesNewestFirst(entriesQuery.data ?? []), [entriesQuery.data]);
-
-  return (
-    <HomeDisclosure
-      eyebrow={i18n("trainingLogEyebrow")}
-      title={i18n("trainingLogTitle")}
-      actions={
-        <button
-          type="button"
-          className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          onClick={() => setDialog({ mode: "pick" })}
-        >
-          {i18n("trainingLogLogWorkout")}
-        </button>
-      }
-    >
-      {entriesQuery.isPending ? (
-        <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("trainingLogLoading")}</p>
-      ) : entriesQuery.isError ? (
-        <p className="text-sm" role="alert" style={{ color: "var(--danger, #dc2626)" }}>
-          {localizeError(entriesQuery.error, i18n)}
-        </p>
-      ) : entries.length === 0 ? (
-        <p className="text-sm" style={{ color: "var(--muted)" }}>{i18n("trainingLogEmpty")}</p>
-      ) : (
-        <ul className="grid gap-3">
-          {entries.map((entry) => (
-            <TrainingLogEntryCard
-              key={entry.id}
-              entry={entry}
-              locale={uiLocale}
-              onEdit={() => setDialog({ mode: "edit", entry })}
-              onVoid={() => setDialog({ mode: "void", entry })}
-            />
-          ))}
-        </ul>
-      )}
-
-      {dialog.mode !== "closed" && token ? (
-        <TrainingLogDialog
-          state={dialog}
-          token={token}
-          onNavigate={setDialog}
-          onClose={() => setDialog({ mode: "closed" })}
-        />
-      ) : null}
-    </HomeDisclosure>
-  );
-}
-
-function TrainingLogEntryCard({
+/** One logged workout in Ημερολόγιο › Ροή, with edit and void (ADR-118). */
+export function TrainingLogEntryCard({
   entry,
   locale,
   onEdit,

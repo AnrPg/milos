@@ -9,7 +9,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { ExecutionPerformanceModal } from "@/components/client/ExecutionPerformanceModal";
 import { formatDay } from "@/components/client/format";
 import { useRepeatWorkout } from "@/components/client/use-repeat-workout";
-import { useWorkoutVault } from "@/components/client/WorkoutHistory";
+import { useWorkoutVault } from "@/components/client/use-workout-vault";
 import {
   formatElapsed,
   groupFinishedWorkouts,

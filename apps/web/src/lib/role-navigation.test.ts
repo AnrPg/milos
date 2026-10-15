@@ -108,11 +108,12 @@ describe("sectionGroupFor", () => {
     expect(sectionGroupFor("/org/gym/admin/finance", { surface: "admin", staffItems, features: [] })).toBeNull();
   });
 
-  it("shows only entitled Box and Journal sub-pages", () => {
+  it("shows only entitled Box sub-pages, and every Journal segment to everyone", () => {
     const box = sectionGroupFor("/box/schedule", { surface: "member", staffItems: [], features: ["videos"] });
     expect(box?.tabs.map((tab) => tab.id)).toEqual(["boxToday", "myWorkouts", "classes", "videos"]);
     const journal = sectionGroupFor("/journal/pantheon", { surface: "athlete", staffItems: [], features: [] });
-    expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "pantheon", "wellbeing", "reviews"]);
+    expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "progress", "wellbeing", "reviews"]);
+    expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/pantheon");
     expect(sectionGroupFor("/box", { surface: "member", staffItems: [], features: ["videos"] })).toBeNull();
     const entitled = sectionGroupFor("/journal", { surface: "athlete", staffItems: [], features: ["progress", "coaching"] });
     expect(entitled?.tabs.map((tab) => tab.id)).toContain("progress");

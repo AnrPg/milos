@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
@@ -9,7 +10,11 @@ import {
   voidTrainingLogEntry,
   type TrainingLogEntry,
 } from "@/api/training-log";
-import { TrainingLogSection } from "@/components/training-log/TrainingLogSection";
+import {
+  TrainingLogDialog,
+  TrainingLogEntryCard,
+  type TrainingLogDialogState,
+} from "@/components/training-log/TrainingLog";
 
 vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ tokens: { access_token: "token" } }),
@@ -50,16 +55,38 @@ const loggedEntry = {
   performed_exercises: [],
 } as unknown as TrainingLogEntry;
 
-function renderSection() {
+// The flow pages own the dialog state; this harness wires a card to the
+// dialog the same way Ημερολόγιο › Ροή and Νέα καταχώρηση do.
+function Harness({ initial }: { initial: TrainingLogDialogState }) {
+  const [state, setState] = useState<TrainingLogDialogState>(initial);
+  return (
+    <>
+      <ul>
+        <TrainingLogEntryCard
+          entry={loggedEntry}
+          locale="en"
+          onEdit={() => setState({ mode: "edit", entry: loggedEntry })}
+          onVoid={() => setState({ mode: "void", entry: loggedEntry })}
+        />
+      </ul>
+      <button type="button" onClick={() => setState({ mode: "pick" })}>trainingLogLogWorkout</button>
+      {state.mode !== "closed" ? (
+        <TrainingLogDialog state={state} token="token" onNavigate={setState} onClose={() => setState({ mode: "closed" })} />
+      ) : null}
+    </>
+  );
+}
+
+function renderSection(initial: TrainingLogDialogState = { mode: "closed" }) {
   const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
   return render(
     <QueryClientProvider client={client}>
-      <TrainingLogSection />
+      <Harness initial={initial} />
     </QueryClientProvider>,
   );
 }
 
-describe("TrainingLogSection", () => {
+describe("training log card and dialog", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mocked(listTrainingLogEntries).mockResolvedValue([loggedEntry]);

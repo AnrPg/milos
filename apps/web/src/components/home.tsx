@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 
 import { useSession } from "@/components/session-provider";
-import { LandingPage } from "@/components/landing-page";
+import { HomeHub } from "@/components/member-app/HomeHub";
 import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganizationsPage";
 
 // Vendors (SaaS operators) have no tenant homepage to speak of by default -
@@ -16,6 +16,9 @@ import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganiz
 // memberships" links on the platform page, or the TopNav dropdown) always
 // renders the ordinary tenant workspace, vendor status notwithstanding -
 // only the bare "/" defaults to the platform console.
+//
+// Everyone else reaching "/" is a member or athlete (admins are redirected to
+// /admin by the route), so "/" is the Αρχική hub (ADR-137).
 export function Home() {
   const pathname = usePathname();
   const { currentUser } = useSession();
@@ -23,5 +26,5 @@ export function Home() {
 
   if (currentUser?.vendor && !inOrganizationContext) return <PlatformOrganizationsPage />;
 
-  return <LandingPage />;
+  return <HomeHub />;
 }

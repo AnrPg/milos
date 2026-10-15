@@ -4804,6 +4804,12 @@
       "injury": "Visibile ai tuoi coach",
       "formReview": "Chiedi un parere al tuo coach",
       "review": "Valuta una lezione o un allenamento"
-    }
+    },
+    "homeTitle": "Home",
+    "wodToday": "Il WOD di oggi in palestra",
+    "wodTodayEmpty": "Oggi non c'è un allenamento in lezione.",
+    "openInBox": "Apri in Box",
+    "feedPosts": "Dal tuo club",
+    "feedPostsEmpty": "I post del tuo club appariranno qui."
   }
 }

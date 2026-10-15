@@ -139,3 +139,25 @@ export function logSourceFor(item: TodayTrainingItem, sources: LogSources | unde
     ? { sourceType: "assigned_workout", referenceId: match.id, title: match.title, scoreableSections: match.scoreable_sections }
     : null;
 }
+
+export type GymWodToday = { workout: WorkoutPreview; classes: { slotId: string; scheduledAt: string }[] };
+
+/**
+ * The gym's WOD of the day for Αρχική (the future #wod-σήμερα card, ADR-138):
+ * the workout of today's first class that has one, with every class of today
+ * that runs it. Booking does not matter here; this is the gym's day, not mine.
+ */
+export function gymWodToday(slots: ScheduleSlot[], now: Date): GymWodToday | null {
+  const today = localIsoDate(now);
+  const todays = slots
+    .filter((slot) => slot.workout && localIsoDate(new Date(slot.scheduled_at)) === today)
+    .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
+  const first = todays[0];
+  if (!first?.workout) return null;
+  return {
+    workout: first.workout,
+    classes: todays
+      .filter((slot) => slot.workout?.id === first.workout!.id)
+      .map((slot) => ({ slotId: slot.id, scheduledAt: slot.scheduled_at })),
+  };
+}

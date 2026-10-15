@@ -4804,6 +4804,12 @@
       "injury": "Visible par vos coachs",
       "formReview": "Demandez l’avis de votre coach",
       "review": "Notez un cours ou une séance"
-    }
+    },
+    "homeTitle": "Accueil",
+    "wodToday": "Le WOD du jour à la salle",
+    "wodTodayEmpty": "Pas d’entraînement en cours aujourd’hui.",
+    "openInBox": "Ouvrir dans Box",
+    "feedPosts": "De votre club",
+    "feedPostsEmpty": "Les publications de votre club apparaîtront ici."
   }
 }

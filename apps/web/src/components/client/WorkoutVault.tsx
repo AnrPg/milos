@@ -11,7 +11,7 @@ import { ExecutionPerformanceModal } from "@/components/client/ExecutionPerforma
 import { formatDay, formatTime } from "@/components/client/format";
 import { useRepeatWorkout } from "@/components/client/use-repeat-workout";
 import { entryDay, filterVault, formatElapsed } from "@/components/client/vault";
-import { useWorkoutVault } from "@/components/client/WorkoutHistory";
+import { useWorkoutVault } from "@/components/client/use-workout-vault";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 

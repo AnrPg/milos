@@ -8,7 +8,7 @@ import { hasCapability } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { NewPRFormModal } from "@/components/pantheon/PRFormModal";
 import { useSession } from "@/components/session-provider";
-import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLogSection";
+import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 /**

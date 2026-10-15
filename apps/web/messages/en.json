@@ -4804,6 +4804,12 @@
       "injury": "Visible to your coaches",
       "formReview": "Ask your coach for feedback",
       "review": "Rate a class or workout"
-    }
+    },
+    "homeTitle": "Home",
+    "wodToday": "Today's WOD at the gym",
+    "wodTodayEmpty": "No class workout today.",
+    "openInBox": "Open in Box",
+    "feedPosts": "From your club",
+    "feedPostsEmpty": "Posts from your club will show up here."
   }
 }

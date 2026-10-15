@@ -2,16 +2,18 @@
 
 import { useUiTranslations } from "@/i18n/ui";
 
-/** The two actions every completed entry offers (ADR-098). */
+/** The actions every completed entry offers (ADR-098); sharing where the page allows it. */
 export function EntryActions({
   onRepeat,
   onPerformance,
+  onShare,
   repeating,
   disabled,
   workoutTitle,
 }: {
   onRepeat: () => void;
   onPerformance: () => void;
+  onShare?: () => void;
   repeating: boolean;
   disabled: boolean;
   workoutTitle: string;
@@ -38,6 +40,17 @@ export function EntryActions({
       >
         {repeating ? i18n("clStarting") : i18n("clDoItAgain")}
       </button>
+      {onShare ? (
+        <button
+          type="button"
+          onClick={onShare}
+          className="rounded-full px-3 py-1.5 text-xs font-semibold"
+          style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+          aria-label={`${i18n("shareInMilos")}: ${workoutTitle}`}
+        >
+          {i18n("shareInMilos")}
+        </button>
+      ) : null}
     </div>
   );
 }
