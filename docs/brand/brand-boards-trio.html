@@ -1,0 +1,234 @@
+<title>Thumoa trio boards</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Commissioner:FLAR,VOLM,wght@0..100,0..100,100..900&family=Fira+Sans+Extra+Condensed:wght@600;800;900&family=Noto+Serif+Display:ital,wght@0,500;0,700;0,800;1,500;1,700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Board picker (chips with mini swatches) → paper switcher → one board: hero, palette+ratio, type & UI kit, six mockups. Chrome themes; board colours are the subject and stay fixed. */
+:root { --bg:#F4F5F7; --plate:#FFFFFF; --fg:#111318; --muted:#5E6470; --line:#E3E5EA; --mono:"JetBrains Mono",ui-monospace,monospace; --ui:"Commissioner",system-ui,sans-serif; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg:#0B0C0F; --plate:#14161B; --fg:#F2F3F5; --muted:#A2A8B3; --line:#262A31; color-scheme:dark; } }
+:root[data-theme="dark"] { --bg:#0B0C0F; --plate:#14161B; --fg:#F2F3F5; --muted:#A2A8B3; --line:#262A31; color-scheme:dark; }
+* { box-sizing:border-box; }
+body { margin:0; background:var(--bg); color:var(--fg); font-family:var(--ui); }
+.wrap { max-width:1200px; margin:0 auto; padding-left:max(16px,env(safe-area-inset-left,0px)); padding-right:max(16px,env(safe-area-inset-right,0px)); padding-block:28px 72px; display:grid; gap:16px; }
+.lbl { font-family:var(--mono); font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+h1 { font-size:clamp(32px,5.4vw,58px); line-height:1; margin:8px 0 10px; font-weight:900; letter-spacing:-.03em; font-variation-settings:"FLAR" 80; }
+p { margin:0; line-height:1.55; max-width:68ch; }
+.muted { color:var(--muted); }
+.du { position:relative; display:inline-block; }
+.du::before { content:""; position:absolute; left:50%; top:-.05em; width:.24em; height:.24em; border-radius:50%; background:var(--dot,currentColor); transform:translateX(-50%); }
+.wmn { white-space:nowrap; }
+
+.picker { display:grid; grid-template-columns:repeat(auto-fill,minmax(min(100%,170px),1fr)); gap:8px; }
+.pick { border:1px solid var(--line); background:var(--plate); color:var(--fg); border-radius:16px; padding:10px 12px; text-align:left; cursor:pointer; display:grid; gap:7px; font:inherit; }
+.pick b { font-size:14.5px; }
+.pick small { font-family:var(--mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); }
+.pick .sw { display:flex; height:14px; border-radius:7px; overflow:hidden; border:1px solid rgba(0,0,0,.06); }
+.pick[aria-pressed="true"] { border-color:var(--fg); box-shadow:inset 0 0 0 1px var(--fg); }
+.pick:focus-visible, .seg button:focus-visible { outline:3px solid #2353E8; outline-offset:2px; }
+.bar { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+.seg { display:inline-flex; border:1px solid var(--line); border-radius:999px; padding:3px; background:var(--plate); flex-wrap:wrap; }
+.seg button { font:600 13px var(--ui); border:0; background:transparent; color:var(--fg); border-radius:999px; padding:6px 12px; cursor:pointer; display:inline-flex; gap:6px; align-items:center; }
+.seg button i { width:12px; height:12px; border-radius:50%; border:1px solid rgba(0,0,0,.2); }
+.seg button[aria-pressed="true"] { background:var(--fg); color:var(--plate); }
+
+.board { border-radius:28px; overflow:hidden; border:1px solid var(--line); }
+.hero { padding:clamp(22px,4vw,44px); display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1fr); gap:20px; align-items:center; }
+@media (max-width:760px) { .hero { grid-template-columns:minmax(0,1fr); } }
+.hero .wm { font-size:clamp(64px,12vw,140px); line-height:.9; letter-spacing:-.045em; }
+.hero .tg { font-size:clamp(18px,2.4vw,24px); margin-top:14px; }
+.hero .idea { font-size:15px; margin-top:12px; opacity:.8; max-width:54ch; line-height:1.5; }
+.hero .mk { justify-self:center; width:min(72%,250px); }
+.tagk { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.65; }
+
+.sec { padding:clamp(18px,3vw,30px); display:grid; gap:14px; border-top:1px solid rgba(127,127,127,.18); }
+.sec .h { font-family:var(--mono); font-size:11px; letter-spacing:.1em; text-transform:uppercase; opacity:.65; }
+.pal { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,140px),1fr)); gap:10px; }
+.sw2 { border-radius:16px; padding:12px; min-height:118px; display:grid; align-content:space-between; border:1px solid rgba(127,127,127,.2); }
+.sw2 b { font-size:15px; }
+.sw2 span { font-family:var(--mono); font-size:11px; line-height:1.4; }
+.ratio { display:flex; height:22px; border-radius:11px; overflow:hidden; border:1px solid rgba(127,127,127,.2); }
+.ratio span { display:block; }
+.kit { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr)); gap:18px; align-items:start; }
+.type .a { font-size:54px; line-height:1; }
+.type .b { font-size:15px; line-height:1.5; margin-top:8px; }
+.ui { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+.btn { border-radius:999px; padding:11px 18px; font-weight:700; font-size:14px; border:2px solid transparent; }
+.badge { border-radius:999px; padding:5px 11px; font-weight:700; font-size:12.5px; }
+.rules { font-size:13.5px; line-height:1.5; display:grid; gap:4px; }
+
+.mocks { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr)); gap:16px; align-items:start; }
+.mock { display:grid; gap:8px; min-width:0; }
+.mock > .cap { font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; opacity:.65; }
+.phone { border-radius:34px; padding:9px; background:#0A0A0A; aspect-ratio:9/18.5; max-width:270px; width:100%; justify-self:center; }
+.scr { border-radius:26px; overflow:hidden; height:100%; display:flex; flex-direction:column; font-size:12px; }
+.scr > * { flex-shrink:0; }
+.st { display:flex; justify-content:space-between; padding:9px 16px 4px; font-weight:700; font-size:11px; }
+.top { display:flex; justify-content:space-between; align-items:center; padding:6px 14px 8px; }
+.top .wm2 { font-weight:800; font-size:20px; letter-spacing:-.04em; display:flex; align-items:center; gap:5px; }
+.stories { display:flex; gap:8px; padding:4px 14px 10px; }
+.stories span { width:38px; height:38px; border-radius:50%; flex-shrink:0; display:grid; place-items:center; font-size:9px; font-weight:800; }
+.post { margin:0 10px; border-radius:18px; overflow:hidden; }
+.post .ph { display:flex; gap:8px; align-items:center; padding:10px; }
+.post .av { width:28px; height:28px; border-radius:50%; display:grid; place-items:center; font-weight:800; font-size:10px; }
+.post .img { padding:14px; min-height:120px; display:grid; align-content:end; gap:4px; }
+.post .img b { font-size:21px; line-height:1; letter-spacing:-.02em; }
+.post .acts { display:flex; gap:6px; padding:9px 10px; align-items:center; }
+.chipx { border-radius:999px; padding:5px 9px; font-weight:700; font-size:10.5px; display:inline-flex; gap:4px; align-items:center; }
+.tabbar { margin-top:auto; display:grid; grid-template-columns:repeat(4,1fr); padding:8px 6px 14px; font-size:9.5px; font-weight:700; text-align:center; gap:2px; }
+.tabbar span { display:grid; justify-items:center; gap:3px; }
+.tabbar i { width:18px; height:18px; border-radius:6px; display:block; }
+.poster { border-radius:18px; padding:20px; aspect-ratio:4/5; display:grid; align-content:space-between; overflow:hidden; }
+.poster .pt { font-size:34px; line-height:.95; letter-spacing:-.02em; }
+.story { border-radius:18px; padding:20px; aspect-ratio:9/16; max-width:240px; width:100%; justify-self:center; display:grid; align-content:space-between; overflow:hidden; }
+.icons { display:flex; gap:12px; align-items:end; flex-wrap:wrap; padding:6px 0; }
+.icons span { border-radius:23%; display:grid; place-items:center; }
+.tee { width:100%; max-width:280px; justify-self:center; }
+.sticker { width:100%; max-width:220px; aspect-ratio:1; border-radius:50%; justify-self:center; display:grid; place-items:center; align-content:center; gap:4px; text-align:center; }
+.card { border-radius:16px; aspect-ratio:1.6; padding:16px; display:grid; align-content:space-between; overflow:hidden; max-width:320px; width:100%; }
+.note { font-size:14px; line-height:1.55; display:grid; gap:6px; }
+.note b { display:block; }
+</style>
+
+<main class="wrap">
+  <header>
+    <span class="lbl">Thumoa · brand boards · round 3</span>
+    <h1>One trio, five bases</h1>
+    <p class="muted">The palette is now fixed: Dojo blue, Spark (formerly Volt) and Heat. What changes is the base: Frost or Graphite, and Plum where it fits. Each colour comes in two tones: a deeper one for light backgrounds and a glow for dark ones, so text always passes contrast. Spark and Heat never meet in the mark.</p>
+  </header>
+
+  <div class="picker" id="picker"></div>
+  <div class="bar"><span class="lbl">Paper</span><div class="seg" id="paper"></div></div>
+  <div id="board"></div>
+</main>
+
+<script>
+(function () {
+  // mark with separate head (dot) and body colours
+  const MK = (head, body, w, cls) => '<svg viewBox="0 0 200 200"' + (cls ? ' class="' + cls + '"' : '') + (w ? ' style="width:' + w + 'px"' : '') + ' aria-hidden="true"><circle cx="94" cy="58" r="23" fill="' + head + '"/><path d="M42 56 Q50 156 104 156 Q156 156 160 104" fill="none" stroke="' + body + '" stroke-width="27" stroke-linecap="round"/></svg>';
+  const WM = (dot) => '<span class="wmn">th<span class="du" style="--dot:' + dot + '">u</span>moa</span>';
+  const lum = (h) => { const c = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255).map(x => x <= .03928 ? x / 12.92 : Math.pow((x + .055) / 1.055, 2.4)); return .2126 * c[0] + .7152 * c[1] + .0722 * c[2]; };
+  const on = (h) => lum(h) > .4 ? '#111318' : '#FFFFFF';
+
+  const F = {
+    sans: { fam: '"Commissioner",system-ui,sans-serif', css: 'font-weight:800;font-variation-settings:"FLAR" 50,"VOLM" 40;' , name: 'Commissioner 800 · flair 50' },
+    sansX: { fam: '"Commissioner",system-ui,sans-serif', css: 'font-weight:900;font-variation-settings:"FLAR" 100,"VOLM" 80;', name: 'Commissioner 900 · flair 100' },
+    serif: { fam: '"Noto Serif Display",Georgia,serif', css: 'font-weight:700;letter-spacing:-.02em;', name: 'Noto Serif Display 700 + Commissioner' },
+    serifI: { fam: '"Noto Serif Display",Georgia,serif', css: 'font-weight:500;font-style:italic;letter-spacing:-.02em;', name: 'Noto Serif Display italic + Commissioner' },
+    cond: { fam: '"Fira Sans Extra Condensed","Commissioner",sans-serif', css: 'font-weight:900;text-transform:uppercase;letter-spacing:-.005em;', name: 'Fira Sans Extra Condensed 900 + Commissioner' },
+  };
+
+  // c: [hex, name, role, %] — order = ratio bar. k: keys into c for roles.
+  // Trio, light-safe: Dojo #2F5BFF (5.2:1 on white), Heat #E0203F (4.7:1). Glow on dark: Dojo #5B7CFF, Heat #FF4D6A. Spark: fills with dark text, or on dark only.
+  const B = [
+    { id: 'frost', name: 'Frost · Graphite', kind: 'Light · core', paper: '#F4F5F7', font: 'sansX',
+      idea: 'The everyday app. Frost, a cool, almost silver white, is the luxurious base. Graphite carries text and deep surfaces. Dojo drives the UI, Spark marks what is live, and Heat is the heart.',
+      tag: 'Thumo up.',
+      c: [['#F4F5F7', 'Frost', 'Base', 46], ['#17181C', 'Graphite', 'Text · deep', 22], ['#2F5BFF', 'Dojo', 'UI · actions', 18], ['#C8FF1E', 'Spark', 'Blocks · live', 8], ['#E0203F', 'Heat', 'Heart · kudos', 6]],
+      head: '#2F5BFF', body: '#17181C', pri: '#2F5BFF', hot: '#E0203F', ink: '#17181C', pop: '#C8FF1E', deep: '#17181C',
+      marks: [['#2F5BFF', '#17181C', '#F4F5F7'], ['#2F5BFF', '#2F5BFF', '#FFFFFF'], ['#C8FF1E', '#F4F5F7', '#17181C'], ['#17181C', '#17181C', '#C8FF1E']],
+      rules: ['Frost is the page, white is the card: two whites give the premium depth.', 'One trio colour per component. Never Spark next to Heat.', 'Spark only as a fill with graphite text, or on graphite.'],
+      risk: 'Blue and lime on dark recall NBA and Intersport a little, as you said. Heat and the dancer mark make it ours.' },
+    { id: 'night', name: 'Graphite Night', kind: 'Dark · core', paper: '#17181C', font: 'sansX',
+      idea: 'Dark mode and night events. The same trio in its glow tones, like LEDs on graphite. This is the board you liked most (Electric Graphite), refined for contrast.',
+      tag: 'Ψηλά το κεφάλι.',
+      c: [['#17181C', 'Graphite', 'Base', 50], ['#F4F5F7', 'Frost', 'Text', 18], ['#5B7CFF', 'Dojo glow', 'UI', 16], ['#C8FF1E', 'Spark', 'Live', 9], ['#FF4D6A', 'Heat glow', 'Heart', 7]],
+      head: '#C8FF1E', body: '#5B7CFF', pri: '#5B7CFF', hot: '#FF4D6A', ink: '#17181C', pop: '#C8FF1E', deep: '#24262C',
+      marks: [['#C8FF1E', '#5B7CFF', '#17181C'], ['#F4F5F7', '#F4F5F7', '#17181C'], ['#5B7CFF', '#5B7CFF', '#24262C'], ['#FF4D6A', '#FF4D6A', '#17181C']],
+      rules: ['Glow tones only on dark (all above 4.5:1).', 'No more than two glows on one screen.', 'Frost text, never pure white, for long reads.'],
+      risk: 'Close to NBA and esports aesthetics. The mitigation is the same: Heat and the mark.' },
+    { id: 'plumdeep', name: 'Frost · Plum', kind: 'Light · plum accents', paper: '#F4F5F7', font: 'sansX',
+      idea: 'Plum only where it adds warmth: member card, merch, stories, the post image. The app UI stays Frost and Graphite. Spark on plum is the strongest pairing of the round (15:1).',
+      tag: 'Raise one for the 7am crew.',
+      c: [['#F4F5F7', 'Frost', 'Base', 44], ['#17181C', 'Graphite', 'Text', 16], ['#2A0F2E', 'Plum', 'Deep surfaces', 14], ['#2F5BFF', 'Dojo', 'UI', 14], ['#C8FF1E', 'Spark', 'On plum', 7], ['#E0203F', 'Heat', 'Heart', 5]],
+      head: '#C8FF1E', body: '#2A0F2E', pri: '#2F5BFF', hot: '#E0203F', ink: '#17181C', pop: '#C8FF1E', deep: '#2A0F2E',
+      marks: [['#C8FF1E', '#F4F5F7', '#2A0F2E'], ['#2F5BFF', '#2A0F2E', '#F4F5F7'], ['#2A0F2E', '#2A0F2E', '#C8FF1E'], ['#E0203F', '#E0203F', '#FFFFFF']],
+      rules: ['Plum is a surface, never text in the app.', 'On plum, use the glow tones: Dojo #5B7CFF and Heat #FF4D6A.', 'Max one plum block per screen.'],
+      risk: 'No strong Greek association that I know of. Plum and blue together can feel cold, so Spark should be present.' },
+    { id: 'plumnight', name: 'Plum Night', kind: 'Dark · plum base', paper: '#1E0B22', font: 'sansX',
+      idea: 'What if dark mode were plum instead of graphite? Warmer, more velvet, more ours. It works best for evenings, events and dance.',
+      tag: 'Thumo up.',
+      c: [['#1E0B22', 'Night plum', 'Base', 50], ['#F4F5F7', 'Frost', 'Text', 18], ['#C8FF1E', 'Spark', 'Primary', 14], ['#5B7CFF', 'Dojo glow', 'UI', 11], ['#FF4D6A', 'Heat glow', 'Heart', 7]],
+      head: '#C8FF1E', body: '#5B7CFF', pri: '#C8FF1E', hot: '#FF4D6A', ink: '#1E0B22', pop: '#C8FF1E', deep: '#341539',
+      marks: [['#C8FF1E', '#5B7CFF', '#1E0B22'], ['#F4F5F7', '#F4F5F7', '#1E0B22'], ['#C8FF1E', '#C8FF1E', '#341539'], ['#1E0B22', '#1E0B22', '#C8FF1E']],
+      rules: ['Spark is the primary on plum (dark text on Spark buttons).', 'Graphite stays for the light-mode text.', 'Use it in marketing first and test it in the app later.'],
+      risk: 'The most distinctive, but also the biggest risk: plum all over may feel like nightlife and not training.' },
+    { id: 'spark', name: 'Spark Block', kind: 'Light · loud', paper: '#F4F5F7', font: 'cond',
+      idea: 'Volt Block, which you liked, inside the trio: big Spark blocks with graphite text on Frost, Dojo for the UI, Heat for the heart. The loudest version for posters, the street and the club door.',
+      tag: 'Thumo up.',
+      c: [['#F4F5F7', 'Frost', 'Base', 42], ['#C8FF1E', 'Spark', 'Blocks', 24], ['#17181C', 'Graphite', 'Text · deep', 20], ['#2F5BFF', 'Dojo', 'UI', 9], ['#E0203F', 'Heat', 'Heart', 5]],
+      head: '#2F5BFF', body: '#17181C', pri: '#C8FF1E', hot: '#E0203F', ink: '#17181C', pop: '#C8FF1E', deep: '#17181C',
+      marks: [['#2F5BFF', '#17181C', '#C8FF1E'], ['#17181C', '#17181C', '#C8FF1E'], ['#C8FF1E', '#C8FF1E', '#17181C'], ['#2F5BFF', '#17181C', '#F4F5F7']],
+      rules: ['On Spark, always graphite text.', 'Spark blocks are big or absent: no thin Spark lines.', 'The mark on Spark is graphite with a Dojo head.'],
+      risk: 'Lime blocks with black recall Nike Volt campaigns. Dojo and Heat in the UI move it away.' },
+  ];
+  const PAPERS = [['board', 'Board default', null], ['#FFFFFF', 'Clear white', '#FFFFFF'], ['#F6F8FC', 'Cool white', '#F6F8FC'], ['#F6F0E6', 'Chalk', '#F6F0E6'], ['#0E0F14', 'Ink', '#0E0F14']];
+
+  let cur = 0, paper = 'board';
+  const picker = document.getElementById('picker'), paperEl = document.getElementById('paper'), out = document.getElementById('board');
+  picker.innerHTML = B.map((b, i) => '<button type="button" class="pick" data-i="' + i + '" aria-pressed="' + (i === 0) + '"><small>' + b.kind + '</small><b>' + b.name + '</b><span class="sw">' + b.c.map(c => '<span style="flex:' + Math.max(c[3], 4) + ';background:' + c[0] + '"></span>').join('') + '</span></button>').join('');
+  paperEl.innerHTML = PAPERS.map((p, i) => '<button type="button" data-p="' + p[0] + '" aria-pressed="' + (i === 0) + '">' + (p[2] ? '<i style="background:' + p[2] + '"></i>' : '') + p[1] + '</button>').join('');
+
+  function render() {
+    const b = B[cur], f = F[b.font];
+    const P = paper === 'board' ? b.paper : paper;
+    const dark = lum(P) < .2;
+    const T = dark ? '#FFFFFF' : b.ink;                // text on paper
+    const S = dark ? 'rgba(255,255,255,.07)' : (b.c.find(c => /Sky|Blush|Cream|Surfaces/.test(c[2] + c[1])) || [null])[0] || 'rgba(0,0,0,.04)'; // soft surface
+    const surf = dark ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.035)';
+    const body = dark && lum(b.body) < .05 ? '#FFFFFF' : b.body;   // keep mark visible on ink
+    const H = (s, extra) => '<span style="font-family:' + f.fam + ';' + f.css + (extra || '') + '">' + s + '</span>';
+
+    const phone = () => {
+      const scrBg = P, t = T;
+      return '<div class="phone"><div class="scr" style="background:' + scrBg + ';color:' + t + '">' +
+        '<div class="st"><span>9:41</span><span>●●● 5G</span></div>' +
+        '<div class="top"><span class="wm2">' + MK(b.head, body, 20) + '<span style="font-family:' + f.fam + ';' + f.css.replace(/text-transform:uppercase;?/, '') + 'font-size:20px">' + WM(b.head) + '</span></span><span class="chipx" style="background:' + surf + '">Κυψέλη ▾</span></div>' +
+        '<div class="stories">' + ['BK', 'ΜΑ', 'ΓΙ', 'ΝΙ', 'ΕΛ'].map((s, i) => '<span style="background:' + (i === 0 ? b.pri : surf) + ';color:' + (i === 0 ? on(b.pri) : t) + ';box-shadow:0 0 0 2px ' + P + ',0 0 0 4px ' + (i < 3 ? b.hot : 'transparent') + '">' + s + '</span>').join('') + '</div>' +
+        '<div class="post" style="background:' + surf + '"><div class="ph"><span class="av" style="background:' + b.pri + ';color:' + on(b.pri) + '">BK</span><div><b>BOX ΚΥΨΕΛΗ</b><div style="opacity:.6;font-size:10.5px">Κανάλι · 12′</div></div></div>' +
+        '<div class="img" style="background:' + b.deep + ';color:' + on(b.deep) + '"><span style="font-family:var(--mono);font-size:9.5px;opacity:.75">WOD · ΤΕΤΑΡΤΗ</span><b>' + H('Η ομάδα των 07:00 έσπασε 12 PR.') + '</b></div>' +
+        '<div class="acts"><span class="chipx" style="background:' + b.hot + ';color:' + on(b.hot) + '">' + MK(on(b.hot), on(b.hot), 12) + ' Thumo · 48</span><span class="chipx" style="background:' + surf + '">💬 9</span><span class="chipx" style="background:' + surf + '">Log it</span></div></div>' +
+        '<div class="post" style="background:' + surf + ';margin-top:8px"><div class="ph"><span class="av" style="background:' + b.hot + ';color:' + on(b.hot) + '">ΜΑ</span><div style="flex:1"><b>Μαρία επέστρεψε</b><div style="opacity:.6;font-size:10.5px">μετά από 3 εβδομάδες</div></div><span class="chipx" style="background:' + b.pri + ';color:' + on(b.pri) + '">Comeback</span></div></div>' +
+        '<div class="tabbar" style="border-top:1px solid ' + (dark ? 'rgba(255,255,255,.1)' : 'rgba(0,0,0,.07)') + '">' + ['Αρχική', 'Box', 'Ημερολόγιο', 'Εγώ'].map((x, i) => '<span style="color:' + (i === 0 ? (dark && lum(b.pri) < .05 ? '#fff' : (!dark && lum(b.pri) > .6 ? b.ink : b.pri)) : t) + ';opacity:' + (i === 0 ? 1 : .55) + '"><i style="background:currentColor;border-radius:' + (i === 0 ? '50%' : '6px') + '"></i>' + x + '</span>').join('') + '</div>' +
+        '</div></div>';
+    };
+
+    const posterBg = b.pri, posterFg = on(b.pri);
+    const tee = '<svg class="tee" viewBox="0 0 300 300" aria-label="T-shirt"><path d="M95 30 L60 45 L20 95 L58 122 L75 102 L75 275 L225 275 L225 102 L242 122 L280 95 L240 45 L205 30 Q190 58 150 58 Q110 58 95 30 Z" fill="' + b.deep + '" stroke="rgba(127,127,127,.25)"/>' + (b.id === 'navy' ? '<rect x="75" y="230" width="150" height="10" fill="#C8323F"/>' : '') + '<g transform="translate(120 100) scale(.3)">' + MK(b.head, lum(b.deep) < .2 && lum(b.body) < .2 ? '#FFFFFF' : b.body).replace('<svg viewBox="0 0 200 200" aria-hidden="true">', '').replace('</svg>', '') + '</g><text x="150" y="196" text-anchor="middle" font-family="' + f.fam.replace(/"/g, "'") + '" font-size="22" font-weight="800" fill="' + on(b.deep) + '">' + (b.font === 'cond' ? 'THUMO UP.' : 'thumoa') + '</text></svg>';
+
+    out.innerHTML = '<div class="board" style="background:' + P + ';color:' + T + '">' +
+      '<div class="hero"><div><div class="tagk">' + b.kind + ' · ' + b.name + '</div>' +
+        '<div class="wm" style="font-family:' + f.fam + ';' + f.css.replace(/text-transform:uppercase;?/, '') + 'margin-top:10px">' + WM(b.head) + '</div>' +
+        '<div class="tg">' + H(b.tag, 'font-weight:' + (b.font === 'serifI' ? 500 : 700) + ';') + '</div>' +
+        '<p class="idea">' + b.idea + '</p></div>' + MK(b.head, body, 0, 'mk') + '</div>' +
+
+      '<div class="sec"><span class="h">Palette · usage ratio</span><div class="pal">' + b.c.map(c => '<div class="sw2" style="background:' + c[0] + ';color:' + on(c[0]) + '"><b>' + c[1] + '</b><span>' + c[0] + '<br>' + c[2] + ' · ' + c[3] + '%</span></div>').join('') + '</div>' +
+        '<div class="ratio">' + b.c.map(c => '<span style="flex:' + c[3] + ';background:' + c[0] + '"></span>').join('') + '</div></div>' +
+
+      '<div class="sec"><div class="kit">' +
+        '<div class="type"><span class="h">' + f.name + '</span><div class="a" style="margin-top:8px">' + H('Αα Ωω Rr') + '</div><div class="b">' + H('Η ομάδα σε περιμένει.', 'font-size:24px;line-height:1.1;display:block;margin-bottom:6px') + ' Body in Commissioner: your 7am crew is waiting. Η ομάδα των 07:00 σε περιμένει.</div></div>' +
+        '<div style="display:grid;gap:12px"><span class="h">UI kit</span><div class="ui">' +
+          '<span class="btn" style="background:' + b.pri + ';color:' + on(b.pri) + '">Check-in</span>' +
+          '<span class="btn" style="border-color:currentColor">Log WOD</span>' +
+          '<span class="btn" style="background:' + b.hot + ';color:' + on(b.hot) + '">' + MK(on(b.hot), on(b.hot), 14) + ' Thumo up</span></div>' +
+          '<div class="ui"><span class="badge" style="background:' + b.deep + ';color:' + b.pop + ';' + (lum(b.pop) < .3 && lum(b.deep) < .2 ? 'color:#fff;' : '') + '">● LIVE · 14 μέσα</span><span class="badge" style="background:' + surf + '">Comeback 🔁</span><span class="badge" style="background:' + b.hot + ';color:' + on(b.hot) + '">PR</span></div>' +
+          '<div class="ui" style="gap:10px">' + b.marks.map(m => '<span style="width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:' + m[2] + ';border:1px solid rgba(127,127,127,.25)">' + MK(m[0], m[1], 40) + '</span>').join('') + '<span style="font-size:12px;opacity:.7;max-width:20ch">Allowed mark colourways. Never Spark with Heat.</span></div>' +
+          '<div class="rules">' + b.rules.map(r => '<span>· ' + r + '</span>').join('') + '<span style="margin-top:6px"><b>Might remind of:</b> ' + b.risk + '</span></div></div>' +
+      '</div></div>' +
+
+      '<div class="sec"><span class="h">Mockups</span><div class="mocks">' +
+        '<div class="mock"><span class="cap">App · feed</span>' + phone() + '</div>' +
+        '<div class="mock"><span class="cap">Poster · club door</span><div class="poster" style="background:' + posterBg + ';color:' + posterFg + '"><div style="display:flex;gap:7px;align-items:center;font-weight:800;font-size:18px">' + MK(b.id === 'heart' || b.head === b.pri ? posterFg : b.head, posterFg, 22) + H(WM(posterFg), 'text-transform:none;font-size:19px') + '</div><div class="pt">' + H(b.font === 'cond' ? 'Open training. Everyone in.' : 'Ανοιχτή προπόνηση. Όλοι μέσα.') + '</div><div style="font-family:var(--mono);font-size:11px">ΣΑΒ 18/10 · 09:00 · BOX ΚΥΨΕΛΗ</div></div></div>' +
+        '<div class="mock"><span class="cap">Instagram story</span><div class="story" style="background:' + b.deep + ';color:' + on(b.deep) + '"><div style="font-family:var(--mono);font-size:10.5px;opacity:.75">@thumoa</div><div>' + MK(b.head, lum(b.deep) < .2 && lum(b.body) < .2 ? '#FFFFFF' : (b.body === b.deep ? b.hot : b.body), 70) + '<div style="font-size:40px;line-height:.95;margin-top:10px">' + H(b.tag) + '</div></div><div class="chipx" style="background:' + b.pop + ';color:' + on(b.pop) + ';justify-self:start;font-size:12px;padding:8px 12px">Βρες τον σύλλογό σου ↗</div></div></div>' +
+        '<div class="mock"><span class="cap">App icons</span><div class="icons">' + [[b.pri, on(b.pri) === '#FFFFFF' ? '#FFFFFF' : b.ink, b.head === b.pri ? null : '#FFFFFF', 76], ['#FFFFFF', b.body, b.head, 58], [b.deep, lum(b.deep) < .2 && lum(b.body) < .2 ? '#FFFFFF' : (b.body === b.deep ? b.hot : b.body), b.head, 44], [b.ink, '#FFFFFF', b.hot, 32]].map(ic => '<span style="width:' + ic[3] + 'px;height:' + ic[3] + 'px;background:' + ic[0] + ';border:1px solid rgba(127,127,127,.25)">' + MK(ic[2] || ic[1], ic[1], Math.round(ic[3] * .66)) + '</span>').join('') + '</div>' +
+          '<span class="cap" style="margin-top:12px">Member card</span><div class="card" style="background:' + b.deep + ';color:' + on(b.deep) + '"><div style="display:flex;justify-content:space-between;align-items:center"><span style="font-weight:800;font-size:18px">' + H(WM(b.head), 'text-transform:none') + '</span>' + MK(b.head, on(b.deep), 26) + '</div><div><div style="font-family:var(--mono);font-size:10px;opacity:.7">MEMBER · BOX ΚΥΨΕΛΗ</div><div style="font-weight:700;font-size:16px">Μαρία Αντωνίου</div></div></div></div>' +
+        '<div class="mock"><span class="cap">Tee · merch</span>' + tee + '</div>' +
+        '<div class="mock"><span class="cap">Door sticker · co-brand</span><div class="sticker" style="background:' + b.pri + ';color:' + on(b.pri) + '">' + MK(b.head === b.pri ? on(b.pri) : b.head, on(b.pri), 70) + '<div style="font-weight:800;font-size:15px;margin-top:6px">BOX ΚΥΨΕΛΗ</div><div style="font-size:12px;opacity:.85">on ' + WM(on(b.pri)) + '</div><div style="font-family:var(--mono);font-size:10px;opacity:.75;margin-top:4px">SCAN · CHECK-IN</div></div></div>' +
+      '</div></div>' +
+      '</div>';
+  }
+  picker.addEventListener('click', e => { const t = e.target.closest('.pick'); if (!t) return; cur = +t.dataset.i; picker.querySelectorAll('.pick').forEach((x, j) => x.setAttribute('aria-pressed', String(j === cur))); render(); });
+  paperEl.addEventListener('click', e => { const t = e.target.closest('button'); if (!t) return; paper = t.dataset.p; paperEl.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', String(x === t))); render(); });
+  render();
+})();
+</script>
