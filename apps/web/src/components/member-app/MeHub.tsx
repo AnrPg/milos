@@ -58,6 +58,8 @@ export function MeHub() {
       </HubCard>
 
       <HubList>
+        <HubListRow href="/me/posts" label={t("mePosts")} detail={t("mePostsHint")} />
+        <HubListRow href="/me/clubs" label={t("meClubs")} detail={t("meClubsHint")} />
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
         <HubListRow href="/me/sharing" label={t("meSharing")} detail={t("meSharingHint")} />
         <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />

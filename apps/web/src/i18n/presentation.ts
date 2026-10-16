@@ -239,6 +239,10 @@ const SEMANTIC_KEYS: Record<string, string> = {
 const API_ERROR_KEYS: Record<string, string> = {
   no_coaching_relationship: "apiErrorNoCoachingRelationship",
   box_message_outside_box_thread: "apiErrorBoxMessageOutsideBoxThread",
+  channel_not_optional: "apiErrorChannelNotOptional",
+  invalid_notify_level: "apiErrorInvalidNotifyLevel",
+  cannot_post_in_channel: "apiErrorCannotPostInChannel",
+  attachment_not_shareable: "apiErrorAttachmentNotShareable",
   invalid_admin_registration_code: "apiErrorInvalidAdminRegistrationCode",
   invalid_invitation: "apiErrorInvalidInvitation",
   invitation_email_mismatch: "apiErrorInvitationEmailMismatch",

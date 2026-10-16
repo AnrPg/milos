@@ -3,6 +3,10 @@
 import { useMemo } from "react";
 import { useTranslations } from "next-intl";
 
+import { ClubBar } from "@/components/community/ClubBar";
+import { ComposeButton } from "@/components/community/ComposeSheet";
+import { FeedList } from "@/components/community/FeedList";
+import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
 import { LeaderboardCard } from "@/components/member-app/home/LeaderboardCard";
@@ -16,25 +20,29 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 /**
  * Αρχική (brief §6.1, §7.1): what is happening at my gym. Fixed slots, each
  * with an empty state: greeting, the gym's WOD of the day, challenges,
- * leaderboard, then club posts. The WOD, challenges and posts slots become
- * the club's #wod-σήμερα, #challenges and feed when the Community context
- * lands (ADR-138); their place on the screen does not change.
+ * leaderboard, then the feed of the member's clubs (ADR-138) under the club
+ * bar, with ⊕ to post. The WOD and challenges slots become the club's
+ * #wod-σήμερα and #challenges cards (M8); their place does not change.
  */
 export function HomeHub() {
   const t = useTranslations("MemberApp");
   const { currentUser, tokens } = useSession();
   const landing = useLanding();
   const gamification = landing.data?.gamification;
+  const clubs = useMyClubs();
+  useClubRealtime(clubs.data);
 
   return (
-    <HubPage title={t("homeTitle")}>
+    <HubPage title={t("homeTitle")} actions={<ComposeButton clubs={clubs.data ?? []} />}>
+      {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
       <WodTodayCard token={tokens?.access_token ?? null} />
       <ChallengesCard challenges={gamification?.active_challenges ?? []} />
       {gamification ? <LeaderboardCard leaderboard={gamification.leaderboard} /> : null}
-      <HubCard eyebrow={t("feedPosts")}>
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("feedPostsEmpty")}</p>
-      </HubCard>
+      <section aria-label={t("feedPosts")} className="flex flex-col gap-3">
+        <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("feedPosts")}</p>
+        <FeedList filter={{}} empty={t("feedPostsEmpty")} />
+      </section>
     </HubPage>
   );
 }
