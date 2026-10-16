@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Der Check-in öffnet 30 Minuten vor dem Kurs.",
     "apiErrorCheckInClosed": "Der Kurs ist vorbei.",
     "apiErrorAttendanceAlreadyRecorded": "Deine Anwesenheit wurde bereits erfasst.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Einchecken geht nur mit einer bestätigten Buchung."
+    "apiErrorAttendanceRequiresApprovedBooking": "Einchecken geht nur mit einer bestätigten Buchung.",
+    "coachProgrammeTitle": "Mein Programm",
+    "coachProgrammeHint": "Tag ändern, ein Workout ablehnen oder deinen Coach um eines bitten."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Wird eingecheckt…",
     "checkedIn": "Eingecheckt ✓",
     "followClassTimer": "Live-Kurstimer",
-    "classCheckIn": "Einchecken"
+    "classCheckIn": "Einchecken",
+    "programmeManage": "Tag ändern oder ablehnen"
   },
   "Community": {
     "all": "Alle",

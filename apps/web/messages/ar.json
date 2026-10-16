@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "يُفتح تسجيل الحضور قبل الحصة بـ30 دقيقة.",
     "apiErrorCheckInClosed": "انتهت الحصة.",
     "apiErrorAttendanceAlreadyRecorded": "سُجّل حضورك بالفعل.",
-    "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد."
+    "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد.",
+    "coachProgrammeTitle": "برنامجي",
+    "coachProgrammeHint": "غيّر يومًا أو ارفض تمرينًا أو اطلب تمرينًا من مدربك."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -5070,7 +5072,8 @@
     "checkingIn": "جارٍ تسجيل الحضور…",
     "checkedIn": "تم تسجيل الحضور ✓",
     "followClassTimer": "مؤقت الحصة المباشر",
-    "classCheckIn": "تسجيل الحضور"
+    "classCheckIn": "تسجيل الحضور",
+    "programmeManage": "تغيير اليوم أو الرفض"
   },
   "Community": {
     "all": "الكل",

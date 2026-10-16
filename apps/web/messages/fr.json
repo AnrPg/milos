@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "L'enregistrement ouvre 30 minutes avant le cours.",
     "apiErrorCheckInClosed": "Le cours est terminé.",
     "apiErrorAttendanceAlreadyRecorded": "Ta présence est déjà enregistrée.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Seule une réservation validée permet de s'enregistrer."
+    "apiErrorAttendanceRequiresApprovedBooking": "Seule une réservation validée permet de s'enregistrer.",
+    "coachProgrammeTitle": "Mon programme",
+    "coachProgrammeHint": "Change un jour, refuse une séance ou demande-en une à ton coach."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Enregistrement…",
     "checkedIn": "Enregistré ✓",
     "followClassTimer": "Minuteur du cours en direct",
-    "classCheckIn": "S'enregistrer"
+    "classCheckIn": "S'enregistrer",
+    "programmeManage": "Changer le jour ou refuser"
   },
   "Community": {
     "all": "Tout",

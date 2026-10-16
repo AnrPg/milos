@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "הצ'ק-אין נפתח 30 דקות לפני השיעור.",
     "apiErrorCheckInClosed": "השיעור הסתיים.",
     "apiErrorAttendanceAlreadyRecorded": "הנוכחות שלך כבר נרשמה.",
-    "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת."
+    "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת.",
+    "coachProgrammeTitle": "התוכנית שלי",
+    "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "מבצעים צ'ק-אין…",
     "checkedIn": "בוצע צ'ק-אין ✓",
     "followClassTimer": "טיימר השיעור בשידור חי",
-    "classCheckIn": "צ'ק-אין"
+    "classCheckIn": "צ'ק-אין",
+    "programmeManage": "שינוי יום או דחייה"
   },
   "Community": {
     "all": "הכול",

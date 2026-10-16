@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Το check-in ανοίγει 30 λεπτά πριν από την τάξη.",
     "apiErrorCheckInClosed": "Η τάξη έχει τελειώσει.",
     "apiErrorAttendanceAlreadyRecorded": "Η παρουσία σου έχει ήδη καταγραφεί.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Check-in γίνεται μόνο με εγκεκριμένη κράτηση."
+    "apiErrorAttendanceRequiresApprovedBooking": "Check-in γίνεται μόνο με εγκεκριμένη κράτηση.",
+    "coachProgrammeTitle": "Το πρόγραμμά μου",
+    "coachProgrammeHint": "Άλλαξε ημέρα, απόρριψε ή ζήτα προπόνηση από τον coach."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Γίνεται check-in…",
     "checkedIn": "Check-in ✓",
     "followClassTimer": "Ζωντανό χρονόμετρο",
-    "classCheckIn": "Check-in"
+    "classCheckIn": "Check-in",
+    "programmeManage": "Αλλαγή ημέρας ή απόρριψη"
   },
   "Community": {
     "all": "Όλα",

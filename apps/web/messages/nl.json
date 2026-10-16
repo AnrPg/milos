@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Inchecken kan vanaf 30 minuten voor de les.",
     "apiErrorCheckInClosed": "De les is afgelopen.",
     "apiErrorAttendanceAlreadyRecorded": "Je aanwezigheid is al geregistreerd.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken."
+    "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken.",
+    "coachProgrammeTitle": "Mijn programma",
+    "coachProgrammeHint": "Wijzig een dag, weiger een training of vraag je coach om een training."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Bezig met inchecken…",
     "checkedIn": "Ingecheckt ✓",
     "followClassTimer": "Live lestimer",
-    "classCheckIn": "Inchecken"
+    "classCheckIn": "Inchecken",
+    "programmeManage": "Dag wijzigen of weigeren"
   },
   "Community": {
     "all": "Alles",

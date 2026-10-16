@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Il check-in apre 30 minuti prima della classe.",
     "apiErrorCheckInClosed": "La classe è finita.",
     "apiErrorAttendanceAlreadyRecorded": "La tua presenza è già registrata.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in."
+    "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in.",
+    "coachProgrammeTitle": "Il mio programma",
+    "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Check-in in corso…",
     "checkedIn": "Check-in fatto ✓",
     "followClassTimer": "Timer della classe dal vivo",
-    "classCheckIn": "Check-in"
+    "classCheckIn": "Check-in",
+    "programmeManage": "Cambia giorno o rifiuta"
   },
   "Community": {
     "all": "Tutti",

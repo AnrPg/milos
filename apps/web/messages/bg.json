@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Чекирането започва 30 минути преди тренировката.",
     "apiErrorCheckInClosed": "Тренировката е приключила.",
     "apiErrorAttendanceAlreadyRecorded": "Присъствието ти вече е отбелязано.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Чекиране е възможно само с одобрена резервация."
+    "apiErrorAttendanceRequiresApprovedBooking": "Чекиране е възможно само с одобрена резервация.",
+    "coachProgrammeTitle": "Моята програма",
+    "coachProgrammeHint": "Смени ден, откажи тренировка или поискай нова от треньора си."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Чекиране…",
     "checkedIn": "Чекиран ✓",
     "followClassTimer": "Таймер на тренировката на живо",
-    "classCheckIn": "Чекирай се"
+    "classCheckIn": "Чекирай се",
+    "programmeManage": "Смени деня или откажи"
   },
   "Community": {
     "all": "Всички",

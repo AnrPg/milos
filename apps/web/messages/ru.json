@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "Отметиться можно за 30 минут до занятия.",
     "apiErrorCheckInClosed": "Занятие закончилось.",
     "apiErrorAttendanceAlreadyRecorded": "Ваше посещение уже отмечено.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Отметиться можно только с подтверждённой записью."
+    "apiErrorAttendanceRequiresApprovedBooking": "Отметиться можно только с подтверждённой записью.",
+    "coachProgrammeTitle": "Моя программа",
+    "coachProgrammeHint": "Перенесите день, откажитесь от тренировки или попросите тренера о новой."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "Отмечаемся…",
     "checkedIn": "Вы отметились ✓",
     "followClassTimer": "Таймер занятия онлайн",
-    "classCheckIn": "Отметиться"
+    "classCheckIn": "Отметиться",
+    "programmeManage": "Перенести или отказаться"
   },
   "Community": {
     "all": "Все",

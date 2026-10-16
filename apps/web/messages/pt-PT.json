@@ -4330,7 +4330,9 @@
     "apiErrorCheckInNotOpen": "O check-in abre 30 minutos antes da aula.",
     "apiErrorCheckInClosed": "A aula já terminou.",
     "apiErrorAttendanceAlreadyRecorded": "A tua presença já foi registada.",
-    "apiErrorAttendanceRequiresApprovedBooking": "Só uma reserva aprovada permite fazer check-in."
+    "apiErrorAttendanceRequiresApprovedBooking": "Só uma reserva aprovada permite fazer check-in.",
+    "coachProgrammeTitle": "O meu programa",
+    "coachProgrammeHint": "Muda um dia, recusa um treino ou pede um ao teu coach."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -5070,7 +5072,8 @@
     "checkingIn": "A fazer check-in…",
     "checkedIn": "Check-in feito ✓",
     "followClassTimer": "Cronómetro da aula em direto",
-    "classCheckIn": "Fazer check-in"
+    "classCheckIn": "Fazer check-in",
+    "programmeManage": "Mudar o dia ou recusar"
   },
   "Community": {
     "all": "Tudo",

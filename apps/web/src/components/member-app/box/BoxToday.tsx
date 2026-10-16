@@ -187,6 +187,15 @@ export function BoxToday() {
             )}
 
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+            {selected.kind === "programme" && !selected.completed ? (
+              <Link
+                href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
+                className="self-start text-sm font-semibold"
+                style={{ color: "var(--primary-strong)" }}
+              >
+                {t("programmeManage")} ›
+              </Link>
+            ) : null}
             <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
             <WorkoutPreviewDetail
               sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
