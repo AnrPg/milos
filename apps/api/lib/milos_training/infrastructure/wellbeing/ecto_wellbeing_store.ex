@@ -6,7 +6,8 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   alias Ecto.Multi
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
-  alias MilosTraining.Wellbeing.{InjuryReport, InjuryStatusEvent}
+  alias MilosTraining.Infrastructure.Journal.FeedBound
+  alias MilosTraining.Wellbeing.{CheckIn, InjuryReport, InjuryStatusEvent}
 
   @impl true
   def report_injury(user_id, actor_id, actor_role, params) do
@@ -289,5 +290,109 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       true ->
         query
     end
+  end
+
+  @impl true
+  def create_check_in(attrs) do
+    attrs
+    |> CheckIn.create_changeset()
+    |> Repo.insert()
+    |> normalize_check_in_result()
+  end
+
+  @impl true
+  def delete_check_in(id, user_id, now) do
+    case live_check_in(id, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      check_in ->
+        check_in |> CheckIn.delete_changeset(now) |> Repo.update() |> normalize_check_in_result()
+    end
+  end
+
+  @impl true
+  def get_check_in_for_user(id, user_id) do
+    case live_check_in(id, user_id) do
+      nil -> nil
+      check_in -> normalize_check_in(check_in)
+    end
+  end
+
+  @impl true
+  def set_check_in_visibility(id, user_id, rung) do
+    case live_check_in(id, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      check_in ->
+        check_in
+        |> CheckIn.visibility_changeset(rung)
+        |> Repo.update()
+        |> normalize_check_in_result()
+    end
+  end
+
+  @impl true
+  def move_check_ins(user_id, from, to) do
+    {count, _rows} =
+      CheckIn
+      |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+      |> where([check_in], not is_nil(check_in.organization_id))
+      |> where([check_in], check_in.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to, updated_at: DateTime.utc_now()])
+
+    count
+  end
+
+  @impl true
+  def list_check_in_items(user_id, bound, limit) do
+    CheckIn
+    |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+    |> FeedBound.apply(:recorded_at, bound)
+    |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  # Coach tenant session: RLS admits only this gym's check-ins whose rung
+  # reaches the coach; the predicates below make the intent explicit.
+  @impl true
+  def list_coach_visible_check_ins(user_id, organization_id) do
+    CheckIn
+    |> where([check_in], check_in.user_id == ^user_id)
+    |> where([check_in], check_in.organization_id == ^organization_id)
+    |> where([check_in], is_nil(check_in.deleted_at))
+    |> where(
+      [check_in],
+      fragment("milos_journal_visibility_reaches_coach(?)", check_in.journal_visibility)
+    )
+    |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  defp live_check_in(id, user_id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} ->
+        CheckIn
+        |> where([check_in], check_in.id == ^id and check_in.user_id == ^user_id)
+        |> where([check_in], is_nil(check_in.deleted_at))
+        |> Repo.one()
+
+      :error ->
+        nil
+    end
+  end
+
+  defp normalize_check_in_result({:ok, check_in}), do: {:ok, normalize_check_in(check_in)}
+  defp normalize_check_in_result(error), do: error
+
+  defp normalize_check_in(%CheckIn{} = check_in) do
+    check_in
+    |> Map.from_struct()
+    |> Map.drop([:__meta__, :deleted_at])
+    |> Map.update!(:sleep_hours, &(&1 && Decimal.to_float(&1)))
   end
 end

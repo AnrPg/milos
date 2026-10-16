@@ -3,7 +3,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant, PRSharingPreference}
+  alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant}
   alias MilosTraining.Pantheon.Domain.PRHistoryPolicy
   alias MilosTraining.Repo
 
@@ -165,19 +165,29 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   end
 
   @impl true
-  def get_sharing_preference(user_id) do
-    case Repo.get(PRSharingPreference, user_id) do
-      nil -> %{coach_visibility: true}
-      preference -> %{coach_visibility: preference.coach_visibility}
+  def set_record_visibility(id, user_id, rung) do
+    case Repo.get_by(PRRecord, id: id, user_id: user_id) do
+      nil ->
+        {:error, :not_found}
+
+      record ->
+        record
+        |> PRRecord.visibility_changeset(rung)
+        |> Repo.update()
+        |> normalize_result(&normalize_pr/1)
     end
   end
 
+  # Only gym PRs move: a personal PR has no coach and stays private.
   @impl true
-  def put_coach_visibility(user_id, enabled?) do
-    (Repo.get(PRSharingPreference, user_id) || %PRSharingPreference{user_id: user_id})
-    |> PRSharingPreference.changeset(%{user_id: user_id, coach_visibility: enabled?})
-    |> Repo.insert_or_update()
-    |> normalize_result(&%{coach_visibility: &1.coach_visibility})
+  def move_records(user_id, from, to) do
+    {count, _rows} =
+      PRRecord
+      |> where([r], r.user_id == ^user_id and not is_nil(r.organization_id))
+      |> where([r], r.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to, updated_at: DateTime.utc_now()])
+
+    count
   end
 
   @impl true
@@ -257,6 +267,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
       beaten_on: Date.to_iso8601(pr.beaten_on),
       supporting_metrics: pr.supporting_metrics || %{},
       notes: pr.notes,
+      journal_visibility: pr.journal_visibility,
       inserted_at: DateTime.to_iso8601(pr.inserted_at),
       updated_at: DateTime.to_iso8601(pr.updated_at)
     }

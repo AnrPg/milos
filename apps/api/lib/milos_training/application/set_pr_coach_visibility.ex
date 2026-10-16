@@ -1,23 +1,32 @@
 defmodule MilosTraining.Application.SetPRCoachVisibility do
   @moduledoc """
-  The owner's coach-visibility opt-out (ADR-129). Applies to every gym the
-  user belongs to; explicit sharing grants are unaffected.
+  "Coaches can see my PRs" (ADR-129, reshaped by ADR-139): sets the member's
+  `pr` default rung and moves every gym PR between `private` and
+  `coach_can_view` to match, so the switch keeps meaning what it says. PRs on
+  a higher rung (a reply request, a post) and explicit grants are unaffected.
   """
 
   alias MilosTraining.Application.GetPRSharing
-  alias MilosTraining.Pantheon
+  alias MilosTraining.{Journal, Pantheon}
 
   def call(%{user_id: user_id} = context, params) when is_map(params) do
-    enabled? = Map.get(params, "coach_visibility", Map.get(params, :coach_visibility))
+    case Map.get(params, "coach_visibility", Map.get(params, :coach_visibility)) do
+      enabled? when is_boolean(enabled?) ->
+        {rung, other} =
+          if enabled?, do: {"coach_can_view", "private"}, else: {"private", "coach_can_view"}
 
-    with {:ok, _preference} <-
-           Pantheon.with_user_context(context, fn ->
-             Pantheon.set_coach_visibility(user_id, normalize(enabled?))
-           end) do
-      GetPRSharing.call(context)
+        with :ok <-
+               Pantheon.with_user_context(context, fn ->
+                 with :ok <- Journal.put_visibility_default(user_id, "pr", rung) do
+                   _moved = Pantheon.move_records(user_id, [other], rung)
+                   :ok
+                 end
+               end) do
+          GetPRSharing.call(context)
+        end
+
+      _invalid ->
+        {:error, :bad_request}
     end
   end
-
-  defp normalize(value) when is_boolean(value), do: value
-  defp normalize(_value), do: :invalid
 end

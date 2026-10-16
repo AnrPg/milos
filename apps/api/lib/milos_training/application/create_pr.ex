@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.CreatePR do
   alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
-  alias MilosTraining.{Gamification, Organizations, Pantheon}
+  alias MilosTraining.{Gamification, Journal, Organizations, Pantheon}
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
   # ADR-129: a PR may record the gym it was achieved in (`organization_slug`).
@@ -23,6 +23,10 @@ defmodule MilosTraining.Application.CreatePR do
            |> Map.drop(["organization_slug", :organization_slug, "organization_id"])
            |> Map.put("user_id", user_id)
            |> Map.put("organization_id", organization_id)
+           |> Map.put(
+             "journal_visibility",
+             Journal.initial_visibility(user_id, "pr", is_binary(organization_id))
+           )
            |> Pantheon.create_record() do
       {:ok, _stats} = Gamification.increment_advancement(user_id, DateTime.utc_now())
       :ok = PRSearchIndex.enqueue_upsert(pr)
