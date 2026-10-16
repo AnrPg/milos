@@ -259,8 +259,6 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       segment_cycle_counts: execution.segment_cycle_counts || %{},
       checked_exercise_ids: execution.checked_exercise_ids || [],
       section_scores: execution.section_scores || [],
-      exercise_notes: execution.exercise_notes || [],
-      exercise_modifications: execution.exercise_modifications || [],
       lock_version: execution.lock_version,
       kpi_counters: execution.kpi_counters || %{},
       duration_adjustments: execution.duration_adjustments || %{},

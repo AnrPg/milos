@@ -127,16 +127,6 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
                status: :completed,
                section_scores: [
                  %{section_id: section.id, value: 120, unit: "kg"}
-               ],
-               exercise_notes: [
-                 %{
-                   id: Ecto.UUID.generate(),
-                   exercise_id: hd(section.exercises).id,
-                   selected_text: "tempo",
-                   note_text: "Knee felt good",
-                   tags: ["form"],
-                   inserted_at: DateTime.utc_now()
-                 }
                ]
              })
 

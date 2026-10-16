@@ -16,7 +16,6 @@ defmodule MilosTraining.Pantheon.PRRecord do
     field(:higher_is_better, :boolean, default: true)
     field(:beaten_on, :date)
     field(:supporting_metrics, :map, default: %{})
-    field(:notes, :string)
     # ADR-139 ladder rung; the coach read policy asks it, not a per-user switch.
     field(:journal_visibility, :string, default: "coach_can_view")
 
@@ -32,13 +31,11 @@ defmodule MilosTraining.Pantheon.PRRecord do
       :unit,
       :higher_is_better,
       :beaten_on,
-      :supporting_metrics,
-      :notes
+      :supporting_metrics
     ])
     |> validate_required([:user_id, :name, :current_score, :unit, :beaten_on])
     |> validate_inclusion(:unit, @valid_units)
     |> validate_number(:current_score, greater_than_or_equal_to: 0)
-    |> validate_length(:notes, max: 2_000)
     |> foreign_key_constraint(:user_id)
   end
 

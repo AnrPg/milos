@@ -15,7 +15,6 @@ defmodule MilosTraining.Pantheon.Domain.PRView do
       higher_is_better: pr.higher_is_better,
       beaten_on: pr.beaten_on,
       supporting_metrics: pr.supporting_metrics || %{},
-      notes: pr.notes,
       updated_at: pr.updated_at,
       history: Enum.map(history, &history_entry/1)
     }
@@ -27,7 +26,6 @@ defmodule MilosTraining.Pantheon.Domain.PRView do
       score: entry.score,
       beaten_on: entry.beaten_on,
       supporting_metrics: entry.supporting_metrics || %{},
-      notes: entry.notes,
       inserted_at: entry.inserted_at
     }
   end

@@ -229,9 +229,9 @@ defmodule MilosTrainingWeb.Schemas.AdminDrillDown do
         started_at_utc: @date_time,
         completed_at_utc: @date_time,
         section_scores: %Schema{type: :array, items: @open_object},
-        exercise_note_count: %Schema{type: :integer}
+        comment_count: %Schema{type: :integer}
       },
-      required: [:id, :status, :section_scores, :exercise_note_count],
+      required: [:id, :status, :section_scores, :comment_count],
       additionalProperties: false
     }
   end
@@ -252,9 +252,9 @@ defmodule MilosTrainingWeb.Schemas.AdminDrillDown do
     %Schema{
       type: :object,
       properties: %{
-        type: %Schema{type: :string},
+        type: %Schema{type: :string, enum: ["admin_note", "athlete_comment"]},
         id: @uuid,
-        body: @string,
+        body: %Schema{type: :string, nullable: true},
         inserted_at: @date_time
       },
       required: [:type, :body, :inserted_at],

@@ -1,6 +1,7 @@
 defmodule MilosTrainingWeb.Schemas.TrainingLog do
   @moduledoc "OpenAPI schemas for standalone training-log entries (ADR-118)."
 
+  alias MilosTrainingWeb.Schemas.JournalComments
   alias OpenApiSpex.Schema
 
   @source_types ["class", "assigned_workout", "library_workout", "freeform"]
@@ -12,34 +13,6 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
       section_id: %Schema{type: :string},
       value: %Schema{oneOf: [%Schema{type: :number}, %Schema{type: :string}]},
       unit: %Schema{type: :string, nullable: true}
-    }
-  }
-
-  # ADR-050 structured patch shape (see ExecutionController.add_modifications).
-  @modification %Schema{
-    type: :object,
-    required: [:patch_id, :section_id, :field, :canonical_value, :actual_value],
-    properties: %{
-      patch_id: %Schema{type: :string},
-      type: %Schema{type: :string},
-      field: %Schema{type: :string},
-      section_id: %Schema{type: :string},
-      section_name: %Schema{type: :string, nullable: true},
-      segment_key: %Schema{type: :string, nullable: true},
-      exercise_id: %Schema{type: :string, nullable: true},
-      exercise_name: %Schema{type: :string, nullable: true},
-      set_index: %Schema{type: :integer, nullable: true},
-      round_index: %Schema{type: :integer, nullable: true},
-      interval_index: %Schema{type: :integer, nullable: true},
-      row_index: %Schema{type: :integer, nullable: true},
-      canonical_value: %Schema{
-        oneOf: [%Schema{type: :string}, %Schema{type: :number}, %Schema{type: :boolean}]
-      },
-      actual_value: %Schema{
-        oneOf: [%Schema{type: :string}, %Schema{type: :number}, %Schema{type: :boolean}]
-      },
-      unit: %Schema{type: :string, nullable: true},
-      note: %Schema{type: :string, nullable: true}
     }
   }
 
@@ -57,8 +30,7 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
       distance: %Schema{type: :number, nullable: true, minimum: 0},
       distance_unit: %Schema{type: :string, nullable: true, enum: ["m", "km", "mi"]},
       duration_seconds: %Schema{type: :integer, nullable: true, minimum: 0},
-      calories: %Schema{type: :integer, nullable: true, minimum: 0},
-      note: %Schema{type: :string, nullable: true, maxLength: 500}
+      calories: %Schema{type: :integer, nullable: true, minimum: 0}
     }
   }
 
@@ -68,10 +40,8 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
     title: %Schema{type: :string, nullable: true, maxLength: 160},
     duration_seconds: %Schema{type: :integer, nullable: true, minimum: 0, maximum: 86_400},
     perceived_effort: %Schema{type: :integer, nullable: true, minimum: 1, maximum: 10},
-    notes: %Schema{type: :string, nullable: true, maxLength: 4000},
     scale_level_slug: %Schema{type: :string, nullable: true},
     section_scores: %Schema{type: :array, items: @section_score, maxItems: 50},
-    exercise_modifications: %Schema{type: :array, items: @modification},
     performed_exercises: %Schema{type: :array, items: @performed_exercise, maxItems: 50}
   }
 
@@ -86,8 +56,8 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
       :status,
       :lock_version,
       :section_scores,
-      :exercise_modifications,
-      :performed_exercises
+      :performed_exercises,
+      :comments
     ],
     properties: %{
       id: %Schema{type: :string, format: :uuid},
@@ -104,9 +74,7 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
       performed_at_tz: %Schema{type: :string},
       duration_seconds: %Schema{type: :integer, nullable: true},
       perceived_effort: %Schema{type: :integer, nullable: true},
-      notes: %Schema{type: :string, nullable: true},
       section_scores: %Schema{type: :array, items: @section_score},
-      exercise_modifications: %Schema{type: :array, items: @modification},
       performed_exercises: %Schema{type: :array, items: @performed_exercise},
       status: %Schema{type: :string, enum: ["logged", "voided"]},
       voided_at: %Schema{type: :string, format: :"date-time", nullable: true},
@@ -140,7 +108,8 @@ defmodule MilosTrainingWeb.Schemas.TrainingLog do
         Map.merge(@detail_properties, %{
           source_type: %Schema{type: :string, enum: @source_types},
           source_reference_id: %Schema{type: :string, format: :uuid, nullable: true},
-          idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 128}
+          idempotency_key: %Schema{type: :string, minLength: 8, maxLength: 128},
+          comments: JournalComments.inline_inputs()
         }),
       additionalProperties: false
     }

@@ -46,5 +46,23 @@ defmodule MilosTraining.Journal.JournalStore do
   @impl true
   def record_coach_reads(rows), do: adapter().record_coach_reads(rows)
 
+  @impl true
+  def save_comment(attrs), do: adapter().save_comment(attrs)
+
+  @impl true
+  def delete_comment(id, user_id, now), do: adapter().delete_comment(id, user_id, now)
+
+  @impl true
+  def list_comments(entry_kind, entry_ids), do: adapter().list_comments(entry_kind, entry_ids)
+
+  @impl true
+  def list_changes_since(user_id, since), do: adapter().list_changes_since(user_id, since)
+
+  @impl true
+  def entry_owner(entry_kind, entry_id), do: adapter().entry_owner(entry_kind, entry_id)
+
+  @impl true
+  def comments_transaction(fun), do: adapter().comments_transaction(fun)
+
   defp adapter, do: Application.fetch_env!(:milos_training, :journal_store)
 end

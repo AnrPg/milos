@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.ListWorkoutExecutions do
+  alias MilosTraining.Application.JournalComments
   alias MilosTraining.Execution
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.{Organizations, Workouts}
@@ -10,6 +11,7 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
     executions =
       user_id
       |> Execution.list_executions_for_user()
+      |> JournalComments.attach("execution")
       |> Enum.map(&attach_workout_summary/1)
 
     {:ok, executions}
@@ -18,6 +20,7 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
   def for_coaching(user_id) do
     user_id
     |> Execution.list_executions_for_coaching()
+    |> JournalComments.attach("execution")
     |> Enum.map(&attach_workout_summary/1)
   end
 

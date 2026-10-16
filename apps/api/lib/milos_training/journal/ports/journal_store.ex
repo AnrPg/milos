@@ -22,4 +22,14 @@ defmodule MilosTraining.Journal.Ports.JournalStore do
   @callback list_coach_visible_notes(user_id :: Ecto.UUID.t(), organization_id :: Ecto.UUID.t()) ::
               [map()]
   @callback record_coach_reads([map()]) :: :ok
+
+  @callback save_comment(map()) :: {:ok, map()} | {:error, :comment_conflict | Ecto.Changeset.t()}
+  @callback delete_comment(Ecto.UUID.t(), Ecto.UUID.t(), DateTime.t()) ::
+              {:ok, map()} | {:error, :not_found}
+  @callback list_comments(String.t(), [Ecto.UUID.t()]) :: [map()]
+  @callback entry_owner(String.t(), Ecto.UUID.t()) ::
+              %{user_id: Ecto.UUID.t(), organization_id: Ecto.UUID.t() | nil} | nil
+  @callback comments_transaction((-> {:ok, term()} | {:error, term()})) ::
+              {:ok, term()} | {:error, term()}
+  @callback list_changes_since(Ecto.UUID.t(), DateTime.t()) :: [map()]
 end

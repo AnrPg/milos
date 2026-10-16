@@ -12,6 +12,7 @@ defmodule MilosTrainingWeb.PRController do
     UpdatePR
   }
 
+  alias MilosTrainingWeb.Schemas.JournalComments
   alias OpenApiSpex.{Parameter, Schema}
 
   action_fallback(MilosTrainingWeb.FallbackController)
@@ -41,7 +42,7 @@ defmodule MilosTrainingWeb.PRController do
       description:
         "Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation."
     },
-    notes: %Schema{type: :string, maxLength: 2000}
+    comments: JournalComments.inline_inputs()
   }
 
   operation(:index,

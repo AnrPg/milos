@@ -1,11 +1,11 @@
 defmodule MilosTraining.Gamification.Domain.PerseveranceCalculator do
   @moduledoc """
-  Calculates perseverance score from exercise_modifications over last 7 training days.
+  Calculates perseverance score from the member's recorded changes (the
+  structured `change` of their comments, ADR-140 §1, with `logged_at` set to
+  when it was written) over the last 7 training days.
 
-  For each modification entry:
-    - skipped exercise: deviation = sets * prescribed_reps (field = "reps" or "sets")
-    - time field: deviation = |prescribed_mins - actual_mins| / prescribed_mins
-    - other numeric: deviation = |prescribed - actual| / prescribed
+  For each change: a skipped exercise deviates fully (1.0); a numeric
+  change deviates by |prescribed - actual| / prescribed, capped at 1.
 
   Perseverance = mean(1 - deviation_ratio) per day, then mean across last 7 training days.
   Returns 100.0 when no modifications exist (no deviations = perfect execution).
@@ -65,39 +65,37 @@ defmodule MilosTraining.Gamification.Domain.PerseveranceCalculator do
     |> Enum.take(n)
   end
 
-  defp deviation_ratio(%{"skipped" => true} = mod) do
-    sets = get_float(mod, "sets", 1.0)
-    prescribed = get_float(mod, "prescribed_value", 1.0)
-    min(sets * prescribed / max(prescribed, 1.0), 1.0)
-  end
-
-  defp deviation_ratio(%{"field" => "time_mins"} = mod) do
-    prescribed = get_float(mod, "prescribed_value", 0.0)
-    actual = get_float(mod, "actual_value", prescribed)
-
-    if prescribed == 0.0 do
-      0.0
-    else
-      min(abs(prescribed - actual) / prescribed, 1.0)
-    end
-  end
+  # A skipped exercise is a full deviation; a changed value deviates by its
+  # relative distance from the prescription (`canonical_value`, or the older
+  # `prescribed_value`), capped at 1. Non-numeric changes (a substitution, a
+  # tempo) carry no measurable deviation.
+  defp deviation_ratio(%{"type" => "skipped"}), do: 1.0
+  defp deviation_ratio(%{"skipped" => true}), do: 1.0
 
   defp deviation_ratio(mod) do
-    prescribed = get_float(mod, "prescribed_value", 0.0)
-    actual = get_float(mod, "actual_value", prescribed)
+    prescribed = number(mod, "canonical_value") || number(mod, "prescribed_value")
+    actual = number(mod, "actual_value")
 
-    if prescribed == 0.0 do
+    if is_nil(prescribed) or is_nil(actual) or prescribed == 0.0 do
       0.0
     else
-      min(abs(prescribed - actual) / prescribed, 1.0)
+      min(abs(prescribed - actual) / abs(prescribed), 1.0)
     end
   end
 
-  defp get_float(mod, key, default) do
-    case Map.get(mod, key) || Map.get(mod, String.to_atom(key)) do
-      nil -> default
-      v when is_number(v) -> v / 1.0
-      _ -> default
+  defp number(mod, key) do
+    case Map.get(mod, key) do
+      value when is_number(value) ->
+        value / 1.0
+
+      value when is_binary(value) ->
+        case Float.parse(String.trim(value)) do
+          {number, _unit} -> number
+          :error -> nil
+        end
+
+      _other ->
+        nil
     end
   end
 

@@ -1682,6 +1682,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "note_too_long", error: "The update text is too long"})
   end
 
+  def call(conn, {:error, :comment_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "comment_conflict", error: "This comment id belongs to another entry"})
+  end
+
   def call(conn, {:error, :injury_already_active}) do
     conn
     |> put_status(:conflict)

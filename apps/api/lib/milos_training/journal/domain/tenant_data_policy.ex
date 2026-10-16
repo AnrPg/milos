@@ -16,6 +16,7 @@ defmodule MilosTraining.Journal.Domain.TenantDataPolicy do
               "Journal notes are member-written personal data; coach-read audit rows only matter while the gym exists.",
             tables: [
               %{table: "journal_coach_reads"},
+              %{table: "journal_comments", rls: :user},
               %{table: "journal_notes", rls: :user}
             ]
           })

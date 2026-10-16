@@ -28,8 +28,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     field(:segment_cycle_counts, :map, default: %{})
     field(:checked_exercise_ids, {:array, :string}, default: [])
     field(:section_scores, {:array, :map}, default: [])
-    field(:exercise_notes, {:array, :map}, default: [])
-    field(:exercise_modifications, {:array, :map}, default: [])
     field(:lock_version, :integer, default: 1)
     field(:kpi_counters, :map, default: %{})
     field(:duration_adjustments, :map, default: %{})
@@ -82,7 +80,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :segment_cycle_counts,
       :checked_exercise_ids,
       :section_scores,
-      :exercise_notes,
       :kpi_counters,
       :duration_adjustments
     ])
@@ -106,8 +103,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :segment_cycle_counts,
       :checked_exercise_ids,
       :section_scores,
-      :exercise_notes,
-      :exercise_modifications,
       :kpi_counters,
       :duration_adjustments
     ])

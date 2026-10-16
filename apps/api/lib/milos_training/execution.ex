@@ -3,7 +3,6 @@ defmodule MilosTraining.Execution do
     CompleteExecution,
     LogTrainingEntry,
     StartExecution,
-    SubmitExecutionNote,
     UpdateExecutionProgress,
     UpdateTrainingLogEntry,
     VoidTrainingLogEntry
@@ -12,6 +11,7 @@ defmodule MilosTraining.Execution do
   alias MilosTraining.Execution.Domain.{
     ExecutionAnalytics,
     ExecutionKpis,
+    ModificationPatchValidator,
     TimerSequenceBuilder,
     TrainingLogPolicy
   }
@@ -27,7 +27,8 @@ defmodule MilosTraining.Execution do
     to: UpdateExecutionProgress,
     as: :call
 
-  defdelegate submit_execution_note(id, user_id, params), to: SubmitExecutionNote, as: :call
+  @doc "A structured change as stored on a comment (ADR-140 §1)."
+  defdelegate normalize_modification(patch), to: ModificationPatchValidator, as: :normalize
   defdelegate get_execution(id), to: GetExecution, as: :by_id
   defdelegate get_execution_for_user(id, user_id), to: GetExecution, as: :by_id_for_user
   defdelegate list_executions_for_user(user_id), to: GetExecution, as: :for_user

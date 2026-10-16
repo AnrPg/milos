@@ -4,7 +4,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   import Ecto.Query
 
   alias MilosTraining.Infrastructure.Journal.FeedBound
-  alias MilosTraining.Journal.{CoachRead, Note, VisibilityDefault}
+  alias MilosTraining.Journal.{CoachRead, Comment, Note, VisibilityDefault}
   alias MilosTraining.Repo
 
   @impl true
@@ -134,6 +134,126 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
 
     {_count, _rows} = Repo.insert_all(CoachRead, entries)
     :ok
+  end
+
+  # Σχόλια (ADR-140 §1). A save is an upsert: by the comment's id when the
+  # owner already has it, else by the change key of a structured change on
+  # the same entry, else a new comment.
+  @impl true
+  def save_comment(%{user_id: user_id} = attrs) do
+    case existing_comment(attrs) do
+      nil ->
+        attrs |> Comment.create_changeset() |> Repo.insert() |> normalize_comment_result()
+
+      %Comment{user_id: ^user_id, entry_kind: kind, entry_id: entry_id} = comment
+      when kind == attrs.entry_kind and entry_id == attrs.entry_id ->
+        comment |> Comment.update_changeset(attrs) |> Repo.update() |> normalize_comment_result()
+
+      %Comment{} ->
+        {:error, :comment_conflict}
+    end
+  end
+
+  @impl true
+  def delete_comment(id, user_id, now) do
+    case live_comment(id) do
+      %Comment{user_id: ^user_id} = comment ->
+        comment |> Comment.delete_changeset(now) |> Repo.update() |> normalize_comment_result()
+
+      _missing ->
+        {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def list_comments(_entry_kind, []), do: []
+
+  def list_comments(entry_kind, entry_ids) do
+    Comment
+    |> where([comment], comment.entry_kind == ^entry_kind and comment.entry_id in ^entry_ids)
+    |> where([comment], is_nil(comment.deleted_at))
+    |> order_by([comment], asc: comment.written_at, asc: comment.id)
+    |> Repo.all()
+    |> Enum.map(&normalize_comment/1)
+  end
+
+  @impl true
+  def list_changes_since(user_id, %DateTime{} = since) do
+    Comment
+    |> where([comment], comment.user_id == ^user_id and is_nil(comment.deleted_at))
+    |> where([comment], not is_nil(comment.change) and comment.written_at >= ^since)
+    |> order_by([comment], asc: comment.written_at)
+    |> Repo.all()
+    |> Enum.map(&normalize_comment/1)
+  end
+
+  @impl true
+  def comments_transaction(fun) do
+    # Inside an outer transaction (an entry saved with its comments) the
+    # outer one decides; a nested rollback would poison it.
+    if Repo.in_transaction?(), do: fun.(), else: transact(fun)
+  end
+
+  defp transact(fun) do
+    Repo.transaction(fn ->
+      case fun.() do
+        {:ok, result} -> result
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  @impl true
+  def entry_owner(entry_kind, entry_id) do
+    with {:ok, uuid} <- Ecto.UUID.dump(entry_id),
+         %{rows: [[user_id, organization_id]]} <-
+           Repo.query!(
+             "SELECT user_id, organization_id FROM milos_journal_entry_owner($1, $2)",
+             [entry_kind, uuid]
+           ) do
+      %{user_id: load_uuid(user_id), organization_id: load_uuid(organization_id)}
+    else
+      _missing -> nil
+    end
+  end
+
+  defp load_uuid(nil), do: nil
+  defp load_uuid(binary), do: Ecto.UUID.load!(binary)
+
+  defp existing_comment(attrs) do
+    by_id = Map.get(attrs, :id) && live_comment(attrs.id)
+
+    by_id ||
+      case Map.get(attrs, :change) do
+        %{"patch_id" => key} when is_binary(key) ->
+          Comment
+          |> where([comment], comment.entry_kind == ^attrs.entry_kind)
+          |> where([comment], comment.entry_id == ^attrs.entry_id and comment.change_key == ^key)
+          |> where([comment], is_nil(comment.deleted_at) and comment.user_id == ^attrs.user_id)
+          |> Repo.one()
+
+        _no_change ->
+          nil
+      end
+  end
+
+  defp live_comment(id) do
+    with {:ok, id} <- Ecto.UUID.cast(id) do
+      Comment
+      |> where([comment], comment.id == ^id and is_nil(comment.deleted_at))
+      |> Repo.one()
+    else
+      :error -> nil
+    end
+  end
+
+  defp normalize_comment_result({:ok, comment}), do: {:ok, normalize_comment(comment)}
+  defp normalize_comment_result(error), do: error
+
+  defp normalize_comment(%Comment{} = comment) do
+    comment
+    |> Map.from_struct()
+    |> Map.drop([:__meta__, :deleted_at, :change_key, :inserted_at])
   end
 
   defp live_note(id, user_id) do

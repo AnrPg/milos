@@ -855,6 +855,9 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    post("/journal/comments/batch", JournalCommentController, :batch)
+    put("/journal/comments/:id", JournalCommentController, :save)
+    delete("/journal/comments/:id", JournalCommentController, :delete)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
@@ -877,9 +880,7 @@ defmodule MilosTrainingWeb.Router do
     get("/vault", ExecutionController, :vault)
     get("/:id", ExecutionController, :show)
     patch("/:id/progress", ExecutionController, :update_progress)
-    post("/:id/notes", ExecutionController, :submit_note)
     patch("/:id/complete", ExecutionController, :complete)
-    post("/:id/modifications", ExecutionController, :add_modifications)
   end
 
   # ADR-123: batched client interaction analytics get their own bucket so a

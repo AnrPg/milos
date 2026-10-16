@@ -16,6 +16,7 @@ defmodule MilosTraining.Application.LogTrainingEntry do
     AuthorizeTrainingLogSource,
     CompleteWorkout,
     InjuryWarningEvaluation,
+    JournalComments,
     TrackAnalyticsEvent
   }
 
@@ -35,10 +36,24 @@ defmodule MilosTraining.Application.LogTrainingEntry do
         {:error, reason} -> {:error, reason}
         :none -> log_new(context, user_id, params, now)
       end
+      |> with_comments(context, params, now)
     end)
   end
 
   def call(_context, _actor, _params), do: {:error, :organization_context_required}
+
+  # ADR-140 §1: comments written in the log form travel with the entry so
+  # the offline outbox replays them together. They are upserted by their own
+  # ids, so a replay converges too.
+  defp with_comments({:ok, entry, outcome}, context, params, now) do
+    comments = params["comments"] || params[:comments]
+
+    with {:ok, _saved} <-
+           JournalComments.save_for_entry(context, "training_log", entry.id, comments, now),
+         do: {:ok, JournalComments.attach(entry, "training_log"), outcome}
+  end
+
+  defp with_comments(error, _context, _params, _now), do: error
 
   defp log_new(context, user_id, params, now) do
     with {:ok, source} <-

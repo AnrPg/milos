@@ -11,19 +11,21 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
   alias MilosTraining.Gamification.GamificationStore
 
-  def call(%{
-        execution:
-          %{
-            id: execution_id,
-            user_id: user_id,
-            organization_id: organization_id,
-            completed_at_utc: completed_at
-          } = execution,
-        completed_executions: completed_executions,
-        workout_lookup: workout_lookup,
-        account: account,
-        settings: settings
-      }) do
+  def call(
+        %{
+          execution:
+            %{
+              id: execution_id,
+              user_id: user_id,
+              organization_id: organization_id,
+              completed_at_utc: completed_at
+            } = execution,
+          completed_executions: completed_executions,
+          workout_lookup: workout_lookup,
+          account: account,
+          settings: settings
+        } = params
+      ) do
     current_execution = Enum.find(completed_executions, &(&1.id == execution_id)) || execution
     previous_scores = previous_scores(completed_executions, execution_id, workout_lookup)
 
@@ -46,7 +48,7 @@ defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
 
     perseverance_score =
       PerseveranceCalculator.calculate(
-        Map.get(current_execution, :exercise_modifications, []),
+        Map.get(params, :recent_changes, []),
         off_days,
         today
       )

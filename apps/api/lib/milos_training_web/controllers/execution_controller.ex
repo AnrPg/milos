@@ -3,7 +3,6 @@ defmodule MilosTrainingWeb.ExecutionController do
   use OpenApiSpex.ControllerSpecs
 
   alias MilosTraining.Application.{
-    AddExecutionModifications,
     CompleteWorkout,
     GetWorkoutExecution,
     GetWorkoutTimerSequence,
@@ -11,7 +10,6 @@ defmodule MilosTrainingWeb.ExecutionController do
     IngestExecutionInteractions,
     ListWorkoutExecutions,
     StartWorkoutExecution,
-    SubmitExecutionNote,
     UpdateExecutionProgress
   }
 
@@ -250,40 +248,6 @@ defmodule MilosTrainingWeb.ExecutionController do
     end
   end
 
-  operation(:submit_note,
-    summary: "Submit an execution note and notify admins",
-    parameters: [@id_param],
-    request_body:
-      {"Execution note params", "application/json",
-       %Schema{
-         type: :object,
-         required: [:exercise_id, :selected_text, :selection_start, :selection_end],
-         properties: %{
-           id: %Schema{type: :string, format: :uuid, nullable: true},
-           exercise_id: %Schema{type: :string},
-           selected_text: %Schema{type: :string},
-           selection_start: %Schema{type: :integer, minimum: 0},
-           selection_end: %Schema{type: :integer, minimum: 1},
-           tags: %Schema{type: :array, items: %Schema{type: :string}},
-           note_text: %Schema{type: :string, nullable: true}
-         }
-       }},
-    responses: [
-      ok: {"Execution", "application/json", %Schema{type: :object}},
-      forbidden: {"Error", "application/json", %Schema{type: :object}},
-      not_found: {"Error", "application/json", %Schema{type: :object}}
-    ]
-  )
-
-  def submit_note(conn, %{"id" => id} = params) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, execution} <-
-           SubmitExecutionNote.call(conn.assigns.user_context, id, current_user.id, params) do
-      json(conn, %{execution: execution})
-    end
-  end
-
   operation(:timer_sequence,
     summary: "Get timer sequence for a workout",
     parameters: [
@@ -391,75 +355,6 @@ defmodule MilosTrainingWeb.ExecutionController do
       json(conn, %{workouts: workouts})
     end
   end
-
-  operation(:add_modifications,
-    summary: "Log actual-workout modification patches",
-    parameters: [@id_param],
-    request_body:
-      {"Modifications", "application/json",
-       %Schema{
-         type: :object,
-         required: [:modifications],
-         properties: %{
-           modifications: %Schema{
-             type: :array,
-             items: %Schema{
-               type: :object,
-               required: [:patch_id, :section_id, :field, :canonical_value, :actual_value],
-               properties: %{
-                 patch_id: %Schema{type: :string},
-                 type: %Schema{
-                   type: :string,
-                   enum: [
-                     "skipped",
-                     "weight_changed",
-                     "reps_changed",
-                     "time_changed",
-                     "sets_changed",
-                     "exercise_substituted",
-                     "distance_changed",
-                     "calories_changed",
-                     "field_changed",
-                     "other"
-                   ],
-                   nullable: true
-                 },
-                 field: %Schema{type: :string},
-                 section_id: %Schema{type: :string},
-                 section_name: %Schema{type: :string, nullable: true},
-                 segment_key: %Schema{type: :string, nullable: true},
-                 exercise_id: %Schema{type: :string, nullable: true},
-                 exercise_name: %Schema{type: :string, nullable: true},
-                 set_index: %Schema{type: :integer, minimum: 1, nullable: true},
-                 round_index: %Schema{type: :integer, minimum: 1, nullable: true},
-                 interval_index: %Schema{type: :integer, minimum: 1, nullable: true},
-                 row_index: %Schema{type: :integer, minimum: 1, nullable: true},
-                 canonical_value: %Schema{
-                   oneOf: [
-                     %Schema{type: :string},
-                     %Schema{type: :number},
-                     %Schema{type: :boolean}
-                   ]
-                 },
-                 actual_value: %Schema{
-                   oneOf: [
-                     %Schema{type: :string},
-                     %Schema{type: :number},
-                     %Schema{type: :boolean}
-                   ]
-                 },
-                 unit: %Schema{type: :string, nullable: true},
-                 note: %Schema{type: :string, nullable: true}
-               }
-             }
-           }
-         }
-       }},
-    responses: [
-      ok: {"Execution", "application/json", %Schema{type: :object}},
-      not_found: {"Error", "application/json", %Schema{type: :object}}
-    ]
-  )
 
   # ADR-123: client-only execution interaction signals. The kind enum is the
   # Analytics allowlist itself, so the contract and validation cannot drift.
@@ -598,20 +493,6 @@ defmodule MilosTrainingWeb.ExecutionController do
 
       {:error, reason} ->
         {:error, reason}
-    end
-  end
-
-  def add_modifications(conn, %{"id" => id, "modifications" => modifications}) do
-    current_user = Guardian.Plug.current_resource(conn)
-
-    with {:ok, execution} <-
-           AddExecutionModifications.call(
-             conn.assigns.user_context,
-             id,
-             current_user.id,
-             modifications
-           ) do
-      json(conn, %{execution: execution})
     end
   end
 end

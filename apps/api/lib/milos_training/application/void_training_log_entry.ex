@@ -8,7 +8,7 @@ defmodule MilosTraining.Application.VoidTrainingLogEntry do
   progress already awarded - see ADR-118 Consequences.
   """
 
-  alias MilosTraining.Application.{InvalidateLandingPages, TrackAnalyticsEvent}
+  alias MilosTraining.Application.{InvalidateLandingPages, JournalComments, TrackAnalyticsEvent}
   alias MilosTraining.Execution
 
   def call(%{organization_id: _} = context, %{id: user_id}, entry_id, params)
@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.VoidTrainingLogEntry do
              Execution.void_training_log_entry(entry_id, user_id, params, DateTime.utc_now()) do
         InvalidateLandingPages.for_users([user_id])
         TrackAnalyticsEvent.call("training_log_entry_voided", context, entry)
-        {:ok, entry}
+        {:ok, JournalComments.attach(entry, "training_log")}
       end
     end)
   end

@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.CreatePR do
-  alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
+  alias MilosTraining.Application.{InvalidateLandingPages, JournalComments, PRSearchIndex}
   alias MilosTraining.{Gamification, Journal, Organizations, Pantheon}
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
@@ -9,7 +9,11 @@ defmodule MilosTraining.Application.CreatePR do
   # Without a slug the PR is personal. Everything runs in the owner's scope.
   def call(%{user_id: user_id, account: account} = context, params) when is_map(params) do
     with {:ok, organization_id} <- provenance(account, params) do
-      Pantheon.with_user_context(context, fn -> create(user_id, organization_id, params) end)
+      JournalComments.write_with_comments(context, "pr", comments(params), fn ->
+        Pantheon.with_user_context(context, fn ->
+          create(user_id, organization_id, Map.drop(params, ["comments", :comments]))
+        end)
+      end)
     end
   end
 
@@ -56,4 +60,6 @@ defmodule MilosTraining.Application.CreatePR do
       {:ok, Map.put(params, "supporting_metrics", metrics)}
     end
   end
+
+  defp comments(params), do: params["comments"] || params[:comments]
 end

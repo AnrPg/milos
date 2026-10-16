@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.CompleteWorkout do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Execution, Gamification, Identity, Notifications, Workouts}
+  alias MilosTraining.{Execution, Gamification, Identity, Journal, Notifications, Workouts}
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
   alias MilosTraining.Workers.RefreshLeaderboardJob
@@ -84,7 +84,8 @@ defmodule MilosTraining.Application.CompleteWorkout do
            account: account,
            settings: settings,
            completed_executions: completed_executions,
-           workout_lookup: workout_lookup
+           workout_lookup: workout_lookup,
+           recent_changes: recent_changes(user_id)
          }) do
       {:ok, result} ->
         _ = refresh_leaderboard()
@@ -228,5 +229,17 @@ defmodule MilosTraining.Application.CompleteWorkout do
         _missing -> acc
       end
     end)
+  end
+
+  # Perseverance looks back 7 training days; off days can stretch that, so
+  # read a generous window and let the calculator pick the days.
+  @changes_lookback_days 21
+
+  defp recent_changes(user_id) do
+    since = DateTime.add(DateTime.utc_now(), -@changes_lookback_days * 86_400, :second)
+
+    user_id
+    |> Journal.list_changes_since(since)
+    |> Enum.map(&Map.put(&1.change, "logged_at", &1.written_at))
   end
 end

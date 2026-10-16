@@ -31,9 +31,7 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     field(:performed_at_tz, :string, default: "UTC")
     field(:duration_seconds, :integer)
     field(:perceived_effort, :integer)
-    field(:notes, :string)
     field(:section_scores, {:array, :map}, default: [])
-    field(:exercise_modifications, {:array, :map}, default: [])
     field(:performed_exercises, {:array, :map}, default: [])
     field(:status, :string, default: "logged")
     field(:voided_at, :utc_datetime_usec)
@@ -50,9 +48,7 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     :performed_at_tz,
     :duration_seconds,
     :perceived_effort,
-    :notes,
     :section_scores,
-    :exercise_modifications,
     :performed_exercises,
     :scale_level_slug
   ]
@@ -117,7 +113,6 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
   defp validate_common(changeset) do
     changeset
     |> validate_length(:title, min: 1, max: 160)
-    |> validate_length(:notes, max: 4000)
     |> validate_number(:duration_seconds, greater_than_or_equal_to: 0)
     |> validate_number(:perceived_effort, greater_than_or_equal_to: 1, less_than_or_equal_to: 10)
     |> validate_inclusion(:status, @statuses)

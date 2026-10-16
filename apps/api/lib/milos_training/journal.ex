@@ -78,6 +78,19 @@ defmodule MilosTraining.Journal do
 
   defdelegate record_coach_reads(rows), to: JournalStore
 
+  # Σχόλια (ADR-140 §1): one store for text on an entry, wherever written.
+  defdelegate comment_entry_kinds(), to: MilosTraining.Journal.Comment, as: :entry_kinds
+  defdelegate save_comment(attrs), to: JournalStore
+  defdelegate delete_comment(id, user_id, now), to: JournalStore
+  defdelegate list_comments(entry_kind, entry_ids), to: JournalStore
+  defdelegate list_changes_since(user_id, since), to: JournalStore
+  defdelegate comments_transaction(fun), to: JournalStore
+  defdelegate comment_entry_owner(entry_kind, entry_id), to: JournalStore, as: :entry_owner
+
+  @doc "Comments of each entry, keyed by entry id (entries without any are absent)."
+  def comments_by_entry(entry_kind, entry_ids),
+    do: entry_kind |> list_comments(entry_ids) |> Enum.group_by(& &1.entry_id)
+
   def tenant_data_policy, do: MilosTraining.Journal.Domain.TenantDataPolicy.policy()
 
   def tenant_data_inventory(context),

@@ -28,12 +28,10 @@ defmodule MilosTraining.Application.PRUpdateModesTest do
 
     assert {:ok, edited} =
              Pantheon.edit_pr(pr.id, user.id, %{
-               "current_score" => 109,
-               "notes" => "Corrected plate total"
+               "current_score" => 109
              })
 
     assert edited.current_score == 109.0
-    assert edited.notes == "Corrected plate total"
     assert {:ok, [_previous_result]} = Pantheon.get_pr_history(pr.id, user.id)
   end
 end

@@ -9,8 +9,6 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   module stays deterministic.
   """
 
-  alias MilosTraining.Execution.Domain.ModificationPatchValidator
-
   @source_types ~w(class assigned_workout library_workout freeform)
   @future_tolerance_seconds 15 * 60
   @max_age_days 366
@@ -44,8 +42,6 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   (only keys present in `params` are returned). `opts`:
 
     * `:now` - reference time (required)
-    * `:structured?` - whether the source has a canonical workout, which
-      enables ADR-050 modification patches
     * `:allowed_section_ids` - scoreable section ids of the source workout
     * `:freeform?` - whether the title is user-provided
   """
@@ -59,12 +55,9 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
       {:performed_at_tz, "timezone", &normalize_timezone/1},
       {:duration_seconds, "duration_seconds", &normalize_duration/1},
       {:perceived_effort, "perceived_effort", &normalize_effort/1},
-      {:notes, "notes", &normalize_notes/1},
       {:scale_level_slug, "scale_level_slug", &normalize_scale/1},
       {:section_scores, "section_scores",
        &normalize_section_scores(&1, Keyword.get(opts, :allowed_section_ids, []))},
-      {:exercise_modifications, "exercise_modifications",
-       &normalize_modifications(&1, Keyword.get(opts, :structured?, false))},
       {:performed_exercises, "performed_exercises", &normalize_performed_exercises/1}
     ]
 
@@ -261,8 +254,7 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
       source_reference_id: entry.source_reference_id,
       completed_at_utc: entry.performed_at_utc,
       completed_at_tz: entry.performed_at_tz,
-      section_scores: entry.section_scores || [],
-      exercise_modifications: entry.exercise_modifications || []
+      section_scores: entry.section_scores || []
     }
   end
 
@@ -351,8 +343,6 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
   defp normalize_effort(value) when is_integer(value) and value in 1..10, do: {:ok, value}
   defp normalize_effort(_value), do: {:error, "must be between 1 and 10"}
 
-  defp normalize_notes(value), do: normalize_optional_text(value, 4000)
-
   defp normalize_scale(nil), do: {:ok, nil}
 
   defp normalize_scale(value) when is_binary(value) do
@@ -433,21 +423,6 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
 
   defp valid_score_value?(_value), do: false
 
-  defp normalize_modifications(nil, _structured?), do: {:ok, []}
-  defp normalize_modifications([], _structured?), do: {:ok, []}
-
-  defp normalize_modifications(patches, true) when is_list(patches) do
-    case ModificationPatchValidator.normalize_many(patches) do
-      {:ok, normalized} -> {:ok, normalized}
-      {:error, _reason} -> {:error, "contains an invalid patch"}
-    end
-  end
-
-  defp normalize_modifications(patches, false) when is_list(patches),
-    do: {:error, "require a workout source"}
-
-  defp normalize_modifications(_patches, _structured?), do: {:error, "is invalid"}
-
   defp normalize_performed_exercises(nil), do: {:ok, []}
 
   defp normalize_performed_exercises(rows)
@@ -480,8 +455,7 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
          {:ok, distance} <- optional_number(row, "distance"),
          {:ok, distance_unit} <- optional_enum(row, "distance_unit", @distance_units),
          {:ok, duration} <- optional_int(row, "duration_seconds", 0, @max_duration_seconds),
-         {:ok, calories} <- optional_int(row, "calories", 0, 100_000),
-         {:ok, note} <- optional_string(row, "note", 500) do
+         {:ok, calories} <- optional_int(row, "calories", 0, 100_000) do
       {:ok,
        compact(%{
          "row_index" => index,
@@ -494,8 +468,7 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicy do
          "distance" => distance,
          "distance_unit" => distance_unit,
          "duration_seconds" => duration,
-         "calories" => calories,
-         "note" => note
+         "calories" => calories
        })}
     else
       _invalid -> :error

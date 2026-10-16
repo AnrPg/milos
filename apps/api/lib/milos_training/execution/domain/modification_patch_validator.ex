@@ -8,7 +8,7 @@ defmodule MilosTraining.Execution.Domain.ModificationPatchValidator do
   """
 
   @types ~w(skipped weight_changed reps_changed time_changed sets_changed exercise_substituted distance_changed calories_changed field_changed other)
-  @fields ~w(exercise_name reps load sets duration_seconds distance calories time_cap tempo rest_seconds prescription_value prescription_unit load_mode skipped note)
+  @fields ~w(exercise_name reps load sets duration_seconds distance calories time_cap tempo rest_seconds prescription_value prescription_unit load_mode skipped)
 
   def normalize_many(patches) when is_list(patches) do
     patches
@@ -110,7 +110,6 @@ defmodule MilosTraining.Execution.Domain.ModificationPatchValidator do
   defp empty_change?(canonical_value, actual_value, _type), do: canonical_value == actual_value
 
   defp section_level_field?("sets", _section_id), do: true
-  defp section_level_field?("note", "free_text"), do: true
   defp section_level_field?(_field, _section_id), do: false
 
   defp string_value(map, key) do

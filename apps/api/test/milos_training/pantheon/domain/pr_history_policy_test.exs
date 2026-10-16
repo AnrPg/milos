@@ -8,7 +8,6 @@ defmodule MilosTraining.Pantheon.Domain.PRHistoryPolicyTest do
   end
 
   test "archives the prior result when any result context changes" do
-    assert PRHistoryPolicy.snapshot_required?(%{notes: "Strict form"})
     assert PRHistoryPolicy.snapshot_required?(%{supporting_metrics: %{reps: 5}})
   end
 
