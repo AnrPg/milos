@@ -1,12 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery, useQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { fetchExecution } from "@/api/executions";
-import { fetchMyReviews, MY_REVIEWS_KEY } from "@/api/reviews";
-import { listTrainingLogEntries } from "@/api/training-log";
+import {
+  fetchJournalPage,
+  JOURNAL_FEED_KEY,
+  JOURNAL_FILTER_KINDS,
+  type JournalFeedPage,
+  type JournalFilter,
+  type JournalVisibilityResult,
+  type TypedJournalItem,
+} from "@/api/journal";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
@@ -15,58 +23,70 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { ExecutionPerformanceModal } from "@/components/client/ExecutionPerformanceModal";
 import { formatDay, formatTime } from "@/components/client/format";
 import { useRepeatWorkout } from "@/components/client/use-repeat-workout";
-import { useWorkoutVault } from "@/components/client/use-workout-vault";
-import { formatElapsed, historyEntries, type HistoryEntry } from "@/components/client/vault";
-import { journalFlow } from "@/components/member-app/journal/journal-flow";
+import { formatElapsed, type HistoryEntry } from "@/components/client/vault";
+import { CommentList } from "@/components/journal/CommentList";
+import { NoteSheet } from "@/components/journal/NoteSheet";
+import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
+import { executionHistoryEntry, journalFlow, withVisibility } from "@/components/member-app/journal/journal-flow";
+import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
 import { ReviewCard } from "@/components/my-reviews";
+import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
-import {
-  TRAINING_LOG_ENTRIES_KEY,
-  TrainingLogDialog,
-  TrainingLogEntryCard,
-  type TrainingLogDialogState,
-} from "@/components/training-log/TrainingLog";
+import { TrainingLogDialog, TrainingLogEntryCard, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { buildExecutionDocument, renderText } from "@/lib/document-export";
+import { latestCommentBody, sortComments } from "@/lib/journal-comments";
+
+const FILTERS: JournalFilter[] = ["all", "training", "notes", "wellbeing"];
+const PAGE_SIZE = 30;
 
 /**
- * Ημερολόγιο › Ροή (brief §7.7, ADR-137): everything the member did, newest
- * first and grouped by day: finished executions (performance, repeat, share),
- * logged workouts (edit, void) and written reviews. New entries start from
- * Νέα καταχώρηση.
+ * Ημερολόγιο › Ροή (brief §7.7, ADR-137, ADR-139): every entry the member
+ * wrote, from the server's feed, newest first and grouped by day, each with
+ * its visibility badge. Finished executions keep performance, repeat and
+ * share; logged workouts edit and void; notes edit and delete. New entries
+ * start from Νέα καταχώρηση.
  */
 export function JournalFlow() {
   const i18n = useUiTranslations();
+  const t = useTranslations("MemberApp.journal");
   const locale = useUiLocale();
+  const queryClient = useQueryClient();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const vault = useWorkoutVault();
-  const logs = useQuery({
-    queryKey: TRAINING_LOG_ENTRIES_KEY,
+  const [filter, setFilter] = useState<JournalFilter>("all");
+  const queryKey = [...JOURNAL_FEED_KEY, filter] as const;
+  const feed = useInfiniteQuery({
+    queryKey,
     enabled: Boolean(token),
-    queryFn: () => listTrainingLogEntries(token!),
-  });
-  const reviews = useQuery({
-    queryKey: MY_REVIEWS_KEY,
-    enabled: Boolean(token),
-    queryFn: () => fetchMyReviews(token!),
+    initialPageParam: null as string | null,
+    queryFn: ({ pageParam }) =>
+      fetchJournalPage(token!, { cursor: pageParam, kinds: JOURNAL_FILTER_KINDS[filter], limit: PAGE_SIZE }),
+    getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
   const { repeat, pendingId, error } = useRepeatWorkout();
   const [performance, setPerformance] = useState<HistoryEntry | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
-  const days = useMemo(
-    () =>
-      journalFlow({
-        executions: historyEntries(vault.data ?? []),
-        logs: logs.data ?? [],
-        reviews: reviews.data?.reviews ?? [],
-      }),
-    [vault.data, logs.data, reviews.data],
-  );
-  const failed = [vault, logs, reviews].find((query) => query.isError) ?? null;
+  const [editingNote, setEditingNote] = useState<Extract<TypedJournalItem, { kind: "note" }> | null>(null);
+  const days = useMemo(() => journalFlow(feed.data?.pages ?? []), [feed.data]);
+
+  function refresh() {
+    void queryClient.invalidateQueries({ queryKey: JOURNAL_FEED_KEY });
+  }
+
+  function moved(result: JournalVisibilityResult) {
+    queryClient.setQueryData<InfiniteData<JournalFeedPage>>(queryKey, (data) =>
+      data ? { ...data, pages: withVisibility(data.pages, result) } : data,
+    );
+    refresh();
+  }
+
+  function badge(item: TypedJournalItem) {
+    return <VisibilityBadge item={item} onChanged={moved} />;
+  }
 
   return (
     <ClientPage
@@ -82,16 +102,35 @@ export function JournalFlow() {
         </Link>
       }
     >
+      <div role="group" aria-label={t("filterLabel")} className="flex flex-wrap gap-2">
+        {FILTERS.map((option) => (
+          <button
+            key={option}
+            type="button"
+            aria-pressed={filter === option}
+            onClick={() => setFilter(option)}
+            className="rounded-full px-3 py-1.5 text-sm font-semibold"
+            style={{
+              background: filter === option ? "var(--primary)" : "var(--panel-raised)",
+              color: filter === option ? "var(--bg)" : "var(--text)",
+              border: "1px solid var(--border)",
+            }}
+          >
+            {t(`filter.${option}`)}
+          </button>
+        ))}
+      </div>
+
       {error ? (
         <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
           {clientErrorMessage(error, i18n)}
         </p>
       ) : null}
 
-      {vault.isPending || logs.isPending || reviews.isPending ? (
+      {feed.isPending ? (
         <LoadingLine />
-      ) : failed ? (
-        <QueryProblem error={failed.error} onRetry={() => void failed.refetch()} />
+      ) : feed.isError ? (
+        <QueryProblem error={feed.error} onRetry={() => void feed.refetch()} />
       ) : days.length === 0 ? (
         <EmptyLine>{i18n("clHistoryEmpty")}</EmptyLine>
       ) : (
@@ -102,40 +141,69 @@ export function JournalFlow() {
                 <time dateTime={day.day}>{formatDay(day.day, locale)}</time>
               </h2>
               <ul className="flex flex-col gap-2">
-                {day.items.map((item) =>
-                  item.kind === "review" ? (
-                    <li key={item.id}>
-                      <ReviewCard
-                        review={item.entry}
-                        time={<time dateTime={item.at}>{formatTime(item.at, locale)}</time>}
-                      />
-                    </li>
-                  ) : item.kind === "log" ? (
-                    <TrainingLogEntryCard
-                      key={item.id}
-                      entry={item.entry}
-                      locale={locale}
-                      onEdit={() => setLogDialog({ mode: "edit", entry: item.entry })}
-                      onVoid={() => setLogDialog({ mode: "void", entry: item.entry })}
-                    />
-                  ) : (
-                    <ExecutionRow
-                      key={item.id}
-                      entry={item.entry}
-                      locale={locale}
-                      onPerformance={() => setPerformance(item.entry)}
-                      onRepeat={() => void repeat(item.entry)}
-                      onShare={() => setSharingId(item.entry.id)}
-                      repeating={pendingId === item.entry.id}
-                      disabled={Boolean(pendingId)}
-                    />
-                  ),
-                )}
+                {day.items.map((item) => {
+                  const key = `${item.kind}:${item.id}`;
+                  switch (item.kind) {
+                    case "review":
+                      return (
+                        <li key={key}>
+                          <ReviewCard
+                            review={item.entry}
+                            time={<time dateTime={item.occurred_at}>{formatTime(item.occurred_at, locale)}</time>}
+                            badge={badge(item)}
+                          />
+                        </li>
+                      );
+                    case "training_log":
+                      return (
+                        <TrainingLogEntryCard
+                          key={key}
+                          entry={item.entry}
+                          locale={locale}
+                          badge={badge(item)}
+                          onEdit={() => setLogDialog({ mode: "edit", entry: item.entry })}
+                          onVoid={() => setLogDialog({ mode: "void", entry: item.entry })}
+                        />
+                      );
+                    case "execution": {
+                      const entry = executionHistoryEntry(item, day.day);
+                      return (
+                        <ExecutionRow
+                          key={key}
+                          entry={entry}
+                          locale={locale}
+                          badge={badge(item)}
+                          onPerformance={() => setPerformance(entry)}
+                          onRepeat={() => void repeat(entry)}
+                          onShare={() => setSharingId(entry.id)}
+                          repeating={pendingId === entry.id}
+                          disabled={Boolean(pendingId)}
+                        />
+                      );
+                    }
+                    default:
+                      return (
+                        <FeedCard key={key} item={item} locale={locale} badge={badge(item)} onEditNote={setEditingNote} />
+                      );
+                  }
+                })}
               </ul>
             </li>
           ))}
         </ol>
       )}
+
+      {feed.hasNextPage ? (
+        <button
+          type="button"
+          onClick={() => void feed.fetchNextPage()}
+          disabled={feed.isFetchingNextPage}
+          className="min-h-11 rounded-2xl text-sm font-semibold disabled:opacity-50"
+          style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+        >
+          {feed.isFetchingNextPage ? t("loadingMore") : t("loadMore")}
+        </button>
+      ) : null}
 
       {performance ? (
         <ExecutionPerformanceModal
@@ -150,16 +218,117 @@ export function JournalFlow() {
           state={logDialog}
           token={token}
           onNavigate={setLogDialog}
-          onClose={() => setLogDialog({ mode: "closed" })}
+          onClose={() => {
+            setLogDialog({ mode: "closed" });
+            refresh();
+          }}
+        />
+      ) : null}
+      {editingNote ? (
+        <NoteSheet
+          note={editingNote.entry}
+          onClose={() => setEditingNote(null)}
+          onSaved={() => {
+            setEditingNote(null);
+            refresh();
+          }}
         />
       ) : null}
     </ClientPage>
   );
 }
 
+/** PRs, injuries, notes and check-ins: one card shape, one line of what happened. */
+function FeedCard({
+  item,
+  locale,
+  badge,
+  onEditNote,
+}: {
+  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" }>;
+  locale: string;
+  badge: ReactNode;
+  onEditNote: (item: Extract<TypedJournalItem, { kind: "note" }>) => void;
+}) {
+  const t = useTranslations("MemberApp.journal");
+  const tCheckIn = useTranslations("MemberApp.checkIn");
+  const time = item.occurred_on ? null : formatTime(item.occurred_at, locale);
+  let title: ReactNode;
+  let detail: ReactNode = null;
+  let actions: ReactNode = null;
+
+  switch (item.kind) {
+    case "pr": {
+      const comment = latestCommentBody(item.entry.comments);
+      title = (
+        <>
+          {item.entry.name} · <span className="tabular-nums">{formatScore(Number(item.entry.current_score), item.entry.unit)}</span>{" "}
+          {item.entry.unit !== "mins_secs" ? <SemanticLabel value={item.entry.unit} /> : null}
+        </>
+      );
+      detail = comment;
+      break;
+    }
+    case "injury":
+      title = (
+        <>
+          <SemanticLabel value={item.entry.body_area} /> · <SemanticLabel value={item.entry.severity} />
+        </>
+      );
+      detail = item.entry.description;
+      break;
+    case "note":
+      title = t(`noteTopic.${item.entry.topic}`);
+      detail = <span className="whitespace-pre-wrap">{item.entry.body}</span>;
+      actions = (
+        <button
+          type="button"
+          onClick={() => onEditNote(item)}
+          className="rounded-full px-3 py-1.5 text-sm font-semibold"
+          style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+        >
+          {t("editNote")}
+        </button>
+      );
+      break;
+    case "check_in":
+      title = t("kind.check_in");
+      detail = item.entry.answers
+        .map(
+          (answer) =>
+            `${CHECK_IN_FACES[answer.value as CheckInValue] ?? ""} ${tCheckIn(`short.${answer.question_key}`)}`,
+        )
+        .join(" · ");
+      break;
+  }
+
+  return (
+    <li className="flex flex-col gap-2 rounded-2xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {t(`kind.${item.kind}`)}
+            {time ? <> · <time dateTime={item.occurred_at}>{time}</time></> : null}
+          </p>
+          <p className="mt-1 break-words text-base font-semibold" style={{ color: "var(--text)" }}>{title}</p>
+          {detail ? <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{detail}</p> : null}
+          {item.kind === "pr" && (item.entry.comments?.length ?? 0) > 1 ? (
+            <div className="mt-2">
+              <CommentList comments={sortComments(item.entry.comments ?? [])} />
+            </div>
+          ) : null}
+          <div className="mt-2">{badge}</div>
+        </div>
+        {actions}
+      </div>
+    </li>
+  );
+}
+
 function ExecutionRow({
   entry,
   locale,
+  badge,
   onPerformance,
   onRepeat,
   onShare,
@@ -168,6 +337,7 @@ function ExecutionRow({
 }: {
   entry: HistoryEntry;
   locale: string;
+  badge: ReactNode;
   onPerformance: () => void;
   onRepeat: () => void;
   onShare: () => void;
@@ -193,6 +363,7 @@ function ExecutionRow({
           {entry.scale_level_slug ? <SemanticLabel value={entry.scale_level_slug} /> : null}
           <SourceBadge source={entry.source} />
         </p>
+        <div className="mt-2">{badge}</div>
       </div>
       <EntryActions
         workoutTitle={title}

@@ -236,7 +236,7 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
 }
 
 /** One review the member wrote; also an entry of Ημερολόγιο › Ροή. */
-export function ReviewCard({ review, time }: { review: Review; time?: ReactNode }) {
+export function ReviewCard({ review, time, badge }: { review: Review; time?: ReactNode; badge?: ReactNode }) {
   const i18n = useUiTranslations();
   return (
     <article className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5">
@@ -246,6 +246,7 @@ export function ReviewCard({ review, time }: { review: Review; time?: ReactNode 
         <span>{i18n("rating6437b7b")} {String(review.rating ?? "—")}</span>
       </p>
       {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
+      {badge ? <div className="mt-2">{badge}</div> : null}
     </article>
   );
 }

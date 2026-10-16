@@ -4,10 +4,13 @@
 import { useEffect, useEffectEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { JOURNAL_FEED_KEY } from "@/api/journal";
 import { MY_REVIEWS_KEY } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { emitUserSync, normalizeUserSyncDetail } from "@/lib/user-sync";
+
+const JOURNAL_SCOPES = ["my_journal", "journal_comments", "my_reviews", "reviews", "my_wellbeing", "wellbeing", "landing"];
 
 export function RealtimeSyncBridge() {
   
@@ -69,6 +72,11 @@ export function RealtimeSyncBridge() {
 
     if (detail.scopes.includes("my_wellbeing") || detail.scopes.includes("wellbeing")) {
       void queryClient.invalidateQueries({ queryKey: ["my", "wellbeing"] });
+    }
+
+    // Ημερολόγιο › Ροή lists every kind of entry, so any of their scopes refreshes it.
+    if (JOURNAL_SCOPES.some((scope) => detail.scopes.includes(scope))) {
+      void queryClient.invalidateQueries({ queryKey: JOURNAL_FEED_KEY });
     }
 
     emitUserSync(detail);

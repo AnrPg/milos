@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "רק אני",
+        "coach_can_view": "המאמן יכול לראות",
+        "coach_reply_requested": "מבקש תשובה",
+        "rated": "דירוג",
+        "posted": "פורסם בבוקס"
+      },
+      "visibilityHint": {
+        "private": "רק אתה רואה.",
+        "coach_can_view": "המאמנים של הבוקס רואים, בלי להגיב.",
+        "coach_reply_requested": "המאמן מקבל את השאלה שלך כהודעה.",
+        "rated": "דירוג לבוקס.",
+        "posted": "פורסם בבוקס."
+      },
+      "changeVisibility": "מי רואה: {current}. שינוי",
+      "whoSees": "מי רואה",
+      "noCoach": "עדיין אין לך מאמן בבוקס הזה.",
+      "visibilityFailed": "לא השתנה. נסה שוב.",
+      "saving": "שומר…",
+      "askCoach": "שאל את המאמן",
+      "save": "שמירה",
+      "personalOnly": "רשומה אישית: רק אתה רואה אותה.",
+      "questionLabel": "השאלה שלך",
+      "questionPlaceholder": "על מה המאמן צריך לענות?",
+      "filterLabel": "מסנן הזרם",
+      "filter": {
+        "all": "הכול",
+        "training": "אימונים",
+        "notes": "הערות",
+        "wellbeing": "רווחה"
+      },
+      "kind": {
+        "execution": "אימון",
+        "training_log": "אימון שנרשם",
+        "pr": "PR",
+        "injury": "פציעה",
+        "review": "דירוג",
+        "note": "הערה",
+        "check_in": "איך אני מרגיש"
+      },
+      "loadMore": "רשומות קודמות",
+      "loadingMore": "טוען…",
+      "editNote": "עריכה",
+      "noteTopic": {
+        "technique": "טכניקה",
+        "thought": "מחשבה",
+        "mood": "מצב רוח",
+        "goal": "מטרה"
+      },
+      "note": {
+        "newTitle": "הערה חדשה",
+        "editTitle": "עריכת הערה",
+        "topicLabel": "נושא",
+        "bodyLabel": "הערה",
+        "bodyPlaceholder": "מה תרצה לזכור?",
+        "savedPrivate": "ההערה נשמרה כ„רק אני”. {reason}",
+        "saveFailed": "לא נשמר. נסה שוב.",
+        "delete": "מחיקה",
+        "close": "סגירה"
+      }
+    },
     "comments": {
       "title": "תגובות",
       "wholeEntry": "הרשומה כולה",
@@ -4818,7 +4880,8 @@
       "injury": "פציעה",
       "formReview": "סרטון טכניקה",
       "review": "ביקורת",
-      "checkIn": "איך אני מרגיש"
+      "checkIn": "איך אני מרגיש",
+      "note": "הערה או מחשבה"
     },
     "entryKindHint": {
       "workout": "תוצאה, RPE, הערות",
@@ -4826,7 +4889,8 @@
       "injury": "גלוי למאמנים שלכם",
       "formReview": "בקשו משוב מהמאמן",
       "review": "דרגו שיעור או אימון",
-      "checkIn": "כמה שאלות קצרות"
+      "checkIn": "כמה שאלות קצרות",
+      "note": "טכניקה, מטרה, מצב רוח"
     },
     "homeTitle": "בית",
     "wodToday": "האימון היומי במכון",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "אימון",
       "wellbeing": "רווחה",
-      "coach": "מאמן"
+      "coach": "מאמן",
+      "note": "הערה"
     },
     "checkIn": {
       "eyebrow": "איך אני מרגיש",

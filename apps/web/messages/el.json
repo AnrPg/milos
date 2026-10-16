@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Μόνο εγώ",
+        "coach_can_view": "Ο coach βλέπει",
+        "coach_reply_requested": "Ζητάω απάντηση",
+        "rated": "Αξιολόγηση",
+        "posted": "Ανάρτηση στο box"
+      },
+      "visibilityHint": {
+        "private": "Μόνο εσύ τη βλέπεις.",
+        "coach_can_view": "Οι coaches του box τη βλέπουν, χωρίς να απαντούν.",
+        "coach_reply_requested": "Ο coach σου παίρνει την ερώτησή σου ως μήνυμα.",
+        "rated": "Βαθμολογία προς το box.",
+        "posted": "Δημοσιευμένη στο box."
+      },
+      "changeVisibility": "Ποιος τη βλέπει: {current}. Αλλαγή",
+      "whoSees": "Ποιος τη βλέπει",
+      "noCoach": "Δεν έχεις coach σε αυτό το box ακόμη.",
+      "visibilityFailed": "Δεν άλλαξε. Δοκίμασε ξανά.",
+      "saving": "Αποθήκευση…",
+      "askCoach": "Ρώτα τον coach",
+      "save": "Αποθήκευση",
+      "personalOnly": "Προσωπική καταχώρηση: τη βλέπεις μόνο εσύ.",
+      "questionLabel": "Η ερώτησή σου",
+      "questionPlaceholder": "Τι θέλεις να σου απαντήσει ο coach;",
+      "filterLabel": "Φίλτρο ροής",
+      "filter": {
+        "all": "Όλα",
+        "training": "Προπονήσεις",
+        "notes": "Σημειώσεις",
+        "wellbeing": "Ευεξία"
+      },
+      "kind": {
+        "execution": "Προπόνηση",
+        "training_log": "Καταγραφή",
+        "pr": "PR",
+        "injury": "Τραυματισμός",
+        "review": "Αξιολόγηση",
+        "note": "Σημείωση",
+        "check_in": "Πώς νιώθω"
+      },
+      "loadMore": "Παλαιότερα",
+      "loadingMore": "Φόρτωση…",
+      "editNote": "Επεξεργασία",
+      "noteTopic": {
+        "technique": "Τεχνική",
+        "thought": "Σκέψη",
+        "mood": "Διάθεση",
+        "goal": "Στόχος"
+      },
+      "note": {
+        "newTitle": "Νέα σημείωση",
+        "editTitle": "Επεξεργασία σημείωσης",
+        "topicLabel": "Θέμα",
+        "bodyLabel": "Σημείωση",
+        "bodyPlaceholder": "Τι θέλεις να θυμάσαι;",
+        "savedPrivate": "Η σημείωση αποθηκεύτηκε ως «Μόνο εγώ». {reason}",
+        "saveFailed": "Δεν αποθηκεύτηκε. Δοκίμασε ξανά.",
+        "delete": "Διαγραφή",
+        "close": "Κλείσιμο"
+      }
+    },
     "comments": {
       "title": "Σχόλια",
       "wholeEntry": "Ολόκληρη η καταχώριση",
@@ -4818,7 +4880,8 @@
       "injury": "Τραυματισμός",
       "formReview": "Βίντεο τεχνικής",
       "review": "Αξιολόγηση",
-      "checkIn": "Πώς νιώθω"
+      "checkIn": "Πώς νιώθω",
+      "note": "Σημείωση ή σκέψη"
     },
     "entryKindHint": {
       "workout": "Σκορ, RPE, σημειώσεις",
@@ -4826,7 +4889,8 @@
       "injury": "Το βλέπουν οι coaches σου",
       "formReview": "Ζήτα σχόλια από τον coach",
       "review": "Βαθμολόγησε μάθημα ή προπόνηση",
-      "checkIn": "Λίγες γρήγορες ερωτήσεις"
+      "checkIn": "Λίγες γρήγορες ερωτήσεις",
+      "note": "Τεχνική, στόχος, διάθεση"
     },
     "homeTitle": "Αρχική",
     "wodToday": "Το WOD της ημέρας στο box",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Προπόνηση",
       "wellbeing": "Ευεξία",
-      "coach": "Coach"
+      "coach": "Coach",
+      "note": "Σημείωση"
     },
     "checkIn": {
       "eyebrow": "Πώς νιώθω",

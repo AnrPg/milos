@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "أنا فقط",
+        "coach_can_view": "يمكن للمدرب الاطلاع",
+        "coach_reply_requested": "طلب رد",
+        "rated": "تقييم",
+        "posted": "منشور في النادي"
+      },
+      "visibilityHint": {
+        "private": "تراه أنت فقط.",
+        "coach_can_view": "يراه مدربو ناديك دون أن يردوا.",
+        "coach_reply_requested": "يتلقى مدربك سؤالك كرسالة.",
+        "rated": "تقييم للنادي.",
+        "posted": "منشور في النادي."
+      },
+      "changeVisibility": "من يراه: {current}. تغيير",
+      "whoSees": "من يراه",
+      "noCoach": "ليس لديك مدرب في هذا النادي بعد.",
+      "visibilityFailed": "لم يتغير. حاول مرة أخرى.",
+      "saving": "جارٍ الحفظ…",
+      "askCoach": "اسأل المدرب",
+      "save": "حفظ",
+      "personalOnly": "إدخال شخصي: تراه أنت فقط.",
+      "questionLabel": "سؤالك",
+      "questionPlaceholder": "بماذا تريد أن يجيبك المدرب؟",
+      "filterLabel": "تصفية السجل",
+      "filter": {
+        "all": "الكل",
+        "training": "التمارين",
+        "notes": "الملاحظات",
+        "wellbeing": "العافية"
+      },
+      "kind": {
+        "execution": "تمرين",
+        "training_log": "تمرين مسجل",
+        "pr": "PR",
+        "injury": "إصابة",
+        "review": "تقييم",
+        "note": "ملاحظة",
+        "check_in": "كيف أشعر"
+      },
+      "loadMore": "إدخالات أقدم",
+      "loadingMore": "جارٍ التحميل…",
+      "editNote": "تعديل",
+      "noteTopic": {
+        "technique": "التقنية",
+        "thought": "فكرة",
+        "mood": "المزاج",
+        "goal": "هدف"
+      },
+      "note": {
+        "newTitle": "ملاحظة جديدة",
+        "editTitle": "تعديل الملاحظة",
+        "topicLabel": "الموضوع",
+        "bodyLabel": "ملاحظة",
+        "bodyPlaceholder": "ماذا تريد أن تتذكر؟",
+        "savedPrivate": "حُفظت الملاحظة كـ«أنا فقط». {reason}",
+        "saveFailed": "لم يُحفظ. حاول مرة أخرى.",
+        "delete": "حذف",
+        "close": "إغلاق"
+      }
+    },
     "comments": {
       "title": "التعليقات",
       "wholeEntry": "الإدخال بالكامل",
@@ -4818,7 +4880,8 @@
       "injury": "إصابة",
       "formReview": "فيديو التقنية",
       "review": "تقييم",
-      "checkIn": "كيف أشعر"
+      "checkIn": "كيف أشعر",
+      "note": "ملاحظة أو فكرة"
     },
     "entryKindHint": {
       "workout": "النتيجة وRPE والملاحظات",
@@ -4826,7 +4889,8 @@
       "injury": "يراها مدربوك",
       "formReview": "اطلب ملاحظات من مدربك",
       "review": "قيّم حصة أو تمرينًا",
-      "checkIn": "بضعة أسئلة سريعة"
+      "checkIn": "بضعة أسئلة سريعة",
+      "note": "التقنية، الهدف، المزاج"
     },
     "homeTitle": "الرئيسية",
     "wodToday": "تمرين اليوم في النادي",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "التدريب",
       "wellbeing": "العافية",
-      "coach": "المدرب"
+      "coach": "المدرب",
+      "note": "ملاحظة"
     },
     "checkIn": {
       "eyebrow": "كيف أشعر",

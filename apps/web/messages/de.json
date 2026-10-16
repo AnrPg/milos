@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Nur ich",
+        "coach_can_view": "Coach kann sehen",
+        "coach_reply_requested": "Antwort angefragt",
+        "rated": "Bewertung",
+        "posted": "Im Gym gepostet"
+      },
+      "visibilityHint": {
+        "private": "Nur du siehst es.",
+        "coach_can_view": "Die Coaches deines Gyms sehen es, ohne zu antworten.",
+        "coach_reply_requested": "Dein Coach bekommt deine Frage als Nachricht.",
+        "rated": "Eine Bewertung für das Gym.",
+        "posted": "Im Gym veröffentlicht."
+      },
+      "changeVisibility": "Wer es sieht: {current}. Ändern",
+      "whoSees": "Wer es sieht",
+      "noCoach": "Du hast in diesem Gym noch keinen Coach.",
+      "visibilityFailed": "Nicht geändert. Versuch es erneut.",
+      "saving": "Wird gespeichert…",
+      "askCoach": "Coach fragen",
+      "save": "Speichern",
+      "personalOnly": "Persönlicher Eintrag: nur du siehst ihn.",
+      "questionLabel": "Deine Frage",
+      "questionPlaceholder": "Was soll dein Coach beantworten?",
+      "filterLabel": "Feed-Filter",
+      "filter": {
+        "all": "Alle",
+        "training": "Workouts",
+        "notes": "Notizen",
+        "wellbeing": "Wohlbefinden"
+      },
+      "kind": {
+        "execution": "Workout",
+        "training_log": "Erfasstes Workout",
+        "pr": "PR",
+        "injury": "Verletzung",
+        "review": "Bewertung",
+        "note": "Notiz",
+        "check_in": "Wie ich mich fühle"
+      },
+      "loadMore": "Ältere Einträge",
+      "loadingMore": "Wird geladen…",
+      "editNote": "Bearbeiten",
+      "noteTopic": {
+        "technique": "Technik",
+        "thought": "Gedanke",
+        "mood": "Stimmung",
+        "goal": "Ziel"
+      },
+      "note": {
+        "newTitle": "Neue Notiz",
+        "editTitle": "Notiz bearbeiten",
+        "topicLabel": "Thema",
+        "bodyLabel": "Notiz",
+        "bodyPlaceholder": "Was willst du dir merken?",
+        "savedPrivate": "Die Notiz wurde als „Nur ich“ gespeichert. {reason}",
+        "saveFailed": "Nicht gespeichert. Versuch es erneut.",
+        "delete": "Löschen",
+        "close": "Schließen"
+      }
+    },
     "comments": {
       "title": "Kommentare",
       "wholeEntry": "Ganzer Eintrag",
@@ -4818,7 +4880,8 @@
       "injury": "Verletzung",
       "formReview": "Technikvideo",
       "review": "Bewertung",
-      "checkIn": "Wie ich mich fühle"
+      "checkIn": "Wie ich mich fühle",
+      "note": "Notiz oder Gedanke"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
@@ -4826,7 +4889,8 @@
       "injury": "Für deine Coaches sichtbar",
       "formReview": "Bitte deinen Coach um Feedback",
       "review": "Bewerte einen Kurs oder ein Training",
-      "checkIn": "Ein paar kurze Fragen"
+      "checkIn": "Ein paar kurze Fragen",
+      "note": "Technik, Ziel, Stimmung"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Training",
       "wellbeing": "Wohlbefinden",
-      "coach": "Coach"
+      "coach": "Coach",
+      "note": "Notiz"
     },
     "checkIn": {
       "eyebrow": "Wie ich mich fühle",

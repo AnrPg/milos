@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Alleen ik",
+        "coach_can_view": "Coach kan meekijken",
+        "coach_reply_requested": "Antwoord gevraagd",
+        "rated": "Beoordeling",
+        "posted": "Gepost in de box"
+      },
+      "visibilityHint": {
+        "private": "Alleen jij ziet het.",
+        "coach_can_view": "De coaches van je box zien het, zonder te reageren.",
+        "coach_reply_requested": "Je coach krijgt je vraag als bericht.",
+        "rated": "Een beoordeling voor de box.",
+        "posted": "Gepost in de box."
+      },
+      "changeVisibility": "Wie het ziet: {current}. Wijzigen",
+      "whoSees": "Wie het ziet",
+      "noCoach": "Je hebt nog geen coach in deze box.",
+      "visibilityFailed": "Niet gewijzigd. Probeer opnieuw.",
+      "saving": "Opslaan…",
+      "askCoach": "Vraag de coach",
+      "save": "Opslaan",
+      "personalOnly": "Persoonlijke invoer: alleen jij ziet die.",
+      "questionLabel": "Je vraag",
+      "questionPlaceholder": "Waar moet je coach op antwoorden?",
+      "filterLabel": "Feedfilter",
+      "filter": {
+        "all": "Alles",
+        "training": "Trainingen",
+        "notes": "Notities",
+        "wellbeing": "Welzijn"
+      },
+      "kind": {
+        "execution": "Training",
+        "training_log": "Gelogde training",
+        "pr": "PR",
+        "injury": "Blessure",
+        "review": "Beoordeling",
+        "note": "Notitie",
+        "check_in": "Hoe ik me voel"
+      },
+      "loadMore": "Oudere invoer",
+      "loadingMore": "Laden…",
+      "editNote": "Bewerken",
+      "noteTopic": {
+        "technique": "Techniek",
+        "thought": "Gedachte",
+        "mood": "Stemming",
+        "goal": "Doel"
+      },
+      "note": {
+        "newTitle": "Nieuwe notitie",
+        "editTitle": "Notitie bewerken",
+        "topicLabel": "Onderwerp",
+        "bodyLabel": "Notitie",
+        "bodyPlaceholder": "Wat wil je onthouden?",
+        "savedPrivate": "De notitie is opgeslagen als Alleen ik. {reason}",
+        "saveFailed": "Niet opgeslagen. Probeer opnieuw.",
+        "delete": "Verwijderen",
+        "close": "Sluiten"
+      }
+    },
     "comments": {
       "title": "Opmerkingen",
       "wholeEntry": "Hele invoer",
@@ -4818,7 +4880,8 @@
       "injury": "Blessure",
       "formReview": "Techniekvideo",
       "review": "Beoordeling",
-      "checkIn": "Hoe ik me voel"
+      "checkIn": "Hoe ik me voel",
+      "note": "Notitie of gedachte"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -4826,7 +4889,8 @@
       "injury": "Zichtbaar voor je coaches",
       "formReview": "Vraag je coach om feedback",
       "review": "Beoordeel een les of training",
-      "checkIn": "Een paar snelle vragen"
+      "checkIn": "Een paar snelle vragen",
+      "note": "Techniek, doel, stemming"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Training",
       "wellbeing": "Welzijn",
-      "coach": "Coach"
+      "coach": "Coach",
+      "note": "Notitie"
     },
     "checkIn": {
       "eyebrow": "Hoe ik me voel",

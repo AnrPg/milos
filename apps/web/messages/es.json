@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Solo yo",
+        "coach_can_view": "El coach puede verlo",
+        "coach_reply_requested": "Respuesta solicitada",
+        "rated": "Valoración",
+        "posted": "Publicado en el box"
+      },
+      "visibilityHint": {
+        "private": "Solo tú lo ves.",
+        "coach_can_view": "Los coaches de tu box lo ven, sin responder.",
+        "coach_reply_requested": "Tu coach recibe tu pregunta como mensaje.",
+        "rated": "Una valoración para el box.",
+        "posted": "Publicado en el box."
+      },
+      "changeVisibility": "Quién lo ve: {current}. Cambiar",
+      "whoSees": "Quién lo ve",
+      "noCoach": "Aún no tienes coach en este box.",
+      "visibilityFailed": "No cambió. Inténtalo de nuevo.",
+      "saving": "Guardando…",
+      "askCoach": "Preguntar al coach",
+      "save": "Guardar",
+      "personalOnly": "Entrada personal: solo tú la ves.",
+      "questionLabel": "Tu pregunta",
+      "questionPlaceholder": "¿Qué quieres que te responda el coach?",
+      "filterLabel": "Filtro del registro",
+      "filter": {
+        "all": "Todo",
+        "training": "Entrenamientos",
+        "notes": "Notas",
+        "wellbeing": "Bienestar"
+      },
+      "kind": {
+        "execution": "Entrenamiento",
+        "training_log": "Entrenamiento registrado",
+        "pr": "PR",
+        "injury": "Lesión",
+        "review": "Valoración",
+        "note": "Nota",
+        "check_in": "Cómo me siento"
+      },
+      "loadMore": "Entradas anteriores",
+      "loadingMore": "Cargando…",
+      "editNote": "Editar",
+      "noteTopic": {
+        "technique": "Técnica",
+        "thought": "Pensamiento",
+        "mood": "Ánimo",
+        "goal": "Objetivo"
+      },
+      "note": {
+        "newTitle": "Nueva nota",
+        "editTitle": "Editar nota",
+        "topicLabel": "Tema",
+        "bodyLabel": "Nota",
+        "bodyPlaceholder": "¿Qué quieres recordar?",
+        "savedPrivate": "La nota se guardó como Solo yo. {reason}",
+        "saveFailed": "No se guardó. Inténtalo de nuevo.",
+        "delete": "Eliminar",
+        "close": "Cerrar"
+      }
+    },
     "comments": {
       "title": "Comentarios",
       "wholeEntry": "Toda la entrada",
@@ -4818,7 +4880,8 @@
       "injury": "Lesión",
       "formReview": "Vídeo de técnica",
       "review": "Valoración",
-      "checkIn": "Cómo me siento"
+      "checkIn": "Cómo me siento",
+      "note": "Nota o pensamiento"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -4826,7 +4889,8 @@
       "injury": "Visible para tus entrenadores",
       "formReview": "Pide opinión a tu entrenador",
       "review": "Valora una clase o un entrenamiento",
-      "checkIn": "Unas preguntas rápidas"
+      "checkIn": "Unas preguntas rápidas",
+      "note": "Técnica, objetivo, ánimo"
     },
     "homeTitle": "Inicio",
     "wodToday": "El WOD de hoy en el box",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Entrenamiento",
       "wellbeing": "Bienestar",
-      "coach": "Coach"
+      "coach": "Coach",
+      "note": "Nota"
     },
     "checkIn": {
       "eyebrow": "Cómo me siento",

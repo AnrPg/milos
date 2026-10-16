@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Only me",
+        "coach_can_view": "Coach can view",
+        "coach_reply_requested": "Reply requested",
+        "rated": "Rating",
+        "posted": "Posted to the box"
+      },
+      "visibilityHint": {
+        "private": "Only you see it.",
+        "coach_can_view": "Your gym's coaches can see it, without replying.",
+        "coach_reply_requested": "Your coach gets your question as a message.",
+        "rated": "A rating for the gym.",
+        "posted": "Posted to the gym."
+      },
+      "changeVisibility": "Who sees it: {current}. Change",
+      "whoSees": "Who sees it",
+      "noCoach": "You don't have a coach at this gym yet.",
+      "visibilityFailed": "Didn't change. Try again.",
+      "saving": "Saving…",
+      "askCoach": "Ask the coach",
+      "save": "Save",
+      "personalOnly": "Personal entry: only you see it.",
+      "questionLabel": "Your question",
+      "questionPlaceholder": "What should your coach answer?",
+      "filterLabel": "Feed filter",
+      "filter": {
+        "all": "All",
+        "training": "Workouts",
+        "notes": "Notes",
+        "wellbeing": "Wellbeing"
+      },
+      "kind": {
+        "execution": "Workout",
+        "training_log": "Logged workout",
+        "pr": "PR",
+        "injury": "Injury",
+        "review": "Rating",
+        "note": "Note",
+        "check_in": "How I feel"
+      },
+      "loadMore": "Older entries",
+      "loadingMore": "Loading…",
+      "editNote": "Edit",
+      "noteTopic": {
+        "technique": "Technique",
+        "thought": "Thought",
+        "mood": "Mood",
+        "goal": "Goal"
+      },
+      "note": {
+        "newTitle": "New note",
+        "editTitle": "Edit note",
+        "topicLabel": "Topic",
+        "bodyLabel": "Note",
+        "bodyPlaceholder": "What do you want to remember?",
+        "savedPrivate": "The note was saved as Only me. {reason}",
+        "saveFailed": "Couldn't save. Try again.",
+        "delete": "Delete",
+        "close": "Close"
+      }
+    },
     "comments": {
       "title": "Comments",
       "wholeEntry": "Whole entry",
@@ -4818,7 +4880,8 @@
       "injury": "Injury",
       "formReview": "Technique video",
       "review": "Review",
-      "checkIn": "How I feel"
+      "checkIn": "How I feel",
+      "note": "Note or thought"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
@@ -4826,7 +4889,8 @@
       "injury": "Visible to your coaches",
       "formReview": "Ask your coach for feedback",
       "review": "Rate a class or workout",
-      "checkIn": "A few quick questions"
+      "checkIn": "A few quick questions",
+      "note": "Technique, goal, mood"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Training",
       "wellbeing": "Wellbeing",
-      "coach": "Coach"
+      "coach": "Coach",
+      "note": "Note"
     },
     "checkIn": {
       "eyebrow": "How I feel",

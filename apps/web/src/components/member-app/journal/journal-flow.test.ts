@@ -1,49 +1,58 @@
 import { describe, expect, it } from "vitest";
 
-import type { ReviewRecord } from "@/api/reviews";
-import type { TrainingLogEntry } from "@/api/training-log";
-import type { HistoryEntry } from "@/components/client/vault";
+import type { JournalFeedItem, JournalFeedPage } from "@/api/journal";
 
-import { journalFlow } from "./journal-flow";
+import { journalFlow, withVisibility } from "./journal-flow";
 
-const execution = (id: string, completedAt: string, day: string) =>
-  ({ id, completed_at_utc: completedAt, day, workout_title: id }) as unknown as HistoryEntry;
-const log = (id: string, performedAt: string, tz = "Europe/Athens") =>
-  ({ id, performed_at_utc: performedAt, performed_at_tz: tz, title: id, status: "logged" }) as unknown as TrainingLogEntry;
+const item = (overrides: Partial<JournalFeedItem>): JournalFeedItem => ({
+  kind: "note",
+  id: "n1",
+  occurred_at: "2026-10-15T16:00:00Z",
+  occurred_tz: "Europe/Athens",
+  occurred_on: null,
+  organization_id: "gym",
+  journal_visibility: "private",
+  choosable_visibilities: ["private", "coach_can_view", "coach_reply_requested"],
+  entry: {},
+  ...overrides,
+});
 
-const review = (id: string, insertedAt: string) =>
-  ({ id, inserted_at: insertedAt, target_type: "app", rating: 5 }) as unknown as ReviewRecord;
+const page = (items: JournalFeedItem[], next_cursor: string | null = null): JournalFeedPage => ({ items, next_cursor });
 
 describe("journalFlow", () => {
-  it("merges executions and logged workouts newest first, grouped by the day they were done", () => {
-    const days = journalFlow({
-      executions: [execution("fran", "2026-10-15T16:00:00Z", "2026-10-15"), execution("grace", "2026-10-13T07:00:00Z", "2026-10-13")],
-      logs: [log("park-run", "2026-10-15T05:00:00Z"), log("late-swim", "2026-10-13T22:30:00Z")],
-    });
+  it("groups the server's order by the day each entry happened, in its own zone", () => {
+    const days = journalFlow([
+      page([
+        // 22:30 UTC is already the next day in Athens.
+        item({ kind: "execution", id: "fran", occurred_at: "2026-10-15T22:30:00Z" }),
+        item({ kind: "note", id: "n1", occurred_at: "2026-10-15T16:00:00Z" }),
+      ]),
+      page([item({ kind: "pr", id: "p1", occurred_at: "2026-10-14T00:00:00Z", occurred_tz: null, occurred_on: "2026-10-14" })]),
+    ]);
 
-    expect(days.map((day) => [day.day, day.items.map((item) => item.id)])).toEqual([
-      ["2026-10-15", ["execution:fran", "log:park-run"]],
-      // 22:30 UTC is already the 14th in Athens, where it was logged.
-      ["2026-10-14", ["log:late-swim"]],
-      ["2026-10-13", ["execution:grace"]],
+    expect(days.map((day) => [day.day, day.items.map((entry) => entry.id)])).toEqual([
+      ["2026-10-16", ["fran"]],
+      ["2026-10-15", ["n1"]],
+      ["2026-10-14", ["p1"]],
     ]);
   });
 
-  it("files reviews in the flow by the day they were written", () => {
-    const days = journalFlow({
-      executions: [execution("fran", "2026-10-15T16:00:00Z", "2026-10-15")],
-      logs: [],
-      reviews: [review("coach", "2026-10-15T18:00:00Z"), review("app", "2026-10-12T21:30:00Z")],
-      fallbackTimeZone: "Europe/Athens",
+  it("shows an entry once even if two pages overlap", () => {
+    const days = journalFlow([page([item({ id: "n1" })]), page([item({ id: "n1" })])]);
+    expect(days.flatMap((day) => day.items)).toHaveLength(1);
+  });
+});
+
+describe("withVisibility", () => {
+  it("puts the server's new rung and choices on the moved entry only", () => {
+    const pages = [page([item({ id: "n1" }), item({ id: "n2" })])];
+    const [moved] = withVisibility(pages, {
+      kind: "note",
+      id: "n1",
+      journal_visibility: "coach_reply_requested",
+      choosable_visibilities: ["private", "coach_can_view", "coach_reply_requested"],
     });
 
-    expect(days.map((day) => [day.day, day.items.map((item) => `${item.kind}:${item.entry.id}`)])).toEqual([
-      ["2026-10-15", ["review:coach", "execution:fran"]],
-      ["2026-10-13", ["review:app"]],
-    ]);
-  });
-
-  it("is empty when nothing was done", () => {
-    expect(journalFlow({ executions: [], logs: [] })).toEqual([]);
+    expect(moved.items.map((entry) => entry.journal_visibility)).toEqual(["coach_reply_requested", "private"]);
   });
 });

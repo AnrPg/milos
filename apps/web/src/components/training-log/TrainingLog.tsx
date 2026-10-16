@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -86,11 +86,14 @@ export function TrainingLogEntryCard({
   locale,
   onEdit,
   onVoid,
+  badge,
 }: {
   entry: TrainingLogEntry;
   locale: string;
   onEdit: () => void;
   onVoid: () => void;
+  /** The entry's visibility badge, where the journal shows one. */
+  badge?: ReactNode;
 }) {
   const i18n = useUiTranslations();
   const voided = entry.status === "voided";
@@ -129,6 +132,7 @@ export function TrainingLogEntryCard({
               ? ` · ${i18n("trainingLogEffortValue", { effort: entry.perceived_effort })}`
               : ""}
           </p>
+          {badge ? <div className="mt-1">{badge}</div> : null}
           {entry.comments.length > 0 ? (
             <div className="mt-2">
               <CommentList

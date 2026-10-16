@@ -4745,6 +4745,68 @@
     }
   },
   "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Только я",
+        "coach_can_view": "Тренер видит",
+        "coach_reply_requested": "Прошу ответить",
+        "rated": "Оценка",
+        "posted": "Опубликовано в зале"
+      },
+      "visibilityHint": {
+        "private": "Видишь только ты.",
+        "coach_can_view": "Тренеры зала видят, но не отвечают.",
+        "coach_reply_requested": "Тренер получит твой вопрос сообщением.",
+        "rated": "Оценка для зала.",
+        "posted": "Опубликовано в зале."
+      },
+      "changeVisibility": "Кто видит: {current}. Изменить",
+      "whoSees": "Кто видит",
+      "noCoach": "В этом зале у тебя пока нет тренера.",
+      "visibilityFailed": "Не изменилось. Попробуй ещё раз.",
+      "saving": "Сохранение…",
+      "askCoach": "Спросить тренера",
+      "save": "Сохранить",
+      "personalOnly": "Личная запись: видишь только ты.",
+      "questionLabel": "Твой вопрос",
+      "questionPlaceholder": "На что должен ответить тренер?",
+      "filterLabel": "Фильтр ленты",
+      "filter": {
+        "all": "Все",
+        "training": "Тренировки",
+        "notes": "Заметки",
+        "wellbeing": "Самочувствие"
+      },
+      "kind": {
+        "execution": "Тренировка",
+        "training_log": "Записанная тренировка",
+        "pr": "PR",
+        "injury": "Травма",
+        "review": "Оценка",
+        "note": "Заметка",
+        "check_in": "Как я себя чувствую"
+      },
+      "loadMore": "Более ранние записи",
+      "loadingMore": "Загрузка…",
+      "editNote": "Изменить",
+      "noteTopic": {
+        "technique": "Техника",
+        "thought": "Мысль",
+        "mood": "Настроение",
+        "goal": "Цель"
+      },
+      "note": {
+        "newTitle": "Новая заметка",
+        "editTitle": "Изменить заметку",
+        "topicLabel": "Тема",
+        "bodyLabel": "Заметка",
+        "bodyPlaceholder": "Что хочешь запомнить?",
+        "savedPrivate": "Заметка сохранена как «Только я». {reason}",
+        "saveFailed": "Не сохранено. Попробуй ещё раз.",
+        "delete": "Удалить",
+        "close": "Закрыть"
+      }
+    },
     "comments": {
       "title": "Комментарии",
       "wholeEntry": "Вся запись",
@@ -4818,7 +4880,8 @@
       "injury": "Травма",
       "formReview": "Видео техники",
       "review": "Отзыв",
-      "checkIn": "Самочувствие"
+      "checkIn": "Самочувствие",
+      "note": "Заметка или мысль"
     },
     "entryKindHint": {
       "workout": "Результат, RPE, заметки",
@@ -4826,7 +4889,8 @@
       "injury": "Видна вашим тренерам",
       "formReview": "Попросите тренера оценить",
       "review": "Оцените занятие или тренировку",
-      "checkIn": "Несколько быстрых вопросов"
+      "checkIn": "Несколько быстрых вопросов",
+      "note": "Техника, цель, настроение"
     },
     "homeTitle": "Главная",
     "wodToday": "Тренировка дня в зале",
@@ -4837,7 +4901,8 @@
     "entryGroup": {
       "training": "Тренировка",
       "wellbeing": "Самочувствие",
-      "coach": "Тренер"
+      "coach": "Тренер",
+      "note": "Заметка"
     },
     "checkIn": {
       "eyebrow": "Самочувствие",

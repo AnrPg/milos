@@ -2,10 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { hasCapability } from "@/components/client/entitlement";
+import { JOURNAL_FEED_KEY } from "@/api/journal";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { NoteSheet } from "@/components/journal/NoteSheet";
 import { NewPRFormModal } from "@/components/pantheon/PRFormModal";
 import { useSession } from "@/components/session-provider";
 import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
@@ -13,14 +16,14 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 /**
  * The kinds of entry a member can write today (brief §7.7), grouped as the
- * feature map groups them: Προπόνηση · Ευεξία · Coach. Each kind opens the
- * flow that already owns it. Kinds that need new backend (Σημείωση) or
- * arrive in Phase 2 (Μέτρηση, Νερό · Ύπνος · Γεύμα, Λιγούρα)
+ * feature map groups them: Προπόνηση · Ευεξία · Coach · Σημείωση. Each kind
+ * opens the flow that owns it. Kinds that arrive in Phase 2 (Μέτρηση,
+ * Νερό · Ύπνος · Γεύμα, Λιγούρα)
  * join their group then, so the sheet never shows a button that leads
  * nowhere, and a group with no kinds is not shown.
  */
-export type NewEntryKind = "workout" | "pr" | "checkIn" | "injury" | "formReview" | "review";
-export type NewEntryGroup = "training" | "wellbeing" | "coach";
+export type NewEntryKind = "workout" | "pr" | "checkIn" | "injury" | "formReview" | "review" | "note";
+export type NewEntryGroup = "training" | "wellbeing" | "coach" | "note";
 
 export function newEntryGroups(options: {
   canRequestFormReview: boolean;
@@ -29,6 +32,7 @@ export function newEntryGroups(options: {
     { group: "training", kinds: ["workout", "pr"] },
     { group: "wellbeing", kinds: ["checkIn", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
+    { group: "note", kinds: ["note"] },
   ];
   return groups.filter((entry) => entry.kinds.length > 0);
 }
@@ -63,9 +67,10 @@ export function NewEntryButton() {
 
 function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { tokens } = useSession();
   const { entitlement } = useClientEntitlement();
-  const [flow, setFlow] = useState<"menu" | "pr" | TrainingLogDialogState>("menu");
+  const [flow, setFlow] = useState<"menu" | "pr" | "note" | TrainingLogDialogState>("menu");
   const groups = newEntryGroups({ canRequestFormReview: hasCapability(entitlement, "request_form_reviews") });
 
   function choose(kind: NewEntryKind) {
@@ -75,10 +80,20 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
       router.push(route);
       return;
     }
-    setFlow(kind === "pr" ? "pr" : { mode: "pick" });
+    setFlow(kind === "pr" ? "pr" : kind === "note" ? "note" : { mode: "pick" });
   }
 
   if (flow === "pr") return <NewPRFormModal onClose={onClose} />;
+  if (flow === "note")
+    return (
+      <NoteSheet
+        onClose={onClose}
+        onSaved={() => {
+          void queryClient.invalidateQueries({ queryKey: JOURNAL_FEED_KEY });
+          onClose();
+        }}
+      />
+    );
   if (flow !== "menu") {
     if (flow.mode === "closed" || !tokens?.access_token) return null;
     return (

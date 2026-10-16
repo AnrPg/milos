@@ -8,6 +8,7 @@ describe("newEntryGroups", () => {
       { group: "training", kinds: ["workout", "pr"] },
       { group: "wellbeing", kinds: ["checkIn", "injury"] },
       { group: "coach", kinds: ["review"] },
+      { group: "note", kinds: ["note"] },
     ]);
   });
 
