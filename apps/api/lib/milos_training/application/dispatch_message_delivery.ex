@@ -68,7 +68,7 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
     thread.participants
     |> Enum.reject(&(&1.user_id == message.sender_id))
     |> Enum.reduce_while(:ok, fn participant, :ok ->
-      case Notifications.dispatch_event(:chat_message, %{
+      case Notifications.dispatch_event(notification_type(message), %{
              user_id: participant.user_id,
              organization_id: thread.organization_id,
              dedupe_key: "chat-message:#{message.id}",
@@ -86,7 +86,15 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
     end)
   end
 
-  defp invalidate_landing(thread, %{message_type: :coaching_note, sender_id: sender_id}) do
+  # Coaching messages and messages from the box reach the inbox; chat stays
+  # in the chat.
+  defp notification_type(%{message_type: type}) when type in [:coaching_message, :box_message],
+    do: type
+
+  defp notification_type(_message), do: :chat_message
+
+  # «Τελευταία από τον coach» on the member's Box › Ο coach σου.
+  defp invalidate_landing(thread, %{message_type: :coaching_message, sender_id: sender_id}) do
     thread.participants
     |> Enum.reject(&(&1.user_id == sender_id))
     |> Enum.map(& &1.user_id)

@@ -15,6 +15,8 @@ defmodule MilosTrainingWeb.MessagingController do
   alias MilosTrainingWeb.ParamExtractor
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
+  @topics ~w(booking payment membership facility)
+
   action_fallback MilosTrainingWeb.FallbackController
 
   def action(conn, _) do
@@ -40,7 +42,7 @@ defmodule MilosTrainingWeb.MessagingController do
     type: :object,
     properties: %{
       id: %Schema{type: :string, format: :uuid},
-      context_type: %Schema{type: :string, enum: ["direct", "assignment", "class_slot"]},
+      context_type: %Schema{type: :string, enum: ["direct", "assignment", "class_slot", "box"]},
       context_id: %Schema{type: :string, format: :uuid, nullable: true},
       created_by_id: %Schema{type: :string, format: :uuid},
       inserted_at: %Schema{type: :string, format: :"date-time"},
@@ -75,7 +77,11 @@ defmodule MilosTrainingWeb.MessagingController do
       thread_id: %Schema{type: :string, format: :uuid},
       sender_id: %Schema{type: :string, format: :uuid},
       body: %Schema{type: :string},
-      message_type: %Schema{type: :string, enum: ["chat", "coaching_note", "system"]},
+      message_type: %Schema{
+        type: :string,
+        enum: ["chat", "coaching_message", "box_message", "system"]
+      },
+      topic: %Schema{type: :string, enum: @topics, nullable: true},
       client_operation_id: %Schema{type: :string, format: :uuid, nullable: true},
       inserted_at: %Schema{type: :string, format: :"date-time"}
     },
@@ -102,7 +108,7 @@ defmodule MilosTrainingWeb.MessagingController do
             properties: %{
               context_type: %Schema{
                 type: :string,
-                enum: ["direct", "assignment", "class_slot"],
+                enum: ["direct", "assignment", "class_slot", "box"],
                 default: "direct"
               },
               participant_id: %Schema{type: :string, format: :uuid},
@@ -126,7 +132,7 @@ defmodule MilosTrainingWeb.MessagingController do
         name: :context_type,
         in: :query,
         required: false,
-        schema: %Schema{type: :string, enum: ["direct", "assignment", "class_slot"]}
+        schema: %Schema{type: :string, enum: ["direct", "assignment", "class_slot", "box"]}
       }
     ],
     responses: [
@@ -214,8 +220,16 @@ defmodule MilosTrainingWeb.MessagingController do
               body: %Schema{type: :string, minLength: 1, maxLength: 5000},
               message_type: %Schema{
                 type: :string,
-                enum: ["chat", "coaching_note"],
-                default: "chat"
+                enum: ["chat", "coaching_message", "box_message"],
+                default: "chat",
+                description:
+                  "A coaching message needs an active coaching relationship; in the gym's " <>
+                    "thread with a member, staff always write a message from the box."
+              },
+              topic: %Schema{
+                type: :string,
+                enum: @topics,
+                description: "What a message from the box is about."
               },
               client_operation_id: %Schema{type: :string, format: :uuid}
             },
@@ -351,6 +365,7 @@ defmodule MilosTrainingWeb.MessagingController do
              sender_id: user.id,
              body: bp(conn, "body"),
              message_type: message_type,
+             topic: bp(conn, "topic"),
              client_operation_id: bp(conn, "client_operation_id")
            }) do
       conn
@@ -399,6 +414,7 @@ defmodule MilosTrainingWeb.MessagingController do
       client_operation_id: message.client_operation_id,
       subject_kind: message.subject_kind,
       subject_id: message.subject_id,
+      topic: message.topic,
       inserted_at: message.inserted_at
     }
   end
@@ -414,9 +430,11 @@ defmodule MilosTrainingWeb.MessagingController do
   defp parse_context_type("direct"), do: :direct
   defp parse_context_type("assignment"), do: :assignment
   defp parse_context_type("class_slot"), do: :class_slot
+  defp parse_context_type("box"), do: :box
   defp parse_context_type(_), do: nil
 
-  defp parse_message_type("coaching_note"), do: :coaching_note
+  defp parse_message_type("coaching_message"), do: :coaching_message
+  defp parse_message_type("box_message"), do: :box_message
   defp parse_message_type("system"), do: :system
   defp parse_message_type(_), do: :chat
 end

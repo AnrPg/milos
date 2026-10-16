@@ -61,11 +61,17 @@ msgstr "Μήνυμα από %{nickname}"
 msgid "%{nickname} sent you a message."
 msgstr "Το %{nickname} σας έστειλε ένα μήνυμα."
 
-msgid "New coach note"
-msgstr "Νέο σημείωμα προπονητή"
+msgid "Message from your coach"
+msgstr "Μήνυμα από τον coach σου"
 
-msgid "Your coach added a new note."
-msgstr "Ο προπονητής σας πρόσθεσε μια νέα σημείωση."
+msgid "Your coach sent you a message."
+msgstr "Ο coach σου σού έστειλε μήνυμα."
+
+msgid "Message from the box"
+msgstr "Μήνυμα από το box"
+
+msgid "Your gym sent you a message."
+msgstr "Το box σου σού έστειλε μήνυμα."
 
 msgid "Challenge completed"
 msgstr "Η πρόκληση ολοκληρώθηκε"

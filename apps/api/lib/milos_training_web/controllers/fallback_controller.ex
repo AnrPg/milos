@@ -22,6 +22,26 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "validation_failed", errors: normalized_errors})
   end
 
+  # ADR-140 §6: a coaching message needs an active coaching relationship;
+  # a message from the box belongs to the gym's thread with the member.
+  def call(conn, {:error, :no_coaching_relationship}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "no_coaching_relationship",
+      error: "Only a coach with an active coaching relationship can send a coaching message"
+    })
+  end
+
+  def call(conn, {:error, :box_message_outside_box_thread}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "box_message_outside_box_thread",
+      error: "A message from the box is sent in the gym's thread with the member"
+    })
+  end
+
   def call(conn, {:error, :invalid_current_password}) do
     conn
     |> put_status(:unprocessable_entity)

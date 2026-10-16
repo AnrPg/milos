@@ -7,7 +7,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
   def build(athlete, assignments, executions, notes, %Date{} = today) do
     assignments = Enum.map(assignments || [], &normalize_assignment(&1, today))
     executions = Enum.map(executions || [], &normalize_execution/1)
-    notes = Enum.map(notes || [], &normalize_admin_note/1)
+    notes = Enum.map(notes || [], &normalize_coaching_message/1)
 
     %{
       identity: identity(athlete),
@@ -143,9 +143,9 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
     |> Enum.sort_by(&note_sort_datetime/1, {:desc, DateTime})
   end
 
-  defp normalize_admin_note(message) do
+  defp normalize_coaching_message(message) do
     %{
-      type: "admin_note",
+      type: "coaching_message",
       id: field(message, :id),
       admin_id: field(message, :sender_id),
       body: field(message, :body),
@@ -223,10 +223,10 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
     if notes == [] do
       [
         %{
-          type: "no_admin_note",
+          type: "no_coaching_message",
           severity: "low",
-          reason: "no_admin_note_recorded",
-          title: "No coach note recorded"
+          reason: "no_coaching_message_sent",
+          title: "No coaching message sent"
         }
         | cues
       ]

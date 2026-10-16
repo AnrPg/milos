@@ -21,7 +21,8 @@ defmodule MilosTraining.Messaging.Application.SendMessage do
                message_type: message_type,
                client_operation_id: client_operation_id,
                subject_kind: Map.get(params, :subject_kind),
-               subject_id: Map.get(params, :subject_id)
+               subject_id: Map.get(params, :subject_id),
+               topic: Map.get(params, :topic)
              },
              Map.put(delivery, :organization_id, thread.organization_id)
            ) do

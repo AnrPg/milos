@@ -68,7 +68,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
   end
 
   @impl true
-  def list_recent_coaching_notes(user_id, limit) do
+  def list_recent_coaching_messages(user_id, limit) do
     Message
     |> scoped_to_tenant()
     |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
@@ -78,7 +78,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
     |> where(
       [message, thread, participant],
       participant.user_id == ^user_id and thread.context_type == :direct and
-        message.message_type == :coaching_note
+        message.message_type == :coaching_message
     )
     |> order_by([message], desc: message.sequence_number)
     |> limit(^limit)
@@ -86,7 +86,7 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
   end
 
   @impl true
-  def list_recent_coaching_notes_for_organization(user_id, limit) do
+  def list_recent_coaching_messages_for_organization(user_id, limit) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->
         Message
@@ -97,7 +97,8 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
         |> where(
           [message, thread, participant],
           participant.user_id == ^user_id and thread.context_type == :direct and
-            message.message_type == :coaching_note and message.organization_id == ^organization_id
+            message.message_type == :coaching_message and
+            message.organization_id == ^organization_id
         )
         |> order_by([message], desc: message.sequence_number)
         |> limit(^limit)
@@ -177,6 +178,45 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
       order_by: [asc: latest_message.sent_at]
     )
     |> Repo.all()
+  end
+
+  @impl true
+  def count_sent(sender_id, message_type, since) do
+    Message
+    |> scoped_to_tenant()
+    |> where(
+      [message],
+      message.sender_id == ^sender_id and message.message_type == ^message_type and
+        message.inserted_at >= ^since
+    )
+    |> select([message], count(message.id))
+    |> Repo.one()
+  end
+
+  # Direct threads a coach is in whose latest message is from one of their
+  # clients: the client is waiting for an answer.
+  @impl true
+  def count_awaiting_reply(coach_id, client_ids) do
+    latest =
+      Message
+      |> scoped_to_tenant()
+      |> join(:inner, [message], thread in Thread, on: thread.id == message.thread_id)
+      |> join(:inner, [_message, thread], participant in Participant,
+        on: participant.thread_id == thread.id and participant.user_id == ^coach_id
+      )
+      |> where(
+        [message, thread],
+        thread.context_type == :direct and message.message_type != :system
+      )
+      |> distinct([message], message.thread_id)
+      |> order_by([message], asc: message.thread_id, desc: message.sequence_number)
+      |> select([message], %{sender_id: message.sender_id})
+
+    from(latest_message in subquery(latest),
+      where: latest_message.sender_id in ^client_ids,
+      select: count()
+    )
+    |> Repo.one()
   end
 
   defp scoped_to_tenant(query) do

@@ -19,7 +19,9 @@ defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
           Workouts.list_assigned_workouts_for_athlete(context, athlete_id, start_date, end_date)
 
         executions = ListWorkoutExecutions.for_coaching(athlete_id)
-        coaching_messages = Messaging.list_recent_coaching_notes_for_organization(athlete_id, 50)
+
+        coaching_messages =
+          Messaging.list_recent_coaching_messages_for_organization(athlete_id, 50)
 
         {:ok,
          %{

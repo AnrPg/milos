@@ -12,8 +12,8 @@ defmodule MilosTraining.Infrastructure.Coaching.EctoCoachingStore do
            Repo.query(
              """
              SELECT period_start, active_athlete_count, inactive_athlete_count,
-                    completed_workouts_this_week, coach_notes_this_week,
-                    average_completion_rate, recent_workout_note_count
+                    completed_workouts_this_week, coaching_messages_this_week,
+                    average_completion_rate, awaiting_reply_count
              FROM coaching_aggregates
              WHERE organization_id = $1::uuid
              ORDER BY period_start DESC
@@ -22,15 +22,15 @@ defmodule MilosTraining.Infrastructure.Coaching.EctoCoachingStore do
              [Ecto.UUID.dump!(organization_id)]
            ) do
       case result do
-        %{rows: [[period_start, active, inactive, completed, notes, rate, recent_notes]]} ->
+        %{rows: [[period_start, active, inactive, completed, messages, rate, awaiting]]} ->
           %{
             period_start: period_start,
             active_athlete_count: active,
             inactive_athlete_count: inactive,
             completed_workouts_this_week: completed,
-            coach_notes_this_week: notes,
+            coaching_messages_this_week: messages,
             average_completion_rate: rate,
-            recent_workout_note_count: recent_notes,
+            awaiting_reply_count: awaiting,
             aggregate_status: "available"
           }
 
@@ -59,9 +59,9 @@ defmodule MilosTraining.Infrastructure.Coaching.EctoCoachingStore do
       active_athlete_count: 0,
       inactive_athlete_count: 0,
       completed_workouts_this_week: 0,
-      coach_notes_this_week: 0,
+      coaching_messages_this_week: 0,
       average_completion_rate: 0.0,
-      recent_workout_note_count: 0,
+      awaiting_reply_count: 0,
       aggregate_status: status,
       aggregate_error: error
     }

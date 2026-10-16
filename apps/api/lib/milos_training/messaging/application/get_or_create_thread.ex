@@ -11,7 +11,7 @@ defmodule MilosTraining.Messaging.Application.GetOrCreateThread do
   end
 
   def call(%{context_type: context_type, context_id: context_id, actor_id: actor_id} = params)
-      when context_type in [:assignment, :class_slot] do
+      when context_type in [:assignment, :class_slot, :box] do
     participant_ids = Map.get(params, :participants, [actor_id])
 
     ThreadStore.get_or_create_thread(

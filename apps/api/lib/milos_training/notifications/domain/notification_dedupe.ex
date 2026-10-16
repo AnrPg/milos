@@ -18,13 +18,6 @@ defmodule MilosTraining.Notifications.Domain.NotificationDedupe do
 
   def batch_key(_user_id, _type, _occurred_at), do: nil
 
-  def admin_note_key(user_id, note_id)
-      when is_binary(user_id) and is_binary(note_id) do
-    Enum.join(["admin_note", user_id, note_id], ":")
-  end
-
-  def admin_note_key(_user_id, _note_id), do: nil
-
   def challenge_completed_key(user_id, challenge_id)
       when is_binary(user_id) and is_binary(challenge_id) do
     Enum.join(["challenge_completed", user_id, challenge_id], ":")

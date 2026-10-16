@@ -42,6 +42,7 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     manage_content: :all,
     manage_challenges: :all,
     message_clients: :all,
+    message_from_box: :all,
     broadcast: :all,
     view_business_analytics: :all,
     view_coaching_analytics: :all,
@@ -95,6 +96,7 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     check_in: :all,
     book_for_clients: :all,
     message_clients: :all,
+    message_from_box: :all,
     review_cleaning: :all,
     manage_inventory: :all
   }
@@ -108,7 +110,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     manage_billing: :all,
     view_promotions: :all,
     view_finance_reports: :all,
-    manage_finance_settings: :all
+    manage_finance_settings: :all,
+    message_from_box: :all
   }
 
   @janitor %{record_cleaning: :own, report_inventory: :all}

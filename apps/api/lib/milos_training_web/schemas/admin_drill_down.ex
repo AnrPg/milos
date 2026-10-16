@@ -252,7 +252,7 @@ defmodule MilosTrainingWeb.Schemas.AdminDrillDown do
     %Schema{
       type: :object,
       properties: %{
-        type: %Schema{type: :string, enum: ["admin_note", "athlete_comment"]},
+        type: %Schema{type: :string, enum: ["coaching_message", "athlete_comment"]},
         id: @uuid,
         body: %Schema{type: :string, nullable: true},
         inserted_at: @date_time

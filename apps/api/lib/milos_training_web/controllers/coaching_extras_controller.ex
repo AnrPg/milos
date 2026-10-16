@@ -12,6 +12,7 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
   alias MilosTraining.Application.{
     AuthorizeClientAccess,
     CompleteFormReview,
+    GetMyClientStats,
     GetMyNutritionPlan,
     ListCoachingReplyQueue,
     SaveNutritionPlan,
@@ -202,6 +203,27 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
     json(conn, %{
       replies: context |> ListCoachingReplyQueue.call() |> own_clients(context, :client_id)
     })
+  end
+
+  operation(:my_client_stats,
+    summary: "Πελάτες μου stats for the signed-in coach (ADR-140 §7)",
+    responses: [
+      ok:
+        {"My client stats", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             client_count: %Schema{type: :integer, minimum: 0},
+             coaching_messages_this_week: %Schema{type: :integer, minimum: 0},
+             awaiting_reply: %Schema{type: :integer, minimum: 0}
+           },
+           required: [:client_count, :coaching_messages_this_week, :awaiting_reply]
+         }}
+    ]
+  )
+
+  def my_client_stats(conn, _params) do
+    json(conn, GetMyClientStats.call(conn.assigns.tenant_context))
   end
 
   # Coaches with scope `:own` see only their own clients' items (ADR-100).

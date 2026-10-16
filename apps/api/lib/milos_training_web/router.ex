@@ -442,6 +442,7 @@ defmodule MilosTrainingWeb.Router do
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
+    get("/my-client-stats", CoachingExtrasController, :my_client_stats)
     get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
     put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
     get("/appointment-slots", AppointmentsController, :slots)
