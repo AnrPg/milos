@@ -148,6 +148,11 @@ public APIs). Realtime: `community:club:<id>` topic for new posts.
 - Read model `Application.GetJournalFeed` returns entries of all kinds with their stored `visibility`.
 - Coach reads of sensitive entries reuse the coach-note read audit pattern.
 
+### ADR-140 Journal text ontology
+- Text is classified by who writes it, about what, and for whom: Σημείωση, Σχόλιο, Πεδίο, Coach
+  note, Οδηγίες, Cue, Οδηγός coach, Μήνυμα, Ενημέρωση τραυματισμού. Details and stores in
+  `docs/adr/ADR-140-journal-text-ontology.md`.
+
 ## 5. Milestones (each one PR into `redesign/social-centered`)
 
 Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain (see §8).
@@ -181,9 +186,51 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
   Ευεξία · Coach, and Πώς νιώθω / Σημείωση join it when their backend lands.
 - Accept: mockups 15–17; visibility badge renders from derived visibility (client-side mapping until M5).
 
-### M5 · Visibility ladder (A)
-- Migrations + backfill on every entry type, schemas, `GetJournalFeed`, OpenAPI, generated client,
-  badge from server; set visibility on each entry type; tests for every backfill mapping.
+### M5 · Visibility ladder and journal text (A + W)
+Scope = ADR-139 + ADR-140 (the owner-approved notes report, 2026-10-16). Split into slices, each its
+own commit set with tests first; the slices land together in one PR into `redesign/social-centered`.
+Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table, coach-read audit
+(a905448).
+
+- **M5.1 Check-ins v2 (A + W).** Rewrite the check-in half of migration `20261017111000`:
+  `wellbeing_check_ins` (immutable submission: `recorded_at`, zone, rung) +
+  `wellbeing_check_in_answers` (`question_key`, value 1–4, note); question catalog in code
+  (sleep, energy, mood, stress, body); ≥1 answer; no update path. `SubmitCheckIn`, list for the
+  timeline, coach read by rung. Web: Ημερολόγιο › Ευεξία form (4 emoji per question, text opens on
+  tap) at the top, per-question timeline below; Νέα καταχώρηση › Πώς νιώθω opens it.
+- **M5.2 Σχόλια (A + W).** `journal_comments` (ADR-140 §1) with RLS (owner write; reads follow the
+  entry's rung); `AddComment`, `EditComment`, `DeleteComment`, list per entry; migration of
+  `exercise_notes`, `exercise_modifications`, training-log `notes` and row `note`, PR notes, then drop
+  those columns; Perseverance reads `change` from comments; retire `POST /executions/:id/notes` and
+  `add_execution_modifications`. Web: one `CommentForm` used by the execution NoteModal, the
+  FinishWizard step (lists what was written during execution, same list), Καταγραφή and the entry
+  card; one comment list per exercise on cards in Ροή, Vault and the coach view.
+- **M5.3 Injury reports and timeline (A + W).** Visible "Αναφορά τραυματισμού" action (Ευεξία, Box
+  injury card); `UpdateInjury` writes an `updated` event with optional text and
+  `changes: [{field, from, to}]`; drop `note_added`. Web: per-injury timeline (collapsed by default)
+  for member and coach.
+- **M5.4 Ladder read side (A + W).** `GetJournalFeed` (`GET /api/me/journal`, cursor, kinds),
+  `PUT /api/me/journal/entries/:kind/:id/visibility`, `RequestCoachReply`
+  (message with `subject_kind/subject_id`), `GetClientJournal` with audit; OpenAPI + generated
+  client; web badge and picker from the server, replacing the client merge in `journal-flow.ts`;
+  Σημείωση form in Νέα καταχώρηση.
+- **M5.5 Workout content markers (A + W).** DSL `!instructions`, `!scaling`, `!safety`,
+  `!equipment`, `!cue` (exercise only), `!coach-brief`; parser accepts the old markers and
+  normalises; migration rewrites stored workouts; `visible_notes` → `visible_content`; assignment
+  `admin_notes` → assignment Οδηγίες. Web: Οδηγίες block (with Κλιμάκωση/Προσοχή/Εξοπλισμός) on the
+  Box card and execution start, cues beside each exercise, «Για τον coach» only in staff views.
+- **M5.6 Messages to members (A + W).** Coaching message only from staff with an active coaching
+  relationship (replace the `role: :admin` match in `send_message.ex`), always metered; new
+  "message from the box" kind (front desk, finance, admin, owner; not metered; gym-owned thread;
+  optional subject). Revive dead paths: "Τελευταία από τον coach" card in Box › Ο coach σου,
+  `admin_note` → `coaching_message` notification, Πελάτες μου stats.
+- **M5.7 Staff member profile and coach notes (A + W).** Coach-note `subject_kind/subject_id`;
+  six-tab profile (Επισκόπηση, Προπόνηση, Ευεξία, Coaching, Οικονομικά, Λογαριασμός), capability
+  gated, tab in the URL, opened from Πελάτες μου and the console, replacing `AdminUserProfile.tsx`
+  panels; "+ Coach note" from `writeAthleteNote`; coach notes in the matching tab + Coaching › Coach
+  notes; `memberships.notes` in Οικονομικά and removed from the member landing payload.
+- Accept: every row of the notes report's retirement table is gone or moved; API suite, web lint,
+  type-check, unit tests and i18n check green; OpenAPI regenerated.
 
 ### M6 · Community context: clubs and channels (A)
 - Migrations, schemas, commands/queries, `ProvisionGymClub`, backfill job, membership sync, OpenAPI,
@@ -222,7 +269,7 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Entitlement, corporate enrollment → Box › Συνδρομή (M3)
 - [x] Invoices, refund receipts (`/account/billing`) → Εγώ › Πληρωμές (M2)
 - [x] Training log (class, assigned, library, free), RPE, scores, void → Ημερολόγιο + Box › Καταγραφή (M3/M4)
-- [ ] Log notes and execution notes → Ροή (M4), visibility (M5)
+- [ ] Log notes and execution notes → Σχόλια on the entry, listed in Ροή (M5.2), visibility from the entry (M5.4)
 - [x] Reviews (`/reviews`) → Νέα καταχώρηση › Coach › Αξιολόγηση, listed in Ροή (M4)
 - [x] Wellbeing: injuries, readiness → Ημερολόγιο › Ευεξία (M4)
 - [x] Vault + repeat → Ημερολόγιο › Vault (M4)

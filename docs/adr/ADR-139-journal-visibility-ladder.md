@@ -117,3 +117,8 @@ type; the owner then chose to build notes and check-ins in Phase 1
   client-side merge of M4 (`journal-flow.ts`) is replaced by the feed.
 - Coaches see less than before for members who choose `private`, which is the
   point. Nothing tells the coach that hidden entries exist.
+
+## Implementation Notes
+- 2026-10-16: §8's check-in shape (1–5 scales, one editable record) is
+  superseded by ADR-140 §2 (four-point answers per question, immutable
+  timestamped submissions). §3 defaults are refined by ADR-140 §9.
