@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "Tous les membres sont dans ce canal ; on ne peut ni le rejoindre ni le quitter.",
     "apiErrorInvalidNotifyLevel": "Niveau de notification inconnu.",
     "apiErrorCannotPostInChannel": "Tu ne peux pas publier dans ce canal.",
-    "apiErrorAttachmentNotShareable": "Tu ne peux joindre que tes propres entrées de journal."
+    "apiErrorAttachmentNotShareable": "Tu ne peux joindre que tes propres entrées de journal.",
+    "apiErrorCheckInNotOpen": "L'enregistrement ouvre 30 minutes avant le cours.",
+    "apiErrorCheckInClosed": "Le cours est terminé.",
+    "apiErrorAttendanceAlreadyRecorded": "Ta présence est déjà enregistrée.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Seule une réservation validée permet de s'enregistrer."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Publications",
     "mePostsHint": "Tout ce que tu as publié dans tes clubs",
     "meClubs": "Mes box et mes clubs",
-    "meClubsHint": "Notifications par club"
+    "meClubsHint": "Notifications par club",
+    "checkingIn": "Enregistrement…",
+    "checkedIn": "Enregistré ✓",
+    "followClassTimer": "Minuteur du cours en direct",
+    "classCheckIn": "S'enregistrer"
   },
   "Community": {
     "all": "Tout",

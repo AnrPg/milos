@@ -142,3 +142,26 @@ export function logSourceFor(item: TodayTrainingItem, sources: LogSources | unde
     ? { sourceType: "assigned_workout", referenceId: match.id, title: match.title, scoreableSections: match.scoreable_sections }
     : null;
 }
+
+export type BookingCheckIn = { checkedIn: boolean; canCheckIn: boolean; live: boolean };
+
+/**
+ * The next-booking card's check-in state (TD-105): checked in already, may
+ * check in now (approved booking, inside the window the server gave), and
+ * whether the class is running, so its live timer can be followed.
+ */
+export function bookingCheckIn(slot: ScheduleSlot, now: Date): BookingCheckIn {
+  const booking = slot.current_user_booking;
+  const at = now.getTime();
+  const starts = new Date(slot.scheduled_at).getTime();
+  const ends = starts + slot.duration_minutes * 60_000;
+  const approved = booking?.status === "approved";
+  const checkedIn = booking?.attendance_status === "attended";
+  const opens = booking?.check_in_opens_at ? new Date(booking.check_in_opens_at).getTime() : starts - 30 * 60_000;
+  const closes = booking?.check_in_closes_at ? new Date(booking.check_in_closes_at).getTime() : ends;
+  return {
+    checkedIn,
+    canCheckIn: approved && !checkedIn && !booking?.attendance_status && at >= opens && at < closes,
+    live: approved && at >= starts && at < ends,
+  };
+}

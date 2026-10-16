@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "Every member is in this channel; it cannot be joined or left.",
     "apiErrorInvalidNotifyLevel": "Unknown notification level.",
     "apiErrorCannotPostInChannel": "You cannot post in this channel.",
-    "apiErrorAttachmentNotShareable": "You can only attach your own journal entries."
+    "apiErrorAttachmentNotShareable": "You can only attach your own journal entries.",
+    "apiErrorCheckInNotOpen": "Check-in opens 30 minutes before the class.",
+    "apiErrorCheckInClosed": "The class has ended.",
+    "apiErrorAttendanceAlreadyRecorded": "Your attendance was already recorded.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Only an approved booking can check in."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Posts",
     "mePostsHint": "Everything you posted in your clubs",
     "meClubs": "My gyms and clubs",
-    "meClubsHint": "Notifications per club"
+    "meClubsHint": "Notifications per club",
+    "checkingIn": "Checking in…",
+    "checkedIn": "Checked in ✓",
+    "followClassTimer": "Live class timer",
+    "classCheckIn": "Check in"
   },
   "Community": {
     "all": "All",

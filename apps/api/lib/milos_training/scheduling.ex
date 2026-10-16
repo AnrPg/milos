@@ -120,6 +120,15 @@ defmodule MilosTraining.Scheduling do
   defdelegate record_attendance(context, params), to: RecordAttendance, as: :call
   defdelegate record_attendance(params), to: RecordAttendance, as: :call
 
+  @doc "The member's attendance status per class, for the classes given."
+  def list_user_attendance(%{organization_id: _} = context, user_id, slot_ids),
+    do: MilosTraining.Scheduling.SchedulingStore.list_user_attendance(context, user_id, slot_ids)
+
+  defdelegate self_check_in_window(slot), to: MilosTraining.Scheduling.Domain.AttendancePolicy
+
+  defdelegate self_check_in(booking, slot, existing, now),
+    to: MilosTraining.Scheduling.Domain.AttendancePolicy
+
   defdelegate get_attendance_for_user_class(context, user_id, scheduled_class_id),
     to: GetAttendance,
     as: :for_user_class

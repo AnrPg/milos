@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "Σε αυτό το κανάλι είναι όλα τα μέλη· δεν μπορείς να μπεις ή να βγεις.",
     "apiErrorInvalidNotifyLevel": "Άγνωστο επίπεδο ειδοποιήσεων.",
     "apiErrorCannotPostInChannel": "Δεν μπορείς να αναρτήσεις σε αυτό το κανάλι.",
-    "apiErrorAttachmentNotShareable": "Μπορείς να επισυνάψεις μόνο δικές σου καταχωρήσεις του ημερολογίου."
+    "apiErrorAttachmentNotShareable": "Μπορείς να επισυνάψεις μόνο δικές σου καταχωρήσεις του ημερολογίου.",
+    "apiErrorCheckInNotOpen": "Το check-in ανοίγει 30 λεπτά πριν από την τάξη.",
+    "apiErrorCheckInClosed": "Η τάξη έχει τελειώσει.",
+    "apiErrorAttendanceAlreadyRecorded": "Η παρουσία σου έχει ήδη καταγραφεί.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Check-in γίνεται μόνο με εγκεκριμένη κράτηση."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -5062,7 +5066,11 @@
     "mePosts": "Αναρτήσεις",
     "mePostsHint": "Ό,τι έχεις δημοσιεύσει στα clubs σου",
     "meClubs": "Τα box και τα clubs μου",
-    "meClubsHint": "Ειδοποιήσεις ανά club"
+    "meClubsHint": "Ειδοποιήσεις ανά club",
+    "checkingIn": "Γίνεται check-in…",
+    "checkedIn": "Check-in ✓",
+    "followClassTimer": "Ζωντανό χρονόμετρο",
+    "classCheckIn": "Check-in"
   },
   "Community": {
     "all": "Όλα",

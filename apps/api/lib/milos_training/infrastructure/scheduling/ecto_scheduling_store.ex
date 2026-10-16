@@ -595,6 +595,21 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def list_user_attendance(_context, _user_id, []), do: %{}
+
+  def list_user_attendance(%{organization_id: organization_id}, user_id, slot_ids) do
+    ClassAttendanceRecord
+    |> where(
+      [record],
+      record.organization_id == ^organization_id and record.user_id == ^user_id and
+        record.scheduled_class_id in ^slot_ids
+    )
+    |> select([record], {record.scheduled_class_id, record.status})
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  @impl true
   def get_attendance_for_user_class(
         %{organization_id: organization_id},
         user_id,

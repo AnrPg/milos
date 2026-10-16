@@ -43099,6 +43099,80 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/bookings/{id}/check-in": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.check_in_class",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "attendance": {
+                      "properties": {
+                        "marked_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "scheduled_class_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "scheduled_class_id",
+                        "status",
+                        "marked_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "attendance"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Attendance"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outside the check-in window"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Check in to a class you booked (from 30 minutes before it starts until it ends)",
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/check-ins": {
       "post": {
         "callbacks": {},

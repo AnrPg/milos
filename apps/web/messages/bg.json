@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "В този канал са всички членове; не може да се влиза или излиза.",
     "apiErrorInvalidNotifyLevel": "Неизвестно ниво на известия.",
     "apiErrorCannotPostInChannel": "Не можеш да публикуваш в този канал.",
-    "apiErrorAttachmentNotShareable": "Можеш да прикачваш само свои записи от дневника."
+    "apiErrorAttachmentNotShareable": "Можеш да прикачваш само свои записи от дневника.",
+    "apiErrorCheckInNotOpen": "Чекирането започва 30 минути преди тренировката.",
+    "apiErrorCheckInClosed": "Тренировката е приключила.",
+    "apiErrorAttendanceAlreadyRecorded": "Присъствието ти вече е отбелязано.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Чекиране е възможно само с одобрена резервация."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Публикации",
     "mePostsHint": "Всичко, което си публикувал в клубовете",
     "meClubs": "Моите зали и клубове",
-    "meClubsHint": "Известия за всеки клуб"
+    "meClubsHint": "Известия за всеки клуб",
+    "checkingIn": "Чекиране…",
+    "checkedIn": "Чекиран ✓",
+    "followClassTimer": "Таймер на тренировката на живо",
+    "classCheckIn": "Чекирай се"
   },
   "Community": {
     "all": "Всички",

@@ -351,6 +351,7 @@ defmodule MilosTrainingWeb.Router do
     post("/bookings/waitlist", ScheduleController, :join_waitlist)
     post("/bookings/guests", ScheduleController, :create_guest_booking)
     delete("/bookings/:id", ScheduleController, :delete_booking)
+    post("/bookings/:id/check-in", ScheduleController, :check_in_class)
     get("/locations", ScheduleController, :locations)
     post("/check-ins", ScheduleController, :check_in)
     get("/workouts/:id", WorkoutController, :show)

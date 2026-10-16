@@ -6,6 +6,7 @@ defmodule MilosTrainingWeb.ScheduleController do
 
   alias MilosTraining.Application.{
     CheckInOpenGym,
+    CheckInToClass,
     GetScheduleCalendar,
     JoinClassWaitlist,
     SubmitBooking,
@@ -25,7 +26,14 @@ defmodule MilosTrainingWeb.ScheduleController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:index, :create_booking, :join_waitlist, :create_guest_booking, :check_in]
+       when action in [
+              :index,
+              :create_booking,
+              :join_waitlist,
+              :create_guest_booking,
+              :check_in,
+              :check_in_class
+            ]
 
   @location_schema FacilitySchemas.location_schema()
 
@@ -339,4 +347,47 @@ defmodule MilosTrainingWeb.ScheduleController do
   end
 
   defp normalize_body_params(conn, params), do: ParamExtractor.body(%{body_params: conn}, params)
+
+  operation(:check_in_class,
+    summary: "Check in to a class you booked (from 30 minutes before it starts until it ends)",
+    parameters: [
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok:
+        {"Attendance", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             attendance: %Schema{
+               type: :object,
+               properties: %{
+                 scheduled_class_id: %Schema{type: :string, format: :uuid},
+                 status: %Schema{type: :string},
+                 marked_at: %Schema{type: :string, format: :"date-time"}
+               },
+               required: [:scheduled_class_id, :status, :marked_at]
+             }
+           },
+           required: [:attendance]
+         }},
+      conflict: {"Outside the check-in window", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def check_in_class(conn, %{id: id}) do
+    with {:ok, attendance} <-
+           CheckInToClass.call(
+             conn.assigns.tenant_context,
+             GuardianPlug.current_resource(conn),
+             id
+           ) do
+      json(conn, %{attendance: Map.take(attendance, [:scheduled_class_id, :status, :marked_at])})
+    end
+  end
 end

@@ -3297,6 +3297,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/bookings/{id}/check-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check in to a class you booked (from 30 minutes before it starts until it ends) */
+        post: operations["MilosTrainingWeb.ScheduleController.check_in_class"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/check-ins": {
         parameters: {
             query?: never;
@@ -21393,6 +21410,45 @@ export interface operations {
             };
             /** @description Not found */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScheduleController.check_in_class": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attendance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attendance: {
+                            /** Format: date-time */
+                            marked_at: string;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            status: string;
+                        };
+                    };
+                };
+            };
+            /** @description Outside the check-in window */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

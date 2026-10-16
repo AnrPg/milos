@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "Alle leden zitten in dit kanaal; je kunt er niet in of uit.",
     "apiErrorInvalidNotifyLevel": "Onbekend meldingsniveau.",
     "apiErrorCannotPostInChannel": "Je kunt niet in dit kanaal plaatsen.",
-    "apiErrorAttachmentNotShareable": "Je kunt alleen je eigen dagboekitems bijvoegen."
+    "apiErrorAttachmentNotShareable": "Je kunt alleen je eigen dagboekitems bijvoegen.",
+    "apiErrorCheckInNotOpen": "Inchecken kan vanaf 30 minuten voor de les.",
+    "apiErrorCheckInClosed": "De les is afgelopen.",
+    "apiErrorAttendanceAlreadyRecorded": "Je aanwezigheid is al geregistreerd.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Berichten",
     "mePostsHint": "Alles wat je in je clubs plaatste",
     "meClubs": "Mijn boxen en clubs",
-    "meClubsHint": "Meldingen per club"
+    "meClubsHint": "Meldingen per club",
+    "checkingIn": "Bezig met inchecken…",
+    "checkedIn": "Ingecheckt ✓",
+    "followClassTimer": "Live lestimer",
+    "classCheckIn": "Inchecken"
   },
   "Community": {
     "all": "Alles",

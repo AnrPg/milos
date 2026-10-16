@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "כל החברים נמצאים בערוץ הזה; אי אפשר להצטרף או לצאת.",
     "apiErrorInvalidNotifyLevel": "רמת התראות לא מוכרת.",
     "apiErrorCannotPostInChannel": "אינך יכול לפרסם בערוץ הזה.",
-    "apiErrorAttachmentNotShareable": "אפשר לצרף רק רשומות מהיומן שלך."
+    "apiErrorAttachmentNotShareable": "אפשר לצרף רק רשומות מהיומן שלך.",
+    "apiErrorCheckInNotOpen": "הצ'ק-אין נפתח 30 דקות לפני השיעור.",
+    "apiErrorCheckInClosed": "השיעור הסתיים.",
+    "apiErrorAttendanceAlreadyRecorded": "הנוכחות שלך כבר נרשמה.",
+    "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -5062,7 +5066,11 @@
     "mePosts": "פוסטים",
     "mePostsHint": "כל מה שפרסמת במועדונים שלך",
     "meClubs": "המכונים והמועדונים שלי",
-    "meClubsHint": "התראות לכל מועדון"
+    "meClubsHint": "התראות לכל מועדון",
+    "checkingIn": "מבצעים צ'ק-אין…",
+    "checkedIn": "בוצע צ'ק-אין ✓",
+    "followClassTimer": "טיימר השיעור בשידור חי",
+    "classCheckIn": "צ'ק-אין"
   },
   "Community": {
     "all": "הכול",

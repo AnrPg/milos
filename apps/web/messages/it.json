@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "In questo canale ci sono tutti i membri; non si può entrare né uscire.",
     "apiErrorInvalidNotifyLevel": "Livello di notifica sconosciuto.",
     "apiErrorCannotPostInChannel": "Non puoi pubblicare in questo canale.",
-    "apiErrorAttachmentNotShareable": "Puoi allegare solo voci del tuo diario."
+    "apiErrorAttachmentNotShareable": "Puoi allegare solo voci del tuo diario.",
+    "apiErrorCheckInNotOpen": "Il check-in apre 30 minuti prima della classe.",
+    "apiErrorCheckInClosed": "La classe è finita.",
+    "apiErrorAttendanceAlreadyRecorded": "La tua presenza è già registrata.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Post",
     "mePostsHint": "Tutto ciò che hai pubblicato nei tuoi club",
     "meClubs": "I miei box e club",
-    "meClubsHint": "Notifiche per club"
+    "meClubsHint": "Notifiche per club",
+    "checkingIn": "Check-in in corso…",
+    "checkedIn": "Check-in fatto ✓",
+    "followClassTimer": "Timer della classe dal vivo",
+    "classCheckIn": "Check-in"
   },
   "Community": {
     "all": "Tutti",

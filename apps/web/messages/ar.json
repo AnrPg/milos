@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "كل الأعضاء في هذه القناة؛ لا يمكن الانضمام إليها أو مغادرتها.",
     "apiErrorInvalidNotifyLevel": "مستوى إشعارات غير معروف.",
     "apiErrorCannotPostInChannel": "لا يمكنك النشر في هذه القناة.",
-    "apiErrorAttachmentNotShareable": "يمكنك إرفاق إدخالات يومياتك فقط."
+    "apiErrorAttachmentNotShareable": "يمكنك إرفاق إدخالات يومياتك فقط.",
+    "apiErrorCheckInNotOpen": "يُفتح تسجيل الحضور قبل الحصة بـ30 دقيقة.",
+    "apiErrorCheckInClosed": "انتهت الحصة.",
+    "apiErrorAttendanceAlreadyRecorded": "سُجّل حضورك بالفعل.",
+    "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -5062,7 +5066,11 @@
     "mePosts": "المنشورات",
     "mePostsHint": "كل ما نشرته في أنديتك",
     "meClubs": "صالاتي وأنديتي",
-    "meClubsHint": "الإشعارات لكل نادٍ"
+    "meClubsHint": "الإشعارات لكل نادٍ",
+    "checkingIn": "جارٍ تسجيل الحضور…",
+    "checkedIn": "تم تسجيل الحضور ✓",
+    "followClassTimer": "مؤقت الحصة المباشر",
+    "classCheckIn": "تسجيل الحضور"
   },
   "Community": {
     "all": "الكل",

@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "In diesem Kanal sind alle Mitglieder; man kann ihm weder beitreten noch ihn verlassen.",
     "apiErrorInvalidNotifyLevel": "Unbekannte Benachrichtigungsstufe.",
     "apiErrorCannotPostInChannel": "Du kannst in diesem Kanal nicht posten.",
-    "apiErrorAttachmentNotShareable": "Du kannst nur deine eigenen Tagebucheinträge anhängen."
+    "apiErrorAttachmentNotShareable": "Du kannst nur deine eigenen Tagebucheinträge anhängen.",
+    "apiErrorCheckInNotOpen": "Der Check-in öffnet 30 Minuten vor dem Kurs.",
+    "apiErrorCheckInClosed": "Der Kurs ist vorbei.",
+    "apiErrorAttendanceAlreadyRecorded": "Deine Anwesenheit wurde bereits erfasst.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Einchecken geht nur mit einer bestätigten Buchung."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Beiträge",
     "mePostsHint": "Alles, was du in deinen Clubs gepostet hast",
     "meClubs": "Meine Boxen und Clubs",
-    "meClubsHint": "Benachrichtigungen pro Club"
+    "meClubsHint": "Benachrichtigungen pro Club",
+    "checkingIn": "Wird eingecheckt…",
+    "checkedIn": "Eingecheckt ✓",
+    "followClassTimer": "Live-Kurstimer",
+    "classCheckIn": "Einchecken"
   },
   "Community": {
     "all": "Alle",

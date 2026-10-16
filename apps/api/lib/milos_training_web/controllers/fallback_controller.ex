@@ -1883,6 +1883,11 @@ defmodule MilosTrainingWeb.FallbackController do
     appointment_not_active: {:conflict, "The appointment is no longer active"},
     appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
     invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"},
+    # TD-105: member self check-in to a booked class.
+    check_in_not_open: {:conflict, "Check-in opens 30 minutes before the class"},
+    check_in_closed: {:conflict, "The class has ended"},
+    attendance_already_recorded: {:conflict, "Your attendance was already recorded"},
+    attendance_requires_approved_booking: {:conflict, "Only an approved booking can check in"},
     add_on_base_required:
       {:unprocessable_entity, "The member needs a compatible membership first"},
     corporate_package_requires_enrollment:

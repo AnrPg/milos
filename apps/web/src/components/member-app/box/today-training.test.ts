@@ -159,3 +159,33 @@ describe("logSourceFor", () => {
     expect(logSourceFor(items[2], undefined)).toBeNull();
   });
 });
+
+describe("bookingCheckIn", async () => {
+  const { bookingCheckIn } = await import("./today-training");
+  const base = new Date("2026-10-16T17:00:00Z");
+  const classAt = (status: string, extra: Record<string, unknown> = {}) =>
+    ({
+      id: "c",
+      scheduled_at: base.toISOString(),
+      duration_minutes: 60,
+      current_user_booking: { id: "b", status, inserted_at: base.toISOString(), ...extra },
+    }) as unknown as Parameters<typeof bookingCheckIn>[0];
+  const minutes = (n: number) => new Date(base.getTime() + n * 60_000);
+
+  it("opens 30 minutes before the class and closes when it ends", () => {
+    expect(bookingCheckIn(classAt("approved"), minutes(-31)).canCheckIn).toBe(false);
+    expect(bookingCheckIn(classAt("approved"), minutes(-30)).canCheckIn).toBe(true);
+    expect(bookingCheckIn(classAt("approved"), minutes(59))).toEqual({ checkedIn: false, canCheckIn: true, live: true });
+    expect(bookingCheckIn(classAt("approved"), minutes(60)).canCheckIn).toBe(false);
+  });
+
+  it("needs an approved booking and stops once checked in or marked by staff", () => {
+    expect(bookingCheckIn(classAt("pending"), minutes(0)).canCheckIn).toBe(false);
+    expect(bookingCheckIn(classAt("approved", { attendance_status: "attended" }), minutes(0))).toEqual({
+      checkedIn: true,
+      canCheckIn: false,
+      live: true,
+    });
+    expect(bookingCheckIn(classAt("approved", { attendance_status: "no_show" }), minutes(0)).canCheckIn).toBe(false);
+  });
+});

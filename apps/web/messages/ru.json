@@ -4326,7 +4326,11 @@
     "apiErrorChannelNotOptional": "В этом канале все участники; вступить или выйти нельзя.",
     "apiErrorInvalidNotifyLevel": "Неизвестный уровень уведомлений.",
     "apiErrorCannotPostInChannel": "Вы не можете публиковать в этом канале.",
-    "apiErrorAttachmentNotShareable": "Прикреплять можно только свои записи дневника."
+    "apiErrorAttachmentNotShareable": "Прикреплять можно только свои записи дневника.",
+    "apiErrorCheckInNotOpen": "Отметиться можно за 30 минут до занятия.",
+    "apiErrorCheckInClosed": "Занятие закончилось.",
+    "apiErrorAttendanceAlreadyRecorded": "Ваше посещение уже отмечено.",
+    "apiErrorAttendanceRequiresApprovedBooking": "Отметиться можно только с подтверждённой записью."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
@@ -5062,7 +5066,11 @@
     "mePosts": "Публикации",
     "mePostsHint": "Всё, что вы опубликовали в клубах",
     "meClubs": "Мои залы и клубы",
-    "meClubsHint": "Уведомления по клубам"
+    "meClubsHint": "Уведомления по клубам",
+    "checkingIn": "Отмечаемся…",
+    "checkedIn": "Вы отметились ✓",
+    "followClassTimer": "Таймер занятия онлайн",
+    "classCheckIn": "Отметиться"
   },
   "Community": {
     "all": "Все",
