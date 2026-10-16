@@ -38,7 +38,7 @@ export async function createDirectThread(token: string, participantId: string) {
 
 export async function getOrCreateContextThread(
   token: string,
-  contextType: "assignment" | "class_slot",
+  contextType: "assignment" | "class_slot" | "box",
   contextId: string,
 ) {
   return apiRequest<{ thread: ChatThread }>("/me/threads", {

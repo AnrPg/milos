@@ -4216,7 +4216,7 @@ export interface paths {
         /** Private notes about a client that you may read (reads are logged) */
         get: operations["MilosTrainingWeb.CoachNotesController.index"];
         put?: never;
-        /** Write a private note about one of your clients */
+        /** Write a private note about one of your clients, optionally about one thing of theirs */
         post: operations["MilosTrainingWeb.CoachNotesController.create"];
         delete?: never;
         options?: never;
@@ -5530,6 +5530,10 @@ export interface components {
             id: string;
             /** Format: date-time */
             inserted_at?: string;
+            /** Format: uuid */
+            subject_id?: string | null;
+            /** @enum {string|null} */
+            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
             /** Format: date-time */
             updated_at?: string;
         };
@@ -24063,6 +24067,10 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -24084,6 +24092,10 @@ export interface operations {
             content: {
                 "application/json": {
                     body: string;
+                    /** Format: uuid */
+                    subject_id?: string;
+                    /** @enum {string} */
+                    subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment";
                 };
             };
         };
@@ -24107,6 +24119,10 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -24337,6 +24353,10 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };

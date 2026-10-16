@@ -772,6 +772,23 @@
             "format": "date-time",
             "type": "string"
           },
+          "subject_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "subject_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "pr",
+              "injury",
+              "form_review",
+              "assignment"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
           "updated_at": {
             "format": "date-time",
             "type": "string"
@@ -49193,6 +49210,23 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "subject_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "subject_kind": {
+                            "enum": [
+                              "execution",
+                              "training_log",
+                              "pr",
+                              "injury",
+                              "form_review",
+                              "assignment"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "updated_at": {
                             "format": "date-time",
                             "type": "string"
@@ -49253,6 +49287,21 @@
                     "maxLength": 5000,
                     "minLength": 1,
                     "type": "string"
+                  },
+                  "subject_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "subject_kind": {
+                    "enum": [
+                      "execution",
+                      "training_log",
+                      "pr",
+                      "injury",
+                      "form_review",
+                      "assignment"
+                    ],
+                    "type": "string"
                   }
                 },
                 "required": [
@@ -49295,6 +49344,23 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "subject_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subject_kind": {
+                          "enum": [
+                            "execution",
+                            "training_log",
+                            "pr",
+                            "injury",
+                            "form_review",
+                            "assignment"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "type": "string"
@@ -49325,7 +49391,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Write a private note about one of your clients",
+        "summary": "Write a private note about one of your clients, optionally about one thing of theirs",
         "tags": [
           "Coach notes"
         ]
@@ -49829,6 +49895,23 @@
                         },
                         "inserted_at": {
                           "format": "date-time",
+                          "type": "string"
+                        },
+                        "subject_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "subject_kind": {
+                          "enum": [
+                            "execution",
+                            "training_log",
+                            "pr",
+                            "injury",
+                            "form_review",
+                            "assignment"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         },
                         "updated_at": {

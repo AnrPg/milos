@@ -28,6 +28,9 @@ export type RoleAccess = RoleAccessResponse;
 export type CoachingRelationship = RelationshipsResponse["relationships"][number];
 export type CoachNote = NotesResponse["notes"][number];
 export type CoachNoteRead = ReadsResponse["reads"][number];
+/** What a coach note is about, when it is about one thing (ADR-140 §5). */
+export type CoachNoteSubjectKind = NonNullable<CoachNote["subject_kind"]>;
+export type CoachNoteSubject = { kind: CoachNoteSubjectKind; id: string };
 export type CleaningArea = AreasResponse["areas"][number];
 export type CleaningEntry = EntriesResponse["entries"][number];
 export type MembershipStatus = MembershipStatusResponse["membership_status"];
@@ -128,11 +131,11 @@ export async function fetchCoachNotes(token: string, clientUserId: string) {
   return response.notes;
 }
 
-export async function createCoachNote(token: string, clientUserId: string, body: string) {
+export async function createCoachNote(token: string, clientUserId: string, body: string, subject?: CoachNoteSubject | null) {
   const response = await apiRequest<NoteResponse>(`/staff/clients/${clientUserId}/coach-notes`, {
     method: "POST",
     token,
-    body: { body },
+    body: { body, ...(subject ? { subject_kind: subject.kind, subject_id: subject.id } : {}) },
   });
   return response.note;
 }
