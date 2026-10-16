@@ -259,8 +259,8 @@ Why swipe works for people and not for clubs: swipe makes sense when **both side
 **`Νέα καταχώρηση`** (grouped sheet): Προπόνηση · PR · Μέτρηση · Νερό/Ύπνος/Γεύμα · Πώς νιώθω (mood, energy, stress) · Λιγούρα · Τραυματισμός · Βίντεο τεχνικής (form review, quota) · Αξιολόγηση (rating) · Σημείωση (technique, thought, mood, goal; can link to a workout).
 
 **Visibility ladder** (shown as a badge on every entry):
-1. **Μόνο εγώ**: default for notes, mood, body, cravings.
-2. **Ο coach μου μπορεί να το δει**: no notification (today: PR coach visibility).
+1. **Μόνο εγώ**: default for notes, mood, body, cravings, and personal workouts outside a gym.
+2. **Ο coach μου μπορεί να το δει**: default for workouts and PRs done in a gym; no notification (today: PR coach visibility, training log in the athlete profile).
 3. **Ζητάω απάντηση**: enters the coach's reply queue, answer arrives in messages (today: execution notes, reply queue, form reviews).
 4. **Αξιολόγηση**: rating 1–5 + sentiment, to coach/box (today: reviews with `admin_only` / `user_visible`).
 5. **Ανάρτηση**: becomes a post (club/followers/public).
