@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "reservas esta aula com frequência",
     "channelsOfBox": "Da box",
     "channelsClassGroups": "Grupos de aula",
-    "channelsOther": "Outros canais"
+    "channelsOther": "Outros canais",
+    "myGymsTitle": "Boxes e coaches",
+    "myGymsEmpty": "Ainda não és membro de nenhuma box.",
+    "myGymsMain": "Principal",
+    "joinLabel": "Código de convite ou link de adesão",
+    "joinPlaceholder": "Cola o código ou o link",
+    "joinSubmit": "Entrar",
+    "joinPending": "A entrar…",
+    "joinInvalid": "Isso não parece um código de convite nem um link de adesão.",
+    "joinDone": "Entraste em {name}."
   }
 }

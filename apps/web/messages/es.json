@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "reservas esta clase a menudo",
     "channelsOfBox": "Del box",
     "channelsClassGroups": "Grupos de clase",
-    "channelsOther": "Otros canales"
+    "channelsOther": "Otros canales",
+    "myGymsTitle": "Boxes y coaches",
+    "myGymsEmpty": "Aún no eres miembro de ningún box.",
+    "myGymsMain": "Principal",
+    "joinLabel": "Código de invitación o enlace para unirte",
+    "joinPlaceholder": "Pega el código o el enlace",
+    "joinSubmit": "Unirme",
+    "joinPending": "Uniéndote…",
+    "joinInvalid": "Eso no parece un código de invitación ni un enlace para unirte.",
+    "joinDone": "Te has unido a {name}."
   }
 }

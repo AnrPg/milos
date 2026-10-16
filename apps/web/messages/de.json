@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "du buchst diesen Kurs oft",
     "channelsOfBox": "Von der Box",
     "channelsClassGroups": "Kursgruppen",
-    "channelsOther": "Weitere Kanäle"
+    "channelsOther": "Weitere Kanäle",
+    "myGymsTitle": "Boxen & Coaches",
+    "myGymsEmpty": "Du bist noch in keiner Box Mitglied.",
+    "myGymsMain": "Haupt-Box",
+    "joinLabel": "Einladungscode oder Beitrittslink",
+    "joinPlaceholder": "Code oder Link einfügen",
+    "joinSubmit": "Beitreten",
+    "joinPending": "Wird beigetreten…",
+    "joinInvalid": "Das sieht nicht nach einem Einladungscode oder Beitrittslink aus.",
+    "joinDone": "Du bist {name} beigetreten."
   }
 }

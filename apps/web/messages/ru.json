@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "вы часто бронируете это занятие",
     "channelsOfBox": "От зала",
     "channelsClassGroups": "Группы занятий",
-    "channelsOther": "Другие каналы"
+    "channelsOther": "Другие каналы",
+    "myGymsTitle": "Залы и тренеры",
+    "myGymsEmpty": "Вы пока не состоите ни в одном зале.",
+    "myGymsMain": "Основной",
+    "joinLabel": "Код приглашения или ссылка для вступления",
+    "joinPlaceholder": "Вставьте код или ссылку",
+    "joinSubmit": "Вступить",
+    "joinPending": "Вступаем…",
+    "joinInvalid": "Это не похоже на код приглашения или ссылку для вступления.",
+    "joinDone": "Вы вступили в {name}."
   }
 }

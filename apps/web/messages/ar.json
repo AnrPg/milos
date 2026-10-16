@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "تحجز هذه الحصة كثيرًا",
     "channelsOfBox": "من النادي",
     "channelsClassGroups": "مجموعات الحصص",
-    "channelsOther": "قنوات أخرى"
+    "channelsOther": "قنوات أخرى",
+    "myGymsTitle": "الأندية والمدربون",
+    "myGymsEmpty": "لست عضوًا في أي نادٍ بعد.",
+    "myGymsMain": "الرئيسي",
+    "joinLabel": "رمز الدعوة أو رابط الانضمام",
+    "joinPlaceholder": "الصق الرمز أو الرابط",
+    "joinSubmit": "انضم",
+    "joinPending": "جارٍ الانضمام…",
+    "joinInvalid": "لا يبدو هذا رمز دعوة أو رابط انضمام.",
+    "joinDone": "انضممت إلى {name}."
   }
 }

@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "често резервираш тази тренировка",
     "channelsOfBox": "От залата",
     "channelsClassGroups": "Групи по тренировки",
-    "channelsOther": "Други канали"
+    "channelsOther": "Други канали",
+    "myGymsTitle": "Зали и треньори",
+    "myGymsEmpty": "Все още не си член на зала.",
+    "myGymsMain": "Основна",
+    "joinLabel": "Код за покана или линк за присъединяване",
+    "joinPlaceholder": "Постави кода или линка",
+    "joinSubmit": "Влез",
+    "joinPending": "Присъединяване…",
+    "joinInvalid": "Това не прилича на код за покана или линк за присъединяване.",
+    "joinDone": "Присъедини се към {name}."
   }
 }

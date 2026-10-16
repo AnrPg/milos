@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "κάνεις συχνά κράτηση σε αυτή την τάξη",
     "channelsOfBox": "Του box",
     "channelsClassGroups": "Ομάδες τάξεων",
-    "channelsOther": "Άλλα κανάλια"
+    "channelsOther": "Άλλα κανάλια",
+    "myGymsTitle": "Box & coaches",
+    "myGymsEmpty": "Δεν είσαι ακόμη μέλος σε κάποιο box.",
+    "myGymsMain": "Κύριο",
+    "joinLabel": "Κωδικός πρόσκλησης ή join link",
+    "joinPlaceholder": "Επικόλλησε τον κωδικό ή το link",
+    "joinSubmit": "Μπες",
+    "joinPending": "Γίνεται…",
+    "joinInvalid": "Αυτό δεν μοιάζει με κωδικό πρόσκλησης ή join link.",
+    "joinDone": "Μπήκες στο {name}."
   }
 }

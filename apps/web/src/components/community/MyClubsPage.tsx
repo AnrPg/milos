@@ -8,18 +8,23 @@ import { useTranslations } from "next-intl";
 import { CLUBS_KEY, NOTIFY_LEVELS, setNotifyLevel, type CommunityClub, type NotifyLevel } from "@/api/community";
 import { clientErrorMessage } from "@/components/client/errors";
 import { clubInitials } from "@/components/community/community";
+import { MyGymsCard } from "@/components/community/MyGymsCard";
 import { useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
-/** Εγώ › Τα box και τα clubs μου (mockup «myClubs»): each club and how much you hear from it. */
+/**
+ * Εγώ › Τα box και τα clubs μου (mockup «myClubs»): your gyms (and joining
+ * another), then each club and how much you hear from it.
+ */
 export function MyClubsPage() {
   const t = useTranslations("Community");
   const clubs = useMyClubs();
 
   return (
     <HubPage title={t("myClubsTitle")}>
+      <MyGymsCard />
       <HubCard eyebrow={t("myClubsNotify")}>
         {clubs.isPending ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>

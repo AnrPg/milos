@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "את/ה מזמינים את השיעור הזה לעיתים קרובות",
     "channelsOfBox": "מהמכון",
     "channelsClassGroups": "קבוצות שיעורים",
-    "channelsOther": "ערוצים אחרים"
+    "channelsOther": "ערוצים אחרים",
+    "myGymsTitle": "מכונים ומאמנים",
+    "myGymsEmpty": "עדיין אינך חבר/ה באף מכון.",
+    "myGymsMain": "ראשי",
+    "joinLabel": "קוד הזמנה או קישור הצטרפות",
+    "joinPlaceholder": "הדביקו את הקוד או הקישור",
+    "joinSubmit": "הצטרפות",
+    "joinPending": "מצטרפים…",
+    "joinInvalid": "זה לא נראה כמו קוד הזמנה או קישור הצטרפות.",
+    "joinDone": "הצטרפת ל-{name}."
   }
 }

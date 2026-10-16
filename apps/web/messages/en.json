@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "you often book this class",
     "channelsOfBox": "From the box",
     "channelsClassGroups": "Class groups",
-    "channelsOther": "Other channels"
+    "channelsOther": "Other channels",
+    "myGymsTitle": "Gyms & coaches",
+    "myGymsEmpty": "You are not a member of any gym yet.",
+    "myGymsMain": "Main",
+    "joinLabel": "Invitation code or join link",
+    "joinPlaceholder": "Paste the code or the link",
+    "joinSubmit": "Join",
+    "joinPending": "Joining…",
+    "joinInvalid": "That does not look like an invitation code or a join link.",
+    "joinDone": "You joined {name}."
   }
 }

@@ -5147,6 +5147,15 @@
     "channelSuggestedHint": "je boekt deze les vaak",
     "channelsOfBox": "Van de box",
     "channelsClassGroups": "Lesgroepen",
-    "channelsOther": "Andere kanalen"
+    "channelsOther": "Andere kanalen",
+    "myGymsTitle": "Boxen & coaches",
+    "myGymsEmpty": "Je bent nog geen lid van een box.",
+    "myGymsMain": "Hoofdbox",
+    "joinLabel": "Uitnodigingscode of deelnamelink",
+    "joinPlaceholder": "Plak de code of de link",
+    "joinSubmit": "Deelnemen",
+    "joinPending": "Bezig…",
+    "joinInvalid": "Dat lijkt geen uitnodigingscode of deelnamelink.",
+    "joinDone": "Je bent lid geworden van {name}."
   }
 }
