@@ -259,4 +259,11 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   @impl true
   def promote_waitlisted_booking(context, booking_id),
     do: tenant_call(context, :promote_waitlisted_booking, [booking_id])
+
+  @impl true
+  def list_active_class_series(context), do: tenant_call(context, :list_active_class_series, [])
+
+  @impl true
+  def series_booking_counts(context, since),
+    do: tenant_call(context, :series_booking_counts, [since])
 end

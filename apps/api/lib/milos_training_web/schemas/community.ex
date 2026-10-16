@@ -28,6 +28,12 @@ defmodule MilosTrainingWeb.Schemas.Community do
         },
         membership: %Schema{type: :string, enum: ~w(everyone opt_in invite)},
         joined: %Schema{type: :boolean, description: "Its posts reach your feed"},
+        participant: %Schema{type: :boolean, description: "You are a member of this channel"},
+        suggested: %Schema{
+          type: :boolean,
+          description: "Offered to you (you often book its class) and not joined yet"
+        },
+        context_type: %Schema{type: :string, nullable: true},
         can_post: %Schema{type: :boolean},
         can_leave: %Schema{type: :boolean, description: "You may join or leave it yourself"}
       },
@@ -272,4 +278,67 @@ defmodule MilosTrainingWeb.Schemas.Community do
   end
 
   defp notify_levels, do: MilosTraining.Community.notify_level_options()
+
+  def wod_today_response do
+    entry = %Schema{
+      title: "WodLeaderboardEntry",
+      type: :object,
+      properties: %{
+        rank: %Schema{type: :integer},
+        user_id: @uuid,
+        nickname: %Schema{type: :string, nullable: true},
+        avatar_url: %Schema{type: :string, nullable: true},
+        scale_level_slug: %Schema{type: :string, nullable: true},
+        value: %Schema{type: :string, nullable: true},
+        unit: %Schema{type: :string, nullable: true},
+        me: %Schema{type: :boolean},
+        opted_in: %Schema{
+          type: :boolean,
+          description: "False only on your own row before you opt in to leaderboards"
+        }
+      },
+      required: [:rank, :user_id, :me, :opted_in]
+    }
+
+    %Schema{
+      title: "WodTodayCard",
+      type: :object,
+      properties: %{
+        date: %Schema{type: :string, format: :date},
+        channel_id: %Schema{type: :string, format: :uuid, nullable: true},
+        workout: %Schema{
+          type: :object,
+          nullable: true,
+          properties: %{
+            id: @uuid,
+            title: %Schema{type: :string},
+            type: %Schema{type: :string, nullable: true}
+          },
+          required: [:id, :title]
+        },
+        classes: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            properties: %{id: @uuid, scheduled_at: @datetime},
+            required: [:id, :scheduled_at]
+          }
+        },
+        score: %Schema{
+          type: :object,
+          nullable: true,
+          properties: %{
+            id: %Schema{type: :string},
+            name: %Schema{type: :string, nullable: true},
+            score_type: %Schema{type: :string},
+            unit: %Schema{type: :string, nullable: true}
+          },
+          required: [:id, :score_type]
+        },
+        leaderboard: %Schema{type: :array, items: entry},
+        logged_by_me: %Schema{type: :boolean}
+      },
+      required: [:date, :classes, :leaderboard, :logged_by_me]
+    }
+  end
 end

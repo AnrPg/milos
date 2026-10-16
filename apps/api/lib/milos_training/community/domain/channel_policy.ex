@@ -18,6 +18,36 @@ defmodule MilosTraining.Community.Domain.ChannelPolicy do
 
   def gym_channels, do: @gym_channels
 
+  # D7: a member who booked the same class this often in the window is
+  # offered its group.
+  @suggest_bookings 3
+  @suggest_window_days 28
+
+  def class_group_suggestion,
+    do: %{bookings: @suggest_bookings, window_days: @suggest_window_days}
+
+  @doc "The channel a recurring class gets (D7): its regulars talk there."
+  def class_slot_channel(%{id: series_id, name: name, local_start_time: start}) do
+    time = if start, do: " " <> String.slice(Time.to_string(start), 0, 5), else: ""
+
+    %{
+      kind: "class_slot",
+      name: String.slice(name || "", 0, 60 - String.length(time)) <> time,
+      write_policy: "participants",
+      membership: "opt_in",
+      context_type: "class_series",
+      context_id: series_id,
+      position: 10
+    }
+  end
+
+  @doc "Members to offer a class group: frequent bookers of that class."
+  def class_group_candidates(counts) do
+    for %{series_id: series_id, user_id: user_id, count: count} <- counts,
+        count >= @suggest_bookings,
+        do: {series_id, user_id}
+  end
+
   @doc "The club role a gym membership's roles give."
   def club_role(%{roles: [_ | _] = roles}), do: club_role(roles)
   def club_role(%{role: role}) when not is_nil(role), do: club_role([role])

@@ -17,11 +17,12 @@ defmodule MilosTraining.Application.ClubScope do
       clubs = Community.list_clubs(context, organization_ids)
       channel_ids = Enum.flat_map(clubs, fn club -> Enum.map(club.channels, & &1.id) end)
       joined = MapSet.new(Community.joined_channel_ids(context, user_id, channel_ids))
+      suggested = MapSet.new(Community.suggested_channel_ids(context, user_id, channel_ids))
       levels = Community.notify_levels(context, user_id, Enum.map(clubs, & &1.id))
 
       {:ok,
        clubs
-       |> Enum.map(&present(&1, by_organization[&1.organization_id], joined, levels))
+       |> Enum.map(&present(&1, by_organization[&1.organization_id], {joined, suggested}, levels))
        |> Enum.sort_by(&{&1.kind != "gym", String.downcase(&1.name)})}
     end
   end
@@ -67,7 +68,7 @@ defmodule MilosTraining.Application.ClubScope do
     end)
   end
 
-  defp present(club, membership, joined, levels) do
+  defp present(club, membership, membership_sets, levels) do
     role = Community.club_role(membership.membership)
     settings = (membership.settings && membership.settings.settings) || %{}
 
@@ -81,7 +82,7 @@ defmodule MilosTraining.Application.ClubScope do
       primary_color: settings["brand_primary_color"],
       role: role,
       notify_level: Map.get(levels, club.id, "all"),
-      channels: Enum.map(club.channels, &present_channel(&1, role, joined))
+      channels: Enum.map(club.channels, &present_channel(&1, role, membership_sets))
     }
   end
 
@@ -94,7 +95,7 @@ defmodule MilosTraining.Application.ClubScope do
 
   defp club_name(club, _organization, _settings), do: club.name
 
-  defp present_channel(channel, role, joined) do
+  defp present_channel(channel, role, {joined, suggested}) do
     joined? = MapSet.member?(joined, channel.id)
 
     %{
@@ -107,6 +108,7 @@ defmodule MilosTraining.Application.ClubScope do
       membership: channel.membership,
       archived_at: channel.archived_at,
       participant: joined?,
+      suggested: not joined? and MapSet.member?(suggested, channel.id),
       joined: Community.channel_in_feed?(channel, joined?),
       can_post: Community.can_post?(channel, role, joined?),
       can_leave: Community.channel_self_service?(channel)

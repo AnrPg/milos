@@ -288,6 +288,7 @@ defmodule MilosTrainingWeb.Router do
       :tenant_write_rate_limited
     ])
 
+    get("/wod-today", CommunityController, :wod_today)
     put("/clubs/:id/notify-level", CommunityController, :set_notify_level)
     post("/channels/:id/membership", CommunityController, :join_channel)
     delete("/channels/:id/membership", CommunityController, :leave_channel)

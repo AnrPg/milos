@@ -191,6 +191,19 @@ defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
   end
 
   @impl true
+  def list_for_workout(organization_id, workout_id, from, to) do
+    TrainingLogEntry
+    |> where(
+      [entry],
+      entry.organization_id == ^organization_id and entry.master_workout_id == ^workout_id and
+        entry.status != "voided" and entry.performed_at_utc >= ^from and
+        entry.performed_at_utc < ^to
+    )
+    |> Repo.all()
+    |> Enum.map(&normalize/1)
+  end
+
+  @impl true
   def set_entry_visibility(id, user_id, rung) do
     with {:ok, id} <- Ecto.UUID.cast(id),
          %TrainingLogEntry{} = entry <- Repo.get_by(TrainingLogEntry, id: id, user_id: user_id) do

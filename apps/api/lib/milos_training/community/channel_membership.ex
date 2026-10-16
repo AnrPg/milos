@@ -1,10 +1,16 @@
 defmodule MilosTraining.Community.ChannelMembership do
-  @moduledoc "A member in an opt-in or invite-only channel (ADR-138)."
+  @moduledoc """
+  A member and an opt-in or invite-only channel (ADR-138). `opt_in`,
+  `invited` and `auto` rows are members; `suggested` is an offer (D7: a
+  frequent booker of a class) and `dismissed` remembers that they left or
+  declined, so they are not offered it again.
+  """
 
   use Ecto.Schema
   import Ecto.Changeset
 
-  @sources ~w(opt_in suggested invited auto)
+  @sources ~w(opt_in suggested invited auto dismissed)
+  @member_sources ~w(opt_in invited auto)
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -17,6 +23,8 @@ defmodule MilosTraining.Community.ChannelMembership do
 
     timestamps(type: :utc_datetime_usec)
   end
+
+  def member_sources, do: @member_sources
 
   def changeset(membership \\ %__MODULE__{}, attrs) do
     membership

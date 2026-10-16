@@ -103,8 +103,26 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
   def joined_channel_ids(_context, _user_id, []), do: []
 
   def joined_channel_ids(_context, user_id, channel_ids) do
+    member_sources = ChannelMembership.member_sources()
+
     ChannelMembership
-    |> where([m], m.user_id == ^user_id and m.channel_id in ^channel_ids)
+    |> where(
+      [m],
+      m.user_id == ^user_id and m.channel_id in ^channel_ids and m.source in ^member_sources
+    )
+    |> select([m], m.channel_id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def suggested_channel_ids(_context, _user_id, []), do: []
+
+  def suggested_channel_ids(_context, user_id, channel_ids) do
+    ChannelMembership
+    |> where(
+      [m],
+      m.user_id == ^user_id and m.channel_id in ^channel_ids and m.source == "suggested"
+    )
     |> select([m], m.channel_id)
     |> Repo.all()
   end
@@ -118,18 +136,79 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
       source: source
     }
     |> ChannelMembership.changeset()
-    |> Repo.insert(on_conflict: :nothing, conflict_target: [:channel_id, :user_id])
+    |> Repo.insert(
+      on_conflict: [set: [source: source, updated_at: DateTime.utc_now()]],
+      conflict_target: [:channel_id, :user_id]
+    )
     |> case do
       {:ok, _membership} -> :ok
       error -> error
     end
   end
 
+  # Leaving keeps a `dismissed` row so the channel is not suggested again.
   @impl true
-  def leave_channel(_context, channel, user_id) do
-    ChannelMembership
-    |> where([m], m.channel_id == ^channel.id and m.user_id == ^user_id)
-    |> Repo.delete_all()
+  def leave_channel(context, channel, user_id),
+    do: join_channel(context, channel, user_id, "dismissed")
+
+  @impl true
+  def ensure_context_channel(_context, club, spec) do
+    attrs =
+      Map.merge(spec, %{organization_id: club.organization_id, club_id: club.id, archived_at: nil})
+
+    attrs
+    |> Channel.changeset()
+    |> Repo.insert(
+      on_conflict: [set: [name: attrs.name, archived_at: nil, updated_at: DateTime.utc_now()]],
+      conflict_target:
+        {:unsafe_fragment, "(club_id, context_type, context_id) WHERE context_id IS NOT NULL"},
+      returning: true
+    )
+    |> case do
+      {:ok, channel} -> {:ok, normalize_channel(channel)}
+      error -> error
+    end
+  end
+
+  @impl true
+  def archive_context_channels(_context, club_id, context_type, keep_context_ids) do
+    now = DateTime.utc_now()
+
+    Channel
+    |> where(
+      [ch],
+      ch.club_id == ^club_id and ch.context_type == ^context_type and is_nil(ch.archived_at) and
+        ch.context_id not in ^keep_context_ids
+    )
+    |> Repo.update_all(set: [archived_at: now, updated_at: now])
+
+    :ok
+  end
+
+  # Offers a channel to members; never overrides a choice they already made.
+  @impl true
+  def suggest_channel_members(_context, []), do: :ok
+
+  def suggest_channel_members(%{organization_id: organization_id}, pairs) do
+    now = DateTime.utc_now()
+
+    rows =
+      Enum.map(pairs, fn {channel_id, user_id} ->
+        %{
+          id: Ecto.UUID.generate(),
+          organization_id: organization_id,
+          channel_id: channel_id,
+          user_id: user_id,
+          source: "suggested",
+          inserted_at: now,
+          updated_at: now
+        }
+      end)
+
+    Repo.insert_all(ChannelMembership, rows,
+      on_conflict: :nothing,
+      conflict_target: [:channel_id, :user_id]
+    )
 
     :ok
   end

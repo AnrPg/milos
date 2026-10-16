@@ -8,6 +8,7 @@ defmodule MilosTraining.Community do
 
   alias MilosTraining.Community.Commands.{
     ChannelMembership,
+    ClassGroups,
     Posts,
     ProvisionGymClub,
     SetNotifyLevel
@@ -30,6 +31,10 @@ defmodule MilosTraining.Community do
   defdelegate join_channel(context, channel_id), to: ChannelMembership, as: :join
   defdelegate leave_channel(context, channel_id), to: ChannelMembership, as: :leave
   defdelegate set_notify_level(context, club_id, level), to: SetNotifyLevel, as: :call
+  defdelegate suggested_channel_ids(context, user_id, channel_ids), to: CommunityStore
+  defdelegate sync_class_groups(context, series, counts), to: ClassGroups, as: :sync
+  defdelegate join_builtin_channel(context, kind, source), to: ClassGroups, as: :join_builtin
+  def class_group_suggestion, do: ChannelPolicy.class_group_suggestion()
   def notify_level_options, do: ClubMembership.notify_levels()
 
   # Posts (M7).

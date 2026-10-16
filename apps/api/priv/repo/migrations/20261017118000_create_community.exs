@@ -156,7 +156,7 @@ defmodule MilosTraining.Repo.Migrations.CreateCommunity do
     composite_fk(:community_channel_memberships, :channel_id, :community_channels)
 
     create constraint(:community_channel_memberships, :community_channel_memberships_source_check,
-             check: "source IN ('opt_in', 'suggested', 'invited', 'auto')"
+             check: "source IN ('opt_in', 'suggested', 'invited', 'auto', 'dismissed')"
            )
 
     create unique_index(:community_channel_memberships, [:channel_id, :user_id])

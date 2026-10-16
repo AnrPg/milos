@@ -4,7 +4,7 @@ defmodule MilosTrainingWeb.CommunityController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{CommunityPreferences, ListMyClubs}
+  alias MilosTraining.Application.{CommunityPreferences, GetWodTodayCard, ListMyClubs}
   alias MilosTrainingWeb.Schemas.Community, as: S
   alias OpenApiSpex.Parameter
 
@@ -67,6 +67,33 @@ defmodule MilosTrainingWeb.CommunityController do
   def leave_channel(conn, %{id: id}) do
     with {:ok, result} <- CommunityPreferences.leave_channel(conn.assigns.tenant_context, id) do
       json(conn, result)
+    end
+  end
+
+  operation(:wod_today,
+    summary: "The gym's #wod card for a day: its WOD, classes and leaderboard",
+    parameters: [
+      %Parameter{
+        name: :date,
+        in: :query,
+        required: false,
+        schema: %OpenApiSpex.Schema{type: :string, format: :date},
+        description: "Local date; today in `timezone` when omitted"
+      },
+      %Parameter{
+        name: :timezone,
+        in: :query,
+        required: false,
+        schema: %OpenApiSpex.Schema{type: :string},
+        description: "IANA time zone of the member, e.g. Europe/Athens"
+      }
+    ],
+    responses: [ok: {"Card", "application/json", S.wod_today_response()}]
+  )
+
+  def wod_today(conn, params) do
+    with {:ok, card} <- GetWodTodayCard.call(conn.assigns.tenant_context, params) do
+      json(conn, card)
     end
   end
 end

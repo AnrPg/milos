@@ -40,6 +40,14 @@ defmodule MilosTraining.Scheduling do
   defdelegate create_class_series(context, params), to: CreateClassSeries, as: :call
   defdelegate create_class_series(params), to: CreateClassSeries, as: :call
   defdelegate extend_class_series(context, series_id, horizon), to: ExtendClassSeries, as: :call
+
+  # ADR-138 D7: class-slot groups.
+  def list_active_class_series(%{organization_id: _} = context),
+    do: MilosTraining.Scheduling.SchedulingStore.list_active_class_series(context)
+
+  def series_booking_counts(%{organization_id: _} = context, %DateTime{} = since),
+    do: MilosTraining.Scheduling.SchedulingStore.series_booking_counts(context, since)
+
   defdelegate extend_class_series(series_id, horizon), to: ExtendClassSeries, as: :call
   defdelegate update_slot(context, id, params), to: UpdateSlot, as: :call
   defdelegate update_slot(id, params), to: UpdateSlot, as: :call

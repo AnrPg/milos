@@ -351,6 +351,18 @@ defmodule MilosTraining.Infrastructure.Gamification.EctoGamificationStore do
   end
 
   @impl true
+  def leaderboard_opted_in_user_ids([]), do: []
+
+  def leaderboard_opted_in_user_ids(user_ids) do
+    LeaderboardOptIn
+    |> scoped_to_tenant()
+    |> where([opt_in], opt_in.user_id in ^user_ids)
+    |> select([opt_in], opt_in.user_id)
+    |> distinct(true)
+    |> Repo.all()
+  end
+
+  @impl true
   def leaderboard_opted_in?(user_id) do
     LeaderboardOptIn
     |> scoped_to_tenant()

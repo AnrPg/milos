@@ -52,6 +52,12 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :invalid_timezone}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_timezone", error: "Unknown time zone"})
+  end
+
   def call(conn, {:error, :invalid_notify_level}) do
     conn
     |> put_status(:unprocessable_entity)

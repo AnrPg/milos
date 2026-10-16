@@ -1554,6 +1554,39 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     }
   end
 
+  @impl true
+  def list_active_class_series(%{organization_id: organization_id}) do
+    today = Date.utc_today()
+
+    ClassSeries
+    |> for_organization(organization_id)
+    |> where([series], series.status == "active")
+    |> where([series], is_nil(series.ends_on) or series.ends_on >= ^today)
+    |> order_by([series], asc: series.local_start_time, asc: series.name)
+    |> Repo.all()
+    |> Enum.map(&normalize_class_series/1)
+  end
+
+  # Approved bookings per member and series since `since` (ADR-138 D7).
+  @impl true
+  def series_booking_counts(%{organization_id: organization_id}, since) do
+    Booking
+    |> for_organization(organization_id)
+    |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
+    |> where(
+      [booking, slot],
+      booking.status == :approved and not is_nil(slot.class_series_id) and
+        slot.scheduled_at >= ^since and not is_nil(booking.user_id)
+    )
+    |> group_by([booking, slot], [slot.class_series_id, booking.user_id])
+    |> select([booking, slot], %{
+      series_id: slot.class_series_id,
+      user_id: booking.user_id,
+      count: count(booking.id)
+    })
+    |> Repo.all()
+  end
+
   defp for_organization(query, organization_id) do
     where(query, [row], row.organization_id == ^organization_id)
   end

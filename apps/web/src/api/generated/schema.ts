@@ -3503,6 +3503,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/community/wod-today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's #wod card for a day: its WOD, classes and leaderboard */
+        get: operations["MilosTrainingWeb.CommunityController.wod_today"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations": {
         parameters: {
             query?: never;
@@ -5768,6 +5785,7 @@ export interface components {
             /** @description You may join or leave it yourself */
             can_leave: boolean;
             can_post: boolean;
+            context_type?: string | null;
             /** Format: uuid */
             id: string;
             /** @description Its posts reach your feed */
@@ -5778,6 +5796,10 @@ export interface components {
             membership: "everyone" | "opt_in" | "invite";
             /** @description Null for built-in channels */
             name?: string | null;
+            /** @description You are a member of this channel */
+            participant?: boolean;
+            /** @description Offered to you (you often book its class) and not joined yet */
+            suggested?: boolean;
             /** @enum {string} */
             write_policy: "staff" | "members" | "participants" | "system_and_members";
         };
@@ -5793,6 +5815,7 @@ export interface components {
                 /** @description You may join or leave it yourself */
                 can_leave: boolean;
                 can_post: boolean;
+                context_type?: string | null;
                 /** Format: uuid */
                 id: string;
                 /** @description Its posts reach your feed */
@@ -5803,6 +5826,10 @@ export interface components {
                 membership: "everyone" | "opt_in" | "invite";
                 /** @description Null for built-in channels */
                 name?: string | null;
+                /** @description You are a member of this channel */
+                participant?: boolean;
+                /** @description Offered to you (you often book its class) and not joined yet */
+                suggested?: boolean;
                 /** @enum {string} */
                 write_policy: "staff" | "members" | "participants" | "system_and_members";
             }[];
@@ -5828,6 +5855,7 @@ export interface components {
                     /** @description You may join or leave it yourself */
                     can_leave: boolean;
                     can_post: boolean;
+                    context_type?: string | null;
                     /** Format: uuid */
                     id: string;
                     /** @description Its posts reach your feed */
@@ -5838,6 +5866,10 @@ export interface components {
                     membership: "everyone" | "opt_in" | "invite";
                     /** @description Null for built-in channels */
                     name?: string | null;
+                    /** @description You are a member of this channel */
+                    participant?: boolean;
+                    /** @description Offered to you (you often book its class) and not joined yet */
+                    suggested?: boolean;
                     /** @enum {string} */
                     write_policy: "staff" | "members" | "participants" | "system_and_members";
                 }[];
@@ -7895,6 +7927,59 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WodLeaderboardEntry */
+        WodLeaderboardEntry: {
+            avatar_url?: string | null;
+            me: boolean;
+            nickname?: string | null;
+            /** @description False only on your own row before you opt in to leaderboards */
+            opted_in: boolean;
+            rank: number;
+            scale_level_slug?: string | null;
+            unit?: string | null;
+            /** Format: uuid */
+            user_id: string;
+            value?: string | null;
+        };
+        /** WodTodayCard */
+        WodTodayCard: {
+            /** Format: uuid */
+            channel_id?: string | null;
+            classes: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                scheduled_at: string;
+            }[];
+            /** Format: date */
+            date: string;
+            leaderboard: {
+                avatar_url?: string | null;
+                me: boolean;
+                nickname?: string | null;
+                /** @description False only on your own row before you opt in to leaderboards */
+                opted_in: boolean;
+                rank: number;
+                scale_level_slug?: string | null;
+                unit?: string | null;
+                /** Format: uuid */
+                user_id: string;
+                value?: string | null;
+            }[];
+            logged_by_me: boolean;
+            score?: {
+                id: string;
+                name?: string | null;
+                score_type: string;
+                unit?: string | null;
+            } | null;
+            workout?: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                type?: string | null;
+            } | null;
+        };
         /** WorkoutDslAuthoringResponse */
         WorkoutDslAuthoringResponse: {
             /** @enum {string} */
@@ -9397,6 +9482,7 @@ export interface operations {
                                 /** @description You may join or leave it yourself */
                                 can_leave: boolean;
                                 can_post: boolean;
+                                context_type?: string | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @description Its posts reach your feed */
@@ -9407,6 +9493,10 @@ export interface operations {
                                 membership: "everyone" | "opt_in" | "invite";
                                 /** @description Null for built-in channels */
                                 name?: string | null;
+                                /** @description You are a member of this channel */
+                                participant?: boolean;
+                                /** @description Offered to you (you often book its class) and not joined yet */
+                                suggested?: boolean;
                                 /** @enum {string} */
                                 write_policy: "staff" | "members" | "participants" | "system_and_members";
                             }[];
@@ -22062,6 +22152,68 @@ export interface operations {
                             kudos_count: number;
                             pinned: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.wod_today": {
+        parameters: {
+            query?: {
+                /** @description Local date; today in `timezone` when omitted */
+                date?: string;
+                /** @description IANA time zone of the member, e.g. Europe/Athens */
+                timezone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id?: string | null;
+                        classes: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        }[];
+                        /** Format: date */
+                        date: string;
+                        leaderboard: {
+                            avatar_url?: string | null;
+                            me: boolean;
+                            nickname?: string | null;
+                            /** @description False only on your own row before you opt in to leaderboards */
+                            opted_in: boolean;
+                            rank: number;
+                            scale_level_slug?: string | null;
+                            unit?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            value?: string | null;
+                        }[];
+                        logged_by_me: boolean;
+                        score?: {
+                            id: string;
+                            name?: string | null;
+                            score_type: string;
+                            unit?: string | null;
+                        } | null;
+                        workout?: {
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type?: string | null;
+                        } | null;
                     };
                 };
             };

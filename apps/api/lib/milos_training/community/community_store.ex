@@ -41,6 +41,22 @@ defmodule MilosTraining.Community.CommunityStore do
     do: tenant_call(context, :leave_channel, [channel, user_id])
 
   @impl true
+  def suggested_channel_ids(context, user_id, channel_ids),
+    do: tenant_call(context, :suggested_channel_ids, [user_id, channel_ids])
+
+  @impl true
+  def ensure_context_channel(context, club, spec),
+    do: tenant_call(context, :ensure_context_channel, [club, spec])
+
+  @impl true
+  def archive_context_channels(context, club_id, context_type, keep_context_ids),
+    do: tenant_call(context, :archive_context_channels, [club_id, context_type, keep_context_ids])
+
+  @impl true
+  def suggest_channel_members(context, pairs),
+    do: tenant_call(context, :suggest_channel_members, [pairs])
+
+  @impl true
   def notify_levels(context, user_id, club_ids),
     do: tenant_call(context, :notify_levels, [user_id, club_ids])
 

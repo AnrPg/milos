@@ -917,6 +917,10 @@
           "can_post": {
             "type": "boolean"
           },
+          "context_type": {
+            "nullable": true,
+            "type": "string"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -948,6 +952,14 @@
             "description": "Null for built-in channels",
             "nullable": true,
             "type": "string"
+          },
+          "participant": {
+            "description": "You are a member of this channel",
+            "type": "boolean"
+          },
+          "suggested": {
+            "description": "Offered to you (you often book its class) and not joined yet",
+            "type": "boolean"
           },
           "write_policy": {
             "enum": [
@@ -1000,6 +1012,10 @@
                 "can_post": {
                   "type": "boolean"
                 },
+                "context_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
                 "id": {
                   "format": "uuid",
                   "type": "string"
@@ -1031,6 +1047,14 @@
                   "description": "Null for built-in channels",
                   "nullable": true,
                   "type": "string"
+                },
+                "participant": {
+                  "description": "You are a member of this channel",
+                  "type": "boolean"
+                },
+                "suggested": {
+                  "description": "Offered to you (you often book its class) and not joined yet",
+                  "type": "boolean"
                 },
                 "write_policy": {
                   "enum": [
@@ -1132,6 +1156,10 @@
                       "can_post": {
                         "type": "boolean"
                       },
+                      "context_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "id": {
                         "format": "uuid",
                         "type": "string"
@@ -1163,6 +1191,14 @@
                         "description": "Null for built-in channels",
                         "nullable": true,
                         "type": "string"
+                      },
+                      "participant": {
+                        "description": "You are a member of this channel",
+                        "type": "boolean"
+                      },
+                      "suggested": {
+                        "description": "Offered to you (you often book its class) and not joined yet",
+                        "type": "boolean"
                       },
                       "write_policy": {
                         "enum": [
@@ -8210,6 +8246,190 @@
         ],
         "type": "object"
       },
+      "WodLeaderboardEntry": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "me": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "opted_in": {
+            "description": "False only on your own row before you opt in to leaderboards",
+            "type": "boolean"
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "scale_level_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "unit": {
+            "nullable": true,
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "value": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "rank",
+          "user_id",
+          "me",
+          "opted_in"
+        ],
+        "title": "WodLeaderboardEntry",
+        "type": "object"
+      },
+      "WodTodayCard": {
+        "properties": {
+          "channel_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "scheduled_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "leaderboard": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "me": {
+                  "type": "boolean"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "opted_in": {
+                  "description": "False only on your own row before you opt in to leaderboards",
+                  "type": "boolean"
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "scale_level_slug": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "value": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rank",
+                "user_id",
+                "me",
+                "opted_in"
+              ],
+              "title": "WodLeaderboardEntry",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "logged_by_me": {
+            "type": "boolean"
+          },
+          "score": {
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "score_type": {
+                "type": "string"
+              },
+              "unit": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "score_type"
+            ],
+            "type": "object"
+          },
+          "workout": {
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "date",
+          "classes",
+          "leaderboard",
+          "logged_by_me"
+        ],
+        "title": "WodTodayCard",
+        "type": "object"
+      },
       "WorkoutDslAuthoringResponse": {
         "additionalProperties": false,
         "properties": {
@@ -11469,6 +11689,10 @@
                                 "can_post": {
                                   "type": "boolean"
                                 },
+                                "context_type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
                                 "id": {
                                   "format": "uuid",
                                   "type": "string"
@@ -11500,6 +11724,14 @@
                                   "description": "Null for built-in channels",
                                   "nullable": true,
                                   "type": "string"
+                                },
+                                "participant": {
+                                  "description": "You are a member of this channel",
+                                  "type": "boolean"
+                                },
+                                "suggested": {
+                                  "description": "Offered to you (you often book its class) and not joined yet",
+                                  "type": "boolean"
                                 },
                                 "write_policy": {
                                   "enum": [
@@ -44700,6 +44932,189 @@
           }
         ],
         "summary": "Staff: pin or unpin an announcement",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/wod-today": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.wod_today",
+        "parameters": [
+          {
+            "description": "Local date; today in `timezone` when omitted",
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "IANA time zone of the member, e.g. Europe/Athens",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "channel_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "classes": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "leaderboard": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "me": {
+                            "type": "boolean"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opted_in": {
+                            "description": "False only on your own row before you opt in to leaderboards",
+                            "type": "boolean"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "scale_level_slug": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "me",
+                          "opted_in"
+                        ],
+                        "title": "WodLeaderboardEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "logged_by_me": {
+                      "type": "boolean"
+                    },
+                    "score": {
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "score_type": {
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "score_type"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "classes",
+                    "leaderboard",
+                    "logged_by_me"
+                  ],
+                  "title": "WodTodayCard",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Card"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's #wod card for a day: its WOD, classes and leaderboard",
         "tags": [
           "Community"
         ]

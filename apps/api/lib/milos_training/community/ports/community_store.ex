@@ -12,6 +12,10 @@ defmodule MilosTraining.Community.Ports.CommunityStore do
   @callback joined_channel_ids(context(), id(), [id()]) :: [id()]
   @callback join_channel(context(), map(), id(), String.t()) :: :ok | {:error, term()}
   @callback leave_channel(context(), map(), id()) :: :ok
+  @callback suggested_channel_ids(context(), id(), [id()]) :: [id()]
+  @callback ensure_context_channel(context(), map(), map()) :: {:ok, map()} | {:error, term()}
+  @callback archive_context_channels(context(), id(), String.t(), [id()]) :: :ok
+  @callback suggest_channel_members(context(), [{id(), id()}]) :: :ok
   @callback notify_levels(context(), id(), [id()]) :: %{id() => String.t()}
   @callback put_notify_level(context(), map(), id(), String.t()) ::
               {:ok, String.t()} | {:error, term()}
