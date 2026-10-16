@@ -13,6 +13,15 @@ export type ChatParticipant = ChatThread["participants"][number];
 export type ChatMessage = MessagesResponse["messages"][number];
 export type MessageType = ChatMessage["message_type"];
 export type ThreadContextType = ChatThread["context_type"];
+/** What a message from the box is about (ADR-140 §6). */
+export const MESSAGE_TOPICS = ["booking", "payment", "membership", "facility"] as const;
+export type MessageTopic = (typeof MESSAGE_TOPICS)[number];
+
+export type SendMessageOptions = {
+  messageType?: MessageType;
+  clientOperationId?: string;
+  topic?: MessageTopic | null;
+};
 
 export async function fetchThreads(token: string, contextType?: ThreadContextType) {
   const qs = contextType ? `?context_type=${contextType}` : "";
@@ -60,8 +69,7 @@ export async function sendMessage(
   token: string,
   threadId: string,
   body: string,
-  messageType: MessageType = "chat",
-  clientOperationId?: string,
+  { messageType = "chat", clientOperationId, topic }: SendMessageOptions = {},
 ) {
   return apiRequest<{ message: ChatMessage }>(`/me/threads/${threadId}/messages`, {
     method: "POST",
@@ -70,6 +78,7 @@ export async function sendMessage(
       body,
       message_type: messageType,
       ...(clientOperationId ? { client_operation_id: clientOperationId } : {}),
+      ...(topic ? { topic } : {}),
     },
   }).then((response) => response.message);
 }

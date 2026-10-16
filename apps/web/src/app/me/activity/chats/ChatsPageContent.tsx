@@ -22,13 +22,15 @@ import { useSession } from "@/components/session-provider";
 import { useUiPrefs } from "@/stores/ui-prefs";
 import { useQueryClient } from "@tanstack/react-query";
 
-type Tab = "direct" | "assignment" | "class_slot";
+type Tab = "direct" | "assignment" | "class_slot" | "box";
 
+// ADR-140 §6: everyone can have a thread with the box (members receive
+// messages from it; staff continue the gym's threads).
 const ROLE_TABS: Record<string, Tab[]> = {
-  admin: ["direct", "assignment", "class_slot"],
-  coach: ["direct", "assignment", "class_slot"],
-  athlete: ["direct", "assignment"],
-  member: ["direct", "class_slot"],
+  admin: ["direct", "assignment", "class_slot", "box"],
+  coach: ["direct", "assignment", "class_slot", "box"],
+  athlete: ["direct", "assignment", "box"],
+  member: ["direct", "class_slot", "box"],
 };
 
 export function ChatsPageContent() {
@@ -38,12 +40,14 @@ export function ChatsPageContent() {
     direct: i18n("directbc81524"),
     assignment: i18n("workout39463a5"),
     class_slot: i18n("class41ff354"),
+    box: i18n("chatsTabBox"),
   };
 
   const TAB_LABELS: Record<Tab, string> = {
     direct: i18n("directChat3892e2c"),
     assignment: i18n("workout39463a5"),
     class_slot: i18n("class41ff354"),
+    box: i18n("chatsTabBox"),
   };
   const searchParams = useSearchParams();
   const { tokens, currentUser } = useSession();
@@ -124,6 +128,11 @@ export function ChatsPageContent() {
     }
     if (thread.context_type === "assignment") return i18n("workoutThreada03f1e1");
     if (thread.context_type === "class_slot") return i18n("classThreadf030236");
+    if (thread.context_type === "box") {
+      if (thread.context_id === currentUserId) return i18n("chatsBoxThread");
+      const member = thread.participants.find((p) => p.user_id === thread.context_id);
+      return member?.nickname ?? i18n("thread7863f75");
+    }
     return i18n("thread7863f75");
   }
 

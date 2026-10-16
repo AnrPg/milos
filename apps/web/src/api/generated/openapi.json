@@ -12492,7 +12492,7 @@
                               },
                               "type": {
                                 "enum": [
-                                  "admin_note",
+                                  "coaching_message",
                                   "athlete_comment"
                                 ],
                                 "type": "string"
@@ -41880,17 +41880,9 @@
               "application/json": {
                 "schema": {
                   "properties": {
-                    "coach_notes": {
+                    "coaching_messages": {
                       "items": {
                         "properties": {
-                          "admin_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "athlete_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
                           "body": {
                             "type": "string"
                           },
@@ -41901,12 +41893,20 @@
                           "inserted_at": {
                             "format": "date-time",
                             "type": "string"
+                          },
+                          "sender_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "thread_id": {
+                            "format": "uuid",
+                            "type": "string"
                           }
                         },
                         "required": [
                           "id",
-                          "admin_id",
-                          "athlete_id",
+                          "thread_id",
+                          "sender_id",
                           "body",
                           "inserted_at"
                         ],
@@ -41988,10 +41988,6 @@
                           "nullable": true,
                           "type": "string"
                         },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
                         "package_code": {
                           "nullable": true,
                           "type": "string"
@@ -42017,7 +42013,7 @@
                   },
                   "required": [
                     "gamification",
-                    "coach_notes",
+                    "coaching_messages",
                     "membership",
                     "recent_executions"
                   ],
@@ -44885,7 +44881,8 @@
               "enum": [
                 "direct",
                 "assignment",
-                "class_slot"
+                "class_slot",
+                "box"
               ],
               "type": "string"
             }
@@ -44909,7 +44906,8 @@
                             "enum": [
                               "direct",
                               "assignment",
-                              "class_slot"
+                              "class_slot",
+                              "box"
                             ],
                             "type": "string"
                           },
@@ -45017,7 +45015,8 @@
                     "enum": [
                       "direct",
                       "assignment",
-                      "class_slot"
+                      "class_slot",
+                      "box"
                     ],
                     "type": "string"
                   },
@@ -45049,7 +45048,8 @@
                           "enum": [
                             "direct",
                             "assignment",
-                            "class_slot"
+                            "class_slot",
+                            "box"
                           ],
                           "type": "string"
                         },
@@ -45197,7 +45197,8 @@
                           "enum": [
                             "direct",
                             "assignment",
-                            "class_slot"
+                            "class_slot",
+                            "box"
                           ],
                           "type": "string"
                         },
@@ -45360,7 +45361,8 @@
                           "message_type": {
                             "enum": [
                               "chat",
-                              "coaching_note",
+                              "coaching_message",
+                              "box_message",
                               "system"
                             ],
                             "type": "string"
@@ -45371,6 +45373,16 @@
                           },
                           "thread_id": {
                             "format": "uuid",
+                            "type": "string"
+                          },
+                          "topic": {
+                            "enum": [
+                              "booking",
+                              "payment",
+                              "membership",
+                              "facility"
+                            ],
+                            "nullable": true,
                             "type": "string"
                           }
                         },
@@ -45456,9 +45468,21 @@
                   },
                   "message_type": {
                     "default": "chat",
+                    "description": "A coaching message needs an active coaching relationship; in the gym's thread with a member, staff always write a message from the box.",
                     "enum": [
                       "chat",
-                      "coaching_note"
+                      "coaching_message",
+                      "box_message"
+                    ],
+                    "type": "string"
+                  },
+                  "topic": {
+                    "description": "What a message from the box is about.",
+                    "enum": [
+                      "booking",
+                      "payment",
+                      "membership",
+                      "facility"
                     ],
                     "type": "string"
                   }
@@ -45499,7 +45523,8 @@
                         "message_type": {
                           "enum": [
                             "chat",
-                            "coaching_note",
+                            "coaching_message",
+                            "box_message",
                             "system"
                           ],
                           "type": "string"
@@ -45510,6 +45535,16 @@
                         },
                         "thread_id": {
                           "format": "uuid",
+                          "type": "string"
+                        },
+                        "topic": {
+                          "enum": [
+                            "booking",
+                            "payment",
+                            "membership",
+                            "facility"
+                          ],
+                          "nullable": true,
                           "type": "string"
                         }
                       },
@@ -53475,6 +53510,53 @@
         "summary": "Owners, admins and coaches of this gym",
         "tags": [
           "Staff"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/my-client-stats": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachingExtrasController.my_client_stats",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "awaiting_reply": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "client_count": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "coaching_messages_this_week": {
+                      "minimum": 0,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "client_count",
+                    "coaching_messages_this_week",
+                    "awaiting_reply"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "My client stats"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Πελάτες μου stats for the signed-in coach (ADR-140 §7)",
+        "tags": [
+          "Coaching"
         ]
       }
     },

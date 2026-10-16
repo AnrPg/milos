@@ -4572,6 +4572,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/my-client-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Πελάτες μου stats for the signed-in coach (ADR-140 §7) */
+        get: operations["MilosTrainingWeb.CoachingExtrasController.my_client_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/reply-queue": {
         parameters: {
             query?: never;
@@ -9801,7 +9818,7 @@ export interface operations {
                                 /** Format: date-time */
                                 inserted_at: string | null;
                                 /** @enum {string} */
-                                type: "admin_note" | "athlete_comment";
+                                type: "coaching_message" | "athlete_comment";
                             } & {
                                 [key: string]: unknown;
                             })[];
@@ -20954,16 +20971,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        coach_notes: {
-                            /** Format: uuid */
-                            admin_id: string;
-                            /** Format: uuid */
-                            athlete_id: string;
+                        coaching_messages: {
                             body: string;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            sender_id: string;
+                            /** Format: uuid */
+                            thread_id: string;
                         }[];
                         gamification: {
                             settings: {
@@ -20985,7 +21002,6 @@ export interface operations {
                             expiration_date?: string | null;
                             /** Format: date */
                             last_paid?: string | null;
-                            notes?: string | null;
                             package_code?: string | null;
                             package_name?: string | null;
                         } | null;
@@ -22204,7 +22220,7 @@ export interface operations {
     "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
-                context_type?: "direct" | "assignment" | "class_slot";
+                context_type?: "direct" | "assignment" | "class_slot" | "box";
             };
             header?: never;
             path?: never;
@@ -22223,7 +22239,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -22263,7 +22279,7 @@ export interface operations {
                      * @default direct
                      * @enum {string}
                      */
-                    context_type?: "direct" | "assignment" | "class_slot";
+                    context_type?: "direct" | "assignment" | "class_slot" | "box";
                     /** Format: uuid */
                     participant_id?: string;
                 };
@@ -22281,7 +22297,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -22347,7 +22363,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -22417,11 +22433,13 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at: string;
                             /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_message" | "box_message" | "system";
                             /** Format: uuid */
                             sender_id: string;
                             /** Format: uuid */
                             thread_id: string;
+                            /** @enum {string|null} */
+                            topic?: "booking" | "payment" | "membership" | "facility" | null;
                         }[];
                     };
                 };
@@ -22454,10 +22472,16 @@ export interface operations {
                     /** Format: uuid */
                     client_operation_id?: string;
                     /**
+                     * @description A coaching message needs an active coaching relationship; in the gym's thread with a member, staff always write a message from the box.
                      * @default chat
                      * @enum {string}
                      */
-                    message_type?: "chat" | "coaching_note";
+                    message_type?: "chat" | "coaching_message" | "box_message";
+                    /**
+                     * @description What a message from the box is about.
+                     * @enum {string}
+                     */
+                    topic?: "booking" | "payment" | "membership" | "facility";
                 };
             };
         };
@@ -22478,11 +22502,13 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at: string;
                             /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_message" | "box_message" | "system";
                             /** Format: uuid */
                             sender_id: string;
                             /** Format: uuid */
                             thread_id: string;
+                            /** @enum {string|null} */
+                            topic?: "booking" | "payment" | "membership" | "facility" | null;
                         };
                     };
                 };
@@ -25605,6 +25631,30 @@ export interface operations {
                             /** Format: uuid */
                             user_id: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CoachingExtrasController.my_client_stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My client stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        awaiting_reply: number;
+                        client_count: number;
+                        coaching_messages_this_week: number;
                     };
                 };
             };

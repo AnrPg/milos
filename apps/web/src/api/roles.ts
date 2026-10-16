@@ -89,6 +89,17 @@ export async function archiveOrganization(token: string, confirm: string) {
   });
 }
 
+export type MyClientStats = {
+  client_count: number;
+  coaching_messages_this_week: number;
+  awaiting_reply: number;
+};
+
+/** Πελάτες μου stats for the signed-in coach (ADR-140 §7). */
+export async function fetchMyClientStats(token: string) {
+  return apiRequest<MyClientStats>("/staff/my-client-stats", { token });
+}
+
 export async function fetchCoachingRelationships(token: string, filter: { coachUserId?: string; clientUserId?: string } = {}) {
   const params = new URLSearchParams();
   if (filter.coachUserId) params.set("coach_user_id", filter.coachUserId);

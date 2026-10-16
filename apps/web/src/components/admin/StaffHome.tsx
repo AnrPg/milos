@@ -8,7 +8,7 @@ import { useState } from "react";
 import { fetchAthletes } from "@/api/admin";
 import { fetchPRDossierMembers } from "@/api/admin-users";
 import { filterDossierMembers } from "@/components/admin/users/admin-user-profile";
-import { fetchCleaningAreas, fetchCoachingRelationships, startCoachingRelationship } from "@/api/roles";
+import { fetchCleaningAreas, fetchCoachingRelationships, fetchMyClientStats, startCoachingRelationship } from "@/api/roles";
 import { fetchAppointmentSlots } from "@/api/staff";
 import { AdminDashboard } from "@/components/admin/AdminDashboard";
 import {
@@ -122,6 +122,11 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
     enabled: Boolean(token && currentUser?.id),
     queryFn: () => fetchCoachingRelationships(token!, { coachUserId: currentUser!.id }),
   });
+  const stats = useQuery({
+    queryKey: [...RELATIONSHIPS_KEY, "my-stats", { coach: currentUser?.id }],
+    enabled: Boolean(token && currentUser?.id),
+    queryFn: () => fetchMyClientStats(token!),
+  });
   const athletes = useQuery({
     queryKey: ["staff", "home", "athletes", search.trim()],
     enabled: Boolean(token) && taking,
@@ -163,6 +168,19 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
       action={takeButton}
     >
       <div className="space-y-3">
+        {stats.data && relationships.length > 0 ? (
+          <dl className="grid grid-cols-2 gap-2">
+            {[
+              { key: "messages", value: stats.data.coaching_messages_this_week, label: i18n("rhStatCoachingMessages") },
+              { key: "awaiting", value: stats.data.awaiting_reply, label: i18n("rhStatAwaitingReply") },
+            ].map((stat) => (
+              <div key={stat.key} className="flex flex-col-reverse rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+                <dt className="text-xs" style={{ color: "var(--dim)" }}>{stat.label}</dt>
+                <dd className="text-lg font-semibold tabular-nums" style={{ color: "var(--text)" }}>{stat.value}</dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
         {clients.isPending ? (
           <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
         ) : clients.isError ? (
