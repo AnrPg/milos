@@ -32,15 +32,21 @@ defmodule MilosTrainingWeb.CoachNotesController do
   end
 
   operation(:create,
-    summary: "Write a private note about one of your clients",
+    summary:
+      "Write a private note about one of your clients, optionally about one thing of theirs",
     parameters: [@user_id],
-    request_body: S.body(S.body_schema()),
+    request_body: S.body(S.create_schema()),
     responses: [created: {"Note", "application/json", S.one(:note, S.note())}]
   )
 
   def create(conn, %{user_id: user_id}) do
     with {:ok, note} <-
-           CoachNotes.create(conn.assigns.tenant_context, user_id, conn.body_params.body) do
+           CoachNotes.create(
+             conn.assigns.tenant_context,
+             user_id,
+             conn.body_params.body,
+             subject(conn.body_params)
+           ) do
       conn |> put_status(:created) |> json(%{note: note})
     end
   end
@@ -107,5 +113,12 @@ defmodule MilosTrainingWeb.CoachNotesController do
            Organizations.set_notes_visibility(conn.assigns.tenant_context, visible) do
       json(conn, %{visible_to_admins: membership.notes_visible_to_admins})
     end
+  end
+
+  # Half a subject reaches the changeset, which rejects it.
+  defp subject(params) do
+    kind = Map.get(params, :subject_kind)
+    id = Map.get(params, :subject_id)
+    if kind || id, do: %{kind: kind, id: id}
   end
 end

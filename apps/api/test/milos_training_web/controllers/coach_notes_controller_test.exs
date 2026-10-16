@@ -97,4 +97,45 @@ defmodule MilosTrainingWeb.CoachNotesControllerTest do
              |> send_json(:patch, "#{base}/coach-notes/#{note_id}", %{body: "Better"})
              |> json_response(200)
   end
+
+  test "a note can be about one thing of the client's, never someone else's", ctx do
+    %{as: as, coach: coach, athlete: athlete, base: base} = ctx
+    stranger = user_fixture()
+    notes_path = "#{base}/clients/#{athlete.id}/coach-notes"
+
+    {:ok, injury} =
+      MilosTraining.Wellbeing.report_injury(athlete.id, athlete.id, "self", %{
+        body_area: "knee",
+        severity: "mild"
+      })
+
+    {:ok, foreign} =
+      MilosTraining.Wellbeing.report_injury(stranger.id, stranger.id, "self", %{
+        body_area: "knee",
+        severity: "mild"
+      })
+
+    assert %{"note" => %{"subject_kind" => "injury", "subject_id" => subject_id}} =
+             as.(coach)
+             |> send_json(:post, notes_path, %{
+               body: "Keep squats above parallel",
+               subject_kind: "injury",
+               subject_id: injury.id
+             })
+             |> json_response(201)
+
+    assert subject_id == injury.id
+
+    assert as.(coach)
+           |> send_json(:post, notes_path, %{
+             body: "Not theirs",
+             subject_kind: "injury",
+             subject_id: foreign.id
+           })
+           |> json_response(422)
+
+    assert as.(coach)
+           |> send_json(:post, notes_path, %{body: "Half a subject", subject_kind: "pr"})
+           |> json_response(422)
+  end
 end

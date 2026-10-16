@@ -32,13 +32,16 @@ defmodule MilosTraining.Application.CoachNotes do
     end
   end
 
-  def create(context, client_id, body) do
+  @doc "`subject` is `%{kind, id}` when the note is about one thing (ADR-140 §5)."
+  def create(context, client_id, body, subject \\ nil) do
     with :ok <- Organizations.authorize_capability(context, :write_coach_notes),
          :ok <- AuthorizeClientAccess.call(context, :manage_coaching, client_id) do
       Coaching.create_note(context, %{
         coach_user_id: context.user_id,
         client_user_id: client_id,
-        body: body
+        body: body,
+        subject_kind: subject && subject.kind,
+        subject_id: subject && subject.id
       })
     end
   end

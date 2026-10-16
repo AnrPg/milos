@@ -40,6 +40,7 @@ defmodule MilosTraining.Coaching do
 
   # Private coach notes (ADR-101).
   def create_note(context, attrs), do: NoteStore.create(context, attrs)
+  def note_subject_kinds, do: MilosTraining.Coaching.Note.subject_kinds()
   def get_note(context, id), do: NoteStore.get(context, id)
   def update_note(context, id, attrs), do: NoteStore.update(context, id, attrs)
   def delete_note(context, id), do: NoteStore.delete(context, id)
