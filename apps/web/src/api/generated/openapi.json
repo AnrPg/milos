@@ -28995,6 +28995,76 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "events": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actor_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "event_type": {
+                                  "enum": [
+                                    "reported",
+                                    "updated",
+                                    "marked_healed",
+                                    "reopened"
+                                  ],
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "occurred_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "payload": {
+                                  "additionalProperties": true,
+                                  "properties": {
+                                    "changes": {
+                                      "items": {
+                                        "properties": {
+                                          "field": {
+                                            "type": "string"
+                                          },
+                                          "from": {
+                                            "nullable": true
+                                          },
+                                          "to": {
+                                            "nullable": true
+                                          }
+                                        },
+                                        "required": [
+                                          "field",
+                                          "from",
+                                          "to"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "note": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "event_type",
+                                "actor_id",
+                                "occurred_at",
+                                "payload"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "healed_on": {
                             "format": "date",
                             "nullable": true,
@@ -29085,6 +29155,7 @@
                           "tags",
                           "visibility",
                           "params",
+                          "events",
                           "inserted_at",
                           "updated_at"
                         ],
@@ -29114,10 +29185,10 @@
         ]
       }
     },
-    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/heal": {
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}": {
       "patch": {
         "callbacks": {},
-        "operationId": "MilosTrainingWeb.AdminWellbeingController.heal",
+        "operationId": "MilosTrainingWeb.AdminWellbeingController.update",
         "parameters": [
           {
             "in": "path",
@@ -29135,8 +29206,33 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
-                  "healed_on": {
-                    "format": "date",
+                  "body_area": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "severity": {
+                    "enum": [
+                      "mild",
+                      "moderate",
+                      "severe"
+                    ],
+                    "type": "string"
+                  },
+                  "tags": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "training_limitations": {
                     "nullable": true,
                     "type": "string"
                   }
@@ -29163,6 +29259,76 @@
                         "description": {
                           "nullable": true,
                           "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "healed_on": {
                           "format": "date",
@@ -29254,6 +29420,245 @@
                         "tags",
                         "visibility",
                         "params",
+                        "events",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add an update to an injury (text and/or field changes) on its timeline",
+        "tags": [
+          "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/heal": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWellbeingController.heal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "healed_on": {
+                    "format": "date",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "events",
                         "inserted_at",
                         "updated_at"
                       ],
@@ -29276,6 +29681,226 @@
           }
         ],
         "summary": "Mark an injury report healed",
+        "tags": [
+          "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/reopen": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWellbeingController.reopen",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "events",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reopen a healed injury",
         "tags": [
           "Admin Wellbeing"
         ]
@@ -29697,6 +30322,76 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "healed_on": {
                           "format": "date",
                           "nullable": true,
@@ -29787,6 +30482,7 @@
                         "tags",
                         "visibility",
                         "params",
+                        "events",
                         "inserted_at",
                         "updated_at"
                       ],
@@ -64459,6 +65155,76 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "events": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "actor_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "event_type": {
+                                  "enum": [
+                                    "reported",
+                                    "updated",
+                                    "marked_healed",
+                                    "reopened"
+                                  ],
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "occurred_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "payload": {
+                                  "additionalProperties": true,
+                                  "properties": {
+                                    "changes": {
+                                      "items": {
+                                        "properties": {
+                                          "field": {
+                                            "type": "string"
+                                          },
+                                          "from": {
+                                            "nullable": true
+                                          },
+                                          "to": {
+                                            "nullable": true
+                                          }
+                                        },
+                                        "required": [
+                                          "field",
+                                          "from",
+                                          "to"
+                                        ],
+                                        "type": "object"
+                                      },
+                                      "type": "array"
+                                    },
+                                    "note": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "object"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "event_type",
+                                "actor_id",
+                                "occurred_at",
+                                "payload"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "healed_on": {
                             "format": "date",
                             "nullable": true,
@@ -64549,6 +65315,7 @@
                           "tags",
                           "visibility",
                           "params",
+                          "events",
                           "inserted_at",
                           "updated_at"
                         ],
@@ -64651,6 +65418,76 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "healed_on": {
                           "format": "date",
                           "nullable": true,
@@ -64741,6 +65578,7 @@
                         "tags",
                         "visibility",
                         "params",
+                        "events",
                         "inserted_at",
                         "updated_at"
                       ],
@@ -64763,6 +65601,269 @@
           }
         ],
         "summary": "Report an injury for the current user",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
+    "/api/wellbeing/injuries/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellbeingController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body_area": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "note": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "severity": {
+                    "enum": [
+                      "mild",
+                      "moderate",
+                      "severe"
+                    ],
+                    "type": "string"
+                  },
+                  "tags": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "training_limitations": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "events",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add an update to an injury (text and/or field changes) on its timeline",
         "tags": [
           "Wellbeing"
         ]
@@ -64818,6 +65919,76 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "healed_on": {
                           "format": "date",
                           "nullable": true,
@@ -64908,6 +66079,7 @@
                         "tags",
                         "visibility",
                         "params",
+                        "events",
                         "inserted_at",
                         "updated_at"
                       ],
@@ -64930,6 +66102,226 @@
           }
         ],
         "summary": "Mark one of the current user's injuries healed",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
+    "/api/wellbeing/injuries/{id}/reopen": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellbeingController.reopen",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "injury": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "body_area": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "events": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "actor_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "event_type": {
+                                "enum": [
+                                  "reported",
+                                  "updated",
+                                  "marked_healed",
+                                  "reopened"
+                                ],
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "occurred_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "payload": {
+                                "additionalProperties": true,
+                                "properties": {
+                                  "changes": {
+                                    "items": {
+                                      "properties": {
+                                        "field": {
+                                          "type": "string"
+                                        },
+                                        "from": {
+                                          "nullable": true
+                                        },
+                                        "to": {
+                                          "nullable": true
+                                        }
+                                      },
+                                      "required": [
+                                        "field",
+                                        "from",
+                                        "to"
+                                      ],
+                                      "type": "object"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "event_type",
+                              "actor_id",
+                              "occurred_at",
+                              "payload"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "healed_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "params": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "reported_by_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reported_by_role": {
+                          "enum": [
+                            "self",
+                            "admin"
+                          ],
+                          "type": "string"
+                        },
+                        "severity": {
+                          "enum": [
+                            "mild",
+                            "moderate",
+                            "severe"
+                          ],
+                          "type": "string"
+                        },
+                        "started_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active",
+                            "healed"
+                          ],
+                          "type": "string"
+                        },
+                        "tags": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "training_limitations": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "visibility": {
+                          "enum": [
+                            "admin_only",
+                            "user_and_admin"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "reported_by_id",
+                        "reported_by_role",
+                        "body_area",
+                        "severity",
+                        "status",
+                        "tags",
+                        "visibility",
+                        "params",
+                        "events",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "injury"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Injury report"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reopen a healed injury",
         "tags": [
           "Wellbeing"
         ]

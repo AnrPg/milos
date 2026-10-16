@@ -736,6 +736,8 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", AdminWellbeingController, :index)
     post("/wellbeing/users/:id/injuries", AdminWellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", AdminWellbeingController, :heal)
+    patch("/wellbeing/injuries/:id", AdminWellbeingController, :update)
+    post("/wellbeing/injuries/:id/reopen", AdminWellbeingController, :reopen)
     # ADR-124 injury-aware workout safety warnings (informational only).
     post("/wellbeing/injury-warnings", AdminInjuryWarningController, :evaluate)
     post("/wellbeing/injury-warnings/acknowledge", AdminInjuryWarningController, :acknowledge)
@@ -848,6 +850,8 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
+    patch("/wellbeing/injuries/:id", WellbeingController, :update)
+    post("/wellbeing/injuries/:id/reopen", WellbeingController, :reopen)
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)

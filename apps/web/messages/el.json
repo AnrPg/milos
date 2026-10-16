@@ -4880,6 +4880,34 @@
       "history": "Όλες οι καταχωρήσεις ({count})",
       "delete": "Διαγραφή",
       "loading": "Φόρτωση…"
+    },
+    "injury": {
+      "addUpdate": "Ενημέρωση",
+      "reopen": "Άνοιγμα ξανά",
+      "timeline": "{count, plural, one {Πορεία · # γεγονός} other {Πορεία · # γεγονότα}}",
+      "timelineAria": "Χρονολόγιο τραυματισμού με {count} γεγονότα",
+      "event": {
+        "reported": "Αναφορά",
+        "updated": "Ενημέρωση",
+        "marked_healed": "Επουλώθηκε",
+        "reopened": "Άνοιξε ξανά"
+      },
+      "field": {
+        "severity": "Σοβαρότητα",
+        "body_area": "Περιοχή σώματος",
+        "training_limitations": "Περιορισμοί προπόνησης",
+        "description": "Περιγραφή",
+        "tags": "Ετικέτες"
+      },
+      "severity": {
+        "mild": "Ήπιο",
+        "moderate": "Μέτριο",
+        "severe": "Σοβαρό"
+      },
+      "notePlaceholder": "Πώς πάει; (προαιρετικά)",
+      "save": "Αποθήκευση ενημέρωσης",
+      "saving": "Αποθήκευση…",
+      "cancel": "Άκυρο"
     }
   }
 }

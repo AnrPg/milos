@@ -4880,6 +4880,34 @@
       "history": "Todos los registros ({count})",
       "delete": "Eliminar",
       "loading": "Cargando…"
+    },
+    "injury": {
+      "addUpdate": "Añadir actualización",
+      "reopen": "Reabrir",
+      "timeline": "{count, plural, one {Evolución · # evento} other {Evolución · # eventos}}",
+      "timelineAria": "Evolución de la lesión con {count} eventos",
+      "event": {
+        "reported": "Notificada",
+        "updated": "Actualización",
+        "marked_healed": "Marcada como curada",
+        "reopened": "Reabierta"
+      },
+      "field": {
+        "severity": "Gravedad",
+        "body_area": "Zona del cuerpo",
+        "training_limitations": "Limitaciones de entrenamiento",
+        "description": "Descripción",
+        "tags": "Etiquetas"
+      },
+      "severity": {
+        "mild": "Leve",
+        "moderate": "Moderada",
+        "severe": "Grave"
+      },
+      "notePlaceholder": "¿Cómo va? (opcional)",
+      "save": "Guardar actualización",
+      "saving": "Guardando…",
+      "cancel": "Cancelar"
     }
   }
 }

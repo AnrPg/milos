@@ -4880,6 +4880,34 @@
       "history": "Alle Einträge ({count})",
       "delete": "Löschen",
       "loading": "Wird geladen…"
+    },
+    "injury": {
+      "addUpdate": "Update hinzufügen",
+      "reopen": "Wieder öffnen",
+      "timeline": "{count, plural, one {Verlauf · # Ereignis} other {Verlauf · # Ereignisse}}",
+      "timelineAria": "Verletzungsverlauf mit {count} Ereignissen",
+      "event": {
+        "reported": "Gemeldet",
+        "updated": "Update",
+        "marked_healed": "Als geheilt markiert",
+        "reopened": "Wieder geöffnet"
+      },
+      "field": {
+        "severity": "Schweregrad",
+        "body_area": "Körperbereich",
+        "training_limitations": "Trainingseinschränkungen",
+        "description": "Beschreibung",
+        "tags": "Schlagwörter"
+      },
+      "severity": {
+        "mild": "Leicht",
+        "moderate": "Mittel",
+        "severe": "Schwer"
+      },
+      "notePlaceholder": "Wie geht es? (optional)",
+      "save": "Update speichern",
+      "saving": "Wird gespeichert…",
+      "cancel": "Abbrechen"
     }
   }
 }

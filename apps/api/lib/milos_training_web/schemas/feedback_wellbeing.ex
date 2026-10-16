@@ -78,6 +78,40 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
     additionalProperties: false
   }
 
+  # ADR-140 §3: the injury's timeline, oldest first.
+  @injury_change %Schema{
+    type: :object,
+    properties: %{
+      field: %Schema{type: :string},
+      from: %Schema{nullable: true},
+      to: %Schema{nullable: true}
+    },
+    required: [:field, :from, :to]
+  }
+
+  @injury_event %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      event_type: %Schema{
+        type: :string,
+        enum: ["reported", "updated", "marked_healed", "reopened"]
+      },
+      actor_id: %Schema{type: :string, format: :uuid, nullable: true},
+      occurred_at: %Schema{type: :string, format: :"date-time"},
+      payload: %Schema{
+        type: :object,
+        properties: %{
+          note: %Schema{type: :string, nullable: true},
+          changes: %Schema{type: :array, items: @injury_change}
+        },
+        additionalProperties: true
+      }
+    },
+    required: [:id, :event_type, :actor_id, :occurred_at, :payload],
+    additionalProperties: false
+  }
+
   @injury %Schema{
     type: :object,
     properties: %{
@@ -96,6 +130,7 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
       tags: %Schema{type: :array, items: %Schema{type: :string}},
       visibility: %Schema{type: :string, enum: ["admin_only", "user_and_admin"]},
       params: %Schema{type: :object, additionalProperties: true},
+      events: %Schema{type: :array, items: @injury_event},
       inserted_at: %Schema{type: :string, format: :"date-time"},
       updated_at: %Schema{type: :string, format: :"date-time"}
     },
@@ -110,6 +145,7 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
       :tags,
       :visibility,
       :params,
+      :events,
       :inserted_at,
       :updated_at
     ],
@@ -216,6 +252,21 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
   def injury, do: @injury
   def injury_collection, do: collection(:injuries, @injury)
   def injury_response, do: item(:injury, @injury)
+
+  def injury_update_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        note: %Schema{type: :string, nullable: true, maxLength: 2000},
+        severity: %Schema{type: :string, enum: ["mild", "moderate", "severe"]},
+        body_area: %Schema{type: :string},
+        training_limitations: %Schema{type: :string, nullable: true},
+        description: %Schema{type: :string, nullable: true},
+        tags: %Schema{type: :array, items: %Schema{type: :string}}
+      },
+      additionalProperties: false
+    }
+  end
 
   defp collection(key, schema) do
     %Schema{

@@ -12,6 +12,12 @@ defmodule MilosTraining.Wellbeing.WellbeingStore do
   def mark_healed(injury_report_id, actor_id, healed_on),
     do: adapter().mark_healed(injury_report_id, actor_id, healed_on)
 
+  def update_injury(injury_report_id, actor_id, build),
+    do: adapter().update_injury(injury_report_id, actor_id, build)
+
+  def reopen_injury(injury_report_id, actor_id),
+    do: adapter().reopen_injury(injury_report_id, actor_id)
+
   def get_injury_for_user(user_id, injury_report_id),
     do: adapter().get_injury_for_user(user_id, injury_report_id)
 

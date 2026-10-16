@@ -4880,6 +4880,34 @@
       "history": "Alle invoer ({count})",
       "delete": "Verwijderen",
       "loading": "Laden…"
+    },
+    "injury": {
+      "addUpdate": "Update toevoegen",
+      "reopen": "Heropenen",
+      "timeline": "{count, plural, one {Verloop · # gebeurtenis} other {Verloop · # gebeurtenissen}}",
+      "timelineAria": "Verloop van de blessure met {count} gebeurtenissen",
+      "event": {
+        "reported": "Gemeld",
+        "updated": "Update",
+        "marked_healed": "Als genezen gemarkeerd",
+        "reopened": "Heropend"
+      },
+      "field": {
+        "severity": "Ernst",
+        "body_area": "Lichaamsdeel",
+        "training_limitations": "Trainingsbeperkingen",
+        "description": "Omschrijving",
+        "tags": "Labels"
+      },
+      "severity": {
+        "mild": "Licht",
+        "moderate": "Matig",
+        "severe": "Ernstig"
+      },
+      "notePlaceholder": "Hoe gaat het? (optioneel)",
+      "save": "Update opslaan",
+      "saving": "Opslaan…",
+      "cancel": "Annuleren"
     }
   }
 }

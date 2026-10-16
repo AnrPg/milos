@@ -1,6 +1,6 @@
 defmodule MilosTraining.Wellbeing do
   alias MilosTraining.Wellbeing.Commands.{MarkHealed, ReportInjury}
-  alias MilosTraining.Wellbeing.Domain.{CheckInQuestions, InjuryRiskPolicy}
+  alias MilosTraining.Wellbeing.Domain.{CheckInQuestions, InjuryRiskPolicy, InjuryUpdate}
 
   alias MilosTraining.Wellbeing.Queries.{
     GetInjuryForUser,
@@ -18,6 +18,12 @@ defmodule MilosTraining.Wellbeing do
   defdelegate report_injury(user_id, actor_id, actor_role, params), to: ReportInjury, as: :call
   defdelegate mark_healed(injury_report_id, actor_id, healed_on \\ nil), to: MarkHealed, as: :call
   defdelegate get_injury_for_user(user_id, injury_report_id), to: GetInjuryForUser, as: :call
+
+  @doc "ADR-140 §3: records an `updated` event with optional text and field changes."
+  def update_injury(injury_report_id, actor_id, params),
+    do: WellbeingStore.update_injury(injury_report_id, actor_id, &InjuryUpdate.build(&1, params))
+
+  defdelegate reopen_injury(injury_report_id, actor_id), to: WellbeingStore
   defdelegate list_injuries_for_user(user_id), to: ListInjuriesForUser, as: :call
 
   def list_injuries_for_user(context, user_id),

@@ -6,26 +6,33 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
   fetchMyInjuries,
   markMyInjuryHealed,
+  reopenMyInjury,
   reportInjury,
+  updateMyInjury,
+  type InjuryUpdateRequest,
   type ReportInjuryRequest,
 } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
 import { CheckInPanel } from "@/components/member-app/wellbeing/CheckInPanel";
+import { InjuryTimeline, InjuryUpdateForm } from "@/components/member-app/wellbeing/InjuryTimeline";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
+  const t = useTranslations("MemberApp.injury");
   const { tokens } = useSession();
   const [bodyArea, setBodyArea] = useState("");
   const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const injuriesQuery = useQuery({
     queryKey: ["my", "wellbeing", "injuries"],
@@ -49,6 +56,20 @@ export function MyWellbeing() {
 
   const healMutation = useMutation({
     mutationFn: async (id: string) => markMyInjuryHealed(tokens!.access_token, id),
+    onSuccess: () => injuriesQuery.refetch(),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, update }: { id: string; update: InjuryUpdateRequest }) =>
+      updateMyInjury(tokens!.access_token, id, update),
+    onSuccess: () => {
+      setUpdatingId(null);
+      injuriesQuery.refetch();
+    },
+  });
+
+  const reopenMutation = useMutation({
+    mutationFn: async (id: string) => reopenMyInjury(tokens!.access_token, id),
     onSuccess: () => injuriesQuery.refetch(),
   });
 
@@ -107,19 +128,48 @@ export function MyWellbeing() {
                   </p>
                   <p className="text-sm text-[var(--muted)]">{i18n("statusbae7d5b")} <SemanticLabel value={injury.status} /></p>
                 </div>
-                {injury.status === "active" ? (
-                  <button
-                    className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-[var(--primary-contrast)]"
-                    type="button"
-                    onClick={() => healMutation.mutate(String(injury.id))}
-                  >
-                    {i18n("markHealed65e6ef9")}
-                  </button>
-                ) : null}
+                <div className="flex flex-wrap gap-2">
+                  {injury.status === "active" ? (
+                    <>
+                      <button
+                        className="rounded-full border border-[var(--border)] px-4 py-2 text-sm font-bold"
+                        type="button"
+                        onClick={() => setUpdatingId(String(injury.id))}
+                      >
+                        {t("addUpdate")}
+                      </button>
+                      <button
+                        className="rounded-full bg-[var(--primary)] px-4 py-2 text-sm font-bold text-[var(--primary-contrast)]"
+                        type="button"
+                        onClick={() => healMutation.mutate(String(injury.id))}
+                      >
+                        {i18n("markHealed65e6ef9")}
+                      </button>
+                    </>
+                  ) : (
+                    <button
+                      className="rounded-full border border-[var(--border)] px-4 py-2 text-sm font-bold"
+                      type="button"
+                      onClick={() => reopenMutation.mutate(String(injury.id))}
+                    >
+                      {t("reopen")}
+                    </button>
+                  )}
+                </div>
               </div>
+              {updatingId === injury.id ? (
+                <InjuryUpdateForm
+                  injury={injury}
+                  pending={updateMutation.isPending}
+                  error={updateMutation.error instanceof Error ? localizeError(updateMutation.error, i18n) : null}
+                  onSubmit={(update) => updateMutation.mutate({ id: String(injury.id), update })}
+                  onCancel={() => setUpdatingId(null)}
+                />
+              ) : null}
+              <InjuryTimeline injury={injury} />
             </article>
           ))}
-          <ErrorText error={healMutation.error} />
+          <ErrorText error={healMutation.error ?? reopenMutation.error} />
         </section>
       </div>
     </main>

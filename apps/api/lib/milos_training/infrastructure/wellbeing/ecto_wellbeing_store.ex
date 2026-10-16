@@ -83,11 +83,68 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   end
 
   @impl true
+  def update_injury(injury_report_id, actor_id, build) when is_function(build, 1) do
+    case InjuryReport |> scoped_to_owner_or_tenant() |> Repo.get(injury_report_id) do
+      nil ->
+        {:error, :not_found}
+
+      %InjuryReport{} = injury_report ->
+        with {:ok, attrs, payload} <- build.(normalize_injury(injury_report)) do
+          injury_report
+          |> InjuryReport.changeset(attrs)
+          |> record_event(actor_id, "updated", payload)
+        end
+    end
+  end
+
+  @impl true
+  def reopen_injury(injury_report_id, actor_id) do
+    case InjuryReport |> scoped_to_owner_or_tenant() |> Repo.get(injury_report_id) do
+      nil ->
+        {:error, :not_found}
+
+      %InjuryReport{status: "active"} ->
+        {:error, :injury_already_active}
+
+      %InjuryReport{} = injury_report ->
+        injury_report
+        |> InjuryReport.changeset(%{status: "active", healed_on: nil})
+        |> record_event(actor_id, "reopened", %{"healed_on" => injury_report.healed_on})
+    end
+  end
+
+  defp record_event(changeset, actor_id, event_type, payload) do
+    Multi.new()
+    |> Multi.update(:injury_report, changeset, force: true)
+    |> Multi.insert(:status_event, fn %{injury_report: updated_report} ->
+      InjuryStatusEvent.changeset(%InjuryStatusEvent{}, %{
+        injury_report_id: updated_report.id,
+        actor_id: actor_id,
+        event_type: event_type,
+        occurred_at: DateTime.utc_now(),
+        payload: payload
+      })
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{injury_report: updated_report}} ->
+        {:ok, updated_report |> Repo.preload(:events, force: true) |> normalize_injury()}
+
+      {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
+
+      {:error, _step, reason, _changes} ->
+        {:error, reason}
+    end
+  end
+
+  @impl true
   def get_injury_for_user(user_id, injury_report_id) do
     InjuryReport
     |> scoped_to_owner_or_tenant()
     |> where([injury], injury.id == ^injury_report_id and injury.user_id == ^user_id)
     |> where([injury], injury.visibility == "user_and_admin")
+    |> preload(:events)
     |> Repo.one()
     |> case do
       nil -> nil
@@ -102,6 +159,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> where([injury], injury.user_id == ^user_id)
     |> where([injury], injury.visibility == "user_and_admin")
     |> order_by([injury], desc: injury.inserted_at)
+    |> preload(:events)
     |> Repo.all()
     |> Enum.map(&normalize_injury/1)
   end
@@ -131,6 +189,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> order_by([injury], desc: injury.inserted_at)
     |> offset(^parse_offset(filters["offset"]))
     |> limit(^parse_limit(filters["limit"]))
+    |> preload(:events)
     |> Repo.all()
     |> Enum.map(&normalize_injury/1)
   end
@@ -174,9 +233,27 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       tags: injury_report.tags || [],
       visibility: injury_report.visibility,
       params: injury_report.params || %{},
+      events: normalize_events(injury_report.events),
       inserted_at: injury_report.inserted_at,
       updated_at: injury_report.updated_at
     }
+  end
+
+  # The injury's timeline (ADR-140 §3), oldest first; empty when not loaded.
+  defp normalize_events(%Ecto.Association.NotLoaded{}), do: []
+
+  defp normalize_events(events) do
+    events
+    |> Enum.sort_by(& &1.occurred_at, DateTime)
+    |> Enum.map(
+      &%{
+        id: &1.id,
+        event_type: &1.event_type,
+        actor_id: &1.actor_id,
+        occurred_at: &1.occurred_at,
+        payload: &1.payload || %{}
+      }
+    )
   end
 
   defp parse_limit(nil), do: 100

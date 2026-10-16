@@ -4880,6 +4880,34 @@
       "history": "כל הרשומות ({count})",
       "delete": "מחיקה",
       "loading": "טוען…"
+    },
+    "injury": {
+      "addUpdate": "הוספת עדכון",
+      "reopen": "פתיחה מחדש",
+      "timeline": "{count, plural, one {התקדמות · אירוע אחד} other {התקדמות · # אירועים}}",
+      "timelineAria": "ציר זמן של הפציעה עם {count} אירועים",
+      "event": {
+        "reported": "דווחה",
+        "updated": "עדכון",
+        "marked_healed": "סומנה כמחלימה",
+        "reopened": "נפתחה מחדש"
+      },
+      "field": {
+        "severity": "חומרה",
+        "body_area": "אזור בגוף",
+        "training_limitations": "מגבלות אימון",
+        "description": "תיאור",
+        "tags": "תגיות"
+      },
+      "severity": {
+        "mild": "קלה",
+        "moderate": "בינונית",
+        "severe": "חמורה"
+      },
+      "notePlaceholder": "איך זה מתקדם? (רשות)",
+      "save": "שמירת עדכון",
+      "saving": "שומר…",
+      "cancel": "ביטול"
     }
   }
 }

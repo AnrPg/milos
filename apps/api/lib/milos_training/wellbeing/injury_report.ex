@@ -21,6 +21,8 @@ defmodule MilosTraining.Wellbeing.InjuryReport do
     field :visibility, :string, default: "user_and_admin"
     field :params, :map, default: %{}
 
+    has_many :events, MilosTraining.Wellbeing.InjuryStatusEvent, foreign_key: :injury_report_id
+
     timestamps(type: :utc_datetime_usec)
   end
 

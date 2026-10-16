@@ -4880,6 +4880,34 @@
       "history": "All check-ins ({count})",
       "delete": "Delete",
       "loading": "Loading…"
+    },
+    "injury": {
+      "addUpdate": "Add update",
+      "reopen": "Reopen",
+      "timeline": "{count, plural, one {Progress · # event} other {Progress · # events}}",
+      "timelineAria": "Injury timeline with {count} events",
+      "event": {
+        "reported": "Reported",
+        "updated": "Update",
+        "marked_healed": "Marked healed",
+        "reopened": "Reopened"
+      },
+      "field": {
+        "severity": "Severity",
+        "body_area": "Body area",
+        "training_limitations": "Training limitations",
+        "description": "Description",
+        "tags": "Tags"
+      },
+      "severity": {
+        "mild": "Mild",
+        "moderate": "Moderate",
+        "severe": "Severe"
+      },
+      "notePlaceholder": "How is it going? (optional)",
+      "save": "Save update",
+      "saving": "Saving…",
+      "cancel": "Cancel"
     }
   }
 }

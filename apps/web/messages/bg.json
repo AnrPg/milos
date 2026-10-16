@@ -4880,6 +4880,34 @@
       "history": "Всички записи ({count})",
       "delete": "Изтрий",
       "loading": "Зареждане…"
+    },
+    "injury": {
+      "addUpdate": "Добави актуализация",
+      "reopen": "Отвори отново",
+      "timeline": "{count, plural, one {Развитие · # събитие} other {Развитие · # събития}}",
+      "timelineAria": "Развитие на травмата с {count} събития",
+      "event": {
+        "reported": "Докладвана",
+        "updated": "Актуализация",
+        "marked_healed": "Отбелязана като излекувана",
+        "reopened": "Отворена отново"
+      },
+      "field": {
+        "severity": "Тежест",
+        "body_area": "Част от тялото",
+        "training_limitations": "Ограничения в тренировките",
+        "description": "Описание",
+        "tags": "Етикети"
+      },
+      "severity": {
+        "mild": "Лека",
+        "moderate": "Умерена",
+        "severe": "Тежка"
+      },
+      "notePlaceholder": "Как върви? (по желание)",
+      "save": "Запази актуализацията",
+      "saving": "Запазване…",
+      "cancel": "Отказ"
     }
   }
 }

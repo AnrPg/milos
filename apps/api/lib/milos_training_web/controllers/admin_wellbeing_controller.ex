@@ -2,7 +2,13 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{AdminReportInjury, ListAdminInjuries, MarkInjuryHealed}
+  alias MilosTraining.Application.{
+    AdminReportInjury,
+    ChangeInjury,
+    ListAdminInjuries,
+    MarkInjuryHealed
+  }
+
   alias MilosTrainingWeb.Schemas.FeedbackWellbeing
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -47,7 +53,7 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
 
   plug(
     OpenApiSpex.Plug.CastAndValidate,
-    [json_render_error_v2: true] when action in [:create, :heal]
+    [json_render_error_v2: true] when action in [:create, :heal, :update]
   )
 
   operation(:index,
@@ -120,6 +126,47 @@ defmodule MilosTrainingWeb.AdminWellbeingController do
              param_id(params),
              body_params(conn, params)
            ) do
+      json(conn, %{injury: injury})
+    end
+  end
+
+  operation(:update,
+    summary: "Add an update to an injury (text and/or field changes) on its timeline",
+    parameters: [@id_parameter],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{schema: FeedbackWellbeing.injury_update_request()}
+      }
+    },
+    responses: [ok: {"Injury report", "application/json", FeedbackWellbeing.injury_response()}]
+  )
+
+  def update(conn, params) do
+    actor = Guardian.Plug.current_resource(conn)
+
+    with {:ok, injury} <-
+           ChangeInjury.update(
+             conn.assigns.tenant_context,
+             actor.id,
+             param_id(params),
+             body_params(conn, params)
+           ) do
+      json(conn, %{injury: injury})
+    end
+  end
+
+  operation(:reopen,
+    summary: "Reopen a healed injury",
+    parameters: [@id_parameter],
+    responses: [ok: {"Injury report", "application/json", FeedbackWellbeing.injury_response()}]
+  )
+
+  def reopen(conn, params) do
+    actor = Guardian.Plug.current_resource(conn)
+
+    with {:ok, injury} <-
+           ChangeInjury.reopen(conn.assigns.tenant_context, actor.id, param_id(params)) do
       json(conn, %{injury: injury})
     end
   end

@@ -1669,6 +1669,25 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-140 §3 injury updates.
+  def call(conn, {:error, :empty_update}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "empty_update", error: "Write something or change at least one field"})
+  end
+
+  def call(conn, {:error, :note_too_long}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "note_too_long", error: "The update text is too long"})
+  end
+
+  def call(conn, {:error, :injury_already_active}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "injury_already_active", error: "This injury is already active"})
+  end
+
   # ADR-140 §2 Πώς νιώθω.
   def call(conn, {:error, :check_in_organization_unavailable}) do
     conn

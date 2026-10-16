@@ -2721,6 +2721,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Add an update to an injury (text and/or field changes) on its timeline */
+        patch: operations["MilosTrainingWeb.AdminWellbeingController.update"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/heal": {
         parameters: {
             query?: never;
@@ -2736,6 +2753,23 @@ export interface paths {
         head?: never;
         /** Mark an injury report healed */
         patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen a healed injury */
+        post: operations["MilosTrainingWeb.AdminWellbeingController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/wellbeing/injury-warnings": {
@@ -5110,6 +5144,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellbeing/injuries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Add an update to an injury (text and/or field changes) on its timeline */
+        patch: operations["MilosTrainingWeb.WellbeingController.update"];
+        trace?: never;
+    };
     "/api/wellbeing/injuries/{id}/heal": {
         parameters: {
             query?: never;
@@ -5125,6 +5176,23 @@ export interface paths {
         head?: never;
         /** Mark one of the current user's injuries healed */
         patch: operations["MilosTrainingWeb.WellbeingController.heal"];
+        trace?: never;
+    };
+    "/api/wellbeing/injuries/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen a healed injury */
+        post: operations["MilosTrainingWeb.WellbeingController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/workouts/{id}/timer-sequence": {
@@ -16381,6 +16449,26 @@ export interface operations {
                         injuries: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -16416,6 +16504,94 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWellbeingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body_area?: string;
+                    description?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    severity?: "mild" | "moderate" | "severe";
+                    tags?: string[];
+                    training_limitations?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWellbeingController.heal": {
         parameters: {
             query?: never;
@@ -16444,6 +16620,102 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWellbeingController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -16617,6 +16889,26 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -28947,6 +29239,26 @@ export interface operations {
                         injuries: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -29017,6 +29329,114 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellbeingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body_area?: string;
+                    description?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    severity?: "mild" | "moderate" | "severe";
+                    tags?: string[];
+                    training_limitations?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -29080,6 +29500,102 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellbeingController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */

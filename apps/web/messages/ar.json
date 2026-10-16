@@ -4880,6 +4880,34 @@
       "history": "كل الإدخالات ({count})",
       "delete": "حذف",
       "loading": "جارٍ التحميل…"
+    },
+    "injury": {
+      "addUpdate": "إضافة تحديث",
+      "reopen": "إعادة الفتح",
+      "timeline": "{count, plural, zero {التطور · لا أحداث} one {التطور · حدث واحد} two {التطور · حدثان} few {التطور · # أحداث} many {التطور · # حدثًا} other {التطور · # حدث}}",
+      "timelineAria": "الخط الزمني للإصابة مع {count} أحداث",
+      "event": {
+        "reported": "تم الإبلاغ",
+        "updated": "تحديث",
+        "marked_healed": "تم الشفاء",
+        "reopened": "أعيد فتحها"
+      },
+      "field": {
+        "severity": "الشدة",
+        "body_area": "منطقة الجسم",
+        "training_limitations": "قيود التدريب",
+        "description": "الوصف",
+        "tags": "الوسوم"
+      },
+      "severity": {
+        "mild": "خفيفة",
+        "moderate": "متوسطة",
+        "severe": "شديدة"
+      },
+      "notePlaceholder": "كيف تسير الأمور؟ (اختياري)",
+      "save": "حفظ التحديث",
+      "saving": "جارٍ الحفظ…",
+      "cancel": "إلغاء"
     }
   }
 }

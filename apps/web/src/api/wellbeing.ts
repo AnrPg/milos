@@ -92,3 +92,29 @@ export async function submitCheckIn(token: string, body: SubmitCheckInRequest) {
 export async function deleteMyCheckIn(token: string, checkInId: string) {
   return apiRequest<void>(`/wellbeing/check-ins/${checkInId}`, { method: "DELETE", token });
 }
+
+// ADR-140 §3: injury updates and reopenings are timestamped timeline events.
+type UpdateInjuryResponse =
+  operations["MilosTrainingWeb.WellbeingController.update"]["responses"][200]["content"]["application/json"];
+export type InjuryUpdateRequest =
+  operations["MilosTrainingWeb.WellbeingController.update"]["requestBody"]["content"]["application/json"];
+
+export async function updateMyInjury(token: string, injuryId: string, body: InjuryUpdateRequest) {
+  return apiRequest<UpdateInjuryResponse>(`/wellbeing/injuries/${injuryId}`, { method: "PATCH", token, body });
+}
+
+export async function reopenMyInjury(token: string, injuryId: string) {
+  return apiRequest<UpdateInjuryResponse>(`/wellbeing/injuries/${injuryId}/reopen`, { method: "POST", token, body: {} });
+}
+
+export async function adminUpdateInjury(token: string, injuryId: string, body: InjuryUpdateRequest) {
+  return apiRequest<UpdateInjuryResponse>(`/admin/wellbeing/injuries/${injuryId}`, { method: "PATCH", token, body });
+}
+
+export async function adminReopenInjury(token: string, injuryId: string) {
+  return apiRequest<UpdateInjuryResponse>(`/admin/wellbeing/injuries/${injuryId}/reopen`, {
+    method: "POST",
+    token,
+    body: {},
+  });
+}

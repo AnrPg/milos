@@ -4880,6 +4880,34 @@
       "history": "Все записи ({count})",
       "delete": "Удалить",
       "loading": "Загрузка…"
+    },
+    "injury": {
+      "addUpdate": "Добавить обновление",
+      "reopen": "Открыть снова",
+      "timeline": "{count, plural, one {Динамика · # событие} few {Динамика · # события} many {Динамика · # событий} other {Динамика · # события}}",
+      "timelineAria": "Динамика травмы: {count} событий",
+      "event": {
+        "reported": "Сообщено",
+        "updated": "Обновление",
+        "marked_healed": "Отмечено как зажившее",
+        "reopened": "Открыто снова"
+      },
+      "field": {
+        "severity": "Тяжесть",
+        "body_area": "Область тела",
+        "training_limitations": "Ограничения в тренировках",
+        "description": "Описание",
+        "tags": "Теги"
+      },
+      "severity": {
+        "mild": "Лёгкая",
+        "moderate": "Средняя",
+        "severe": "Тяжёлая"
+      },
+      "notePlaceholder": "Как дела? (необязательно)",
+      "save": "Сохранить обновление",
+      "saving": "Сохранение…",
+      "cancel": "Отмена"
     }
   }
 }

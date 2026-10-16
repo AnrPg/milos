@@ -4880,6 +4880,34 @@
       "history": "Tutte le voci ({count})",
       "delete": "Elimina",
       "loading": "Caricamento…"
+    },
+    "injury": {
+      "addUpdate": "Aggiungi aggiornamento",
+      "reopen": "Riapri",
+      "timeline": "{count, plural, one {Andamento · # evento} other {Andamento · # eventi}}",
+      "timelineAria": "Andamento dell’infortunio con {count} eventi",
+      "event": {
+        "reported": "Segnalato",
+        "updated": "Aggiornamento",
+        "marked_healed": "Segnato come guarito",
+        "reopened": "Riaperto"
+      },
+      "field": {
+        "severity": "Gravità",
+        "body_area": "Zona del corpo",
+        "training_limitations": "Limitazioni di allenamento",
+        "description": "Descrizione",
+        "tags": "Tag"
+      },
+      "severity": {
+        "mild": "Lieve",
+        "moderate": "Moderato",
+        "severe": "Grave"
+      },
+      "notePlaceholder": "Come va? (facoltativo)",
+      "save": "Salva aggiornamento",
+      "saving": "Salvataggio…",
+      "cancel": "Annulla"
     }
   }
 }
