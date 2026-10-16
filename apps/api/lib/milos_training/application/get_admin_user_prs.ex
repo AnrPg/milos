@@ -14,7 +14,7 @@ defmodule MilosTraining.Application.GetAdminUserPRs do
   reach the full profile can still title the PR dossier (ADR-132).
   """
 
-  alias MilosTraining.Application.TenantUserAccess
+  alias MilosTraining.Application.{JournalComments, TenantUserAccess}
   alias MilosTraining.{Identity, Organizations, Pantheon}
 
   def call(context, user_id) do
@@ -40,6 +40,11 @@ defmodule MilosTraining.Application.GetAdminUserPRs do
   defp read(context, user_id) do
     user_id
     |> Pantheon.list_organization_records(context.organization_id)
-    |> Enum.map(&Pantheon.read_only_view(&1, Pantheon.list_record_history(&1.id)))
+    |> JournalComments.attach("pr")
+    |> Enum.map(fn pr ->
+      pr
+      |> Pantheon.read_only_view(Pantheon.list_record_history(pr.id))
+      |> Map.put(:comments, pr.comments)
+    end)
   end
 end

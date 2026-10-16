@@ -15,9 +15,11 @@ defmodule MilosTraining.Pantheon.Ports.PRStore do
   @callback count_user_prs(user_id :: Ecto.UUID.t()) :: non_neg_integer()
   @callback list_organization_prs(user_id :: Ecto.UUID.t(), organization_id :: Ecto.UUID.t()) ::
               [map()]
-  @callback get_sharing_preference(user_id :: Ecto.UUID.t()) :: %{coach_visibility: boolean()}
-  @callback put_coach_visibility(user_id :: Ecto.UUID.t(), enabled :: boolean()) ::
-              {:ok, %{coach_visibility: boolean()}} | {:error, Ecto.Changeset.t()}
+  # ADR-139 ladder: one PR's rung, and bulk moves when the PR default changes.
+  @callback set_record_visibility(Ecto.UUID.t(), Ecto.UUID.t(), String.t()) ::
+              {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
+  @callback move_records(Ecto.UUID.t(), [String.t()], String.t()) :: non_neg_integer()
+  @callback list_record_items(Ecto.UUID.t(), term(), pos_integer(), term()) :: [map()]
   @callback list_owned_grants(user_id :: Ecto.UUID.t()) :: [map()]
   @callback list_received_grants(grantee_user_id :: Ecto.UUID.t()) :: [map()]
   @callback get_active_grant(user_id :: Ecto.UUID.t(), grantee_user_id :: Ecto.UUID.t()) ::

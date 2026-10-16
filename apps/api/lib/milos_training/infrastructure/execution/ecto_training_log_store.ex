@@ -14,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
 
   alias Ecto.Multi
   alias MilosTraining.Execution.TrainingLogEntry
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
@@ -175,6 +176,46 @@ defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
   # Owner rows only. Within a tenant session the organization is pinned too,
   # unless the caller explicitly asks for the owner's rows across tenants
   # (personal gamification projection); RLS still requires the owner match.
+  # Journal feed (ADR-139 §9): logged (not voided) entries, newest first,
+  # after the page bound, for the owner across gyms or for a coach of one gym.
+  @impl true
+  def list_entry_items(user_id, bound, limit, scope) do
+    TrainingLogEntry
+    |> where([entry], entry.status == "logged")
+    |> FeedScope.apply(user_id, scope)
+    |> FeedBound.apply(:performed_at_utc, bound)
+    |> order_by([entry], desc: entry.performed_at_utc, desc: entry.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(&normalize/1)
+  end
+
+  @impl true
+  def set_entry_visibility(id, user_id, rung) do
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         %TrainingLogEntry{} = entry <- Repo.get_by(TrainingLogEntry, id: id, user_id: user_id) do
+      entry
+      |> TrainingLogEntry.visibility_changeset(rung)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> {:ok, normalize(updated)}
+        error -> error
+      end
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def move_entries(user_id, from, to) do
+    {count, _rows} =
+      TrainingLogEntry
+      |> where([entry], entry.user_id == ^user_id and entry.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to, updated_at: DateTime.utc_now()])
+
+    count
+  end
+
   defp scoped(query, across_tenants? \\ false) do
     organization_id = RepoContext.current_setting("app.organization_id")
     user_id = RepoContext.current_setting("app.user_id")
@@ -213,15 +254,14 @@ defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
       performed_at_tz: entry.performed_at_tz,
       duration_seconds: entry.duration_seconds,
       perceived_effort: entry.perceived_effort,
-      notes: entry.notes,
       section_scores: entry.section_scores || [],
-      exercise_modifications: entry.exercise_modifications || [],
       performed_exercises: entry.performed_exercises || [],
       status: entry.status,
       voided_at: entry.voided_at,
       void_reason: entry.void_reason,
       idempotency_key: entry.idempotency_key,
       lock_version: entry.lock_version,
+      journal_visibility: entry.journal_visibility,
       inserted_at: entry.inserted_at,
       updated_at: entry.updated_at
     }

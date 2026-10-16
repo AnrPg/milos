@@ -3,7 +3,8 @@
 import { useUiTranslations } from "@/i18n/ui";
 import React from "react";
 
-import type { TimerSegment } from "@/api/executions";
+import type { TimerBriefing, TimerSegment } from "@/api/executions";
+import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
 import { segmentLimitMs } from "@/lib/timer-engine";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
 
@@ -37,8 +38,11 @@ export function ReadyScreen({
   onTestSound,
   onStart,
   notice,
+  briefing,
 }: {
   segments: TimerSegment[];
+  /** The assignment's, the workout's and each section's Οδηγίες. */
+  briefing?: TimerBriefing | null;
   soundControl: React.ReactNode;
   onTestSound: () => void;
   onStart: () => void;
@@ -64,26 +68,38 @@ export function ReadyScreen({
 
         {notice ? <div className="mt-4">{notice}</div> : null}
 
+        {briefing ? (
+          <div className="mt-4">
+            <WorkoutContentBlock entries={briefing.workout} lead={briefing.assignment_instructions} />
+          </div>
+        ) : null}
+
         <ol className="mt-6 flex flex-col gap-2">
           {sections.map((section, index) => (
             <li
               key={section.id}
-              className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
+              className="flex flex-col gap-2 rounded-2xl px-4 py-3"
               style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             >
-              <span className="min-w-0">
-                <span className="block truncate text-sm font-semibold">
-                  {index + 1}. {section.name || formatLabels[section.format as SectionFormat] || section.format}
+              <div className="flex items-center justify-between gap-3">
+                <span className="min-w-0">
+                  <span className="block truncate text-sm font-semibold">
+                    {index + 1}. {section.name || formatLabels[section.format as SectionFormat] || section.format}
+                  </span>
+                  <span className="block text-xs" style={{ color: "var(--muted)" }}>
+                    {formatLabels[section.format as SectionFormat] ?? section.format}
+                  </span>
                 </span>
-                <span className="block text-xs" style={{ color: "var(--muted)" }}>
-                  {formatLabels[section.format as SectionFormat] ?? section.format}
+                <span className="shrink-0 text-sm font-semibold tabular-nums" style={{ color: "var(--text-soft)" }}>
+                  {section.timedMs > 0 && !section.open
+                    ? formatClock(Math.round(section.timedMs / 1000))
+                    : i18n("openDurationLabel")}
                 </span>
-              </span>
-              <span className="shrink-0 text-sm font-semibold tabular-nums" style={{ color: "var(--text-soft)" }}>
-                {section.timedMs > 0 && !section.open
-                  ? formatClock(Math.round(section.timedMs / 1000))
-                  : i18n("openDurationLabel")}
-              </span>
+              </div>
+              <WorkoutContentBlock
+                entries={briefing?.sections.find((entry) => entry.id === section.id)?.content}
+                title={false}
+              />
             </li>
           ))}
         </ol>

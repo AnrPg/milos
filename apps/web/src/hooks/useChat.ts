@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {useUiTranslations} from "@/i18n/ui";
 import { useQueryClient } from "@tanstack/react-query";
 
-import { type ChatMessage, fetchThreadMessages, markThreadRead } from "@/api/messaging";
+import { type ChatMessage, type MessageTopic, type MessageType, fetchThreadMessages, markThreadRead } from "@/api/messaging";
 import {
   deliverQueuedMessage,
   discardQueuedMessageOperation,
@@ -37,7 +37,7 @@ interface UseChatReturn {
   messages: DisplayChatMessage[];
   typingUsers: TypingUser[];
   isLoading: boolean;
-  sendMessage: (body: string, messageType?: string) => Promise<DisplayChatMessage>;
+  sendMessage: (body: string, messageType?: MessageType, topic?: MessageTopic | null) => Promise<DisplayChatMessage>;
   /** Re-enqueues a failed message with its original operation id (ADR-120). */
   retryMessage: (operationId: string) => Promise<void>;
   /** Removes a failed message from the device outbox; it is never sent. */
@@ -209,7 +209,7 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
   }, []);
 
   const sendMessage = useCallback(
-    async (body: string, messageType = "chat") => {
+    async (body: string, messageType: MessageType = "chat", topic: MessageTopic | null = null) => {
       if (!threadId || !accessToken || !currentUserId) {
         throw new Error(i18n("chatDisconnectedError"));
       }
@@ -218,7 +218,8 @@ export function useChat({ threadId, accessToken, currentUserId }: UseChatOptions
         currentUserId,
         threadId,
         body,
-        messageType as QueuedMessageOperation["messageType"],
+        messageType,
+        topic,
       );
       setQueuedMessages((previous) => [...previous, operation]);
 

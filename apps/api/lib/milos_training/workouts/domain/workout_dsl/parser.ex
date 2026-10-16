@@ -1,6 +1,7 @@
 defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
   @moduledoc false
 
+  alias MilosTraining.Workouts.Domain.WorkoutContent
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{ExerciseCatalog, Values, Vocabulary}
 
   @version 1
@@ -11,7 +12,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
   @max_blocks 2_000
   @max_nesting 8
   @max_title_bytes 500
-  @max_note_bytes 20_000
+  @max_content_bytes WorkoutContent.max_body_bytes()
   @workout_types ~w(crossfit strength gymnastics aerobics flexibility recovery)
   @difficulties ~w(beginner intermediate advanced all-levels)
   @score_types ~w(
@@ -96,15 +97,15 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
     line = String.trim(raw_line)
 
     case state.pending do
-      %{kind: :note} -> process_pending_note(state, line, line_number)
+      %{kind: :content} -> process_pending_content(state, line, line_number)
       %{kind: :sets} -> process_pending_sets(state, line, line_number)
       nil -> process_statement(state, line, line_number)
     end
   end
 
-  defp process_pending_note(state, "", _line_number), do: flush_pending(state)
+  defp process_pending_content(state, "", _line_number), do: flush_pending(state)
 
-  defp process_pending_note(state, line, line_number) do
+  defp process_pending_content(state, line, line_number) do
     if structural_statement?(line) do
       state
       |> flush_pending()
@@ -163,7 +164,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         close_block(state, Enum.at(match, 1) |> String.downcase(), line_number)
 
       match = Regex.run(~r/^(![a-z][a-z-]*):\s*$/i, line) ->
-        start_note(state, Enum.at(match, 1) |> String.downcase(), line_number)
+        start_content(state, Enum.at(match, 1) |> String.downcase(), line_number)
 
       match = Regex.run(~r/^([a-z][a-z0-9_-]*):\s*(.*)$/iu, line) ->
         put_statement(
@@ -182,7 +183,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
     frame =
       frame(:workout, line_number, %{
         sections: [],
-        notes: [],
+        content: [],
         equipment: [],
         tags: [],
         workout_metadata: %{"schema_version" => @schema_version},
@@ -212,7 +213,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
             timer_config: %{type: format},
             exercises: [],
             sections: [],
-            notes: [],
+            content: [],
             section_metadata: metadata
           }
 
@@ -232,7 +233,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
                 timer_config: %{type: Vocabulary.normalize_format(raw_format)},
                 exercises: [],
                 sections: [],
-                notes: [],
+                content: [],
                 section_metadata: %{}
               },
               %{path: path}
@@ -271,7 +272,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
             title: nil,
             sets: nil,
             rest_between_groups_seconds: nil,
-            notes: [],
+            content: [],
             items: []
           },
           %{path: path}
@@ -316,7 +317,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         subtitle: nil,
         set_prescriptions: [],
         variations: [],
-        notes: []
+        content: []
       }
 
       push_frame(state, frame(:header, line_number, data), line_number)
@@ -333,7 +334,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
 
           data = %{
             scale_level_slug: slug,
-            notes: [],
+            content: [],
             prescription_metadata: %{},
             excluded: false
           }
@@ -438,7 +439,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
         "title" => title,
         "sets" => frame.data.sets,
         "rest_between_groups_seconds" => frame.data.rest_between_groups_seconds,
-        "notes" => frame.data.notes
+        "content" => frame.data.content
       }
       |> reject_nil_values()
 
@@ -473,14 +474,14 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
 
     meaningful_keys =
       data
-      |> Map.drop([:scale_level_slug, :notes, :prescription_metadata, :excluded])
+      |> Map.drop([:scale_level_slug, :content, :prescription_metadata, :excluded])
       |> Enum.reject(fn {_key, value} -> blank?(value) end)
 
     has_metadata = map_size(value(data, :prescription_metadata, %{})) > 0
-    has_notes = value(data, :notes, []) != []
+    has_content = value(data, :content, []) != []
 
     state =
-      if meaningful_keys == [] and not has_metadata and not has_notes and not data.excluded,
+      if meaningful_keys == [] and not has_metadata and not has_content and not data.excluded,
         do:
           add_error(state, :empty_scale_variation, line_number, %{scale: data.scale_level_slug}),
         else: state
@@ -551,18 +552,27 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
     end
   end
 
-  defp start_note(state, marker, line_number) do
-    cond do
-      state.frames == [] ->
-        add_error(state, :invalid_note_scope, line_number, %{marker: marker})
+  defp start_content(%{frames: []} = state, marker, line_number),
+    do: add_error(state, :invalid_content_scope, line_number, %{marker: marker})
 
-      not Vocabulary.note_marker?(marker) ->
-        add_error(state, :unknown_note_marker, line_number, %{marker: marker})
+  defp start_content(state, marker, line_number) do
+    level = content_level(current_kind(state))
 
-      true ->
-        %{state | pending: %{kind: :note, marker: marker, line: line_number, lines: []}}
+    with true <- Vocabulary.content_marker?(marker),
+         {:ok, type} <- WorkoutContent.normalize_type(marker, level) do
+      pending = %{kind: :content, marker: marker, type: type, level: level, line: line_number}
+      %{state | pending: Map.put(pending, :lines, [])}
+    else
+      {:error, :cue_outside_exercise} ->
+        add_error(state, :cue_outside_exercise, line_number, %{marker: marker})
+
+      _unknown ->
+        add_error(state, :unknown_content_marker, line_number, %{marker: marker})
     end
   end
+
+  defp content_level(:scale), do: :variation
+  defp content_level(kind), do: kind
 
   defp put_statement(%{frames: []} = state, key, _raw_value, line_number),
     do: add_error(state, :invalid_parameter_scope, line_number, %{key: key})
@@ -1486,24 +1496,28 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
 
   defp flush_pending(%{pending: nil} = state), do: state
 
-  defp flush_pending(%{pending: %{kind: :note} = pending} = state) do
+  defp flush_pending(%{pending: %{kind: :content} = pending} = state) do
     body = pending.lines |> Enum.join("\n") |> String.trim()
     state = %{state | pending: nil}
 
     cond do
       body == "" ->
-        add_error(state, :empty_note, pending.line, %{marker: pending.marker})
+        add_error(state, :empty_content, pending.line, %{marker: pending.marker})
 
-      byte_size(body) > @max_note_bytes ->
-        add_error(state, :note_too_long, pending.line, %{maximum_bytes: @max_note_bytes})
+      byte_size(body) > @max_content_bytes ->
+        add_error(state, :content_too_long, pending.line, %{maximum_bytes: @max_content_bytes})
 
       true ->
-        note_type = String.trim_leading(pending.marker, "!")
-        note = %{type: note_type, body: body}
+        entry = %{type: pending.type, body: body}
 
+        # The level's plain `note` mirrors its first cue or Οδηγίες, the text
+        # the structured editor and the timer show.
         update_top_data(state, fn data ->
-          data = Map.update(data, :notes, [note], &(&1 ++ [note]))
-          if note_type == "coach-note", do: data, else: Map.put_new(data, :note, body)
+          data = Map.update(data, :content, [entry], &(&1 ++ [entry]))
+
+          if pending.type == WorkoutContent.primary(pending.level),
+            do: Map.put_new(data, :note, body),
+            else: data
         end)
     end
   end
@@ -1962,7 +1976,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Parser do
       name: name,
       exercise_ref: exercise_ref,
       variations: [],
-      notes: [],
+      content: [],
       prescription_metadata: %{},
       set_prescriptions: []
     }

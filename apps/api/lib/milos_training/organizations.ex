@@ -242,6 +242,9 @@ defmodule MilosTraining.Organizations do
   def resolve_tenant_context(account, slug, request_metadata \\ %{}),
     do: ResolveTenantContext.call(account, slug, request_metadata)
 
+  def resolve_tenant_context_by_id(account, organization_id, request_metadata \\ %{}),
+    do: ResolveTenantContext.by_id(account, organization_id, request_metadata)
+
   @doc """
   ADR-129: whether the tenant context's acting member is a coach of the
   tenant. The application-level mirror of `milos_acting_user_coaches/1`.

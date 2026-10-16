@@ -3,7 +3,8 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant, PRSharingPreference}
+  alias MilosTraining.Infrastructure.Journal.FeedScope
+  alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant}
   alias MilosTraining.Pantheon.Domain.PRHistoryPolicy
   alias MilosTraining.Repo
 
@@ -90,8 +91,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
                   pr_record_id: id,
                   score: existing.current_score,
                   beaten_on: existing.beaten_on,
-                  supporting_metrics: existing.supporting_metrics,
-                  notes: existing.notes
+                  supporting_metrics: existing.supporting_metrics
                 })
                 |> Repo.insert!()
               end
@@ -165,19 +165,60 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   end
 
   @impl true
-  def get_sharing_preference(user_id) do
-    case Repo.get(PRSharingPreference, user_id) do
-      nil -> %{coach_visibility: true}
-      preference -> %{coach_visibility: preference.coach_visibility}
+  def set_record_visibility(id, user_id, rung) do
+    case Repo.get_by(PRRecord, id: id, user_id: user_id) do
+      nil ->
+        {:error, :not_found}
+
+      record ->
+        record
+        |> PRRecord.visibility_changeset(rung)
+        |> Repo.update()
+        |> normalize_result(&normalize_pr/1)
     end
   end
 
+  # Journal feed (ADR-139 §9): a PR is dated by the day it was beaten, which
+  # the feed places at midnight UTC of that day.
   @impl true
-  def put_coach_visibility(user_id, enabled?) do
-    (Repo.get(PRSharingPreference, user_id) || %PRSharingPreference{user_id: user_id})
-    |> PRSharingPreference.changeset(%{user_id: user_id, coach_visibility: enabled?})
-    |> Repo.insert_or_update()
-    |> normalize_result(&%{coach_visibility: &1.coach_visibility})
+  def list_record_items(user_id, bound, limit, scope) do
+    PRRecord
+    |> FeedScope.apply(user_id, scope)
+    |> beaten_bound(bound)
+    |> order_by([r], desc: r.beaten_on, desc: r.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(&normalize_pr/1)
+  end
+
+  defp beaten_bound(query, :none), do: query
+
+  defp beaten_bound(query, {:at_most, at}),
+    do: where(query, [r], fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) <= ^at)
+
+  defp beaten_bound(query, {:before, at}),
+    do: where(query, [r], fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) < ^at)
+
+  defp beaten_bound(query, {:before_id, at, id}) do
+    where(
+      query,
+      [r],
+      fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) < ^at or
+        (fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) == ^at and
+           r.id < type(^id, :binary_id))
+    )
+  end
+
+  # Only gym PRs move: a personal PR has no coach and stays private.
+  @impl true
+  def move_records(user_id, from, to) do
+    {count, _rows} =
+      PRRecord
+      |> where([r], r.user_id == ^user_id and not is_nil(r.organization_id))
+      |> where([r], r.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to, updated_at: DateTime.utc_now()])
+
+    count
   end
 
   @impl true
@@ -256,7 +297,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
       higher_is_better: pr.higher_is_better,
       beaten_on: Date.to_iso8601(pr.beaten_on),
       supporting_metrics: pr.supporting_metrics || %{},
-      notes: pr.notes,
+      journal_visibility: pr.journal_visibility,
       inserted_at: DateTime.to_iso8601(pr.inserted_at),
       updated_at: DateTime.to_iso8601(pr.updated_at)
     }
@@ -269,7 +310,6 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
       score: Decimal.to_float(h.score),
       beaten_on: Date.to_iso8601(h.beaten_on),
       supporting_metrics: h.supporting_metrics || %{},
-      notes: h.notes,
       inserted_at: DateTime.to_iso8601(h.inserted_at)
     }
   end

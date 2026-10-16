@@ -140,6 +140,7 @@ config :milos_training,
        MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore
 
 config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
+config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
 
 config :milos_training,
        :push_subscription_store,

@@ -22,6 +22,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     coaching_relationships
     coaching_notes
     coaching_note_reads
+    journal_coach_reads
     housekeeping_areas
     housekeeping_entries
     inventory_machines
@@ -63,7 +64,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
     user_pr_records user_stats user_achievements user_gamification_preferences
-    injury_reports user_pr_sharing_preferences user_pr_share_grants
+    injury_reports user_pr_share_grants journal_visibility_defaults
+    journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
   )
 
   def report do

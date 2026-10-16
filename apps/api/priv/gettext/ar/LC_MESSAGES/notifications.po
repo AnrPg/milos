@@ -61,11 +61,17 @@ msgstr "رسالة من %{nickname}"
 msgid "%{nickname} sent you a message."
 msgstr "%{nickname} أرسل لك رسالة."
 
-msgid "New coach note"
-msgstr "مذكرة المدرب الجديد"
+msgid "Message from your coach"
+msgstr "رسالة من مدربك"
 
-msgid "Your coach added a new note."
-msgstr "أضاف مدربك ملاحظة جديدة."
+msgid "Your coach sent you a message."
+msgstr "أرسل لك مدربك رسالة."
+
+msgid "Message from the box"
+msgstr "رسالة من النادي"
+
+msgid "Your gym sent you a message."
+msgstr "أرسل لك ناديك رسالة."
 
 msgid "Challenge completed"
 msgstr "اكتمل التحدي"

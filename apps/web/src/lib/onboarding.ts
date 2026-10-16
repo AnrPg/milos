@@ -13,17 +13,17 @@ export const TOUR_STEPS: Record<TourAudience, TourStep[]> = {
   ],
   member: [
     { id: "welcome", icon: "👋" },
-    { id: "schedule", icon: "🗓️", href: "/schedule" },
+    { id: "schedule", icon: "🗓️", href: "/box/schedule" },
     { id: "train", icon: "⏱️", href: "/workouts" },
-    { id: "records", icon: "🏆", href: "/my-workouts/pantheon" },
-    { id: "account", icon: "💳", href: "/account/billing" },
+    { id: "records", icon: "🏆", href: "/journal/pantheon" },
+    { id: "account", icon: "💳", href: "/me/payments" },
   ],
   athlete: [
     { id: "welcome", icon: "👋" },
-    { id: "programme", icon: "📋", href: "/my-workouts" },
+    { id: "programme", icon: "📋", href: "/box/workouts" },
     { id: "train", icon: "⏱️" },
-    { id: "records", icon: "🏆", href: "/my-workouts/pantheon" },
-    { id: "account", icon: "💳", href: "/account/billing" },
+    { id: "records", icon: "🏆", href: "/journal/pantheon" },
+    { id: "account", icon: "💳", href: "/me/payments" },
   ],
 };
 

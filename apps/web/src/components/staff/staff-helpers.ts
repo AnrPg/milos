@@ -190,7 +190,7 @@ export function remainingBeneficiaryPlaces(limit: unknown, activeBeneficiaries: 
 
 /** The chat thread where staff answer a member (same route chat notifications open). */
 export function chatThreadHref(threadId: string): string {
-  return `/account/activity/chats?thread=${encodeURIComponent(threadId)}`;
+  return `/me/activity/chats?thread=${encodeURIComponent(threadId)}`;
 }
 
 /** Active packages of the corporate type, the only ones a corporate client can use. */

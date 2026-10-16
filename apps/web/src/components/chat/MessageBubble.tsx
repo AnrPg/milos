@@ -1,7 +1,8 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import type { ChatMessage } from "@/api/messaging";
+import type { ChatMessage, MessageTopic } from "@/api/messaging";
+import { TOPIC_KEYS } from "./message-topics";
 import { OutboxFailureControls } from "@/components/outbox/OutboxFailureControls";
 import type { DisplayChatMessage } from "@/lib/offline-message-outbox";
 
@@ -23,7 +24,15 @@ export function MessageBubble({
   onDiscard,
 }: MessageBubbleProps) {
   const i18n = useUiTranslations();
-  const isCoachingNote = message.message_type === "coaching_note";
+  // ADR-140 §6: a coaching message and a message from the box are marked;
+  // chat is not.
+  const topic = "topic" in message ? message.topic : null;
+  const kindLabel =
+    message.message_type === "coaching_message"
+      ? i18n("msgKindCoaching")
+      : message.message_type === "box_message"
+        ? [i18n("msgKindBox"), topic ? i18n(TOPIC_KEYS[topic as MessageTopic]) : null].filter(Boolean).join(" · ")
+        : null;
   const failedOperationId =
     "delivery_status" in message && message.delivery_status === "failed"
       ? (message.client_operation_id ?? null)
@@ -51,12 +60,12 @@ export function MessageBubble({
             : { background: "var(--card)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }
         }
       >
-        {isCoachingNote && (
+        {kindLabel && (
           <span
             className="block text-[10px] font-semibold uppercase tracking-widest mb-1"
             style={{ color: isOwnMessage ? "var(--primary-contrast)" : "var(--primary-strong)" }}
           >
-            {i18n("coachingNote7e2c608")}
+            {kindLabel}
           </span>
         )}
         {message.body}

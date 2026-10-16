@@ -7,6 +7,7 @@ defmodule MilosTraining.Application.SubmitReview do
     Execution,
     Feedback,
     Finance,
+    Journal,
     Notifications,
     Scheduling,
     Workouts
@@ -162,13 +163,13 @@ defmodule MilosTraining.Application.SubmitReview do
   end
 
   defp exercise_execution_status(user_id, exercise_id) do
-    user_id
-    |> Execution.list_executions_for_user()
+    executions = Execution.list_executions_for_user(user_id)
+    commented = Journal.comments_by_entry("execution", Enum.map(executions, & &1.id))
+
+    executions
     |> Enum.filter(fn execution ->
       exercise_id in (execution.checked_exercise_ids || []) or
-        Enum.any?(execution.exercise_notes || [], fn note ->
-          (note[:exercise_id] || note["exercise_id"]) == exercise_id
-        end)
+        Enum.any?(Map.get(commented, execution.id, []), &(&1.exercise_id == exercise_id))
     end)
     |> completion_status()
   end

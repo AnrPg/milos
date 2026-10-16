@@ -10,7 +10,7 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
   schema "assigned_workouts" do
     field :organization_id, :binary_id
     field :scheduled_for, :date
-    field :admin_notes, :string
+    field :instructions, :string
     # ADR-125: set when the assignment is a per-member variant of a class
     # occurrence (loose reference to a Scheduling-owned scheduled class).
     field :source_scheduled_class_id, :binary_id
@@ -27,33 +27,33 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
       :organization_id,
       :master_workout_id,
       :scheduled_for,
-      :admin_notes,
+      :instructions,
       :source_scheduled_class_id
     ])
-    |> update_change(:admin_notes, &normalize_admin_notes/1)
+    |> update_change(:instructions, &normalize_instructions/1)
     |> validate_required([:organization_id, :master_workout_id, :scheduled_for])
     |> foreign_key_constraint(:master_workout_id)
-    |> unique_constraint([:master_workout_id, :scheduled_for, :admin_notes],
+    |> unique_constraint([:master_workout_id, :scheduled_for, :instructions],
       name: :assigned_workouts_workout_date_notes_index
     )
   end
 
   def update_changeset(assignment, params) do
     assignment
-    |> cast(params, [:scheduled_for, :admin_notes])
-    |> update_change(:admin_notes, &normalize_admin_notes/1)
+    |> cast(params, [:scheduled_for, :instructions])
+    |> update_change(:instructions, &normalize_instructions/1)
     |> validate_required([:scheduled_for])
-    |> unique_constraint([:master_workout_id, :scheduled_for, :admin_notes],
+    |> unique_constraint([:master_workout_id, :scheduled_for, :instructions],
       name: :assigned_workouts_workout_date_notes_index
     )
   end
 
-  defp normalize_admin_notes(value) when is_binary(value) do
+  defp normalize_instructions(value) when is_binary(value) do
     case String.trim(value) do
       "" -> nil
       trimmed -> trimmed
     end
   end
 
-  defp normalize_admin_notes(value), do: value
+  defp normalize_instructions(value), do: value
 end

@@ -114,7 +114,8 @@ defmodule MilosTraining.Application.AuthorizeWorkoutExecutionSource do
            %{
              source: "assigned",
              source_reference_id: assignment_id,
-             organization_id: access.organization_id
+             organization_id: access.organization_id,
+             instructions: Map.get(access, :instructions)
            }}
         else
           {:error, :execution_source_forbidden}

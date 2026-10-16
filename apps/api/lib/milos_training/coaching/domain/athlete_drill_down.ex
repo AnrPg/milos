@@ -7,7 +7,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
   def build(athlete, assignments, executions, notes, %Date{} = today) do
     assignments = Enum.map(assignments || [], &normalize_assignment(&1, today))
     executions = Enum.map(executions || [], &normalize_execution/1)
-    notes = Enum.map(notes || [], &normalize_admin_note/1)
+    notes = Enum.map(notes || [], &normalize_coaching_message/1)
 
     %{
       identity: identity(athlete),
@@ -57,7 +57,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
       master_workout_id: field(assignment, :master_workout_id) || field(workout, :id),
       scheduled_for: scheduled_for,
       status: assignment_status(assignment, scheduled_for, today),
-      admin_notes: field(assignment, :admin_notes),
+      instructions: field(assignment, :instructions),
       workout: %{
         id: field(workout, :id),
         title: field(workout, :title),
@@ -87,7 +87,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
       started_at_utc: normalize_datetime(field(execution, :started_at_utc)),
       completed_at_utc: normalize_datetime(field(execution, :completed_at_utc)),
       section_scores: normalize_section_scores(field(execution, :section_scores) || []),
-      exercise_notes: normalize_exercise_notes(field(execution, :exercise_notes) || [])
+      comments: normalize_comments(field(execution, :comments) || [])
     }
   end
 
@@ -105,7 +105,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
         started_at_utc: execution.started_at_utc,
         completed_at_utc: execution.completed_at_utc,
         section_scores: execution.section_scores,
-        exercise_note_count: length(execution.exercise_notes)
+        comment_count: length(execution.comments)
       }
     end)
   end
@@ -143,9 +143,9 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
     |> Enum.sort_by(&note_sort_datetime/1, {:desc, DateTime})
   end
 
-  defp normalize_admin_note(message) do
+  defp normalize_coaching_message(message) do
     %{
-      type: "admin_note",
+      type: "coaching_message",
       id: field(message, :id),
       admin_id: field(message, :sender_id),
       body: field(message, :body),
@@ -155,16 +155,18 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
 
   defp execution_note_context(executions) do
     Enum.flat_map(executions, fn execution ->
-      Enum.map(execution.exercise_notes, fn note ->
+      Enum.map(execution.comments, fn comment ->
         %{
-          type: "athlete_execution_note",
-          id: field(note, :id),
+          type: "athlete_comment",
+          id: field(comment, :id),
           execution_id: execution.id,
           workout_title: execution.workout_title,
-          body: field(note, :note_text) || field(note, :body),
-          selected_text: field(note, :selected_text),
-          tags: field(note, :tags) || [],
-          inserted_at: normalize_datetime(field(note, :inserted_at))
+          body: field(comment, :body),
+          selected_text: field(comment, :selected_text),
+          exercise_id: field(comment, :exercise_id),
+          tags: field(comment, :tags) || [],
+          change: field(comment, :change),
+          inserted_at: normalize_datetime(field(comment, :written_at))
         }
       end)
     end)
@@ -221,10 +223,10 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
     if notes == [] do
       [
         %{
-          type: "no_admin_note",
+          type: "no_coaching_message",
           severity: "low",
-          reason: "no_admin_note_recorded",
-          title: "No coach note recorded"
+          reason: "no_coaching_message_sent",
+          title: "No coaching message sent"
         }
         | cues
       ]
@@ -258,8 +260,8 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
     end)
   end
 
-  defp normalize_exercise_notes(notes) when is_list(notes), do: notes
-  defp normalize_exercise_notes(_notes), do: []
+  defp normalize_comments(comments) when is_list(comments), do: comments
+  defp normalize_comments(_comments), do: []
 
   defp activity_state(last_completed_at, assignments, today) do
     cond do

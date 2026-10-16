@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.CreatePR do
-  alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
-  alias MilosTraining.{Gamification, Organizations, Pantheon}
+  alias MilosTraining.Application.{InvalidateLandingPages, JournalComments, PRSearchIndex}
+  alias MilosTraining.{Gamification, Journal, Organizations, Pantheon}
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
   # ADR-129: a PR may record the gym it was achieved in (`organization_slug`).
@@ -9,7 +9,11 @@ defmodule MilosTraining.Application.CreatePR do
   # Without a slug the PR is personal. Everything runs in the owner's scope.
   def call(%{user_id: user_id, account: account} = context, params) when is_map(params) do
     with {:ok, organization_id} <- provenance(account, params) do
-      Pantheon.with_user_context(context, fn -> create(user_id, organization_id, params) end)
+      JournalComments.write_with_comments(context, "pr", comments(params), fn ->
+        Pantheon.with_user_context(context, fn ->
+          create(user_id, organization_id, Map.drop(params, ["comments", :comments]))
+        end)
+      end)
     end
   end
 
@@ -23,6 +27,10 @@ defmodule MilosTraining.Application.CreatePR do
            |> Map.drop(["organization_slug", :organization_slug, "organization_id"])
            |> Map.put("user_id", user_id)
            |> Map.put("organization_id", organization_id)
+           |> Map.put(
+             "journal_visibility",
+             Journal.initial_visibility(user_id, "pr", is_binary(organization_id))
+           )
            |> Pantheon.create_record() do
       {:ok, _stats} = Gamification.increment_advancement(user_id, DateTime.utc_now())
       :ok = PRSearchIndex.enqueue_upsert(pr)
@@ -52,4 +60,6 @@ defmodule MilosTraining.Application.CreatePR do
       {:ok, Map.put(params, "supporting_metrics", metrics)}
     end
   end
+
+  defp comments(params), do: params["comments"] || params[:comments]
 end

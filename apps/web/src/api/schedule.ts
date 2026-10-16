@@ -1,4 +1,5 @@
 import type { AssignedWorkoutPreview } from "@/api/assigned-workouts";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import { apiRequest } from "@/api/client";
 import type { operations, paths } from "@/api/generated/schema";
 
@@ -50,6 +51,7 @@ export type WorkoutPreviewExercise = {
   rest_pause_seconds?: number | null;
   pacing?: number | null;
   interval_assignment?: number | null;
+  content?: WorkoutContentEntry[];
   variations?: Array<{
     id?: string;
     description?: string | null;
@@ -71,6 +73,7 @@ export type WorkoutPreviewSection = {
   scoreable?: boolean;
   score_config?: Record<string, unknown> | null;
   timer_config?: Record<string, unknown> | null;
+  content?: WorkoutContentEntry[];
   exercises: WorkoutPreviewExercise[];
 };
 
@@ -81,6 +84,8 @@ export type WorkoutPreview = {
   authoring_mode?: "structured" | "quick_text" | "free_text";
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
+  /** Οδηγίες and the rest of the workout's content (ADR-140 §4). */
+  content?: WorkoutContentEntry[];
   sections: WorkoutPreviewSection[];
 };
 

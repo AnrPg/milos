@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { SectionScore } from "@/api/executions";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 export type AthleteOption = {
   id: string;
@@ -15,6 +16,8 @@ export type AssignedWorkoutPreview = {
   authoring_mode?: "structured" | "quick_text" | "free_text";
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
+  /** Οδηγίες and the rest of the workout's content (ADR-140 §4). */
+  content?: WorkoutContentEntry[];
   sections: Array<{
     id?: string;
     parent_section_id?: string | null;
@@ -23,6 +26,7 @@ export type AssignedWorkoutPreview = {
     scoreable: boolean;
     score_config?: Record<string, unknown> | null;
     timer_config?: Record<string, unknown> | null;
+    content?: WorkoutContentEntry[];
     exercises: Array<{
       id?: string;
       name: string;
@@ -60,7 +64,8 @@ export type AssignedWorkoutRecord = {
   id: string;
   master_workout_id: string;
   scheduled_for: string;
-  admin_notes?: string | null;
+  /** The assignment's Οδηγίες, shown to its members before the workout's. */
+  instructions?: string | null;
   athlete_ids?: string[];
   athletes?: AthleteOption[];
   workout: AssignedWorkoutPreview;
@@ -84,7 +89,7 @@ export type AssignWorkoutPayload = {
   /** Assignee user ids: athletes or (ADR-125) entitled members. */
   athlete_ids: string[];
   scheduled_for: string;
-  admin_notes?: string;
+  instructions?: string;
   /** ADR-125: makes the assignment one member's version of this class. */
   source_slot_id?: string;
 };
@@ -92,7 +97,7 @@ export type AssignWorkoutPayload = {
 export type UpdateAssignedWorkoutPayload = {
   athlete_ids: string[];
   scheduled_for: string;
-  admin_notes?: string;
+  instructions?: string;
 };
 
 export async function fetchAssignedWorkoutWeek(token: string, startDate?: string) {

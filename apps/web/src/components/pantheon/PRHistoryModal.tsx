@@ -8,7 +8,9 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRSupportingMetrics, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
+import { CommentList } from "@/components/journal/CommentList";
 import { SemanticLabel } from "@/components/semantic-label";
+import { sortComments } from "@/lib/journal-comments";
 
 function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -54,7 +56,6 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
       score: pr.current_score,
       beaten_on: pr.beaten_on,
       supporting_metrics: pr.supporting_metrics,
-      notes: pr.notes,
     },
     ...(historyQuery.data ?? []),
   ];
@@ -72,7 +73,7 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div
-        className="w-full max-w-md rounded-[2rem] p-6"
+        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-[2rem] p-6"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
         <div className="flex items-start justify-between gap-4">
@@ -82,6 +83,12 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
           </div>
           <button type="button" onClick={onClose} className="text-xl font-light shrink-0" style={{ color: "var(--dim)" }}>✕</button>
         </div>
+
+        {pr.comments?.length ? (
+          <div className="mt-5">
+            <CommentList comments={sortComments(pr.comments)} />
+          </div>
+        ) : null}
 
         <div className="mt-5 space-y-2">
           {historyQuery.isPending ? (
@@ -105,9 +112,6 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
                   <p className="mt-1.5 text-xs" style={{ color: "var(--text-soft)" }}>
                     {formatSupportingMetrics(entry.supporting_metrics, i18n)}
                   </p>
-                )}
-                {entry.notes && (
-                  <p className="mt-1.5 text-xs" style={{ color: "var(--dim)" }}>{entry.notes}</p>
                 )}
               </div>
             ))

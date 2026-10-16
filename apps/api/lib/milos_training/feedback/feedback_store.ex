@@ -10,6 +10,9 @@ defmodule MilosTraining.Feedback.FeedbackStore do
   def list_reviews_for_user(user_id), do: adapter().list_reviews_for_user(user_id)
   def list_reviews(filters), do: adapter().list_reviews(filters)
 
+  def list_review_items(user_id, bound, limit, scope),
+    do: adapter().list_review_items(user_id, bound, limit, scope)
+
   def update_review_status(review_id, status),
     do: adapter().update_review_status(review_id, status)
 

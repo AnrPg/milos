@@ -74,6 +74,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     notifications/notification_store
     coaching/coaching_store
     pantheon/pr_store
+    journal/journal_store
     coaching/form_review_store
     coaching/relationship_store
     coaching/note_store

@@ -6,19 +6,26 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
 
 import {
   createDirectThread,
   fetchThreads,
+  MESSAGE_TOPICS,
   searchUsers,
   type ChatThread,
+  type MessageTopic,
 } from "@/api/messaging";
+import { fetchCoachingRelationships } from "@/api/roles";
 import { useSession } from "@/components/session-provider";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { can } from "@/lib/role-navigation";
 import { useChat } from "@/hooks/useChat";
 import { useUiPrefs } from "@/stores/ui-prefs";
 import { MessageBubble } from "./MessageBubble";
 import { MessageComposer } from "./MessageComposer";
+import { TOPIC_KEYS } from "./message-topics";
 import { TypingIndicator } from "./TypingIndicator";
 import { SemanticLabel } from "@/components/semantic-label";
 
@@ -46,12 +53,25 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   const [input, setInput] = useState("");
   const [sendError, setSendError] = useState<string | null>(null);
   const [isSending, setIsSending] = useState(false);
+  const [asCoaching, setAsCoaching] = useState(false);
+  const [topic, setTopic] = useState<MessageTopic | null>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { membership } = useSelectedMembershipRole();
+  const coaches = can(membership, "manage_coaching");
+
+  // ADR-140 §6: a coaching message goes only to the coach's own clients.
+  const clients = useQuery({
+    queryKey: ["staff", "coaching-relationships", { coach: currentUserId }],
+    enabled: Boolean(accessToken && currentUserId && coaches),
+    queryFn: () => fetchCoachingRelationships(accessToken!, { coachUserId: currentUserId! }),
+  });
+  const clientIds = new Set((clients.data ?? []).map((item) => item.client_user_id));
 
   useEffect(() => {
     if (!accessToken) return;
-    void fetchThreads(accessToken, "direct")
-      .then((d) => setThreads(Array.isArray(d.threads) ? d.threads : []))
+    // Direct chats and the gym's threads with the member (messages from the box).
+    void Promise.all([fetchThreads(accessToken, "direct"), fetchThreads(accessToken, "box")])
+      .then((pages) => setThreads(pages.flatMap((d) => (Array.isArray(d.threads) ? d.threads : []))))
       .catch(() => setThreads([]));
   }, [accessToken]);
 
@@ -103,6 +123,8 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   const openThread = (thread: ChatThread) => {
     setActiveThread(thread);
+    setAsCoaching(false);
+    setTopic(null);
     setView("thread");
     setSearchQuery("");
     setSearchResults([]);
@@ -123,7 +145,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
     setSendError(null);
 
     try {
-      await sendMessage(draft);
+      await sendMessage(draft, fromBox ? "box_message" : canCoach && asCoaching ? "coaching_message" : "chat", fromBox ? topic : null);
       setInput((current) => (current === draft ? "" : current));
       sendTypingStop();
     } catch (error) {
@@ -134,7 +156,20 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   };
 
   const otherParticipant = (thread: ChatThread) =>
-    thread.participants.find((p) => p.user_id !== currentUserId);
+    thread.context_type === "box"
+      ? thread.participants.find((p) => p.user_id === thread.context_id)
+      : thread.participants.find((p) => p.user_id !== currentUserId);
+
+  // The member's own box thread is "Το box"; staff see the member.
+  const threadName = (thread: ChatThread) =>
+    thread.context_type === "box" && thread.context_id === currentUserId
+      ? i18n("chatsBoxThread")
+      : (otherParticipant(thread)?.nickname ?? i18n("directMessagefc7f864"));
+
+  const fromBox = activeThread?.context_type === "box" && activeThread.context_id !== currentUserId;
+  const activeOther = activeThread ? otherParticipant(activeThread) : undefined;
+  const canCoach =
+    activeThread?.context_type === "direct" && Boolean(activeOther && clientIds.has(activeOther.user_id));
 
   const visibleThreads = threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id));
 
@@ -231,7 +266,6 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
               </p>
             ) : (
               visibleThreads.map((thread) => {
-                const other = otherParticipant(thread);
                 return (
                   <div
                     key={thread.id}
@@ -250,12 +284,15 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
                           color: "var(--primary-strong)",
                         }}
                       >
-                        {other?.nickname?.[0]?.toUpperCase() ?? "?"}
+                        {threadName(thread)[0]?.toUpperCase() ?? "?"}
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium truncate" style={{ color: "var(--text)" }}>
-                          {other?.nickname ?? i18n("directMessagefc7f864")}
+                          {threadName(thread)}
                         </p>
+                        {thread.context_type === "box" ? (
+                          <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("msgKindBox")}</p>
+                        ) : null}
                       </div>
                     </button>
                     <button
@@ -295,6 +332,41 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
             className="p-3 border-t"
             style={{ background: "var(--panel-muted)", borderColor: "var(--border)" }}
           >
+            {canCoach ? (
+              <label className="mb-2 flex items-start gap-2 text-xs" style={{ color: "var(--text-soft)" }}>
+                <input
+                  type="checkbox"
+                  className="mt-0.5"
+                  checked={asCoaching}
+                  onChange={(event) => setAsCoaching(event.target.checked)}
+                />
+                <span>
+                  <span className="font-semibold">{i18n("msgSendAsCoaching")}</span>
+                  <span className="block" style={{ color: "var(--dim)" }}>{i18n("msgSendAsCoachingHint")}</span>
+                </span>
+              </label>
+            ) : null}
+            {fromBox ? (
+              <div role="radiogroup" aria-label={i18n("msgTopic")} className="mb-2 flex flex-wrap gap-1.5">
+                {MESSAGE_TOPICS.map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    role="radio"
+                    aria-checked={topic === item}
+                    onClick={() => setTopic((current) => (current === item ? null : item))}
+                    className="rounded-full px-3 py-1 text-xs font-semibold"
+                    style={
+                      topic === item
+                        ? { background: "var(--primary)", color: "var(--primary-contrast)" }
+                        : { background: "var(--card)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }
+                    }
+                  >
+                    {i18n(TOPIC_KEYS[item])}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <MessageComposer
                 error={sendError ? `${sendError} ${i18n("yourDraftIsStillHereReconnectAndRetry617338d")}` : null}
                 placeholder={i18n("writeAMessage24bf2a3")}

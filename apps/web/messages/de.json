@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Anleitung",
+    "scaling": "Skalierung",
+    "safety": "Achtung",
+    "equipment": "Ausrüstung",
+    "cue": "Cue",
+    "coachBrief": "Für den Coach"
+  },
   "Common": {
     "save": "Speichern",
     "saving": "Wird gespeichert…",
@@ -51,7 +59,15 @@
     "inventory": "Inventar",
     "menu": "Menü",
     "notifications": "Benachrichtigungen",
-    "unreadNotifications": "{count, plural, one {# ungelesene Benachrichtigung} other {# ungelesene Benachrichtigungen}}"
+    "unreadNotifications": "{count, plural, one {# ungelesene Benachrichtigung} other {# ungelesene Benachrichtigungen}}",
+    "box": "Box",
+    "me": "Ich",
+    "today": "Heute",
+    "journalFlow": "Verlauf",
+    "vault": "Archiv",
+    "reviews": "Bewertungen",
+    "coach": "Coach",
+    "memberTabs": "Hauptbereiche"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "Noch keine Gespräche. Suchen Sie, um eine zu starten.",
     "hideConversationdfb77ca": "Gespräch ausblenden",
     "yourDraftIsStillHereReconnectAndRetry617338d": "Ihr Entwurf ist noch hier; Stellen Sie die Verbindung wieder her und versuchen Sie es erneut.",
-    "coachingNote7e2c608": "Coaching-Hinweis",
+    "msgKindCoaching": "Coaching-Nachricht",
     "pendingApprovals6ac383a": "Ausstehende Genehmigungen",
     "classesTodayd01b776": "Heute Unterricht",
     "todayAtAGlance07e2821": "Heute auf einen Blick",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "Dieses Training ablehnen? Ihr Trainer wird benachrichtigt.",
     "calendar4e44752": "+ Kalender",
     "workoutDetails9366821": "Trainingsdetails",
-    "coachNotee98376b": "Trainernotiz",
+    "notifCoachingMessage": "Nachricht von deinem Coach",
     "assignedAthletes3f6c5e6": "Zugewiesene Athleten",
     "scheduledFor4cbbcd5": "Geplant für",
     "yourScores842c2ab": "Ihre Noten",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "Welcher Teil fühlte sich zu hart, schmerzhaft, verwirrend oder unnötig an?",
     "whatShouldYourCoachAdjustNextTimea76c965": "Was sollte Ihr Trainer das nächste Mal anpassen?",
     "workoutAnnotationSubmittedd0b2f39": "Trainingsanmerkung übermittelt.",
-    "yourCoachAddedANewNote3eec2b4": "Ihr Trainer hat eine neue Notiz hinzugefügt.",
+    "notifCoachingMessageBody": "Dein Coach hat dir eine Nachricht geschickt.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "Die geplante Zeit für dieses Training wurde geändert.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "Ihr Trainer hat die Übungen in diesem Training aktualisiert.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "Ihr Trainer hat ein geplantes Training geändert.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "Aufgabe",
     "semanticClassSlot": "Klassenslot",
     "semanticChat": "Chatten",
-    "semanticCoachingNote": "Coaching-Hinweis",
+    "semanticCoachingMessage": "Coaching-Nachricht",
     "semanticSystem": "System",
     "semanticWorkoutCount": "Trainingsanzahl",
     "semanticWorkoutTypeCount": "Anzahl der Trainingsarten",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "Geplant",
     "semanticNoRecentCompletion": "Keine aktuelle Fertigstellung",
     "semanticOverdueAssignment": "Überfälliger Auftrag",
-    "semanticNoAdminNote": "Keine Trainernotiz",
+    "semanticNoCoachingMessage": "Keine Coaching-Nachricht",
     "apiErrorOffline": "Du bist offline. Stellen Sie die Verbindung wieder her und versuchen Sie es erneut.",
     "manifestDescription": "Fitnessstudioplanung, Athletenprogrammierung und Trainingsausführung.",
     "apiValidationField": "Überprüfen Sie diesen Wert und versuchen Sie es erneut.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "Buchungsbestätigung",
     "outboxKindBookingReject": "Buchungsablehnung",
     "outboxKindTrainingLog": "Protokolliertes Training",
+    "outboxKindJournalComment": "Kommentar",
+    "outboxKindJournalCommentDelete": "Kommentar löschen",
     "outboxKindUnknown": "Offline-Änderung",
     "outboxFailureNetwork": "Der Server war nicht erreichbar.",
     "outboxFailureSessionExpired": "Deine Sitzung ist abgelaufen. Melde dich erneut an, um sie zu senden.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {# Workout} other {# Workouts}}",
     "accessEndedTitle": "Ihr Zugang ist abgelaufen",
     "accessEndedCancelledBookings": "{count, plural, one {Ihre kommende Buchung wurde storniert.} other {Ihre # kommenden Buchungen wurden storniert.}}",
-    "dashNoClassesToday": "Heute keine Kurse"
+    "dashNoClassesToday": "Heute keine Kurse",
+    "msgKindBox": "Von der Box",
+    "notifBoxMessage": "Nachricht von der Box",
+    "notifBoxMessageBody": "Deine Box hat dir eine Nachricht geschickt.",
+    "semanticBoxMessage": "Nachricht von der Box",
+    "semanticBox": "Box",
+    "msgTopic": "Thema",
+    "msgTopicBooking": "Buchung",
+    "msgTopicPayment": "Zahlung",
+    "msgTopicMembership": "Mitgliedschaft",
+    "msgTopicFacility": "Räumlichkeiten",
+    "msgSendAsCoaching": "Als Coaching-Nachricht",
+    "msgSendAsCoachingHint": "Zählt als Coaching-Kontakt für deinen Klienten.",
+    "chatsTabBox": "Box",
+    "chatsBoxThread": "Deine Box",
+    "coachLatestTitle": "Neues von deinem Coach",
+    "coachLatestEmpty": "Noch keine Nachrichten von deinem Coach.",
+    "coachLatestOpen": "Unterhaltung öffnen",
+    "rhStatCoachingMessages": "Coaching-Nachrichten diese Woche",
+    "rhStatAwaitingReply": "warten auf Antwort",
+    "apiErrorNoCoachingRelationship": "Nur ein Coach mit aktiver Coaching-Beziehung kann eine Coaching-Nachricht senden.",
+    "apiErrorBoxMessageOutsideBoxThread": "Nachrichten von der Box werden in der Unterhaltung der Box mit dem Mitglied gesendet.",
+    "mpTabs": "Profilbereiche",
+    "mpTabOverview": "Übersicht",
+    "mpTabTraining": "Training",
+    "mpTabWellbeing": "Wohlbefinden",
+    "mpTabCoaching": "Coaching",
+    "mpTabFinance": "Finanzen",
+    "mpTabAccount": "Konto",
+    "bmTitle": "Nachricht von der Box",
+    "bmBody": "Nachricht",
+    "bmPlaceholder": "Schreib dem Mitglied im Namen der Box…",
+    "bmSentOpen": "Gesendet. Unterhaltung öffnen",
+    "cnAbout": "Betrifft",
+    "cnAboutPick": "Wähle, worum es geht",
+    "cnAboutNothing": "Allgemeine Notiz",
+    "cnSubjectExecution": "Workout",
+    "cnSubjectTrainingLog": "Trainingseintrag",
+    "cnSubjectPr": "PR",
+    "cnSubjectInjury": "Verletzung",
+    "cnSubjectFormReview": "Form-Review",
+    "cnSubjectAssignment": "Zugewiesenes Workout"
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4732,6 +4791,258 @@
           "body": "Deine Mitgliedschaft siehst du unter {billing}. Sprache und Benachrichtigungen änderst du im Profil."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Nur ich",
+        "coach_can_view": "Coach kann sehen",
+        "coach_reply_requested": "Antwort angefragt",
+        "rated": "Bewertung",
+        "posted": "Im Gym gepostet"
+      },
+      "visibilityHint": {
+        "private": "Nur du siehst es.",
+        "coach_can_view": "Die Coaches deines Gyms sehen es, ohne zu antworten.",
+        "coach_reply_requested": "Dein Coach bekommt deine Frage als Nachricht.",
+        "rated": "Eine Bewertung für das Gym.",
+        "posted": "Im Gym veröffentlicht."
+      },
+      "changeVisibility": "Wer es sieht: {current}. Ändern",
+      "whoSees": "Wer es sieht",
+      "noCoach": "Du hast in diesem Gym noch keinen Coach.",
+      "visibilityFailed": "Nicht geändert. Versuch es erneut.",
+      "saving": "Wird gespeichert…",
+      "askCoach": "Coach fragen",
+      "save": "Speichern",
+      "personalOnly": "Persönlicher Eintrag: nur du siehst ihn.",
+      "questionLabel": "Deine Frage",
+      "questionPlaceholder": "Was soll dein Coach beantworten?",
+      "filterLabel": "Feed-Filter",
+      "filter": {
+        "all": "Alle",
+        "training": "Workouts",
+        "notes": "Notizen",
+        "wellbeing": "Wohlbefinden"
+      },
+      "kind": {
+        "execution": "Workout",
+        "training_log": "Erfasstes Workout",
+        "pr": "PR",
+        "injury": "Verletzung",
+        "review": "Bewertung",
+        "note": "Notiz",
+        "check_in": "Wie ich mich fühle"
+      },
+      "loadMore": "Ältere Einträge",
+      "loadingMore": "Wird geladen…",
+      "editNote": "Bearbeiten",
+      "noteTopic": {
+        "technique": "Technik",
+        "thought": "Gedanke",
+        "mood": "Stimmung",
+        "goal": "Ziel"
+      },
+      "note": {
+        "newTitle": "Neue Notiz",
+        "editTitle": "Notiz bearbeiten",
+        "topicLabel": "Thema",
+        "bodyLabel": "Notiz",
+        "bodyPlaceholder": "Was willst du dir merken?",
+        "savedPrivate": "Die Notiz wurde als „Nur ich“ gespeichert. {reason}",
+        "saveFailed": "Nicht gespeichert. Versuch es erneut.",
+        "delete": "Löschen",
+        "close": "Schließen"
+      }
+    },
+    "comments": {
+      "title": "Kommentare",
+      "wholeEntry": "Ganzer Eintrag",
+      "pending": "Wartet auf Synchronisierung",
+      "set": "Satz {set}",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "editTitle": "Kommentar bearbeiten",
+      "newTitle": "Neuer Kommentar",
+      "bodyLabel": "Kommentar",
+      "bodyPlaceholder": "Wie lief es? Etwas, das du dir merken willst…",
+      "cancel": "Abbrechen",
+      "saving": "Wird gespeichert…",
+      "save": "Speichern",
+      "workoutComment": "Kommentar zum Workout",
+      "workoutCommentPlaceholder": "Wie lief das ganze Workout?",
+      "logComment": "Kommentar",
+      "commentOptional": "Kommentar (optional)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "Ich",
+    "journalTitle": "Tagebuch",
+    "loading": "Wird geladen…",
+    "cancel": "Abbrechen",
+    "signOut": "Abmelden",
+    "todayWorkout": "Training des Tages",
+    "todaySources": "Heutige Trainings nach Quelle",
+    "todayEmpty": "Für heute ist nichts geplant. Buche einen Kurs oder trage ein eigenes Training ein.",
+    "classChip": "Kurs {time}",
+    "programmeChip": "{title} · von deinem Coach",
+    "logWorkout": "Eintragen",
+    "logged": "Eingetragen",
+    "startWorkout": "Starten",
+    "resumeWorkout": "Fortsetzen",
+    "nextSession": "Deine nächste Einheit",
+    "noBooking": "Noch keine Buchung.",
+    "bookClass": "Kurs buchen",
+    "manageBooking": "Buchung öffnen",
+    "todayLabel": "Heute",
+    "boxActions": "Box-Aktionen",
+    "actionSchedule": "Kursplan",
+    "actionAppointments": "Termine",
+    "actionVideos": "Videos",
+    "actionCoach": "Coach",
+    "membership": "Mitgliedschaft",
+    "membershipNone": "Kein aktives Paket.",
+    "membershipOpen": "Mitgliedschaft & Zahlungen",
+    "newEntry": "Neuer Eintrag",
+    "meSharedPrs": "Meine Bestleistungen",
+    "meSharedPrsHint": "Pantheon und mit dir geteilte Bestleistungen",
+    "meSharing": "Teilen & Sichtbarkeit",
+    "meSharingHint": "Was dein Coach und andere sehen",
+    "mePayments": "Zahlungen & Belege",
+    "mePaymentsHint": "Rechnungen, Erstattungen und dein Paket",
+    "meChats": "Unterhaltungen",
+    "meSettings": "Einstellungen",
+    "meSettingsHint": "Profil, Sprache, Design, Konto",
+    "meTour": "Rundgang starten",
+    "meChecklist": "Erste Schritte",
+    "meConsole": "Verwaltung",
+    "meConsoleHint": "Personalkonsole öffnen",
+    "meMyBoxes": "Meine Boxen",
+    "bookingStatus": {
+      "approved": "Gebucht",
+      "pending": "Ausstehend",
+      "waitlisted": "Warteliste"
+    },
+    "entryKind": {
+      "workout": "Training",
+      "pr": "Bestleistung",
+      "injury": "Verletzung",
+      "formReview": "Technikvideo",
+      "review": "Bewertung",
+      "checkIn": "Wie ich mich fühle",
+      "note": "Notiz oder Gedanke"
+    },
+    "entryKindHint": {
+      "workout": "Ergebnis, RPE, Notizen",
+      "pr": "Eine neue persönliche Bestleistung",
+      "injury": "Für deine Coaches sichtbar",
+      "formReview": "Bitte deinen Coach um Feedback",
+      "review": "Bewerte einen Kurs oder ein Training",
+      "checkIn": "Ein paar kurze Fragen",
+      "note": "Technik, Ziel, Stimmung"
+    },
+    "homeTitle": "Start",
+    "wodToday": "WOD des Tages in der Box",
+    "wodTodayEmpty": "Heute gibt es kein Kurstraining.",
+    "openInBox": "In Box öffnen",
+    "feedPosts": "Aus deinem Club",
+    "feedPostsEmpty": "Beiträge aus deinem Club erscheinen hier.",
+    "entryGroup": {
+      "training": "Training",
+      "wellbeing": "Wohlbefinden",
+      "coach": "Coach",
+      "note": "Notiz"
+    },
+    "checkIn": {
+      "eyebrow": "Wie ich mich fühle",
+      "title": "Wie fühlst du dich gerade?",
+      "question": {
+        "sleep": "Wie hast du geschlafen?",
+        "energy": "Wie viel Energie hast du?",
+        "mood": "Wie ist deine Stimmung?",
+        "stress": "Wie viel Stress hast du?",
+        "body": "Wie fühlt sich dein Körper an?"
+      },
+      "short": {
+        "sleep": "Schlaf",
+        "energy": "Energie",
+        "mood": "Stimmung",
+        "stress": "Stress",
+        "body": "Körper"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Schlecht",
+          "2": "Mittel",
+          "3": "Gut",
+          "4": "Super"
+        },
+        "energy": {
+          "1": "Erschöpft",
+          "2": "Wenig",
+          "3": "Gut",
+          "4": "Voll"
+        },
+        "mood": {
+          "1": "Mies",
+          "2": "Gedrückt",
+          "3": "Gut",
+          "4": "Super"
+        },
+        "stress": {
+          "1": "Sehr viel",
+          "2": "Ziemlich",
+          "3": "Wenig",
+          "4": "Keiner"
+        },
+        "body": {
+          "1": "Schmerzen",
+          "2": "Steif",
+          "3": "Okay",
+          "4": "Frisch"
+        }
+      },
+      "notePlaceholder": "Möchtest du etwas dazu sagen?",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "answerOne": "Beantworte mindestens eine Frage.",
+      "savesAsNew": "Jedes Speichern ist ein neuer Eintrag; frühere bleiben in deiner Zeitleiste.",
+      "saved": "Gespeichert um {time}.",
+      "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+      "timelineTitle": "Letzte {days} Tage",
+      "timelineEmpty": "Noch keine Einträge. Deine Antworten erscheinen hier als Zeitleiste.",
+      "timelineAria": "{question}: {count, plural, one {# Eintrag} other {# Einträge}}",
+      "history": "Alle Einträge ({count})",
+      "delete": "Löschen",
+      "loading": "Wird geladen…"
+    },
+    "injury": {
+      "addUpdate": "Update hinzufügen",
+      "reopen": "Wieder öffnen",
+      "timeline": "{count, plural, one {Verlauf · # Ereignis} other {Verlauf · # Ereignisse}}",
+      "timelineAria": "Verletzungsverlauf mit {count} Ereignissen",
+      "event": {
+        "reported": "Gemeldet",
+        "updated": "Update",
+        "marked_healed": "Als geheilt markiert",
+        "reopened": "Wieder geöffnet"
+      },
+      "field": {
+        "severity": "Schweregrad",
+        "body_area": "Körperbereich",
+        "training_limitations": "Trainingseinschränkungen",
+        "description": "Beschreibung",
+        "tags": "Schlagwörter"
+      },
+      "severity": {
+        "mild": "Leicht",
+        "moderate": "Mittel",
+        "severe": "Schwer"
+      },
+      "notePlaceholder": "Wie geht es? (optional)",
+      "save": "Update speichern",
+      "saving": "Wird gespeichert…",
+      "cancel": "Abbrechen"
     }
   }
 }

@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.Execution
+  alias MilosTraining.{Execution, Journal}
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.Organizations
   alias MilosTraining.Workouts
@@ -40,11 +40,25 @@ defmodule MilosTraining.Application.StartWorkoutExecution do
       # that organization; the outer `call/3` context never carried it.
       execution_context
       |> Workouts.with_tenant_context(fn ->
-        Execution.start_execution(actor.id, Map.merge(params, authorized_source))
+        Execution.start_execution(
+          actor.id,
+          params
+          |> Map.merge(authorized_source)
+          |> Map.put(:journal_visibility, initial_visibility(actor, authorized_source))
+        )
       end)
       |> track_started(actor)
     end
   end
+
+  # ADR-139: the member's `workout` default in a gym, private when personal.
+  defp initial_visibility(actor, authorized_source),
+    do:
+      Journal.initial_visibility(
+        actor.id,
+        "execution",
+        is_binary(Map.get(authorized_source, :organization_id))
+      )
 
   defp track_started({:ok, execution} = result, actor) do
     TrackAnalyticsEvent.call("workout_execution_started", actor, execution, %{user_id: actor.id})

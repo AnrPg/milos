@@ -1,13 +1,17 @@
 defmodule MilosTraining.Application.ListTrainingLogEntries do
   @moduledoc "Lists the acting user's training-log entries in the tenant (ADR-118)."
 
+  alias MilosTraining.Application.JournalComments
   alias MilosTraining.Execution
 
   @default_limit 100
 
   def call(%{organization_id: _} = context, %{id: user_id}) do
     Execution.with_training_log_context(context, fn ->
-      {:ok, Execution.list_training_log_entries_for_user(user_id, limit: @default_limit)}
+      {:ok,
+       user_id
+       |> Execution.list_training_log_entries_for_user(limit: @default_limit)
+       |> JournalComments.attach("training_log")}
     end)
   end
 
@@ -17,7 +21,7 @@ defmodule MilosTraining.Application.ListTrainingLogEntries do
     Execution.with_training_log_context(context, fn ->
       case Execution.get_training_log_entry_for_user(entry_id, user_id) do
         nil -> {:error, :not_found}
-        entry -> {:ok, entry}
+        entry -> {:ok, JournalComments.attach(entry, "training_log")}
       end
     end)
   end

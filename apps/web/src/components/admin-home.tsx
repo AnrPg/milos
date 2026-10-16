@@ -132,7 +132,7 @@ export function AdminHome() {
             { label: i18n("finance1b48d3f"), route: "/admin/finance", href: "/admin/finance" },
             { label: i18n("reviewsb83c4cd"), route: "/admin/reviews", href: "/admin/reviews" },
             { label: i18n("wellbeinga85b236"), route: "/admin/wellbeing", href: "/admin/wellbeing" },
-            { label: i18n("athleteWeekViewfc0f571"), route: "/my-workouts", href: "/my-workouts" },
+            { label: i18n("athleteWeekViewfc0f571"), route: "/box/workouts", href: "/box/workouts" },
           ].map(({ label, route, href }) => (
             <Link
               key={href}

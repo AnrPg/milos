@@ -5,7 +5,7 @@ const pages = [
   { path: "/about", heading: /trainingjournal/i },
   { path: "/register", heading: /create your account/i },
   {
-    path: "/schedule",
+    path: "/box/schedule",
     heading: /^schedule$/i,
     user: { id: "member-1", nickname: "Maya Member", role: "member" },
   },

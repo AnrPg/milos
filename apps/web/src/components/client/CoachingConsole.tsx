@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useId, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
@@ -18,12 +19,13 @@ import { FeatureGate } from "@/components/client/FeatureGate";
 import { formatDateTime } from "@/components/client/format";
 import { CLIENT_ENTITLEMENT_QUERY_KEY, useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { safeVideoUrl } from "@/components/client/video";
+import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 
 const FORM_REVIEWS_KEY = ["me", "form-reviews"] as const;
 
-/** `/coaching`: form reviews and the nutrition plan, each shown when included. */
+/** `/box/coach`: form reviews and the nutrition plan, each shown when included. */
 export function CoachingConsole() {
   const i18n = useUiTranslations();
   return (
@@ -57,9 +59,58 @@ function CoachingContent() {
           {i18n("clCoachResponseTime", { hours: slaHours })}
         </p>
       ) : null}
+      <LatestFromCoach />
       {showReviews ? <FormReviews /> : null}
       {showNutrition ? <NutritionPlanCard /> : null}
     </div>
+  );
+}
+
+/** «Τελευταία από τον coach» (ADR-140 §7): the coaching messages the member received. */
+function LatestFromCoach() {
+  const i18n = useUiTranslations();
+  const locale = useUiLocale();
+  const landing = useLanding();
+  const messages = landing.data?.coaching_messages ?? [];
+  const latestThread = messages[0]?.thread_id;
+
+  return (
+    <ClientCard
+      id="coach-messages"
+      title={i18n("coachLatestTitle")}
+      aside={
+        latestThread ? (
+          <Link
+            href={`/me/activity/chats?thread=${encodeURIComponent(latestThread)}`}
+            className="text-sm font-semibold"
+            style={{ color: "var(--primary-strong)" }}
+          >
+            {i18n("coachLatestOpen")}
+          </Link>
+        ) : null
+      }
+    >
+      {landing.isPending ? (
+        <LoadingLine />
+      ) : landing.isError ? (
+        <QueryProblem error={landing.error} onRetry={() => void landing.refetch()} />
+      ) : messages.length === 0 ? (
+        <EmptyLine>{i18n("coachLatestEmpty")}</EmptyLine>
+      ) : (
+        <ul className="flex flex-col gap-2">
+          {messages.map((message) => (
+            <li key={message.id} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)" }}>
+              <p className="whitespace-pre-line break-words text-sm leading-6" style={{ color: "var(--text-soft)" }} data-user-text>
+                {message.body}
+              </p>
+              <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>
+                {formatDateTime(message.inserted_at, locale)}
+              </p>
+            </li>
+          ))}
+        </ul>
+      )}
+    </ClientCard>
   );
 }
 

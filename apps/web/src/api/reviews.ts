@@ -19,6 +19,9 @@ export type AdminReviewFilters = NonNullable<
 export type UpdateReviewStatusRequest =
   operations["MilosTrainingWeb.AdminReviewController.update_status"]["requestBody"]["content"]["application/json"];
 
+/** Query key of the member's own reviews (reviews page, Ροή, realtime sync). */
+export const MY_REVIEWS_KEY = ["my", "reviews"] as const;
+
 export async function fetchMyReviews(token: string) {
   return apiRequest<MyReviewsResponse>("/me/reviews", { token });
 }

@@ -44,13 +44,6 @@ defmodule MilosTrainingWeb.Realtime do
     })
   end
 
-  def broadcast_execution_note(execution_id, note) do
-    Endpoint.broadcast("execution:#{execution_id}", "execution:note_submitted", %{
-      execution_id: execution_id,
-      note: note
-    })
-  end
-
   def broadcast_class_timer(scheduled_class_id, payload) do
     Endpoint.broadcast("class_timer:#{scheduled_class_id}", "class_timer:updated", payload)
   end

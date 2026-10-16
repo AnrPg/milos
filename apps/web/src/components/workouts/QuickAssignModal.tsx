@@ -128,7 +128,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
         master_workout_id: selectedWorkout.id,
         athlete_ids: selectedAthleteIds,
         scheduled_for: scheduledFor,
-        admin_notes: assignmentNotes(),
+        instructions: assignmentNotes(),
       });
       onAssigned();
     } catch (err) {

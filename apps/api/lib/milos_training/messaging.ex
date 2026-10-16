@@ -27,17 +27,28 @@ defmodule MilosTraining.Messaging do
   defdelegate get_thread(thread_id, user_id), to: GetThread, as: :call
   def get_message(message_id), do: MilosTraining.Messaging.MessageStore.get_message(message_id)
 
-  def list_recent_coaching_notes(user_id, limit \\ 5)
+  def list_recent_coaching_messages(user_id, limit \\ 5)
       when is_integer(limit) and limit in 1..50,
-      do: MilosTraining.Messaging.MessageStore.list_recent_coaching_notes(user_id, limit)
+      do: MessageStore.list_recent_coaching_messages(user_id, limit)
 
-  def list_recent_coaching_notes_for_organization(user_id, limit \\ 5)
+  def list_recent_coaching_messages_for_organization(user_id, limit \\ 5)
       when is_integer(limit) and limit in 1..50,
-      do:
-        MilosTraining.Messaging.MessageStore.list_recent_coaching_notes_for_organization(
-          user_id,
-          limit
-        )
+      do: MessageStore.list_recent_coaching_messages_for_organization(user_id, limit)
+
+  @doc "Messages of one kind a sender wrote since a time (Πελάτες μου stats)."
+  def count_sent(sender_id, message_type, %NaiveDateTime{} = since),
+    do: MessageStore.count_sent(sender_id, message_type, since)
+
+  @doc "Direct threads where one of the coach's clients waits for an answer."
+  def count_awaiting_reply(_coach_id, []), do: 0
+
+  def count_awaiting_reply(coach_id, client_ids),
+    do: MessageStore.count_awaiting_reply(coach_id, client_ids)
+
+  @doc "Adds a member of staff to a thread (a message from the box is the gym's thread)."
+  def add_participant(thread_id, user_id), do: ThreadStore.add_participant(thread_id, user_id)
+
+  def message_topics, do: MilosTraining.Messaging.Message.topics()
 
   def count_unread_threads(user_id),
     do: MilosTraining.Messaging.ThreadStore.count_unread_threads(user_id)

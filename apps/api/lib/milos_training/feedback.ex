@@ -8,6 +8,10 @@ defmodule MilosTraining.Feedback do
   defdelegate update_review_status(review_id, status), to: UpdateReviewStatus, as: :call
   defdelegate review_summary(filters \\ %{}), to: ReviewSummary, as: :call
 
+  # Journal feed (ADR-139 §9).
+  defdelegate list_review_items(user_id, bound, limit, scope),
+    to: MilosTraining.Feedback.FeedbackStore
+
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.

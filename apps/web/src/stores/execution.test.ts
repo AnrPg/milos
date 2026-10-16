@@ -44,7 +44,7 @@ function echo(payload: ExecutionProgressPayload, lockVersion: number): WorkoutEx
     segment_cycle_counts: payload.segment_cycle_counts,
     checked_exercise_ids: payload.checked_exercise_ids,
     section_scores: payload.section_scores,
-    exercise_notes: [],
+    comments: [],
   } as unknown as WorkoutExecution;
 }
 

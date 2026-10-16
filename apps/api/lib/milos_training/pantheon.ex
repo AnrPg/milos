@@ -49,13 +49,13 @@ defmodule MilosTraining.Pantheon do
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: MilosTraining.Pantheon.PRStore.with_scope(context, fun)
 
-  # ADR-129 sharing: coach-visibility opt-out and explicit grants.
-  defdelegate get_sharing_preference(user_id),
-    to: MilosTraining.Pantheon.PRStore
+  # ADR-139 ladder: each PR carries its own rung (the ADR-129 switch became
+  # the member's `pr` default in the Journal context).
+  defdelegate set_record_visibility(id, user_id, rung), to: MilosTraining.Pantheon.PRStore
+  defdelegate move_records(user_id, from, to), to: MilosTraining.Pantheon.PRStore
+  defdelegate list_record_items(user_id, bound, limit, scope), to: MilosTraining.Pantheon.PRStore
 
-  defdelegate set_coach_visibility(user_id, enabled?),
-    to: MilosTraining.Pantheon.Commands.SetCoachVisibility,
-    as: :call
+  # ADR-129 explicit sharing grants.
 
   defdelegate grant_pr_access(user_id, grantee_user_id),
     to: MilosTraining.Pantheon.Commands.GrantPRAccess,

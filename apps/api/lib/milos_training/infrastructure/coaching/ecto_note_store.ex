@@ -98,7 +98,17 @@ defmodule MilosTraining.Infrastructure.Coaching.EctoNoteStore do
   end
 
   defp normalize(note),
-    do: Map.take(note, [:id, :coach_user_id, :client_user_id, :body, :inserted_at, :updated_at])
+    do:
+      Map.take(note, [
+        :id,
+        :coach_user_id,
+        :client_user_id,
+        :body,
+        :subject_kind,
+        :subject_id,
+        :inserted_at,
+        :updated_at
+      ])
 
   defp result({:ok, note}), do: {:ok, normalize(note)}
   defp result(error), do: error

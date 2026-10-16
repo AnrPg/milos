@@ -60,7 +60,8 @@ defmodule MilosTraining.Execution.Commands.LogTrainingEntry do
           booking_id: source[:booking_id],
           workout_type: source[:workout_type],
           idempotency_key: key,
-          status: "logged"
+          status: "logged",
+          journal_visibility: Keyword.get(opts, :journal_visibility, "coach_can_view")
         })
 
       case TrainingLogStore.create_entry(attrs, Keyword.get(opts, :job_builder)) do

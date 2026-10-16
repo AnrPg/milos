@@ -1,13 +1,14 @@
 defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
   @moduledoc """
-  Pure validation for bounded rich workout metadata and typed notes.
+  Pure validation for bounded rich workout metadata. Workout content (Οδηγίες,
+  cues, Οδηγός coach) is validated by `WorkoutContent`.
 
   Metadata maps are canonical extension points, not arbitrary storage. Every
   accepted key and value kind is registered here so structured authoring, DSL
   publication, and persistence share the same boundary.
   """
 
-  @note_types ~w(note coach-note athlete-note safety-note scaling-note equipment-note)
+  alias MilosTraining.Workouts.Domain.WorkoutContent
 
   @specs %{
     workout: %{
@@ -71,7 +72,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
       "title" => :short_string,
       "sets" => :positive_integer,
       "rest_between_groups_seconds" => :non_negative_integer,
-      "notes" => :notes
+      "content" => :content
     },
     set: %{
       "load_unit" => {:enum, ~w(kg lb bodyweight pct_1rm)},
@@ -85,7 +86,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
     }
   }
 
-  def note_types, do: @note_types
   def keys(scope), do: @specs |> Map.fetch!(scope) |> Map.keys()
 
   def validate(scope, metadata) when is_map(metadata) do
@@ -108,26 +108,9 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
 
   def validate(_scope, _metadata), do: {:error, :metadata_must_be_an_object}
 
-  def validate_notes(notes) when is_list(notes) do
-    if Enum.all?(notes, &valid_note?/1), do: :ok, else: {:error, :invalid_typed_note}
-  end
-
-  def validate_notes(_notes), do: {:error, :notes_must_be_a_list}
-
   def normalize_keys(metadata) when is_map(metadata) do
     Map.new(metadata, fn {key, value} -> {to_string(key), value} end)
   end
-
-  defp valid_note?(note) when is_map(note) do
-    type = Map.get(note, :type) || Map.get(note, "type")
-    body = Map.get(note, :body) || Map.get(note, "body")
-    document = Map.get(note, :document) || Map.get(note, "document")
-
-    type in @note_types and is_binary(body) and byte_size(body) in 1..20_000 and
-      (is_nil(document) or is_map(document))
-  end
-
-  defp valid_note?(_note), do: false
 
   defp valid_value?(:short_string, value),
     do: is_binary(value) and byte_size(String.trim(value)) in 1..500
@@ -149,7 +132,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata do
   defp valid_value?(:duration_range, [minimum, maximum]),
     do: is_integer(minimum) and is_integer(maximum) and minimum >= 0 and maximum >= minimum
 
-  defp valid_value?(:notes, value), do: validate_notes(value) == :ok
+  defp valid_value?(:content, value), do: WorkoutContent.validate(value, :group) == :ok
   defp valid_value?({:enum, allowed}, value), do: value in allowed
 
   defp valid_value?({:number_range, minimum, maximum}, value),

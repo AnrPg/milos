@@ -4,13 +4,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import {
-  addExecutionModifications,
   completeExecution as completeExecutionRequest,
   fetchExecution,
   startExecution,
-  type ExerciseModification,
   type SectionScore,
 } from "@/api/executions";
+import type { JournalComment } from "@/api/journal-comments";
 import { fetchWorkout } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
@@ -21,7 +20,9 @@ import {
   type FreeTextExecutionWorkout,
 } from "@/lib/free-text-execution";
 import { type FreeTextSnapshot, useFreeTextProgressSync } from "@/hooks/useFreeTextProgressSync";
+import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
+import { finishWrites, type FinishComments } from "@/lib/journal-comments";
 import {
   buildFreeTextSegments,
   type FreeTextRun,
@@ -65,7 +66,8 @@ export function FreeTextExecutionMode() {
   const [showFinishWizard, setShowFinishWizard] = useState(false);
   const [isSavingCompletion, setIsSavingCompletion] = useState(false);
   const [completionFeedback, setCompletionFeedback] = useState<string | null>(null);
-  const [initialModifications, setInitialModifications] = useState<ExerciseModification[]>([]);
+  const [comments, setComments] = useState<JournalComment[]>([]);
+  const commentWriter = useJournalCommentWriter();
   const [cueMode] = useState<CueMode>(() => readCueMode());
   const [castMode, setCastMode] = useState(false);
   const exitCastMode = useCallback(() => setCastMode(false), []);
@@ -256,7 +258,7 @@ export function FreeTextExecutionMode() {
         }
 
         if (cancelled) return;
-        setInitialModifications(execution.exercise_modifications ?? []);
+        setComments(execution.comments ?? []);
         storeFreeTextExecutionWorkout(record, execution);
         setWorkout(readFreeTextExecutionWorkout(workoutId));
       } catch {
@@ -278,7 +280,7 @@ export function FreeTextExecutionMode() {
     let cancelled = false;
     void fetchExecution(tokens.access_token, activeExecutionId)
       .then((execution) => {
-        if (!cancelled) setInitialModifications(execution.exercise_modifications ?? []);
+        if (!cancelled) setComments(execution.comments ?? []);
       })
       .catch(() => undefined);
 
@@ -295,7 +297,7 @@ export function FreeTextExecutionMode() {
     setShowFinishWizard(true);
   }
 
-  async function confirmFinish(editedScores: SectionScore[], modifications: ExerciseModification[]) {
+  async function confirmFinish(editedScores: SectionScore[], finish: FinishComments) {
     if (!tokens?.access_token || !workout?.execution_id) {
       setCompletionFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
       return;
@@ -305,10 +307,9 @@ export function FreeTextExecutionMode() {
     setCompletionFeedback(null);
 
     try {
-      if (modifications.length > 0) {
-        const updated = await addExecutionModifications(tokens.access_token, workout.execution_id, modifications);
-        setInitialModifications(updated.exercise_modifications ?? modifications);
-      }
+      const writes = finishWrites("execution", workout.execution_id, comments, finish);
+      for (const draft of writes.save) await commentWriter.save(draft);
+      for (const id of writes.remove) await commentWriter.remove(id);
 
       await completeExecutionRequest(tokens.access_token, workout.execution_id, {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -345,7 +346,7 @@ export function FreeTextExecutionMode() {
       <FinishWizard
         scores={[]}
         segments={[]}
-        initialModifications={initialModifications}
+        comments={comments}
         freeText
         isSaving={isSavingCompletion}
         feedback={completionFeedback}

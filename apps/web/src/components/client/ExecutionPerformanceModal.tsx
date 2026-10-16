@@ -3,7 +3,9 @@
 import { useId } from "react";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchExecution, isFreeTextModification } from "@/api/executions";
+import { fetchExecution } from "@/api/executions";
+import { CommentList } from "@/components/journal/CommentList";
+import { exerciseNamesOf } from "@/lib/journal-comments";
 import { LocalizedScore } from "@/components/localized-score";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -35,6 +37,7 @@ export function ExecutionPerformanceModal({
     queryFn: () => fetchExecution(tokens!.access_token, executionId),
   });
   const execution = query.data;
+  const exerciseNames = exerciseNamesOf(execution?.workout);
   const elapsed = formatElapsed(execution?.total_elapsed_ms);
   const tile = "rounded-2xl px-4 py-3";
   const tileStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)" };
@@ -146,57 +149,12 @@ export function ExecutionPerformanceModal({
               <h3 className="text-sm font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                 {i18n("modificationsAndNotes8a73e2c")}
               </h3>
-              <div className="mt-2 space-y-2">
-                {execution.exercise_modifications.length === 0 && execution.exercise_notes.length === 0 ? (
-                  <p className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--panel-muted)", color: "var(--dim)" }}>
-                    {i18n("noExerciseNotesWereSubmittedb9552b2")}
-                  </p>
-                ) : null}
-                {execution.exercise_modifications.map((modification, index) => (
-                  <div
-                    key={modification.patch_id ?? `${modification.section_id}:${modification.exercise_id}:${modification.field}:${index}`}
-                    className="rounded px-3 py-2"
-                    style={{
-                      background: "color-mix(in srgb, var(--warning) 10%, transparent)",
-                      borderInlineStart: "4px solid color-mix(in srgb, var(--warning) 55%, transparent)",
-                    }}
-                  >
-                    {isFreeTextModification(modification) ? (
-                      <p className="whitespace-pre-wrap break-words text-sm" style={{ color: "var(--muted)" }}>
-                        {String(modification.actual_value)}
-                      </p>
-                    ) : (
-                      <>
-                        <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                          {modification.exercise_name ?? modification.section_name ?? modification.section_id}
-                        </p>
-                        <p className="mt-0.5 text-sm" style={{ color: "var(--muted)" }}>
-                          <SemanticLabel value={modification.field} />
-                          {": "}
-                          <bdi>{String(modification.canonical_value)}</bdi>
-                          {" → "}
-                          <bdi>{String(modification.actual_value)}</bdi>
-                          {modification.set_index ? ` · ${i18n("setLabel")} ${modification.set_index}` : ""}
-                        </p>
-                      </>
-                    )}
-                  </div>
-                ))}
-                {execution.exercise_notes.map((note, index) => (
-                  <div
-                    key={note.id ?? `${note.exercise_id}-${index}`}
-                    className="rounded px-3 py-2"
-                    style={{
-                      background: "color-mix(in srgb, var(--primary) 8%, transparent)",
-                      borderInlineStart: "4px solid color-mix(in srgb, var(--primary) 50%, transparent)",
-                    }}
-                  >
-                    <p className="text-sm font-medium" style={{ color: "var(--text)" }}>{note.selected_text}</p>
-                    {note.note_text ? (
-                      <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{note.note_text}</p>
-                    ) : null}
-                  </div>
-                ))}
+              <div className="mt-2">
+                <CommentList
+                  comments={execution.comments ?? []}
+                  anchorLabel={(comment) => (comment.exercise_id ? (exerciseNames[comment.exercise_id] ?? null) : null)}
+                  emptyText={i18n("noExerciseNotesWereSubmittedb9552b2")}
+                />
               </div>
             </div>
           </div>

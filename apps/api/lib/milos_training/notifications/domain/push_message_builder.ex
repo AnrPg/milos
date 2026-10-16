@@ -155,11 +155,19 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
-  def build("admin_note", payload, localize) do
+  def build("coaching_message", payload, localize) do
     %{
-      title: localize.("New coach note", %{}),
-      body: payload["body"] || localize.("Your coach added a new note.", %{}),
-      url: payload["url"] || "/#coach-notes"
+      title: localize.("Message from your coach", %{}),
+      body: payload["body"] || localize.("Your coach sent you a message.", %{}),
+      url: payload["url"] || "/box/coach"
+    }
+  end
+
+  def build("box_message", payload, localize) do
+    %{
+      title: localize.("Message from the box", %{}),
+      body: payload["body"] || localize.("Your gym sent you a message.", %{}),
+      url: payload["url"] || "/"
     }
   end
 

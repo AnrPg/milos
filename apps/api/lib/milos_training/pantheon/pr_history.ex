@@ -11,7 +11,6 @@ defmodule MilosTraining.Pantheon.PRHistory do
     field(:score, :decimal)
     field(:beaten_on, :date)
     field(:supporting_metrics, :map, default: %{})
-    field(:notes, :string)
 
     timestamps(type: :utc_datetime_usec, updated_at: false)
   end
@@ -23,11 +22,9 @@ defmodule MilosTraining.Pantheon.PRHistory do
       :pr_record_id,
       :score,
       :beaten_on,
-      :supporting_metrics,
-      :notes
+      :supporting_metrics
     ])
     |> validate_required([:pr_record_id, :score, :beaten_on])
-    |> validate_length(:notes, max: 2_000)
     |> foreign_key_constraint(:pr_record_id)
   end
 end

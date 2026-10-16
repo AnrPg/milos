@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 
 import {
@@ -26,7 +26,7 @@ import {
 import type { PRSupportingMetrics } from "@/api/gamification";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { updateFinanceMember } from "@/api/finance";
-import { shouldShowAllowanceQuota } from "@/app/account/billing/billing-entitlement-visibility";
+import { shouldShowAllowanceQuota } from "@/components/finance/billing-entitlement-visibility";
 import { dossierMode, grantableAllowances, packageSubscriptionLabel, prSectionContentCount, visibleAdminProfileSections } from "@/components/admin/users/admin-user-profile";
 import { MembershipFreezes } from "@/components/admin/users/MembershipFreezes";
 import { CommitmentOverridePrompt } from "@/components/admin/finance/shared/CommitmentOverridePrompt";
@@ -39,6 +39,7 @@ import {
 import { MemberClassPlacementModal } from "@/components/admin/users/MemberClassPlacementModal";
 import { HoverHint } from "@/components/HelpTooltip";
 import { LocalizedScore } from "@/components/localized-score";
+import { CommentList } from "@/components/journal/CommentList";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -46,7 +47,15 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { allowanceLabel, localizeError, semanticLabel } from "@/i18n/presentation";
 import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
-import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
+import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
+import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
+import {
+  activeProfileTab,
+  SECTION_TAB,
+  subjectKindsFor,
+  visibleProfileTabs,
+  type ProfileTab,
+} from "@/components/admin/users/member-profile-tabs";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can, membershipRoles } from "@/lib/role-navigation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -55,11 +64,12 @@ import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammin
 import { IntegerInput } from "@/components/integer-input";
 import { TrainingHistory } from "@/components/history/TrainingHistory";
 import { defaultHistoryKind } from "@/lib/training-history";
+import { sortComments } from "@/lib/journal-comments";
 import { fetchUserTrainingHistory } from "@/api/training-history";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
-  const [open, setOpen] = useState(id === "overview" || id === "finance" || id === "admin_actions");
+  const [open, setOpen] = useState(true);
 
   useEffect(() => {
     const initialHashFrame = window.requestAnimationFrame(() => {
@@ -97,6 +107,15 @@ function Panel({ id, title, children }: { id: string; title: string; children: R
     </article>
   );
 }
+
+const PROFILE_TAB_KEYS: Record<ProfileTab, string> = {
+  overview: "mpTabOverview",
+  training: "mpTabTraining",
+  wellbeing: "mpTabWellbeing",
+  coaching: "mpTabCoaching",
+  finance: "mpTabFinance",
+  account: "mpTabAccount",
+};
 
 function Empty({ children }: { children: React.ReactNode }) {
   return <p style={{ color: "var(--muted)" }}>{children}</p>;
@@ -186,7 +205,11 @@ function PRCard({ pr }: { pr: AdminUserPR }) {
       plainChildren
     >
       {details ? <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p> : null}
-      {pr.notes ? <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{pr.notes}</p> : null}
+      {pr.comments?.length ? (
+        <div className="mt-2">
+          <CommentList comments={sortComments(pr.comments)} />
+        </div>
+      ) : null}
       {pr.history.length ? (
         <div className="mt-3 border-s-2 ps-3" style={{ borderColor: "var(--primary)" }}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</p>
@@ -413,7 +436,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
                 key={valueText(assignment.id)}
                 title={valueText((assignment.workout as Record<string, unknown> | undefined)?.title)}
                 meta={<><SemanticLabel value={valueText(assignment.status)} /> · {date(assignment.scheduled_for)}</>}
-                href={`/my-workouts?open_assignment=${valueText(assignment.id)}`}
+                href={`/box/workouts?open_assignment=${valueText(assignment.id)}`}
               />
             ))}
             {assignments.length === 0 ? <Empty>{i18n("none6eef664")}</Empty> : null}
@@ -428,7 +451,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
                 title={<SemanticLabel value={valueText(note.type)} />}
                 meta={date(note.inserted_at)}
                 detail={<p className="line-clamp-3">{valueText(note.body)}</p>}
-                href="/account/activity/chats"
+                href="/me/activity/chats"
               />
             ))}
             {notes.length === 0 ? <Empty>{i18n("noConversationsRecordedd525265")}</Empty> : null}
@@ -503,8 +526,11 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   const token = tokens?.access_token;
   const organizationSlug = useOrganizationSlug();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const queryClient = useQueryClient();
   const { membership: actor } = useSelectedMembershipRole();
+  const [hashSection, setHashSection] = useState<string | null>(null);
   const profileQuery = useDossierQuery(token, userId, "profile", fetchAdminUserProfile);
   const profile = profileQuery.data?.user;
   const finance = useDossierQuery(token, userId, "finance", fetchAdminUserFinance, Boolean(profile?.available_sections.includes("finance")));
@@ -534,6 +560,19 @@ export function AdminUserProfile({ userId }: { userId: string }) {
       router.push(adminHref("/admin/users", organizationSlug));
     },
   });
+
+  // A `#section` link or request opens the section's tab (ADR-140 §8).
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setHashSection(window.location.hash.slice(1) || null));
+    function handleSectionRequest(event: Event) {
+      setHashSection((event as AdminProfileSectionRequest).detail.section);
+    }
+    window.addEventListener(ADMIN_PROFILE_SECTION_REQUEST, handleSectionRequest);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener(ADMIN_PROFILE_SECTION_REQUEST, handleSectionRequest);
+    };
+  }, []);
 
   useEffect(() => {
     function handleUserSync(event: Event) {
@@ -585,6 +624,42 @@ export function AdminUserProfile({ userId }: { userId: string }) {
     : profile.identity.role === "member" || profile.identity.role === "athlete";
   const showCoachNotes = isClient && (can(actor, "write_coach_notes") || can(actor, "read_coach_notes"));
   const showCoaches = isClient && (can(actor, "assign_coaches") || can(actor, "manage_coaching"));
+  const showBoxMessage = isClient && can(actor, "message_from_box");
+  const trains = profile.identity.role === "member" || profile.identity.role === "athlete";
+
+  // ADR-140 §8: six tabs, each shown when one of its sections is.
+  const tabSections = new Set(sections);
+  if (trains) tabSections.add("training_history");
+  if (showCoaches) tabSections.add("coaching_relationships");
+  if (showCoachNotes) tabSections.add("coach_notes");
+  if (showBoxMessage) tabSections.add("box_message");
+  const tabs = visibleProfileTabs(tabSections);
+  const tab = activeProfileTab(tabs, searchParams.get("tab"), hashSection);
+  const inTab = (section: string) => SECTION_TAB[section] === tab && tabSections.has(section);
+  const selectTab = (next: ProfileTab) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("tab", next);
+    setHashSection(null);
+    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+
+  // What a new coach note can be about (ADR-140 §5).
+  const trainingSubjects: CoachNoteSubjectOption[] = [
+    ...(prs.data?.prs ?? []).map((pr) => ({ kind: "pr" as const, id: pr.id, label: pr.name })),
+    ...executions
+      .filter((execution) => execution.completed_at_utc)
+      .slice(0, 20)
+      .map((execution) => ({
+        kind: "execution" as const,
+        id: execution.id,
+        label: `${execution.workout_title} · ${date(execution.completed_at_utc)}`,
+      })),
+  ];
+  const wellbeingSubjects: CoachNoteSubjectOption[] = (incidents.data?.incidents ?? []).map((incident) => ({
+    kind: "injury" as const,
+    id: incident.id,
+    label: `${semanticLabel(incident.body_area, i18n)} · ${date(incident.started_on)}`,
+  }));
   const overviewItems: Array<[string, React.ReactNode]> = [
     [i18n("rolec3f104d"), <SemanticLabel key="role" value={profile.identity.role} />],
     [i18n("account85dfa32"), <SemanticLabel key="account" value={profile.account_status} />],
@@ -654,17 +729,48 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           />
         ) : null}
 
-        <section className="space-y-4">
-          <Panel id="overview" title={i18n("overview0efc2e6")}>
-            <StatGrid items={overviewItems} />
-          </Panel>
+        <div
+          role="tablist"
+          aria-label={i18n("mpTabs")}
+          className="flex max-w-full gap-1 overflow-x-auto rounded-full p-0.5"
+          style={{ background: "var(--border)", width: "fit-content" }}
+        >
+          {tabs.map((item) => (
+            <button
+              key={item}
+              type="button"
+              role="tab"
+              id={`profile-tab-${item}`}
+              aria-selected={tab === item}
+              aria-controls="profile-tab-panel"
+              onClick={() => selectTab(item)}
+              className="shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold"
+              style={tab === item ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--dim)" }}
+            >
+              {i18n(PROFILE_TAB_KEYS[item])}
+            </button>
+          ))}
+        </div>
 
-          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={profile.identity.role} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
+        <section id="profile-tab-panel" role="tabpanel" aria-labelledby={`profile-tab-${tab}`} className="space-y-4">
+          {tab === "overview" ? (
+            <Panel id="overview" title={i18n("overview0efc2e6")}>
+              <StatGrid items={overviewItems} />
+            </Panel>
+          ) : null}
 
-          {sections.has("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
+          {inTab("box_message") ? (
+            <Panel id="box_message" title={i18n("bmTitle")}>
+              <BoxMessagePanel userId={userId} />
+            </Panel>
+          ) : null}
+
+          {token && trains && inTab("schedule") ? <Panel id="schedule" title={i18n("featureScheduleProgramming")}><UserProgrammingSchedule key={scheduleVersion} token={token} userId={userId} role={profile.identity.role} assignRequestDate={assignRequestDate} onAssignRequestHandled={clearAssignRequest} /></Panel> : null}
+
+          {inTab("finance") ? <Panel id="finance" title={i18n("finance1b48d3f")}>{finance.data && token ? <FinanceDetails finance={finance.data} token={token} userId={userId} effectiveEntitlement={effectiveEntitlement} creditBalance={finance.data?.summary?.credit_balance ?? 0} onRefresh={() => queryClient.invalidateQueries({ queryKey: ["admin", "users", userId, "finance"] })} /> : null}</Panel> : null}
 
 
-          {token && (profile.identity.role === "member" || profile.identity.role === "athlete") ? (
+          {token && inTab("training_history") ? (
             <TrainingHistory
               id="training_history"
               queryKey={["admin", "users", userId]}
@@ -673,21 +779,33 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             />
           ) : null}
 
-          {sections.has("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.visibility === "coach_role_required" ? <Empty>{tPrSharing("dossierCoachOnly")}</Empty> : prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
+          {inTab("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.visibility === "coach_role_required" ? <Empty>{tPrSharing("dossierCoachOnly")}</Empty> : prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 
 
-          {sections.has("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
+          {token && showCoachNotes && tab === "training" ? (
+            <Panel id="training_notes" title={i18n("rhCoachNotes")}>
+              <CoachNotesPanel userId={userId} kinds={subjectKindsFor("training")} subjects={trainingSubjects} />
+            </Panel>
+          ) : null}
 
-          {sections.has("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
+          {inTab("health_incidents") ? <Panel id="health_incidents" title={i18n("healthIncidentse3ca869")} href={adminHref("/admin/metrics#health-incidents", organizationSlug)}><p>{incidents.data?.summary.active ?? 0} {i18n("active4c71073")} {incidents.data?.summary.total ?? 0} {i18n("total5a537e2")}</p><div className="mt-3 grid gap-3">{incidents.data?.incidents.length ? incidents.data.incidents.map((incident) => <GenericRecordCard key={incident.id} title={incident.body_area} meta={<><SemanticLabel value={incident.severity} /> · <SemanticLabel value={incident.status} /> · {date(incident.started_on)}</>} detail={incident.training_limitations ? <p style={{ color: "var(--muted)" }}>{incident.training_limitations}</p> : null} href={adminHref("/admin/metrics#health-incidents", organizationSlug)} />) : <Empty>{i18n("noHealthIncidentsRecorded91c9d4e")}</Empty>}</div></Panel> : null}
 
-          {token && showCoaches ? <Panel id="coaching_relationships" title={i18n("rhCoaches")}><CoachAssignmentPanel userId={userId} /></Panel> : null}
+          {token && showCoachNotes && tab === "wellbeing" ? (
+            <Panel id="wellbeing_notes" title={i18n("rhCoachNotes")}>
+              <CoachNotesPanel userId={userId} kinds={subjectKindsFor("wellbeing")} subjects={wellbeingSubjects} />
+            </Panel>
+          ) : null}
 
-          {token && showCoachNotes ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} /></Panel> : null}
+          {inTab("coaching_context") ? <Panel id="coaching_context" title={i18n("coachingContexteb3075d")} href={adminHref("/admin/coaching-assignments", organizationSlug)}><CoachingContextSummary drillDown={coaching.data?.drill_down} /></Panel> : null}
+
+          {token && inTab("coaching_relationships") ? <Panel id="coaching_relationships" title={i18n("rhCoaches")}><CoachAssignmentPanel userId={userId} /></Panel> : null}
+
+          {token && inTab("coach_notes") ? <Panel id="coach_notes" title={i18n("rhCoachNotes")}><CoachNotesPanel userId={userId} subjects={[...trainingSubjects, ...wellbeingSubjects]} /></Panel> : null}
 
 
-          {sections.has("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/account/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/account/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
+          {inTab("messages") ? <Panel id="messages" title={i18n("chat2ced57f")} href="/me/activity/chats"><p>{messages.data?.summary.thread_count ?? 0} {i18n("threadS2bddeec")} {messages.data?.summary.unread_thread_count ?? 0} {i18n("unread1b9aebd")}</p><div className="mt-3 grid gap-3">{messages.data?.threads.length ? messages.data.threads.slice(0, 6).map((thread) => <GenericRecordCard key={thread.id} title={<SemanticLabel value={thread.context_type} />} meta={`${thread.message_count} ${i18n("threadS2bddeec")} · ${date(thread.latest_message?.inserted_at)}`} detail={<p>{thread.latest_message?.body ?? i18n("emptyThreadfee51b1")}</p>} href="/me/activity/chats" />) : <Empty>{i18n("noConversationsRecordedd525265")}</Empty>}</div></Panel> : null}
 
-          {sections.has("admin_actions") ? (
+          {inTab("admin_actions") ? (
             <Panel id="admin_actions" title={i18n("adminActionsfa81c61")}>
               <div className="space-y-5">
                 {profile.membership && token ? (

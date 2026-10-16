@@ -6,7 +6,7 @@ describe("pathActive", () => {
   it("only marks Home active on the root page", () => {
     expect(pathActive("/", "/")).toBe(true);
     expect(pathActive("/admin/coaching-assignments", "/")).toBe(false);
-    expect(pathActive("/schedule", "/")).toBe(false);
+    expect(pathActive("/box/schedule", "/")).toBe(false);
   });
 
   it("keeps section links active for their nested pages", () => {
@@ -92,10 +92,9 @@ describe("tenantBrandLogoUrl", () => {
 });
 
 describe("pathActive for my workouts", () => {
-  it("keeps My Workouts inactive on history and pantheon pages", () => {
-    expect(pathActive("/my-workouts", "/my-workouts")).toBe(true);
-    expect(pathActive("/my-workouts/history", "/my-workouts")).toBe(false);
-    expect(pathActive("/my-workouts/history", "/my-workouts/history")).toBe(true);
-    expect(pathActive("/my-workouts/pantheon", "/my-workouts")).toBe(false);
+  it("keeps My Workouts inactive on the journal pages that used to sit under it", () => {
+    expect(pathActive("/box/workouts", "/box/workouts")).toBe(true);
+    expect(pathActive("/journal", "/box/workouts")).toBe(false);
+    expect(pathActive("/journal/pantheon", "/box/workouts")).toBe(false);
   });
 });

@@ -551,6 +551,7 @@ export function SlotPopup({
               </div>
               <WorkoutPreviewDetail
                 sections={slot.my_version.workout.sections as PreviewSection[]}
+                content={slot.my_version.workout.content}
                 authoringMode={slot.my_version.workout.authoring_mode}
                 freeTextBody={slot.my_version.workout.free_text_body}
                 freeTextDocument={slot.my_version.workout.free_text_document}
@@ -637,6 +638,7 @@ export function SlotPopup({
             {slot.workout ? (
               <WorkoutPreviewDetail
                 sections={slot.workout.sections}
+                content={slot.workout.content}
                 activeScaleOverride={!isAdmin ? activeScale : undefined}
                 hideScaleChips={!isAdmin}
                 authoringMode={slot.workout.authoring_mode}

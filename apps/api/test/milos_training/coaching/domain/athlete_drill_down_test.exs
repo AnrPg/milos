@@ -13,7 +13,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
         id: "assignment-1",
         master_workout_id: "workout-1",
         scheduled_for: "2026-06-12",
-        admin_notes: "Keep volume controlled",
+        instructions: "Keep volume controlled",
         execution_status: "completed",
         workout: %{id: "workout-1", title: "Strength A", type: "strength"}
       },
@@ -21,7 +21,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
         id: "assignment-2",
         master_workout_id: "workout-2",
         scheduled_for: "2026-06-18",
-        admin_notes: nil,
+        instructions: nil,
         workout: %{id: "workout-2", title: "Engine B", type: "aerobics"}
       }
     ]
@@ -39,11 +39,14 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
         section_scores: [
           %{section_id: "section-1", section_name: "Back squat", value: 120, unit: "kg"}
         ],
-        exercise_notes: [
+        comments: [
           %{
-            "id" => "note-1",
-            "note_text" => "Left knee felt tight",
-            "inserted_at" => "2026-06-12T10:01:00Z"
+            id: "comment-1",
+            body: "Left knee felt tight",
+            exercise_id: "squat",
+            tags: [],
+            change: nil,
+            written_at: ~U[2026-06-12 10:01:00Z]
           }
         ]
       }
@@ -73,7 +76,10 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
 
     assert Enum.map(drill_down.assigned_workouts, & &1.status) == ["completed", "upcoming"]
     assert [%{workout_type: "strength", entries: [%{value: 120}]}] = drill_down.score_trends
-    assert [%{type: "admin_note"}, %{type: "athlete_execution_note"}] = drill_down.notes_context
+
+    assert [%{type: "coaching_message"}, %{type: "athlete_comment", body: "Left knee felt tight"}] =
+             drill_down.notes_context
+
     assert drill_down.attention_cues == []
 
     actions = Map.new(drill_down.actions, &{&1.key, &1})

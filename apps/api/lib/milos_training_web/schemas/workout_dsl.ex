@@ -141,7 +141,7 @@ defmodule MilosTrainingWeb.Schemas.WorkoutDsl do
         group_parameters: string_array(),
         scale_parameters: string_array(),
         header_parameters: string_array(),
-        note_markers: string_array(),
+        content_markers: string_array(),
         exercise_catalog: %Schema{
           type: :array,
           items: %Schema{
@@ -172,7 +172,7 @@ defmodule MilosTrainingWeb.Schemas.WorkoutDsl do
         :group_parameters,
         :scale_parameters,
         :header_parameters,
-        :note_markers,
+        :content_markers,
         :section_parameters,
         :exercise_catalog
       ],

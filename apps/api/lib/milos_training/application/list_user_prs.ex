@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.ListUserPRs do
-  alias MilosTraining.Application.PRSearchIndex
+  alias MilosTraining.Application.{JournalComments, PRSearchIndex}
   alias MilosTraining.Pantheon
 
   def call(user_or_context, opts \\ [])
@@ -26,6 +26,6 @@ defmodule MilosTraining.Application.ListUserPRs do
         Pantheon.list_records(user_id)
       end
 
-    {:ok, prs}
+    {:ok, JournalComments.attach(prs, "pr")}
   end
 end

@@ -61,11 +61,17 @@ msgstr "Bericht van %{nickname}"
 msgid "%{nickname} sent you a message."
 msgstr "%{nickname} heeft je een bericht gestuurd."
 
-msgid "New coach note"
-msgstr "Nieuwe coachnotitie"
+msgid "Message from your coach"
+msgstr "Bericht van je coach"
 
-msgid "Your coach added a new note."
-msgstr "Je coach heeft een nieuwe notitie toegevoegd."
+msgid "Your coach sent you a message."
+msgstr "Je coach heeft je een bericht gestuurd."
+
+msgid "Message from the box"
+msgstr "Bericht van de box"
+
+msgid "Your gym sent you a message."
+msgstr "Je box heeft je een bericht gestuurd."
 
 msgid "Challenge completed"
 msgstr "Uitdaging voltooid"

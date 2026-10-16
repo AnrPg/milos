@@ -69,7 +69,6 @@ defmodule MilosTrainingWeb.PRSharingController do
       score: %Schema{type: :number},
       beaten_on: %Schema{type: :string, format: :date},
       supporting_metrics: %Schema{type: :object, additionalProperties: true},
-      notes: %Schema{type: :string, nullable: true},
       inserted_at: %Schema{type: :string, format: :"date-time"}
     }
   }
@@ -86,7 +85,6 @@ defmodule MilosTrainingWeb.PRSharingController do
       higher_is_better: %Schema{type: :boolean},
       beaten_on: %Schema{type: :string, format: :date},
       supporting_metrics: %Schema{type: :object, additionalProperties: true},
-      notes: %Schema{type: :string, nullable: true},
       updated_at: %Schema{type: :string, format: :"date-time"},
       history: %Schema{type: :array, items: @history_entry}
     }

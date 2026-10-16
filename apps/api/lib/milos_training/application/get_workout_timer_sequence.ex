@@ -31,12 +31,31 @@ defmodule MilosTraining.Application.GetWorkoutTimerSequence do
       with %{} = workout <- Workouts.get_workout(execution_context, workout_id) || :not_found,
            {:ok, materialized_workout} <-
              materialize_workout(workout, scale_slug) do
-        {:ok, Execution.build_timer_sequence(materialized_workout)}
+        {:ok,
+         %{
+           segments: Execution.build_timer_sequence(materialized_workout),
+           content: content(materialized_workout, authorized_source)
+         }}
       else
         :not_found -> {:error, :not_found}
         error -> error
       end
     end
+  end
+
+  # What the member reads before Έναρξη (ADR-140 §4): the assignment's and
+  # the workout's Οδηγίες, then each section's. Members never get a
+  # coach-brief: the workout was read for the member audience.
+  defp content(workout, authorized_source) do
+    %{
+      assignment_instructions: Map.get(authorized_source, :instructions),
+      workout: Map.get(workout, :content, []),
+      sections:
+        workout
+        |> Map.get(:sections, [])
+        |> Enum.map(&%{id: &1.id, name: &1.name, content: Map.get(&1, :content, [])})
+        |> Enum.reject(&(&1.content == []))
+    }
   end
 
   defp authorize_entitlement(execution_context, actor, authorized_source) do

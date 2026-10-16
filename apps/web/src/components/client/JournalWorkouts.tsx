@@ -2,14 +2,17 @@
 
 import { useEffect, useMemo, useState } from "react";
 
+import { fetchMyTrainingHistory } from "@/api/training-history";
+import { TrainingHistory } from "@/components/history/TrainingHistory";
 import { SemanticLabel } from "@/components/semantic-label";
+import { useSession } from "@/components/session-provider";
 import { ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { EntryActions } from "@/components/client/EntryActions";
 import { clientErrorMessage } from "@/components/client/errors";
 import { ExecutionPerformanceModal } from "@/components/client/ExecutionPerformanceModal";
 import { formatDay } from "@/components/client/format";
 import { useRepeatWorkout } from "@/components/client/use-repeat-workout";
-import { useWorkoutVault } from "@/components/client/WorkoutHistory";
+import { useWorkoutVault } from "@/components/client/use-workout-vault";
 import {
   formatElapsed,
   groupFinishedWorkouts,
@@ -20,6 +23,7 @@ import {
 } from "@/components/client/vault";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { defaultHistoryKind } from "@/lib/training-history";
 
 type ViewMode = "folders" | "tree";
 
@@ -37,6 +41,7 @@ function storedView(): ViewMode {
 export function JournalWorkouts() {
   const i18n = useUiTranslations();
   const vault = useWorkoutVault();
+  const { tokens, currentUser } = useSession();
   const { repeat, pendingId, error } = useRepeatWorkout();
   const [view, setViewState] = useState<ViewMode>("folders");
   const [openFolder, setOpenFolder] = useState<string | null>(null);
@@ -178,6 +183,15 @@ export function JournalWorkouts() {
           ))}
         </div>
       )}
+
+      {tokens?.access_token && currentUser ? (
+        <TrainingHistory
+          id="history"
+          queryKey={["me", currentUser.id]}
+          fetchPage={(kind, offset) => fetchMyTrainingHistory(tokens.access_token, kind, offset)}
+          defaultKind={defaultHistoryKind(currentUser.role)}
+        />
+      ) : null}
 
       {performance ? (
         <ExecutionPerformanceModal

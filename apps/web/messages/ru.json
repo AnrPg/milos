@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Инструкции",
+    "scaling": "Масштабирование",
+    "safety": "Внимание",
+    "equipment": "Инвентарь",
+    "cue": "Подсказка",
+    "coachBrief": "Для тренера"
+  },
   "Common": {
     "save": "Сохранить",
     "saving": "Сохранение…",
@@ -51,7 +59,15 @@
     "inventory": "Инвентарь",
     "menu": "Меню",
     "notifications": "Уведомления",
-    "unreadNotifications": "{count, plural, one {# непрочитанное уведомление} few {# непрочитанных уведомления} many {# непрочитанных уведомлений} other {# непрочитанного уведомления}}"
+    "unreadNotifications": "{count, plural, one {# непрочитанное уведомление} few {# непрочитанных уведомления} many {# непрочитанных уведомлений} other {# непрочитанного уведомления}}",
+    "box": "Box",
+    "me": "Я",
+    "today": "Сегодня",
+    "journalFlow": "Лента",
+    "vault": "Архив",
+    "reviews": "Отзывы",
+    "coach": "Тренер",
+    "memberTabs": "Основные разделы"
   },
   "Profile": {
     "eyebrow": "Профиль",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "Разговоров пока нет. Найдите, чтобы начать.",
     "hideConversationdfb77ca": "Скрыть разговор",
     "yourDraftIsStillHereReconnectAndRetry617338d": "Ваш черновик все еще здесь; переподключитесь и повторите попытку.",
-    "coachingNote7e2c608": "Тренерская записка",
+    "msgKindCoaching": "Сообщение коучинга",
     "pendingApprovals6ac383a": "Ожидающие одобрения",
     "classesTodayd01b776": "Занятия сегодня",
     "todayAtAGlance07e2821": "Сегодня вкратце",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "Отклонить эту тренировку? Ваш тренер будет уведомлен.",
     "calendar4e44752": "+ Календарь",
     "workoutDetails9366821": "Подробности тренировки",
-    "coachNotee98376b": "Примечание тренера",
+    "notifCoachingMessage": "Сообщение от вашего тренера",
     "assignedAthletes3f6c5e6": "Назначенные спортсмены",
     "scheduledFor4cbbcd5": "Запланировано на",
     "yourScores842c2ab": "Ваши результаты",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "Какая часть показалась вам слишком сложной, болезненной, запутанной или ненужной?",
     "whatShouldYourCoachAdjustNextTimea76c965": "Что тренеру следует скорректировать в следующий раз?",
     "workoutAnnotationSubmittedd0b2f39": "Аннотация к тренировке отправлена.",
-    "yourCoachAddedANewNote3eec2b4": "Ваш тренер добавил новую заметку.",
+    "notifCoachingMessageBody": "Ваш тренер отправил вам сообщение.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "Запланированное время этой тренировки было изменено.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "Ваш тренер обновил упражнения этой тренировки.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "Ваш тренер изменил расписание тренировки.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "Назначение",
     "semanticClassSlot": "Слот класса",
     "semanticChat": "Чат",
-    "semanticCoachingNote": "Тренерская записка",
+    "semanticCoachingMessage": "Сообщение коучинга",
     "semanticSystem": "Система",
     "semanticWorkoutCount": "Количество тренировок",
     "semanticWorkoutTypeCount": "Количество типов тренировок",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "Запланировано",
     "semanticNoRecentCompletion": "Нет недавних завершений",
     "semanticOverdueAssignment": "Просроченное задание",
-    "semanticNoAdminNote": "Нет записи тренера",
+    "semanticNoCoachingMessage": "Нет сообщений коучинга",
     "apiErrorOffline": "Вы не в сети. Подключитесь и повторите попытку.",
     "manifestDescription": "Планирование спортзала, программирование спортсменов и выполнение тренировок.",
     "apiValidationField": "Проверьте это значение и повторите попытку.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "Подтверждение записи",
     "outboxKindBookingReject": "Отклонение записи",
     "outboxKindTrainingLog": "Записанная тренировка",
+    "outboxKindJournalComment": "Комментарий",
+    "outboxKindJournalCommentDelete": "Удаление комментария",
     "outboxKindUnknown": "Офлайн-изменение",
     "outboxFailureNetwork": "Не удалось связаться с сервером.",
     "outboxFailureSessionExpired": "Сессия истекла. Войдите снова, чтобы отправить.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}",
     "accessEndedTitle": "Ваш доступ закончился",
     "accessEndedCancelledBookings": "{count, plural, one {Ваша предстоящая запись отменена.} few {# предстоящие записи отменены.} many {# предстоящих записей отменено.} other {# предстоящих записей отменено.}}",
-    "dashNoClassesToday": "Сегодня занятий нет"
+    "dashNoClassesToday": "Сегодня занятий нет",
+    "msgKindBox": "От зала",
+    "notifBoxMessage": "Сообщение от зала",
+    "notifBoxMessageBody": "Ваш зал отправил вам сообщение.",
+    "semanticBoxMessage": "Сообщение от зала",
+    "semanticBox": "Зал",
+    "msgTopic": "Тема",
+    "msgTopicBooking": "Бронирование",
+    "msgTopicPayment": "Оплата",
+    "msgTopicMembership": "Абонемент",
+    "msgTopicFacility": "Помещение",
+    "msgSendAsCoaching": "Как сообщение коучинга",
+    "msgSendAsCoachingHint": "Засчитывается как контакт коучинга с клиентом.",
+    "chatsTabBox": "Зал",
+    "chatsBoxThread": "Ваш зал",
+    "coachLatestTitle": "Последнее от тренера",
+    "coachLatestEmpty": "Сообщений от тренера пока нет.",
+    "coachLatestOpen": "Открыть беседу",
+    "rhStatCoachingMessages": "сообщений коучинга за неделю",
+    "rhStatAwaitingReply": "ждут ответа",
+    "apiErrorNoCoachingRelationship": "Сообщение коучинга может отправить только тренер с активной связью с клиентом.",
+    "apiErrorBoxMessageOutsideBoxThread": "Сообщения от зала отправляются в беседе зала с участником.",
+    "mpTabs": "Разделы профиля",
+    "mpTabOverview": "Обзор",
+    "mpTabTraining": "Тренировки",
+    "mpTabWellbeing": "Самочувствие",
+    "mpTabCoaching": "Коучинг",
+    "mpTabFinance": "Финансы",
+    "mpTabAccount": "Аккаунт",
+    "bmTitle": "Сообщение от зала",
+    "bmBody": "Сообщение",
+    "bmPlaceholder": "Напишите участнику от имени зала…",
+    "bmSentOpen": "Отправлено. Открыть беседу",
+    "cnAbout": "Касается",
+    "cnAboutPick": "Выберите, к чему относится",
+    "cnAboutNothing": "Общая заметка",
+    "cnSubjectExecution": "Тренировка",
+    "cnSubjectTrainingLog": "Журнал тренировок",
+    "cnSubjectPr": "PR",
+    "cnSubjectInjury": "Травма",
+    "cnSubjectFormReview": "Разбор техники",
+    "cnSubjectAssignment": "Назначенная тренировка"
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
@@ -4732,6 +4791,258 @@
           "body": "Абонемент — в разделе {billing}. Язык и уведомления меняются в профиле."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Только я",
+        "coach_can_view": "Тренер видит",
+        "coach_reply_requested": "Прошу ответить",
+        "rated": "Оценка",
+        "posted": "Опубликовано в зале"
+      },
+      "visibilityHint": {
+        "private": "Видишь только ты.",
+        "coach_can_view": "Тренеры зала видят, но не отвечают.",
+        "coach_reply_requested": "Тренер получит твой вопрос сообщением.",
+        "rated": "Оценка для зала.",
+        "posted": "Опубликовано в зале."
+      },
+      "changeVisibility": "Кто видит: {current}. Изменить",
+      "whoSees": "Кто видит",
+      "noCoach": "В этом зале у тебя пока нет тренера.",
+      "visibilityFailed": "Не изменилось. Попробуй ещё раз.",
+      "saving": "Сохранение…",
+      "askCoach": "Спросить тренера",
+      "save": "Сохранить",
+      "personalOnly": "Личная запись: видишь только ты.",
+      "questionLabel": "Твой вопрос",
+      "questionPlaceholder": "На что должен ответить тренер?",
+      "filterLabel": "Фильтр ленты",
+      "filter": {
+        "all": "Все",
+        "training": "Тренировки",
+        "notes": "Заметки",
+        "wellbeing": "Самочувствие"
+      },
+      "kind": {
+        "execution": "Тренировка",
+        "training_log": "Записанная тренировка",
+        "pr": "PR",
+        "injury": "Травма",
+        "review": "Оценка",
+        "note": "Заметка",
+        "check_in": "Как я себя чувствую"
+      },
+      "loadMore": "Более ранние записи",
+      "loadingMore": "Загрузка…",
+      "editNote": "Изменить",
+      "noteTopic": {
+        "technique": "Техника",
+        "thought": "Мысль",
+        "mood": "Настроение",
+        "goal": "Цель"
+      },
+      "note": {
+        "newTitle": "Новая заметка",
+        "editTitle": "Изменить заметку",
+        "topicLabel": "Тема",
+        "bodyLabel": "Заметка",
+        "bodyPlaceholder": "Что хочешь запомнить?",
+        "savedPrivate": "Заметка сохранена как «Только я». {reason}",
+        "saveFailed": "Не сохранено. Попробуй ещё раз.",
+        "delete": "Удалить",
+        "close": "Закрыть"
+      }
+    },
+    "comments": {
+      "title": "Комментарии",
+      "wholeEntry": "Вся запись",
+      "pending": "Ожидает синхронизации",
+      "set": "подход {set}",
+      "edit": "Изменить",
+      "delete": "Удалить",
+      "editTitle": "Изменить комментарий",
+      "newTitle": "Новый комментарий",
+      "bodyLabel": "Комментарий",
+      "bodyPlaceholder": "Как прошло? Что-нибудь стоит запомнить…",
+      "cancel": "Отмена",
+      "saving": "Сохранение…",
+      "save": "Сохранить",
+      "workoutComment": "Комментарий к тренировке",
+      "workoutCommentPlaceholder": "Как прошла тренировка в целом?",
+      "logComment": "Комментарий",
+      "commentOptional": "Комментарий (необязательно)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "Я",
+    "journalTitle": "Дневник",
+    "loading": "Загрузка…",
+    "cancel": "Отмена",
+    "signOut": "Выйти",
+    "todayWorkout": "Тренировка дня",
+    "todaySources": "Тренировки на сегодня по источнику",
+    "todayEmpty": "На сегодня ничего не запланировано. Запишитесь на занятие или запишите свою тренировку.",
+    "classChip": "Занятие {time}",
+    "programmeChip": "{title} · от тренера",
+    "logWorkout": "Записать",
+    "logged": "Записано",
+    "startWorkout": "Начать",
+    "resumeWorkout": "Продолжить",
+    "nextSession": "Ваше следующее занятие",
+    "noBooking": "Пока нет записей.",
+    "bookClass": "Записаться",
+    "manageBooking": "Открыть запись",
+    "todayLabel": "Сегодня",
+    "boxActions": "Действия зала",
+    "actionSchedule": "Расписание",
+    "actionAppointments": "Встречи",
+    "actionVideos": "Видео",
+    "actionCoach": "Тренер",
+    "membership": "Абонемент",
+    "membershipNone": "Нет активного пакета.",
+    "membershipOpen": "Абонемент и платежи",
+    "newEntry": "Новая запись",
+    "meSharedPrs": "Мои рекорды",
+    "meSharedPrsHint": "Пантеон и рекорды, которыми с вами поделились",
+    "meSharing": "Доступ и видимость",
+    "meSharingHint": "Что видят тренер и другие",
+    "mePayments": "Платежи и чеки",
+    "mePaymentsHint": "Счета, возвраты и ваш пакет",
+    "meChats": "Переписка",
+    "meSettings": "Настройки",
+    "meSettingsHint": "Профиль, язык, тема, аккаунт",
+    "meTour": "Обзор приложения",
+    "meChecklist": "Первые шаги",
+    "meConsole": "Управление",
+    "meConsoleHint": "Открыть панель персонала",
+    "meMyBoxes": "Мои залы",
+    "bookingStatus": {
+      "approved": "Записан",
+      "pending": "Ожидает",
+      "waitlisted": "Лист ожидания"
+    },
+    "entryKind": {
+      "workout": "Тренировка",
+      "pr": "Рекорд",
+      "injury": "Травма",
+      "formReview": "Видео техники",
+      "review": "Отзыв",
+      "checkIn": "Самочувствие",
+      "note": "Заметка или мысль"
+    },
+    "entryKindHint": {
+      "workout": "Результат, RPE, заметки",
+      "pr": "Новый личный рекорд",
+      "injury": "Видна вашим тренерам",
+      "formReview": "Попросите тренера оценить",
+      "review": "Оцените занятие или тренировку",
+      "checkIn": "Несколько быстрых вопросов",
+      "note": "Техника, цель, настроение"
+    },
+    "homeTitle": "Главная",
+    "wodToday": "Тренировка дня в зале",
+    "wodTodayEmpty": "Сегодня нет тренировки на занятиях.",
+    "openInBox": "Открыть в Box",
+    "feedPosts": "Из вашего клуба",
+    "feedPostsEmpty": "Здесь появятся публикации вашего клуба.",
+    "entryGroup": {
+      "training": "Тренировка",
+      "wellbeing": "Самочувствие",
+      "coach": "Тренер",
+      "note": "Заметка"
+    },
+    "checkIn": {
+      "eyebrow": "Самочувствие",
+      "title": "Как ты себя чувствуешь сейчас?",
+      "question": {
+        "sleep": "Как ты спал(а)?",
+        "energy": "Сколько у тебя энергии?",
+        "mood": "Какое у тебя настроение?",
+        "stress": "Насколько ты в стрессе?",
+        "body": "Как ощущается тело?"
+      },
+      "short": {
+        "sleep": "Сон",
+        "energy": "Энергия",
+        "mood": "Настроение",
+        "stress": "Стресс",
+        "body": "Тело"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Плохо",
+          "2": "Так себе",
+          "3": "Хорошо",
+          "4": "Отлично"
+        },
+        "energy": {
+          "1": "Без сил",
+          "2": "Мало",
+          "3": "Хорошо",
+          "4": "Полно"
+        },
+        "mood": {
+          "1": "Ужасное",
+          "2": "Подавленное",
+          "3": "Хорошее",
+          "4": "Отличное"
+        },
+        "stress": {
+          "1": "Очень",
+          "2": "Довольно",
+          "3": "Немного",
+          "4": "Нет"
+        },
+        "body": {
+          "1": "Болит",
+          "2": "Скованно",
+          "3": "Нормально",
+          "4": "Свежо"
+        }
+      },
+      "notePlaceholder": "Хочешь что-то добавить?",
+      "save": "Сохранить",
+      "saving": "Сохранение…",
+      "answerOne": "Ответь хотя бы на один вопрос.",
+      "savesAsNew": "Каждое сохранение — новая запись; прежние остаются на шкале времени.",
+      "saved": "Сохранено в {time}.",
+      "saveFailed": "Не удалось сохранить. Попробуй ещё раз.",
+      "timelineTitle": "Последние {days} дней",
+      "timelineEmpty": "Пока нет записей. Твои ответы появятся здесь на шкале времени.",
+      "timelineAria": "{question}: {count, plural, one {# запись} few {# записи} many {# записей} other {# записи}}",
+      "history": "Все записи ({count})",
+      "delete": "Удалить",
+      "loading": "Загрузка…"
+    },
+    "injury": {
+      "addUpdate": "Добавить обновление",
+      "reopen": "Открыть снова",
+      "timeline": "{count, plural, one {Динамика · # событие} few {Динамика · # события} many {Динамика · # событий} other {Динамика · # события}}",
+      "timelineAria": "Динамика травмы: {count} событий",
+      "event": {
+        "reported": "Сообщено",
+        "updated": "Обновление",
+        "marked_healed": "Отмечено как зажившее",
+        "reopened": "Открыто снова"
+      },
+      "field": {
+        "severity": "Тяжесть",
+        "body_area": "Область тела",
+        "training_limitations": "Ограничения в тренировках",
+        "description": "Описание",
+        "tags": "Теги"
+      },
+      "severity": {
+        "mild": "Лёгкая",
+        "moderate": "Средняя",
+        "severe": "Тяжёлая"
+      },
+      "notePlaceholder": "Как дела? (необязательно)",
+      "save": "Сохранить обновление",
+      "saving": "Сохранение…",
+      "cancel": "Отмена"
     }
   }
 }

@@ -331,7 +331,7 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
             thread_id: athlete_thread.id,
             sender_id: admin.id,
             body: "Private note",
-            message_type: :coaching_note
+            message_type: :coaching_message
           })
 
         {:ok, other_thread} =
@@ -371,7 +371,7 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
         master_workout_id: workout.id,
         athlete_ids: [athlete.id],
         scheduled_for: first_date,
-        admin_notes: "First"
+        instructions: "First"
       })
 
     {:ok, second} =
@@ -379,7 +379,7 @@ defmodule MilosTrainingWeb.MyWorkoutControllerTest do
         master_workout_id: workout.id,
         athlete_ids: [athlete.id],
         scheduled_for: second_date,
-        admin_notes: "Second"
+        instructions: "Second"
       })
 
     athlete_execution_context = %{organization_id: context.organization_id, user_id: athlete.id}

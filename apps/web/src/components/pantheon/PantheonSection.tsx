@@ -45,7 +45,7 @@ export function PantheonSection() {
               +
             </button>
             <Link
-              href="/my-workouts/pantheon"
+              href="/journal/pantheon"
               className="rounded-2xl px-4 py-2 text-sm font-semibold"
               style={{ background: "var(--border)", border: "1px solid var(--border-strong)", color: "var(--text-soft)" }}
             >

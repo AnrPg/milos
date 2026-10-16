@@ -63,7 +63,6 @@ defmodule MilosTraining.Execution.Commands.CompleteExecution do
             segment_cycle_counts: segment_cycle_counts,
             checked_exercise_ids: checked_exercise_ids,
             section_scores: section_scores,
-            exercise_notes: execution.exercise_notes || [],
             kpi_counters:
               execution[:kpi_counters]
               |> ExecutionKpis.merge_counters(

@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Instructions",
+    "scaling": "Scaling",
+    "safety": "Caution",
+    "equipment": "Equipment",
+    "cue": "Cue",
+    "coachBrief": "For the coach"
+  },
   "Common": {
     "save": "Save",
     "saving": "Saving…",
@@ -51,7 +59,15 @@
     "inventory": "Inventory",
     "menu": "Menu",
     "notifications": "Notifications",
-    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}"
+    "unreadNotifications": "{count, plural, one {# unread notification} other {# unread notifications}}",
+    "box": "Box",
+    "me": "Me",
+    "today": "Today",
+    "journalFlow": "Feed",
+    "vault": "Vault",
+    "reviews": "Reviews",
+    "coach": "Coach",
+    "memberTabs": "Main sections"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "No conversations yet. Search to start one.",
     "hideConversationdfb77ca": "Hide conversation",
     "yourDraftIsStillHereReconnectAndRetry617338d": "Your draft is still here; reconnect and retry.",
-    "coachingNote7e2c608": "Coaching note",
+    "msgKindCoaching": "Coaching message",
     "pendingApprovals6ac383a": "Pending approvals",
     "classesTodayd01b776": "Classes today",
     "todayAtAGlance07e2821": "Today at a glance",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "Reject this workout? Your coach will be notified.",
     "calendar4e44752": "+ Calendar",
     "workoutDetails9366821": "Workout Details",
-    "coachNotee98376b": "Coach note",
+    "notifCoachingMessage": "Message from your coach",
     "assignedAthletes3f6c5e6": "Assigned athletes",
     "scheduledFor4cbbcd5": "Scheduled for",
     "yourScores842c2ab": "Your scores",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "Which part felt too hard, painful, confusing, or unnecessary?",
     "whatShouldYourCoachAdjustNextTimea76c965": "What should your coach adjust next time?",
     "workoutAnnotationSubmittedd0b2f39": "Workout annotation submitted.",
-    "yourCoachAddedANewNote3eec2b4": "Your coach added a new note.",
+    "notifCoachingMessageBody": "Your coach sent you a message.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "The scheduled time for this workout was changed.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "Your coach updated the exercises in this workout.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "Your coach changed a scheduled workout.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "Assignment",
     "semanticClassSlot": "Class slot",
     "semanticChat": "Chat",
-    "semanticCoachingNote": "Coaching note",
+    "semanticCoachingMessage": "Coaching message",
     "semanticSystem": "System",
     "semanticWorkoutCount": "Workout count",
     "semanticWorkoutTypeCount": "Workout-type count",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "Scheduled",
     "semanticNoRecentCompletion": "No recent completion",
     "semanticOverdueAssignment": "Overdue assignment",
-    "semanticNoAdminNote": "No coach note",
+    "semanticNoCoachingMessage": "No coaching message",
     "apiErrorOffline": "You are offline. Reconnect and try again.",
     "manifestDescription": "Gym scheduling, athlete programming, and workout execution.",
     "apiValidationField": "Check this value and try again.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "Booking approval",
     "outboxKindBookingReject": "Booking rejection",
     "outboxKindTrainingLog": "Logged workout",
+    "outboxKindJournalComment": "Comment",
+    "outboxKindJournalCommentDelete": "Comment deletion",
     "outboxKindUnknown": "Offline change",
     "outboxFailureNetwork": "The server could not be reached.",
     "outboxFailureSessionExpired": "Your session expired. Sign in again to send it.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {# workout} other {# workouts}}",
     "accessEndedTitle": "Your access has ended",
     "accessEndedCancelledBookings": "{count, plural, one {Your upcoming booking was cancelled.} other {Your # upcoming bookings were cancelled.}}",
-    "dashNoClassesToday": "No classes today"
+    "dashNoClassesToday": "No classes today",
+    "msgKindBox": "From the box",
+    "notifBoxMessage": "Message from the box",
+    "notifBoxMessageBody": "Your gym sent you a message.",
+    "semanticBoxMessage": "Message from the box",
+    "semanticBox": "Box",
+    "msgTopic": "Topic",
+    "msgTopicBooking": "Booking",
+    "msgTopicPayment": "Payment",
+    "msgTopicMembership": "Membership",
+    "msgTopicFacility": "Facility",
+    "msgSendAsCoaching": "As a coaching message",
+    "msgSendAsCoachingHint": "Counts as a coaching touchpoint for your client.",
+    "chatsTabBox": "Box",
+    "chatsBoxThread": "Your gym",
+    "coachLatestTitle": "Latest from your coach",
+    "coachLatestEmpty": "No messages from your coach yet.",
+    "coachLatestOpen": "Open conversation",
+    "rhStatCoachingMessages": "coaching messages this week",
+    "rhStatAwaitingReply": "waiting for a reply",
+    "apiErrorNoCoachingRelationship": "Only a coach with an active coaching relationship can send a coaching message.",
+    "apiErrorBoxMessageOutsideBoxThread": "Messages from the box are sent in the gym's conversation with the member.",
+    "mpTabs": "Profile sections",
+    "mpTabOverview": "Overview",
+    "mpTabTraining": "Training",
+    "mpTabWellbeing": "Wellbeing",
+    "mpTabCoaching": "Coaching",
+    "mpTabFinance": "Finance",
+    "mpTabAccount": "Account",
+    "bmTitle": "Message from the box",
+    "bmBody": "Message",
+    "bmPlaceholder": "Write to the member on behalf of the gym…",
+    "bmSentOpen": "Sent. Open conversation",
+    "cnAbout": "About",
+    "cnAboutPick": "Choose what it is about",
+    "cnAboutNothing": "General note",
+    "cnSubjectExecution": "Workout",
+    "cnSubjectTrainingLog": "Training log",
+    "cnSubjectPr": "PR",
+    "cnSubjectInjury": "Injury",
+    "cnSubjectFormReview": "Form review",
+    "cnSubjectAssignment": "Assigned workout"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4732,6 +4791,258 @@
           "body": "See your membership in {billing}. Change language and notifications in your profile."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Only me",
+        "coach_can_view": "Coach can view",
+        "coach_reply_requested": "Reply requested",
+        "rated": "Rating",
+        "posted": "Posted to the box"
+      },
+      "visibilityHint": {
+        "private": "Only you see it.",
+        "coach_can_view": "Your gym's coaches can see it, without replying.",
+        "coach_reply_requested": "Your coach gets your question as a message.",
+        "rated": "A rating for the gym.",
+        "posted": "Posted to the gym."
+      },
+      "changeVisibility": "Who sees it: {current}. Change",
+      "whoSees": "Who sees it",
+      "noCoach": "You don't have a coach at this gym yet.",
+      "visibilityFailed": "Didn't change. Try again.",
+      "saving": "Saving…",
+      "askCoach": "Ask the coach",
+      "save": "Save",
+      "personalOnly": "Personal entry: only you see it.",
+      "questionLabel": "Your question",
+      "questionPlaceholder": "What should your coach answer?",
+      "filterLabel": "Feed filter",
+      "filter": {
+        "all": "All",
+        "training": "Workouts",
+        "notes": "Notes",
+        "wellbeing": "Wellbeing"
+      },
+      "kind": {
+        "execution": "Workout",
+        "training_log": "Logged workout",
+        "pr": "PR",
+        "injury": "Injury",
+        "review": "Rating",
+        "note": "Note",
+        "check_in": "How I feel"
+      },
+      "loadMore": "Older entries",
+      "loadingMore": "Loading…",
+      "editNote": "Edit",
+      "noteTopic": {
+        "technique": "Technique",
+        "thought": "Thought",
+        "mood": "Mood",
+        "goal": "Goal"
+      },
+      "note": {
+        "newTitle": "New note",
+        "editTitle": "Edit note",
+        "topicLabel": "Topic",
+        "bodyLabel": "Note",
+        "bodyPlaceholder": "What do you want to remember?",
+        "savedPrivate": "The note was saved as Only me. {reason}",
+        "saveFailed": "Couldn't save. Try again.",
+        "delete": "Delete",
+        "close": "Close"
+      }
+    },
+    "comments": {
+      "title": "Comments",
+      "wholeEntry": "Whole entry",
+      "pending": "Waiting to sync",
+      "set": "set {set}",
+      "edit": "Edit",
+      "delete": "Delete",
+      "editTitle": "Edit comment",
+      "newTitle": "New comment",
+      "bodyLabel": "Comment",
+      "bodyPlaceholder": "How did it go? Anything worth remembering…",
+      "cancel": "Cancel",
+      "saving": "Saving…",
+      "save": "Save",
+      "workoutComment": "Comment on the workout",
+      "workoutCommentPlaceholder": "How did the whole workout go?",
+      "logComment": "Comment",
+      "commentOptional": "Comment (optional)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "Me",
+    "journalTitle": "Journal",
+    "loading": "Loading…",
+    "cancel": "Cancel",
+    "signOut": "Sign out",
+    "todayWorkout": "Today's workout",
+    "todaySources": "Today's workouts by source",
+    "todayEmpty": "Nothing planned for today. Book a class or log a workout of your own.",
+    "classChip": "Class {time}",
+    "programmeChip": "{title} · from your coach",
+    "logWorkout": "Log",
+    "logged": "Logged",
+    "startWorkout": "Start",
+    "resumeWorkout": "Resume",
+    "nextSession": "Your next session",
+    "noBooking": "No booking yet.",
+    "bookClass": "Book a class",
+    "manageBooking": "Open booking",
+    "todayLabel": "Today",
+    "boxActions": "Box actions",
+    "actionSchedule": "Schedule",
+    "actionAppointments": "Appointments",
+    "actionVideos": "Videos",
+    "actionCoach": "Coach",
+    "membership": "Membership",
+    "membershipNone": "No active package.",
+    "membershipOpen": "Membership & payments",
+    "newEntry": "New entry",
+    "meSharedPrs": "My PRs",
+    "meSharedPrsHint": "Pantheon and PRs shared with you",
+    "meSharing": "Sharing & visibility",
+    "meSharingHint": "What your coach and others can see",
+    "mePayments": "Payments & receipts",
+    "mePaymentsHint": "Invoices, refunds and your package",
+    "meChats": "Conversations",
+    "meSettings": "Settings",
+    "meSettingsHint": "Profile, language, theme, account",
+    "meTour": "Take the tour",
+    "meChecklist": "Getting started",
+    "meConsole": "Management",
+    "meConsoleHint": "Open the staff console",
+    "meMyBoxes": "My boxes",
+    "bookingStatus": {
+      "approved": "Booked",
+      "pending": "Pending",
+      "waitlisted": "Waitlist"
+    },
+    "entryKind": {
+      "workout": "Workout",
+      "pr": "PR",
+      "injury": "Injury",
+      "formReview": "Technique video",
+      "review": "Review",
+      "checkIn": "How I feel",
+      "note": "Note or thought"
+    },
+    "entryKindHint": {
+      "workout": "Score, RPE, notes",
+      "pr": "A new personal record",
+      "injury": "Visible to your coaches",
+      "formReview": "Ask your coach for feedback",
+      "review": "Rate a class or workout",
+      "checkIn": "A few quick questions",
+      "note": "Technique, goal, mood"
+    },
+    "homeTitle": "Home",
+    "wodToday": "Today's WOD at the gym",
+    "wodTodayEmpty": "No class workout today.",
+    "openInBox": "Open in Box",
+    "feedPosts": "From your club",
+    "feedPostsEmpty": "Posts from your club will show up here.",
+    "entryGroup": {
+      "training": "Training",
+      "wellbeing": "Wellbeing",
+      "coach": "Coach",
+      "note": "Note"
+    },
+    "checkIn": {
+      "eyebrow": "How I feel",
+      "title": "How do you feel right now?",
+      "question": {
+        "sleep": "How did you sleep?",
+        "energy": "How much energy do you have?",
+        "mood": "How is your mood?",
+        "stress": "How much stress do you have?",
+        "body": "How does your body feel?"
+      },
+      "short": {
+        "sleep": "Sleep",
+        "energy": "Energy",
+        "mood": "Mood",
+        "stress": "Stress",
+        "body": "Body"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Badly",
+          "2": "So-so",
+          "3": "Well",
+          "4": "Great"
+        },
+        "energy": {
+          "1": "Drained",
+          "2": "Low",
+          "3": "Good",
+          "4": "Full"
+        },
+        "mood": {
+          "1": "Awful",
+          "2": "Down",
+          "3": "Good",
+          "4": "Great"
+        },
+        "stress": {
+          "1": "A lot",
+          "2": "Quite a bit",
+          "3": "A little",
+          "4": "None"
+        },
+        "body": {
+          "1": "In pain",
+          "2": "Stiff",
+          "3": "Fine",
+          "4": "Fresh"
+        }
+      },
+      "notePlaceholder": "Want to say something?",
+      "save": "Save",
+      "saving": "Saving…",
+      "answerOne": "Answer at least one question.",
+      "savesAsNew": "Each save is a new entry; earlier ones stay on your timeline.",
+      "saved": "Saved at {time}.",
+      "saveFailed": "Couldn't save. Try again.",
+      "timelineTitle": "Last {days} days",
+      "timelineEmpty": "No check-ins yet. Your answers will show up here as a timeline.",
+      "timelineAria": "{question}: {count, plural, one {# entry} other {# entries}}",
+      "history": "All check-ins ({count})",
+      "delete": "Delete",
+      "loading": "Loading…"
+    },
+    "injury": {
+      "addUpdate": "Add update",
+      "reopen": "Reopen",
+      "timeline": "{count, plural, one {Progress · # event} other {Progress · # events}}",
+      "timelineAria": "Injury timeline with {count} events",
+      "event": {
+        "reported": "Reported",
+        "updated": "Update",
+        "marked_healed": "Marked healed",
+        "reopened": "Reopened"
+      },
+      "field": {
+        "severity": "Severity",
+        "body_area": "Body area",
+        "training_limitations": "Training limitations",
+        "description": "Description",
+        "tags": "Tags"
+      },
+      "severity": {
+        "mild": "Mild",
+        "moderate": "Moderate",
+        "severe": "Severe"
+      },
+      "notePlaceholder": "How is it going? (optional)",
+      "save": "Save update",
+      "saving": "Saving…",
+      "cancel": "Cancel"
     }
   }
 }

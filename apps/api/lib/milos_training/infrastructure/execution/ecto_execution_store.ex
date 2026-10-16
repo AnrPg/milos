@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
 
   alias Ecto.Multi
   alias MilosTraining.Execution.{ProgressOperation, WorkoutExecution}
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
@@ -183,6 +184,12 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
           [execution],
           execution.user_id == ^user_id and execution.organization_id == ^organization_id
         )
+        # ADR-139 §6: a coach reads a member's executions only on a rung
+        # that reaches the coach.
+        |> where(
+          [execution],
+          fragment("milos_journal_visibility_reaches_coach(?)", execution.journal_visibility)
+        )
         |> order_by([execution], desc: execution.started_at_utc)
         |> Repo.all()
         |> Enum.map(&normalize/1)
@@ -222,6 +229,48 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
     end
   end
 
+  # Journal feed (ADR-139 §9): completed executions, newest first, after the
+  # page bound, for the owner or for a coach of one gym.
+  @impl true
+  def list_execution_items(user_id, bound, limit, scope) do
+    WorkoutExecution
+    |> where([e], not is_nil(e.completed_at_utc))
+    |> FeedScope.apply(user_id, scope)
+    |> FeedBound.apply(:completed_at_utc, bound)
+    |> order_by([e], desc: e.completed_at_utc, desc: e.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(&normalize/1)
+  end
+
+  @impl true
+  def set_execution_visibility(id, user_id, rung) do
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         %WorkoutExecution{} = execution <-
+           Repo.get_by(WorkoutExecution, id: id, user_id: user_id) do
+      execution
+      |> WorkoutExecution.visibility_changeset(rung)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> {:ok, normalize(updated)}
+        error -> error
+      end
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def move_executions(user_id, from, to) do
+    {count, _rows} =
+      WorkoutExecution
+      |> where([e], e.user_id == ^user_id and not is_nil(e.organization_id))
+      |> where([e], e.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to])
+
+    count
+  end
+
   defp normalize(%WorkoutExecution{} = execution) do
     normalized_status =
       cond do
@@ -259,11 +308,10 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
       segment_cycle_counts: execution.segment_cycle_counts || %{},
       checked_exercise_ids: execution.checked_exercise_ids || [],
       section_scores: execution.section_scores || [],
-      exercise_notes: execution.exercise_notes || [],
-      exercise_modifications: execution.exercise_modifications || [],
       lock_version: execution.lock_version,
       kpi_counters: execution.kpi_counters || %{},
       duration_adjustments: execution.duration_adjustments || %{},
+      journal_visibility: execution.journal_visibility,
       inserted_at: execution.inserted_at
     }
   end

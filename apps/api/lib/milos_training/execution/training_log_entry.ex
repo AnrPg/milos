@@ -31,15 +31,15 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     field(:performed_at_tz, :string, default: "UTC")
     field(:duration_seconds, :integer)
     field(:perceived_effort, :integer)
-    field(:notes, :string)
     field(:section_scores, {:array, :map}, default: [])
-    field(:exercise_modifications, {:array, :map}, default: [])
     field(:performed_exercises, {:array, :map}, default: [])
     field(:status, :string, default: "logged")
     field(:voided_at, :utc_datetime_usec)
     field(:void_reason, :string)
     field(:idempotency_key, :string)
     field(:lock_version, :integer, default: 1)
+    # ADR-139 ladder rung, set when logged from the member's `workout` default.
+    field(:journal_visibility, :string, default: "coach_can_view")
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -50,9 +50,7 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     :performed_at_tz,
     :duration_seconds,
     :perceived_effort,
-    :notes,
     :section_scores,
-    :exercise_modifications,
     :performed_exercises,
     :scale_level_slug
   ]
@@ -71,7 +69,8 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
         :master_workout_id,
         :booking_id,
         :workout_type,
-        :idempotency_key
+        :idempotency_key,
+        :journal_visibility
       ] ++ @editable_fields
     )
     |> validate_required([
@@ -97,6 +96,13 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     |> foreign_key_constraint(:master_workout_id)
   end
 
+  @doc "Moves the entry on the journal ladder (ADR-139)."
+  def visibility_changeset(%__MODULE__{} = entry, rung) do
+    entry
+    |> change(journal_visibility: rung)
+    |> check_constraint(:journal_visibility, name: :training_log_entries_journal_visibility_check)
+  end
+
   def update_changeset(%__MODULE__{} = entry, params) do
     entry
     |> cast(params, @editable_fields)
@@ -117,7 +123,6 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
   defp validate_common(changeset) do
     changeset
     |> validate_length(:title, min: 1, max: 160)
-    |> validate_length(:notes, max: 4000)
     |> validate_number(:duration_seconds, greater_than_or_equal_to: 0)
     |> validate_number(:perceived_effort, greater_than_or_equal_to: 1, less_than_or_equal_to: 10)
     |> validate_inclusion(:status, @statuses)

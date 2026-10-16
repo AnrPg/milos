@@ -65,6 +65,8 @@ describe("explicit outbox adapter registry", () => {
       "booking.approve",
       "booking.reject",
       "booking.request",
+      "journal_comment.delete",
+      "journal_comment.save",
       "training_log.create",
     ]);
     expect(getOutboxCommandAdapter("workout.update")).toBeUndefined();

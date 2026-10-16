@@ -16,7 +16,8 @@ defmodule MilosTraining.Pantheon.PRRecord do
     field(:higher_is_better, :boolean, default: true)
     field(:beaten_on, :date)
     field(:supporting_metrics, :map, default: %{})
-    field(:notes, :string)
+    # ADR-139 ladder rung; the coach read policy asks it, not a per-user switch.
+    field(:journal_visibility, :string, default: "coach_can_view")
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -30,13 +31,11 @@ defmodule MilosTraining.Pantheon.PRRecord do
       :unit,
       :higher_is_better,
       :beaten_on,
-      :supporting_metrics,
-      :notes
+      :supporting_metrics
     ])
     |> validate_required([:user_id, :name, :current_score, :unit, :beaten_on])
     |> validate_inclusion(:unit, @valid_units)
     |> validate_number(:current_score, greater_than_or_equal_to: 0)
-    |> validate_length(:notes, max: 2_000)
     |> foreign_key_constraint(:user_id)
   end
 
@@ -48,8 +47,16 @@ defmodule MilosTraining.Pantheon.PRRecord do
   def create_changeset(params) do
     %__MODULE__{}
     |> changeset(params)
-    |> cast(params, [:organization_id])
+    |> cast(params, [:organization_id, :journal_visibility])
+    |> validate_required([:journal_visibility])
+    |> check_constraint(:journal_visibility, name: :user_pr_records_journal_visibility_check)
     |> foreign_key_constraint(:organization_id)
+  end
+
+  def visibility_changeset(%__MODULE__{} = record, rung) do
+    record
+    |> change(journal_visibility: rung)
+    |> check_constraint(:journal_visibility, name: :user_pr_records_journal_visibility_check)
   end
 
   def valid_units, do: @valid_units

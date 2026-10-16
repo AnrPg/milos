@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Instructies",
+    "scaling": "Schalen",
+    "safety": "Let op",
+    "equipment": "Materiaal",
+    "cue": "Cue",
+    "coachBrief": "Voor de coach"
+  },
   "Common": {
     "save": "Opslaan",
     "saving": "Opslaan…",
@@ -51,7 +59,15 @@
     "inventory": "Inventaris",
     "menu": "Menu",
     "notifications": "Meldingen",
-    "unreadNotifications": "{count, plural, one {# ongelezen melding} other {# ongelezen meldingen}}"
+    "unreadNotifications": "{count, plural, one {# ongelezen melding} other {# ongelezen meldingen}}",
+    "box": "Box",
+    "me": "Ik",
+    "today": "Vandaag",
+    "journalFlow": "Tijdlijn",
+    "vault": "Archief",
+    "reviews": "Beoordelingen",
+    "coach": "Coach",
+    "memberTabs": "Hoofdonderdelen"
   },
   "Profile": {
     "eyebrow": "Profiel",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "Nog geen gesprekken. Zoek om er een te starten.",
     "hideConversationdfb77ca": "Gesprek verbergen",
     "yourDraftIsStillHereReconnectAndRetry617338d": "Je concept is er nog; maak opnieuw verbinding en probeer het opnieuw.",
-    "coachingNote7e2c608": "Coachende opmerking",
+    "msgKindCoaching": "Coachingbericht",
     "pendingApprovals6ac383a": "In afwachting van goedkeuringen",
     "classesTodayd01b776": "Lessen vandaag",
     "todayAtAGlance07e2821": "Vandaag in één oogopslag",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "Deze training afwijzen? Je coach wordt op de hoogte gebracht.",
     "calendar4e44752": "+ Kalender",
     "workoutDetails9366821": "Trainingsdetails",
-    "coachNotee98376b": "Opmerking van de coach",
+    "notifCoachingMessage": "Bericht van je coach",
     "assignedAthletes3f6c5e6": "Toegewezen atleten",
     "scheduledFor4cbbcd5": "Gepland voor",
     "yourScores842c2ab": "Jouw scores",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "Welk deel voelde te moeilijk, pijnlijk, verwarrend of onnodig?",
     "whatShouldYourCoachAdjustNextTimea76c965": "Wat moet jouw coach de volgende keer aanpassen?",
     "workoutAnnotationSubmittedd0b2f39": "Trainingannotatie ingediend.",
-    "yourCoachAddedANewNote3eec2b4": "Je coach heeft een nieuwe notitie toegevoegd.",
+    "notifCoachingMessageBody": "Je coach heeft je een bericht gestuurd.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "De geplande tijd voor deze training is gewijzigd.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "Je coach heeft de oefeningen in deze training bijgewerkt.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "Je coach heeft een geplande training gewijzigd.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "Opdracht",
     "semanticClassSlot": "Klasse slot",
     "semanticChat": "Chatten",
-    "semanticCoachingNote": "Coachende opmerking",
+    "semanticCoachingMessage": "Coachingbericht",
     "semanticSystem": "Systeem",
     "semanticWorkoutCount": "Aantal trainingen",
     "semanticWorkoutTypeCount": "Aantal trainingstypes",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "Gepland",
     "semanticNoRecentCompletion": "Geen recente voltooiing",
     "semanticOverdueAssignment": "Achterstallige opdracht",
-    "semanticNoAdminNote": "Geen coachnotitie",
+    "semanticNoCoachingMessage": "Geen coachingbericht",
     "apiErrorOffline": "Je bent offline. Maak opnieuw verbinding en probeer het opnieuw.",
     "manifestDescription": "Planning van de sportschool, programmering van atleten en uitvoering van trainingen.",
     "apiValidationField": "Controleer deze waarde en probeer het opnieuw.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "Goedkeuring van boeking",
     "outboxKindBookingReject": "Afwijzing van boeking",
     "outboxKindTrainingLog": "Gelogde training",
+    "outboxKindJournalComment": "Opmerking",
+    "outboxKindJournalCommentDelete": "Opmerking verwijderen",
     "outboxKindUnknown": "Offline wijziging",
     "outboxFailureNetwork": "De server was niet bereikbaar.",
     "outboxFailureSessionExpired": "Je sessie is verlopen. Log opnieuw in om te verzenden.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {# workout} other {# workouts}}",
     "accessEndedTitle": "Je toegang is afgelopen",
     "accessEndedCancelledBookings": "{count, plural, one {Je komende boeking is geannuleerd.} other {Je # komende boekingen zijn geannuleerd.}}",
-    "dashNoClassesToday": "Vandaag geen lessen"
+    "dashNoClassesToday": "Vandaag geen lessen",
+    "msgKindBox": "Van de box",
+    "notifBoxMessage": "Bericht van de box",
+    "notifBoxMessageBody": "Je box heeft je een bericht gestuurd.",
+    "semanticBoxMessage": "Bericht van de box",
+    "semanticBox": "Box",
+    "msgTopic": "Onderwerp",
+    "msgTopicBooking": "Boeking",
+    "msgTopicPayment": "Betaling",
+    "msgTopicMembership": "Lidmaatschap",
+    "msgTopicFacility": "Faciliteiten",
+    "msgSendAsCoaching": "Als coachingbericht",
+    "msgSendAsCoachingHint": "Telt als coachingcontact met je klant.",
+    "chatsTabBox": "Box",
+    "chatsBoxThread": "Je box",
+    "coachLatestTitle": "Laatste van je coach",
+    "coachLatestEmpty": "Nog geen berichten van je coach.",
+    "coachLatestOpen": "Gesprek openen",
+    "rhStatCoachingMessages": "coachingberichten deze week",
+    "rhStatAwaitingReply": "wachten op antwoord",
+    "apiErrorNoCoachingRelationship": "Alleen een coach met een actieve coachingrelatie kan een coachingbericht sturen.",
+    "apiErrorBoxMessageOutsideBoxThread": "Berichten van de box worden verstuurd in het gesprek van de box met het lid.",
+    "mpTabs": "Profielonderdelen",
+    "mpTabOverview": "Overzicht",
+    "mpTabTraining": "Training",
+    "mpTabWellbeing": "Welzijn",
+    "mpTabCoaching": "Coaching",
+    "mpTabFinance": "Financiën",
+    "mpTabAccount": "Account",
+    "bmTitle": "Bericht van de box",
+    "bmBody": "Bericht",
+    "bmPlaceholder": "Schrijf het lid namens de box…",
+    "bmSentOpen": "Verstuurd. Gesprek openen",
+    "cnAbout": "Over",
+    "cnAboutPick": "Kies waar het over gaat",
+    "cnAboutNothing": "Algemene notitie",
+    "cnSubjectExecution": "Workout",
+    "cnSubjectTrainingLog": "Trainingslog",
+    "cnSubjectPr": "PR",
+    "cnSubjectInjury": "Blessure",
+    "cnSubjectFormReview": "Techniekreview",
+    "cnSubjectAssignment": "Toegewezen workout"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4732,6 +4791,258 @@
           "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "Alleen ik",
+        "coach_can_view": "Coach kan meekijken",
+        "coach_reply_requested": "Antwoord gevraagd",
+        "rated": "Beoordeling",
+        "posted": "Gepost in de box"
+      },
+      "visibilityHint": {
+        "private": "Alleen jij ziet het.",
+        "coach_can_view": "De coaches van je box zien het, zonder te reageren.",
+        "coach_reply_requested": "Je coach krijgt je vraag als bericht.",
+        "rated": "Een beoordeling voor de box.",
+        "posted": "Gepost in de box."
+      },
+      "changeVisibility": "Wie het ziet: {current}. Wijzigen",
+      "whoSees": "Wie het ziet",
+      "noCoach": "Je hebt nog geen coach in deze box.",
+      "visibilityFailed": "Niet gewijzigd. Probeer opnieuw.",
+      "saving": "Opslaan…",
+      "askCoach": "Vraag de coach",
+      "save": "Opslaan",
+      "personalOnly": "Persoonlijke invoer: alleen jij ziet die.",
+      "questionLabel": "Je vraag",
+      "questionPlaceholder": "Waar moet je coach op antwoorden?",
+      "filterLabel": "Feedfilter",
+      "filter": {
+        "all": "Alles",
+        "training": "Trainingen",
+        "notes": "Notities",
+        "wellbeing": "Welzijn"
+      },
+      "kind": {
+        "execution": "Training",
+        "training_log": "Gelogde training",
+        "pr": "PR",
+        "injury": "Blessure",
+        "review": "Beoordeling",
+        "note": "Notitie",
+        "check_in": "Hoe ik me voel"
+      },
+      "loadMore": "Oudere invoer",
+      "loadingMore": "Laden…",
+      "editNote": "Bewerken",
+      "noteTopic": {
+        "technique": "Techniek",
+        "thought": "Gedachte",
+        "mood": "Stemming",
+        "goal": "Doel"
+      },
+      "note": {
+        "newTitle": "Nieuwe notitie",
+        "editTitle": "Notitie bewerken",
+        "topicLabel": "Onderwerp",
+        "bodyLabel": "Notitie",
+        "bodyPlaceholder": "Wat wil je onthouden?",
+        "savedPrivate": "De notitie is opgeslagen als Alleen ik. {reason}",
+        "saveFailed": "Niet opgeslagen. Probeer opnieuw.",
+        "delete": "Verwijderen",
+        "close": "Sluiten"
+      }
+    },
+    "comments": {
+      "title": "Opmerkingen",
+      "wholeEntry": "Hele invoer",
+      "pending": "Wacht op synchronisatie",
+      "set": "set {set}",
+      "edit": "Bewerken",
+      "delete": "Verwijderen",
+      "editTitle": "Opmerking bewerken",
+      "newTitle": "Nieuwe opmerking",
+      "bodyLabel": "Opmerking",
+      "bodyPlaceholder": "Hoe ging het? Iets om te onthouden…",
+      "cancel": "Annuleren",
+      "saving": "Opslaan…",
+      "save": "Opslaan",
+      "workoutComment": "Opmerking over de training",
+      "workoutCommentPlaceholder": "Hoe ging de hele training?",
+      "logComment": "Opmerking",
+      "commentOptional": "Opmerking (optioneel)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "Ik",
+    "journalTitle": "Logboek",
+    "loading": "Laden…",
+    "cancel": "Annuleren",
+    "signOut": "Afmelden",
+    "todayWorkout": "Training van vandaag",
+    "todaySources": "Trainingen van vandaag per bron",
+    "todayEmpty": "Niets gepland voor vandaag. Boek een les of leg je eigen training vast.",
+    "classChip": "Les {time}",
+    "programmeChip": "{title} · van je coach",
+    "logWorkout": "Vastleggen",
+    "logged": "Vastgelegd",
+    "startWorkout": "Starten",
+    "resumeWorkout": "Hervatten",
+    "nextSession": "Je volgende sessie",
+    "noBooking": "Nog geen boeking.",
+    "bookClass": "Les boeken",
+    "manageBooking": "Boeking openen",
+    "todayLabel": "Vandaag",
+    "boxActions": "Box-acties",
+    "actionSchedule": "Rooster",
+    "actionAppointments": "Afspraken",
+    "actionVideos": "Video’s",
+    "actionCoach": "Coach",
+    "membership": "Lidmaatschap",
+    "membershipNone": "Geen actief pakket.",
+    "membershipOpen": "Lidmaatschap en betalingen",
+    "newEntry": "Nieuwe invoer",
+    "meSharedPrs": "Mijn records",
+    "meSharedPrsHint": "Pantheon en met jou gedeelde records",
+    "meSharing": "Delen en zichtbaarheid",
+    "meSharingHint": "Wat je coach en anderen kunnen zien",
+    "mePayments": "Betalingen en bonnen",
+    "mePaymentsHint": "Facturen, terugbetalingen en je pakket",
+    "meChats": "Gesprekken",
+    "meSettings": "Instellingen",
+    "meSettingsHint": "Profiel, taal, thema, account",
+    "meTour": "Rondleiding",
+    "meChecklist": "Aan de slag",
+    "meConsole": "Beheer",
+    "meConsoleHint": "Personeelsconsole openen",
+    "meMyBoxes": "Mijn boxen",
+    "bookingStatus": {
+      "approved": "Geboekt",
+      "pending": "In afwachting",
+      "waitlisted": "Wachtlijst"
+    },
+    "entryKind": {
+      "workout": "Training",
+      "pr": "Record",
+      "injury": "Blessure",
+      "formReview": "Techniekvideo",
+      "review": "Beoordeling",
+      "checkIn": "Hoe ik me voel",
+      "note": "Notitie of gedachte"
+    },
+    "entryKindHint": {
+      "workout": "Score, RPE, notities",
+      "pr": "Een nieuw persoonlijk record",
+      "injury": "Zichtbaar voor je coaches",
+      "formReview": "Vraag je coach om feedback",
+      "review": "Beoordeel een les of training",
+      "checkIn": "Een paar snelle vragen",
+      "note": "Techniek, doel, stemming"
+    },
+    "homeTitle": "Home",
+    "wodToday": "De WOD van vandaag in de box",
+    "wodTodayEmpty": "Vandaag is er geen lestraining.",
+    "openInBox": "Openen in Box",
+    "feedPosts": "Uit je club",
+    "feedPostsEmpty": "Berichten uit je club verschijnen hier.",
+    "entryGroup": {
+      "training": "Training",
+      "wellbeing": "Welzijn",
+      "coach": "Coach",
+      "note": "Notitie"
+    },
+    "checkIn": {
+      "eyebrow": "Hoe ik me voel",
+      "title": "Hoe voel je je nu?",
+      "question": {
+        "sleep": "Hoe heb je geslapen?",
+        "energy": "Hoeveel energie heb je?",
+        "mood": "Hoe is je stemming?",
+        "stress": "Hoeveel stress heb je?",
+        "body": "Hoe voelt je lichaam?"
+      },
+      "short": {
+        "sleep": "Slaap",
+        "energy": "Energie",
+        "mood": "Stemming",
+        "stress": "Stress",
+        "body": "Lichaam"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Slecht",
+          "2": "Matig",
+          "3": "Goed",
+          "4": "Super"
+        },
+        "energy": {
+          "1": "Uitgeput",
+          "2": "Laag",
+          "3": "Goed",
+          "4": "Vol"
+        },
+        "mood": {
+          "1": "Beroerd",
+          "2": "Somber",
+          "3": "Goed",
+          "4": "Super"
+        },
+        "stress": {
+          "1": "Heel veel",
+          "2": "Behoorlijk",
+          "3": "Een beetje",
+          "4": "Geen"
+        },
+        "body": {
+          "1": "Pijn",
+          "2": "Stijf",
+          "3": "Prima",
+          "4": "Fris"
+        }
+      },
+      "notePlaceholder": "Wil je iets kwijt?",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "answerOne": "Beantwoord minstens één vraag.",
+      "savesAsNew": "Elke keer opslaan is een nieuwe invoer; eerdere blijven op je tijdlijn.",
+      "saved": "Opgeslagen om {time}.",
+      "saveFailed": "Opslaan mislukt. Probeer het opnieuw.",
+      "timelineTitle": "Laatste {days} dagen",
+      "timelineEmpty": "Nog geen invoer. Je antwoorden verschijnen hier als tijdlijn.",
+      "timelineAria": "{question}: {count, plural, one {# invoer} other {# invoeren}}",
+      "history": "Alle invoer ({count})",
+      "delete": "Verwijderen",
+      "loading": "Laden…"
+    },
+    "injury": {
+      "addUpdate": "Update toevoegen",
+      "reopen": "Heropenen",
+      "timeline": "{count, plural, one {Verloop · # gebeurtenis} other {Verloop · # gebeurtenissen}}",
+      "timelineAria": "Verloop van de blessure met {count} gebeurtenissen",
+      "event": {
+        "reported": "Gemeld",
+        "updated": "Update",
+        "marked_healed": "Als genezen gemarkeerd",
+        "reopened": "Heropend"
+      },
+      "field": {
+        "severity": "Ernst",
+        "body_area": "Lichaamsdeel",
+        "training_limitations": "Trainingsbeperkingen",
+        "description": "Omschrijving",
+        "tags": "Labels"
+      },
+      "severity": {
+        "mild": "Licht",
+        "moderate": "Matig",
+        "severe": "Ernstig"
+      },
+      "notePlaceholder": "Hoe gaat het? (optioneel)",
+      "save": "Update opslaan",
+      "saving": "Opslaan…",
+      "cancel": "Annuleren"
     }
   }
 }

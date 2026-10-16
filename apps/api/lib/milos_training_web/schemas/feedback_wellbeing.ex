@@ -78,6 +78,40 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
     additionalProperties: false
   }
 
+  # ADR-140 §3: the injury's timeline, oldest first.
+  @injury_change %Schema{
+    type: :object,
+    properties: %{
+      field: %Schema{type: :string},
+      from: %Schema{nullable: true},
+      to: %Schema{nullable: true}
+    },
+    required: [:field, :from, :to]
+  }
+
+  @injury_event %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      event_type: %Schema{
+        type: :string,
+        enum: ["reported", "updated", "marked_healed", "reopened"]
+      },
+      actor_id: %Schema{type: :string, format: :uuid, nullable: true},
+      occurred_at: %Schema{type: :string, format: :"date-time"},
+      payload: %Schema{
+        type: :object,
+        properties: %{
+          note: %Schema{type: :string, nullable: true},
+          changes: %Schema{type: :array, items: @injury_change}
+        },
+        additionalProperties: true
+      }
+    },
+    required: [:id, :event_type, :actor_id, :occurred_at, :payload],
+    additionalProperties: false
+  }
+
   @injury %Schema{
     type: :object,
     properties: %{
@@ -96,6 +130,7 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
       tags: %Schema{type: :array, items: %Schema{type: :string}},
       visibility: %Schema{type: :string, enum: ["admin_only", "user_and_admin"]},
       params: %Schema{type: :object, additionalProperties: true},
+      events: %Schema{type: :array, items: @injury_event},
       inserted_at: %Schema{type: :string, format: :"date-time"},
       updated_at: %Schema{type: :string, format: :"date-time"}
     },
@@ -110,11 +145,105 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
       :tags,
       :visibility,
       :params,
+      :events,
       :inserted_at,
       :updated_at
     ],
     additionalProperties: false
   }
+
+  # ADR-140 §2 Πώς νιώθω.
+  @check_in_answer %Schema{
+    type: :object,
+    properties: %{
+      question_key: %Schema{type: :string},
+      value: %Schema{type: :integer, minimum: 1, maximum: 4},
+      note: %Schema{type: :string, nullable: true}
+    },
+    required: [:question_key, :value, :note],
+    additionalProperties: false
+  }
+
+  @check_in %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      user_id: %Schema{type: :string, format: :uuid},
+      organization_id: %Schema{type: :string, format: :uuid, nullable: true},
+      recorded_at: %Schema{type: :string, format: :"date-time"},
+      recorded_tz: %Schema{type: :string},
+      journal_visibility: %Schema{
+        type: :string,
+        enum: ["private", "coach_can_view", "coach_reply_requested", "posted"]
+      },
+      answers: %Schema{type: :array, items: @check_in_answer},
+      inserted_at: %Schema{type: :string, format: :"date-time"},
+      updated_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [
+      :id,
+      :user_id,
+      :organization_id,
+      :recorded_at,
+      :recorded_tz,
+      :journal_visibility,
+      :answers,
+      :inserted_at,
+      :updated_at
+    ],
+    additionalProperties: false
+  }
+
+  @check_in_question %Schema{
+    type: :object,
+    properties: %{
+      key: %Schema{type: :string},
+      min: %Schema{type: :integer},
+      max: %Schema{type: :integer}
+    },
+    required: [:key, :min, :max],
+    additionalProperties: false
+  }
+
+  def check_in_response, do: item(:check_in, @check_in)
+
+  def check_in_timeline do
+    %Schema{
+      type: :object,
+      properties: %{
+        questions: %Schema{type: :array, items: @check_in_question},
+        check_ins: %Schema{type: :array, items: @check_in}
+      },
+      required: [:questions, :check_ins],
+      additionalProperties: false
+    }
+  end
+
+  def check_in_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        organization_slug: %Schema{type: :string, nullable: true},
+        recorded_tz: %Schema{type: :string, nullable: true},
+        answers: %Schema{
+          type: :array,
+          minItems: 1,
+          items: %Schema{
+            type: :object,
+            properties: %{
+              question_key: %Schema{type: :string},
+              value: %Schema{type: :integer, minimum: 1, maximum: 4},
+              note: %Schema{type: :string, nullable: true, maxLength: 1000}
+            },
+            required: [:question_key, :value],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [:answers],
+      additionalProperties: false
+    }
+  end
 
   def review, do: @review
   def review_collection, do: collection(:reviews, @review)
@@ -123,6 +252,21 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
   def injury, do: @injury
   def injury_collection, do: collection(:injuries, @injury)
   def injury_response, do: item(:injury, @injury)
+
+  def injury_update_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        note: %Schema{type: :string, nullable: true, maxLength: 2000},
+        severity: %Schema{type: :string, enum: ["mild", "moderate", "severe"]},
+        body_area: %Schema{type: :string},
+        training_limitations: %Schema{type: :string, nullable: true},
+        description: %Schema{type: :string, nullable: true},
+        tags: %Schema{type: :array, items: %Schema{type: :string}}
+      },
+      additionalProperties: false
+    }
+  end
 
   defp collection(key, schema) do
     %Schema{

@@ -1,6 +1,8 @@
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
+import type { JournalComment, JournalCommentChange } from "@/api/journal-comments";
 import type { WorkoutRecord } from "@/api/workouts";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 /** How an execution was started; `repeat` re-runs one of my earlier executions (ADR-098). */
 export type ExecutionSource = "class_booking" | "assigned" | "self_selected" | "repeat";
@@ -90,18 +92,8 @@ export type WorkoutExecution = {
     source?: string;
     kind?: string;
   }>;
-  exercise_notes: Array<{
-    id: string;
-    exercise_id: string;
-    selected_text: string;
-    selection_start?: number | null;
-    selection_end?: number | null;
-    tags?: string[];
-    note_text?: string;
-    inserted_at?: string;
-    updated_at?: string;
-  }>;
-  exercise_modifications: ExerciseModification[];
+  /** Σχόλια (ADR-140 §1); only reads of the execution carry them. */
+  comments?: JournalComment[];
   lock_version: number;
   kpi_counters?: Record<string, number>;
   /** Mid-workout clock changes; older APIs omit the field. */
@@ -119,49 +111,12 @@ export type SectionScore = {
   kind?: string;
 };
 
-export type ExerciseModification = {
-  patch_id?: string;
-  type?:
-    | "skipped"
-    | "weight_changed"
-    | "reps_changed"
-    | "time_changed"
-    | "sets_changed"
-    | "exercise_substituted"
-    | "distance_changed"
-    | "calories_changed"
-    | "field_changed"
-    | "other";
-  field: string;
-  section_id: string;
-  section_name?: string | null;
-  segment_key?: string | null;
-  exercise_id?: string | null;
-  exercise_name?: string | null;
-  set_index?: number | null;
-  round_index?: number | null;
-  interval_index?: number | null;
-  row_index?: number | null;
-  canonical_value: string | number | boolean;
-  actual_value: string | number | boolean;
-  unit?: string | null;
-  note?: string | null;
-  logged_at?: string;
-};
-
-export function isFreeTextModification(modification: ExerciseModification) {
-  return modification.field === "note" && modification.section_id === "free_text";
-}
-
-export type ExerciseNote = {
-  id?: string;
-  exercise_id: string;
-  selected_text: string;
-  selection_start?: number | null;
-  selection_end?: number | null;
-  tags?: string[];
-  note_text?: string;
-};
+/**
+ * A change to the prescription, as recorded on a comment (ADR-140 §1): one
+ * per row and field, keyed by `patch_id`. `note` is sent as the comment's
+ * text.
+ */
+export type ExerciseModification = JournalCommentChange;
 
 export type ExecutionProgressPayload = {
   expected_version: number;
@@ -225,7 +180,6 @@ export async function completeExecution(
     timezone?: string;
     checked_exercise_ids?: string[];
     section_scores?: SectionScore[];
-    exercise_notes?: ExerciseNote[];
     total_elapsed_ms?: number;
     section_elapsed_ms?: Record<string, number>;
     segment_cycle_counts?: Record<string, number>;
@@ -261,23 +215,6 @@ export async function updateExecutionProgress(
   return data.execution;
 }
 
-export async function submitExecutionNote(
-  token: string,
-  executionId: string,
-  note: ExerciseNote,
-): Promise<WorkoutExecution> {
-  const data = await apiRequest<{ execution: WorkoutExecution }>(
-    `/executions/${executionId}/notes`,
-    {
-      method: "POST",
-      token,
-      body: note,
-    },
-  );
-
-  return data.execution;
-}
-
 export async function fetchExecution(
   token: string,
   executionId: string,
@@ -289,6 +226,15 @@ export async function fetchExecution(
   return data.execution;
 }
 
+/** What the member reads before Έναρξη (ADR-140 §4): never a coach-brief. */
+export type TimerBriefing = {
+  assignment_instructions: string | null;
+  workout: WorkoutContentEntry[];
+  sections: Array<{ id: string; name: string; content: WorkoutContentEntry[] }>;
+};
+
+export type TimerSequence = { segments: TimerSegment[]; briefing: TimerBriefing | null };
+
 export async function fetchTimerSequence(
   token: string,
   workoutId: string,
@@ -297,7 +243,7 @@ export async function fetchTimerSequence(
     source: ExecutionSource;
     sourceReferenceId?: string | null;
   },
-): Promise<TimerSegment[]> {
+): Promise<TimerSequence> {
   const query = new URLSearchParams({ source: params.source });
 
   if (params.scaleSlug) query.set("scale", params.scaleSlug);
@@ -305,8 +251,8 @@ export async function fetchTimerSequence(
 
   const path = `/workouts/${workoutId}/timer-sequence?${query.toString()}`;
 
-  const data = await apiRequest<{ segments: TimerSegment[] }>(path, { token });
-  return data.segments;
+  const data = await apiRequest<{ segments: TimerSegment[]; content?: TimerBriefing }>(path, { token });
+  return { segments: data.segments, briefing: data.content ?? null };
 }
 
 export async function listMyExecutions(token: string): Promise<WorkoutExecution[]> {
@@ -314,22 +260,6 @@ export async function listMyExecutions(token: string): Promise<WorkoutExecution[
     token,
   });
   return data.executions;
-}
-
-export async function addExecutionModifications(
-  token: string,
-  executionId: string,
-  modifications: Omit<ExerciseModification, "logged_at">[],
-): Promise<WorkoutExecution> {
-  const data = await apiRequest<{ execution: WorkoutExecution }>(
-    `/executions/${executionId}/modifications`,
-    {
-      method: "POST",
-      token,
-      body: { modifications },
-    },
-  );
-  return data.execution;
 }
 
 type VaultResponse =

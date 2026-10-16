@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "التعليمات",
+    "scaling": "التدرّج",
+    "safety": "تنبيه",
+    "equipment": "المعدات",
+    "cue": "تلميح",
+    "coachBrief": "للمدرب"
+  },
   "Common": {
     "save": "حفظ",
     "saving": "جارٍ الحفظ…",
@@ -51,7 +59,15 @@
     "inventory": "المخزون",
     "menu": "القائمة",
     "notifications": "الإشعارات",
-    "unreadNotifications": "{count, plural, zero {لا إشعارات غير مقروءة} one {إشعار واحد غير مقروء} two {إشعاران غير مقروءين} few {# إشعارات غير مقروءة} many {# إشعارًا غير مقروء} other {# إشعار غير مقروء}}"
+    "unreadNotifications": "{count, plural, zero {لا إشعارات غير مقروءة} one {إشعار واحد غير مقروء} two {إشعاران غير مقروءين} few {# إشعارات غير مقروءة} many {# إشعارًا غير مقروء} other {# إشعار غير مقروء}}",
+    "box": "Box",
+    "me": "أنا",
+    "today": "اليوم",
+    "journalFlow": "السجل",
+    "vault": "الأرشيف",
+    "reviews": "التقييمات",
+    "coach": "المدرب",
+    "memberTabs": "الأقسام الرئيسية"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "لا توجد محادثات حتى الآن. البحث لبدء واحدة.",
     "hideConversationdfb77ca": "إخفاء المحادثة",
     "yourDraftIsStillHereReconnectAndRetry617338d": "مسودتك لا تزال هنا. أعد الاتصال ثم أعد المحاولة.",
-    "coachingNote7e2c608": "مذكرة التدريب",
+    "msgKindCoaching": "رسالة تدريب",
     "pendingApprovals6ac383a": "الموافقات في انتظار",
     "classesTodayd01b776": "دروس اليوم",
     "todayAtAGlance07e2821": "اليوم في لمحة",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "هل ترفض هذا التمرين؟ سيتم إخطار المدرب الخاص بك.",
     "calendar4e44752": "+ التقويم",
     "workoutDetails9366821": "تفاصيل التمرين",
-    "coachNotee98376b": "ملاحظة المدرب",
+    "notifCoachingMessage": "رسالة من مدربك",
     "assignedAthletes3f6c5e6": "الرياضيين المعينين",
     "scheduledFor4cbbcd5": "المقرر ل",
     "yourScores842c2ab": "درجاتك",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "أي جزء بدا صعبًا أو مؤلمًا أو مربكًا أو غير ضروري؟",
     "whatShouldYourCoachAdjustNextTimea76c965": "ما الذي يجب على مدربك تعديله في المرة القادمة؟",
     "workoutAnnotationSubmittedd0b2f39": "تم إرسال التعليق التوضيحي للتمرين.",
-    "yourCoachAddedANewNote3eec2b4": "أضاف مدربك ملاحظة جديدة.",
+    "notifCoachingMessageBody": "أرسل لك مدربك رسالة.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "تم تغيير الوقت المقرر لهذا التمرين.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "قام مدربك بتحديث التمارين في هذا التمرين.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "قام مدربك بتغيير التمرين المقرر.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "تكليف",
     "semanticClassSlot": "فتحة الصف",
     "semanticChat": "محادثة",
-    "semanticCoachingNote": "مذكرة التدريب",
+    "semanticCoachingMessage": "رسالة تدريب",
     "semanticSystem": "نظام",
     "semanticWorkoutCount": "عد التمرين",
     "semanticWorkoutTypeCount": "عدد نوع التمرين",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "المقرر",
     "semanticNoRecentCompletion": "لا يوجد الانتهاء مؤخرا",
     "semanticOverdueAssignment": "مهمة متأخرة",
-    "semanticNoAdminNote": "لا يوجد مذكرة المدرب",
+    "semanticNoCoachingMessage": "لا توجد رسالة تدريب",
     "apiErrorOffline": "أنت غير متصل. أعد الاتصال وحاول مرة أخرى.",
     "manifestDescription": "جدولة الصالة الرياضية، برمجة الرياضيين، وتنفيذ التمرين.",
     "apiValidationField": "تحقق من هذه القيمة وحاول مرة أخرى.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "الموافقة على الحجز",
     "outboxKindBookingReject": "رفض الحجز",
     "outboxKindTrainingLog": "تمرين مسجل",
+    "outboxKindJournalComment": "تعليق",
+    "outboxKindJournalCommentDelete": "حذف تعليق",
     "outboxKindUnknown": "تغيير دون اتصال",
     "outboxFailureNetwork": "تعذر الوصول إلى الخادم.",
     "outboxFailureSessionExpired": "انتهت صلاحية جلستك. سجّل الدخول مرة أخرى لإرساله.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
     "accessEndedTitle": "انتهى وصولك",
     "accessEndedCancelledBookings": "{count, plural, one {أُلغي حجزك القادم.} other {أُلغيت حجوزاتك القادمة (#).}}",
-    "dashNoClassesToday": "لا توجد حصص اليوم"
+    "dashNoClassesToday": "لا توجد حصص اليوم",
+    "msgKindBox": "من النادي",
+    "notifBoxMessage": "رسالة من النادي",
+    "notifBoxMessageBody": "أرسل لك ناديك رسالة.",
+    "semanticBoxMessage": "رسالة من النادي",
+    "semanticBox": "النادي",
+    "msgTopic": "الموضوع",
+    "msgTopicBooking": "حجز",
+    "msgTopicPayment": "دفع",
+    "msgTopicMembership": "عضوية",
+    "msgTopicFacility": "المرافق",
+    "msgSendAsCoaching": "كرسالة تدريب",
+    "msgSendAsCoachingHint": "تُحتسب تواصلًا تدريبيًا مع عميلك.",
+    "chatsTabBox": "النادي",
+    "chatsBoxThread": "ناديك",
+    "coachLatestTitle": "آخر ما أرسله مدربك",
+    "coachLatestEmpty": "لا توجد رسائل من مدربك بعد.",
+    "coachLatestOpen": "فتح المحادثة",
+    "rhStatCoachingMessages": "رسائل تدريب هذا الأسبوع",
+    "rhStatAwaitingReply": "بانتظار الرد",
+    "apiErrorNoCoachingRelationship": "لا يرسل رسالة التدريب إلا مدرب لديه علاقة تدريب نشطة.",
+    "apiErrorBoxMessageOutsideBoxThread": "تُرسل رسائل النادي في محادثة النادي مع العضو.",
+    "mpTabs": "أقسام الملف",
+    "mpTabOverview": "نظرة عامة",
+    "mpTabTraining": "التدريب",
+    "mpTabWellbeing": "العافية",
+    "mpTabCoaching": "التدريب الشخصي",
+    "mpTabFinance": "المالية",
+    "mpTabAccount": "الحساب",
+    "bmTitle": "رسالة من النادي",
+    "bmBody": "الرسالة",
+    "bmPlaceholder": "اكتب للعضو باسم النادي…",
+    "bmSentOpen": "أُرسلت. فتح المحادثة",
+    "cnAbout": "بخصوص",
+    "cnAboutPick": "اختر ما تتعلق به",
+    "cnAboutNothing": "ملاحظة عامة",
+    "cnSubjectExecution": "تمرين",
+    "cnSubjectTrainingLog": "سجل التدريب",
+    "cnSubjectPr": "رقم قياسي",
+    "cnSubjectInjury": "إصابة",
+    "cnSubjectFormReview": "مراجعة الأداء",
+    "cnSubjectAssignment": "تمرين مُسند"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4732,6 +4791,258 @@
           "body": "اطّلع على اشتراكك في {billing}. غيّر اللغة والإشعارات من ملفك الشخصي."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "أنا فقط",
+        "coach_can_view": "يمكن للمدرب الاطلاع",
+        "coach_reply_requested": "طلب رد",
+        "rated": "تقييم",
+        "posted": "منشور في النادي"
+      },
+      "visibilityHint": {
+        "private": "تراه أنت فقط.",
+        "coach_can_view": "يراه مدربو ناديك دون أن يردوا.",
+        "coach_reply_requested": "يتلقى مدربك سؤالك كرسالة.",
+        "rated": "تقييم للنادي.",
+        "posted": "منشور في النادي."
+      },
+      "changeVisibility": "من يراه: {current}. تغيير",
+      "whoSees": "من يراه",
+      "noCoach": "ليس لديك مدرب في هذا النادي بعد.",
+      "visibilityFailed": "لم يتغير. حاول مرة أخرى.",
+      "saving": "جارٍ الحفظ…",
+      "askCoach": "اسأل المدرب",
+      "save": "حفظ",
+      "personalOnly": "إدخال شخصي: تراه أنت فقط.",
+      "questionLabel": "سؤالك",
+      "questionPlaceholder": "بماذا تريد أن يجيبك المدرب؟",
+      "filterLabel": "تصفية السجل",
+      "filter": {
+        "all": "الكل",
+        "training": "التمارين",
+        "notes": "الملاحظات",
+        "wellbeing": "العافية"
+      },
+      "kind": {
+        "execution": "تمرين",
+        "training_log": "تمرين مسجل",
+        "pr": "PR",
+        "injury": "إصابة",
+        "review": "تقييم",
+        "note": "ملاحظة",
+        "check_in": "كيف أشعر"
+      },
+      "loadMore": "إدخالات أقدم",
+      "loadingMore": "جارٍ التحميل…",
+      "editNote": "تعديل",
+      "noteTopic": {
+        "technique": "التقنية",
+        "thought": "فكرة",
+        "mood": "المزاج",
+        "goal": "هدف"
+      },
+      "note": {
+        "newTitle": "ملاحظة جديدة",
+        "editTitle": "تعديل الملاحظة",
+        "topicLabel": "الموضوع",
+        "bodyLabel": "ملاحظة",
+        "bodyPlaceholder": "ماذا تريد أن تتذكر؟",
+        "savedPrivate": "حُفظت الملاحظة كـ«أنا فقط». {reason}",
+        "saveFailed": "لم يُحفظ. حاول مرة أخرى.",
+        "delete": "حذف",
+        "close": "إغلاق"
+      }
+    },
+    "comments": {
+      "title": "التعليقات",
+      "wholeEntry": "الإدخال بالكامل",
+      "pending": "بانتظار المزامنة",
+      "set": "المجموعة {set}",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "editTitle": "تعديل التعليق",
+      "newTitle": "تعليق جديد",
+      "bodyLabel": "تعليق",
+      "bodyPlaceholder": "كيف سار الأمر؟ شيء يستحق التذكر…",
+      "cancel": "إلغاء",
+      "saving": "جارٍ الحفظ…",
+      "save": "حفظ",
+      "workoutComment": "تعليق على التمرين",
+      "workoutCommentPlaceholder": "كيف سار التمرين بشكل عام؟",
+      "logComment": "تعليق",
+      "commentOptional": "تعليق (اختياري)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "أنا",
+    "journalTitle": "اليوميات",
+    "loading": "جارٍ التحميل…",
+    "cancel": "إلغاء",
+    "signOut": "تسجيل الخروج",
+    "todayWorkout": "تمرين اليوم",
+    "todaySources": "تمارين اليوم حسب المصدر",
+    "todayEmpty": "لا شيء مخطط لليوم. احجز حصة أو سجّل تمرينًا خاصًا بك.",
+    "classChip": "حصة {time}",
+    "programmeChip": "{title} · من مدربك",
+    "logWorkout": "تسجيل",
+    "logged": "تم التسجيل",
+    "startWorkout": "ابدأ",
+    "resumeWorkout": "متابعة",
+    "nextSession": "حصتك التالية",
+    "noBooking": "لا يوجد حجز بعد.",
+    "bookClass": "احجز حصة",
+    "manageBooking": "فتح الحجز",
+    "todayLabel": "اليوم",
+    "boxActions": "إجراءات النادي",
+    "actionSchedule": "الجدول",
+    "actionAppointments": "المواعيد",
+    "actionVideos": "الفيديوهات",
+    "actionCoach": "المدرب",
+    "membership": "الاشتراك",
+    "membershipNone": "لا توجد باقة نشطة.",
+    "membershipOpen": "الاشتراك والمدفوعات",
+    "newEntry": "إدخال جديد",
+    "meSharedPrs": "أرقامي القياسية",
+    "meSharedPrsHint": "البانثيون والأرقام التي شاركها الآخرون معك",
+    "meSharing": "المشاركة والظهور",
+    "meSharingHint": "ما يمكن لمدربك وللآخرين رؤيته",
+    "mePayments": "المدفوعات والإيصالات",
+    "mePaymentsHint": "الفواتير والمبالغ المستردة وباقتك",
+    "meChats": "المحادثات",
+    "meSettings": "الإعدادات",
+    "meSettingsHint": "الملف الشخصي واللغة والمظهر والحساب",
+    "meTour": "جولة تعريفية",
+    "meChecklist": "البدء",
+    "meConsole": "الإدارة",
+    "meConsoleHint": "فتح لوحة الموظفين",
+    "meMyBoxes": "نواديّ",
+    "bookingStatus": {
+      "approved": "محجوز",
+      "pending": "قيد الانتظار",
+      "waitlisted": "قائمة الانتظار"
+    },
+    "entryKind": {
+      "workout": "تمرين",
+      "pr": "رقم قياسي",
+      "injury": "إصابة",
+      "formReview": "فيديو التقنية",
+      "review": "تقييم",
+      "checkIn": "كيف أشعر",
+      "note": "ملاحظة أو فكرة"
+    },
+    "entryKindHint": {
+      "workout": "النتيجة وRPE والملاحظات",
+      "pr": "رقم شخصي جديد",
+      "injury": "يراها مدربوك",
+      "formReview": "اطلب ملاحظات من مدربك",
+      "review": "قيّم حصة أو تمرينًا",
+      "checkIn": "بضعة أسئلة سريعة",
+      "note": "التقنية، الهدف، المزاج"
+    },
+    "homeTitle": "الرئيسية",
+    "wodToday": "تمرين اليوم في النادي",
+    "wodTodayEmpty": "لا يوجد تمرين حصة اليوم.",
+    "openInBox": "فتح في Box",
+    "feedPosts": "من ناديك",
+    "feedPostsEmpty": "ستظهر هنا منشورات ناديك.",
+    "entryGroup": {
+      "training": "التدريب",
+      "wellbeing": "العافية",
+      "coach": "المدرب",
+      "note": "ملاحظة"
+    },
+    "checkIn": {
+      "eyebrow": "كيف أشعر",
+      "title": "كيف تشعر الآن؟",
+      "question": {
+        "sleep": "كيف كان نومك؟",
+        "energy": "كم لديك من الطاقة؟",
+        "mood": "كيف مزاجك؟",
+        "stress": "ما مقدار التوتر لديك؟",
+        "body": "كيف يشعر جسمك؟"
+      },
+      "short": {
+        "sleep": "النوم",
+        "energy": "الطاقة",
+        "mood": "المزاج",
+        "stress": "التوتر",
+        "body": "الجسم"
+      },
+      "answer": {
+        "sleep": {
+          "1": "سيئ",
+          "2": "متوسط",
+          "3": "جيد",
+          "4": "ممتاز"
+        },
+        "energy": {
+          "1": "منهك",
+          "2": "منخفضة",
+          "3": "جيدة",
+          "4": "كاملة"
+        },
+        "mood": {
+          "1": "سيئ جدًا",
+          "2": "منخفض",
+          "3": "جيد",
+          "4": "ممتاز"
+        },
+        "stress": {
+          "1": "كثير",
+          "2": "إلى حد ما",
+          "3": "قليل",
+          "4": "لا يوجد"
+        },
+        "body": {
+          "1": "متألم",
+          "2": "متيبس",
+          "3": "بخير",
+          "4": "منتعش"
+        }
+      },
+      "notePlaceholder": "هل تريد قول شيء؟",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "answerOne": "أجب عن سؤال واحد على الأقل.",
+      "savesAsNew": "كل حفظ إدخال جديد؛ تبقى الإدخالات السابقة على خطك الزمني.",
+      "saved": "تم الحفظ في {time}.",
+      "saveFailed": "تعذّر الحفظ. حاول مرة أخرى.",
+      "timelineTitle": "آخر {days} يومًا",
+      "timelineEmpty": "لا توجد إدخالات بعد. ستظهر إجاباتك هنا كخط زمني.",
+      "timelineAria": "{question}: {count, plural, zero {لا إدخالات} one {إدخال واحد} two {إدخالان} few {# إدخالات} many {# إدخالًا} other {# إدخال}}",
+      "history": "كل الإدخالات ({count})",
+      "delete": "حذف",
+      "loading": "جارٍ التحميل…"
+    },
+    "injury": {
+      "addUpdate": "إضافة تحديث",
+      "reopen": "إعادة الفتح",
+      "timeline": "{count, plural, zero {التطور · لا أحداث} one {التطور · حدث واحد} two {التطور · حدثان} few {التطور · # أحداث} many {التطور · # حدثًا} other {التطور · # حدث}}",
+      "timelineAria": "الخط الزمني للإصابة مع {count} أحداث",
+      "event": {
+        "reported": "تم الإبلاغ",
+        "updated": "تحديث",
+        "marked_healed": "تم الشفاء",
+        "reopened": "أعيد فتحها"
+      },
+      "field": {
+        "severity": "الشدة",
+        "body_area": "منطقة الجسم",
+        "training_limitations": "قيود التدريب",
+        "description": "الوصف",
+        "tags": "الوسوم"
+      },
+      "severity": {
+        "mild": "خفيفة",
+        "moderate": "متوسطة",
+        "severe": "شديدة"
+      },
+      "notePlaceholder": "كيف تسير الأمور؟ (اختياري)",
+      "save": "حفظ التحديث",
+      "saving": "جارٍ الحفظ…",
+      "cancel": "إلغاء"
     }
   }
 }

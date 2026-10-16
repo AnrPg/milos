@@ -41,10 +41,11 @@ export type LeaderboardEntry = {
   prs_this_month: number;
 };
 
-export type CoachNoteRecord = {
+/** A coaching message the member received (ADR-140 §6). */
+export type CoachingMessageRecord = {
   id: string;
-  admin_id: string;
-  athlete_id: string;
+  thread_id: string;
+  sender_id: string;
   body: string;
   inserted_at: string;
 };
@@ -95,7 +96,7 @@ export type LandingPayload = {
       monthly: LeaderboardEntry[];
     };
   };
-  coach_notes: CoachNoteRecord[];
+  coaching_messages: CoachingMessageRecord[];
   membership: null | {
     package_name?: string | null;
     package_code?: string | null;
@@ -103,7 +104,6 @@ export type LandingPayload = {
     last_paid?: string | null;
     amount?: number | null;
     currency?: string | null;
-    notes?: string | null;
     entitlement_status?: string | null;
     entitlement_source?: string | null;
   };

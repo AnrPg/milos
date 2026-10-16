@@ -6,6 +6,7 @@ defmodule MilosTraining.Application.UpdateTrainingLogEntry do
   projection (gamification is computed once, when the entry is logged).
   """
 
+  alias MilosTraining.Application.JournalComments
   alias MilosTraining.{Execution, Workouts}
 
   def call(%{organization_id: _} = context, %{id: user_id}, entry_id, params)
@@ -16,10 +17,12 @@ defmodule MilosTraining.Application.UpdateTrainingLogEntry do
           {:error, :not_found}
 
         entry ->
-          Execution.update_training_log_entry(entry_id, user_id, params,
-            now: DateTime.utc_now(),
-            allowed_section_ids: allowed_section_ids(context, entry)
-          )
+          with {:ok, updated} <-
+                 Execution.update_training_log_entry(entry_id, user_id, params,
+                   now: DateTime.utc_now(),
+                   allowed_section_ids: allowed_section_ids(context, entry)
+                 ),
+               do: {:ok, JournalComments.attach(updated, "training_log")}
       end
     end)
   end

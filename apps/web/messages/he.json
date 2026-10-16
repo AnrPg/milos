@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "הנחיות",
+    "scaling": "התאמה",
+    "safety": "זהירות",
+    "equipment": "ציוד",
+    "cue": "רמז",
+    "coachBrief": "למאמן"
+  },
   "Common": {
     "save": "שמירה",
     "saving": "שומר…",
@@ -51,7 +59,15 @@
     "inventory": "מלאי",
     "menu": "תפריט",
     "notifications": "התראות",
-    "unreadNotifications": "{count, plural, one {התראה אחת שלא נקראה} two {# התראות שלא נקראו} other {# התראות שלא נקראו}}"
+    "unreadNotifications": "{count, plural, one {התראה אחת שלא נקראה} two {# התראות שלא נקראו} other {# התראות שלא נקראו}}",
+    "box": "Box",
+    "me": "אני",
+    "today": "היום",
+    "journalFlow": "רצף",
+    "vault": "ארכיון",
+    "reviews": "ביקורות",
+    "coach": "מאמן",
+    "memberTabs": "מדורים ראשיים"
   },
   "Profile": {
     "eyebrow": "פרופיל",
@@ -655,7 +671,7 @@
     "noConversationsYetSearchToStartOne1a91cf7": "עדיין אין שיחות. חפש כדי להתחיל אחד.",
     "hideConversationdfb77ca": "הסתר שיחה",
     "yourDraftIsStillHereReconnectAndRetry617338d": "הטיוטה שלך עדיין כאן; התחבר מחדש ונסה שוב.",
-    "coachingNote7e2c608": "הערת אימון",
+    "msgKindCoaching": "הודעת אימון",
     "pendingApprovals6ac383a": "ממתינים לאישורים",
     "classesTodayd01b776": "שיעורים היום",
     "todayAtAGlance07e2821": "היום במבט חטוף",
@@ -812,7 +828,7 @@
     "rejectThisWorkoutYourCoachWillBeNotifiedc5e945d": "לדחות את האימון הזה? המאמן שלך יקבל הודעה.",
     "calendar4e44752": "+ לוח שנה",
     "workoutDetails9366821": "פרטי אימון",
-    "coachNotee98376b": "הערת המאמן",
+    "notifCoachingMessage": "הודעה מהמאמן שלך",
     "assignedAthletes3f6c5e6": "ספורטאים שהוקצו",
     "scheduledFor4cbbcd5": "מתוכנן ל",
     "yourScores842c2ab": "הציונים שלך",
@@ -1728,7 +1744,7 @@
     "whichPartFeltTooHardPainfulConfusingOrced1e04": "איזה חלק הרגיש קשה מדי, כואב, מבלבל או מיותר?",
     "whatShouldYourCoachAdjustNextTimea76c965": "מה המאמן שלך צריך להתאים בפעם הבאה?",
     "workoutAnnotationSubmittedd0b2f39": "הערת אימון נשלחה.",
-    "yourCoachAddedANewNote3eec2b4": "המאמן שלך הוסיף הערה חדשה.",
+    "notifCoachingMessageBody": "המאמן שלך שלח לך הודעה.",
     "theScheduledTimeForThisWorkoutWasChanged2d953b3": "הזמן המתוכנן לאימון זה השתנה.",
     "yourCoachUpdatedTheExercisesInThisWorkout1c9eed2": "המאמן שלך עדכן את התרגילים באימון זה.",
     "yourCoachChangedAScheduledWorkoutf8cf1d6": "המאמן שלך שינה אימון מתוכנן.",
@@ -2056,7 +2072,7 @@
     "semanticAssignment": "משימה",
     "semanticClassSlot": "חריץ כיתתי",
     "semanticChat": "צ'אט",
-    "semanticCoachingNote": "הערת אימון",
+    "semanticCoachingMessage": "הודעת אימון",
     "semanticSystem": "מערכת",
     "semanticWorkoutCount": "ספירת אימונים",
     "semanticWorkoutTypeCount": "ספירת סוגי האימון",
@@ -2203,7 +2219,7 @@
     "semanticScheduled": "מתוזמן",
     "semanticNoRecentCompletion": "אין השלמה לאחרונה",
     "semanticOverdueAssignment": "משימה באיחור",
-    "semanticNoAdminNote": "אין הערת מאמן",
+    "semanticNoCoachingMessage": "אין הודעת אימון",
     "apiErrorOffline": "אתה במצב לא מקוון. התחבר מחדש ונסה שוב.",
     "manifestDescription": "תזמון חדר כושר, תכנות ספורטאים וביצוע אימון.",
     "apiValidationField": "בדוק את הערך הזה ונסה שוב.",
@@ -2746,6 +2762,8 @@
     "outboxKindBookingApprove": "אישור הזמנה",
     "outboxKindBookingReject": "דחיית הזמנה",
     "outboxKindTrainingLog": "אימון שנרשם",
+    "outboxKindJournalComment": "תגובה",
+    "outboxKindJournalCommentDelete": "מחיקת תגובה",
     "outboxKindUnknown": "שינוי ללא חיבור",
     "outboxFailureNetwork": "לא ניתן היה להתחבר לשרת.",
     "outboxFailureSessionExpired": "פג תוקף ההתחברות. התחברו שוב כדי לשלוח.",
@@ -4251,7 +4269,48 @@
     "workoutCount": "{count, plural, one {אימון אחד} two {שני אימונים} other {# אימונים}}",
     "accessEndedTitle": "הגישה שלך הסתיימה",
     "accessEndedCancelledBookings": "{count, plural, one {ההזמנה הקרובה שלך בוטלה.} other {# ההזמנות הקרובות שלך בוטלו.}}",
-    "dashNoClassesToday": "אין שיעורים היום"
+    "dashNoClassesToday": "אין שיעורים היום",
+    "msgKindBox": "מהמכון",
+    "notifBoxMessage": "הודעה מהמכון",
+    "notifBoxMessageBody": "המכון שלך שלח לך הודעה.",
+    "semanticBoxMessage": "הודעה מהמכון",
+    "semanticBox": "המכון",
+    "msgTopic": "נושא",
+    "msgTopicBooking": "הזמנה",
+    "msgTopicPayment": "תשלום",
+    "msgTopicMembership": "מנוי",
+    "msgTopicFacility": "מתקנים",
+    "msgSendAsCoaching": "כהודעת אימון",
+    "msgSendAsCoachingHint": "נספר כנקודת מגע אימונית עם הלקוח.",
+    "chatsTabBox": "המכון",
+    "chatsBoxThread": "המכון שלך",
+    "coachLatestTitle": "האחרון מהמאמן",
+    "coachLatestEmpty": "עדיין אין הודעות מהמאמן שלך.",
+    "coachLatestOpen": "פתיחת שיחה",
+    "rhStatCoachingMessages": "הודעות אימון השבוע",
+    "rhStatAwaitingReply": "ממתינים לתשובה",
+    "apiErrorNoCoachingRelationship": "רק מאמן עם קשר אימון פעיל יכול לשלוח הודעת אימון.",
+    "apiErrorBoxMessageOutsideBoxThread": "הודעות מהמכון נשלחות בשיחה של המכון עם המתאמן.",
+    "mpTabs": "חלקי הפרופיל",
+    "mpTabOverview": "סקירה",
+    "mpTabTraining": "אימונים",
+    "mpTabWellbeing": "רווחה",
+    "mpTabCoaching": "אימון אישי",
+    "mpTabFinance": "כספים",
+    "mpTabAccount": "חשבון",
+    "bmTitle": "הודעה מהמכון",
+    "bmBody": "הודעה",
+    "bmPlaceholder": "כתבו למתאמן בשם המכון…",
+    "bmSentOpen": "נשלח. פתיחת שיחה",
+    "cnAbout": "בנושא",
+    "cnAboutPick": "בחרו במה מדובר",
+    "cnAboutNothing": "הערה כללית",
+    "cnSubjectExecution": "אימון",
+    "cnSubjectTrainingLog": "יומן אימונים",
+    "cnSubjectPr": "שיא אישי",
+    "cnSubjectInjury": "פציעה",
+    "cnSubjectFormReview": "בדיקת טכניקה",
+    "cnSubjectAssignment": "אימון שהוקצה"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4732,6 +4791,258 @@
           "body": "את המנוי רואים ב{billing}. שפה והתראות משנים בפרופיל."
         }
       }
+    }
+  },
+  "MemberApp": {
+    "journal": {
+      "visibility": {
+        "private": "רק אני",
+        "coach_can_view": "המאמן יכול לראות",
+        "coach_reply_requested": "מבקש תשובה",
+        "rated": "דירוג",
+        "posted": "פורסם בבוקס"
+      },
+      "visibilityHint": {
+        "private": "רק אתה רואה.",
+        "coach_can_view": "המאמנים של הבוקס רואים, בלי להגיב.",
+        "coach_reply_requested": "המאמן מקבל את השאלה שלך כהודעה.",
+        "rated": "דירוג לבוקס.",
+        "posted": "פורסם בבוקס."
+      },
+      "changeVisibility": "מי רואה: {current}. שינוי",
+      "whoSees": "מי רואה",
+      "noCoach": "עדיין אין לך מאמן בבוקס הזה.",
+      "visibilityFailed": "לא השתנה. נסה שוב.",
+      "saving": "שומר…",
+      "askCoach": "שאל את המאמן",
+      "save": "שמירה",
+      "personalOnly": "רשומה אישית: רק אתה רואה אותה.",
+      "questionLabel": "השאלה שלך",
+      "questionPlaceholder": "על מה המאמן צריך לענות?",
+      "filterLabel": "מסנן הזרם",
+      "filter": {
+        "all": "הכול",
+        "training": "אימונים",
+        "notes": "הערות",
+        "wellbeing": "רווחה"
+      },
+      "kind": {
+        "execution": "אימון",
+        "training_log": "אימון שנרשם",
+        "pr": "PR",
+        "injury": "פציעה",
+        "review": "דירוג",
+        "note": "הערה",
+        "check_in": "איך אני מרגיש"
+      },
+      "loadMore": "רשומות קודמות",
+      "loadingMore": "טוען…",
+      "editNote": "עריכה",
+      "noteTopic": {
+        "technique": "טכניקה",
+        "thought": "מחשבה",
+        "mood": "מצב רוח",
+        "goal": "מטרה"
+      },
+      "note": {
+        "newTitle": "הערה חדשה",
+        "editTitle": "עריכת הערה",
+        "topicLabel": "נושא",
+        "bodyLabel": "הערה",
+        "bodyPlaceholder": "מה תרצה לזכור?",
+        "savedPrivate": "ההערה נשמרה כ„רק אני”. {reason}",
+        "saveFailed": "לא נשמר. נסה שוב.",
+        "delete": "מחיקה",
+        "close": "סגירה"
+      }
+    },
+    "comments": {
+      "title": "תגובות",
+      "wholeEntry": "הרשומה כולה",
+      "pending": "ממתין לסנכרון",
+      "set": "סט {set}",
+      "edit": "עריכה",
+      "delete": "מחיקה",
+      "editTitle": "עריכת תגובה",
+      "newTitle": "תגובה חדשה",
+      "bodyLabel": "תגובה",
+      "bodyPlaceholder": "איך היה? משהו ששווה לזכור…",
+      "cancel": "ביטול",
+      "saving": "שומר…",
+      "save": "שמירה",
+      "workoutComment": "תגובה על האימון",
+      "workoutCommentPlaceholder": "איך היה האימון בסך הכול?",
+      "logComment": "תגובה",
+      "commentOptional": "תגובה (אופציונלי)"
+    },
+    "boxTitle": "Box",
+    "meTitle": "אני",
+    "journalTitle": "יומן",
+    "loading": "טוען…",
+    "cancel": "ביטול",
+    "signOut": "התנתקות",
+    "todayWorkout": "האימון של היום",
+    "todaySources": "אימוני היום לפי מקור",
+    "todayEmpty": "אין שום דבר מתוכנן להיום. הזמינו שיעור או תעדו אימון משלכם.",
+    "classChip": "שיעור {time}",
+    "programmeChip": "{title} · מהמאמן",
+    "logWorkout": "תיעוד",
+    "logged": "תועד",
+    "startWorkout": "התחלה",
+    "resumeWorkout": "המשך",
+    "nextSession": "האימון הבא שלכם",
+    "noBooking": "עדיין אין הזמנה.",
+    "bookClass": "הזמנת שיעור",
+    "manageBooking": "פתיחת ההזמנה",
+    "todayLabel": "היום",
+    "boxActions": "פעולות הבוקס",
+    "actionSchedule": "לוח זמנים",
+    "actionAppointments": "פגישות",
+    "actionVideos": "סרטונים",
+    "actionCoach": "מאמן",
+    "membership": "מנוי",
+    "membershipNone": "אין חבילה פעילה.",
+    "membershipOpen": "מנוי ותשלומים",
+    "newEntry": "רשומה חדשה",
+    "meSharedPrs": "השיאים שלי",
+    "meSharedPrsHint": "הפנתיאון ושיאים ששותפו איתכם",
+    "meSharing": "שיתוף ונראות",
+    "meSharingHint": "מה המאמן ואחרים יכולים לראות",
+    "mePayments": "תשלומים וקבלות",
+    "mePaymentsHint": "חשבוניות, החזרים והחבילה שלכם",
+    "meChats": "שיחות",
+    "meSettings": "הגדרות",
+    "meSettingsHint": "פרופיל, שפה, ערכת נושא, חשבון",
+    "meTour": "סיור במערכת",
+    "meChecklist": "צעדים ראשונים",
+    "meConsole": "ניהול",
+    "meConsoleHint": "פתיחת מסוף הצוות",
+    "meMyBoxes": "הבוקסים שלי",
+    "bookingStatus": {
+      "approved": "מוזמן",
+      "pending": "ממתין",
+      "waitlisted": "רשימת המתנה"
+    },
+    "entryKind": {
+      "workout": "אימון",
+      "pr": "שיא",
+      "injury": "פציעה",
+      "formReview": "סרטון טכניקה",
+      "review": "ביקורת",
+      "checkIn": "איך אני מרגיש",
+      "note": "הערה או מחשבה"
+    },
+    "entryKindHint": {
+      "workout": "תוצאה, RPE, הערות",
+      "pr": "שיא אישי חדש",
+      "injury": "גלוי למאמנים שלכם",
+      "formReview": "בקשו משוב מהמאמן",
+      "review": "דרגו שיעור או אימון",
+      "checkIn": "כמה שאלות קצרות",
+      "note": "טכניקה, מטרה, מצב רוח"
+    },
+    "homeTitle": "בית",
+    "wodToday": "האימון היומי במכון",
+    "wodTodayEmpty": "אין היום אימון בשיעורים.",
+    "openInBox": "פתיחה ב-Box",
+    "feedPosts": "מהמועדון שלכם",
+    "feedPostsEmpty": "הפוסטים של המועדון שלכם יופיעו כאן.",
+    "entryGroup": {
+      "training": "אימון",
+      "wellbeing": "רווחה",
+      "coach": "מאמן",
+      "note": "הערה"
+    },
+    "checkIn": {
+      "eyebrow": "איך אני מרגיש",
+      "title": "איך אתה מרגיש עכשיו?",
+      "question": {
+        "sleep": "איך ישנת?",
+        "energy": "כמה אנרגיה יש לך?",
+        "mood": "איך מצב הרוח שלך?",
+        "stress": "כמה לחץ יש לך?",
+        "body": "איך הגוף שלך מרגיש?"
+      },
+      "short": {
+        "sleep": "שינה",
+        "energy": "אנרגיה",
+        "mood": "מצב רוח",
+        "stress": "לחץ",
+        "body": "גוף"
+      },
+      "answer": {
+        "sleep": {
+          "1": "רע",
+          "2": "ככה-ככה",
+          "3": "טוב",
+          "4": "מעולה"
+        },
+        "energy": {
+          "1": "מותש",
+          "2": "נמוכה",
+          "3": "טובה",
+          "4": "מלאה"
+        },
+        "mood": {
+          "1": "נורא",
+          "2": "ירוד",
+          "3": "טוב",
+          "4": "מעולה"
+        },
+        "stress": {
+          "1": "הרבה",
+          "2": "די הרבה",
+          "3": "קצת",
+          "4": "בכלל לא"
+        },
+        "body": {
+          "1": "כואב",
+          "2": "תפוס",
+          "3": "בסדר",
+          "4": "רענן"
+        }
+      },
+      "notePlaceholder": "רוצה להוסיף משהו?",
+      "save": "שמירה",
+      "saving": "שומר…",
+      "answerOne": "ענה לפחות על שאלה אחת.",
+      "savesAsNew": "כל שמירה היא רשומה חדשה; הקודמות נשארות בציר הזמן.",
+      "saved": "נשמר ב-{time}.",
+      "saveFailed": "השמירה נכשלה. נסה שוב.",
+      "timelineTitle": "{days} הימים האחרונים",
+      "timelineEmpty": "אין עדיין רשומות. התשובות שלך יופיעו כאן כציר זמן.",
+      "timelineAria": "{question}: {count, plural, one {רשומה אחת} other {# רשומות}}",
+      "history": "כל הרשומות ({count})",
+      "delete": "מחיקה",
+      "loading": "טוען…"
+    },
+    "injury": {
+      "addUpdate": "הוספת עדכון",
+      "reopen": "פתיחה מחדש",
+      "timeline": "{count, plural, one {התקדמות · אירוע אחד} other {התקדמות · # אירועים}}",
+      "timelineAria": "ציר זמן של הפציעה עם {count} אירועים",
+      "event": {
+        "reported": "דווחה",
+        "updated": "עדכון",
+        "marked_healed": "סומנה כמחלימה",
+        "reopened": "נפתחה מחדש"
+      },
+      "field": {
+        "severity": "חומרה",
+        "body_area": "אזור בגוף",
+        "training_limitations": "מגבלות אימון",
+        "description": "תיאור",
+        "tags": "תגיות"
+      },
+      "severity": {
+        "mild": "קלה",
+        "moderate": "בינונית",
+        "severe": "חמורה"
+      },
+      "notePlaceholder": "איך זה מתקדם? (רשות)",
+      "save": "שמירת עדכון",
+      "saving": "שומר…",
+      "cancel": "ביטול"
     }
   }
 }

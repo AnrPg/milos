@@ -3,7 +3,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
   import Ecto.Changeset
 
   alias MilosTraining.{ScaleLevel, Workouts.WorkoutExercise}
-  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
+  alias MilosTraining.Workouts.Domain.{WorkoutAuthoringMetadata, WorkoutContent}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -22,7 +22,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     field :load_progression, :map
     field :excluded, :boolean, default: false
     field :note, :string
-    field :notes, {:array, :map}, default: []
+    field :content, {:array, :map}, default: []
     field :prescription_metadata, :map, default: %{}
 
     belongs_to :workout_exercise, WorkoutExercise
@@ -46,7 +46,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
       :load_progression,
       :note,
       :excluded,
-      :notes,
+      :content,
       :prescription_metadata
     ])
     |> update_change(:exercise_name_override, &normalize_string/1)
@@ -56,7 +56,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     |> validate_optional_number(:load_value)
     |> validate_override_or_excluded()
     |> validate_bounded_metadata()
-    |> validate_typed_notes()
+    |> validate_content()
     |> foreign_key_constraint(:workout_exercise_id)
     |> foreign_key_constraint(:scale_level_id)
     |> unique_constraint([:workout_exercise_id, :scale_level_id])
@@ -84,7 +84,7 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
       :load_mode,
       :load_progression,
       :note,
-      :notes,
+      :content,
       :prescription_metadata
     ]
 
@@ -117,11 +117,13 @@ defmodule MilosTraining.Workouts.ExerciseVariation do
     end)
   end
 
-  defp validate_typed_notes(changeset) do
-    validate_change(changeset, :notes, fn :notes, notes ->
-      case WorkoutAuthoringMetadata.validate_notes(notes) do
+  defp validate_content(changeset) do
+    level = :variation
+
+    validate_change(changeset, :content, fn :content, content ->
+      case WorkoutContent.validate(content, level) do
         :ok -> []
-        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+        {:error, reason} -> [content: "is invalid: #{inspect(reason)}"]
       end
     end)
   end

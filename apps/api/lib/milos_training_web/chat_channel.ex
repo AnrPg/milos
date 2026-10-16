@@ -38,6 +38,7 @@ defmodule MilosTrainingWeb.ChatChannel do
           sender_id: user_id,
           body: body,
           message_type: message_type,
+          topic: Map.get(params, "topic"),
           client_operation_id: client_operation_id
         })
       end)
@@ -98,6 +99,9 @@ defmodule MilosTrainingWeb.ChatChannel do
       body: message.body,
       message_type: message.message_type,
       client_operation_id: message.client_operation_id,
+      subject_kind: message.subject_kind,
+      subject_id: message.subject_id,
+      topic: message.topic,
       inserted_at: message.inserted_at
     }
   end
@@ -112,7 +116,8 @@ defmodule MilosTrainingWeb.ChatChannel do
 
   defp format_errors(reason), do: inspect(reason)
 
-  defp parse_message_type("coaching_note"), do: :coaching_note
+  defp parse_message_type("coaching_message"), do: :coaching_message
+  defp parse_message_type("box_message"), do: :box_message
   defp parse_message_type("system"), do: :system
   defp parse_message_type(_), do: :chat
 end

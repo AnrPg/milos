@@ -3,6 +3,10 @@ import { describe, expect, it, vi } from "vitest";
 
 import { WorkoutPreviewDetail } from "./WorkoutPreviewDetail";
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+}));
+
 vi.mock("@/i18n/ui", () => ({
   useUiTranslations: () => (key: string, values?: Record<string, unknown>) =>
     key === "supersetLabel" ? "Superset" :

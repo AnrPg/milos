@@ -51,7 +51,9 @@ const SEMANTIC_KEYS: Record<string, string> = {
   assignment: "semanticAssignment",
   class_slot: "semanticClassSlot",
   chat: "semanticChat",
-  coaching_note: "semanticCoachingNote",
+  coaching_message: "semanticCoachingMessage",
+  box_message: "semanticBoxMessage",
+  box: "semanticBox",
   system: "semanticSystem",
   workout_count: "semanticWorkoutCount",
   workout_type_count: "semanticWorkoutTypeCount",
@@ -159,7 +161,7 @@ const SEMANTIC_KEYS: Record<string, string> = {
   scheduled: "semanticScheduled",
   no_recent_completion: "semanticNoRecentCompletion",
   overdue_assignment: "semanticOverdueAssignment",
-  no_admin_note: "semanticNoAdminNote",
+  no_coaching_message: "semanticNoCoachingMessage",
   all: "semanticAll",
   admin_only: "semanticAdminOnly",
   user_visible: "semanticUserVisible",
@@ -235,6 +237,8 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  no_coaching_relationship: "apiErrorNoCoachingRelationship",
+  box_message_outside_box_thread: "apiErrorBoxMessageOutsideBoxThread",
   invalid_admin_registration_code: "apiErrorInvalidAdminRegistrationCode",
   invalid_invitation: "apiErrorInvalidInvitation",
   invitation_email_mismatch: "apiErrorInvitationEmailMismatch",

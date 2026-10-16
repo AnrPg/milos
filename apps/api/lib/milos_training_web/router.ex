@@ -408,6 +408,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    get("/clients/:user_id/journal", JournalController, :client_journal)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -441,6 +442,7 @@ defmodule MilosTrainingWeb.Router do
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
+    get("/my-client-stats", CoachingExtrasController, :my_client_stats)
     get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
     put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
     get("/appointment-slots", AppointmentsController, :slots)
@@ -736,6 +738,8 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", AdminWellbeingController, :index)
     post("/wellbeing/users/:id/injuries", AdminWellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", AdminWellbeingController, :heal)
+    patch("/wellbeing/injuries/:id", AdminWellbeingController, :update)
+    post("/wellbeing/injuries/:id/reopen", AdminWellbeingController, :reopen)
     # ADR-124 injury-aware workout safety warnings (informational only).
     post("/wellbeing/injury-warnings", AdminInjuryWarningController, :evaluate)
     post("/wellbeing/injury-warnings/acknowledge", AdminInjuryWarningController, :acknowledge)
@@ -848,6 +852,19 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
+    patch("/wellbeing/injuries/:id", WellbeingController, :update)
+    post("/wellbeing/injuries/:id/reopen", WellbeingController, :reopen)
+    get("/wellbeing/check-ins", CheckInController, :index)
+    post("/wellbeing/check-ins", CheckInController, :create)
+    delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    post("/journal/comments/batch", JournalCommentController, :batch)
+    put("/journal/comments/:id", JournalCommentController, :save)
+    delete("/journal/comments/:id", JournalCommentController, :delete)
+    get("/me/journal", JournalController, :index)
+    put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
+    post("/me/journal/notes", JournalController, :create_note)
+    patch("/me/journal/notes/:id", JournalController, :update_note)
+    delete("/me/journal/notes/:id", JournalController, :delete_note)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
@@ -870,9 +887,7 @@ defmodule MilosTrainingWeb.Router do
     get("/vault", ExecutionController, :vault)
     get("/:id", ExecutionController, :show)
     patch("/:id/progress", ExecutionController, :update_progress)
-    post("/:id/notes", ExecutionController, :submit_note)
     patch("/:id/complete", ExecutionController, :complete)
-    post("/:id/modifications", ExecutionController, :add_modifications)
   end
 
   # ADR-123: batched client interaction analytics get their own bucket so a

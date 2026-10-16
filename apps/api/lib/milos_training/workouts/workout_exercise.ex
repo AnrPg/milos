@@ -2,7 +2,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
+  alias MilosTraining.Workouts.Domain.{WorkoutAuthoringMetadata, WorkoutContent}
   alias MilosTraining.Workouts.{ExerciseVariation, WorkoutSection}
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -35,7 +35,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     field :note, :string
     field :subtitle, :string
     field :exercise_ref, :string
-    field :notes, {:array, :map}, default: []
+    field :content, {:array, :map}, default: []
     field :prescription_metadata, :map, default: %{}
     field :group_config, :map
 
@@ -71,7 +71,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
       :note,
       :subtitle,
       :exercise_ref,
-      :notes,
+      :content,
       :prescription_metadata,
       :group_config
     ])
@@ -91,7 +91,7 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     |> validate_optional_number(:interval_assignment, 0)
     |> validate_bounded_metadata(:prescription_metadata, :exercise)
     |> validate_optional_bounded_metadata(:group_config, :group)
-    |> validate_typed_notes()
+    |> validate_content()
     |> validate_item_groups()
     |> foreign_key_constraint(:workout_section_id)
     |> cast_assoc(:variations, with: &ExerciseVariation.changeset/2)
@@ -147,12 +147,18 @@ defmodule MilosTraining.Workouts.WorkoutExercise do
     end)
   end
 
-  defp validate_typed_notes(changeset) do
-    validate_change(changeset, :notes, fn :notes, notes ->
-      case WorkoutAuthoringMetadata.validate_notes(notes) do
+  defp validate_content(changeset) do
+    level = content_level(changeset)
+
+    validate_change(changeset, :content, fn :content, content ->
+      case WorkoutContent.validate(content, level) do
         :ok -> []
-        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+        {:error, reason} -> [content: "is invalid: #{inspect(reason)}"]
       end
     end)
   end
+
+  # A header row carries Οδηγίες; an exercise row carries cues.
+  defp content_level(changeset),
+    do: if(get_field(changeset, :item_type) == :header, do: :header, else: :exercise)
 end

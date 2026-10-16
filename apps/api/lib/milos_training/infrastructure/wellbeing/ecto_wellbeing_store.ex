@@ -6,7 +6,9 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   alias Ecto.Multi
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
-  alias MilosTraining.Wellbeing.{InjuryReport, InjuryStatusEvent}
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
+  alias MilosTraining.Wellbeing.{CheckIn, InjuryReport, InjuryStatusEvent}
+  alias MilosTraining.Wellbeing.Domain.CheckInQuestions
 
   @impl true
   def report_injury(user_id, actor_id, actor_role, params) do
@@ -81,11 +83,68 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   end
 
   @impl true
+  def update_injury(injury_report_id, actor_id, build) when is_function(build, 1) do
+    case InjuryReport |> scoped_to_owner_or_tenant() |> Repo.get(injury_report_id) do
+      nil ->
+        {:error, :not_found}
+
+      %InjuryReport{} = injury_report ->
+        with {:ok, attrs, payload} <- build.(normalize_injury(injury_report)) do
+          injury_report
+          |> InjuryReport.changeset(attrs)
+          |> record_event(actor_id, "updated", payload)
+        end
+    end
+  end
+
+  @impl true
+  def reopen_injury(injury_report_id, actor_id) do
+    case InjuryReport |> scoped_to_owner_or_tenant() |> Repo.get(injury_report_id) do
+      nil ->
+        {:error, :not_found}
+
+      %InjuryReport{status: "active"} ->
+        {:error, :injury_already_active}
+
+      %InjuryReport{} = injury_report ->
+        injury_report
+        |> InjuryReport.changeset(%{status: "active", healed_on: nil})
+        |> record_event(actor_id, "reopened", %{"healed_on" => injury_report.healed_on})
+    end
+  end
+
+  defp record_event(changeset, actor_id, event_type, payload) do
+    Multi.new()
+    |> Multi.update(:injury_report, changeset, force: true)
+    |> Multi.insert(:status_event, fn %{injury_report: updated_report} ->
+      InjuryStatusEvent.changeset(%InjuryStatusEvent{}, %{
+        injury_report_id: updated_report.id,
+        actor_id: actor_id,
+        event_type: event_type,
+        occurred_at: DateTime.utc_now(),
+        payload: payload
+      })
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{injury_report: updated_report}} ->
+        {:ok, updated_report |> Repo.preload(:events, force: true) |> normalize_injury()}
+
+      {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
+        {:error, changeset}
+
+      {:error, _step, reason, _changes} ->
+        {:error, reason}
+    end
+  end
+
+  @impl true
   def get_injury_for_user(user_id, injury_report_id) do
     InjuryReport
     |> scoped_to_owner_or_tenant()
     |> where([injury], injury.id == ^injury_report_id and injury.user_id == ^user_id)
     |> where([injury], injury.visibility == "user_and_admin")
+    |> preload(:events)
     |> Repo.one()
     |> case do
       nil -> nil
@@ -100,6 +159,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> where([injury], injury.user_id == ^user_id)
     |> where([injury], injury.visibility == "user_and_admin")
     |> order_by([injury], desc: injury.inserted_at)
+    |> preload(:events)
     |> Repo.all()
     |> Enum.map(&normalize_injury/1)
   end
@@ -129,6 +189,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> order_by([injury], desc: injury.inserted_at)
     |> offset(^parse_offset(filters["offset"]))
     |> limit(^parse_limit(filters["limit"]))
+    |> preload(:events)
     |> Repo.all()
     |> Enum.map(&normalize_injury/1)
   end
@@ -171,10 +232,29 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       training_limitations: injury_report.training_limitations,
       tags: injury_report.tags || [],
       visibility: injury_report.visibility,
+      journal_visibility: injury_report.journal_visibility,
       params: injury_report.params || %{},
+      events: normalize_events(injury_report.events),
       inserted_at: injury_report.inserted_at,
       updated_at: injury_report.updated_at
     }
+  end
+
+  # The injury's timeline (ADR-140 §3), oldest first; empty when not loaded.
+  defp normalize_events(%Ecto.Association.NotLoaded{}), do: []
+
+  defp normalize_events(events) do
+    events
+    |> Enum.sort_by(& &1.occurred_at, DateTime)
+    |> Enum.map(
+      &%{
+        id: &1.id,
+        event_type: &1.event_type,
+        actor_id: &1.actor_id,
+        occurred_at: &1.occurred_at,
+        payload: &1.payload || %{}
+      }
+    )
   end
 
   defp parse_limit(nil), do: 100
@@ -289,5 +369,169 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       true ->
         query
     end
+  end
+
+  @impl true
+  def create_check_in(attrs) do
+    attrs
+    |> CheckIn.create_changeset()
+    |> Repo.insert()
+    |> normalize_check_in_result()
+  end
+
+  @impl true
+  def delete_check_in(id, user_id, now) do
+    case live_check_in(id, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      check_in ->
+        check_in |> CheckIn.delete_changeset(now) |> Repo.update() |> normalize_check_in_result()
+    end
+  end
+
+  @impl true
+  def get_check_in_for_user(id, user_id) do
+    case live_check_in(id, user_id) do
+      nil -> nil
+      check_in -> normalize_check_in(check_in)
+    end
+  end
+
+  @impl true
+  def set_check_in_visibility(id, user_id, rung) do
+    case live_check_in(id, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      check_in ->
+        check_in
+        |> CheckIn.visibility_changeset(rung)
+        |> Repo.update()
+        |> normalize_check_in_result()
+    end
+  end
+
+  @impl true
+  def move_check_ins(user_id, from, to) do
+    {count, _rows} =
+      CheckIn
+      |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+      |> where([check_in], not is_nil(check_in.organization_id))
+      |> where([check_in], check_in.journal_visibility in ^from)
+      |> Repo.update_all(set: [journal_visibility: to, updated_at: DateTime.utc_now()])
+
+    count
+  end
+
+  @impl true
+  def list_check_in_items(user_id, bound, limit, scope) do
+    CheckIn
+    |> where([check_in], is_nil(check_in.deleted_at))
+    |> FeedScope.apply(user_id, scope)
+    |> FeedBound.apply(:recorded_at, bound)
+    |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
+    |> limit(^limit)
+    |> preload(:answers)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  # Journal feed (ADR-139 §9): injuries by report time. The member sees the
+  # reports addressed to them; a coach of the gym sees every injury reported
+  # there (vision §4.5), whatever its rung.
+  @impl true
+  def list_injury_items(user_id, bound, limit, scope) do
+    InjuryReport
+    |> FeedScope.apply(user_id, scope, rung?: false)
+    |> owner_audience(scope)
+    |> FeedBound.apply(:inserted_at, bound)
+    |> order_by([injury], desc: injury.inserted_at, desc: injury.id)
+    |> limit(^limit)
+    |> preload(:events)
+    |> Repo.all()
+    |> Enum.map(&normalize_injury/1)
+  end
+
+  @impl true
+  def set_injury_visibility(id, user_id, rung) do
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         %InjuryReport{} = injury <- Repo.get_by(InjuryReport, id: id, user_id: user_id) do
+      injury
+      |> InjuryReport.visibility_changeset(rung)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> {:ok, updated |> Repo.preload(:events) |> normalize_injury()}
+        error -> error
+      end
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  defp owner_audience(query, :owner),
+    do: where(query, [injury], injury.visibility == "user_and_admin")
+
+  defp owner_audience(query, _coach_scope), do: query
+
+  # The timeline of ADR-140 §2: every live submission in [from, to), oldest
+  # first, so each question draws one line with a point per submission.
+  @impl true
+  def list_check_ins_between(user_id, %DateTime{} = from, %DateTime{} = to) do
+    CheckIn
+    |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+    |> where([check_in], check_in.recorded_at >= ^from and check_in.recorded_at < ^to)
+    |> order_by([check_in], asc: check_in.recorded_at, asc: check_in.id)
+    |> preload(:answers)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  # Coach tenant session: RLS admits only this gym's check-ins whose rung
+  # reaches the coach (and their answers, through the parent); the
+  # predicates below make the intent explicit.
+  @impl true
+  def list_coach_visible_check_ins(user_id, organization_id) do
+    CheckIn
+    |> where([check_in], check_in.user_id == ^user_id)
+    |> where([check_in], check_in.organization_id == ^organization_id)
+    |> where([check_in], is_nil(check_in.deleted_at))
+    |> where(
+      [check_in],
+      fragment("milos_journal_visibility_reaches_coach(?)", check_in.journal_visibility)
+    )
+    |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
+    |> preload(:answers)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  defp live_check_in(id, user_id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} ->
+        CheckIn
+        |> where([check_in], check_in.id == ^id and check_in.user_id == ^user_id)
+        |> where([check_in], is_nil(check_in.deleted_at))
+        |> preload(:answers)
+        |> Repo.one()
+
+      :error ->
+        nil
+    end
+  end
+
+  defp normalize_check_in_result({:ok, check_in}), do: {:ok, normalize_check_in(check_in)}
+  defp normalize_check_in_result(error), do: error
+
+  defp normalize_check_in(%CheckIn{} = check_in) do
+    answers =
+      check_in.answers
+      |> Enum.map(&Map.take(&1, [:question_key, :value, :note]))
+      |> Enum.sort_by(&CheckInQuestions.order(&1.question_key))
+
+    check_in
+    |> Map.from_struct()
+    |> Map.drop([:__meta__, :deleted_at])
+    |> Map.put(:answers, answers)
   end
 end
