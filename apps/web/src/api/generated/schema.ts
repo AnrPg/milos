@@ -8377,6 +8377,8 @@ export interface operations {
                         nickname: string;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                        /** @description The member's own theme; null follows the gym's */
+                        preferred_theme_slug?: string | null;
                         role: string;
                         vendor: boolean;
                     };
@@ -9852,6 +9854,11 @@ export interface operations {
                     password?: string;
                     /** @enum {string} */
                     preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                    /**
+                     * @description Your own theme; null follows your gym's
+                     * @enum {string|null}
+                     */
+                    preferred_theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
                 };
             };
         };
@@ -9869,6 +9876,7 @@ export interface operations {
                             id?: string;
                             nickname?: string;
                             preferred_locale?: string;
+                            preferred_theme_slug?: string | null;
                             role?: string;
                         };
                     };

@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG أو JPEG أو PNG أو WebP أو GIF أو BMP أو AVIF. يتم ضغط الصور الكبيرة إلى أقل من 5 MiB بعد قصها.",
     "avatarRotation": "التدوير",
     "avatarRotateLeft": "تدوير لليسار",
-    "avatarRotateRight": "تدوير لليمين"
+    "avatarRotateRight": "تدوير لليمين",
+    "themeTitle": "المظهر",
+    "themeDescription": "ألوان التطبيق على كل أجهزتك.",
+    "themeGym": "مظهر النادي",
+    "themeGymHint": "يتبع مظهر ناديك",
+    "themeError": "لم يُحفظ المظهر. حاول مرة أخرى.",
+    "syncTitle": "المزامنة دون اتصال",
+    "syncDescription": "ما تحفظه دون اتصال يُرسل فور عودتك إلى الإنترنت.",
+    "syncFailed": "فشل: {count}",
+    "syncOffline": "غير متصل",
+    "syncPending": "بالانتظار: {count}",
+    "syncAllDone": "تمت مزامنة كل شيء",
+    "syncNow": "زامن الآن"
   },
   "Session": {
     "required": "يلزم تسجيل الدخول",

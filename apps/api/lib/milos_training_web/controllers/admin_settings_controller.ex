@@ -11,7 +11,7 @@ defmodule MilosTrainingWeb.AdminSettingsController do
   tags(["Admin Settings"])
   security([%{"bearerAuth" => []}])
 
-  @theme_slugs ~w(ember sage steel aurora royal volt noir daybreak paper lagoon sunset)
+  @theme_slugs MilosTraining.Themes.slugs()
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true] when action in [:update]

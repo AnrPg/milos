@@ -119,6 +119,45 @@ defmodule MilosTrainingWeb.MeControllerTest do
       assert Identity.find_by_id(user.id).preferred_locale == "ar"
     end
 
+    test "stores a personal theme, rejects unknown ones and clears back to the gym's", %{
+      conn: conn
+    } do
+      {:ok, user} =
+        Identity.register(%{
+          nickname: "theme_picker",
+          password: "S3cur3P@ss!42",
+          role: :member,
+          email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
+        })
+
+      {:ok, access_token, _claims} =
+        Guardian.encode_and_sign(user, %{"sv" => Map.get(user, :security_version, 1)},
+          token_type: "access"
+        )
+
+      patch_theme = fn slug ->
+        build_conn()
+        |> put_req_header("authorization", "Bearer " <> access_token)
+        |> put_req_header("content-type", "application/json")
+        |> patch("/api/me/profile", Jason.encode!(%{preferred_theme_slug: slug}))
+      end
+
+      assert %{"user" => %{"preferred_theme_slug" => "paper"}} =
+               "paper" |> patch_theme.() |> json_response(200)
+
+      "neon" |> patch_theme.() |> json_response(422)
+      assert Identity.find_by_id(user.id).preferred_theme_slug == "paper"
+
+      assert %{"preferred_theme_slug" => "paper"} =
+               conn
+               |> put_req_header("authorization", "Bearer " <> access_token)
+               |> get("/api/auth/me")
+               |> json_response(200)
+
+      assert %{"user" => %{"preferred_theme_slug" => nil}} =
+               nil |> patch_theme.() |> json_response(200)
+    end
+
     test "rejects an unsupported locale without changing the preference", %{conn: conn} do
       {:ok, user} =
         Identity.register(%{

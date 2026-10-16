@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP או AVIF. תמונות גדולות נדחסות מתחת ל־5 MiB לאחר החיתוך.",
     "avatarRotation": "סיבוב",
     "avatarRotateLeft": "סובב שמאלה",
-    "avatarRotateRight": "סובב ימינה"
+    "avatarRotateRight": "סובב ימינה",
+    "themeTitle": "ערכת נושא",
+    "themeDescription": "צבעי האפליקציה בכל המכשירים שלך.",
+    "themeGym": "של המכון",
+    "themeGymHint": "לפי ערכת הנושא של המכון שלך",
+    "themeError": "ערכת הנושא לא נשמרה. נסו שוב.",
+    "syncTitle": "סנכרון לא מקוון",
+    "syncDescription": "מה שנשמר בלי חיבור יישלח ברגע שתחזרו לרשת.",
+    "syncFailed": "נכשלו: {count}",
+    "syncOffline": "אין חיבור",
+    "syncPending": "ממתינים: {count}",
+    "syncAllDone": "הכול מסונכרן",
+    "syncNow": "סנכרון עכשיו"
   },
   "Session": {
     "required": "נדרשת התחברות",

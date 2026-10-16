@@ -1,17 +1,12 @@
 import { apiRequest } from "@/api/client";
+import type { paths } from "@/api/generated/schema";
 
-export type ProfileUpdate = {
-  nickname?: string;
-  current_password?: string;
-  password?: string;
-  preferred_locale?: string;
-};
-
-export type ProfileUser = {
+type ProfilePatch = paths["/api/me/profile"]["patch"];
+export type ProfileUpdate = NonNullable<ProfilePatch["requestBody"]>["content"]["application/json"];
+export type ProfileUser = NonNullable<ProfilePatch["responses"]["200"]["content"]["application/json"]["user"]> & {
   id: string;
   nickname: string;
   role: string;
-  avatar_url?: string | null;
   preferred_locale: string;
 };
 

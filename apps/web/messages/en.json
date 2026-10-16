@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP, or AVIF. Large images are compressed under 5 MiB after you crop them.",
     "avatarRotation": "Rotation",
     "avatarRotateLeft": "Rotate left",
-    "avatarRotateRight": "Rotate right"
+    "avatarRotateRight": "Rotate right",
+    "themeTitle": "Theme",
+    "themeDescription": "The app's colours on all your devices.",
+    "themeGym": "Your gym's",
+    "themeGymHint": "Follows your gym's theme",
+    "themeError": "The theme was not saved. Try again.",
+    "syncTitle": "Offline sync",
+    "syncDescription": "What you save without a connection is sent as soon as you are back online.",
+    "syncFailed": "Failed: {count}",
+    "syncOffline": "Offline",
+    "syncPending": "Waiting: {count}",
+    "syncAllDone": "All synced",
+    "syncNow": "Sync now"
   },
   "Session": {
     "required": "Authentication required",

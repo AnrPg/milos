@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP ou AVIF. Les grandes images sont compressées sous 5 Mio après le recadrage.",
     "avatarRotation": "Rotation",
     "avatarRotateLeft": "Pivoter à gauche",
-    "avatarRotateRight": "Pivoter à droite"
+    "avatarRotateRight": "Pivoter à droite",
+    "themeTitle": "Thème",
+    "themeDescription": "Les couleurs de l'app sur tous tes appareils.",
+    "themeGym": "De la box",
+    "themeGymHint": "Suit le thème de ta box",
+    "themeError": "Le thème n'a pas été enregistré. Réessaie.",
+    "syncTitle": "Synchronisation hors ligne",
+    "syncDescription": "Ce que tu enregistres hors connexion est envoyé dès que tu es de nouveau en ligne.",
+    "syncFailed": "Échecs : {count}",
+    "syncOffline": "Hors ligne",
+    "syncPending": "En attente : {count}",
+    "syncAllDone": "Tout est synchronisé",
+    "syncNow": "Synchroniser maintenant"
   },
   "Session": {
     "required": "Authentification requise",

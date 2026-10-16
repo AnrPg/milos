@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP of AVIF. Grote afbeeldingen worden na het bijsnijden tot onder 5 MiB gecomprimeerd.",
     "avatarRotation": "Rotatie",
     "avatarRotateLeft": "Linksom draaien",
-    "avatarRotateRight": "Rechtsom draaien"
+    "avatarRotateRight": "Rechtsom draaien",
+    "themeTitle": "Thema",
+    "themeDescription": "De kleuren van de app op al je apparaten.",
+    "themeGym": "Van de box",
+    "themeGymHint": "Volgt het thema van je box",
+    "themeError": "Het thema is niet opgeslagen. Probeer het opnieuw.",
+    "syncTitle": "Offline synchronisatie",
+    "syncDescription": "Wat je zonder verbinding opslaat, wordt verstuurd zodra je weer online bent.",
+    "syncFailed": "Mislukt: {count}",
+    "syncOffline": "Offline",
+    "syncPending": "Wachtend: {count}",
+    "syncAllDone": "Alles gesynchroniseerd",
+    "syncNow": "Nu synchroniseren"
   },
   "Session": {
     "required": "Aanmelden vereist",

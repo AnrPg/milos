@@ -9538,6 +9538,11 @@
                       ],
                       "type": "string"
                     },
+                    "preferred_theme_slug": {
+                      "description": "The member's own theme; null follows the gym's",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "role": {
                       "type": "string"
                     },
@@ -12736,6 +12741,25 @@
                       "fr"
                     ],
                     "type": "string"
+                  },
+                  "preferred_theme_slug": {
+                    "description": "Your own theme; null follows your gym's",
+                    "enum": [
+                      "ember",
+                      "sage",
+                      "steel",
+                      "aurora",
+                      "royal",
+                      "volt",
+                      "noir",
+                      "daybreak",
+                      "paper",
+                      "lagoon",
+                      "sunset",
+                      null
+                    ],
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -12764,6 +12788,10 @@
                           "type": "string"
                         },
                         "preferred_locale": {
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "role": {

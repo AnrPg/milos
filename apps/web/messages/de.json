@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP oder AVIF. Große Bilder werden nach dem Zuschneiden auf unter 5 MiB komprimiert.",
     "avatarRotation": "Drehung",
     "avatarRotateLeft": "Nach links drehen",
-    "avatarRotateRight": "Nach rechts drehen"
+    "avatarRotateRight": "Nach rechts drehen",
+    "themeTitle": "Design",
+    "themeDescription": "Die Farben der App auf all deinen Geräten.",
+    "themeGym": "Der Box",
+    "themeGymHint": "Folgt dem Design deiner Box",
+    "themeError": "Das Design wurde nicht gespeichert. Versuch es noch einmal.",
+    "syncTitle": "Offline-Synchronisierung",
+    "syncDescription": "Was du ohne Verbindung speicherst, wird gesendet, sobald du wieder online bist.",
+    "syncFailed": "Fehlgeschlagen: {count}",
+    "syncOffline": "Offline",
+    "syncPending": "Wartend: {count}",
+    "syncAllDone": "Alles synchronisiert",
+    "syncNow": "Jetzt synchronisieren"
   },
   "Session": {
     "required": "Anmeldung erforderlich",

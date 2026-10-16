@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP o AVIF. Le immagini grandi vengono compresse sotto 5 MiB dopo il ritaglio.",
     "avatarRotation": "Rotazione",
     "avatarRotateLeft": "Ruota a sinistra",
-    "avatarRotateRight": "Ruota a destra"
+    "avatarRotateRight": "Ruota a destra",
+    "themeTitle": "Tema",
+    "themeDescription": "I colori dell'app su tutti i tuoi dispositivi.",
+    "themeGym": "Del box",
+    "themeGymHint": "Segue il tema del tuo box",
+    "themeError": "Il tema non è stato salvato. Riprova.",
+    "syncTitle": "Sincronizzazione offline",
+    "syncDescription": "Ciò che salvi senza connessione viene inviato appena torni online.",
+    "syncFailed": "Non riusciti: {count}",
+    "syncOffline": "Offline",
+    "syncPending": "In attesa: {count}",
+    "syncAllDone": "Tutto sincronizzato",
+    "syncNow": "Sincronizza ora"
   },
   "Session": {
     "required": "Autenticazione richiesta",

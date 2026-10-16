@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP ή AVIF. Οι μεγάλες εικόνες συμπιέζονται κάτω από 5 MiB αφού τις περικόψετε.",
     "avatarRotation": "Περιστροφή",
     "avatarRotateLeft": "Περιστροφή αριστερά",
-    "avatarRotateRight": "Περιστροφή δεξιά"
+    "avatarRotateRight": "Περιστροφή δεξιά",
+    "themeTitle": "Θέμα",
+    "themeDescription": "Τα χρώματα της app σε όλες τις συσκευές σου.",
+    "themeGym": "Του box",
+    "themeGymHint": "Ακολουθεί το θέμα του box σου",
+    "themeError": "Δεν αποθηκεύτηκε το θέμα. Δοκίμασε ξανά.",
+    "syncTitle": "Συγχρονισμός offline",
+    "syncDescription": "Ό,τι αποθηκεύεις χωρίς σύνδεση στέλνεται μόλις συνδεθείς.",
+    "syncFailed": "Απέτυχαν: {count}",
+    "syncOffline": "Χωρίς σύνδεση",
+    "syncPending": "Σε αναμονή: {count}",
+    "syncAllDone": "Όλα συγχρονισμένα",
+    "syncNow": "Συγχρονισμός τώρα"
   },
   "Session": {
     "required": "Απαιτείται σύνδεση",

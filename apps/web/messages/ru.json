@@ -90,7 +90,19 @@
     "avatarFormatHelp": "JPG, JPEG, PNG, WebP, GIF, BMP или AVIF. Большие изображения сжимаются до размера меньше 5 MiB после обрезки.",
     "avatarRotation": "Поворот",
     "avatarRotateLeft": "Повернуть влево",
-    "avatarRotateRight": "Повернуть вправо"
+    "avatarRotateRight": "Повернуть вправо",
+    "themeTitle": "Тема",
+    "themeDescription": "Цвета приложения на всех ваших устройствах.",
+    "themeGym": "Зала",
+    "themeGymHint": "Следует теме вашего зала",
+    "themeError": "Тема не сохранилась. Попробуйте ещё раз.",
+    "syncTitle": "Офлайн-синхронизация",
+    "syncDescription": "То, что вы сохраняете без связи, отправится, как только вы снова будете онлайн.",
+    "syncFailed": "Ошибки: {count}",
+    "syncOffline": "Нет связи",
+    "syncPending": "В очереди: {count}",
+    "syncAllDone": "Всё синхронизировано",
+    "syncNow": "Синхронизировать сейчас"
   },
   "Session": {
     "required": "Требуется вход",
