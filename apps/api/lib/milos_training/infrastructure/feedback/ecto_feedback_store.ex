@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
 
   alias Ecto.Multi
   alias MilosTraining.Feedback.{Review, ReviewAnswer}
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
 
@@ -47,6 +48,19 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
     |> scoped_to_tenant()
     |> where([review], review.user_id == ^user_id)
     |> order_by([review], desc: review.inserted_at)
+    |> Repo.all()
+    |> preload_answers()
+  end
+
+  # Journal feed (ADR-139 §9): a review is the `rated` rung itself, so it
+  # carries no ladder column; a coach of the gym reads every review there.
+  @impl true
+  def list_review_items(user_id, bound, limit, scope) do
+    Review
+    |> FeedScope.apply(user_id, scope, rung?: false)
+    |> FeedBound.apply(:inserted_at, bound)
+    |> order_by([review], desc: review.inserted_at, desc: review.id)
+    |> limit(^limit)
     |> Repo.all()
     |> preload_answers()
   end

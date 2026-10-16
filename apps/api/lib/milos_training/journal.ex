@@ -7,7 +7,7 @@ defmodule MilosTraining.Journal do
   """
 
   alias MilosTraining.Journal.Commands.WriteNote
-  alias MilosTraining.Journal.Domain.{FeedCursor, Visibility}
+  alias MilosTraining.Journal.Domain.{FeedCursor, FeedItem, Visibility}
   alias MilosTraining.Journal.JournalStore
 
   def with_context(context, fun) when is_function(fun, 0),
@@ -57,24 +57,11 @@ defmodule MilosTraining.Journal do
   defdelegate move_notes(user_id, from, to), to: JournalStore
   defdelegate list_coach_visible_notes(user_id, organization_id), to: JournalStore
 
-  @doc "Notes as feed items, newest first, after `bound`."
-  def list_note_items(user_id, bound, limit) do
-    user_id
-    |> JournalStore.list_note_items(bound, limit)
-    |> Enum.map(&note_item/1)
-  end
+  @doc "Live notes, newest first, after `bound`, for the owner or a coach (ADR-139 §9)."
+  defdelegate list_note_items(user_id, bound, limit, scope), to: JournalStore
 
-  def note_item(note) do
-    %{
-      kind: "note",
-      id: note.id,
-      occurred_at: note.written_at,
-      occurred_tz: note.written_tz,
-      organization_id: note.organization_id,
-      journal_visibility: note.journal_visibility,
-      note: note
-    }
-  end
+  defdelegate feed_item(kind, entry, occurred_at, opts \\ []), to: FeedItem, as: :build
+  defdelegate choosable_visibilities(kind, organization_id), to: FeedItem, as: :choosable
 
   defdelegate record_coach_reads(rows), to: JournalStore
 
@@ -84,7 +71,7 @@ defmodule MilosTraining.Journal do
   defdelegate delete_comment(id, user_id, now), to: JournalStore
   defdelegate list_comments(entry_kind, entry_ids), to: JournalStore
   defdelegate list_changes_since(user_id, since), to: JournalStore
-  defdelegate comments_transaction(fun), to: JournalStore
+  defdelegate transaction(fun), to: JournalStore
   defdelegate comment_entry_owner(entry_kind, entry_id), to: JournalStore, as: :entry_owner
 
   @doc "Comments of each entry, keyed by entry id (entries without any are absent)."

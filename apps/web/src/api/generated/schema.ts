@@ -455,6 +455,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your journal: every entry kind, newest first */
+        get: operations["MilosTrainingWeb.JournalController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/entries/{kind}/{id}/visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Move one of your entries on the visibility ladder */
+        put: operations["MilosTrainingWeb.JournalController.set_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write a Σημείωση */
+        post: operations["MilosTrainingWeb.JournalController.create_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete one of your notes */
+        delete: operations["MilosTrainingWeb.JournalController.delete_note"];
+        options?: never;
+        head?: never;
+        /** Edit one of your notes */
+        patch: operations["MilosTrainingWeb.JournalController.update_note"];
+        trace?: never;
+    };
     "/api/me/profile": {
         parameters: {
             query?: never;
@@ -4155,6 +4224,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's journal as their coach may read it (audited) */
+        get: operations["MilosTrainingWeb.JournalController.client_journal"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/clients/{user_id}/nutrition-plan": {
         parameters: {
             query?: never;
@@ -6644,6 +6730,117 @@ export interface components {
         JournalCommentsResponse: {
             comments: components["schemas"]["JournalComment"][];
         };
+        /** JournalFeedItem */
+        JournalFeedItem: {
+            choosable_visibilities: ("private" | "coach_can_view" | "coach_reply_requested")[];
+            entry: {
+                [key: string]: unknown;
+            };
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+            /** @enum {string} */
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            /** Format: date-time */
+            occurred_at: string;
+            /**
+             * Format: date
+             * @description Set for entries dated by day only (PRs).
+             */
+            occurred_on?: string | null;
+            occurred_tz?: string | null;
+            /** Format: uuid */
+            organization_id?: string | null;
+        };
+        /** JournalFeedPage */
+        JournalFeedPage: {
+            items: components["schemas"]["JournalFeedItem"][];
+            next_cursor?: string | null;
+        };
+        /** JournalNote */
+        JournalNote: {
+            body: string;
+            /** Format: uuid */
+            id: string;
+            journal_visibility: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            lock_version: number;
+            /** Format: uuid */
+            organization_id?: string | null;
+            /** @enum {string} */
+            topic: "technique" | "thought" | "mood" | "goal";
+            /** Format: uuid */
+            user_id?: string;
+            /** Format: date-time */
+            written_at: string;
+            written_tz?: string;
+        };
+        /** JournalNoteCreateRequest */
+        JournalNoteCreateRequest: {
+            body: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            /** @description The gym the note is written in; personal when absent. */
+            organization_slug?: string | null;
+            /** @enum {string} */
+            topic: "technique" | "thought" | "mood" | "goal";
+            /** Format: date-time */
+            written_at?: string | null;
+            written_tz?: string | null;
+        };
+        /** JournalNoteResponse */
+        JournalNoteResponse: {
+            note: components["schemas"]["JournalNote"];
+        };
+        /** JournalNoteUpdateRequest */
+        JournalNoteUpdateRequest: {
+            body?: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            lock_version?: number;
+            /** @enum {string} */
+            topic?: "technique" | "thought" | "mood" | "goal";
+            /** Format: date-time */
+            written_at?: string | null;
+            written_tz?: string | null;
+        };
+        /** JournalVisibilityRequest */
+        JournalVisibilityRequest: {
+            /**
+             * Format: uuid
+             * @description Which coach answers, when the member has several.
+             */
+            coach_user_id?: string;
+            /** @description Required for coach_reply_requested: sent to the coach as a message. */
+            question?: string;
+            /** @enum {string} */
+            visibility: "private" | "coach_can_view" | "coach_reply_requested";
+        };
+        /** JournalVisibilityResponse */
+        JournalVisibilityResponse: {
+            choosable_visibilities: string[];
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+            /** @enum {string} */
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            /** @description The message sent to the coach, for coach_reply_requested. */
+            reply_request?: {
+                /** Format: uuid */
+                id?: string;
+                /** Format: uuid */
+                thread_id?: string;
+            } | null;
+        };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
             /** @enum {string} */
@@ -8580,6 +8777,204 @@ export interface operations {
                         max_bytes?: number;
                         required_headers?: Record<string, never>;
                         upload_url?: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.index": {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page */
+                cursor?: string;
+                /** @description Comma-separated kinds to list (all when absent) */
+                kinds?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["JournalFeedItem"][];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.set_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description Which coach answers, when the member has several.
+                     */
+                    coach_user_id?: string;
+                    /** @description Required for coach_reply_requested: sent to the coach as a message. */
+                    question?: string;
+                    /** @enum {string} */
+                    visibility: "private" | "coach_can_view" | "coach_reply_requested";
+                };
+            };
+        };
+        responses: {
+            /** @description New rung */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        choosable_visibilities: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+                        /** @enum {string} */
+                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                        /** @description The message sent to the coach, for coach_reply_requested. */
+                        reply_request?: {
+                            /** Format: uuid */
+                            id?: string;
+                            /** Format: uuid */
+                            thread_id?: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Entry not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Rung not allowed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.create_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** Format: uuid */
+                    linked_id?: string | null;
+                    /** @enum {string|null} */
+                    linked_kind?: "execution" | "training_log" | "workout" | null;
+                    /** @description The gym the note is written in; personal when absent. */
+                    organization_slug?: string | null;
+                    /** @enum {string} */
+                    topic: "technique" | "thought" | "mood" | "goal";
+                    /** Format: date-time */
+                    written_at?: string | null;
+                    written_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        note: components["schemas"]["JournalNote"];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.delete_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.update_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string;
+                    /** Format: uuid */
+                    linked_id?: string | null;
+                    /** @enum {string|null} */
+                    linked_kind?: "execution" | "training_log" | "workout" | null;
+                    lock_version?: number;
+                    /** @enum {string} */
+                    topic?: "technique" | "thought" | "mood" | "goal";
+                    /** Format: date-time */
+                    written_at?: string | null;
+                    written_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        note: components["schemas"]["JournalNote"];
                     };
                 };
             };
@@ -23689,6 +24084,37 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.client_journal": {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page */
+                cursor?: string;
+                /** @description Comma-separated kinds to list (all when absent) */
+                kinds?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["JournalFeedItem"][];
+                        next_cursor?: string | null;
                     };
                 };
             };

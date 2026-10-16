@@ -4841,6 +4841,365 @@
         "title": "JournalCommentsResponse",
         "type": "object"
       },
+      "JournalFeedItem": {
+        "properties": {
+          "choosable_visibilities": {
+            "items": {
+              "enum": [
+                "private",
+                "coach_can_view",
+                "coach_reply_requested"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "entry": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "journal_visibility": {
+            "enum": [
+              "private",
+              "coach_can_view",
+              "coach_reply_requested",
+              "rated",
+              "posted"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "pr",
+              "injury",
+              "review",
+              "note",
+              "check_in"
+            ],
+            "type": "string"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "occurred_on": {
+            "description": "Set for entries dated by day only (PRs).",
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "occurred_tz": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "occurred_at",
+          "journal_visibility",
+          "choosable_visibilities",
+          "entry"
+        ],
+        "title": "JournalFeedItem",
+        "type": "object"
+      },
+      "JournalFeedPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/JournalFeedItem"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "JournalFeedPage",
+        "type": "object"
+      },
+      "JournalNote": {
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "journal_visibility": {
+            "type": "string"
+          },
+          "linked_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "linked_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "workout"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "lock_version": {
+            "type": "integer"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "topic": {
+            "enum": [
+              "technique",
+              "thought",
+              "mood",
+              "goal"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "written_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "written_tz": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "topic",
+          "body",
+          "written_at",
+          "journal_visibility",
+          "lock_version"
+        ],
+        "title": "JournalNote",
+        "type": "object"
+      },
+      "JournalNoteCreateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "linked_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "linked_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "workout"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_slug": {
+            "description": "The gym the note is written in; personal when absent.",
+            "nullable": true,
+            "type": "string"
+          },
+          "topic": {
+            "enum": [
+              "technique",
+              "thought",
+              "mood",
+              "goal"
+            ],
+            "type": "string"
+          },
+          "written_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "written_tz": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "topic",
+          "body"
+        ],
+        "title": "JournalNoteCreateRequest",
+        "type": "object"
+      },
+      "JournalNoteResponse": {
+        "properties": {
+          "note": {
+            "$ref": "#/components/schemas/JournalNote"
+          }
+        },
+        "required": [
+          "note"
+        ],
+        "title": "JournalNoteResponse",
+        "type": "object"
+      },
+      "JournalNoteUpdateRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "type": "string"
+          },
+          "linked_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "linked_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "workout"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "lock_version": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "topic": {
+            "enum": [
+              "technique",
+              "thought",
+              "mood",
+              "goal"
+            ],
+            "type": "string"
+          },
+          "written_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "written_tz": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "JournalNoteUpdateRequest",
+        "type": "object"
+      },
+      "JournalVisibilityRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "coach_user_id": {
+            "description": "Which coach answers, when the member has several.",
+            "format": "uuid",
+            "type": "string"
+          },
+          "question": {
+            "description": "Required for coach_reply_requested: sent to the coach as a message.",
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "visibility": {
+            "enum": [
+              "private",
+              "coach_can_view",
+              "coach_reply_requested"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "visibility"
+        ],
+        "title": "JournalVisibilityRequest",
+        "type": "object"
+      },
+      "JournalVisibilityResponse": {
+        "properties": {
+          "choosable_visibilities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "journal_visibility": {
+            "enum": [
+              "private",
+              "coach_can_view",
+              "coach_reply_requested",
+              "rated",
+              "posted"
+            ],
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "pr",
+              "injury",
+              "review",
+              "note",
+              "check_in"
+            ],
+            "type": "string"
+          },
+          "reply_request": {
+            "description": "The message sent to the coach, for coach_reply_requested.",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "thread_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "journal_visibility",
+          "choosable_visibilities"
+        ],
+        "title": "JournalVisibilityResponse",
+        "type": "object"
+      },
       "MyInjuryWarningsAcknowledged": {
         "additionalProperties": false,
         "properties": {
@@ -9780,6 +10139,473 @@
         "summary": "Create a constrained presigned avatar upload",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/me/journal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.index",
+        "parameters": [
+          {
+            "description": "`next_cursor` of the previous page",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated kinds to list (all when absent)",
+            "in": "query",
+            "name": "kinds",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/JournalFeedItem"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "title": "JournalFeedPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Feed page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your journal: every entry kind, newest first",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/entries/{kind}/{id}/visibility": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.set_visibility",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "execution",
+                "training_log",
+                "pr",
+                "injury",
+                "review",
+                "note",
+                "check_in"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "coach_user_id": {
+                    "description": "Which coach answers, when the member has several.",
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "question": {
+                    "description": "Required for coach_reply_requested: sent to the coach as a message.",
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  "visibility": {
+                    "enum": [
+                      "private",
+                      "coach_can_view",
+                      "coach_reply_requested"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "visibility"
+                ],
+                "title": "JournalVisibilityRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "choosable_visibilities": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "journal_visibility": {
+                      "enum": [
+                        "private",
+                        "coach_can_view",
+                        "coach_reply_requested",
+                        "rated",
+                        "posted"
+                      ],
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "execution",
+                        "training_log",
+                        "pr",
+                        "injury",
+                        "review",
+                        "note",
+                        "check_in"
+                      ],
+                      "type": "string"
+                    },
+                    "reply_request": {
+                      "description": "The message sent to the coach, for coach_reply_requested.",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "thread_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "journal_visibility",
+                    "choosable_visibilities"
+                  ],
+                  "title": "JournalVisibilityResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "New rung"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rung not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Move one of your entries on the visibility ladder",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/notes": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.create_note",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "linked_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "linked_kind": {
+                    "enum": [
+                      "execution",
+                      "training_log",
+                      "workout"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "description": "The gym the note is written in; personal when absent.",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "topic": {
+                    "enum": [
+                      "technique",
+                      "thought",
+                      "mood",
+                      "goal"
+                    ],
+                    "type": "string"
+                  },
+                  "written_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "written_tz": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "topic",
+                  "body"
+                ],
+                "title": "JournalNoteCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "note": {
+                      "$ref": "#/components/schemas/JournalNote"
+                    }
+                  },
+                  "required": [
+                    "note"
+                  ],
+                  "title": "JournalNoteResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Note"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write a Σημείωση",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/notes/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.delete_note",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete one of your notes",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.update_note",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "body": {
+                    "maxLength": 4000,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "linked_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "linked_kind": {
+                    "enum": [
+                      "execution",
+                      "training_log",
+                      "workout"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "lock_version": {
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "topic": {
+                    "enum": [
+                      "technique",
+                      "thought",
+                      "mood",
+                      "goal"
+                    ],
+                    "type": "string"
+                  },
+                  "written_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "written_tz": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "JournalNoteUpdateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "note": {
+                      "$ref": "#/components/schemas/JournalNote"
+                    }
+                  },
+                  "required": [
+                    "note"
+                  ],
+                  "title": "JournalNoteResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Note"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit one of your notes",
+        "tags": [
+          "Journal"
         ]
       }
     },
@@ -48467,6 +49293,88 @@
         "summary": "Write a private note about one of your clients",
         "tags": [
           "Coach notes"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/journal": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.client_journal",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "`next_cursor` of the previous page",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated kinds to list (all when absent)",
+            "in": "query",
+            "name": "kinds",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "$ref": "#/components/schemas/JournalFeedItem"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "items"
+                  ],
+                  "title": "JournalFeedPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Feed page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's journal as their coach may read it (audited)",
+        "tags": [
+          "Journal"
         ]
       }
     },

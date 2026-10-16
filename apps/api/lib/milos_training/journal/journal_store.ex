@@ -37,7 +37,8 @@ defmodule MilosTraining.Journal.JournalStore do
   def move_notes(user_id, from, to), do: adapter().move_notes(user_id, from, to)
 
   @impl true
-  def list_note_items(user_id, bound, limit), do: adapter().list_note_items(user_id, bound, limit)
+  def list_note_items(user_id, bound, limit, scope),
+    do: adapter().list_note_items(user_id, bound, limit, scope)
 
   @impl true
   def list_coach_visible_notes(user_id, organization_id),
@@ -62,7 +63,7 @@ defmodule MilosTraining.Journal.JournalStore do
   def entry_owner(entry_kind, entry_id), do: adapter().entry_owner(entry_kind, entry_id)
 
   @impl true
-  def comments_transaction(fun), do: adapter().comments_transaction(fun)
+  def transaction(fun), do: adapter().transaction(fun)
 
   defp adapter, do: Application.fetch_env!(:milos_training, :journal_store)
 end

@@ -35,6 +35,32 @@ defmodule MilosTraining.Organizations.Queries.ResolveTenantContext do
 
   def call(_account, _slug, _request_metadata), do: {:error, :membership_required}
 
+  @doc """
+  The same context for a gym known by id: an entry's provenance, when the
+  member acts in the gym the entry was recorded in (ADR-139 §7).
+  """
+  def by_id(account, organization_id, request_metadata \\ %{})
+
+  def by_id(account, organization_id, request_metadata)
+      when is_map(account) and is_binary(organization_id) do
+    RepoContext.run(%{user_id: account.id}, fn ->
+      organization = OrganizationStore.get_organization_by_id(organization_id)
+
+      membership =
+        if organization, do: OrganizationStore.get_membership(organization.id, account.id)
+
+      TenantAuthorization.build(
+        account,
+        organization,
+        membership,
+        request_metadata,
+        role_grants(organization)
+      )
+    end)
+  end
+
+  def by_id(_account, _organization_id, _request_metadata), do: {:error, :membership_required}
+
   # What the gym unlocked for roles such as front desk (ADR-099).
   defp role_grants(nil), do: %{}
 

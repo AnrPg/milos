@@ -20,7 +20,7 @@ defmodule MilosTraining.Application.LogTrainingEntry do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Execution, Workouts}
+  alias MilosTraining.{Execution, Journal, Workouts}
   alias MilosTraining.Workers.ProcessWorkoutCompletionJob
 
   def call(%{organization_id: _} = context, %{id: user_id}, params) when is_map(params) do
@@ -69,6 +69,7 @@ defmodule MilosTraining.Application.LogTrainingEntry do
              now: now,
              allowed_section_ids: allowed_section_ids(source),
              completed_executions: Execution.list_executions_for_user(user_id),
+             journal_visibility: Journal.initial_visibility(user_id, "training_log", true),
              job_builder: job_builder()
            ),
          :ok <- process_inline_if_needed(entry, outcome) do

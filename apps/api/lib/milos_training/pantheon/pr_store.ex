@@ -57,6 +57,10 @@ defmodule MilosTraining.Pantheon.PRStore do
   def move_records(user_id, from, to), do: adapter().move_records(user_id, from, to)
 
   @impl true
+  def list_record_items(user_id, bound, limit, scope),
+    do: adapter().list_record_items(user_id, bound, limit, scope)
+
+  @impl true
   def list_owned_grants(user_id), do: adapter().list_owned_grants(user_id)
 
   @impl true

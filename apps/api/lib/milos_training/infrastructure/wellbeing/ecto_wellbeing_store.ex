@@ -6,7 +6,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   alias Ecto.Multi
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
-  alias MilosTraining.Infrastructure.Journal.FeedBound
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Wellbeing.{CheckIn, InjuryReport, InjuryStatusEvent}
   alias MilosTraining.Wellbeing.Domain.CheckInQuestions
 
@@ -232,6 +232,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       training_limitations: injury_report.training_limitations,
       tags: injury_report.tags || [],
       visibility: injury_report.visibility,
+      journal_visibility: injury_report.journal_visibility,
       params: injury_report.params || %{},
       events: normalize_events(injury_report.events),
       inserted_at: injury_report.inserted_at,
@@ -424,9 +425,10 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   end
 
   @impl true
-  def list_check_in_items(user_id, bound, limit) do
+  def list_check_in_items(user_id, bound, limit, scope) do
     CheckIn
-    |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+    |> where([check_in], is_nil(check_in.deleted_at))
+    |> FeedScope.apply(user_id, scope)
     |> FeedBound.apply(:recorded_at, bound)
     |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
     |> limit(^limit)
@@ -434,6 +436,43 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> Repo.all()
     |> Enum.map(&normalize_check_in/1)
   end
+
+  # Journal feed (ADR-139 §9): injuries by report time. The member sees the
+  # reports addressed to them; a coach of the gym sees every injury reported
+  # there (vision §4.5), whatever its rung.
+  @impl true
+  def list_injury_items(user_id, bound, limit, scope) do
+    InjuryReport
+    |> FeedScope.apply(user_id, scope, rung?: false)
+    |> owner_audience(scope)
+    |> FeedBound.apply(:inserted_at, bound)
+    |> order_by([injury], desc: injury.inserted_at, desc: injury.id)
+    |> limit(^limit)
+    |> preload(:events)
+    |> Repo.all()
+    |> Enum.map(&normalize_injury/1)
+  end
+
+  @impl true
+  def set_injury_visibility(id, user_id, rung) do
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         %InjuryReport{} = injury <- Repo.get_by(InjuryReport, id: id, user_id: user_id) do
+      injury
+      |> InjuryReport.visibility_changeset(rung)
+      |> Repo.update()
+      |> case do
+        {:ok, updated} -> {:ok, updated |> Repo.preload(:events) |> normalize_injury()}
+        error -> error
+      end
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  defp owner_audience(query, :owner),
+    do: where(query, [injury], injury.visibility == "user_and_admin")
+
+  defp owner_audience(query, _coach_scope), do: query
 
   # The timeline of ADR-140 §2: every live submission in [from, to), oldest
   # first, so each question draws one line with a point per submission.

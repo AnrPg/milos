@@ -36,6 +36,24 @@ defmodule MilosTraining.Execution do
   def list_executions_for_coaching(user_id),
     do: ExecutionStore.list_executions_for_coaching(user_id)
 
+  # Journal ladder (ADR-139): executions and training-log entries as feed
+  # items, moved between rungs one by one or in bulk by a default change.
+  defdelegate list_execution_items(user_id, bound, limit, scope), to: ExecutionStore
+  defdelegate set_execution_visibility(id, user_id, rung), to: ExecutionStore
+  defdelegate move_executions(user_id, from, to), to: ExecutionStore
+
+  defdelegate list_training_log_items(user_id, bound, limit, scope),
+    to: TrainingLogStore,
+    as: :list_entry_items
+
+  defdelegate set_training_log_visibility(id, user_id, rung),
+    to: TrainingLogStore,
+    as: :set_entry_visibility
+
+  defdelegate move_training_log_entries(user_id, from, to),
+    to: TrainingLogStore,
+    as: :move_entries
+
   @doc "Execution KPI report for the current organization since `since`."
   def execution_kpis(%DateTime{} = since) do
     since

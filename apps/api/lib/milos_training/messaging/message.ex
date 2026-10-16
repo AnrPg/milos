@@ -15,6 +15,9 @@ defmodule MilosTraining.Messaging.Message do
     field :message_type, Ecto.Enum, values: @message_types, default: :chat
     field :client_operation_id, Ecto.UUID
     field :sequence_number, :integer, read_after_writes: true
+    # The journal entry the message is about (Ζητάω απάντηση, ADR-139 §7).
+    field :subject_kind, :string
+    field :subject_id, :binary_id
 
     timestamps(updated_at: false)
   end
@@ -29,10 +32,13 @@ defmodule MilosTraining.Messaging.Message do
       :sender_id,
       :body,
       :message_type,
-      :client_operation_id
+      :client_operation_id,
+      :subject_kind,
+      :subject_id
     ])
     |> validate_required([:thread_id, :sender_id, :body])
     |> validate_length(:body, min: 1, max: 5000)
+    |> check_constraint(:subject_kind, name: :messaging_messages_subject_check)
     |> foreign_key_constraint(:thread_id)
     |> foreign_key_constraint(:sender_id)
     |> unique_constraint(:client_operation_id,

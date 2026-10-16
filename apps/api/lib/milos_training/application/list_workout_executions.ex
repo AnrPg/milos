@@ -8,24 +8,33 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
     do: ExecutionStore.with_user_context(context, fn -> call(user_id) end)
 
   def call(user_id) do
-    executions =
-      user_id
-      |> Execution.list_executions_for_user()
-      |> JournalComments.attach("execution")
-      |> Enum.map(&attach_workout_summary/1)
-
-    {:ok, executions}
+    {:ok, user_id |> Execution.list_executions_for_user() |> summarize()}
   end
 
   def for_coaching(user_id) do
     user_id
     |> Execution.list_executions_for_coaching()
-    |> JournalComments.attach("execution")
-    |> Enum.map(&attach_workout_summary/1)
+    |> summarize()
   end
 
-  defp attach_workout_summary(execution) do
-    case execution.master_workout_id && fetch_workout(execution) do
+  @doc """
+  Executions as readers see them: with their Σχόλια and the title, type and
+  section names of the workout done. Each workout is read once.
+  """
+  def summarize(executions) do
+    workouts =
+      executions
+      |> Enum.filter(&(is_binary(&1.organization_id) and is_binary(&1.master_workout_id)))
+      |> Enum.uniq_by(&{&1.organization_id, &1.master_workout_id})
+      |> Map.new(&{{&1.organization_id, &1.master_workout_id}, fetch_workout(&1)})
+
+    executions
+    |> JournalComments.attach("execution")
+    |> Enum.map(&attach_workout_summary(&1, workouts))
+  end
+
+  defp attach_workout_summary(execution, workouts) do
+    case Map.get(workouts, {execution.organization_id, execution.master_workout_id}) do
       nil ->
         Map.merge(execution, %{
           workout_title: "Deleted workout",

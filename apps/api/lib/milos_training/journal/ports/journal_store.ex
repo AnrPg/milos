@@ -17,7 +17,12 @@ defmodule MilosTraining.Journal.Ports.JournalStore do
               {:ok, note()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback move_notes(user_id :: Ecto.UUID.t(), from :: [String.t()], to :: String.t()) ::
               non_neg_integer()
-  @callback list_note_items(user_id :: Ecto.UUID.t(), bound :: term(), limit :: pos_integer()) ::
+  @callback list_note_items(
+              user_id :: Ecto.UUID.t(),
+              bound :: term(),
+              limit :: pos_integer(),
+              scope :: term()
+            ) ::
               [map()]
   @callback list_coach_visible_notes(user_id :: Ecto.UUID.t(), organization_id :: Ecto.UUID.t()) ::
               [map()]
@@ -29,7 +34,7 @@ defmodule MilosTraining.Journal.Ports.JournalStore do
   @callback list_comments(String.t(), [Ecto.UUID.t()]) :: [map()]
   @callback entry_owner(String.t(), Ecto.UUID.t()) ::
               %{user_id: Ecto.UUID.t(), organization_id: Ecto.UUID.t() | nil} | nil
-  @callback comments_transaction((-> {:ok, term()} | {:error, term()})) ::
+  @callback transaction((-> {:ok, term()} | {:error, term()})) ::
               {:ok, term()} | {:error, term()}
   @callback list_changes_since(Ecto.UUID.t(), DateTime.t()) :: [map()]
 end

@@ -3,6 +3,7 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Journal.FeedScope
   alias MilosTraining.Pantheon.{PRHistory, PRRecord, PRShareGrant}
   alias MilosTraining.Pantheon.Domain.PRHistoryPolicy
   alias MilosTraining.Repo
@@ -175,6 +176,37 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
         |> Repo.update()
         |> normalize_result(&normalize_pr/1)
     end
+  end
+
+  # Journal feed (ADR-139 §9): a PR is dated by the day it was beaten, which
+  # the feed places at midnight UTC of that day.
+  @impl true
+  def list_record_items(user_id, bound, limit, scope) do
+    PRRecord
+    |> FeedScope.apply(user_id, scope)
+    |> beaten_bound(bound)
+    |> order_by([r], desc: r.beaten_on, desc: r.id)
+    |> limit(^limit)
+    |> Repo.all()
+    |> Enum.map(&normalize_pr/1)
+  end
+
+  defp beaten_bound(query, :none), do: query
+
+  defp beaten_bound(query, {:at_most, at}),
+    do: where(query, [r], fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) <= ^at)
+
+  defp beaten_bound(query, {:before, at}),
+    do: where(query, [r], fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) < ^at)
+
+  defp beaten_bound(query, {:before_id, at, id}) do
+    where(
+      query,
+      [r],
+      fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) < ^at or
+        (fragment("(?::timestamp AT TIME ZONE 'UTC')", r.beaten_on) == ^at and
+           r.id < type(^id, :binary_id))
+    )
   end
 
   # Only gym PRs move: a personal PR has no coach and stays private.

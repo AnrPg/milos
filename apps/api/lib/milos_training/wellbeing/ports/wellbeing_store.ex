@@ -24,7 +24,10 @@ defmodule MilosTraining.Wellbeing.Ports.WellbeingStore do
   @callback set_check_in_visibility(Ecto.UUID.t(), Ecto.UUID.t(), String.t()) ::
               {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback move_check_ins(Ecto.UUID.t(), [String.t()], String.t()) :: non_neg_integer()
-  @callback list_check_in_items(Ecto.UUID.t(), term(), pos_integer()) :: [map()]
+  @callback list_check_in_items(Ecto.UUID.t(), term(), pos_integer(), term()) :: [map()]
+  @callback list_injury_items(Ecto.UUID.t(), term(), pos_integer(), term()) :: [map()]
+  @callback set_injury_visibility(Ecto.UUID.t(), Ecto.UUID.t(), String.t()) ::
+              {:ok, map()} | {:error, :not_found | Ecto.Changeset.t()}
   @callback list_check_ins_between(Ecto.UUID.t(), DateTime.t(), DateTime.t()) :: [map()]
   @callback list_coach_visible_check_ins(Ecto.UUID.t(), Ecto.UUID.t()) :: [map()]
 end

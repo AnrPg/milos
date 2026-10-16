@@ -19,4 +19,8 @@ defmodule MilosTraining.Execution.Ports.TrainingLogStore do
   @callback get_entry(binary()) :: entry() | nil
   @callback list_entries_for_user(binary(), keyword()) :: [entry()]
   @callback list_live_source_reference_ids(binary(), binary()) :: [binary()]
+  @callback list_entry_items(binary(), term(), pos_integer(), term()) :: [entry()]
+  @callback set_entry_visibility(binary(), binary(), String.t()) ::
+              {:ok, entry()} | {:error, :not_found} | {:error, Ecto.Changeset.t()}
+  @callback move_entries(binary(), [String.t()], String.t()) :: non_neg_integer()
 end

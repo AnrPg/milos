@@ -53,6 +53,7 @@ defmodule MilosTraining.Pantheon do
   # the member's `pr` default in the Journal context).
   defdelegate set_record_visibility(id, user_id, rung), to: MilosTraining.Pantheon.PRStore
   defdelegate move_records(user_id, from, to), to: MilosTraining.Pantheon.PRStore
+  defdelegate list_record_items(user_id, bound, limit, scope), to: MilosTraining.Pantheon.PRStore
 
   # ADR-129 explicit sharing grants.
 

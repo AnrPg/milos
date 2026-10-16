@@ -29,7 +29,7 @@ defmodule MilosTraining.Application.JournalComments do
   def save_many(%{user_id: user_id} = context, comments, now)
       when is_list(comments) and length(comments) <= @max_batch do
     Journal.with_context(context, fn ->
-      Journal.comments_transaction(fn ->
+      Journal.transaction(fn ->
         comments
         |> Enum.reduce_while({:ok, []}, fn params, {:ok, saved} ->
           case save_one(user_id, params, now) do
@@ -89,7 +89,7 @@ defmodule MilosTraining.Application.JournalComments do
   """
   def write_with_comments(context, entry_kind, comments, write, now \\ DateTime.utc_now())
       when is_function(write, 0) do
-    Journal.comments_transaction(fn ->
+    Journal.transaction(fn ->
       with {:ok, entry} <- write.(),
            {:ok, _saved} <- save_for_entry(context, entry_kind, entry.id, comments, now) do
         {:ok, Journal.with_context(context, fn -> attach(entry, entry_kind) end)}

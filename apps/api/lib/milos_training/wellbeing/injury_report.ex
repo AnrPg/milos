@@ -20,10 +20,19 @@ defmodule MilosTraining.Wellbeing.InjuryReport do
     field :tags, {:array, :string}, default: []
     field :visibility, :string, default: "user_and_admin"
     field :params, :map, default: %{}
+    # ADR-139 ladder rung; coaches always see injuries, so it is never private.
+    field :journal_visibility, :string, default: "coach_can_view"
 
     has_many :events, MilosTraining.Wellbeing.InjuryStatusEvent, foreign_key: :injury_report_id
 
     timestamps(type: :utc_datetime_usec)
+  end
+
+  @doc "Moves the injury_report on the journal ladder (ADR-139)."
+  def visibility_changeset(%__MODULE__{} = injury_report, rung) do
+    injury_report
+    |> change(journal_visibility: rung)
+    |> check_constraint(:journal_visibility, name: :injury_reports_journal_visibility_check)
   end
 
   def changeset(injury_report \\ %__MODULE__{}, params) do

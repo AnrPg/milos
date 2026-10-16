@@ -3,7 +3,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Infrastructure.Journal.FeedBound
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Journal.{CoachRead, Comment, Note, VisibilityDefault}
   alias MilosTraining.Repo
 
@@ -45,8 +45,9 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
         {:error, :not_found}
 
       note ->
+        # Without a version the edit applies to the note as it is now.
         note
-        |> Map.put(:lock_version, lock_version)
+        |> Map.put(:lock_version, lock_version || note.lock_version)
         |> Note.update_changeset(attrs)
         |> Repo.update(stale_error_field: :lock_version)
         |> case do
@@ -93,9 +94,10 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   end
 
   @impl true
-  def list_note_items(user_id, bound, limit) do
+  def list_note_items(user_id, bound, limit, scope) do
     Note
-    |> where([note], note.user_id == ^user_id and is_nil(note.deleted_at))
+    |> where([note], is_nil(note.deleted_at))
+    |> FeedScope.apply(user_id, scope)
     |> FeedBound.apply(:written_at, bound)
     |> order_by([note], desc: note.written_at, desc: note.id)
     |> limit(^limit)
@@ -188,7 +190,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   end
 
   @impl true
-  def comments_transaction(fun) do
+  def transaction(fun) do
     # Inside an outer transaction (an entry saved with its comments) the
     # outer one decides; a nested rollback would poison it.
     if Repo.in_transaction?(), do: fun.(), else: transact(fun)

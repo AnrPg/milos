@@ -98,6 +98,8 @@ defmodule MilosTrainingWeb.ChatChannel do
       body: message.body,
       message_type: message.message_type,
       client_operation_id: message.client_operation_id,
+      subject_kind: message.subject_kind,
+      subject_id: message.subject_id,
       inserted_at: message.inserted_at
     }
   end

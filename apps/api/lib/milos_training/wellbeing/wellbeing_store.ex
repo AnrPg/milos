@@ -38,8 +38,14 @@ defmodule MilosTraining.Wellbeing.WellbeingStore do
 
   def move_check_ins(user_id, from, to), do: adapter().move_check_ins(user_id, from, to)
 
-  def list_check_in_items(user_id, bound, limit),
-    do: adapter().list_check_in_items(user_id, bound, limit)
+  def list_check_in_items(user_id, bound, limit, scope),
+    do: adapter().list_check_in_items(user_id, bound, limit, scope)
+
+  def list_injury_items(user_id, bound, limit, scope),
+    do: adapter().list_injury_items(user_id, bound, limit, scope)
+
+  def set_injury_visibility(id, user_id, rung),
+    do: adapter().set_injury_visibility(id, user_id, rung)
 
   def list_check_ins_between(user_id, from, to),
     do: adapter().list_check_ins_between(user_id, from, to)

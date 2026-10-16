@@ -56,6 +56,11 @@ defmodule MilosTraining.Wellbeing do
   defdelegate list_check_ins_between(user_id, from, to), to: WellbeingStore
   defdelegate list_coach_visible_check_ins(user_id, organization_id), to: WellbeingStore
 
+  # Journal feed (ADR-139 §9).
+  defdelegate list_check_in_items(user_id, bound, limit, scope), to: WellbeingStore
+  defdelegate list_injury_items(user_id, bound, limit, scope), to: WellbeingStore
+  defdelegate set_injury_visibility(id, user_id, rung), to: WellbeingStore
+
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,
   # always inside a RepoContext session for the purge's tenant.

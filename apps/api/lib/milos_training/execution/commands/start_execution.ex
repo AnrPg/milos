@@ -28,7 +28,9 @@ defmodule MilosTraining.Execution.Commands.StartExecution do
            current_segment_index: 0,
            segment_started_at_utc: started_at_utc,
            paused_elapsed_ms: 0,
-           resume_countdown_ends_at_utc: nil
+           resume_countdown_ends_at_utc: nil,
+           # Server-derived by the caller (ADR-139), like the organization.
+           journal_visibility: Params.get(params, :journal_visibility) || "private"
          } do
       ExecutionStore.start_execution(execution_params)
     end

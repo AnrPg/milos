@@ -408,6 +408,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
+    get("/clients/:user_id/journal", JournalController, :client_journal)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -858,6 +859,11 @@ defmodule MilosTrainingWeb.Router do
     post("/journal/comments/batch", JournalCommentController, :batch)
     put("/journal/comments/:id", JournalCommentController, :save)
     delete("/journal/comments/:id", JournalCommentController, :delete)
+    get("/me/journal", JournalController, :index)
+    put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
+    post("/me/journal/notes", JournalController, :create_note)
+    patch("/me/journal/notes/:id", JournalController, :update_note)
+    delete("/me/journal/notes/:id", JournalController, :delete_note)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

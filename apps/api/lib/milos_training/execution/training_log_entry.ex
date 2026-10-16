@@ -38,6 +38,8 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     field(:void_reason, :string)
     field(:idempotency_key, :string)
     field(:lock_version, :integer, default: 1)
+    # ADR-139 ladder rung, set when logged from the member's `workout` default.
+    field(:journal_visibility, :string, default: "coach_can_view")
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -67,7 +69,8 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
         :master_workout_id,
         :booking_id,
         :workout_type,
-        :idempotency_key
+        :idempotency_key,
+        :journal_visibility
       ] ++ @editable_fields
     )
     |> validate_required([
@@ -91,6 +94,13 @@ defmodule MilosTraining.Execution.TrainingLogEntry do
     |> foreign_key_constraint(:organization_id)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:master_workout_id)
+  end
+
+  @doc "Moves the entry on the journal ladder (ADR-139)."
+  def visibility_changeset(%__MODULE__{} = entry, rung) do
+    entry
+    |> change(journal_visibility: rung)
+    |> check_constraint(:journal_visibility, name: :training_log_entries_journal_visibility_check)
   end
 
   def update_changeset(%__MODULE__{} = entry, params) do

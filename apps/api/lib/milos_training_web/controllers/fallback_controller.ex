@@ -1682,6 +1682,26 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "note_too_long", error: "The update text is too long"})
   end
 
+  # ADR-139 ladder moves and reply requests.
+  @journal_errors %{
+    unknown_kind: {:unprocessable_entity, "Unknown journal entry kind"},
+    visibility_not_allowed: {:unprocessable_entity, "This entry cannot take that visibility"},
+    no_gym_for_entry: {:unprocessable_entity, "A personal entry has no coach to show it to"},
+    no_active_coach: {:unprocessable_entity, "You have no active coach in this entry's gym"},
+    question_required: {:unprocessable_entity, "Ask your coach a question"},
+    question_too_long: {:unprocessable_entity, "The question is too long"},
+    note_organization_unavailable: {:unprocessable_entity, "That gym is not available"},
+    stale: {:conflict, "This entry changed meanwhile; reload it"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do
+    {status, message} = Map.fetch!(@journal_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
   def call(conn, {:error, :comment_conflict}) do
     conn
     |> put_status(:conflict)
