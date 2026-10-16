@@ -1669,6 +1669,22 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-140 §2 Πώς νιώθω.
+  def call(conn, {:error, :check_in_organization_unavailable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "check_in_organization_unavailable",
+      error: "Check-ins can only be recorded in a gym you are an active member of"
+    })
+  end
+
+  def call(conn, {:error, :invalid_range}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_range", error: "from must be before to, at most a year apart"})
+  end
+
   # ADR-126 refund receipts, reconciliation and accounting exports.
   def call(conn, {:error, :reconciliation_reference_conflict}) do
     conn

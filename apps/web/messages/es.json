@@ -4796,14 +4796,16 @@
       "pr": "Marca personal",
       "injury": "Lesión",
       "formReview": "Vídeo de técnica",
-      "review": "Valoración"
+      "review": "Valoración",
+      "checkIn": "Cómo me siento"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
       "pr": "Una nueva marca personal",
       "injury": "Visible para tus entrenadores",
       "formReview": "Pide opinión a tu entrenador",
-      "review": "Valora una clase o un entrenamiento"
+      "review": "Valora una clase o un entrenamiento",
+      "checkIn": "Unas preguntas rápidas"
     },
     "homeTitle": "Inicio",
     "wodToday": "El WOD de hoy en el box",
@@ -4815,6 +4817,69 @@
       "training": "Entrenamiento",
       "wellbeing": "Bienestar",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "Cómo me siento",
+      "title": "¿Cómo te sientes ahora?",
+      "question": {
+        "sleep": "¿Cómo dormiste?",
+        "energy": "¿Cuánta energía tienes?",
+        "mood": "¿Cómo está tu ánimo?",
+        "stress": "¿Cuánto estrés tienes?",
+        "body": "¿Cómo sientes el cuerpo?"
+      },
+      "short": {
+        "sleep": "Sueño",
+        "energy": "Energía",
+        "mood": "Ánimo",
+        "stress": "Estrés",
+        "body": "Cuerpo"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Mal",
+          "2": "Regular",
+          "3": "Bien",
+          "4": "Genial"
+        },
+        "energy": {
+          "1": "Agotado",
+          "2": "Baja",
+          "3": "Buena",
+          "4": "A tope"
+        },
+        "mood": {
+          "1": "Fatal",
+          "2": "Bajo",
+          "3": "Bueno",
+          "4": "Genial"
+        },
+        "stress": {
+          "1": "Mucho",
+          "2": "Bastante",
+          "3": "Poco",
+          "4": "Nada"
+        },
+        "body": {
+          "1": "Con dolor",
+          "2": "Rígido",
+          "3": "Bien",
+          "4": "Fresco"
+        }
+      },
+      "notePlaceholder": "¿Quieres comentar algo?",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "answerOne": "Responde al menos una pregunta.",
+      "savesAsNew": "Cada guardado es una entrada nueva; las anteriores siguen en tu línea de tiempo.",
+      "saved": "Guardado a las {time}.",
+      "saveFailed": "No se pudo guardar. Inténtalo de nuevo.",
+      "timelineTitle": "Últimos {days} días",
+      "timelineEmpty": "Aún no hay registros. Tus respuestas aparecerán aquí como línea de tiempo.",
+      "timelineAria": "{question}: {count, plural, one {# registro} other {# registros}}",
+      "history": "Todos los registros ({count})",
+      "delete": "Eliminar",
+      "loading": "Cargando…"
     }
   }
 }

@@ -5057,6 +5057,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellbeing/check-ins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current user's Πώς νιώθω timeline */
+        get: operations["MilosTrainingWeb.CheckInController.index"];
+        put?: never;
+        /** Submit a Πώς νιώθω check-in (a new timestamped entry) */
+        post: operations["MilosTrainingWeb.CheckInController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellbeing/check-ins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete one of the current user's check-ins */
+        delete: operations["MilosTrainingWeb.CheckInController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/wellbeing/injuries": {
         parameters: {
             query?: never;
@@ -28764,6 +28799,132 @@ export interface operations {
                         theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                     };
                 };
+            };
+        };
+    };
+    "MilosTrainingWeb.CheckInController.index": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Questions and submissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        check_ins: {
+                            answers: {
+                                note: string | null;
+                                question_key: string;
+                                value: number;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** Format: uuid */
+                            organization_id: string | null;
+                            /** Format: date-time */
+                            recorded_at: string;
+                            recorded_tz: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        questions: {
+                            key: string;
+                            max: number;
+                            min: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CheckInController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    answers: {
+                        note?: string | null;
+                        question_key: string;
+                        value: number;
+                    }[];
+                    organization_slug?: string | null;
+                    recorded_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Check-in */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        check_in: {
+                            answers: {
+                                note: string | null;
+                                question_key: string;
+                                value: number;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** Format: uuid */
+                            organization_id: string | null;
+                            /** Format: date-time */
+                            recorded_at: string;
+                            recorded_tz: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CheckInController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -4796,14 +4796,16 @@
       "pr": "Bestleistung",
       "injury": "Verletzung",
       "formReview": "Technikvideo",
-      "review": "Bewertung"
+      "review": "Bewertung",
+      "checkIn": "Wie ich mich fühle"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
       "pr": "Eine neue persönliche Bestleistung",
       "injury": "Für deine Coaches sichtbar",
       "formReview": "Bitte deinen Coach um Feedback",
-      "review": "Bewerte einen Kurs oder ein Training"
+      "review": "Bewerte einen Kurs oder ein Training",
+      "checkIn": "Ein paar kurze Fragen"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -4815,6 +4817,69 @@
       "training": "Training",
       "wellbeing": "Wohlbefinden",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "Wie ich mich fühle",
+      "title": "Wie fühlst du dich gerade?",
+      "question": {
+        "sleep": "Wie hast du geschlafen?",
+        "energy": "Wie viel Energie hast du?",
+        "mood": "Wie ist deine Stimmung?",
+        "stress": "Wie viel Stress hast du?",
+        "body": "Wie fühlt sich dein Körper an?"
+      },
+      "short": {
+        "sleep": "Schlaf",
+        "energy": "Energie",
+        "mood": "Stimmung",
+        "stress": "Stress",
+        "body": "Körper"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Schlecht",
+          "2": "Mittel",
+          "3": "Gut",
+          "4": "Super"
+        },
+        "energy": {
+          "1": "Erschöpft",
+          "2": "Wenig",
+          "3": "Gut",
+          "4": "Voll"
+        },
+        "mood": {
+          "1": "Mies",
+          "2": "Gedrückt",
+          "3": "Gut",
+          "4": "Super"
+        },
+        "stress": {
+          "1": "Sehr viel",
+          "2": "Ziemlich",
+          "3": "Wenig",
+          "4": "Keiner"
+        },
+        "body": {
+          "1": "Schmerzen",
+          "2": "Steif",
+          "3": "Okay",
+          "4": "Frisch"
+        }
+      },
+      "notePlaceholder": "Möchtest du etwas dazu sagen?",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "answerOne": "Beantworte mindestens eine Frage.",
+      "savesAsNew": "Jedes Speichern ist ein neuer Eintrag; frühere bleiben in deiner Zeitleiste.",
+      "saved": "Gespeichert um {time}.",
+      "saveFailed": "Speichern fehlgeschlagen. Bitte erneut versuchen.",
+      "timelineTitle": "Letzte {days} Tage",
+      "timelineEmpty": "Noch keine Einträge. Deine Antworten erscheinen hier als Zeitleiste.",
+      "timelineAria": "{question}: {count, plural, one {# Eintrag} other {# Einträge}}",
+      "history": "Alle Einträge ({count})",
+      "delete": "Löschen",
+      "loading": "Wird geladen…"
     }
   }
 }

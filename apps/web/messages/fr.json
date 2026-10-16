@@ -4796,14 +4796,16 @@
       "pr": "Record",
       "injury": "Blessure",
       "formReview": "Vidéo de technique",
-      "review": "Avis"
+      "review": "Avis",
+      "checkIn": "Comment je me sens"
     },
     "entryKindHint": {
       "workout": "Résultat, RPE, remarques",
       "pr": "Un nouveau record personnel",
       "injury": "Visible par vos coachs",
       "formReview": "Demandez l’avis de votre coach",
-      "review": "Notez un cours ou une séance"
+      "review": "Notez un cours ou une séance",
+      "checkIn": "Quelques questions rapides"
     },
     "homeTitle": "Accueil",
     "wodToday": "Le WOD du jour à la salle",
@@ -4815,6 +4817,69 @@
       "training": "Entraînement",
       "wellbeing": "Bien-être",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "Comment je me sens",
+      "title": "Comment te sens-tu en ce moment ?",
+      "question": {
+        "sleep": "Comment as-tu dormi ?",
+        "energy": "Quelle est ton énergie ?",
+        "mood": "Comment est ton moral ?",
+        "stress": "Quel est ton niveau de stress ?",
+        "body": "Comment se sent ton corps ?"
+      },
+      "short": {
+        "sleep": "Sommeil",
+        "energy": "Énergie",
+        "mood": "Moral",
+        "stress": "Stress",
+        "body": "Corps"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Mal",
+          "2": "Moyen",
+          "3": "Bien",
+          "4": "Super"
+        },
+        "energy": {
+          "1": "Épuisé",
+          "2": "Faible",
+          "3": "Bonne",
+          "4": "Au top"
+        },
+        "mood": {
+          "1": "Au plus bas",
+          "2": "Morose",
+          "3": "Bon",
+          "4": "Excellent"
+        },
+        "stress": {
+          "1": "Beaucoup",
+          "2": "Assez",
+          "3": "Un peu",
+          "4": "Aucun"
+        },
+        "body": {
+          "1": "Douloureux",
+          "2": "Raide",
+          "3": "Ça va",
+          "4": "En forme"
+        }
+      },
+      "notePlaceholder": "Tu veux ajouter quelque chose ?",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "answerOne": "Réponds à au moins une question.",
+      "savesAsNew": "Chaque enregistrement est une nouvelle entrée ; les précédentes restent sur ta chronologie.",
+      "saved": "Enregistré à {time}.",
+      "saveFailed": "Échec de l’enregistrement. Réessaie.",
+      "timelineTitle": "{days} derniers jours",
+      "timelineEmpty": "Aucune entrée pour l’instant. Tes réponses apparaîtront ici sous forme de chronologie.",
+      "timelineAria": "{question} : {count, plural, one {# entrée} other {# entrées}}",
+      "history": "Toutes les entrées ({count})",
+      "delete": "Supprimer",
+      "loading": "Chargement…"
     }
   }
 }

@@ -35,6 +35,9 @@ defmodule MilosTraining.Wellbeing.WellbeingStore do
   def list_check_in_items(user_id, bound, limit),
     do: adapter().list_check_in_items(user_id, bound, limit)
 
+  def list_check_ins_between(user_id, from, to),
+    do: adapter().list_check_ins_between(user_id, from, to)
+
   def list_coach_visible_check_ins(user_id, organization_id),
     do: adapter().list_coach_visible_check_ins(user_id, organization_id)
 

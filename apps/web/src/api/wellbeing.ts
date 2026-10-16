@@ -67,3 +67,28 @@ export async function adminMarkInjuryHealed(token: string, injuryId: string) {
     body: {},
   });
 }
+
+// ADR-140 §2 Πώς νιώθω: immutable, timestamped check-ins.
+type CheckInTimelineResponse =
+  operations["MilosTrainingWeb.CheckInController.index"]["responses"][200]["content"]["application/json"];
+type SubmitCheckInResponse =
+  operations["MilosTrainingWeb.CheckInController.create"]["responses"][201]["content"]["application/json"];
+
+export type CheckInTimeline = CheckInTimelineResponse;
+export type CheckInRecord = CheckInTimelineResponse["check_ins"][number];
+export type CheckInQuestion = CheckInTimelineResponse["questions"][number];
+export type SubmitCheckInRequest =
+  operations["MilosTrainingWeb.CheckInController.create"]["requestBody"]["content"]["application/json"];
+
+export async function fetchMyCheckIns(token: string, window: { from: string; to: string }) {
+  const params = new URLSearchParams(window);
+  return apiRequest<CheckInTimelineResponse>(`/wellbeing/check-ins?${params.toString()}`, { token });
+}
+
+export async function submitCheckIn(token: string, body: SubmitCheckInRequest) {
+  return apiRequest<SubmitCheckInResponse>("/wellbeing/check-ins", { method: "POST", token, body });
+}
+
+export async function deleteMyCheckIn(token: string, checkInId: string) {
+  return apiRequest<void>(`/wellbeing/check-ins/${checkInId}`, { method: "DELETE", token });
+}

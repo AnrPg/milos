@@ -64082,6 +64082,360 @@
         ]
       }
     },
+    "/api/wellbeing/check-ins": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CheckInController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "check_ins": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "answers": {
+                            "items": {
+                              "additionalProperties": false,
+                              "properties": {
+                                "note": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "question_key": {
+                                  "type": "string"
+                                },
+                                "value": {
+                                  "maximum": 4,
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "question_key",
+                                "value",
+                                "note"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "journal_visibility": {
+                            "enum": [
+                              "private",
+                              "coach_can_view",
+                              "coach_reply_requested",
+                              "posted"
+                            ],
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "recorded_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "recorded_tz": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "organization_id",
+                          "recorded_at",
+                          "recorded_tz",
+                          "journal_visibility",
+                          "answers",
+                          "inserted_at",
+                          "updated_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "questions": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "key": {
+                            "type": "string"
+                          },
+                          "max": {
+                            "type": "integer"
+                          },
+                          "min": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "min",
+                          "max"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "questions",
+                    "check_ins"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Questions and submissions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user's Πώς νιώθω timeline",
+        "tags": [
+          "Wellbeing"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CheckInController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "answers": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "note": {
+                          "maxLength": 1000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "question_key": {
+                          "type": "string"
+                        },
+                        "value": {
+                          "maximum": 4,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "question_key",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "minItems": 1,
+                    "type": "array"
+                  },
+                  "organization_slug": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "recorded_tz": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "answers"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "check_in": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "answers": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "note": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "question_key": {
+                                "type": "string"
+                              },
+                              "value": {
+                                "maximum": 4,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "question_key",
+                              "value",
+                              "note"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "recorded_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "recorded_tz": {
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "user_id",
+                        "organization_id",
+                        "recorded_at",
+                        "recorded_tz",
+                        "journal_visibility",
+                        "answers",
+                        "inserted_at",
+                        "updated_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "check_in"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Check-in"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Submit a Πώς νιώθω check-in (a new timestamped entry)",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
+    "/api/wellbeing/check-ins/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CheckInController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete one of the current user's check-ins",
+        "tags": [
+          "Wellbeing"
+        ]
+      }
+    },
     "/api/wellbeing/injuries": {
       "get": {
         "callbacks": {},

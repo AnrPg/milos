@@ -18,6 +18,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
+import { CheckInPanel } from "@/components/member-app/wellbeing/CheckInPanel";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -55,6 +56,10 @@ export function MyWellbeing() {
     <main className="min-h-screen bg-[var(--bg)] px-6 py-10 text-[var(--text)] md:px-10">
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader title={i18n("myWellbeing1916377")} />
+
+        <section id="check-in" className="scroll-mt-24">
+          <CheckInPanel />
+        </section>
 
         <form
           id="report-injury"

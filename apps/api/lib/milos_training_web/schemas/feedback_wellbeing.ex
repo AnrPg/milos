@@ -116,6 +116,99 @@ defmodule MilosTrainingWeb.Schemas.FeedbackWellbeing do
     additionalProperties: false
   }
 
+  # ADR-140 §2 Πώς νιώθω.
+  @check_in_answer %Schema{
+    type: :object,
+    properties: %{
+      question_key: %Schema{type: :string},
+      value: %Schema{type: :integer, minimum: 1, maximum: 4},
+      note: %Schema{type: :string, nullable: true}
+    },
+    required: [:question_key, :value, :note],
+    additionalProperties: false
+  }
+
+  @check_in %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      user_id: %Schema{type: :string, format: :uuid},
+      organization_id: %Schema{type: :string, format: :uuid, nullable: true},
+      recorded_at: %Schema{type: :string, format: :"date-time"},
+      recorded_tz: %Schema{type: :string},
+      journal_visibility: %Schema{
+        type: :string,
+        enum: ["private", "coach_can_view", "coach_reply_requested", "posted"]
+      },
+      answers: %Schema{type: :array, items: @check_in_answer},
+      inserted_at: %Schema{type: :string, format: :"date-time"},
+      updated_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [
+      :id,
+      :user_id,
+      :organization_id,
+      :recorded_at,
+      :recorded_tz,
+      :journal_visibility,
+      :answers,
+      :inserted_at,
+      :updated_at
+    ],
+    additionalProperties: false
+  }
+
+  @check_in_question %Schema{
+    type: :object,
+    properties: %{
+      key: %Schema{type: :string},
+      min: %Schema{type: :integer},
+      max: %Schema{type: :integer}
+    },
+    required: [:key, :min, :max],
+    additionalProperties: false
+  }
+
+  def check_in_response, do: item(:check_in, @check_in)
+
+  def check_in_timeline do
+    %Schema{
+      type: :object,
+      properties: %{
+        questions: %Schema{type: :array, items: @check_in_question},
+        check_ins: %Schema{type: :array, items: @check_in}
+      },
+      required: [:questions, :check_ins],
+      additionalProperties: false
+    }
+  end
+
+  def check_in_request do
+    %Schema{
+      type: :object,
+      properties: %{
+        organization_slug: %Schema{type: :string, nullable: true},
+        recorded_tz: %Schema{type: :string, nullable: true},
+        answers: %Schema{
+          type: :array,
+          minItems: 1,
+          items: %Schema{
+            type: :object,
+            properties: %{
+              question_key: %Schema{type: :string},
+              value: %Schema{type: :integer, minimum: 1, maximum: 4},
+              note: %Schema{type: :string, nullable: true, maxLength: 1000}
+            },
+            required: [:question_key, :value],
+            additionalProperties: false
+          }
+        }
+      },
+      required: [:answers],
+      additionalProperties: false
+    }
+  end
+
   def review, do: @review
   def review_collection, do: collection(:reviews, @review)
   def review_response, do: item(:review, @review)

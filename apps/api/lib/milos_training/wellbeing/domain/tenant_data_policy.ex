@@ -17,7 +17,11 @@ defmodule MilosTraining.Wellbeing.Domain.TenantDataPolicy do
             tables: [
               %{table: "injury_status_events", parent: {"injury_reports", "injury_report_id"}},
               %{table: "injury_reports"},
-              # ADR-139 Πώς νιώθω check-ins: personal rows with gym provenance.
+              # ADR-139/140 Πώς νιώθω check-ins: personal rows with gym provenance.
+              %{
+                table: "wellbeing_check_in_answers",
+                rls: {:user_via, "wellbeing_check_ins", "check_in_id"}
+              },
               %{table: "wellbeing_check_ins", rls: :user}
             ]
           })

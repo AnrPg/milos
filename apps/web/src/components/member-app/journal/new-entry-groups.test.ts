@@ -6,7 +6,7 @@ describe("newEntryGroups", () => {
   it("groups the entry kinds that exist today as the feature map does", () => {
     expect(newEntryGroups({ canRequestFormReview: false })).toEqual([
       { group: "training", kinds: ["workout", "pr"] },
-      { group: "wellbeing", kinds: ["injury"] },
+      { group: "wellbeing", kinds: ["checkIn", "injury"] },
       { group: "coach", kinds: ["review"] },
     ]);
   });

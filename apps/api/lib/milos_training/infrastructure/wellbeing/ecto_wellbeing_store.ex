@@ -8,6 +8,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   alias MilosTraining.Repo
   alias MilosTraining.Infrastructure.Journal.FeedBound
   alias MilosTraining.Wellbeing.{CheckIn, InjuryReport, InjuryStatusEvent}
+  alias MilosTraining.Wellbeing.Domain.CheckInQuestions
 
   @impl true
   def report_injury(user_id, actor_id, actor_role, params) do
@@ -352,12 +353,27 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
     |> FeedBound.apply(:recorded_at, bound)
     |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
     |> limit(^limit)
+    |> preload(:answers)
+    |> Repo.all()
+    |> Enum.map(&normalize_check_in/1)
+  end
+
+  # The timeline of ADR-140 §2: every live submission in [from, to), oldest
+  # first, so each question draws one line with a point per submission.
+  @impl true
+  def list_check_ins_between(user_id, %DateTime{} = from, %DateTime{} = to) do
+    CheckIn
+    |> where([check_in], check_in.user_id == ^user_id and is_nil(check_in.deleted_at))
+    |> where([check_in], check_in.recorded_at >= ^from and check_in.recorded_at < ^to)
+    |> order_by([check_in], asc: check_in.recorded_at, asc: check_in.id)
+    |> preload(:answers)
     |> Repo.all()
     |> Enum.map(&normalize_check_in/1)
   end
 
   # Coach tenant session: RLS admits only this gym's check-ins whose rung
-  # reaches the coach; the predicates below make the intent explicit.
+  # reaches the coach (and their answers, through the parent); the
+  # predicates below make the intent explicit.
   @impl true
   def list_coach_visible_check_ins(user_id, organization_id) do
     CheckIn
@@ -369,6 +385,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       fragment("milos_journal_visibility_reaches_coach(?)", check_in.journal_visibility)
     )
     |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
+    |> preload(:answers)
     |> Repo.all()
     |> Enum.map(&normalize_check_in/1)
   end
@@ -379,6 +396,7 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
         CheckIn
         |> where([check_in], check_in.id == ^id and check_in.user_id == ^user_id)
         |> where([check_in], is_nil(check_in.deleted_at))
+        |> preload(:answers)
         |> Repo.one()
 
       :error ->
@@ -390,9 +408,14 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   defp normalize_check_in_result(error), do: error
 
   defp normalize_check_in(%CheckIn{} = check_in) do
+    answers =
+      check_in.answers
+      |> Enum.map(&Map.take(&1, [:question_key, :value, :note]))
+      |> Enum.sort_by(&CheckInQuestions.order(&1.question_key))
+
     check_in
     |> Map.from_struct()
     |> Map.drop([:__meta__, :deleted_at])
-    |> Map.update!(:sleep_hours, &(&1 && Decimal.to_float(&1)))
+    |> Map.put(:answers, answers)
   end
 end

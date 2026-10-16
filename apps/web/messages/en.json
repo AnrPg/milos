@@ -4796,14 +4796,16 @@
       "pr": "PR",
       "injury": "Injury",
       "formReview": "Technique video",
-      "review": "Review"
+      "review": "Review",
+      "checkIn": "How I feel"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
       "pr": "A new personal record",
       "injury": "Visible to your coaches",
       "formReview": "Ask your coach for feedback",
-      "review": "Rate a class or workout"
+      "review": "Rate a class or workout",
+      "checkIn": "A few quick questions"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -4815,6 +4817,69 @@
       "training": "Training",
       "wellbeing": "Wellbeing",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "How I feel",
+      "title": "How do you feel right now?",
+      "question": {
+        "sleep": "How did you sleep?",
+        "energy": "How much energy do you have?",
+        "mood": "How is your mood?",
+        "stress": "How much stress do you have?",
+        "body": "How does your body feel?"
+      },
+      "short": {
+        "sleep": "Sleep",
+        "energy": "Energy",
+        "mood": "Mood",
+        "stress": "Stress",
+        "body": "Body"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Badly",
+          "2": "So-so",
+          "3": "Well",
+          "4": "Great"
+        },
+        "energy": {
+          "1": "Drained",
+          "2": "Low",
+          "3": "Good",
+          "4": "Full"
+        },
+        "mood": {
+          "1": "Awful",
+          "2": "Down",
+          "3": "Good",
+          "4": "Great"
+        },
+        "stress": {
+          "1": "A lot",
+          "2": "Quite a bit",
+          "3": "A little",
+          "4": "None"
+        },
+        "body": {
+          "1": "In pain",
+          "2": "Stiff",
+          "3": "Fine",
+          "4": "Fresh"
+        }
+      },
+      "notePlaceholder": "Want to say something?",
+      "save": "Save",
+      "saving": "Saving…",
+      "answerOne": "Answer at least one question.",
+      "savesAsNew": "Each save is a new entry; earlier ones stay on your timeline.",
+      "saved": "Saved at {time}.",
+      "saveFailed": "Couldn't save. Try again.",
+      "timelineTitle": "Last {days} days",
+      "timelineEmpty": "No check-ins yet. Your answers will show up here as a timeline.",
+      "timelineAria": "{question}: {count, plural, one {# entry} other {# entries}}",
+      "history": "All check-ins ({count})",
+      "delete": "Delete",
+      "loading": "Loading…"
     }
   }
 }

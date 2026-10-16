@@ -4796,14 +4796,16 @@
       "pr": "Record",
       "injury": "Blessure",
       "formReview": "Techniekvideo",
-      "review": "Beoordeling"
+      "review": "Beoordeling",
+      "checkIn": "Hoe ik me voel"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
       "pr": "Een nieuw persoonlijk record",
       "injury": "Zichtbaar voor je coaches",
       "formReview": "Vraag je coach om feedback",
-      "review": "Beoordeel een les of training"
+      "review": "Beoordeel een les of training",
+      "checkIn": "Een paar snelle vragen"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -4815,6 +4817,69 @@
       "training": "Training",
       "wellbeing": "Welzijn",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "Hoe ik me voel",
+      "title": "Hoe voel je je nu?",
+      "question": {
+        "sleep": "Hoe heb je geslapen?",
+        "energy": "Hoeveel energie heb je?",
+        "mood": "Hoe is je stemming?",
+        "stress": "Hoeveel stress heb je?",
+        "body": "Hoe voelt je lichaam?"
+      },
+      "short": {
+        "sleep": "Slaap",
+        "energy": "Energie",
+        "mood": "Stemming",
+        "stress": "Stress",
+        "body": "Lichaam"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Slecht",
+          "2": "Matig",
+          "3": "Goed",
+          "4": "Super"
+        },
+        "energy": {
+          "1": "Uitgeput",
+          "2": "Laag",
+          "3": "Goed",
+          "4": "Vol"
+        },
+        "mood": {
+          "1": "Beroerd",
+          "2": "Somber",
+          "3": "Goed",
+          "4": "Super"
+        },
+        "stress": {
+          "1": "Heel veel",
+          "2": "Behoorlijk",
+          "3": "Een beetje",
+          "4": "Geen"
+        },
+        "body": {
+          "1": "Pijn",
+          "2": "Stijf",
+          "3": "Prima",
+          "4": "Fris"
+        }
+      },
+      "notePlaceholder": "Wil je iets kwijt?",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "answerOne": "Beantwoord minstens één vraag.",
+      "savesAsNew": "Elke keer opslaan is een nieuwe invoer; eerdere blijven op je tijdlijn.",
+      "saved": "Opgeslagen om {time}.",
+      "saveFailed": "Opslaan mislukt. Probeer het opnieuw.",
+      "timelineTitle": "Laatste {days} dagen",
+      "timelineEmpty": "Nog geen invoer. Je antwoorden verschijnen hier als tijdlijn.",
+      "timelineAria": "{question}: {count, plural, one {# invoer} other {# invoeren}}",
+      "history": "Alle invoer ({count})",
+      "delete": "Verwijderen",
+      "loading": "Laden…"
     }
   }
 }

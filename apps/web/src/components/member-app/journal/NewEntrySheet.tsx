@@ -14,12 +14,12 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 /**
  * The kinds of entry a member can write today (brief §7.7), grouped as the
  * feature map groups them: Προπόνηση · Ευεξία · Coach. Each kind opens the
- * flow that already owns it. Kinds that need new backend (Πώς νιώθω,
- * Σημείωση) or arrive in Phase 2 (Μέτρηση, Νερό · Ύπνος · Γεύμα, Λιγούρα)
+ * flow that already owns it. Kinds that need new backend (Σημείωση) or
+ * arrive in Phase 2 (Μέτρηση, Νερό · Ύπνος · Γεύμα, Λιγούρα)
  * join their group then, so the sheet never shows a button that leads
  * nowhere, and a group with no kinds is not shown.
  */
-export type NewEntryKind = "workout" | "pr" | "injury" | "formReview" | "review";
+export type NewEntryKind = "workout" | "pr" | "checkIn" | "injury" | "formReview" | "review";
 export type NewEntryGroup = "training" | "wellbeing" | "coach";
 
 export function newEntryGroups(options: {
@@ -27,13 +27,14 @@ export function newEntryGroups(options: {
 }): { group: NewEntryGroup; kinds: NewEntryKind[] }[] {
   const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
     { group: "training", kinds: ["workout", "pr"] },
-    { group: "wellbeing", kinds: ["injury"] },
+    { group: "wellbeing", kinds: ["checkIn", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
   ];
   return groups.filter((entry) => entry.kinds.length > 0);
 }
 
 const ROUTES: Partial<Record<NewEntryKind, string>> = {
+  checkIn: "/journal/wellbeing#check-in",
   injury: "/journal/wellbeing#report-injury",
   formReview: "/box/coach",
   review: "/journal/reviews#new-review",

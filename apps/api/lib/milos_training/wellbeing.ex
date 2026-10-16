@@ -1,6 +1,6 @@
 defmodule MilosTraining.Wellbeing do
   alias MilosTraining.Wellbeing.Commands.{MarkHealed, ReportInjury}
-  alias MilosTraining.Wellbeing.Domain.InjuryRiskPolicy
+  alias MilosTraining.Wellbeing.Domain.{CheckInQuestions, InjuryRiskPolicy}
 
   alias MilosTraining.Wellbeing.Queries.{
     GetInjuryForUser,
@@ -38,6 +38,17 @@ defmodule MilosTraining.Wellbeing do
   defdelegate evaluate_injury_risk(injuries, exercises), to: InjuryRiskPolicy, as: :evaluate
   defdelegate injury_risk_analytics_facts(evaluation), to: InjuryRiskPolicy, as: :analytics_facts
   defdelegate max_injury_warning_level(levels), to: InjuryRiskPolicy, as: :max_level
+
+  # Πώς νιώθω (ADR-140 §2): immutable, timestamped submissions.
+  defdelegate check_in_questions(), to: CheckInQuestions, as: :catalog
+
+  def submit_check_in(attrs), do: WellbeingStore.create_check_in(attrs)
+  defdelegate delete_check_in(id, user_id, now), to: WellbeingStore
+  defdelegate get_check_in_for_user(id, user_id), to: WellbeingStore
+  defdelegate set_check_in_visibility(id, user_id, rung), to: WellbeingStore
+  defdelegate move_check_ins(user_id, from, to), to: WellbeingStore
+  defdelegate list_check_ins_between(user_id, from, to), to: WellbeingStore
+  defdelegate list_coach_visible_check_ins(user_id, organization_id), to: WellbeingStore
 
   # ADR-117 reviewed tenant export/purge. This context owns its table list and
   # retention policy; the shared executor only runs what this policy declares,

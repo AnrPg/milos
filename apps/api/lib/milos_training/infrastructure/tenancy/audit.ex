@@ -65,7 +65,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     workout_executions execution_progress_operations notifications push_subscriptions
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
-    journal_notes wellbeing_check_ins
+    journal_notes wellbeing_check_ins wellbeing_check_in_answers
   )
 
   def report do

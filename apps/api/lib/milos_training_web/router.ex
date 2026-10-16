@@ -848,6 +848,9 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
+    get("/wellbeing/check-ins", CheckInController, :index)
+    post("/wellbeing/check-ins", CheckInController, :create)
+    delete("/wellbeing/check-ins/:id", CheckInController, :delete)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

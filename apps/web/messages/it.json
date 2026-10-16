@@ -4796,14 +4796,16 @@
       "pr": "Record",
       "injury": "Infortunio",
       "formReview": "Video della tecnica",
-      "review": "Recensione"
+      "review": "Recensione",
+      "checkIn": "Come mi sento"
     },
     "entryKindHint": {
       "workout": "Punteggio, RPE, note",
       "pr": "Un nuovo record personale",
       "injury": "Visibile ai tuoi coach",
       "formReview": "Chiedi un parere al tuo coach",
-      "review": "Valuta una lezione o un allenamento"
+      "review": "Valuta una lezione o un allenamento",
+      "checkIn": "Poche domande rapide"
     },
     "homeTitle": "Home",
     "wodToday": "Il WOD di oggi in palestra",
@@ -4815,6 +4817,69 @@
       "training": "Allenamento",
       "wellbeing": "Benessere",
       "coach": "Coach"
+    },
+    "checkIn": {
+      "eyebrow": "Come mi sento",
+      "title": "Come ti senti adesso?",
+      "question": {
+        "sleep": "Come hai dormito?",
+        "energy": "Quanta energia hai?",
+        "mood": "Com’è il tuo umore?",
+        "stress": "Quanto stress hai?",
+        "body": "Come senti il corpo?"
+      },
+      "short": {
+        "sleep": "Sonno",
+        "energy": "Energia",
+        "mood": "Umore",
+        "stress": "Stress",
+        "body": "Corpo"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Male",
+          "2": "Così così",
+          "3": "Bene",
+          "4": "Benissimo"
+        },
+        "energy": {
+          "1": "Esausto",
+          "2": "Bassa",
+          "3": "Buona",
+          "4": "Al massimo"
+        },
+        "mood": {
+          "1": "Pessimo",
+          "2": "Giù",
+          "3": "Buono",
+          "4": "Ottimo"
+        },
+        "stress": {
+          "1": "Molto",
+          "2": "Parecchio",
+          "3": "Poco",
+          "4": "Nessuno"
+        },
+        "body": {
+          "1": "Dolorante",
+          "2": "Rigido",
+          "3": "Bene",
+          "4": "Fresco"
+        }
+      },
+      "notePlaceholder": "Vuoi aggiungere qualcosa?",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "answerOne": "Rispondi ad almeno una domanda.",
+      "savesAsNew": "Ogni salvataggio è una nuova voce; le precedenti restano nella tua cronologia.",
+      "saved": "Salvato alle {time}.",
+      "saveFailed": "Salvataggio non riuscito. Riprova.",
+      "timelineTitle": "Ultimi {days} giorni",
+      "timelineEmpty": "Ancora nessuna voce. Le tue risposte appariranno qui come cronologia.",
+      "timelineAria": "{question}: {count, plural, one {# voce} other {# voci}}",
+      "history": "Tutte le voci ({count})",
+      "delete": "Elimina",
+      "loading": "Caricamento…"
     }
   }
 }

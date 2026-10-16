@@ -4796,14 +4796,16 @@
       "pr": "Recorde",
       "injury": "Lesão",
       "formReview": "Vídeo de técnica",
-      "review": "Avaliação"
+      "review": "Avaliação",
+      "checkIn": "Como me sinto"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
       "pr": "Um novo recorde pessoal",
       "injury": "Visível para os seus treinadores",
       "formReview": "Peça feedback ao seu treinador",
-      "review": "Avalie uma aula ou um treino"
+      "review": "Avalie uma aula ou um treino",
+      "checkIn": "Algumas perguntas rápidas"
     },
     "homeTitle": "Início",
     "wodToday": "O WOD de hoje no box",
@@ -4815,6 +4817,69 @@
       "training": "Treino",
       "wellbeing": "Bem-estar",
       "coach": "Treinador"
+    },
+    "checkIn": {
+      "eyebrow": "Como me sinto",
+      "title": "Como te sentes agora?",
+      "question": {
+        "sleep": "Como dormiste?",
+        "energy": "Quanta energia tens?",
+        "mood": "Como está o teu humor?",
+        "stress": "Quanto stress tens?",
+        "body": "Como sentes o corpo?"
+      },
+      "short": {
+        "sleep": "Sono",
+        "energy": "Energia",
+        "mood": "Humor",
+        "stress": "Stress",
+        "body": "Corpo"
+      },
+      "answer": {
+        "sleep": {
+          "1": "Mal",
+          "2": "Mais ou menos",
+          "3": "Bem",
+          "4": "Ótimo"
+        },
+        "energy": {
+          "1": "Esgotado",
+          "2": "Baixa",
+          "3": "Boa",
+          "4": "No máximo"
+        },
+        "mood": {
+          "1": "Péssimo",
+          "2": "Em baixo",
+          "3": "Bom",
+          "4": "Ótimo"
+        },
+        "stress": {
+          "1": "Muito",
+          "2": "Bastante",
+          "3": "Pouco",
+          "4": "Nenhum"
+        },
+        "body": {
+          "1": "Com dores",
+          "2": "Rígido",
+          "3": "Bem",
+          "4": "Fresco"
+        }
+      },
+      "notePlaceholder": "Queres dizer alguma coisa?",
+      "save": "Guardar",
+      "saving": "A guardar…",
+      "answerOne": "Responde a pelo menos uma pergunta.",
+      "savesAsNew": "Cada registo é uma nova entrada; as anteriores ficam na tua cronologia.",
+      "saved": "Guardado às {time}.",
+      "saveFailed": "Não foi possível guardar. Tenta novamente.",
+      "timelineTitle": "Últimos {days} dias",
+      "timelineEmpty": "Ainda não há registos. As tuas respostas vão aparecer aqui como cronologia.",
+      "timelineAria": "{question}: {count, plural, one {# registo} other {# registos}}",
+      "history": "Todos os registos ({count})",
+      "delete": "Eliminar",
+      "loading": "A carregar…"
     }
   }
 }

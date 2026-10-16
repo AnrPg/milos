@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
   @moduledoc """
   ADR-139: the two private-by-default journal entries (Σημείωση; Πώς νιώθω,
-  the 10-second readiness check of sleep, energy, mood and stress),
+  the short questionnaire of ADR-140 §2),
   the audit of coach reads of journal entries, and the journal entry a
   "Ζητάω απάντηση" message is about.
 
@@ -57,6 +57,9 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
     create index(:journal_notes, [:user_id, :written_at], where: "deleted_at IS NULL")
     create index(:journal_notes, [:organization_id])
 
+    # Πώς νιώθω (ADR-140 §2): every submission is an immutable, timestamped
+    # row; a member may submit many times a day and the latest is the current
+    # state. Answers are one row per question of the catalog in code.
     create table(:wellbeing_check_ins, primary_key: false) do
       add :id, :binary_id, primary_key: true
       add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
@@ -64,12 +67,6 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
       add :organization_id,
           references(:organizations, type: :binary_id, on_delete: :delete_all)
 
-      add :sleep_hours, :decimal, precision: 3, scale: 1
-      add :sleep_quality, :smallint
-      add :energy, :smallint
-      add :mood, :smallint
-      add :stress, :smallint
-      add :note, :text
       add :recorded_at, :utc_datetime_usec, null: false
       add :recorded_tz, :string, null: false, default: "UTC"
       add :journal_visibility, :string, null: false, default: "private"
@@ -78,32 +75,68 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
       timestamps(type: :utc_datetime_usec)
     end
 
-    for scale <- ~w(sleep_quality energy mood stress) do
-      create constraint(:wellbeing_check_ins, :"wellbeing_check_ins_#{scale}_check",
-               check: "#{scale} IS NULL OR #{scale} BETWEEN 1 AND 5"
-             )
-    end
-
-    create constraint(:wellbeing_check_ins, :wellbeing_check_ins_sleep_hours_check,
-             check: "sleep_hours IS NULL OR sleep_hours BETWEEN 0 AND 24"
-           )
-
-    create constraint(:wellbeing_check_ins, :wellbeing_check_ins_any_value_check,
-             check:
-               "sleep_hours IS NOT NULL OR sleep_quality IS NOT NULL OR energy IS NOT NULL " <>
-                 "OR mood IS NOT NULL OR stress IS NOT NULL"
-           )
-
-    create constraint(:wellbeing_check_ins, :wellbeing_check_ins_note_check,
-             check: "note IS NULL OR char_length(note) <= 1000"
-           )
-
     create constraint(:wellbeing_check_ins, :wellbeing_check_ins_journal_visibility_check,
              check: "journal_visibility IN #{@member_rungs}"
            )
 
     create index(:wellbeing_check_ins, [:user_id, :recorded_at], where: "deleted_at IS NULL")
     create index(:wellbeing_check_ins, [:organization_id])
+
+    create table(:wellbeing_check_in_answers, primary_key: false) do
+      add :id, :binary_id, primary_key: true
+
+      add :check_in_id,
+          references(:wellbeing_check_ins, type: :binary_id, on_delete: :delete_all),
+          null: false
+
+      add :user_id, references(:users, type: :binary_id, on_delete: :delete_all), null: false
+      add :question_key, :string, null: false
+      add :value, :smallint, null: false
+      add :note, :text
+
+      timestamps(type: :utc_datetime_usec, updated_at: false)
+    end
+
+    create constraint(:wellbeing_check_in_answers, :wellbeing_check_in_answers_value_check,
+             check: "value BETWEEN 1 AND 4"
+           )
+
+    create constraint(:wellbeing_check_in_answers, :wellbeing_check_in_answers_note_check,
+             check: "note IS NULL OR char_length(note) BETWEEN 1 AND 1000"
+           )
+
+    create unique_index(:wellbeing_check_in_answers, [:check_in_id, :question_key])
+    create index(:wellbeing_check_in_answers, [:user_id, :question_key])
+
+    # The owner writes answers; anyone who may read the check-in (its owner,
+    # or a coach its rung reaches) may read them, through the parent's RLS.
+    execute(
+      """
+      CREATE POLICY wellbeing_check_in_answers_owner_policy ON wellbeing_check_in_answers
+      USING (user_id = NULLIF(current_setting('app.user_id', true), '')::uuid)
+      WITH CHECK (user_id = NULLIF(current_setting('app.user_id', true), '')::uuid)
+      """,
+      "DROP POLICY IF EXISTS wellbeing_check_in_answers_owner_policy ON wellbeing_check_in_answers"
+    )
+
+    execute(
+      """
+      CREATE POLICY wellbeing_check_in_answers_read_policy ON wellbeing_check_in_answers
+      FOR SELECT
+      USING (EXISTS (SELECT 1 FROM wellbeing_check_ins c WHERE c.id = check_in_id))
+      """,
+      "DROP POLICY IF EXISTS wellbeing_check_in_answers_read_policy ON wellbeing_check_in_answers"
+    )
+
+    execute(
+      "ALTER TABLE wellbeing_check_in_answers ENABLE ROW LEVEL SECURITY",
+      "ALTER TABLE wellbeing_check_in_answers DISABLE ROW LEVEL SECURITY"
+    )
+
+    execute(
+      "ALTER TABLE wellbeing_check_in_answers FORCE ROW LEVEL SECURITY",
+      "ALTER TABLE wellbeing_check_in_answers NO FORCE ROW LEVEL SECURITY"
+    )
 
     for table <- ~w(journal_notes wellbeing_check_ins) do
       execute(
