@@ -5,6 +5,7 @@ import type {
   KpiCounters,
   ExecutionProgressPayload,
   SectionScore,
+  TimerBriefing,
   TimerSegment,
   WorkoutExecution,
 } from "@/api/executions";
@@ -36,6 +37,8 @@ type ExecutionState = {
   segments: TimerSegment[];
   /** The sequence as authored, before clock adjustments. */
   baseSegments: TimerSegment[];
+  /** Οδηγίες read on the ready screen (ADR-140 §4). */
+  briefing: TimerBriefing | null;
   currentSegmentIndex: number;
   status: ExecutionStatus;
   segmentStartedAt: number | null;
@@ -66,6 +69,7 @@ type ExecutionState = {
     workoutId: string | null;
     scaleSlug: string | null;
     segments: TimerSegment[];
+    briefing?: TimerBriefing | null;
     checkedExerciseIds?: string[];
     sectionScores?: SectionScore[];
     comments?: JournalComment[];
@@ -113,6 +117,7 @@ type ExecutionState = {
   adjustSegmentDuration: (index: number, deltaSeconds: number) => void;
   /** Replaces the segment list, re-applying this execution's clock adjustments. */
   setSegments: (segments: TimerSegment[]) => void;
+  setBriefing: (briefing: TimerBriefing | null) => void;
   /** Adds to a KPI counter. */
   countKpi: (key: Exclude<keyof KpiCounters, "first_started_at_ms">, amount?: number) => void;
   /** Records the athlete's pause (for pause count and paused time). */
@@ -139,6 +144,7 @@ const initialState = {
   workoutId: null,
   scaleSlug: null,
   segments: [],
+  briefing: null as TimerBriefing | null,
   baseSegments: [] as TimerSegment[],
   currentSegmentIndex: 0,
   status: "idle" as ExecutionStatus,
@@ -286,6 +292,7 @@ export const useExecutionStore = create<ExecutionState>()(
         workoutId,
         scaleSlug,
         segments,
+        briefing = null,
         checkedExerciseIds = [],
         sectionScores = [],
         comments = [],
@@ -306,6 +313,7 @@ export const useExecutionStore = create<ExecutionState>()(
           scaleSlug,
           segments,
           baseSegments: segments,
+          briefing,
           checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
           sectionScores,
           comments: sortComments(comments),
@@ -657,6 +665,8 @@ export const useExecutionStore = create<ExecutionState>()(
         };
       },
 
+      setBriefing: (briefing) => set({ briefing }),
+
       reset: () => set(initialState),
     }),
     {
@@ -666,6 +676,7 @@ export const useExecutionStore = create<ExecutionState>()(
         executionId: state.executionId,
         lockVersion: state.lockVersion,
         workoutId: state.workoutId,
+        briefing: state.briefing,
         scaleSlug: state.scaleSlug,
         segments: state.segments,
         baseSegments: state.baseSegments,

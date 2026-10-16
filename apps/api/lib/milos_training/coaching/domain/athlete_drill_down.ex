@@ -57,7 +57,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDown do
       master_workout_id: field(assignment, :master_workout_id) || field(workout, :id),
       scheduled_for: scheduled_for,
       status: assignment_status(assignment, scheduled_for, today),
-      admin_notes: field(assignment, :admin_notes),
+      instructions: field(assignment, :instructions),
       workout: %{
         id: field(workout, :id),
         title: field(workout, :title),

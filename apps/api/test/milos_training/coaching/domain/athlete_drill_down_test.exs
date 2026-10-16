@@ -13,7 +13,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
         id: "assignment-1",
         master_workout_id: "workout-1",
         scheduled_for: "2026-06-12",
-        admin_notes: "Keep volume controlled",
+        instructions: "Keep volume controlled",
         execution_status: "completed",
         workout: %{id: "workout-1", title: "Strength A", type: "strength"}
       },
@@ -21,7 +21,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
         id: "assignment-2",
         master_workout_id: "workout-2",
         scheduled_for: "2026-06-18",
-        admin_notes: nil,
+        instructions: nil,
         workout: %{id: "workout-2", title: "Engine B", type: "aerobics"}
       }
     ]

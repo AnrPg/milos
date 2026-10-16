@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "הנחיות",
+    "scaling": "התאמה",
+    "safety": "זהירות",
+    "equipment": "ציוד",
+    "cue": "רמז",
+    "coachBrief": "למאמן"
+  },
   "Common": {
     "save": "שמירה",
     "saving": "שומר…",

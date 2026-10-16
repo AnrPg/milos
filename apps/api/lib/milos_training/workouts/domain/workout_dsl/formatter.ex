@@ -1,6 +1,7 @@
 defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
   @moduledoc false
 
+  alias MilosTraining.Workouts.Domain.WorkoutContent
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Values, Vocabulary}
 
   @version 1
@@ -29,7 +30,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
       scalar_line("program-position", value(metadata, "program_position")),
       scalar_line("default-scale", value(metadata, "default_scale")),
       boolean_line("is-team-workout", value(workout, :is_team_workout)),
-      format_notes(workout),
+      format_content(workout, :workout),
       workout
       |> value(:sections, [])
       |> Enum.sort_by(&value(&1, :order, 0))
@@ -77,7 +78,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
         "rest-before-next-section",
         value(section, :rest_before_next_section_seconds)
       ),
-      format_notes(section),
+      format_content(section, :section),
       format_section_items(value(section, :exercises, [])),
       section
       |> value(:sections, [])
@@ -122,7 +123,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
             "rest-between-groups",
             value(config, "rest_between_groups_seconds")
           ),
-          format_notes(%{notes: value(config, "notes", [])}),
+          format_content(%{content: value(config, "content", [])}, :group),
           Enum.map(items, &format_exercise/1),
           "[/group]"
         ]
@@ -136,7 +137,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
         "[header]",
         scalar_line("title", value(item, :name)),
         scalar_line("subtitle", value(item, :subtitle)),
-        format_notes(item),
+        format_content(item, :header),
         "[/header]"
       ]
       |> flatten_lines()
@@ -184,7 +185,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
       scalar_line("rest-until", value(metadata, "rest_until")),
       duration_range_line("rest-range", value(metadata, "rest_range_seconds")),
       duration_line("transition-time", value(metadata, "transition_seconds")),
-      format_notes(item),
+      format_content(item, :exercise),
       item |> value(:variations, []) |> Enum.map(&format_scale/1),
       "[/exercise]"
     ]
@@ -218,7 +219,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
       duration_line("rest-between-sides", value(metadata, "rest_between_sides_seconds")),
       scalar_line("rest-until", value(metadata, "rest_until")),
       duration_range_line("rest-range", value(metadata, "rest_range_seconds")),
-      format_notes(variation),
+      format_content(variation, :variation),
       "[/scale]"
     ]
     |> flatten_lines()
@@ -336,23 +337,31 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Formatter do
     end
   end
 
-  defp format_notes(container) do
-    notes =
-      case value(container, :notes, []) do
+  # Content in canonical markers; a level's plain `note` alone is its cue or
+  # Οδηγίες.
+  defp format_content(container, level) do
+    entries =
+      case value(container, :content, []) do
         [] ->
           case value(container, :note) do
             nil -> []
-            note -> [%{type: "note", body: note}]
+            note -> [%{type: WorkoutContent.primary(level), body: note}]
           end
 
-        typed_notes ->
-          typed_notes
+        entries ->
+          entries
       end
 
-    Enum.map(notes, fn note ->
-      type = value(note, :type, "note")
-      body = value(note, :body, "")
-      ["!#{type}:", String.split(body, "\n", trim: false)]
+    Enum.map(entries, fn entry ->
+      written = value(entry, :type, WorkoutContent.primary(level))
+
+      type =
+        case WorkoutContent.normalize_type(written, level) do
+          {:ok, type} -> type
+          {:error, _reason} -> written
+        end
+
+      ["!#{type}:", String.split(value(entry, :body, ""), "\n", trim: false)]
     end)
   end
 

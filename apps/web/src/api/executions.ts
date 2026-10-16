@@ -2,6 +2,7 @@ import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
 import type { JournalComment, JournalCommentChange } from "@/api/journal-comments";
 import type { WorkoutRecord } from "@/api/workouts";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 /** How an execution was started; `repeat` re-runs one of my earlier executions (ADR-098). */
 export type ExecutionSource = "class_booking" | "assigned" | "self_selected" | "repeat";
@@ -225,6 +226,15 @@ export async function fetchExecution(
   return data.execution;
 }
 
+/** What the member reads before Έναρξη (ADR-140 §4): never a coach-brief. */
+export type TimerBriefing = {
+  assignment_instructions: string | null;
+  workout: WorkoutContentEntry[];
+  sections: Array<{ id: string; name: string; content: WorkoutContentEntry[] }>;
+};
+
+export type TimerSequence = { segments: TimerSegment[]; briefing: TimerBriefing | null };
+
 export async function fetchTimerSequence(
   token: string,
   workoutId: string,
@@ -233,7 +243,7 @@ export async function fetchTimerSequence(
     source: ExecutionSource;
     sourceReferenceId?: string | null;
   },
-): Promise<TimerSegment[]> {
+): Promise<TimerSequence> {
   const query = new URLSearchParams({ source: params.source });
 
   if (params.scaleSlug) query.set("scale", params.scaleSlug);
@@ -241,8 +251,8 @@ export async function fetchTimerSequence(
 
   const path = `/workouts/${workoutId}/timer-sequence?${query.toString()}`;
 
-  const data = await apiRequest<{ segments: TimerSegment[] }>(path, { token });
-  return data.segments;
+  const data = await apiRequest<{ segments: TimerSegment[]; content?: TimerBriefing }>(path, { token });
+  return { segments: data.segments, briefing: data.content ?? null };
 }
 
 export async function listMyExecutions(token: string): Promise<WorkoutExecution[]> {

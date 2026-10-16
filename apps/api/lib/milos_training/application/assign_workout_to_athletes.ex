@@ -72,7 +72,7 @@ defmodule MilosTraining.Application.AssignWorkoutToAthletes do
         master_workout_id: workout.id,
         athlete_ids: [athlete.id],
         scheduled_for: value(params, :scheduled_for),
-        admin_notes: value(params, :admin_notes)
+        instructions: value(params, :instructions)
       })
       |> case do
         {:ok, assignment} ->

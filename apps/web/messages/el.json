@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Οδηγίες",
+    "scaling": "Κλιμάκωση",
+    "safety": "Προσοχή",
+    "equipment": "Εξοπλισμός",
+    "cue": "Cue",
+    "coachBrief": "Για τον coach"
+  },
   "Common": {
     "save": "Αποθήκευση",
     "saving": "Αποθήκευση…",

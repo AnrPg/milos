@@ -1,5 +1,6 @@
 import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
 import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
@@ -168,6 +169,8 @@ export type WorkoutRecord = {
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
   workout_metadata?: Record<string, unknown> | null;
+  /** Οδηγίες and the rest of the workout's content; staff also get the coach-brief (ADR-140 §4). */
+  content?: WorkoutContentEntry[];
 };
 
 export type WorkoutFolder = {

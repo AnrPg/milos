@@ -6,7 +6,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
   Internal identifiers use snake_case. DSL tokens use kebab-case.
   """
 
-  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
+  alias MilosTraining.Workouts.Domain.WorkoutContent
   alias MilosTraining.Workouts.Domain.WorkoutDsl.ExerciseCatalog
 
   @timer_specs %{
@@ -242,7 +242,6 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
 
   @group_keys ~w(title sets rest-between-groups)
   @scale_keys @exercise_keys
-  @note_markers Enum.map(WorkoutAuthoringMetadata.note_types(), &"!#{&1}")
   @key_aliases %{"set" => "sets"}
 
   def section_formats, do: @section_formats
@@ -359,16 +358,16 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
   def timer_enum_values(:amrap_scoring_style), do: ~w(grand_total lowest_window)
   def timer_enum_values(_field), do: []
 
-  def suggestions(:workout), do: @workout_keys ++ @note_markers
+  def suggestions(:workout), do: @workout_keys ++ WorkoutContent.markers(:workout)
   def suggestions(:section), do: suggestions(:section, nil)
-  def suggestions(:exercise), do: @exercise_keys ++ @note_markers
-  def suggestions(:header), do: ~w(title subtitle) ++ @note_markers
-  def suggestions(:group), do: @group_keys ++ @note_markers
-  def suggestions(:scale), do: @scale_keys ++ @note_markers
-  def suggestions(:note), do: @note_markers
+  def suggestions(:exercise), do: @exercise_keys ++ WorkoutContent.markers(:exercise)
+  def suggestions(:header), do: ~w(title subtitle) ++ WorkoutContent.markers(:header)
+  def suggestions(:group), do: @group_keys ++ WorkoutContent.markers(:group)
+  def suggestions(:scale), do: @scale_keys ++ WorkoutContent.markers(:variation)
+  def suggestions(:content), do: WorkoutContent.markers()
   def suggestions(_scope), do: []
 
-  def suggestions(:section, nil), do: @section_keys ++ @note_markers
+  def suggestions(:section, nil), do: @section_keys ++ WorkoutContent.markers(:section)
 
   def suggestions(:section, format) do
     timer_keys =
@@ -377,15 +376,16 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
       |> Enum.map(&dsl_key_for_timer_field/1)
       |> Enum.reject(&is_nil/1)
 
-    Enum.uniq(@section_keys ++ timer_keys ++ @note_markers)
+    Enum.uniq(@section_keys ++ timer_keys ++ WorkoutContent.markers(:section))
   end
 
   def workout_key?(key), do: canonical_key(key) in @workout_keys
   def section_key?(key), do: canonical_key(key) in @section_keys
   def exercise_key?(key), do: canonical_key(key) in @exercise_keys
   def group_key?(key), do: canonical_key(key) in @group_keys
-  def note_marker?(marker), do: marker in @note_markers
-  def note_markers, do: @note_markers
+  @doc "A content marker, current or written before ADR-140."
+  def content_marker?(marker), do: WorkoutContent.marker?(marker)
+  def content_markers, do: WorkoutContent.markers()
 
   def export do
     %{
@@ -416,7 +416,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Vocabulary do
       group_parameters: suggestions(:group),
       scale_parameters: suggestions(:scale),
       header_parameters: suggestions(:header),
-      note_markers: @note_markers,
+      content_markers: WorkoutContent.markers(),
       section_parameters:
         Map.new(@section_formats, fn format ->
           {format, suggestions(:section, format)}

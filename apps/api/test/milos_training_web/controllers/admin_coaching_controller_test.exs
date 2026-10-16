@@ -102,7 +102,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
                master_workout_id: workout.id,
                scheduled_for: Date.utc_today(),
                athlete_ids: [athlete.id],
-               admin_notes: "Focus on pacing."
+               instructions: "Focus on pacing."
              })
 
     set_tenant_session!(legacy_organization.id, athlete.id)

@@ -278,9 +278,9 @@ defmodule MilosTrainingWeb.ExecutionController do
   def timer_sequence(conn, %{"id" => id} = params) do
     current_user = Guardian.Plug.current_resource(conn)
 
-    with {:ok, segments} <-
+    with {:ok, %{segments: segments, content: content}} <-
            GetWorkoutTimerSequence.call(execution_context(conn), current_user, id, params) do
-      json(conn, %{segments: segments})
+      json(conn, %{segments: segments, content: content})
     end
   end
 

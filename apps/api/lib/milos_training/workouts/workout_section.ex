@@ -2,7 +2,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutAuthoringMetadata}
+  alias MilosTraining.Workouts.Domain.{TimerConfig, WorkoutAuthoringMetadata, WorkoutContent}
   alias MilosTraining.Workouts.{MasterWorkout, WorkoutExercise}
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -18,7 +18,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
     field :note, :string
     field :subtitle, :string
     field :rest_before_next_section_seconds, :integer
-    field :notes, {:array, :map}, default: []
+    field :content, {:array, :map}, default: []
     field :section_metadata, :map, default: %{}
 
     belongs_to :master_workout, MasterWorkout
@@ -52,7 +52,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
       :note,
       :subtitle,
       :rest_before_next_section_seconds,
-      :notes,
+      :content,
       :section_metadata
     ])
     |> update_change(:name, &normalize_name/1)
@@ -61,7 +61,7 @@ defmodule MilosTraining.Workouts.WorkoutSection do
     |> validate_length(:subtitle, max: 240)
     |> validate_number(:rest_before_next_section_seconds, greater_than_or_equal_to: 0)
     |> validate_bounded_metadata()
-    |> validate_typed_notes()
+    |> validate_content()
     |> normalize_timer_config()
     |> foreign_key_constraint(:master_workout_id)
     |> foreign_key_constraint(:parent_section_id,
@@ -96,11 +96,13 @@ defmodule MilosTraining.Workouts.WorkoutSection do
     end)
   end
 
-  defp validate_typed_notes(changeset) do
-    validate_change(changeset, :notes, fn :notes, notes ->
-      case WorkoutAuthoringMetadata.validate_notes(notes) do
+  defp validate_content(changeset) do
+    level = :section
+
+    validate_change(changeset, :content, fn :content, content ->
+      case WorkoutContent.validate(content, level) do
         :ok -> []
-        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+        {:error, reason} -> [content: "is invalid: #{inspect(reason)}"]
       end
     end)
   end

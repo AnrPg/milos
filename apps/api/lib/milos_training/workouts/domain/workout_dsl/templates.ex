@@ -72,7 +72,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Templates do
       "[exercise: Air Squat]",
       "sets: 3",
       "reps: 10",
-      "!coach-note:",
+      "!coach-brief:",
       "Add coaching intent here.",
       "[/exercise]"
     ]

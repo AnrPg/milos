@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "التعليمات",
+    "scaling": "التدرّج",
+    "safety": "تنبيه",
+    "equipment": "المعدات",
+    "cue": "تلميح",
+    "coachBrief": "للمدرب"
+  },
   "Common": {
     "save": "حفظ",
     "saving": "جارٍ الحفظ…",

@@ -35,7 +35,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedNames, setSelectedNames] = useState<Record<string, string>>({});
   const [scheduledFor, setScheduledFor] = useState(() => formatLocalDate(new Date()));
-  const [adminNotes, setAdminNotes] = useState("");
+  const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(true);
   const [athletesLoading, setAthletesLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -120,7 +120,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
         master_workout_id: workoutId,
         athlete_ids: selectedIds,
         scheduled_for: scheduledFor,
-        admin_notes: adminNotes.trim() || undefined,
+        instructions: instructions.trim() || undefined,
       });
 
       router.push("/box/workouts");
@@ -287,13 +287,13 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
             </div>
 
             <label className="mt-5 block">
-              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("adminNotesdff73a2")}</span>
+              <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("instructionsdff73a2")}</span>
               <textarea
                 className="mt-3 min-h-28 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                onChange={(event) => setAdminNotes(event.target.value)}
+                onChange={(event) => setInstructions(event.target.value)}
                 placeholder={i18n("optionalProgrammingContextOrCuesa25eaae")}
-                value={adminNotes}
+                value={instructions}
               />
             </label>
 

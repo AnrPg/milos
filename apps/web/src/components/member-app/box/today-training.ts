@@ -23,6 +23,8 @@ export type TodayTrainingItem = {
   /** The class this item belongs to, for the schedule deep link. */
   slotId: string | null;
   completed: boolean;
+  /** The assignment's own Οδηγίες (ADR-140 §4), read before the workout's. */
+  instructions?: string;
 };
 
 export type ActiveExecution = { id: string; status: string; master_workout_id?: string | null };
@@ -105,6 +107,7 @@ export function buildTodayTraining(input: {
       injuryContext: { surface: "assignment_detail", id: assignment.id },
       slotId: null,
       completed: assignment.execution_status === "completed",
+      instructions: assignment.instructions?.trim() || undefined,
     });
   }
 

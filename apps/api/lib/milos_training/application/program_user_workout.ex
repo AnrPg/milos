@@ -204,7 +204,7 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
       master_workout_id: workout_id,
       athlete_ids: [assignee_id],
       scheduled_for: value(params, :scheduled_for),
-      admin_notes: value(params, :admin_notes)
+      instructions: value(params, :instructions)
     })
   end
 
@@ -213,7 +213,7 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
       master_workout_id: workout_id,
       athlete_ids: [member_id],
       scheduled_for: value(params, :scheduled_for),
-      admin_notes: value(params, :admin_notes),
+      instructions: value(params, :instructions),
       source_slot_id: value(params, :slot_id)
     })
   end

@@ -25,6 +25,7 @@ import {
   type TrainingLogDialogState,
 } from "@/components/training-log/TrainingLog";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -185,6 +186,7 @@ export function BoxToday() {
             )}
 
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+            <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
             <WorkoutPreviewDetail
               sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
               initiallyExpanded={false}

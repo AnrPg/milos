@@ -8,10 +8,10 @@ import {
 const vocabulary: WorkoutDslVocabulary = {
   version: 1,
   section_formats: ["untimed", "emom", "complex_emom", "amrap"],
-  workout_parameters: ["dsl-version", "title", "type", "!note", "!coach-note"],
-  exercise_parameters: ["sets", "reps", "load", "rest-between-sets", "!coach-note"],
-  header_parameters: ["title", "subtitle", "!note"],
-  note_markers: ["!note", "!coach-note", "!athlete-note"],
+  workout_parameters: ["dsl-version", "title", "type", "!instructions", "!coach-brief"],
+  exercise_parameters: ["sets", "reps", "load", "rest-between-sets", "!cue", "!coach-brief"],
+  header_parameters: ["title", "subtitle", "!instructions"],
+  content_markers: ["!instructions", "!scaling", "!safety", "!equipment", "!cue", "!coach-brief"],
   section_parameters: {
     untimed: ["title", "score"],
     emom: ["title", "duration", "interval", "score"],
@@ -30,12 +30,24 @@ describe("buildWorkoutDslSuggestions", () => {
     expect(result.items.every((item) => item.kind === "format")).toBe(true);
   });
 
-  it("updates note-marker suggestions as the user continues typing", () => {
+  it("updates content-marker suggestions as the user continues typing", () => {
     const source = "[workout]\n!co";
     const result = buildWorkoutDslSuggestions(source, source.length, vocabulary, []);
 
     expect(result.query).toBe("!co");
-    expect(result.items.map((item) => item.value)).toEqual(["!coach-note"]);
+    expect(result.items.map((item) => item.value)).toEqual(["!coach-brief"]);
+  });
+
+  it("offers a cue only inside an exercise", () => {
+    const workout = "[workout]\n!c";
+    const exercise = "[workout]\n[section: untimed]\n[exercise: Back Squat]\n!c";
+
+    expect(buildWorkoutDslSuggestions(workout, workout.length, vocabulary, []).items.map((item) => item.value)).toEqual([
+      "!coach-brief",
+    ]);
+    expect(
+      buildWorkoutDslSuggestions(exercise, exercise.length, vocabulary, []).items.map((item) => item.value),
+    ).toEqual(["!cue", "!coach-brief"]);
   });
 
   it("prioritizes canonical tokens over ordinary workout words", () => {

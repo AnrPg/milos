@@ -126,7 +126,7 @@ export function AssignedWorkoutPanel({
         ? await updateAssignedWorkout(accessToken, assignment.id, {
             scheduled_for: rescheduleDate,
             athlete_ids: assignment.athlete_ids ?? [],
-            admin_notes: assignment.admin_notes ?? undefined,
+            instructions: assignment.instructions ?? undefined,
           })
         : await rescheduleAssignment(accessToken, assignment.id, rescheduleDate);
       onRescheduled?.(updated);
@@ -232,7 +232,7 @@ export function AssignedWorkoutPanel({
                 downloadIcsEvent({
                   title: assignment.workout.title,
                   date: assignment.scheduled_for,
-                  description: assignment.admin_notes ?? undefined,
+                  description: assignment.instructions ?? undefined,
                 })
               }
               type="button"
@@ -269,6 +269,8 @@ export function AssignedWorkoutPanel({
                   </p>
                   <WorkoutPreviewDetail
                     sections={sections}
+                    content={assignment.workout.content}
+                    instructions={assignment.instructions}
                     initiallyExpanded
                     activeScaleOverride={scaleLevels.length > 0 ? activeScale : undefined}
                     hideScaleChips={scaleLevels.length > 0}
@@ -277,19 +279,6 @@ export function AssignedWorkoutPanel({
                     freeTextDocument={assignment.workout.free_text_document}
                   />
                 </section>
-
-                {/* Admin notes */}
-                {assignment.admin_notes ? (
-                  <section
-                    className="rounded-[1.2rem] px-4 py-3 text-sm"
-                    style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 15%, transparent)", color: "var(--primary-strong)" }}
-                  >
-                    <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>
-                      {i18n("coachNotee98376b")}
-                    </p>
-                    {assignment.admin_notes}
-                  </section>
-                ) : null}
 
                 {/* Admin controls */}
                 {isAdmin ? (

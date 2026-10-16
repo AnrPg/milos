@@ -7357,6 +7357,7 @@ export interface components {
             version: 1;
             /** WorkoutDslVocabulary */
             vocabulary: {
+                content_markers: string[];
                 exercise_catalog: {
                     aliases: string[];
                     capabilities: string[];
@@ -7373,7 +7374,6 @@ export interface components {
                 };
                 group_parameters: string[];
                 header_parameters: string[];
-                note_markers: string[];
                 scale_parameters: string[];
                 section_formats: string[];
                 section_parameters: {
@@ -7405,6 +7405,7 @@ export interface components {
             version: 1;
             /** WorkoutDslVocabulary */
             vocabulary: {
+                content_markers: string[];
                 exercise_catalog: {
                     aliases: string[];
                     capabilities: string[];
@@ -7421,7 +7422,6 @@ export interface components {
                 };
                 group_parameters: string[];
                 header_parameters: string[];
-                note_markers: string[];
                 scale_parameters: string[];
                 section_formats: string[];
                 section_parameters: {
@@ -7467,6 +7467,7 @@ export interface components {
         };
         /** WorkoutDslVocabulary */
         WorkoutDslVocabulary: {
+            content_markers: string[];
             exercise_catalog: {
                 aliases: string[];
                 capabilities: string[];
@@ -7483,7 +7484,6 @@ export interface components {
             };
             group_parameters: string[];
             header_parameters: string[];
-            note_markers: string[];
             scale_parameters: string[];
             section_formats: string[];
             section_parameters: {
@@ -9596,9 +9596,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string;
                     /** @description Assignee user ids (athletes or members). */
                     athlete_ids: string[];
+                    instructions?: string;
                     /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date */
@@ -9664,8 +9664,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string;
                     athlete_ids: string[];
+                    instructions?: string;
                     /** Format: date */
                     scheduled_for: string;
                 };
@@ -9744,12 +9744,12 @@ export interface operations {
                                 reason: string | null;
                             }[];
                             assigned_workouts: {
-                                admin_notes?: string | null;
                                 execution_scores: {
                                     [key: string]: unknown;
                                 }[];
                                 /** Format: uuid */
                                 id: string | null;
+                                instructions?: string | null;
                                 /** Format: uuid */
                                 master_workout_id?: string | null;
                                 /** Format: date */
@@ -16167,10 +16167,10 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string | null;
                     /** @default true */
                     copy_source: boolean;
                     folder_id?: string | null;
+                    instructions?: string | null;
                     /** Format: uuid */
                     master_workout_id?: string;
                     /**
@@ -17472,6 +17472,7 @@ export interface operations {
                         version: 1;
                         /** WorkoutDslVocabulary */
                         vocabulary: {
+                            content_markers: string[];
                             exercise_catalog: {
                                 aliases: string[];
                                 capabilities: string[];
@@ -17488,7 +17489,6 @@ export interface operations {
                             };
                             group_parameters: string[];
                             header_parameters: string[];
-                            note_markers: string[];
                             scale_parameters: string[];
                             section_formats: string[];
                             section_parameters: {
@@ -17540,6 +17540,7 @@ export interface operations {
                         version: 1;
                         /** WorkoutDslVocabulary */
                         vocabulary: {
+                            content_markers: string[];
                             exercise_catalog: {
                                 aliases: string[];
                                 capabilities: string[];
@@ -17556,7 +17557,6 @@ export interface operations {
                             };
                             group_parameters: string[];
                             header_parameters: string[];
-                            note_markers: string[];
                             scale_parameters: string[];
                             section_formats: string[];
                             section_parameters: {
@@ -17844,6 +17844,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -17879,14 +17887,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -17896,10 +17896,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -17919,14 +17935,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -17958,6 +17966,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -17990,14 +18006,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -18028,6 +18036,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -18047,14 +18063,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -18090,14 +18098,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -18111,10 +18111,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -18134,14 +18150,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -18173,6 +18181,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -18205,14 +18221,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -18243,6 +18251,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -18262,14 +18278,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -18305,14 +18313,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -18447,6 +18447,14 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -18479,19 +18487,27 @@ export interface operations {
                         /** @enum {string} */
                         severity: "error" | "warning";
                     }[];
-                    notes?: {
-                        body: string;
-                        document?: {
-                            [key: string]: unknown;
-                        } | null;
-                        /** @enum {string} */
-                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                    }[];
                     sections?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
                         exercises: {
                             /** Format: uuid */
                             alternating_group_id?: string | null;
                             applied_variation?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -18511,14 +18527,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -18550,6 +18558,14 @@ export interface operations {
                                 sets?: number | null;
                             } | null;
                             cluster_rest_seconds?: number | null;
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             description?: string | null;
                             excluded?: boolean;
                             exercise_ref?: string | null;
@@ -18582,14 +18598,6 @@ export interface operations {
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             pacing?: number | null;
                             prescription_metadata?: {
@@ -18620,6 +18628,14 @@ export interface operations {
                             superset_group_id?: string | null;
                             tempo?: string | null;
                             variations?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -18639,14 +18655,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -18682,14 +18690,6 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
-                        notes?: {
-                            body: string;
-                            document?: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @enum {string} */
-                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
@@ -18703,10 +18703,26 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         sections?: {
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             exercises: {
                                 /** Format: uuid */
                                 alternating_group_id?: string | null;
                                 applied_variation?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -18726,14 +18742,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -18765,6 +18773,14 @@ export interface operations {
                                     sets?: number | null;
                                 } | null;
                                 cluster_rest_seconds?: number | null;
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 description?: string | null;
                                 excluded?: boolean;
                                 exercise_ref?: string | null;
@@ -18797,14 +18813,6 @@ export interface operations {
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 pacing?: number | null;
                                 prescription_metadata?: {
@@ -18835,6 +18843,14 @@ export interface operations {
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
                                 variations?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -18854,14 +18870,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -18897,14 +18905,6 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
@@ -19233,6 +19233,14 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -19265,19 +19273,27 @@ export interface operations {
                         /** @enum {string} */
                         severity: "error" | "warning";
                     }[];
-                    notes?: {
-                        body: string;
-                        document?: {
-                            [key: string]: unknown;
-                        } | null;
-                        /** @enum {string} */
-                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                    }[];
                     sections?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
                         exercises: {
                             /** Format: uuid */
                             alternating_group_id?: string | null;
                             applied_variation?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -19297,14 +19313,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -19336,6 +19344,14 @@ export interface operations {
                                 sets?: number | null;
                             } | null;
                             cluster_rest_seconds?: number | null;
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             description?: string | null;
                             excluded?: boolean;
                             exercise_ref?: string | null;
@@ -19368,14 +19384,6 @@ export interface operations {
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             pacing?: number | null;
                             prescription_metadata?: {
@@ -19406,6 +19414,14 @@ export interface operations {
                             superset_group_id?: string | null;
                             tempo?: string | null;
                             variations?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -19425,14 +19441,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -19468,14 +19476,6 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
-                        notes?: {
-                            body: string;
-                            document?: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @enum {string} */
-                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
@@ -19489,10 +19489,26 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         sections?: {
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             exercises: {
                                 /** Format: uuid */
                                 alternating_group_id?: string | null;
                                 applied_variation?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -19512,14 +19528,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -19551,6 +19559,14 @@ export interface operations {
                                     sets?: number | null;
                                 } | null;
                                 cluster_rest_seconds?: number | null;
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 description?: string | null;
                                 excluded?: boolean;
                                 exercise_ref?: string | null;
@@ -19583,14 +19599,6 @@ export interface operations {
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 pacing?: number | null;
                                 prescription_metadata?: {
@@ -19621,6 +19629,14 @@ export interface operations {
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
                                 variations?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -19640,14 +19656,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -19683,14 +19691,6 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
@@ -19746,6 +19746,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -19781,14 +19789,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -19798,10 +19798,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -19821,14 +19837,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -19860,6 +19868,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -19892,14 +19908,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -19930,6 +19938,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -19949,14 +19965,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -19992,14 +20000,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -20013,10 +20013,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -20036,14 +20052,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -20075,6 +20083,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -20107,14 +20123,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -20145,6 +20153,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -20164,14 +20180,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -20207,14 +20215,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -25676,6 +25676,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -25711,14 +25719,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -25728,10 +25728,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -25751,14 +25767,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -25790,6 +25798,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -25822,14 +25838,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -25860,6 +25868,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -25879,14 +25895,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -25922,14 +25930,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -25943,10 +25943,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -25966,14 +25982,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26005,6 +26013,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -26037,14 +26053,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -26075,6 +26083,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26094,14 +26110,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26137,14 +26145,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -26228,6 +26228,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -26263,14 +26271,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -26280,10 +26280,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26303,14 +26319,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26342,6 +26350,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -26374,14 +26390,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -26412,6 +26420,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26431,14 +26447,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26474,14 +26482,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -26495,10 +26495,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26518,14 +26534,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26557,6 +26565,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -26589,14 +26605,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -26627,6 +26635,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26646,14 +26662,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26689,14 +26697,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -26745,6 +26745,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -26780,14 +26788,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -26797,10 +26797,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26820,14 +26836,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26859,6 +26867,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -26891,14 +26907,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -26929,6 +26937,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26948,14 +26964,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26991,14 +26999,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -27012,10 +27012,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -27035,14 +27051,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -27074,6 +27082,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -27106,14 +27122,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -27144,6 +27152,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -27163,14 +27179,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -27206,14 +27214,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;

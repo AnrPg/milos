@@ -174,6 +174,7 @@ export function ExecutionMode() {
     scaleSlug,
     lockVersion,
     segments,
+    briefing,
     currentSegmentIndex,
     status,
     segmentStartedAt,
@@ -765,6 +766,7 @@ export function ExecutionMode() {
       <div onPointerDownCapture={primeCueAudio}>
         <ReadyScreen
           segments={segments}
+          briefing={briefing}
           soundControl={soundControl}
           onTestSound={() => {
             primeCueAudio();

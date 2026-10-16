@@ -373,7 +373,7 @@ export function AssignedWorkoutsConsole({
   const [panelAssignment, setPanelAssignment] = useState<AssignedWorkoutRecord | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editScheduledFor, setEditScheduledFor] = useState("");
-  const [editAdminNotes, setEditAdminNotes] = useState("");
+  const [editInstructions, setEditInstructions] = useState("");
   const [editAthleteIds, setEditAthleteIds] = useState<string[]>([]);
   const [editQuery, setEditQuery] = useState("");
   const [athletesLoading, setAthletesLoading] = useState(false);
@@ -684,7 +684,7 @@ export function AssignedWorkoutsConsole({
   function beginEdit(assignment: AssignedWorkoutRecord) {
     setEditingId(assignment.id);
     setEditScheduledFor(assignment.scheduled_for);
-    setEditAdminNotes(assignment.admin_notes ?? "");
+    setEditInstructions(assignment.instructions ?? "");
     setEditAthleteIds(assignment.athlete_ids ?? []);
     setAthletes(assignment.athletes ?? []);
     setAthletesLoading(true);
@@ -695,7 +695,7 @@ export function AssignedWorkoutsConsole({
   function cancelEdit() {
     setEditingId(null);
     setEditScheduledFor("");
-    setEditAdminNotes("");
+    setEditInstructions("");
     setEditAthleteIds([]);
     setEditQuery("");
   }
@@ -709,7 +709,7 @@ export function AssignedWorkoutsConsole({
       const updatedAssignment = await updateAssignedWorkout(tokens.access_token, assignmentId, {
         scheduled_for: editScheduledFor,
         athlete_ids: editAthleteIds,
-        admin_notes: editAdminNotes.trim() || undefined,
+        instructions: editInstructions.trim() || undefined,
       });
 
       const athletePool = [...(existingAssignment?.athletes ?? []), ...athletes].filter(
@@ -779,7 +779,7 @@ export function AssignedWorkoutsConsole({
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
 
-      const segments = await fetchTimerSequence(tokens.access_token, assignment.workout.id, {
+      const { segments, briefing } = await fetchTimerSequence(tokens.access_token, assignment.workout.id, {
         source: "assigned",
         sourceReferenceId: assignment.id,
       });
@@ -789,6 +789,7 @@ export function AssignedWorkoutsConsole({
         workoutId: assignment.workout.id,
         scaleSlug: null,
         segments,
+        briefing,
         checkedExerciseIds: execution.checked_exercise_ids,
         sectionScores: execution.section_scores,
         comments: execution.comments,
@@ -852,7 +853,7 @@ export function AssignedWorkoutsConsole({
           await updateAssignedWorkout(tokens.access_token!, assignment.id, {
             scheduled_for: newDate,
             athlete_ids: assignment.athlete_ids ?? [],
-            admin_notes: assignment.admin_notes ?? undefined,
+            instructions: assignment.instructions ?? undefined,
           });
         } else {
           const updated = await rescheduleAssignment(tokens.access_token!, assignment.id, newDate);
@@ -1173,12 +1174,12 @@ export function AssignedWorkoutsConsole({
                       </div>
                     ) : null}
 
-                    {assignment.admin_notes ? (
+                    {assignment.instructions ? (
                       <p
                         className="mt-2.5 rounded-[1rem] px-3 py-2 text-xs"
                         style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", color: "var(--primary-strong)" }}
                       >
-                        {assignment.admin_notes}
+                        {assignment.instructions}
                       </p>
                     ) : null}
 
@@ -1312,13 +1313,13 @@ export function AssignedWorkoutsConsole({
 
                         <label className="block">
                           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                            {i18n("adminNotesdff73a2")}
+                            {i18n("instructionsdff73a2")}
                           </span>
                           <textarea
                             className="mt-2 min-h-24 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                            onChange={(event) => setEditAdminNotes(event.target.value)}
-                            value={editAdminNotes}
+                            onChange={(event) => setEditInstructions(event.target.value)}
+                            value={editInstructions}
                           />
                         </label>
 

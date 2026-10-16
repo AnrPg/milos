@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Instrucciones",
+    "scaling": "Escalado",
+    "safety": "Precaución",
+    "equipment": "Material",
+    "cue": "Cue",
+    "coachBrief": "Para el coach"
+  },
   "Common": {
     "save": "Guardar",
     "saving": "Guardando…",

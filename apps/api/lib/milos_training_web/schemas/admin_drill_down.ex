@@ -207,7 +207,7 @@ defmodule MilosTrainingWeb.Schemas.AdminDrillDown do
         master_workout_id: @uuid,
         scheduled_for: @date,
         status: %Schema{type: :string, enum: ["completed", "upcoming", "overdue", "rejected"]},
-        admin_notes: @string,
+        instructions: @string,
         workout: @open_object,
         execution_scores: %Schema{type: :array, items: @open_object}
       },

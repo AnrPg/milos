@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Instructies",
+    "scaling": "Schalen",
+    "safety": "Let op",
+    "equipment": "Materiaal",
+    "cue": "Cue",
+    "coachBrief": "Voor de coach"
+  },
   "Common": {
     "save": "Opslaan",
     "saving": "Opslaan…",

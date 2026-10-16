@@ -1,4 +1,12 @@
 {
+  "WorkoutContent": {
+    "instructions": "Инструкции",
+    "scaling": "Масштабирование",
+    "safety": "Внимание",
+    "equipment": "Инвентарь",
+    "cue": "Подсказка",
+    "coachBrief": "Для тренера"
+  },
   "Common": {
     "save": "Сохранить",
     "saving": "Сохранение…",

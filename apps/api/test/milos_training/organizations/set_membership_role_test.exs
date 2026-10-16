@@ -196,7 +196,7 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
                  athlete_ids: [athlete.id],
-                 admin_notes: "Cross-org coverage"
+                 instructions: "Cross-org coverage"
                })
 
       # The athlete also belongs to a second gym, where the role change happens.
@@ -253,7 +253,7 @@ defmodule MilosTraining.Organizations.SetMembershipRoleTest do
                  master_workout_id: workout.id,
                  scheduled_for: Date.utc_today() |> Date.add(1) |> Date.to_iso8601(),
                  athlete_ids: [athlete.id],
-                 admin_notes: "Role transition coverage"
+                 instructions: "Role transition coverage"
                })
 
       assert Workouts.get_assignment_execution_access(context, assignment.id, athlete.id)

@@ -168,7 +168,7 @@ export function programAdminUserWorkout(
     scheduled_for: string;
     slot_id?: string | null;
     copy_source: boolean;
-    admin_notes?: string;
+    instructions?: string;
     /** ADR-125 member programming mode; ignored for athletes. */
     mode?: MemberProgrammingMode;
   },

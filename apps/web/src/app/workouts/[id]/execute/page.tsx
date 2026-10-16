@@ -61,7 +61,7 @@ function ExecutePageContent() {
           return;
         }
 
-        const recoveredSegments = await fetchTimerSequence(
+        const { segments: recoveredSegments, briefing } = await fetchTimerSequence(
           accessToken,
           execution.master_workout_id,
           {
@@ -88,6 +88,7 @@ function ExecutePageContent() {
           hydrateFromExecution(execution, recoveredSegments);
         }
 
+        useExecutionStore.getState().setBriefing(briefing);
         setRecoveryState("done");
       } catch {
         if (!cancelled) router.replace("/workouts");

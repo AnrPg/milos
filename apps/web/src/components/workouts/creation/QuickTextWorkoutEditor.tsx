@@ -57,7 +57,7 @@ const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
   group_parameters: [],
   scale_parameters: [],
   header_parameters: [],
-  note_markers: [],
+  content_markers: [],
   section_parameters: {},
   exercise_catalog: [],
 };
