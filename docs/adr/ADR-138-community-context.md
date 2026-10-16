@@ -84,4 +84,20 @@ predicate the root tenant tables use, so it adds no new trust boundary.
   memberships explicitly and need their own read policy for non-members.
 
 ## Implementation Notes
-Filled in as M6–M8 land.
+- M6: `community_*` tables (migration `20261017118000`) with tenant RLS plus a
+  read policy for members of the club's gym, so the cross-gym feed reads in
+  the user's session. `ProvisionGymClub` runs inside gym provisioning, on
+  first read (`ClubScope`) and hourly (`ProvisionGymClubsJob`).
+- M7: posts, kudos and comments (`Community.Commands.Posts`), the feed query
+  with a keyset cursor (`FeedCursor`), realtime topic `community:club:<id>`.
+  Attaching a journal entry snapshots it and moves it to the `posted` rung;
+  deleting the post restores the previous rung (`PostAttachment`).
+- M8: `GET /community/wod-today` (`GetWodTodayCard`) ranks the day's
+  executions and logged scores by the WOD's scored section
+  (`Execution.Domain.ScoreRanking`); private results never show, and only
+  members who opted in to leaderboards appear (plus the viewer's own row).
+  Entering a challenge joins `#challenges` with source `auto`. Class-slot
+  groups (D7): `SyncClassGroups` keeps one opt-in channel per active class
+  series, archives the rest, and offers the group (`suggested`) to members
+  with 3 approved bookings of that class in 28 days; leaving stores
+  `dismissed`, so it is not offered again.

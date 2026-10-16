@@ -252,17 +252,17 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 ## 6. Feature-coverage checklist (brief §8.1, mockup «Κάλυψη»)
 - [x] Messages (direct, threads, search) → Αρχική ✈; Box › Coach filtered (M2/M3)
 - [x] Notifications, web push → Αρχική ♡ (M2)
-- [ ] Seasonal challenges + opt-in leaderboard → Club #challenges (M8); own progress → Πρόοδος (M4)
+- [x] Seasonal challenges + opt-in leaderboard → Club #challenges (M8); own progress → Πρόοδος (M4)
 - [x] Global leaderboard opt-in → Εγώ › Κοινοποίηση & ορατότητα (M9)
-- [ ] "Κοινοποίηση στο Milos" → ⊕ with attachment (M7); until then, kept in Vault/Ροή (M4)
+- [x] "Κοινοποίηση στο Milos" → ⊕ with attachment (M7)
 - [x] Shared-with-me PRs → Ημερολόγιο › Πρόοδος › Pantheon (M4)
 - [x] WOD of the day, scale levels → Box card (M3)
 - [x] Execution (timer, steps, modifications, notes) → Box › Έναρξη, Vault › Επανάληψη (M3/M4)
 - [x] Injury warnings + acknowledge → Box card (M3)
 - [x] Schedule, booking, waitlist, cancel, guest pass, locations, ICS → Box › Πρόγραμμα (`/box/schedule`) (M3)
-- [ ] Class and open-gym check-in → Box next-booking card (M3)
-- [ ] Class timer display → Box next-class card while live (M3)
-- [ ] Assigned workouts: reject, reschedule, request → Box › Coach / workout card chip (M3)
+- [x] Class and open-gym check-in → Box next-booking card (M3; class self check-in TD-105)
+- [x] Class timer display → Box next-class card while live (M3; TD-105)
+- [x] Assigned workouts: reject, reschedule, request → Box › Coach / workout card chip (M3)
 - [x] Appointments → Box › Ραντεβού (M3)
 - [x] Videos → Box › Βίντεο (M3)
 - [x] Form reviews, nutrition plan → Box › Coach (`/coaching`) (M3); Νέα καταχώρηση › Βίντεο τεχνικής (M4)
@@ -280,17 +280,17 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 - [x] Profile, avatar, language, theme → Εγώ (M2/M9)
 - [x] PR sharing grants, coach visibility → Εγώ › Κοινοποίηση & ορατότητα (M9)
 - [x] Gamification preferences → Εγώ › Κοινοποίηση & ορατότητα (M9)
-- [ ] Org memberships, join link (`/join/[slug]`), invitations → Εγώ › Τα box και τα clubs μου (M2)
+- [x] Org memberships, join link (`/join/[slug]`), invitations → Εγώ › Τα box και τα clubs μου (M9)
 - [x] Chats activity (`/account/activity/chats`) → Αρχική ✈ (M2)
-- [ ] Offline outbox status → Εγώ › Ρυθμίσεις (M9); global panel stays
+- [x] Offline outbox status → Εγώ › Ρυθμίσεις (M9); global panel stays
 - [x] Onboarding/tours → Εγώ › Βοήθεια (M9)
 - [x] Staff: console → Εγώ › Διαχείριση (M2)
 
 ## 7. Open questions
-1. Brief §10 Q3: how many bookings make a member "frequent" for class-slot groups (default 3 in 4 weeks).
+1. Brief §10 Q3: how many bookings make a member "frequent" for class-slot groups (implemented default: 3 approved bookings in 28 days, `ChannelPolicy`).
 2. Brief §10 Q4: moderation minimum for Phase 1 (default: hide/delete, no report queue).
-3. Should `#wod-σήμερα` show members who did not opt in to leaderboards as "Εσύ" only (default yes,
-   others hidden)?
+3. Should `#wod-σήμερα` show members who did not opt in to leaderboards as "Εσύ" only (implemented
+   default: yes, others hidden)?
 
 ## 8. Environment notes
 - OTP/Elixir install in the cloud session (hex hosts are allowed); the API suite runs here
@@ -302,4 +302,4 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 - [x] Step 1 explore
 - [x] Step 2 decisions (cards posted; defaults recorded in §3)
 - [x] Step 3 plan (this file)
-- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [x] M5 (M5.1–M5.7: check-ins, Σχόλια, injury timeline, ladder read side, workout content markers, messages to members, six-tab staff member profile) · [ ] M6 · [ ] M7 · [ ] M8 · [~] M9 (Κοινοποίηση & ορατότητα page; Ρυθμίσεις slimmed; Vault, history and reviews moved to Ημερολόγιο)
+- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [x] M5 (M5.1–M5.7: check-ins, Σχόλια, injury timeline, ladder read side, workout content markers, messages to members, six-tab staff member profile) · [x] M6 · [x] M7 · [x] M8 (#wod card and leaderboard, #challenges auto-join, class-slot groups, Box announcements) · [x] M9 (Κοινοποίηση & ορατότητα; Ρυθμίσεις with personal theme and offline sync status; gyms, invitation code and join link in Τα box μου; Box class check-in and live timer, TD-105 (1))
