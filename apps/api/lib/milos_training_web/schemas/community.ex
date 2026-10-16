@@ -102,5 +102,174 @@ defmodule MilosTrainingWeb.Schemas.Community do
 
   def datetime, do: @datetime
 
+  def attachment_types, do: MilosTraining.Community.attachment_types()
+
+  def post do
+    %Schema{
+      title: "CommunityPost",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        club: %Schema{
+          type: :object,
+          properties: %{
+            id: @uuid,
+            name: %Schema{type: :string},
+            organization_slug: %Schema{type: :string},
+            logo_url: %Schema{type: :string, nullable: true},
+            primary_color: %Schema{type: :string, nullable: true}
+          },
+          required: [:id, :name, :organization_slug]
+        },
+        channel: %Schema{
+          type: :object,
+          properties: %{
+            id: @uuid,
+            kind: %Schema{type: :string, nullable: true},
+            name: %Schema{type: :string, nullable: true}
+          },
+          required: [:id]
+        },
+        author: author(),
+        body: %Schema{type: :string, nullable: true},
+        attachment_type: %Schema{type: :string, enum: attachment_types(), nullable: true},
+        attachment_id: %Schema{type: :string, format: :uuid, nullable: true},
+        attachment: %Schema{
+          type: :object,
+          nullable: true,
+          additionalProperties: true,
+          description:
+            "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on"
+        },
+        pinned: %Schema{type: :boolean},
+        hidden: %Schema{type: :boolean},
+        kudos_count: %Schema{type: :integer},
+        comment_count: %Schema{type: :integer},
+        kudos_by_me: %Schema{type: :boolean},
+        can_delete: %Schema{type: :boolean},
+        can_moderate: %Schema{type: :boolean},
+        can_pin: %Schema{type: :boolean},
+        inserted_at: @datetime
+      },
+      required: [
+        :id,
+        :club,
+        :channel,
+        :author,
+        :pinned,
+        :hidden,
+        :kudos_count,
+        :comment_count,
+        :kudos_by_me,
+        :can_delete,
+        :can_moderate,
+        :can_pin,
+        :inserted_at
+      ]
+    }
+  end
+
+  def author do
+    %Schema{
+      title: "CommunityAuthor",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        nickname: %Schema{type: :string, nullable: true},
+        avatar_url: %Schema{type: :string, nullable: true}
+      },
+      required: [:id]
+    }
+  end
+
+  def feed_response do
+    %Schema{
+      title: "CommunityFeedPage",
+      type: :object,
+      properties: %{
+        pinned: %Schema{type: :array, items: post()},
+        posts: %Schema{type: :array, items: post()},
+        next_cursor: %Schema{type: :string, nullable: true}
+      },
+      required: [:pinned, :posts]
+    }
+  end
+
+  def post_response do
+    %Schema{
+      title: "CommunityPostResponse",
+      type: :object,
+      properties: %{post: post()},
+      required: [:post]
+    }
+  end
+
+  def create_post_request do
+    %Schema{
+      title: "CommunityPostCreateRequest",
+      type: :object,
+      properties: %{
+        channel_id: @uuid,
+        body: %Schema{type: :string, maxLength: 5000},
+        attachment_type: %Schema{type: :string, enum: attachment_types()},
+        attachment_id: @uuid,
+        client_operation_id: %Schema{type: :string, maxLength: 120}
+      },
+      required: [:channel_id]
+    }
+  end
+
+  def flag_request(name) do
+    %Schema{
+      title: "CommunityPost#{Macro.camelize(Atom.to_string(name))}Request",
+      type: :object,
+      properties: %{name => %Schema{type: :boolean}},
+      required: [name]
+    }
+  end
+
+  def comment do
+    %Schema{
+      title: "CommunityComment",
+      type: :object,
+      properties: %{
+        id: @uuid,
+        post_id: @uuid,
+        author: author(),
+        body: %Schema{type: :string},
+        inserted_at: @datetime,
+        can_delete: %Schema{type: :boolean}
+      },
+      required: [:id, :post_id, :author, :body, :inserted_at, :can_delete]
+    }
+  end
+
+  def comments_response do
+    %Schema{
+      title: "CommunityCommentsResponse",
+      type: :object,
+      properties: %{comments: %Schema{type: :array, items: comment()}},
+      required: [:comments]
+    }
+  end
+
+  def comment_response do
+    %Schema{
+      title: "CommunityCommentResponse",
+      type: :object,
+      properties: %{comment: comment()},
+      required: [:comment]
+    }
+  end
+
+  def comment_request do
+    %Schema{
+      title: "CommunityCommentRequest",
+      type: :object,
+      properties: %{body: %Schema{type: :string, minLength: 1, maxLength: 2000}},
+      required: [:body]
+    }
+  end
+
   defp notify_levels, do: MilosTraining.Community.notify_level_options()
 end

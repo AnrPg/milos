@@ -455,6 +455,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your clubs across every gym you belong to, with their channels */
+        get: operations["MilosTrainingWeb.CommunityController.my_clubs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Posts from your clubs, newest first */
+        get: operations["MilosTrainingWeb.CommunityPostController.feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -3314,6 +3348,161 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/community/channels/{id}/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an opt-in channel */
+        post: operations["MilosTrainingWeb.CommunityController.join_channel"];
+        /** Leave an opt-in channel */
+        delete: operations["MilosTrainingWeb.CommunityController.leave_channel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/clubs/{id}/notify-level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** How much you hear from a club */
+        put: operations["MilosTrainingWeb.CommunityController.set_notify_level"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your comment (staff: any comment in their club) */
+        delete: operations["MilosTrainingWeb.CommunityPostController.delete_comment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post in a channel of your gym's club, optionally attaching a journal entry */
+        post: operations["MilosTrainingWeb.CommunityPostController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your post (staff: any post in their club) */
+        delete: operations["MilosTrainingWeb.CommunityPostController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A post's comments, oldest first */
+        get: operations["MilosTrainingWeb.CommunityPostController.comments"];
+        put?: never;
+        /** Comment on a post */
+        post: operations["MilosTrainingWeb.CommunityPostController.comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Staff: hide or show a post */
+        put: operations["MilosTrainingWeb.CommunityPostController.hide"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give or take back kudos */
+        put: operations["MilosTrainingWeb.CommunityPostController.kudos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/pinned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Staff: pin or unpin an announcement */
+        put: operations["MilosTrainingWeb.CommunityPostController.pin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/invitations": {
         parameters: {
             query?: never;
@@ -5566,6 +5755,390 @@ export interface components {
             origin: "assigned" | "self_assigned" | "invited";
             /** Format: date-time */
             started_at?: string;
+        };
+        /** CommunityAuthor */
+        CommunityAuthor: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** CommunityChannel */
+        CommunityChannel: {
+            /** @description You may join or leave it yourself */
+            can_leave: boolean;
+            can_post: boolean;
+            /** Format: uuid */
+            id: string;
+            /** @description Its posts reach your feed */
+            joined: boolean;
+            /** @enum {string} */
+            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+            /** @enum {string} */
+            membership: "everyone" | "opt_in" | "invite";
+            /** @description Null for built-in channels */
+            name?: string | null;
+            /** @enum {string} */
+            write_policy: "staff" | "members" | "participants" | "system_and_members";
+        };
+        /** CommunityChannelMembershipResponse */
+        CommunityChannelMembershipResponse: {
+            /** Format: uuid */
+            channel_id: string;
+            joined: boolean;
+        };
+        /** CommunityClub */
+        CommunityClub: {
+            channels: {
+                /** @description You may join or leave it yourself */
+                can_leave: boolean;
+                can_post: boolean;
+                /** Format: uuid */
+                id: string;
+                /** @description Its posts reach your feed */
+                joined: boolean;
+                /** @enum {string} */
+                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                /** @enum {string} */
+                membership: "everyone" | "opt_in" | "invite";
+                /** @description Null for built-in channels */
+                name?: string | null;
+                /** @enum {string} */
+                write_policy: "staff" | "members" | "participants" | "system_and_members";
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+            logo_url?: string | null;
+            name: string;
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+            /** Format: uuid */
+            organization_id: string;
+            organization_slug: string;
+            primary_color?: string | null;
+            /** @enum {string} */
+            role: "member" | "staff";
+        };
+        /** CommunityClubsResponse */
+        CommunityClubsResponse: {
+            clubs: {
+                channels: {
+                    /** @description You may join or leave it yourself */
+                    can_leave: boolean;
+                    can_post: boolean;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Its posts reach your feed */
+                    joined: boolean;
+                    /** @enum {string} */
+                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                    /** @enum {string} */
+                    membership: "everyone" | "opt_in" | "invite";
+                    /** @description Null for built-in channels */
+                    name?: string | null;
+                    /** @enum {string} */
+                    write_policy: "staff" | "members" | "participants" | "system_and_members";
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+                logo_url?: string | null;
+                name: string;
+                /** @enum {string} */
+                notify_level: "all" | "announcements" | "none";
+                /** Format: uuid */
+                organization_id: string;
+                organization_slug: string;
+                primary_color?: string | null;
+                /** @enum {string} */
+                role: "member" | "staff";
+            }[];
+        };
+        /** CommunityComment */
+        CommunityComment: {
+            /** CommunityAuthor */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            body: string;
+            can_delete: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: uuid */
+            post_id: string;
+        };
+        /** CommunityCommentRequest */
+        CommunityCommentRequest: {
+            body: string;
+        };
+        /** CommunityCommentResponse */
+        CommunityCommentResponse: {
+            /** CommunityComment */
+            comment: {
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body: string;
+                can_delete: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uuid */
+                post_id: string;
+            };
+        };
+        /** CommunityCommentsResponse */
+        CommunityCommentsResponse: {
+            comments: {
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body: string;
+                can_delete: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uuid */
+                post_id: string;
+            }[];
+        };
+        /** CommunityFeedPage */
+        CommunityFeedPage: {
+            next_cursor?: string | null;
+            pinned: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            }[];
+            posts: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            }[];
+        };
+        /** CommunityNotifyLevelRequest */
+        CommunityNotifyLevelRequest: {
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+        };
+        /** CommunityNotifyLevelResponse */
+        CommunityNotifyLevelResponse: {
+            /** Format: uuid */
+            club_id: string;
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+        };
+        /** CommunityPost */
+        CommunityPost: {
+            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+            attachment?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            attachment_id?: string | null;
+            /** @enum {string|null} */
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+            /** CommunityAuthor */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            body?: string | null;
+            can_delete: boolean;
+            can_moderate: boolean;
+            can_pin: boolean;
+            channel: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            club: {
+                /** Format: uuid */
+                id: string;
+                logo_url?: string | null;
+                name: string;
+                organization_slug: string;
+                primary_color?: string | null;
+            };
+            comment_count: number;
+            hidden: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            kudos_by_me: boolean;
+            kudos_count: number;
+            pinned: boolean;
+        };
+        /** CommunityPostCreateRequest */
+        CommunityPostCreateRequest: {
+            /** Format: uuid */
+            attachment_id?: string;
+            /** @enum {string} */
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+            body?: string;
+            /** Format: uuid */
+            channel_id: string;
+            client_operation_id?: string;
+        };
+        /** CommunityPostHiddenRequest */
+        CommunityPostHiddenRequest: {
+            hidden: boolean;
+        };
+        /** CommunityPostKudosRequest */
+        CommunityPostKudosRequest: {
+            kudos: boolean;
+        };
+        /** CommunityPostPinnedRequest */
+        CommunityPostPinnedRequest: {
+            pinned: boolean;
+        };
+        /** CommunityPostResponse */
+        CommunityPostResponse: {
+            /** CommunityPost */
+            post: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            };
         };
         /** ContentVideo */
         ContentVideo: {
@@ -8798,6 +9371,177 @@ export interface operations {
                         max_bytes?: number;
                         required_headers?: Record<string, never>;
                         upload_url?: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.my_clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Clubs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clubs: {
+                            channels: {
+                                /** @description You may join or leave it yourself */
+                                can_leave: boolean;
+                                can_post: boolean;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Its posts reach your feed */
+                                joined: boolean;
+                                /** @enum {string} */
+                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                                /** @enum {string} */
+                                membership: "everyone" | "opt_in" | "invite";
+                                /** @description Null for built-in channels */
+                                name?: string | null;
+                                /** @enum {string} */
+                                write_policy: "staff" | "members" | "participants" | "system_and_members";
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+                            logo_url?: string | null;
+                            name: string;
+                            /** @enum {string} */
+                            notify_level: "all" | "announcements" | "none";
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            primary_color?: string | null;
+                            /** @enum {string} */
+                            role: "member" | "staff";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.feed": {
+        parameters: {
+            query?: {
+                club_id?: string;
+                channel_id?: string;
+                /** @description Only your own posts */
+                mine?: boolean;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        pinned: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        }[];
+                        posts: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        }[];
                     };
                 };
             };
@@ -20800,6 +21544,524 @@ export interface operations {
                     "application/json": {
                         code: string;
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.join_channel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id: string;
+                        joined: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.leave_channel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id: string;
+                        joined: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.set_notify_level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    notify_level: "all" | "announcements" | "none";
+                };
+            };
+        };
+        responses: {
+            /** @description Level */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        club_id: string;
+                        /** @enum {string} */
+                        notify_level: "all" | "announcements" | "none";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.delete_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    attachment_id?: string;
+                    /** @enum {string} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+                    body?: string;
+                    /** Format: uuid */
+                    channel_id: string;
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Comment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityComment */
+                        comment: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kudos: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    pinned: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
                     };
                 };
             };

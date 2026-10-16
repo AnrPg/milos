@@ -6,7 +6,14 @@ defmodule MilosTraining.Community do
   stores what a member chose (notification level, opt-in channels).
   """
 
-  alias MilosTraining.Community.Commands.{ChannelMembership, ProvisionGymClub, SetNotifyLevel}
+  alias MilosTraining.Community.Commands.{
+    ChannelMembership,
+    Posts,
+    ProvisionGymClub,
+    SetNotifyLevel
+  }
+
+  alias MilosTraining.Community.Queries.Feed
   alias MilosTraining.Community.{ClubMembership, CommunityStore}
   alias MilosTraining.Community.Domain.{ChannelPolicy, FeedCursor, TenantDataPolicy}
 
@@ -24,6 +31,20 @@ defmodule MilosTraining.Community do
   defdelegate leave_channel(context, channel_id), to: ChannelMembership, as: :leave
   defdelegate set_notify_level(context, club_id, level), to: SetNotifyLevel, as: :call
   def notify_level_options, do: ClubMembership.notify_levels()
+
+  # Posts (M7).
+  defdelegate create_post(context, channel, role, joined?, attrs), to: Posts, as: :create
+  defdelegate fetch_post(context, post_id), to: Posts, as: :fetch
+  defdelegate delete_post(context, post, role, now), to: Posts, as: :delete
+  defdelegate hide_post(context, post, role, hidden?, now), to: Posts, as: :hide
+  defdelegate pin_post(context, post, channel, role, pinned?, now), to: Posts, as: :pin
+  defdelegate set_kudos(context, post, on?), to: Posts, as: :kudos
+  defdelegate add_comment(context, post, body), to: Posts, as: :comment
+  defdelegate delete_comment(context, comment_id, role, now), to: Posts
+  defdelegate list_comments(context, post_id), to: CommunityStore
+  defdelegate feed_page(context, params), to: Feed, as: :page
+  defdelegate pinned_posts(context, channel_ids, viewer_id), to: Feed, as: :pinned
+  def attachment_types, do: MilosTraining.Community.Post.attachment_types()
 
   # Governance rules (vision §7.1).
   defdelegate club_role(context_or_roles), to: ChannelPolicy

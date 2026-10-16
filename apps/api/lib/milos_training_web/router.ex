@@ -291,6 +291,14 @@ defmodule MilosTrainingWeb.Router do
     put("/clubs/:id/notify-level", CommunityController, :set_notify_level)
     post("/channels/:id/membership", CommunityController, :join_channel)
     delete("/channels/:id/membership", CommunityController, :leave_channel)
+    post("/posts", CommunityPostController, :create)
+    delete("/posts/:id", CommunityPostController, :delete)
+    put("/posts/:id/hidden", CommunityPostController, :hide)
+    put("/posts/:id/pinned", CommunityPostController, :pin)
+    put("/posts/:id/kudos", CommunityPostController, :kudos)
+    get("/posts/:id/comments", CommunityPostController, :comments)
+    post("/posts/:id/comments", CommunityPostController, :comment)
+    delete("/comments/:id", CommunityPostController, :delete_comment)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
@@ -881,6 +889,7 @@ defmodule MilosTrainingWeb.Router do
     patch("/me/journal/notes/:id", JournalController, :update_note)
     delete("/me/journal/notes/:id", JournalController, :delete_note)
     get("/me/clubs", CommunityController, :my_clubs)
+    get("/me/feed", CommunityPostController, :feed)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
