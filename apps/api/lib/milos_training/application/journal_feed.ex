@@ -89,7 +89,10 @@ defmodule MilosTraining.Application.JournalFeed do
   defp items(records, "pr") do
     records
     |> JournalComments.attach("pr")
-    |> Enum.map(&Journal.feed_item("pr", &1, midnight(&1.beaten_on), on: &1.beaten_on))
+    |> Enum.map(fn record ->
+      on = to_date(record.beaten_on)
+      Journal.feed_item("pr", record, midnight(on), on: on)
+    end)
   end
 
   defp items(injuries, "injury"),
@@ -109,6 +112,10 @@ defmodule MilosTraining.Application.JournalFeed do
       )
 
   defp midnight(%Date{} = date), do: DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
+
+  # The PR facade serialises `beaten_on` as an ISO date.
+  defp to_date(%Date{} = date), do: date
+  defp to_date(date) when is_binary(date), do: Date.from_iso8601!(date)
 
   defp utc(%DateTime{} = at), do: at
   defp utc(%NaiveDateTime{} = at), do: DateTime.from_naive!(at, "Etc/UTC")

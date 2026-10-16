@@ -43,7 +43,7 @@ defmodule MilosTraining.Application.AssignmentMessageIsolationTest do
           thread_id: athlete_thread.id,
           sender_id: admin.id,
           body: "Private note for athlete",
-          message_type: :coaching_note
+          message_type: :coaching_message
         })
 
       {:ok, other_thread} =

@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
     RecordCommunicationMessage
   }
 
-  alias MilosTraining.{Finance, Identity, Messaging, Notifications}
+  alias MilosTraining.{Finance, Identity, Messaging, Notifications, Organizations}
 
   def call(tenant_context, %{"organization_id" => organization_id} = delivery) do
     with true <- tenant_organization_id(tenant_context) == organization_id do
@@ -71,7 +71,7 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
       case Notifications.dispatch_event(notification_type(message), %{
              user_id: participant.user_id,
              organization_id: thread.organization_id,
-             dedupe_key: "chat-message:#{message.id}",
+             dedupe_key: dedupe_key(message),
              thread_id: thread.id,
              context_type: thread.context_type,
              context_id: thread.context_id,
@@ -93,6 +93,11 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   defp notification_type(_message), do: :chat_message
 
+  defp dedupe_key(%{message_type: type, id: id}) when type in [:coaching_message, :box_message],
+    do: "#{type}:#{id}"
+
+  defp dedupe_key(%{id: id}), do: "chat-message:#{id}"
+
   # «Τελευταία από τον coach» on the member's Box › Ο coach σου.
   defp invalidate_landing(thread, %{message_type: :coaching_message, sender_id: sender_id}) do
     thread.participants
@@ -103,44 +108,56 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
 
   defp invalidate_landing(_thread, _message), do: :ok
 
+  # Staff-client communication analytics: direction comes from who is staff
+  # in the gym (owners, admins, coaches, front desk...), not from the global
+  # account role; member-to-member chat is not staff communication.
   defp record_analytics(message, thread) do
+    staff = MapSet.new(Organizations.list_staff_user_ids(thread.organization_id))
+
     users =
       thread.participants
       |> Enum.map(& &1.user_id)
       |> Identity.list_by_ids()
       |> Map.new(&{&1.id, &1})
 
-    sender = Map.get(users, message.sender_id)
+    sender_staff? = MapSet.member?(staff, message.sender_id)
 
     thread.participants
     |> Enum.reject(&(&1.user_id == message.sender_id))
     |> Enum.reduce_while(:ok, fn participant, :ok ->
-      recipient = Map.get(users, participant.user_id)
+      recipient_staff? = MapSet.member?(staff, participant.user_id)
 
-      attrs = %{
-        "sender_id" => message.sender_id,
-        "recipient_id" => participant.user_id,
-        "thread_id" => thread.id,
-        "sender_role_snapshot" => role_name(sender),
-        "recipient_role_snapshot" => role_name(recipient),
-        "direction" => direction(sender, recipient),
-        "channel" => "in_app",
-        "body" => message.body,
-        "sent_at" => message.inserted_at,
-        "context_type" => "messaging_#{thread.context_type}",
-        "context_id" => thread.context_id || thread.id,
-        "assigned_admin_id" => admin_id(sender, recipient),
-        "message_params" => %{
-          "context_type" => to_string(thread.context_type),
-          "context_id" => thread.context_id,
-          "message_type" => to_string(message.message_type),
-          "message_id" => message.id
-        }
-      }
+      case direction(sender_staff?, recipient_staff?) do
+        nil ->
+          {:cont, :ok}
 
-      case RecordCommunicationMessage.call(attrs) do
-        :ok -> {:cont, :ok}
-        {:error, reason} -> {:halt, {:error, reason}}
+        direction ->
+          attrs = %{
+            "sender_id" => message.sender_id,
+            "recipient_id" => participant.user_id,
+            "thread_id" => thread.id,
+            "sender_role_snapshot" => role_name(Map.get(users, message.sender_id)),
+            "recipient_role_snapshot" => role_name(Map.get(users, participant.user_id)),
+            "direction" => direction,
+            "channel" => "in_app",
+            "body" => message.body,
+            "sent_at" => message.inserted_at,
+            "context_type" => "messaging_#{thread.context_type}",
+            "context_id" => thread.context_id || thread.id,
+            "assigned_admin_id" =>
+              if(sender_staff?, do: message.sender_id, else: participant.user_id),
+            "message_params" => %{
+              "context_type" => to_string(thread.context_type),
+              "context_id" => thread.context_id,
+              "message_type" => to_string(message.message_type),
+              "message_id" => message.id
+            }
+          }
+
+          case RecordCommunicationMessage.call(attrs) do
+            :ok -> {:cont, :ok}
+            {:error, reason} -> {:halt, {:error, reason}}
+          end
       end
     end)
   end
@@ -148,12 +165,8 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
   defp role_name(%{role: role}), do: to_string(role)
   defp role_name(_user), do: "unknown"
 
-  defp direction(%{role: :admin}, %{role: :admin}), do: "admin_to_admin"
-  defp direction(%{role: :admin}, _recipient), do: "admin_to_user"
-  defp direction(_sender, %{role: :admin}), do: "user_to_admin"
-  defp direction(_sender, _recipient), do: "user_to_user"
-
-  defp admin_id(%{id: id, role: :admin}, _recipient), do: id
-  defp admin_id(_sender, %{id: id, role: :admin}), do: id
-  defp admin_id(_sender, _recipient), do: nil
+  defp direction(true, true), do: "admin_to_admin"
+  defp direction(true, false), do: "admin_to_user"
+  defp direction(false, true), do: "user_to_admin"
+  defp direction(false, false), do: nil
 end

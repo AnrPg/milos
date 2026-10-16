@@ -400,33 +400,47 @@ defmodule MilosTrainingWeb.MessagingControllerTest do
                )
     end
 
-    test "admin can send a coaching_note", %{conn: conn} do
+    test "only a coach with an active coaching relationship sends a coaching message", %{
+      conn: conn
+    } do
       admin = admin_fixture()
+      coach = user_fixture()
       athlete = user_fixture(%{role: :athlete})
-      organization = create_org_with_members([{admin, :owner}, {athlete, :athlete}])
 
-      %{"thread" => thread} =
-        conn
-        |> put_bearer_token(admin)
-        |> post(
-          "/api/org/#{organization.slug}/me/threads",
-          %{context_type: "direct", participant_id: athlete.id}
-        )
-        |> json_response(200)
+      organization =
+        create_org_with_members([{admin, :owner}, {coach, :coach}, {athlete, :athlete}])
 
-      response =
+      {:ok, _} =
+        MilosTraining.Coaching.start_relationship(%{organization_id: organization.id}, %{
+          coach_user_id: coach.id,
+          client_user_id: athlete.id,
+          origin: "assigned"
+        })
+
+      send_coaching = fn sender ->
+        %{"thread" => thread} =
+          conn
+          |> put_bearer_token(sender)
+          |> post(
+            "/api/org/#{organization.slug}/me/threads",
+            %{context_type: "direct", participant_id: athlete.id}
+          )
+          |> json_response(200)
+
         conn
-        |> put_bearer_token(admin)
+        |> put_bearer_token(sender)
         |> post(
           "/api/org/#{organization.slug}/me/threads/#{thread["id"]}/messages",
-          %{
-            body: "Focus on your form this week.",
-            message_type: "coaching_note"
-          }
+          %{body: "Focus on your form this week.", message_type: "coaching_message"}
         )
-        |> json_response(201)
+      end
 
-      assert response["message"]["message_type"] == "coaching_note"
+      # ADR-140 §6: the owner by role is not the athlete's coach.
+      assert %{"code" => "no_coaching_relationship"} =
+               admin |> send_coaching.() |> json_response(422)
+
+      assert %{"message" => %{"message_type" => "coaching_message"}} =
+               coach |> send_coaching.() |> json_response(201)
     end
 
     test "non-participant cannot send a message", %{conn: conn} do

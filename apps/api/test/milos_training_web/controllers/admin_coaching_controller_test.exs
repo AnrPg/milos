@@ -36,36 +36,47 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     Repo.query!("SELECT set_config($1, $2, false)", ["app.user_id", user_id])
   end
 
-  test "admin can send a coaching note and create a hidden chat delivery record", %{
+  test "a coach's coaching message reaches the client's inbox, chat stays hidden", %{
     conn: conn
   } do
     admin = admin_fixture()
+    coach = user_fixture()
     athlete = user_fixture(%{role: :athlete})
-    legacy_organization = legacy_org_with_members!([{admin, :owner}, {athlete, :athlete}])
-    set_tenant_session!(legacy_organization.id, admin.id)
+
+    legacy_organization =
+      legacy_org_with_members!([{admin, :owner}, {coach, :coach}, {athlete, :athlete}])
+
+    set_tenant_session!(legacy_organization.id, coach.id)
+
+    {:ok, _} =
+      MilosTraining.Coaching.start_relationship(%{organization_id: legacy_organization.id}, %{
+        coach_user_id: coach.id,
+        client_user_id: athlete.id,
+        origin: "assigned"
+      })
 
     {:ok, thread} =
       Messaging.get_or_create_thread(%{
         context_type: :direct,
-        actor_id: admin.id,
+        actor_id: coach.id,
         participant_id: athlete.id
       })
 
     response =
       conn
-      |> put_bearer_token(admin)
+      |> put_bearer_token(coach)
       |> post(
         "/api/org/#{legacy_organization.slug}/me/threads/#{thread.id}/messages",
         %{
           body: "Keep your squat tempo controlled this week.",
-          message_type: "coaching_note"
+          message_type: "coaching_message"
         }
       )
       |> json_response(201)
 
-    assert response["message"]["sender_id"] == admin.id
+    assert response["message"]["sender_id"] == coach.id
     assert response["message"]["body"] == "Keep your squat tempo controlled this week."
-    assert response["message"]["message_type"] == "coaching_note"
+    assert response["message"]["message_type"] == "coaching_message"
 
     assert :ok =
              DispatchMessageJob.perform(%Oban.Job{
@@ -78,12 +89,13 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     notification =
       Repo.get_by!(Notification,
         user_id: athlete.id,
-        type: :chat_message,
-        dedupe_key: "chat-message:#{response["message"]["id"]}"
+        type: :coaching_message,
+        dedupe_key: "coaching_message:#{response["message"]["id"]}"
       )
 
     assert notification.payload["url"] == "/account/activity/chats?thread=#{thread.id}"
-    assert Notifications.list_for_user(athlete.id) == []
+    assert [%{id: inbox_id}] = Notifications.list_for_user(athlete.id)
+    assert inbox_id == notification.id
     assert Messaging.count_unread_threads(athlete.id) == 1
   end
 
@@ -144,7 +156,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
         thread_id: thread.id,
         sender_id: admin.id,
         body: "Keep strength work steady.",
-        message_type: :coaching_note
+        message_type: :coaching_message
       })
 
     response =
@@ -164,7 +176,7 @@ defmodule MilosTrainingWeb.AdminCoachingControllerTest do
     assert [%{"workout_type" => "strength"}] = response["drill_down"]["score_trends"]
 
     assert Enum.any?(response["drill_down"]["notes_context"], fn note ->
-             note["type"] == "admin_note" and note["body"] == "Keep strength work steady."
+             note["type"] == "coaching_message" and note["body"] == "Keep strength work steady."
            end)
 
     action_keys = Enum.map(response["drill_down"]["actions"], & &1["key"])

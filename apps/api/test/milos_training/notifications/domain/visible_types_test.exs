@@ -11,6 +11,6 @@ defmodule MilosTraining.Notifications.Domain.VisibleTypesTest do
 
   test "keeps non-conversational updates visible" do
     assert VisibleTypes.visible_inbox_type?(:booking_approved)
-    assert VisibleTypes.visible_inbox_type?("admin_note")
+    assert VisibleTypes.visible_inbox_type?("coaching_message")
   end
 end

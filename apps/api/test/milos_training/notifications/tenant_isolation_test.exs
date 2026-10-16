@@ -107,7 +107,7 @@ defmodule MilosTraining.Notifications.TenantIsolationTest do
       NotificationStore.create_notification(%{
         user_id: member.id,
         organization_id: context.organization_id,
-        type: :admin_note,
+        type: :coaching_message,
         payload: %{"body" => body}
       })
     end)

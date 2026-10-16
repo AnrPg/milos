@@ -1,4 +1,4 @@
-defmodule MilosTraining.Application.WriteAdminAthleteNoteTest do
+defmodule MilosTraining.Application.CoachingMessageSendTest do
   use MilosTraining.DataCase
 
   alias MilosTraining.{Messaging, Organizations}
@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.WriteAdminAthleteNoteTest do
 
     {:ok, organization} =
       Organizations.create_organization(%{
-        name: "Athlete Note Gym #{System.unique_integer([:positive])}"
+        name: "Coaching Message Gym #{System.unique_integer([:positive])}"
       })
 
     {:ok, _admin_membership} =
@@ -41,7 +41,7 @@ defmodule MilosTraining.Application.WriteAdminAthleteNoteTest do
     %{admin: admin, athlete: athlete, organization: organization}
   end
 
-  test "sends a coaching_note message and returns it even when notification delivery fails", %{
+  test "stores a coaching message and returns it even when notification delivery fails", %{
     admin: admin,
     athlete: athlete
   } do
@@ -57,10 +57,10 @@ defmodule MilosTraining.Application.WriteAdminAthleteNoteTest do
                thread_id: thread.id,
                sender_id: admin.id,
                body: "Keep the tempo steady.",
-               message_type: :coaching_note
+               message_type: :coaching_message
              })
 
-    assert message.message_type == :coaching_note
+    assert message.message_type == :coaching_message
     assert message.sender_id == admin.id
     assert message.body == "Keep the tempo steady."
 

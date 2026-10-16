@@ -77,7 +77,7 @@ defmodule MilosTraining.Coaching.Domain.AthleteDrillDownTest do
     assert Enum.map(drill_down.assigned_workouts, & &1.status) == ["completed", "upcoming"]
     assert [%{workout_type: "strength", entries: [%{value: 120}]}] = drill_down.score_trends
 
-    assert [%{type: "admin_note"}, %{type: "athlete_comment", body: "Left knee felt tight"}] =
+    assert [%{type: "coaching_message"}, %{type: "athlete_comment", body: "Left knee felt tight"}] =
              drill_down.notes_context
 
     assert drill_down.attention_cues == []

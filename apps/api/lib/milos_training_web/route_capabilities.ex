@@ -178,6 +178,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AppointmentsController, :book_for_client} => [:manage_appointments, :book_for_clients],
     {W.AppointmentsController, :cancel} => [:manage_appointments, :book_for_clients],
 
+    # A client's journal through the coach seam (ADR-139 §6)
+    {W.JournalController, :client_journal} => [:manage_coaching],
+
     # Private coach notes (ADR-101)
     {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],
     {W.CoachNotesController, :create} => [:write_coach_notes],

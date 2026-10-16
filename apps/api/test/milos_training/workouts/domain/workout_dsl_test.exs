@@ -47,12 +47,15 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
 
       assert "reps" in Vocabulary.suggestions(:exercise)
       assert "rest-between-sets" in Vocabulary.suggestions(:exercise)
-      assert "!coach-note" in Vocabulary.suggestions(:note)
+      # ADR-140 §4: a cue only inside an exercise; the coach brief anywhere.
+      assert "!cue" in Vocabulary.suggestions(:exercise)
+      refute "!cue" in Vocabulary.suggestions(:workout)
+      assert "!coach-brief" in Vocabulary.suggestions(:content)
     end
   end
 
   describe "parse/1" do
-    test "compiles a canonical workout with notes, a header and explicit deload sets" do
+    test "compiles a workout with legacy note markers, a header and explicit deload sets" do
       source = """
       [workout]
       dsl-version: 1
@@ -120,8 +123,9 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDslTest do
       assert exercise.rest_seconds == 150
       refute Map.has_key?(exercise, :note)
 
-      assert [%{type: "coach-note", body: "Reduce the final heavy set if bar speed drops."}] =
-               exercise.notes
+      # The legacy `!coach-note` normalises to the coach brief (ADR-140 §4).
+      assert [%{type: "coach-brief", body: "Reduce the final heavy set if bar speed drops."}] =
+               exercise.content
 
       assert Enum.map(exercise.set_prescriptions, & &1.load_value) == [60, 70, 80, 65]
       assert Enum.map(exercise.set_prescriptions, & &1.prescription_value) == [5, 5, 3, 5]

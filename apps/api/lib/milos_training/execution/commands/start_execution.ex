@@ -29,12 +29,18 @@ defmodule MilosTraining.Execution.Commands.StartExecution do
            segment_started_at_utc: started_at_utc,
            paused_elapsed_ms: 0,
            resume_countdown_ends_at_utc: nil,
-           # Server-derived by the caller (ADR-139), like the organization.
-           journal_visibility: Params.get(params, :journal_visibility) || "private"
+           # Server-derived by the caller (ADR-139), like the organization;
+           # without one, the ADR-140 §9 default: in a gym, coach_can_view.
+           journal_visibility:
+             Params.get(params, :journal_visibility) ||
+               default_rung(Params.get(params, :organization_id))
          } do
       ExecutionStore.start_execution(execution_params)
     end
   end
+
+  defp default_rung(organization_id) when is_binary(organization_id), do: "coach_can_view"
+  defp default_rung(_personal), do: "private"
 
   defp validate_workout(_scope, nil, _scale_slug), do: {:error, :bad_request}
 

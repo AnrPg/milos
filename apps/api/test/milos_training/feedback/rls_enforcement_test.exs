@@ -53,15 +53,25 @@ defmodule MilosTraining.Feedback.RLSEnforcementTest do
     visible_in_own_org =
       as_session(conn, user_id_s, org_id_s, false, fn -> select_ids(conn, review_id) end)
 
-    visible_in_other_org =
+    # ADR-139: the author's journal spans gyms, so they read their own review
+    # from any session; nobody else sees it outside its organization.
+    {stranger_id_s, _stranger_id} = uuid()
+
+    visible_to_stranger_in_other_org =
+      as_session(conn, stranger_id_s, other_org_id_s, false, fn ->
+        select_ids(conn, review_id)
+      end)
+
+    visible_to_stranger_with_no_context =
+      as_session(conn, stranger_id_s, nil, false, fn -> select_ids(conn, review_id) end)
+
+    visible_to_author_elsewhere =
       as_session(conn, user_id_s, other_org_id_s, false, fn -> select_ids(conn, review_id) end)
 
-    visible_with_no_context =
-      as_session(conn, user_id_s, nil, false, fn -> select_ids(conn, review_id) end)
-
     assert visible_in_own_org == [review_id_s]
-    assert visible_in_other_org == []
-    assert visible_with_no_context == []
+    assert visible_to_stranger_in_other_org == []
+    assert visible_to_stranger_with_no_context == []
+    assert visible_to_author_elsewhere == [review_id_s]
 
     as_session(conn, user_id_s, org_id_s, false, fn ->
       Postgrex.query!(conn, "DELETE FROM reviews WHERE id = $1", [review_id])
