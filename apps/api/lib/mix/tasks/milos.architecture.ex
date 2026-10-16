@@ -84,6 +84,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     content/content_store
     appointments/appointment_store
     nutrition/nutrition_store
+    community/community_store
   )
 
   defp tenant_scope_violations do

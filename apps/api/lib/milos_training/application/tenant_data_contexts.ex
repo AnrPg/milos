@@ -12,6 +12,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Analytics,
     Appointments,
     Coaching,
+    Community,
     Content,
     Execution,
     Facility,
@@ -34,6 +35,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
 
   @purgeable [
     Analytics,
+    Community,
     Notifications,
     Execution,
     Pantheon,

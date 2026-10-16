@@ -42,6 +42,37 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-138: club and channel governance.
+  def call(conn, {:error, :channel_not_optional}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "channel_not_optional",
+      error: "Every member is in this channel; it cannot be joined or left"
+    })
+  end
+
+  def call(conn, {:error, :invalid_notify_level}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_notify_level", error: "Unknown notification level"})
+  end
+
+  def call(conn, {:error, :cannot_post_in_channel}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "cannot_post_in_channel", error: "You cannot post in this channel"})
+  end
+
+  def call(conn, {:error, :attachment_not_shareable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "attachment_not_shareable",
+      error: "Only your own journal entries can be attached"
+    })
+  end
+
   def call(conn, {:error, :invalid_current_password}) do
     conn
     |> put_status(:unprocessable_entity)

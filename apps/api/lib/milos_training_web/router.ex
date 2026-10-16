@@ -278,6 +278,21 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
+  # ADR-138: a member's choices about their gym's club and its channels.
+  scope "/api/org/:organization_slug/community", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    put("/clubs/:id/notify-level", CommunityController, :set_notify_level)
+    post("/channels/:id/membership", CommunityController, :join_channel)
+    delete("/channels/:id/membership", CommunityController, :leave_channel)
+  end
+
   # ADR-118: standalone training log (class / offline workouts).
   scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
     pipe_through([
@@ -865,6 +880,7 @@ defmodule MilosTrainingWeb.Router do
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)
     delete("/me/journal/notes/:id", JournalController, :delete_note)
+    get("/me/clubs", CommunityController, :my_clubs)
   end
 
   scope "/api/workouts", MilosTrainingWeb do
