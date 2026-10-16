@@ -109,7 +109,10 @@ export function changeDraft(
   change: JournalCommentChange & { logged_at?: string },
   existing?: JournalComment,
 ): JournalCommentDraft {
-  const { note, logged_at: _loggedAt, ...patch } = change;
+  const { note, ...rest } = change;
+  // `logged_at` dates the change in the journal; it is not part of the patch.
+  const patch: Omit<typeof rest, "logged_at"> = { ...rest };
+  delete (patch as { logged_at?: string }).logged_at;
   return commentDraft(entryKind, entryId, {
     id: existing?.id,
     body: note?.trim() ? note.trim() : (existing?.body ?? null),

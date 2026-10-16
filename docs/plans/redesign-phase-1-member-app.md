@@ -269,7 +269,7 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 - [x] Entitlement, corporate enrollment → Box › Συνδρομή (M3)
 - [x] Invoices, refund receipts (`/account/billing`) → Εγώ › Πληρωμές (M2)
 - [x] Training log (class, assigned, library, free), RPE, scores, void → Ημερολόγιο + Box › Καταγραφή (M3/M4)
-- [ ] Log notes and execution notes → Σχόλια on the entry, listed in Ροή (M5.2), visibility from the entry (M5.4)
+- [x] Log notes and execution notes → Σχόλια on the entry, listed in Ροή (M5.2), visibility from the entry (M5.4)
 - [x] Reviews (`/reviews`) → Νέα καταχώρηση › Coach › Αξιολόγηση, listed in Ροή (M4)
 - [x] Wellbeing: injuries, readiness → Ημερολόγιο › Ευεξία (M4)
 - [x] Vault + repeat → Ημερολόγιο › Vault (M4)
@@ -293,9 +293,8 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
    others hidden)?
 
 ## 8. Environment notes
-- The cloud session cannot reach `repo.hex.pm` or `builds.hex.pm`, so `mix` deps and an OTP 27 build
-  cannot be installed here. **A** milestones need either those hosts allowed in the cloud environment's
-  network settings, or a Remote Control session on a machine with the Docker stack.
+- OTP/Elixir install in the cloud session (hex hosts are allowed); the API suite runs here
+  (1498 tests green at the end of M5).
 - Pushes from the cloud session are limited to the session branch; milestone PRs go from that branch
   into `redesign/social-centered`.
 
@@ -303,4 +302,4 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 - [x] Step 1 explore
 - [x] Step 2 decisions (cards posted; defaults recorded in §3)
 - [x] Step 3 plan (this file)
-- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [ ] M5 · [ ] M6 · [ ] M7 · [ ] M8 · [~] M9 (Κοινοποίηση & ορατότητα page; Ρυθμίσεις slimmed; Vault, history and reviews moved to Ημερολόγιο)
+- [x] M1 · [x] M2 (Αρχική hub with fixed slots; posts slot empty until M7) · [x] M3 (class-timer link and check-in: TD-105) · [x] M4 (old landing split into Αρχική, Ροή and Πρόοδος and deleted) · [x] M5 (M5.1–M5.7: check-ins, Σχόλια, injury timeline, ladder read side, workout content markers, messages to members, six-tab staff member profile) · [ ] M6 · [ ] M7 · [ ] M8 · [~] M9 (Κοινοποίηση & ορατότητα page; Ρυθμίσεις slimmed; Vault, history and reviews moved to Ημερολόγιο)
