@@ -5,10 +5,7 @@ import React, { useCallback, useEffect, useEffectEvent, useMemo, useRef, useStat
 import { useRouter } from "next/navigation";
 
 import {
-  addExecutionModifications,
   completeExecution as completeExecutionRequest,
-  type ExerciseModification,
-  type ExerciseNote,
   type SectionScore,
   type TimerSegment,
   type WorkoutExecution,
@@ -17,9 +14,18 @@ import { useSession } from "@/components/session-provider";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { useExecutionSync, type SyncProblem } from "@/hooks/useExecutionSync";
+import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useMediaSession } from "@/hooks/useMediaSession";
 import { useScreenWakeLock } from "@/hooks/useScreenWakeLock";
 import { useWorkoutTimer } from "@/hooks/useWorkoutTimer";
+import type { JournalComment, JournalCommentDraft } from "@/api/journal-comments";
+import {
+  changeDraft,
+  commentDraft,
+  commentsForExercise,
+  finishWrites,
+  type FinishComments,
+} from "@/lib/journal-comments";
 import { subscribeToTopic } from "@/lib/realtime";
 import { segmentLabel } from "@/lib/segment-label";
 import { planCatchUp, segmentLimitMs } from "@/lib/timer-engine";
@@ -37,7 +43,7 @@ import { useExecutionStore } from "@/stores/execution";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
 
 import { FinishWizard } from "./FinishWizard";
-import { ModificationModal } from "./ModificationModal";
+import { ModificationModal, type StepComment } from "./ModificationModal";
 import {
   buildSegmentStepIds,
   computeMeasuredScore,
@@ -178,6 +184,8 @@ export function ExecutionMode() {
     segmentCycleCounts,
     checkedExerciseIds,
     sectionScores,
+    comments,
+    unsyncedCommentIds,
     pendingSync,
     pauseTimer,
     startResumeCountdown,
@@ -189,7 +197,8 @@ export function ExecutionMode() {
     adjustSegmentDuration,
     setCheckedExerciseIds,
     upsertScore,
-    upsertNote,
+    upsertComment,
+    removeComment,
     hydrateFromExecution,
     completeExecution,
     reset,
@@ -199,7 +208,7 @@ export function ExecutionMode() {
   const [isSaving, setIsSaving] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
   const [countdownNow, setCountdownNow] = useState(() => Date.now());
-  const [inExecutionModifications, setInExecutionModifications] = useState<ExerciseModification[]>([]);
+  const commentWriter = useJournalCommentWriter();
   const [modifyTarget, setModifyTarget] = useState<ChecklistStep | null>(null);
   const [pendingFinish, setPendingFinish] = useState<{ scores: SectionScore[] } | null>(null);
   const [undo, setUndo] = useState<UndoState | null>(null);
@@ -331,15 +340,49 @@ export function ExecutionMode() {
     else goToSegment(currentSegmentIndex + 1);
   }
 
-  async function confirmPendingFinish(editedScores: SectionScore[], modifications: ExerciseModification[]) {
+  /** Saves one Σχόλιο (ADR-140 §1) through the outbox and shows it at once. */
+  async function writeComment(draft: JournalCommentDraft) {
+    const { comment, synced } = await commentWriter.save(draft);
+    upsertComment(comment, { unsynced: !synced });
+  }
+
+  async function deleteComment(comment: JournalComment) {
+    removeComment(comment.id);
+    await commentWriter.remove(comment.id);
+  }
+
+  async function saveStepComment(step: ChecklistStep, recorded: StepComment) {
+    if (!executionId) return;
+    const exerciseComments = commentsForExercise(comments, step.exercise.id);
+    const existing = recorded.change
+      ? exerciseComments.find((comment) => comment.change?.patch_id === recorded.change!.patch_id)
+      : undefined;
+    const draft = recorded.change
+      ? changeDraft("execution", executionId, { ...recorded.change, note: recorded.body }, existing)
+      : commentDraft("execution", executionId, {
+          section_id: currentSegment?.section_id ?? null,
+          exercise_id: step.exercise.id,
+          body: recorded.body,
+          tags: recorded.tags,
+        });
+    try {
+      await writeComment(draft);
+    } catch {
+      setFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
+    }
+  }
+
+  async function confirmPendingFinish(editedScores: SectionScore[], finish: FinishComments) {
     if (!tokens?.access_token || !executionId) return;
     setIsSaving(true);
     setFeedback(null);
 
     try {
-      if (modifications.length > 0) {
-        const execution = await addExecutionModifications(tokens.access_token, executionId, modifications);
-        hydrateFromExecution(execution);
+      const writes = finishWrites("execution", executionId, useExecutionStore.getState().comments, finish);
+      for (const draft of writes.save) await writeComment(draft);
+      for (const id of writes.remove) {
+        removeComment(id);
+        await commentWriter.remove(id);
       }
 
       // Let queued progress land first so it cannot arrive after completion.
@@ -350,7 +393,6 @@ export function ExecutionMode() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         checked_exercise_ids: store.checkedExerciseIds,
         section_scores: editedScores,
-        exercise_notes: store.exerciseNotes,
         total_elapsed_ms: totals.totalElapsedMs,
         section_elapsed_ms: totals.sectionElapsedMs,
         segment_cycle_counts: store.segmentCycleCounts,
@@ -480,17 +522,6 @@ export function ExecutionMode() {
         if (payload.execution.lock_version <= useExecutionStore.getState().lockVersion) return;
         hydrateFromExecution(payload.execution);
       },
-      "execution:note_submitted": (payload) => {
-        if (
-          typeof payload === "object" &&
-          payload !== null &&
-          "note" in payload &&
-          payload.note &&
-          typeof payload.note === "object"
-        ) {
-          upsertNote(payload.note as ExerciseNote);
-        }
-      },
       "execution:completed": (payload) => {
         if (isExecutionPayload(payload)) {
           hydrateFromExecution(payload.execution);
@@ -498,7 +529,7 @@ export function ExecutionMode() {
         completeExecution();
       },
     });
-  }, [completeExecution, executionId, hydrateFromExecution, isSyncing, tokens?.access_token, upsertNote]);
+  }, [completeExecution, executionId, hydrateFromExecution, isSyncing, tokens?.access_token]);
 
   useEffect(() => {
     if (!undo) return;
@@ -715,7 +746,8 @@ export function ExecutionMode() {
       <FinishWizard
         scores={pendingFinish.scores}
         segments={segments}
-        initialModifications={inExecutionModifications}
+        comments={comments}
+        pendingCommentIds={unsyncedCommentIds}
         clockAdjustments={clockAdjustmentSummaries()}
         isSaving={isSaving}
         feedback={feedback}
@@ -1127,13 +1159,14 @@ export function ExecutionMode() {
         <ModificationModal
           segment={currentSegment}
           step={modifyTarget}
-          onSave={(mod) => {
-            setInExecutionModifications((prev) => {
-              const without = prev.filter((m) => (m.patch_id ?? "") !== (mod.patch_id ?? ""));
-              return [...without, mod];
-            });
+          comments={commentsForExercise(comments, modifyTarget.exercise.id)}
+          pendingCommentIds={unsyncedCommentIds}
+          onSave={(recorded) => {
+            const step = modifyTarget;
             setModifyTarget(null);
+            void saveStepComment(step, recorded);
           }}
+          onDeleteComment={(comment) => void deleteComment(comment)}
           onClose={() => setModifyTarget(null)}
         />
       )}

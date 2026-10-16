@@ -3,12 +3,13 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 import type {
   KpiCounters,
-  ExerciseNote,
   ExecutionProgressPayload,
   SectionScore,
   TimerSegment,
   WorkoutExecution,
 } from "@/api/executions";
+import type { JournalComment } from "@/api/journal-comments";
+import { removeComment, sortComments, upsertComment } from "@/lib/journal-comments";
 import { hasMarkChanges, type ProgressMarks, rebaseProgressMarks } from "@/lib/execution-rebase";
 import { liveElapsedMs } from "@/lib/timer-engine";
 
@@ -45,7 +46,10 @@ type ExecutionState = {
   segmentCycleCounts: Record<string, number>;
   checkedExerciseIds: string[];
   sectionScores: SectionScore[];
-  exerciseNotes: ExerciseNote[];
+  /** Σχόλια on this execution (ADR-140 §1), oldest first. */
+  comments: JournalComment[];
+  /** Comments saved on this device the server has not acknowledged yet (outbox). */
+  unsyncedCommentIds: string[];
   /** Local progress the server has not acknowledged yet. */
   pendingSync: boolean;
   /** Hand-made marks as the server last acknowledged them; the base for conflict rebases. */
@@ -64,7 +68,7 @@ type ExecutionState = {
     segments: TimerSegment[];
     checkedExerciseIds?: string[];
     sectionScores?: SectionScore[];
-    exerciseNotes?: ExerciseNote[];
+    comments?: JournalComment[];
     currentSegmentIndex?: number;
     status?: ExecutionStatus;
     segmentStartedAt?: number | null;
@@ -119,8 +123,9 @@ type ExecutionState = {
   decrementSegmentCycle: (segmentKey: string) => void;
   setCheckedExerciseIds: (exerciseIds: string[]) => void;
   upsertScore: (score: SectionScore) => void;
-  upsertNote: (note: ExerciseNote) => void;
-  replaceNotes: (notes: ExerciseNote[]) => void;
+  /** A comment as saved locally (`unsynced`) or as the server answered. */
+  upsertComment: (comment: JournalComment, options?: { unsynced?: boolean }) => void;
+  removeComment: (id: string) => void;
   completeExecution: () => void;
   /** Committed totals plus the current segment's elapsed time at `now`. */
   completionTotals: (now?: number) => { totalElapsedMs: number; sectionElapsedMs: Record<string, number> };
@@ -145,7 +150,8 @@ const initialState = {
   segmentCycleCounts: {},
   checkedExerciseIds: [],
   sectionScores: [],
-  exerciseNotes: [],
+  comments: [],
+  unsyncedCommentIds: [],
   pendingSync: false,
   syncedMarks: null as ProgressMarks | null,
   durationAdjustments: {} as Record<string, number>,
@@ -245,6 +251,30 @@ function addElapsed(
   };
 }
 
+/**
+ * The server's comments are authoritative, except those this device saved
+ * that have not reached it yet (they wait in the outbox).
+ */
+function hydratedComments(
+  state: Pick<ExecutionState, "comments" | "unsyncedCommentIds">,
+  execution: WorkoutExecution,
+  sameExecution: boolean,
+): Pick<ExecutionState, "comments" | "unsyncedCommentIds"> {
+  if (execution.comments === undefined) {
+    return sameExecution ? state : { comments: [], unsyncedCommentIds: [] };
+  }
+  const serverIds = new Set(execution.comments.map((comment) => comment.id));
+  const unsynced = sameExecution
+    ? state.comments.filter(
+        (comment) => state.unsyncedCommentIds.includes(comment.id) && !serverIds.has(comment.id),
+      )
+    : [];
+  return {
+    comments: unsynced.reduce(upsertComment, sortComments(execution.comments)),
+    unsyncedCommentIds: unsynced.map((comment) => comment.id),
+  };
+}
+
 export const useExecutionStore = create<ExecutionState>()(
   persist(
     (set, get) => ({
@@ -258,7 +288,7 @@ export const useExecutionStore = create<ExecutionState>()(
         segments,
         checkedExerciseIds = [],
         sectionScores = [],
-        exerciseNotes = [],
+        comments = [],
         currentSegmentIndex = 0,
         status = "active",
         segmentStartedAt = Date.now(),
@@ -278,7 +308,7 @@ export const useExecutionStore = create<ExecutionState>()(
           baseSegments: segments,
           checkedExerciseIds: normalizeCheckedExerciseIds(checkedExerciseIds),
           sectionScores,
-          exerciseNotes,
+          comments: sortComments(comments),
           currentSegmentIndex,
           status,
           segmentStartedAt: status === "active" ? segmentStartedAt : null,
@@ -334,7 +364,7 @@ export const useExecutionStore = create<ExecutionState>()(
             segmentCycleCounts: execution.segment_cycle_counts ?? {},
             checkedExerciseIds: normalizeCheckedExerciseIds(execution.checked_exercise_ids),
             sectionScores: execution.section_scores,
-            exerciseNotes: execution.exercise_notes,
+            ...hydratedComments(state, execution, sameExecution),
             syncedMarks: serverMarks(execution),
             durationAdjustments,
             kpiCounters: sameExecution ? state.kpiCounters : {},
@@ -570,32 +600,19 @@ export const useExecutionStore = create<ExecutionState>()(
           return { sectionScores: updated };
         }),
 
-      upsertNote: (note) =>
-        set((state) => {
-          const existing = state.exerciseNotes.findIndex((candidate) => {
-            if (note.id && candidate.id) {
-              return candidate.id === note.id;
-            }
+      upsertComment: (comment, options) =>
+        set((state) => ({
+          comments: upsertComment(state.comments, comment),
+          unsyncedCommentIds: options?.unsynced
+            ? [...new Set([...state.unsyncedCommentIds, comment.id])]
+            : state.unsyncedCommentIds.filter((id) => id !== comment.id),
+        })),
 
-            return (
-              candidate.exercise_id === note.exercise_id &&
-              candidate.selected_text === note.selected_text &&
-              candidate.selection_start === note.selection_start &&
-              candidate.selection_end === note.selection_end
-            );
-          });
-
-          const updated =
-            existing >= 0
-              ? state.exerciseNotes.map((candidate, index) =>
-                  index === existing ? note : candidate,
-                )
-              : [...state.exerciseNotes, note];
-
-          return { exerciseNotes: updated };
-        }),
-
-      replaceNotes: (notes) => set({ exerciseNotes: notes }),
+      removeComment: (id) =>
+        set((state) => ({
+          comments: removeComment(state.comments, id),
+          unsyncedCommentIds: state.unsyncedCommentIds.filter((candidate) => candidate !== id),
+        })),
 
       completeExecution: () =>
         set({
@@ -662,7 +679,8 @@ export const useExecutionStore = create<ExecutionState>()(
         segmentCycleCounts: state.segmentCycleCounts,
         checkedExerciseIds: state.checkedExerciseIds,
         sectionScores: state.sectionScores,
-        exerciseNotes: state.exerciseNotes,
+        comments: state.comments,
+        unsyncedCommentIds: state.unsyncedCommentIds,
         pendingSync: state.pendingSync,
         syncedMarks: state.syncedMarks,
         durationAdjustments: state.durationAdjustments,

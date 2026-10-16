@@ -6,6 +6,8 @@ import type {
   TrainingLogSourceType,
   UpdateTrainingLogRequest,
 } from "@/api/training-log";
+import { newCommentId, type JournalCommentDraft } from "@/api/journal-comments";
+import { commentDraft } from "@/lib/journal-comments";
 
 export type LoadUnit = "kg" | "lb";
 
@@ -22,7 +24,9 @@ export type TrainingLogForm = {
   performedAt: string;
   durationMinutes: string;
   perceivedEffort: string;
-  notes: string;
+  /** A Σχόλιο written with the entry (ADR-140 §1); its id keeps replays converging. */
+  comment: string;
+  commentId: string;
   sectionScores: Record<string, string>;
   exercises: TrainingLogExerciseRow[];
 };
@@ -70,7 +74,8 @@ export function emptyTrainingLogForm(now: Date, title = ""): TrainingLogForm {
     performedAt: toDateTimeLocal(now),
     durationMinutes: "",
     perceivedEffort: "",
-    notes: "",
+    comment: "",
+    commentId: newCommentId(),
     sectionScores: {},
     exercises: [],
   };
@@ -177,7 +182,6 @@ function detailsPayload(
     timezone,
     duration_seconds: typeof minutes === "number" ? minutes * 60 : null,
     perceived_effort: typeof effort === "number" && effort >= 1 && effort <= 10 ? effort : null,
-    notes: isBlank(form.notes) ? null : form.notes.trim(),
     section_scores: scoresPayload(form, sections),
     performed_exercises: exercisesPayload(form.exercises),
   };
@@ -194,7 +198,14 @@ export function buildCreatePayload(
     source_reference_id: source.sourceType === "freeform" ? null : source.referenceId,
     title: source.sourceType === "freeform" ? form.title.trim() : null,
     idempotency_key: options.idempotencyKey,
+    comments: isBlank(form.comment) ? [] : [{ id: form.commentId, body: form.comment.trim() }],
   };
+}
+
+/** On an existing entry the comment is saved on its own, after the edit. */
+export function commentDraftFromForm(form: TrainingLogForm, entryId: string): JournalCommentDraft | null {
+  if (isBlank(form.comment)) return null;
+  return commentDraft("training_log", entryId, { id: form.commentId, body: form.comment.trim() });
 }
 
 export function buildUpdatePayload(
@@ -222,7 +233,8 @@ export function formFromEntry(entry: TrainingLogEntry): TrainingLogForm {
     durationMinutes:
       typeof entry.duration_seconds === "number" ? String(Math.round(entry.duration_seconds / 60)) : "",
     perceivedEffort: typeof entry.perceived_effort === "number" ? String(entry.perceived_effort) : "",
-    notes: entry.notes ?? "",
+    comment: "",
+    commentId: newCommentId(),
     sectionScores: Object.fromEntries(
       entry.section_scores.map((score) => [score.section_id, String(score.value)]),
     ),

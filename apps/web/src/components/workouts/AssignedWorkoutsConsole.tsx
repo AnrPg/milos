@@ -791,7 +791,7 @@ export function AssignedWorkoutsConsole({
         segments,
         checkedExerciseIds: execution.checked_exercise_ids,
         sectionScores: execution.section_scores,
-        exerciseNotes: execution.exercise_notes,
+        comments: execution.comments,
         currentSegmentIndex: execution.current_segment_index,
         status: execution.status,
         segmentStartedAt: execution.segment_started_at_utc

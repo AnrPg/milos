@@ -7,8 +7,13 @@ vi.mock("@/i18n/ui", () => ({
   useUiTranslations: () => (key: string) => key,
 }));
 
-describe("FinishWizard free-text modifications", () => {
-  it("collects one multiline modification patch and previews it as blob text", () => {
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useFormatter: () => ({ dateTime: () => "" }),
+}));
+
+describe("FinishWizard free-text comments", () => {
+  it("collects one multiline comment on the whole workout and previews it as written", () => {
     const onConfirm = vi.fn();
     const note = "Used a lighter sandbag.\nStopped after four rounds.";
 
@@ -16,7 +21,8 @@ describe("FinishWizard free-text modifications", () => {
       <FinishWizard
         scores={[]}
         segments={[]}
-        initialModifications={[]}
+        comments={[]}
+        pendingCommentIds={[]}
         freeText
         isSaving={false}
         feedback={null}
@@ -31,16 +37,7 @@ describe("FinishWizard free-text modifications", () => {
     expect(screen.getByText(/Used a lighter sandbag/)).toHaveClass("whitespace-pre-wrap");
 
     fireEvent.click(screen.getByRole("button", { name: "saveDone3614269" }));
-    expect(onConfirm).toHaveBeenCalledWith([], [
-      expect.objectContaining({
-        patch_id: "free-text:modification",
-        type: "other",
-        field: "note",
-        section_id: "free_text",
-        canonical_value: "",
-        actual_value: note,
-      }),
-    ]);
+    expect(onConfirm).toHaveBeenCalledWith([], { changes: [], text: note });
   });
 
   it("offers a way back to the workout from the first step", () => {
@@ -50,7 +47,8 @@ describe("FinishWizard free-text modifications", () => {
       <FinishWizard
         scores={[]}
         segments={[]}
-        initialModifications={[]}
+        comments={[]}
+        pendingCommentIds={[]}
         isSaving={false}
         feedback={null}
         onConfirm={vi.fn()}

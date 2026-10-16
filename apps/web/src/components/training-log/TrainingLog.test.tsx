@@ -25,6 +25,18 @@ vi.mock("@/i18n/ui", () => ({
     params ? `${key}:${JSON.stringify(params)}` : key,
 }));
 
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useFormatter: () => ({ dateTime: () => "" }),
+}));
+
+vi.mock("@/hooks/useJournalCommentWriter", () => ({
+  useJournalCommentWriter: () => ({
+    save: vi.fn(async (comment: unknown) => ({ comment, synced: true })),
+    remove: vi.fn(async () => undefined),
+  }),
+}));
+
 vi.mock("@/i18n/use-ui-locale", () => ({ useUiLocale: () => "en" }));
 
 vi.mock("@/i18n/presentation", () => ({
@@ -47,11 +59,10 @@ const loggedEntry = {
   performed_at_tz: "UTC",
   duration_seconds: 3600,
   perceived_effort: 8,
-  notes: null,
   status: "logged",
   lock_version: 1,
   section_scores: [],
-  exercise_modifications: [],
+  comments: [],
   performed_exercises: [],
 } as unknown as TrainingLogEntry;
 

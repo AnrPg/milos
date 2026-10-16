@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import {
   fetchTrainingLogSources,
@@ -11,12 +12,15 @@ import {
   type TrainingLogSourceType,
 } from "@/api/training-log";
 import { localizeError } from "@/i18n/presentation";
+import { CommentList } from "@/components/journal/CommentList";
+import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
   buildCreatePayload,
   buildUpdatePayload,
+  commentDraftFromForm,
   emptyExerciseRow,
   emptyTrainingLogForm,
   formFromEntry,
@@ -69,6 +73,13 @@ function browserTimezone() {
   }
 }
 
+/** A comment on a performed row (`row:<n>`) names the row's exercise. */
+function rowLabel(entry: TrainingLogEntry, exerciseId: string | null | undefined): string | null {
+  const match = exerciseId?.match(/^row:(\d+)$/);
+  if (!match) return null;
+  return entry.performed_exercises[Number(match[1]) - 1]?.name ?? null;
+}
+
 /** One logged workout in Ημερολόγιο › Ροή, with edit and void (ADR-118). */
 export function TrainingLogEntryCard({
   entry,
@@ -118,10 +129,13 @@ export function TrainingLogEntryCard({
               ? ` · ${i18n("trainingLogEffortValue", { effort: entry.perceived_effort })}`
               : ""}
           </p>
-          {entry.notes ? (
-            <p className="mt-2 whitespace-pre-wrap break-words text-sm" style={{ color: "var(--text)" }}>
-              {entry.notes}
-            </p>
+          {entry.comments.length > 0 ? (
+            <div className="mt-2">
+              <CommentList
+                comments={entry.comments}
+                anchorLabel={(comment) => rowLabel(entry, comment.exercise_id)}
+              />
+            </div>
           ) : null}
           {entry.performed_exercises.length > 0 ? (
             <ul className="mt-2 grid gap-1 text-sm" style={{ color: "var(--muted)" }}>
@@ -357,6 +371,7 @@ function EntryForm({
   onDone: () => void;
 }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("MemberApp.comments");
   const queryClient = useQueryClient();
   const sourceType = state.mode === "create" ? state.source.sourceType : state.entry.source_type;
   const sections =
@@ -368,6 +383,7 @@ function EntryForm({
   const [errors, setErrors] = useState<TrainingLogFormError[]>([]);
   const [queued, setQueued] = useState(false);
   const submitCommand = useOutboxCommand();
+  const commentWriter = useJournalCommentWriter();
 
   const mutation = useMutation({
     // ADR-120: new entries go through the durable outbox (the form's
@@ -383,6 +399,8 @@ function EntryForm({
       }
 
       await updateTrainingLogEntry(token, state.entry.id, buildUpdatePayload(form, state.entry, sections, browserTimezone()));
+      const draft = commentDraftFromForm(form, state.entry.id);
+      if (draft) await commentWriter.save(draft);
       return { queued: false };
     },
     onSuccess: async (result) => {
@@ -561,14 +579,26 @@ function EntryForm({
         </button>
       </fieldset>
 
+      {state.mode === "edit" && state.entry.comments.length > 0 ? (
+        <CommentList
+          comments={state.entry.comments}
+          anchorLabel={(comment) => rowLabel(state.entry, comment.exercise_id)}
+          onDelete={async (comment) => {
+            await commentWriter.remove(comment.id);
+            await queryClient.invalidateQueries({ queryKey: ["training-log"] });
+          }}
+        />
+      ) : null}
+
       <label className={labelClass} style={{ color: "var(--dim)" }}>
-        {i18n("trainingLogFormNotes")}
+        {t("logComment")}
         <textarea
           className={`${inputClass} min-h-[96px]`}
           style={inputStyle}
-          value={form.notes}
+          value={form.comment}
           maxLength={4000}
-          onChange={(event) => update({ notes: event.target.value })}
+          placeholder={t("bodyPlaceholder")}
+          onChange={(event) => update({ comment: event.target.value })}
         />
       </label>
 

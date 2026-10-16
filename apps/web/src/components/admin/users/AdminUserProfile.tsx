@@ -39,6 +39,7 @@ import {
 import { MemberClassPlacementModal } from "@/components/admin/users/MemberClassPlacementModal";
 import { HoverHint } from "@/components/HelpTooltip";
 import { LocalizedScore } from "@/components/localized-score";
+import { CommentList } from "@/components/journal/CommentList";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -55,6 +56,7 @@ import { UserProgrammingSchedule } from "@/components/admin/users/UserProgrammin
 import { IntegerInput } from "@/components/integer-input";
 import { TrainingHistory } from "@/components/history/TrainingHistory";
 import { defaultHistoryKind } from "@/lib/training-history";
+import { sortComments } from "@/lib/journal-comments";
 import { fetchUserTrainingHistory } from "@/api/training-history";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
@@ -186,7 +188,11 @@ function PRCard({ pr }: { pr: AdminUserPR }) {
       plainChildren
     >
       {details ? <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p> : null}
-      {pr.notes ? <p className="mt-2 text-xs" style={{ color: "var(--muted)" }}>{pr.notes}</p> : null}
+      {pr.comments?.length ? (
+        <div className="mt-2">
+          <CommentList comments={sortComments(pr.comments)} />
+        </div>
+      ) : null}
       {pr.history.length ? (
         <div className="mt-3 border-s-2 ps-3" style={{ borderColor: "var(--primary)" }}>
           <p className="text-[10px] font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</p>

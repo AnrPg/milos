@@ -34,7 +34,7 @@ function execution(payload: Partial<ExecutionProgressPayload>, lockVersion: numb
     segment_cycle_counts: {},
     checked_exercise_ids: [],
     section_scores: [],
-    exercise_notes: [],
+    comments: [],
     ...payload,
   } as unknown as WorkoutExecution;
 }

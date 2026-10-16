@@ -331,40 +331,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/executions/{id}/modifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Log actual-workout modification patches */
-        post: operations["MilosTrainingWeb.ExecutionController.add_modifications"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/executions/{id}/notes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Submit an execution note and notify admins */
-        post: operations["MilosTrainingWeb.ExecutionController.submit_note"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/executions/{id}/progress": {
         parameters: {
             query?: never;
@@ -415,6 +381,41 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/journal/comments/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write or edit several comments at once (all or none) */
+        post: operations["MilosTrainingWeb.JournalCommentController.batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/journal/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Write or edit a comment on one of your entries */
+        put: operations["MilosTrainingWeb.JournalCommentController.save"];
+        post?: never;
+        /** Delete one of your comments */
+        delete: operations["MilosTrainingWeb.JournalCommentController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6535,6 +6536,114 @@ export interface components {
             /** Format: uuid */
             user_id?: string | null;
         };
+        /** JournalComment */
+        JournalComment: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** Format: uuid */
+            entry_id: string;
+            /** @enum {string} */
+            entry_kind: "execution" | "training_log" | "pr";
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            organization_id?: string | null;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags: string[];
+            /** Format: date-time */
+            updated_at?: string;
+            /** Format: uuid */
+            user_id?: string;
+            /** Format: date-time */
+            written_at: string;
+        };
+        /** JournalCommentBatch */
+        JournalCommentBatch: {
+            comments: (components["schemas"]["JournalCommentSave"] & {
+                /** Format: uuid */
+                id: string;
+            })[];
+        };
+        /**
+         * JournalCommentChange
+         * @description A structured change to the prescription (modification-patch shape); one per row and field, upserted by patch_id.
+         */
+        JournalCommentChange: {
+            actual_value?: (string | number | boolean) | null;
+            canonical_value?: (string | number | boolean) | null;
+            exercise_id?: string | null;
+            exercise_name?: string | null;
+            field: string;
+            interval_index?: number | null;
+            /** @description Accepted as the comment's text when no body is given; never stored. */
+            note?: string | null;
+            patch_id: string;
+            round_index?: number | null;
+            row_index?: number | null;
+            section_id: string;
+            section_name?: string | null;
+            segment_key?: string | null;
+            set_index?: number | null;
+            /** @enum {string|null} */
+            type?: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "sets_changed" | "exercise_substituted" | "distance_changed" | "calories_changed" | "field_changed" | "other" | null;
+            unit?: string | null;
+        };
+        /**
+         * JournalCommentInput
+         * @description A comment written together with its entry; the entry is implied.
+         */
+        JournalCommentInput: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            /** Format: uuid */
+            id?: string;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags?: string[];
+            /**
+             * Format: date-time
+             * @description When it was written on the device (never later than now).
+             */
+            written_at?: string | null;
+        };
+        /** JournalCommentResponse */
+        JournalCommentResponse: {
+            comment: components["schemas"]["JournalComment"];
+        };
+        /** JournalCommentSave */
+        JournalCommentSave: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** Format: uuid */
+            entry_id: string;
+            /** @enum {string} */
+            entry_kind: "execution" | "training_log" | "pr";
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags?: string[];
+            /**
+             * Format: date-time
+             * @description When it was written on the device (never later than now).
+             */
+            written_at?: string | null;
+        };
+        /** JournalCommentsResponse */
+        JournalCommentsResponse: {
+            comments: components["schemas"]["JournalComment"][];
+        };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
             /** @enum {string} */
@@ -6810,27 +6919,9 @@ export interface components {
         };
         /** TrainingLogCreateRequest */
         TrainingLogCreateRequest: {
+            comments?: components["schemas"]["JournalCommentInput"][];
             duration_seconds?: number | null;
-            exercise_modifications?: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             idempotency_key: string;
-            notes?: string | null;
             perceived_effort?: number | null;
             /** Format: date-time */
             performed_at: string;
@@ -6845,7 +6936,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -6867,25 +6957,8 @@ export interface components {
         TrainingLogEntry: {
             /** Format: uuid */
             booking_id?: string | null;
+            comments: components["schemas"]["JournalComment"][];
             duration_seconds?: number | null;
-            exercise_modifications: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             /** Format: uuid */
             id: string;
             idempotency_key?: string;
@@ -6894,7 +6967,6 @@ export interface components {
             lock_version: number;
             /** Format: uuid */
             master_workout_id?: string | null;
-            notes?: string | null;
             /** Format: uuid */
             organization_id?: string;
             perceived_effort?: number | null;
@@ -6912,7 +6984,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -6941,160 +7012,11 @@ export interface components {
         };
         /** TrainingLogEntryCollection */
         TrainingLogEntryCollection: {
-            entries: {
-                /** Format: uuid */
-                booking_id?: string | null;
-                duration_seconds?: number | null;
-                exercise_modifications: {
-                    actual_value: string | number | boolean;
-                    canonical_value: string | number | boolean;
-                    exercise_id?: string | null;
-                    exercise_name?: string | null;
-                    field: string;
-                    interval_index?: number | null;
-                    note?: string | null;
-                    patch_id: string;
-                    round_index?: number | null;
-                    row_index?: number | null;
-                    section_id: string;
-                    section_name?: string | null;
-                    segment_key?: string | null;
-                    set_index?: number | null;
-                    type?: string;
-                    unit?: string | null;
-                }[];
-                /** Format: uuid */
-                id: string;
-                idempotency_key?: string;
-                /** Format: date-time */
-                inserted_at?: string;
-                lock_version: number;
-                /** Format: uuid */
-                master_workout_id?: string | null;
-                notes?: string | null;
-                /** Format: uuid */
-                organization_id?: string;
-                perceived_effort?: number | null;
-                performed_at_tz?: string;
-                /** Format: date-time */
-                performed_at_utc: string;
-                performed_exercises: {
-                    calories?: number | null;
-                    distance?: number | null;
-                    /** @enum {string|null} */
-                    distance_unit?: "m" | "km" | "mi" | null;
-                    duration_seconds?: number | null;
-                    exercise_ref?: string | null;
-                    load?: number | null;
-                    /** @enum {string|null} */
-                    load_unit?: "kg" | "lb" | null;
-                    name: string;
-                    note?: string | null;
-                    reps?: number | null;
-                    row_index?: number;
-                    sets?: number | null;
-                }[];
-                scale_level_slug?: string | null;
-                section_scores: {
-                    section_id: string;
-                    unit?: string | null;
-                    value: number | string;
-                }[];
-                /** Format: uuid */
-                source_reference_id?: string | null;
-                /** @enum {string} */
-                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                /** @enum {string} */
-                status: "logged" | "voided";
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-                /** Format: uuid */
-                user_id?: string;
-                void_reason?: string | null;
-                /** Format: date-time */
-                voided_at?: string | null;
-                workout_type?: string | null;
-            }[];
+            entries: components["schemas"]["TrainingLogEntry"][];
         };
         /** TrainingLogEntryResponse */
         TrainingLogEntryResponse: {
-            /** TrainingLogEntry */
-            entry: {
-                /** Format: uuid */
-                booking_id?: string | null;
-                duration_seconds?: number | null;
-                exercise_modifications: {
-                    actual_value: string | number | boolean;
-                    canonical_value: string | number | boolean;
-                    exercise_id?: string | null;
-                    exercise_name?: string | null;
-                    field: string;
-                    interval_index?: number | null;
-                    note?: string | null;
-                    patch_id: string;
-                    round_index?: number | null;
-                    row_index?: number | null;
-                    section_id: string;
-                    section_name?: string | null;
-                    segment_key?: string | null;
-                    set_index?: number | null;
-                    type?: string;
-                    unit?: string | null;
-                }[];
-                /** Format: uuid */
-                id: string;
-                idempotency_key?: string;
-                /** Format: date-time */
-                inserted_at?: string;
-                lock_version: number;
-                /** Format: uuid */
-                master_workout_id?: string | null;
-                notes?: string | null;
-                /** Format: uuid */
-                organization_id?: string;
-                perceived_effort?: number | null;
-                performed_at_tz?: string;
-                /** Format: date-time */
-                performed_at_utc: string;
-                performed_exercises: {
-                    calories?: number | null;
-                    distance?: number | null;
-                    /** @enum {string|null} */
-                    distance_unit?: "m" | "km" | "mi" | null;
-                    duration_seconds?: number | null;
-                    exercise_ref?: string | null;
-                    load?: number | null;
-                    /** @enum {string|null} */
-                    load_unit?: "kg" | "lb" | null;
-                    name: string;
-                    note?: string | null;
-                    reps?: number | null;
-                    row_index?: number;
-                    sets?: number | null;
-                }[];
-                scale_level_slug?: string | null;
-                section_scores: {
-                    section_id: string;
-                    unit?: string | null;
-                    value: number | string;
-                }[];
-                /** Format: uuid */
-                source_reference_id?: string | null;
-                /** @enum {string} */
-                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                /** @enum {string} */
-                status: "logged" | "voided";
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-                /** Format: uuid */
-                user_id?: string;
-                void_reason?: string | null;
-                /** Format: date-time */
-                voided_at?: string | null;
-                workout_type?: string | null;
-            };
+            entry: components["schemas"]["TrainingLogEntry"];
         };
         /** TrainingLogSources */
         TrainingLogSources: {
@@ -7142,26 +7064,7 @@ export interface components {
         /** TrainingLogUpdateRequest */
         TrainingLogUpdateRequest: {
             duration_seconds?: number | null;
-            exercise_modifications?: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             expected_version?: number;
-            notes?: string | null;
             perceived_effort?: number | null;
             /** Format: date-time */
             performed_at?: string;
@@ -7176,7 +7079,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -8297,118 +8199,6 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.add_modifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Execution ID */
-                id: string;
-            };
-            cookie?: never;
-        };
-        /** @description Modifications */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    modifications: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        /** @enum {string|null} */
-                        type?: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "sets_changed" | "exercise_substituted" | "distance_changed" | "calories_changed" | "field_changed" | "other" | null;
-                        unit?: string | null;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description Execution */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.ExecutionController.submit_note": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Execution ID */
-                id: string;
-            };
-            cookie?: never;
-        };
-        /** @description Execution note params */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    exercise_id: string;
-                    /** Format: uuid */
-                    id?: string | null;
-                    note_text?: string | null;
-                    selected_text: string;
-                    selection_end: number;
-                    selection_start: number;
-                    tags?: string[];
-                };
-            };
-        };
-        responses: {
-            /** @description Execution */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     "MilosTrainingWeb.ExecutionController.update_progress": {
         parameters: {
             query?: never;
@@ -8618,6 +8408,105 @@ export interface operations {
                         version: string;
                     };
                 };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalCommentController.batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    comments: (components["schemas"]["JournalCommentSave"] & {
+                        /** Format: uuid */
+                        id: string;
+                    })[];
+                };
+            };
+        };
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: components["schemas"]["JournalComment"][];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalCommentController.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Comment id (generated by the client) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JournalCommentSave"];
+            };
+        };
+        responses: {
+            /** @description Comment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comment: components["schemas"]["JournalComment"];
+                    };
+                };
+            };
+            /** @description Entry or comment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Id belongs to another entry */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalCommentController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Comment id (generated by the client) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -9486,9 +9375,9 @@ export interface operations {
                                 [key: string]: unknown;
                             })[];
                             execution_history: {
+                                comment_count: number;
                                 /** Format: date-time */
                                 completed_at_utc?: string | null;
-                                exercise_note_count: number;
                                 /** Format: uuid */
                                 id: string | null;
                                 /** Format: uuid */
@@ -9516,7 +9405,8 @@ export interface operations {
                                 id?: string | null;
                                 /** Format: date-time */
                                 inserted_at: string | null;
-                                type: string;
+                                /** @enum {string} */
+                                type: "admin_note" | "athlete_comment";
                             } & {
                                 [key: string]: unknown;
                             })[];
@@ -22290,81 +22180,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        entries: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        }[];
+                        entries: components["schemas"]["TrainingLogEntry"][];
                     };
                 };
             };
@@ -22380,27 +22196,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     duration_seconds?: number | null;
-                    exercise_modifications?: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        type?: string;
-                        unit?: string | null;
-                    }[];
                     idempotency_key: string;
-                    notes?: string | null;
                     perceived_effort?: number | null;
                     /** Format: date-time */
                     performed_at: string;
@@ -22415,7 +22213,6 @@ export interface operations {
                         /** @enum {string|null} */
                         load_unit?: "kg" | "lb" | null;
                         name: string;
-                        note?: string | null;
                         reps?: number | null;
                         row_index?: number;
                         sets?: number | null;
@@ -22443,82 +22240,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22529,82 +22251,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22665,82 +22312,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22769,26 +22341,7 @@ export interface operations {
             content: {
                 "application/json": {
                     duration_seconds?: number | null;
-                    exercise_modifications?: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        type?: string;
-                        unit?: string | null;
-                    }[];
                     expected_version?: number;
-                    notes?: string | null;
                     perceived_effort?: number | null;
                     /** Format: date-time */
                     performed_at?: string;
@@ -22803,7 +22356,6 @@ export interface operations {
                         /** @enum {string|null} */
                         load_unit?: "kg" | "lb" | null;
                         name: string;
-                        note?: string | null;
                         reps?: number | null;
                         row_index?: number;
                         sets?: number | null;
@@ -22827,82 +22379,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22961,82 +22438,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -28765,7 +28167,6 @@ export interface operations {
                                     id: string;
                                     /** Format: date-time */
                                     inserted_at?: string;
-                                    notes?: string | null;
                                     score: number;
                                     supporting_metrics?: {
                                         [key: string]: unknown;
@@ -28774,7 +28175,6 @@ export interface operations {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                notes?: string | null;
                                 /** Format: uuid */
                                 organization_id?: string | null;
                                 supporting_metrics?: {
@@ -28827,10 +28227,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score: number;
                     higher_is_better?: boolean;
                     name: string;
-                    notes?: string;
                     /** @description Gym the PR was achieved in (ADR-129). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
                     organization_slug?: string | null;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
@@ -28909,10 +28309,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on?: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score?: number;
                     higher_is_better?: boolean;
                     name?: string;
-                    notes?: string;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
                     /** @enum {string} */
@@ -28966,10 +28366,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on?: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score?: number;
                     higher_is_better?: boolean;
                     name?: string;
-                    notes?: string;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
                     /** @enum {string} */

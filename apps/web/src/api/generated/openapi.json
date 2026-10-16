@@ -4444,6 +4444,403 @@
         "title": "InventorySupplyMovement",
         "type": "object"
       },
+      "JournalComment": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "nullable": true,
+            "type": "string"
+          },
+          "change": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/JournalCommentChange"
+              }
+            ],
+            "nullable": true
+          },
+          "entry_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "entry_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "pr"
+            ],
+            "type": "string"
+          },
+          "exercise_id": {
+            "description": "Exercise id, or `row:<n>` for a training-log row.",
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "section_id": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "selected_text": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          },
+          "selection_end": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "selection_start": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "written_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "entry_kind",
+          "entry_id",
+          "tags",
+          "written_at"
+        ],
+        "title": "JournalComment",
+        "type": "object"
+      },
+      "JournalCommentBatch": {
+        "properties": {
+          "comments": {
+            "items": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/JournalCommentSave"
+                },
+                {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                }
+              ]
+            },
+            "maxItems": 200,
+            "type": "array"
+          }
+        },
+        "required": [
+          "comments"
+        ],
+        "title": "JournalCommentBatch",
+        "type": "object"
+      },
+      "JournalCommentChange": {
+        "description": "A structured change to the prescription (modification-patch shape); one per row and field, upserted by patch_id.",
+        "properties": {
+          "actual_value": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "canonical_value": {
+            "nullable": true,
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "exercise_id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "exercise_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "interval_index": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "note": {
+            "description": "Accepted as the comment's text when no body is given; never stored.",
+            "nullable": true,
+            "type": "string"
+          },
+          "patch_id": {
+            "type": "string"
+          },
+          "round_index": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "row_index": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "section_id": {
+            "type": "string"
+          },
+          "section_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "segment_key": {
+            "nullable": true,
+            "type": "string"
+          },
+          "set_index": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "type": {
+            "enum": [
+              "skipped",
+              "weight_changed",
+              "reps_changed",
+              "time_changed",
+              "sets_changed",
+              "exercise_substituted",
+              "distance_changed",
+              "calories_changed",
+              "field_changed",
+              "other"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "unit": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "patch_id",
+          "section_id",
+          "field"
+        ],
+        "title": "JournalCommentChange",
+        "type": "object"
+      },
+      "JournalCommentInput": {
+        "description": "A comment written together with its entry; the entry is implied.",
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "nullable": true,
+            "type": "string"
+          },
+          "change": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/JournalCommentChange"
+              }
+            ],
+            "nullable": true
+          },
+          "exercise_id": {
+            "description": "Exercise id, or `row:<n>` for a training-log row.",
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "section_id": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "selected_text": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          },
+          "selection_end": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "selection_start": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "written_at": {
+            "description": "When it was written on the device (never later than now).",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "JournalCommentInput",
+        "type": "object"
+      },
+      "JournalCommentResponse": {
+        "properties": {
+          "comment": {
+            "$ref": "#/components/schemas/JournalComment"
+          }
+        },
+        "required": [
+          "comment"
+        ],
+        "title": "JournalCommentResponse",
+        "type": "object"
+      },
+      "JournalCommentSave": {
+        "properties": {
+          "body": {
+            "maxLength": 4000,
+            "nullable": true,
+            "type": "string"
+          },
+          "change": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/JournalCommentChange"
+              }
+            ],
+            "nullable": true
+          },
+          "entry_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "entry_kind": {
+            "enum": [
+              "execution",
+              "training_log",
+              "pr"
+            ],
+            "type": "string"
+          },
+          "exercise_id": {
+            "description": "Exercise id, or `row:<n>` for a training-log row.",
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "section_id": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "selected_text": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          },
+          "selection_end": {
+            "minimum": 1,
+            "nullable": true,
+            "type": "integer"
+          },
+          "selection_start": {
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "written_at": {
+            "description": "When it was written on the device (never later than now).",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "entry_kind",
+          "entry_id"
+        ],
+        "title": "JournalCommentSave",
+        "type": "object"
+      },
+      "JournalCommentsResponse": {
+        "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/JournalComment"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "comments"
+        ],
+        "title": "JournalCommentsResponse",
+        "type": "object"
+      },
       "MyInjuryWarningsAcknowledged": {
         "additionalProperties": false,
         "properties": {
@@ -5404,113 +5801,22 @@
       "TrainingLogCreateRequest": {
         "additionalProperties": false,
         "properties": {
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/JournalCommentInput"
+            },
+            "maxItems": 200,
+            "type": "array"
+          },
           "duration_seconds": {
             "maximum": 86400,
             "minimum": 0,
             "nullable": true,
             "type": "integer"
           },
-          "exercise_modifications": {
-            "items": {
-              "properties": {
-                "actual_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "canonical_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "exercise_id": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "exercise_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "field": {
-                  "type": "string"
-                },
-                "interval_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "note": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "patch_id": {
-                  "type": "string"
-                },
-                "round_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "row_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "section_id": {
-                  "type": "string"
-                },
-                "section_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "segment_key": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "set_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "type": {
-                  "type": "string"
-                },
-                "unit": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "required": [
-                "patch_id",
-                "section_id",
-                "field",
-                "canonical_value",
-                "actual_value"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
           "idempotency_key": {
             "maxLength": 128,
             "minLength": 8,
-            "type": "string"
-          },
-          "notes": {
-            "maxLength": 4000,
-            "nullable": true,
             "type": "string"
           },
           "perceived_effort": {
@@ -5571,11 +5877,6 @@
                 "name": {
                   "maxLength": 120,
                   "minLength": 1,
-                  "type": "string"
-                },
-                "note": {
-                  "maxLength": 500,
-                  "nullable": true,
                   "type": "string"
                 },
                 "reps": {
@@ -5674,102 +5975,15 @@
             "nullable": true,
             "type": "string"
           },
+          "comments": {
+            "items": {
+              "$ref": "#/components/schemas/JournalComment"
+            },
+            "type": "array"
+          },
           "duration_seconds": {
             "nullable": true,
             "type": "integer"
-          },
-          "exercise_modifications": {
-            "items": {
-              "properties": {
-                "actual_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "canonical_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "exercise_id": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "exercise_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "field": {
-                  "type": "string"
-                },
-                "interval_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "note": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "patch_id": {
-                  "type": "string"
-                },
-                "round_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "row_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "section_id": {
-                  "type": "string"
-                },
-                "section_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "segment_key": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "set_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "type": {
-                  "type": "string"
-                },
-                "unit": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "required": [
-                "patch_id",
-                "section_id",
-                "field",
-                "canonical_value",
-                "actual_value"
-              ],
-              "type": "object"
-            },
-            "type": "array"
           },
           "id": {
             "format": "uuid",
@@ -5787,10 +6001,6 @@
           },
           "master_workout_id": {
             "format": "uuid",
-            "nullable": true,
-            "type": "string"
-          },
-          "notes": {
             "nullable": true,
             "type": "string"
           },
@@ -5857,11 +6067,6 @@
                 "name": {
                   "maxLength": 120,
                   "minLength": 1,
-                  "type": "string"
-                },
-                "note": {
-                  "maxLength": 500,
-                  "nullable": true,
                   "type": "string"
                 },
                 "reps": {
@@ -5973,8 +6178,8 @@
           "status",
           "lock_version",
           "section_scores",
-          "exercise_modifications",
-          "performed_exercises"
+          "performed_exercises",
+          "comments"
         ],
         "title": "TrainingLogEntry",
         "type": "object"
@@ -5983,316 +6188,7 @@
         "properties": {
           "entries": {
             "items": {
-              "properties": {
-                "booking_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "duration_seconds": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "exercise_modifications": {
-                  "items": {
-                    "properties": {
-                      "actual_value": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "boolean"
-                          }
-                        ]
-                      },
-                      "canonical_value": {
-                        "oneOf": [
-                          {
-                            "type": "string"
-                          },
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "boolean"
-                          }
-                        ]
-                      },
-                      "exercise_id": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "exercise_name": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "field": {
-                        "type": "string"
-                      },
-                      "interval_index": {
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "note": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "patch_id": {
-                        "type": "string"
-                      },
-                      "round_index": {
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "row_index": {
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "section_id": {
-                        "type": "string"
-                      },
-                      "section_name": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "segment_key": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "set_index": {
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "type": {
-                        "type": "string"
-                      },
-                      "unit": {
-                        "nullable": true,
-                        "type": "string"
-                      }
-                    },
-                    "required": [
-                      "patch_id",
-                      "section_id",
-                      "field",
-                      "canonical_value",
-                      "actual_value"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
-                },
-                "id": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "idempotency_key": {
-                  "type": "string"
-                },
-                "inserted_at": {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                "lock_version": {
-                  "type": "integer"
-                },
-                "master_workout_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "notes": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "organization_id": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "perceived_effort": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "performed_at_tz": {
-                  "type": "string"
-                },
-                "performed_at_utc": {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                "performed_exercises": {
-                  "items": {
-                    "properties": {
-                      "calories": {
-                        "minimum": 0,
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "distance": {
-                        "minimum": 0,
-                        "nullable": true,
-                        "type": "number"
-                      },
-                      "distance_unit": {
-                        "enum": [
-                          "m",
-                          "km",
-                          "mi"
-                        ],
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "duration_seconds": {
-                        "minimum": 0,
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "exercise_ref": {
-                        "maxLength": 120,
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "load": {
-                        "minimum": 0,
-                        "nullable": true,
-                        "type": "number"
-                      },
-                      "load_unit": {
-                        "enum": [
-                          "kg",
-                          "lb"
-                        ],
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "name": {
-                        "maxLength": 120,
-                        "minLength": 1,
-                        "type": "string"
-                      },
-                      "note": {
-                        "maxLength": 500,
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "reps": {
-                        "minimum": 0,
-                        "nullable": true,
-                        "type": "integer"
-                      },
-                      "row_index": {
-                        "type": "integer"
-                      },
-                      "sets": {
-                        "maximum": 100,
-                        "minimum": 1,
-                        "nullable": true,
-                        "type": "integer"
-                      }
-                    },
-                    "required": [
-                      "name"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
-                },
-                "scale_level_slug": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "section_scores": {
-                  "items": {
-                    "properties": {
-                      "section_id": {
-                        "type": "string"
-                      },
-                      "unit": {
-                        "nullable": true,
-                        "type": "string"
-                      },
-                      "value": {
-                        "oneOf": [
-                          {
-                            "type": "number"
-                          },
-                          {
-                            "type": "string"
-                          }
-                        ]
-                      }
-                    },
-                    "required": [
-                      "section_id",
-                      "value"
-                    ],
-                    "type": "object"
-                  },
-                  "type": "array"
-                },
-                "source_reference_id": {
-                  "format": "uuid",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "source_type": {
-                  "enum": [
-                    "class",
-                    "assigned_workout",
-                    "library_workout",
-                    "freeform"
-                  ],
-                  "type": "string"
-                },
-                "status": {
-                  "enum": [
-                    "logged",
-                    "voided"
-                  ],
-                  "type": "string"
-                },
-                "title": {
-                  "type": "string"
-                },
-                "updated_at": {
-                  "format": "date-time",
-                  "type": "string"
-                },
-                "user_id": {
-                  "format": "uuid",
-                  "type": "string"
-                },
-                "void_reason": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "voided_at": {
-                  "format": "date-time",
-                  "nullable": true,
-                  "type": "string"
-                },
-                "workout_type": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "required": [
-                "id",
-                "source_type",
-                "title",
-                "performed_at_utc",
-                "status",
-                "lock_version",
-                "section_scores",
-                "exercise_modifications",
-                "performed_exercises"
-              ],
-              "title": "TrainingLogEntry",
-              "type": "object"
+              "$ref": "#/components/schemas/TrainingLogEntry"
             },
             "type": "array"
           }
@@ -6306,316 +6202,7 @@
       "TrainingLogEntryResponse": {
         "properties": {
           "entry": {
-            "properties": {
-              "booking_id": {
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
-              },
-              "duration_seconds": {
-                "nullable": true,
-                "type": "integer"
-              },
-              "exercise_modifications": {
-                "items": {
-                  "properties": {
-                    "actual_value": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        }
-                      ]
-                    },
-                    "canonical_value": {
-                      "oneOf": [
-                        {
-                          "type": "string"
-                        },
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "boolean"
-                        }
-                      ]
-                    },
-                    "exercise_id": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "exercise_name": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "field": {
-                      "type": "string"
-                    },
-                    "interval_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "note": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "patch_id": {
-                      "type": "string"
-                    },
-                    "round_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "row_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "section_id": {
-                      "type": "string"
-                    },
-                    "section_name": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "segment_key": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "set_index": {
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "type": {
-                      "type": "string"
-                    },
-                    "unit": {
-                      "nullable": true,
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "patch_id",
-                    "section_id",
-                    "field",
-                    "canonical_value",
-                    "actual_value"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "idempotency_key": {
-                "type": "string"
-              },
-              "inserted_at": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "lock_version": {
-                "type": "integer"
-              },
-              "master_workout_id": {
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
-              },
-              "notes": {
-                "nullable": true,
-                "type": "string"
-              },
-              "organization_id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "perceived_effort": {
-                "nullable": true,
-                "type": "integer"
-              },
-              "performed_at_tz": {
-                "type": "string"
-              },
-              "performed_at_utc": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "performed_exercises": {
-                "items": {
-                  "properties": {
-                    "calories": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "distance": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "distance_unit": {
-                      "enum": [
-                        "m",
-                        "km",
-                        "mi"
-                      ],
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "duration_seconds": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "exercise_ref": {
-                      "maxLength": 120,
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "load": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "number"
-                    },
-                    "load_unit": {
-                      "enum": [
-                        "kg",
-                        "lb"
-                      ],
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "name": {
-                      "maxLength": 120,
-                      "minLength": 1,
-                      "type": "string"
-                    },
-                    "note": {
-                      "maxLength": 500,
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "reps": {
-                      "minimum": 0,
-                      "nullable": true,
-                      "type": "integer"
-                    },
-                    "row_index": {
-                      "type": "integer"
-                    },
-                    "sets": {
-                      "maximum": 100,
-                      "minimum": 1,
-                      "nullable": true,
-                      "type": "integer"
-                    }
-                  },
-                  "required": [
-                    "name"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "scale_level_slug": {
-                "nullable": true,
-                "type": "string"
-              },
-              "section_scores": {
-                "items": {
-                  "properties": {
-                    "section_id": {
-                      "type": "string"
-                    },
-                    "unit": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "value": {
-                      "oneOf": [
-                        {
-                          "type": "number"
-                        },
-                        {
-                          "type": "string"
-                        }
-                      ]
-                    }
-                  },
-                  "required": [
-                    "section_id",
-                    "value"
-                  ],
-                  "type": "object"
-                },
-                "type": "array"
-              },
-              "source_reference_id": {
-                "format": "uuid",
-                "nullable": true,
-                "type": "string"
-              },
-              "source_type": {
-                "enum": [
-                  "class",
-                  "assigned_workout",
-                  "library_workout",
-                  "freeform"
-                ],
-                "type": "string"
-              },
-              "status": {
-                "enum": [
-                  "logged",
-                  "voided"
-                ],
-                "type": "string"
-              },
-              "title": {
-                "type": "string"
-              },
-              "updated_at": {
-                "format": "date-time",
-                "type": "string"
-              },
-              "user_id": {
-                "format": "uuid",
-                "type": "string"
-              },
-              "void_reason": {
-                "nullable": true,
-                "type": "string"
-              },
-              "voided_at": {
-                "format": "date-time",
-                "nullable": true,
-                "type": "string"
-              },
-              "workout_type": {
-                "nullable": true,
-                "type": "string"
-              }
-            },
-            "required": [
-              "id",
-              "source_type",
-              "title",
-              "performed_at_utc",
-              "status",
-              "lock_version",
-              "section_scores",
-              "exercise_modifications",
-              "performed_exercises"
-            ],
-            "title": "TrainingLogEntry",
-            "type": "object"
+            "$ref": "#/components/schemas/TrainingLogEntry"
           }
         },
         "required": [
@@ -6792,107 +6379,9 @@
             "nullable": true,
             "type": "integer"
           },
-          "exercise_modifications": {
-            "items": {
-              "properties": {
-                "actual_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "canonical_value": {
-                  "oneOf": [
-                    {
-                      "type": "string"
-                    },
-                    {
-                      "type": "number"
-                    },
-                    {
-                      "type": "boolean"
-                    }
-                  ]
-                },
-                "exercise_id": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "exercise_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "field": {
-                  "type": "string"
-                },
-                "interval_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "note": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "patch_id": {
-                  "type": "string"
-                },
-                "round_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "row_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "section_id": {
-                  "type": "string"
-                },
-                "section_name": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "segment_key": {
-                  "nullable": true,
-                  "type": "string"
-                },
-                "set_index": {
-                  "nullable": true,
-                  "type": "integer"
-                },
-                "type": {
-                  "type": "string"
-                },
-                "unit": {
-                  "nullable": true,
-                  "type": "string"
-                }
-              },
-              "required": [
-                "patch_id",
-                "section_id",
-                "field",
-                "canonical_value",
-                "actual_value"
-              ],
-              "type": "object"
-            },
-            "type": "array"
-          },
           "expected_version": {
             "minimum": 1,
             "type": "integer"
-          },
-          "notes": {
-            "maxLength": 4000,
-            "nullable": true,
-            "type": "string"
           },
           "perceived_effort": {
             "maximum": 10,
@@ -6952,11 +6441,6 @@
                 "name": {
                   "maxLength": 120,
                   "minLength": 1,
-                  "type": "string"
-                },
-                "note": {
-                  "maxLength": 500,
-                  "nullable": true,
                   "type": "string"
                 },
                 "reps": {
@@ -9536,288 +9020,6 @@
         ]
       }
     },
-    "/api/executions/{id}/modifications": {
-      "post": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.ExecutionController.add_modifications",
-        "parameters": [
-          {
-            "description": "Execution ID",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "modifications": {
-                    "items": {
-                      "properties": {
-                        "actual_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "canonical_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "exercise_id": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "exercise_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "field": {
-                          "type": "string"
-                        },
-                        "interval_index": {
-                          "minimum": 1,
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "note": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "patch_id": {
-                          "type": "string"
-                        },
-                        "round_index": {
-                          "minimum": 1,
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "row_index": {
-                          "minimum": 1,
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "section_id": {
-                          "type": "string"
-                        },
-                        "section_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "segment_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "set_index": {
-                          "minimum": 1,
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "type": {
-                          "enum": [
-                            "skipped",
-                            "weight_changed",
-                            "reps_changed",
-                            "time_changed",
-                            "sets_changed",
-                            "exercise_substituted",
-                            "distance_changed",
-                            "calories_changed",
-                            "field_changed",
-                            "other"
-                          ],
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "unit": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "patch_id",
-                        "section_id",
-                        "field",
-                        "canonical_value",
-                        "actual_value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "modifications"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "description": "Modifications",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Execution"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Log actual-workout modification patches",
-        "tags": [
-          "Execution"
-        ]
-      }
-    },
-    "/api/executions/{id}/notes": {
-      "post": {
-        "callbacks": {},
-        "operationId": "MilosTrainingWeb.ExecutionController.submit_note",
-        "parameters": [
-          {
-            "description": "Execution ID",
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "properties": {
-                  "exercise_id": {
-                    "type": "string"
-                  },
-                  "id": {
-                    "format": "uuid",
-                    "nullable": true,
-                    "type": "string"
-                  },
-                  "note_text": {
-                    "nullable": true,
-                    "type": "string"
-                  },
-                  "selected_text": {
-                    "type": "string"
-                  },
-                  "selection_end": {
-                    "minimum": 1,
-                    "type": "integer"
-                  },
-                  "selection_start": {
-                    "minimum": 0,
-                    "type": "integer"
-                  },
-                  "tags": {
-                    "items": {
-                      "type": "string"
-                    },
-                    "type": "array"
-                  }
-                },
-                "required": [
-                  "exercise_id",
-                  "selected_text",
-                  "selection_start",
-                  "selection_end"
-                ],
-                "type": "object"
-              }
-            }
-          },
-          "description": "Execution note params",
-          "required": false
-        },
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Execution"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Error"
-          }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ],
-        "summary": "Submit an execution note and notify admins",
-        "tags": [
-          "Execution"
-        ]
-      }
-    },
     "/api/executions/{id}/progress": {
       "patch": {
         "callbacks": {},
@@ -10242,6 +9444,193 @@
         "summary": "Read API health",
         "tags": [
           "Health"
+        ]
+      }
+    },
+    "/api/journal/comments/batch": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalCommentController.batch",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "comments": {
+                    "items": {
+                      "allOf": [
+                        {
+                          "$ref": "#/components/schemas/JournalCommentSave"
+                        },
+                        {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        }
+                      ]
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "comments"
+                ],
+                "title": "JournalCommentBatch",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comments": {
+                      "items": {
+                        "$ref": "#/components/schemas/JournalComment"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "comments"
+                  ],
+                  "title": "JournalCommentsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comments"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write or edit several comments at once (all or none)",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/journal/comments/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalCommentController.delete",
+        "parameters": [
+          {
+            "description": "Comment id (generated by the client)",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete one of your comments",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalCommentController.save",
+        "parameters": [
+          {
+            "description": "Comment id (generated by the client)",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/JournalCommentSave"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comment": {
+                      "$ref": "#/components/schemas/JournalComment"
+                    }
+                  },
+                  "required": [
+                    "comment"
+                  ],
+                  "title": "JournalCommentResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comment"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry or comment not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Id belongs to another entry"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write or edit a comment on one of your entries",
+        "tags": [
+          "Journal"
         ]
       }
     },
@@ -12172,13 +11561,13 @@
                           "items": {
                             "additionalProperties": false,
                             "properties": {
+                              "comment_count": {
+                                "type": "integer"
+                              },
                               "completed_at_utc": {
                                 "format": "date-time",
                                 "nullable": true,
                                 "type": "string"
-                              },
-                              "exercise_note_count": {
-                                "type": "integer"
                               },
                               "id": {
                                 "format": "uuid",
@@ -12223,7 +11612,7 @@
                               "id",
                               "status",
                               "section_scores",
-                              "exercise_note_count"
+                              "comment_count"
                             ],
                             "type": "object"
                           },
@@ -12276,6 +11665,10 @@
                                 "type": "string"
                               },
                               "type": {
+                                "enum": [
+                                  "admin_note",
+                                  "athlete_comment"
+                                ],
                                 "type": "string"
                               }
                             },
@@ -45458,316 +44851,7 @@
                   "properties": {
                     "entries": {
                       "items": {
-                        "properties": {
-                          "booking_id": {
-                            "format": "uuid",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "duration_seconds": {
-                            "nullable": true,
-                            "type": "integer"
-                          },
-                          "exercise_modifications": {
-                            "items": {
-                              "properties": {
-                                "actual_value": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    },
-                                    {
-                                      "type": "boolean"
-                                    }
-                                  ]
-                                },
-                                "canonical_value": {
-                                  "oneOf": [
-                                    {
-                                      "type": "string"
-                                    },
-                                    {
-                                      "type": "number"
-                                    },
-                                    {
-                                      "type": "boolean"
-                                    }
-                                  ]
-                                },
-                                "exercise_id": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "exercise_name": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "field": {
-                                  "type": "string"
-                                },
-                                "interval_index": {
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "note": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "patch_id": {
-                                  "type": "string"
-                                },
-                                "round_index": {
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "row_index": {
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "section_id": {
-                                  "type": "string"
-                                },
-                                "section_name": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "segment_key": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "set_index": {
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "type": {
-                                  "type": "string"
-                                },
-                                "unit": {
-                                  "nullable": true,
-                                  "type": "string"
-                                }
-                              },
-                              "required": [
-                                "patch_id",
-                                "section_id",
-                                "field",
-                                "canonical_value",
-                                "actual_value"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          },
-                          "id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "idempotency_key": {
-                            "type": "string"
-                          },
-                          "inserted_at": {
-                            "format": "date-time",
-                            "type": "string"
-                          },
-                          "lock_version": {
-                            "type": "integer"
-                          },
-                          "master_workout_id": {
-                            "format": "uuid",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "notes": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "organization_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "perceived_effort": {
-                            "nullable": true,
-                            "type": "integer"
-                          },
-                          "performed_at_tz": {
-                            "type": "string"
-                          },
-                          "performed_at_utc": {
-                            "format": "date-time",
-                            "type": "string"
-                          },
-                          "performed_exercises": {
-                            "items": {
-                              "properties": {
-                                "calories": {
-                                  "minimum": 0,
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "distance": {
-                                  "minimum": 0,
-                                  "nullable": true,
-                                  "type": "number"
-                                },
-                                "distance_unit": {
-                                  "enum": [
-                                    "m",
-                                    "km",
-                                    "mi"
-                                  ],
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "duration_seconds": {
-                                  "minimum": 0,
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "exercise_ref": {
-                                  "maxLength": 120,
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "load": {
-                                  "minimum": 0,
-                                  "nullable": true,
-                                  "type": "number"
-                                },
-                                "load_unit": {
-                                  "enum": [
-                                    "kg",
-                                    "lb"
-                                  ],
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "name": {
-                                  "maxLength": 120,
-                                  "minLength": 1,
-                                  "type": "string"
-                                },
-                                "note": {
-                                  "maxLength": 500,
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "reps": {
-                                  "minimum": 0,
-                                  "nullable": true,
-                                  "type": "integer"
-                                },
-                                "row_index": {
-                                  "type": "integer"
-                                },
-                                "sets": {
-                                  "maximum": 100,
-                                  "minimum": 1,
-                                  "nullable": true,
-                                  "type": "integer"
-                                }
-                              },
-                              "required": [
-                                "name"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          },
-                          "scale_level_slug": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "section_scores": {
-                            "items": {
-                              "properties": {
-                                "section_id": {
-                                  "type": "string"
-                                },
-                                "unit": {
-                                  "nullable": true,
-                                  "type": "string"
-                                },
-                                "value": {
-                                  "oneOf": [
-                                    {
-                                      "type": "number"
-                                    },
-                                    {
-                                      "type": "string"
-                                    }
-                                  ]
-                                }
-                              },
-                              "required": [
-                                "section_id",
-                                "value"
-                              ],
-                              "type": "object"
-                            },
-                            "type": "array"
-                          },
-                          "source_reference_id": {
-                            "format": "uuid",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "source_type": {
-                            "enum": [
-                              "class",
-                              "assigned_workout",
-                              "library_workout",
-                              "freeform"
-                            ],
-                            "type": "string"
-                          },
-                          "status": {
-                            "enum": [
-                              "logged",
-                              "voided"
-                            ],
-                            "type": "string"
-                          },
-                          "title": {
-                            "type": "string"
-                          },
-                          "updated_at": {
-                            "format": "date-time",
-                            "type": "string"
-                          },
-                          "user_id": {
-                            "format": "uuid",
-                            "type": "string"
-                          },
-                          "void_reason": {
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "voided_at": {
-                            "format": "date-time",
-                            "nullable": true,
-                            "type": "string"
-                          },
-                          "workout_type": {
-                            "nullable": true,
-                            "type": "string"
-                          }
-                        },
-                        "required": [
-                          "id",
-                          "source_type",
-                          "title",
-                          "performed_at_utc",
-                          "status",
-                          "lock_version",
-                          "section_scores",
-                          "exercise_modifications",
-                          "performed_exercises"
-                        ],
-                        "title": "TrainingLogEntry",
-                        "type": "object"
+                        "$ref": "#/components/schemas/TrainingLogEntry"
                       },
                       "type": "array"
                     }
@@ -45804,113 +44888,22 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "comments": {
+                    "items": {
+                      "$ref": "#/components/schemas/JournalCommentInput"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "duration_seconds": {
                     "maximum": 86400,
                     "minimum": 0,
                     "nullable": true,
                     "type": "integer"
                   },
-                  "exercise_modifications": {
-                    "items": {
-                      "properties": {
-                        "actual_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "canonical_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "exercise_id": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "exercise_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "field": {
-                          "type": "string"
-                        },
-                        "interval_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "note": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "patch_id": {
-                          "type": "string"
-                        },
-                        "round_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "row_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "section_id": {
-                          "type": "string"
-                        },
-                        "section_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "segment_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "set_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "type": {
-                          "type": "string"
-                        },
-                        "unit": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "patch_id",
-                        "section_id",
-                        "field",
-                        "canonical_value",
-                        "actual_value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
                   "idempotency_key": {
                     "maxLength": 128,
                     "minLength": 8,
-                    "type": "string"
-                  },
-                  "notes": {
-                    "maxLength": 4000,
-                    "nullable": true,
                     "type": "string"
                   },
                   "perceived_effort": {
@@ -45971,11 +44964,6 @@
                         "name": {
                           "maxLength": 120,
                           "minLength": 1,
-                          "type": "string"
-                        },
-                        "note": {
-                          "maxLength": 500,
-                          "nullable": true,
                           "type": "string"
                         },
                         "reps": {
@@ -46078,316 +45066,7 @@
                 "schema": {
                   "properties": {
                     "entry": {
-                      "properties": {
-                        "booking_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "duration_seconds": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "exercise_modifications": {
-                          "items": {
-                            "properties": {
-                              "actual_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "canonical_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "exercise_id": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "exercise_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "field": {
-                                "type": "string"
-                              },
-                              "interval_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "note": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "patch_id": {
-                                "type": "string"
-                              },
-                              "round_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "section_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "segment_key": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "set_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "type": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "patch_id",
-                              "section_id",
-                              "field",
-                              "canonical_value",
-                              "actual_value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "idempotency_key": {
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "lock_version": {
-                          "type": "integer"
-                        },
-                        "master_workout_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "organization_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "perceived_effort": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "performed_at_tz": {
-                          "type": "string"
-                        },
-                        "performed_at_utc": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "performed_exercises": {
-                          "items": {
-                            "properties": {
-                              "calories": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "distance": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "distance_unit": {
-                                "enum": [
-                                  "m",
-                                  "km",
-                                  "mi"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "duration_seconds": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "exercise_ref": {
-                                "maxLength": 120,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "load": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "load_unit": {
-                                "enum": [
-                                  "kg",
-                                  "lb"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "note": {
-                                "maxLength": 500,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "reps": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "type": "integer"
-                              },
-                              "sets": {
-                                "maximum": 100,
-                                "minimum": 1,
-                                "nullable": true,
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "scale_level_slug": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "section_scores": {
-                          "items": {
-                            "properties": {
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "value": {
-                                "oneOf": [
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "string"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "section_id",
-                              "value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "source_reference_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "source_type": {
-                          "enum": [
-                            "class",
-                            "assigned_workout",
-                            "library_workout",
-                            "freeform"
-                          ],
-                          "type": "string"
-                        },
-                        "status": {
-                          "enum": [
-                            "logged",
-                            "voided"
-                          ],
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "void_reason": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "voided_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "workout_type": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "source_type",
-                        "title",
-                        "performed_at_utc",
-                        "status",
-                        "lock_version",
-                        "section_scores",
-                        "exercise_modifications",
-                        "performed_exercises"
-                      ],
-                      "title": "TrainingLogEntry",
-                      "type": "object"
+                      "$ref": "#/components/schemas/TrainingLogEntry"
                     }
                   },
                   "required": [
@@ -46406,316 +45085,7 @@
                 "schema": {
                   "properties": {
                     "entry": {
-                      "properties": {
-                        "booking_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "duration_seconds": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "exercise_modifications": {
-                          "items": {
-                            "properties": {
-                              "actual_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "canonical_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "exercise_id": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "exercise_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "field": {
-                                "type": "string"
-                              },
-                              "interval_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "note": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "patch_id": {
-                                "type": "string"
-                              },
-                              "round_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "section_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "segment_key": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "set_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "type": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "patch_id",
-                              "section_id",
-                              "field",
-                              "canonical_value",
-                              "actual_value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "idempotency_key": {
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "lock_version": {
-                          "type": "integer"
-                        },
-                        "master_workout_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "organization_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "perceived_effort": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "performed_at_tz": {
-                          "type": "string"
-                        },
-                        "performed_at_utc": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "performed_exercises": {
-                          "items": {
-                            "properties": {
-                              "calories": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "distance": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "distance_unit": {
-                                "enum": [
-                                  "m",
-                                  "km",
-                                  "mi"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "duration_seconds": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "exercise_ref": {
-                                "maxLength": 120,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "load": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "load_unit": {
-                                "enum": [
-                                  "kg",
-                                  "lb"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "note": {
-                                "maxLength": 500,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "reps": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "type": "integer"
-                              },
-                              "sets": {
-                                "maximum": 100,
-                                "minimum": 1,
-                                "nullable": true,
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "scale_level_slug": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "section_scores": {
-                          "items": {
-                            "properties": {
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "value": {
-                                "oneOf": [
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "string"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "section_id",
-                              "value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "source_reference_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "source_type": {
-                          "enum": [
-                            "class",
-                            "assigned_workout",
-                            "library_workout",
-                            "freeform"
-                          ],
-                          "type": "string"
-                        },
-                        "status": {
-                          "enum": [
-                            "logged",
-                            "voided"
-                          ],
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "void_reason": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "voided_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "workout_type": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "source_type",
-                        "title",
-                        "performed_at_utc",
-                        "status",
-                        "lock_version",
-                        "section_scores",
-                        "exercise_modifications",
-                        "performed_exercises"
-                      ],
-                      "title": "TrainingLogEntry",
-                      "type": "object"
+                      "$ref": "#/components/schemas/TrainingLogEntry"
                     }
                   },
                   "required": [
@@ -46803,316 +45173,7 @@
                 "schema": {
                   "properties": {
                     "entry": {
-                      "properties": {
-                        "booking_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "duration_seconds": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "exercise_modifications": {
-                          "items": {
-                            "properties": {
-                              "actual_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "canonical_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "exercise_id": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "exercise_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "field": {
-                                "type": "string"
-                              },
-                              "interval_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "note": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "patch_id": {
-                                "type": "string"
-                              },
-                              "round_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "section_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "segment_key": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "set_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "type": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "patch_id",
-                              "section_id",
-                              "field",
-                              "canonical_value",
-                              "actual_value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "idempotency_key": {
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "lock_version": {
-                          "type": "integer"
-                        },
-                        "master_workout_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "organization_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "perceived_effort": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "performed_at_tz": {
-                          "type": "string"
-                        },
-                        "performed_at_utc": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "performed_exercises": {
-                          "items": {
-                            "properties": {
-                              "calories": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "distance": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "distance_unit": {
-                                "enum": [
-                                  "m",
-                                  "km",
-                                  "mi"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "duration_seconds": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "exercise_ref": {
-                                "maxLength": 120,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "load": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "load_unit": {
-                                "enum": [
-                                  "kg",
-                                  "lb"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "note": {
-                                "maxLength": 500,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "reps": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "type": "integer"
-                              },
-                              "sets": {
-                                "maximum": 100,
-                                "minimum": 1,
-                                "nullable": true,
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "scale_level_slug": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "section_scores": {
-                          "items": {
-                            "properties": {
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "value": {
-                                "oneOf": [
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "string"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "section_id",
-                              "value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "source_reference_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "source_type": {
-                          "enum": [
-                            "class",
-                            "assigned_workout",
-                            "library_workout",
-                            "freeform"
-                          ],
-                          "type": "string"
-                        },
-                        "status": {
-                          "enum": [
-                            "logged",
-                            "voided"
-                          ],
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "void_reason": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "voided_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "workout_type": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "source_type",
-                        "title",
-                        "performed_at_utc",
-                        "status",
-                        "lock_version",
-                        "section_scores",
-                        "exercise_modifications",
-                        "performed_exercises"
-                      ],
-                      "title": "TrainingLogEntry",
-                      "type": "object"
+                      "$ref": "#/components/schemas/TrainingLogEntry"
                     }
                   },
                   "required": [
@@ -47173,107 +45234,9 @@
                     "nullable": true,
                     "type": "integer"
                   },
-                  "exercise_modifications": {
-                    "items": {
-                      "properties": {
-                        "actual_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "canonical_value": {
-                          "oneOf": [
-                            {
-                              "type": "string"
-                            },
-                            {
-                              "type": "number"
-                            },
-                            {
-                              "type": "boolean"
-                            }
-                          ]
-                        },
-                        "exercise_id": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "exercise_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "field": {
-                          "type": "string"
-                        },
-                        "interval_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "note": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "patch_id": {
-                          "type": "string"
-                        },
-                        "round_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "row_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "section_id": {
-                          "type": "string"
-                        },
-                        "section_name": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "segment_key": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "set_index": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "type": {
-                          "type": "string"
-                        },
-                        "unit": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "patch_id",
-                        "section_id",
-                        "field",
-                        "canonical_value",
-                        "actual_value"
-                      ],
-                      "type": "object"
-                    },
-                    "type": "array"
-                  },
                   "expected_version": {
                     "minimum": 1,
                     "type": "integer"
-                  },
-                  "notes": {
-                    "maxLength": 4000,
-                    "nullable": true,
-                    "type": "string"
                   },
                   "perceived_effort": {
                     "maximum": 10,
@@ -47333,11 +45296,6 @@
                         "name": {
                           "maxLength": 120,
                           "minLength": 1,
-                          "type": "string"
-                        },
-                        "note": {
-                          "maxLength": 500,
-                          "nullable": true,
                           "type": "string"
                         },
                         "reps": {
@@ -47421,316 +45379,7 @@
                 "schema": {
                   "properties": {
                     "entry": {
-                      "properties": {
-                        "booking_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "duration_seconds": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "exercise_modifications": {
-                          "items": {
-                            "properties": {
-                              "actual_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "canonical_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "exercise_id": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "exercise_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "field": {
-                                "type": "string"
-                              },
-                              "interval_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "note": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "patch_id": {
-                                "type": "string"
-                              },
-                              "round_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "section_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "segment_key": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "set_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "type": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "patch_id",
-                              "section_id",
-                              "field",
-                              "canonical_value",
-                              "actual_value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "idempotency_key": {
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "lock_version": {
-                          "type": "integer"
-                        },
-                        "master_workout_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "organization_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "perceived_effort": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "performed_at_tz": {
-                          "type": "string"
-                        },
-                        "performed_at_utc": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "performed_exercises": {
-                          "items": {
-                            "properties": {
-                              "calories": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "distance": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "distance_unit": {
-                                "enum": [
-                                  "m",
-                                  "km",
-                                  "mi"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "duration_seconds": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "exercise_ref": {
-                                "maxLength": 120,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "load": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "load_unit": {
-                                "enum": [
-                                  "kg",
-                                  "lb"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "note": {
-                                "maxLength": 500,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "reps": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "type": "integer"
-                              },
-                              "sets": {
-                                "maximum": 100,
-                                "minimum": 1,
-                                "nullable": true,
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "scale_level_slug": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "section_scores": {
-                          "items": {
-                            "properties": {
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "value": {
-                                "oneOf": [
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "string"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "section_id",
-                              "value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "source_reference_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "source_type": {
-                          "enum": [
-                            "class",
-                            "assigned_workout",
-                            "library_workout",
-                            "freeform"
-                          ],
-                          "type": "string"
-                        },
-                        "status": {
-                          "enum": [
-                            "logged",
-                            "voided"
-                          ],
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "void_reason": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "voided_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "workout_type": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "source_type",
-                        "title",
-                        "performed_at_utc",
-                        "status",
-                        "lock_version",
-                        "section_scores",
-                        "exercise_modifications",
-                        "performed_exercises"
-                      ],
-                      "title": "TrainingLogEntry",
-                      "type": "object"
+                      "$ref": "#/components/schemas/TrainingLogEntry"
                     }
                   },
                   "required": [
@@ -47831,316 +45480,7 @@
                 "schema": {
                   "properties": {
                     "entry": {
-                      "properties": {
-                        "booking_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "duration_seconds": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "exercise_modifications": {
-                          "items": {
-                            "properties": {
-                              "actual_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "canonical_value": {
-                                "oneOf": [
-                                  {
-                                    "type": "string"
-                                  },
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "boolean"
-                                  }
-                                ]
-                              },
-                              "exercise_id": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "exercise_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "field": {
-                                "type": "string"
-                              },
-                              "interval_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "note": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "patch_id": {
-                                "type": "string"
-                              },
-                              "round_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "section_name": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "segment_key": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "set_index": {
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "type": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              }
-                            },
-                            "required": [
-                              "patch_id",
-                              "section_id",
-                              "field",
-                              "canonical_value",
-                              "actual_value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "idempotency_key": {
-                          "type": "string"
-                        },
-                        "inserted_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "lock_version": {
-                          "type": "integer"
-                        },
-                        "master_workout_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "notes": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "organization_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "perceived_effort": {
-                          "nullable": true,
-                          "type": "integer"
-                        },
-                        "performed_at_tz": {
-                          "type": "string"
-                        },
-                        "performed_at_utc": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "performed_exercises": {
-                          "items": {
-                            "properties": {
-                              "calories": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "distance": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "distance_unit": {
-                                "enum": [
-                                  "m",
-                                  "km",
-                                  "mi"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "duration_seconds": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "exercise_ref": {
-                                "maxLength": 120,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "load": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "number"
-                              },
-                              "load_unit": {
-                                "enum": [
-                                  "kg",
-                                  "lb"
-                                ],
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "name": {
-                                "maxLength": 120,
-                                "minLength": 1,
-                                "type": "string"
-                              },
-                              "note": {
-                                "maxLength": 500,
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "reps": {
-                                "minimum": 0,
-                                "nullable": true,
-                                "type": "integer"
-                              },
-                              "row_index": {
-                                "type": "integer"
-                              },
-                              "sets": {
-                                "maximum": 100,
-                                "minimum": 1,
-                                "nullable": true,
-                                "type": "integer"
-                              }
-                            },
-                            "required": [
-                              "name"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "scale_level_slug": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "section_scores": {
-                          "items": {
-                            "properties": {
-                              "section_id": {
-                                "type": "string"
-                              },
-                              "unit": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "value": {
-                                "oneOf": [
-                                  {
-                                    "type": "number"
-                                  },
-                                  {
-                                    "type": "string"
-                                  }
-                                ]
-                              }
-                            },
-                            "required": [
-                              "section_id",
-                              "value"
-                            ],
-                            "type": "object"
-                          },
-                          "type": "array"
-                        },
-                        "source_reference_id": {
-                          "format": "uuid",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "source_type": {
-                          "enum": [
-                            "class",
-                            "assigned_workout",
-                            "library_workout",
-                            "freeform"
-                          ],
-                          "type": "string"
-                        },
-                        "status": {
-                          "enum": [
-                            "logged",
-                            "voided"
-                          ],
-                          "type": "string"
-                        },
-                        "title": {
-                          "type": "string"
-                        },
-                        "updated_at": {
-                          "format": "date-time",
-                          "type": "string"
-                        },
-                        "user_id": {
-                          "format": "uuid",
-                          "type": "string"
-                        },
-                        "void_reason": {
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "voided_at": {
-                          "format": "date-time",
-                          "nullable": true,
-                          "type": "string"
-                        },
-                        "workout_type": {
-                          "nullable": true,
-                          "type": "string"
-                        }
-                      },
-                      "required": [
-                        "id",
-                        "source_type",
-                        "title",
-                        "performed_at_utc",
-                        "status",
-                        "lock_version",
-                        "section_scores",
-                        "exercise_modifications",
-                        "performed_exercises"
-                      ],
-                      "title": "TrainingLogEntry",
-                      "type": "object"
+                      "$ref": "#/components/schemas/TrainingLogEntry"
                     }
                   },
                   "required": [
@@ -64153,10 +61493,6 @@
                                         "format": "date-time",
                                         "type": "string"
                                       },
-                                      "notes": {
-                                        "nullable": true,
-                                        "type": "string"
-                                      },
                                       "score": {
                                         "type": "number"
                                       },
@@ -64179,10 +61515,6 @@
                                   "type": "string"
                                 },
                                 "name": {
-                                  "type": "string"
-                                },
-                                "notes": {
-                                  "nullable": true,
                                   "type": "string"
                                 },
                                 "organization_id": {
@@ -64301,6 +61633,13 @@
                     "format": "date",
                     "type": "string"
                   },
+                  "comments": {
+                    "items": {
+                      "$ref": "#/components/schemas/JournalCommentInput"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "current_score": {
                     "type": "number"
                   },
@@ -64308,10 +61647,6 @@
                     "type": "boolean"
                   },
                   "name": {
-                    "type": "string"
-                  },
-                  "notes": {
-                    "maxLength": 2000,
                     "type": "string"
                   },
                   "organization_slug": {
@@ -64453,6 +61788,13 @@
                     "format": "date",
                     "type": "string"
                   },
+                  "comments": {
+                    "items": {
+                      "$ref": "#/components/schemas/JournalCommentInput"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "current_score": {
                     "type": "number"
                   },
@@ -64460,10 +61802,6 @@
                     "type": "boolean"
                   },
                   "name": {
-                    "type": "string"
-                  },
-                  "notes": {
-                    "maxLength": 2000,
                     "type": "string"
                   },
                   "supporting_metrics": {
@@ -64557,6 +61895,13 @@
                     "format": "date",
                     "type": "string"
                   },
+                  "comments": {
+                    "items": {
+                      "$ref": "#/components/schemas/JournalCommentInput"
+                    },
+                    "maxItems": 200,
+                    "type": "array"
+                  },
                   "current_score": {
                     "type": "number"
                   },
@@ -64564,10 +61909,6 @@
                     "type": "boolean"
                   },
                   "name": {
-                    "type": "string"
-                  },
-                  "notes": {
-                    "maxLength": 2000,
                     "type": "string"
                   },
                   "supporting_metrics": {

@@ -5,6 +5,8 @@
 
 
 
+import { useTranslations } from "next-intl";
+
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useId, useState } from "react";
@@ -25,7 +27,11 @@ import {
   usePRGymOptions,
   type PRGymOption,
 } from "@/components/pantheon/PRGymField";
+import { newCommentId, type JournalComment } from "@/api/journal-comments";
+import { CommentList } from "@/components/journal/CommentList";
 import { useSession } from "@/components/session-provider";
+import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
+import { removeComment, sortComments } from "@/lib/journal-comments";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 function todayIso() {
@@ -163,7 +169,14 @@ export function PRFormModal({
   const [beatenOn, setBeatenOn] = useState(pr?.beaten_on ?? todayIso());
   const [details, setDetails] = useState<Partial<Record<PRSupportingMetricKey, string>>>(() => rawMetrics(pr?.supporting_metrics));
   const [detailToAdd, setDetailToAdd] = useState<PRSupportingMetricKey | "">("");
-  const [notes, setNotes] = useState(pr?.notes ?? "");
+  // Σχόλια (ADR-140 §1): the PR's comments, and one being written or edited,
+  // saved with the PR in the same request (upserted by id).
+  const tComments = useTranslations("MemberApp.comments");
+  const commentWriter = useJournalCommentWriter();
+  const [comments, setComments] = useState<JournalComment[]>(() => sortComments(pr?.comments ?? []));
+  const [comment, setComment] = useState("");
+  const [editingComment, setEditingComment] = useState<JournalComment | null>(null);
+  const [commentId, setCommentId] = useState(newCommentId);
   const [gymChoice, setGymChoice] = useState<string | undefined>(undefined);
   const gymSlug = gymChoice ?? defaultGymSlug;
   const [error, setError] = useState<string | null>(null);
@@ -180,7 +193,9 @@ export function PRFormModal({
         higher_is_better: higherIsBetter,
         beaten_on: beatenOn,
         supporting_metrics: submitMetrics(details),
-        notes: notes.trim() || null,
+        comments: comment.trim()
+          ? [{ id: commentId, body: comment.trim(), tags: editingComment?.tags ?? [] }]
+          : [],
       };
       if (mode === "edit" && pr) {
         return editPR(tokens.access_token, pr.id, params);
@@ -383,8 +398,20 @@ export function PRFormModal({
           {isExisting ? null : <PRGymField gyms={gyms} value={gymSlug} onChange={setGymChoice} />}
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>{i18n("notesOptional4d56ca9")}</label>
-            <textarea className="min-h-24 w-full resize-y rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={notes} onChange={(event) => setNotes(event.target.value)} maxLength={2000} />
+            <label htmlFor={`${titleId}-comment`} className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>{editingComment ? tComments("editTitle") : tComments("commentOptional")}</label>
+            <CommentList
+              comments={comments.filter((item) => item.id !== editingComment?.id)}
+              onEdit={(item) => {
+                setEditingComment(item);
+                setCommentId(item.id);
+                setComment(item.body ?? "");
+              }}
+              onDelete={(item) => {
+                setComments((current) => removeComment(current, item.id));
+                void commentWriter.remove(item.id).then(() => queryClient.invalidateQueries({ queryKey: ["prs"] }));
+              }}
+            />
+            <textarea id={`${titleId}-comment`} className="min-h-24 w-full resize-y rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={comment} placeholder={tComments("bodyPlaceholder")} onChange={(event) => setComment(event.target.value)} maxLength={4000} />
           </div>
 
           <label className="flex items-center gap-3 cursor-pointer">

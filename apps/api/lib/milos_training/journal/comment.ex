@@ -102,11 +102,14 @@ defmodule MilosTraining.Journal.Comment do
   # context (ModificationPatchValidator); its `patch_id` becomes the stable
   # `change_key` the comment is upserted by.
   defp validate_change_patch(changeset) do
-    case get_change(changeset, :change) do
-      nil ->
+    case fetch_change(changeset, :change) do
+      :error ->
         changeset
 
-      %{"patch_id" => key} = patch when is_binary(key) and key != "" ->
+      {:ok, nil} ->
+        put_change(changeset, :change_key, nil)
+
+      {:ok, %{"patch_id" => key} = patch} when is_binary(key) and key != "" ->
         changeset
         |> put_change(:change, Map.drop(patch, ["note", "logged_at"]))
         |> put_change(:change_key, key)

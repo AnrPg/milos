@@ -1,6 +1,6 @@
 import type { PRHistoryEntry, PRRecord } from "@/api/gamification";
 
-type PRHistoryDisplayEntry = Pick<PRHistoryEntry, "id" | "score" | "beaten_on" | "supporting_metrics" | "notes"> & {
+type PRHistoryDisplayEntry = Pick<PRHistoryEntry, "id" | "score" | "beaten_on" | "supporting_metrics"> & {
   current: boolean;
 };
 
@@ -14,7 +14,6 @@ export function chronologicalPRHistory(
       score: current.current_score,
       beaten_on: current.beaten_on,
       supporting_metrics: current.supporting_metrics,
-      notes: current.notes,
       current: true,
     },
     ...history.map((entry) => ({ ...entry, current: false })),

@@ -4,17 +4,27 @@
 
 
 
+import { useTranslations } from "next-intl";
 import {useUiTranslations} from "@/i18n/ui";
 import { semanticLabel } from "@/i18n/presentation";
 import { useId, useState } from "react";
 import type { ExerciseModification, TimerSegment } from "@/api/executions";
+import type { JournalComment } from "@/api/journal-comments";
+import { CommentList } from "@/components/journal/CommentList";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import type { ChecklistStep } from "./WorkoutChecklist";
+
+/** What the athlete recorded on a step: a change, text and tags, or both (ADR-140 §1). */
+export type StepComment = { change: ExerciseModification | null; body: string | null; tags: string[] };
 
 type Props = {
   segment: TimerSegment;
   step: ChecklistStep;
-  onSave: (mod: ExerciseModification) => void;
+  /** Comments already on this exercise, listed under the form. */
+  comments?: JournalComment[];
+  pendingCommentIds?: string[];
+  onSave: (comment: StepComment) => void;
+  onDeleteComment?: (comment: JournalComment) => void;
   onClose: () => void;
 };
 
@@ -28,8 +38,18 @@ function patchId(segment: TimerSegment, step: ChecklistStep, field: string) {
   return [segment.segment_key, step.exerciseId, setIndexFromLabel(step.stepLabel), segment.round ?? 0, field].join(":");
 }
 
-export function ModificationModal({ segment, step, onSave, onClose }: Props) {
+export function ModificationModal({
+  segment,
+  step,
+  comments = [],
+  pendingCommentIds = [],
+  onSave,
+  onDeleteComment,
+  onClose,
+}: Props) {
   const i18n = useUiTranslations();
+  const t = useTranslations("MemberApp.comments");
+  const [body, setBody] = useState("");
   const { exercise } = step;
 
   const hasPrescription =
@@ -50,7 +70,7 @@ export function ModificationModal({ segment, step, onSave, onClose }: Props) {
   const titleId = useId();
 
   function handleSkip() {
-    onSave({
+    save({
       patch_id: patchId(segment, step, "skipped"),
       field: "skipped",
       section_id: segment.section_id,
@@ -64,6 +84,10 @@ export function ModificationModal({ segment, step, onSave, onClose }: Props) {
       actual_value: true,
       type: "skipped",
     });
+  }
+
+  function save(change: ExerciseModification | null) {
+    onSave({ change, body: body.trim() || null, tags: [] });
   }
 
   function handleSave() {
@@ -94,7 +118,14 @@ export function ModificationModal({ segment, step, onSave, onClose }: Props) {
           ? parsedActualSets
           : parsedActualValue;
 
-    onSave({
+    const unchanged = actual === null || actual === canonicalValue;
+    if (unchanged) {
+      if (body.trim()) save(null);
+      else onClose();
+      return;
+    }
+
+    save({
       patch_id: patchId(segment, step, field),
       field,
       section_id: segment.section_id,
@@ -217,7 +248,31 @@ export function ModificationModal({ segment, step, onSave, onClose }: Props) {
               {i18n("noPrescribedValuesForThisExerciseUseThe2d5dd0b")}
             </p>
           )}
+
+          <label className="block text-xs font-semibold" style={{ color: "var(--muted)" }}>
+            {t("bodyLabel")}
+            <textarea
+              rows={3}
+              maxLength={4000}
+              placeholder={t("bodyPlaceholder")}
+              className="mt-1 w-full resize-none rounded-xl px-4 py-2.5 text-sm outline-none"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={body}
+              onChange={(event) => setBody(event.target.value)}
+            />
+          </label>
         </div>
+
+        {comments.length > 0 ? (
+          <div className="mb-4 max-h-48 overflow-y-auto">
+            <CommentList
+              comments={comments}
+              pendingIds={pendingCommentIds}
+              anchorLabel={() => exercise.name}
+              onDelete={onDeleteComment}
+            />
+          </div>
+        ) : null}
 
         <div className="flex flex-col gap-2">
           <button

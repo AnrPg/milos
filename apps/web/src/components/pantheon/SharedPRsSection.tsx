@@ -90,7 +90,6 @@ function SharedPRCard({ pr }: { pr: SharedPR }) {
       </div>
       <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{date}</p>
       {details ? <p className="mt-2 text-[11px]" style={{ color: "var(--text-soft)" }}>{details}</p> : null}
-      {pr.notes ? <p className="mt-1 text-[11px]" style={{ color: "var(--muted)" }}>{pr.notes}</p> : null}
       {pr.history.length > 0 ? (
         <p className="mt-2 text-[11px]" style={{ color: "var(--muted)" }}>
           {t("earlierResults", { count: pr.history.length })}
