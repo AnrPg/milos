@@ -109,3 +109,8 @@ lost from today's features.
   `#training-schedule` and `#account-activity` anchors redirect on the client.
   The rest-day picker now allows the five days the API accepts (it stopped
   at three).
+- Following the feature map, Ημερολόγιο's segments are Ροή · Vault · Ευεξία
+  · Πρόοδος. Reviews have no segment: `journal-flow.ts` files them in Ροή by
+  the day they were written, and `/journal/reviews` (the review form) lights
+  Ροή. Νέα καταχώρηση groups its kinds as Προπόνηση · Ευεξία · Coach and
+  hides a group with no kinds, so kinds can be added without moving others.

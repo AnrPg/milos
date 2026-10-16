@@ -4810,6 +4810,11 @@
     "wodTodayEmpty": "Vandaag is er geen lestraining.",
     "openInBox": "Openen in Box",
     "feedPosts": "Uit je club",
-    "feedPostsEmpty": "Berichten uit je club verschijnen hier."
+    "feedPostsEmpty": "Berichten uit je club verschijnen hier.",
+    "entryGroup": {
+      "training": "Training",
+      "wellbeing": "Welzijn",
+      "coach": "Coach"
+    }
   }
 }

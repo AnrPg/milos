@@ -201,6 +201,15 @@ async function stubMemberApi(page: Page) {
       }),
     ),
   );
+  await page.route(/\/api(?:\/org\/[^/]+)?\/me\/reviews$/, (route) =>
+    route.fulfill(
+      json({
+        reviews: [
+          { id: "review-1", inserted_at: daysAgoAt(1, 12), target_type: "app", rating: 5, body: "Love the new journal", status: "open", sentiment: "positive", tags: [], answers: [], params: {}, target_snapshot: {} },
+        ],
+      }),
+    ),
+  );
   await page.route(/\/api(?:\/org\/[^/]+)?\/pr-sharing$/, (route) =>
     route.fulfill(json({ coach_visibility: true, grants: [] })),
   );
@@ -254,6 +263,7 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Journal", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "New entry" }).click();
     const sheet = page.getByRole("dialog", { name: "New entry" });
+    await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Training", "Wellbeing", "Coach"]);
     await expect(sheet.getByRole("button")).toContainText(["Workout", "PR", "Injury", "Technique video", "Review", "Cancel"]);
     await page.screenshot({ path: "test-results/member-app/journal-new-entry.png" });
   });
@@ -281,12 +291,14 @@ test.describe("member app shell", () => {
     await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
   });
 
-  test("Journal's flow merges finished workouts and logged ones; Progress holds stats and PRs", async ({ page }) => {
+  test("Journal's flow merges finished workouts, logged ones and reviews; Progress holds stats and PRs", async ({ page }) => {
     await stubMemberApi(page);
     await page.goto("/journal");
     const flow = page.getByRole("main").last();
     await expect(flow.getByText("Fran")).toBeVisible();
     await expect(flow.getByText("Park run")).toBeVisible();
+    await expect(flow.getByText("Love the new journal")).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Wellbeing", "Progress"]);
     await expect(flow.getByRole("button", { name: /Share in Milos: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 

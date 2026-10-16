@@ -4810,6 +4810,11 @@
     "wodTodayEmpty": "Δεν υπάρχει WOD μαθήματος σήμερα.",
     "openInBox": "Άνοιγμα στο Box",
     "feedPosts": "Από το club σου",
-    "feedPostsEmpty": "Οι αναρτήσεις του club σου θα εμφανίζονται εδώ."
+    "feedPostsEmpty": "Οι αναρτήσεις του club σου θα εμφανίζονται εδώ.",
+    "entryGroup": {
+      "training": "Προπόνηση",
+      "wellbeing": "Ευεξία",
+      "coach": "Coach"
+    }
   }
 }

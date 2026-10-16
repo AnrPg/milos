@@ -7,11 +7,11 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useState, type ReactNode } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { listMyExecutions, type WorkoutExecution } from "@/api/executions";
-import { fetchMyReviews, submitReview, type SubmitReviewRequest } from "@/api/reviews";
+import { fetchMyReviews, MY_REVIEWS_KEY, submitReview, type SubmitReviewRequest } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
@@ -83,6 +83,7 @@ export function ReviewForm() {
         : "";
   const selectedTargetId = targetId || defaultTargetId || "";
 
+  const queryClient = useQueryClient();
   const submitMutation = useMutation({
     mutationFn: async () =>
       submitReview(tokens!.access_token, {
@@ -103,6 +104,8 @@ export function ReviewForm() {
     onSuccess: () => {
       setAnswers({ ability_match: "", useful_part: "", hard_part: "", next_adjustment: "" });
       setTargetId("");
+      // Don't wait for the realtime echo: the new review belongs in Ροή now.
+      void queryClient.invalidateQueries({ queryKey: MY_REVIEWS_KEY });
     },
   });
 
@@ -226,16 +229,24 @@ export function ReviewList({ reviews }: { reviews: Review[] }) {
   return (
     <section className="grid gap-3">
       {reviews.map((review) => (
-        <article
-          key={String(review.id)}
-          className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5"
-        >
-          <p className="font-bold"><SemanticLabel value={review.target_type} /></p>
-          <p className="text-sm text-[var(--muted)]">{i18n("rating6437b7b")} {String(review.rating ?? "—")}</p>
-          {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
-        </article>
+        <ReviewCard key={String(review.id)} review={review} />
       ))}
     </section>
+  );
+}
+
+/** One review the member wrote; also an entry of Ημερολόγιο › Ροή. */
+export function ReviewCard({ review, time }: { review: Review; time?: ReactNode }) {
+  const i18n = useUiTranslations();
+  return (
+    <article className="rounded-2xl border border-[var(--border)] bg-[var(--panel)] p-5">
+      <p className="font-bold"><SemanticLabel value={review.target_type} /></p>
+      <p className="flex flex-wrap gap-2 text-sm text-[var(--muted)]">
+        {time}
+        <span>{i18n("rating6437b7b")} {String(review.rating ?? "—")}</span>
+      </p>
+      {review.body ? <p className="mt-2 text-sm">{String(review.body)}</p> : null}
+    </article>
   );
 }
 
@@ -244,7 +255,7 @@ export function MyReviews() {
   const { tokens } = useSession();
 
   const reviewsQuery = useQuery({
-    queryKey: ["my", "reviews"],
+    queryKey: MY_REVIEWS_KEY,
     enabled: Boolean(tokens?.access_token),
     queryFn: async () => fetchMyReviews(tokens!.access_token),
   });

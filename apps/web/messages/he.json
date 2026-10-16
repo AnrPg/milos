@@ -4810,6 +4810,11 @@
     "wodTodayEmpty": "אין היום אימון בשיעורים.",
     "openInBox": "פתיחה ב-Box",
     "feedPosts": "מהמועדון שלכם",
-    "feedPostsEmpty": "הפוסטים של המועדון שלכם יופיעו כאן."
+    "feedPostsEmpty": "הפוסטים של המועדון שלכם יופיעו כאן.",
+    "entryGroup": {
+      "training": "אימון",
+      "wellbeing": "רווחה",
+      "coach": "מאמן"
+    }
   }
 }

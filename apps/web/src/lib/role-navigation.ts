@@ -219,7 +219,8 @@ export function sectionGroupFor(
         ...(feature("coaching") ? [{ id: "coaching", href: "/box/coach", labelKey: "coach", match: ["/box/coach"] }] : []),
       ],
     });
-    // Journal segments (brief §7.7). Σώμα and the new Ευεξία arrive in Phase 2.
+    // Journal segments in the map's order: Ροή · Vault · (Σώμα, Phase 2) ·
+    // Ευεξία · Πρόοδος. Reviews are entries of Ροή; their form page lights Ροή.
     // Πρόοδος is for everyone (its advanced statistics stay package-gated
     // inside the page) and owns the full Pantheon page.
     groups.push({
@@ -227,9 +228,8 @@ export function sectionGroupFor(
       tabs: [
         { id: "flow", href: "/journal", labelKey: "journalFlow", match: ["/journal"] },
         { id: "vault", href: "/journal/vault", labelKey: "vault", match: ["/journal/vault"] },
-        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
         { id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] },
-        { id: "reviews", href: "/journal/reviews", labelKey: "reviews", match: ["/journal/reviews"] },
+        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
       ],
     });
   }

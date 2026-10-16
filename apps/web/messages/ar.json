@@ -4810,6 +4810,11 @@
     "wodTodayEmpty": "لا يوجد تمرين حصة اليوم.",
     "openInBox": "فتح في Box",
     "feedPosts": "من ناديك",
-    "feedPostsEmpty": "ستظهر هنا منشورات ناديك."
+    "feedPostsEmpty": "ستظهر هنا منشورات ناديك.",
+    "entryGroup": {
+      "training": "التدريب",
+      "wellbeing": "العافية",
+      "coach": "المدرب"
+    }
   }
 }

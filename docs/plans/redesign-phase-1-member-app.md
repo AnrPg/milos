@@ -176,6 +176,9 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - `Νέα καταχώρηση` sheet listing existing entry types (Προπόνηση, PR, Τραυματισμός/Πώς νιώθω via
   wellbeing, Βίντεο τεχνικής if entitled, Αξιολόγηση, Σημείωση) that open existing forms; segments
   Ροή (history + finished), Vault, Πρόοδος (progress + Pantheon), Ευεξία (existing wellbeing).
+- Aligned with the feature map (2026-10-16): segments Ροή · Vault · Ευεξία · Πρόοδος (Σώμα joins
+  in Phase 2); reviews are entries of Ροή, not a segment; the sheet groups kinds as Προπόνηση ·
+  Ευεξία · Coach, and Πώς νιώθω / Σημείωση join it when their backend lands.
 - Accept: mockups 15–17; visibility badge renders from derived visibility (client-side mapping until M5).
 
 ### M5 · Visibility ladder (A)
@@ -220,7 +223,7 @@ Legend: **W** = web only (testable in cloud), **A** = needs the Elixir toolchain
 - [x] Invoices, refund receipts (`/account/billing`) → Εγώ › Πληρωμές (M2)
 - [x] Training log (class, assigned, library, free), RPE, scores, void → Ημερολόγιο + Box › Καταγραφή (M3/M4)
 - [ ] Log notes and execution notes → Ροή (M4), visibility (M5)
-- [x] Reviews (`/reviews`) → Νέα καταχώρηση › Αξιολόγηση (M4)
+- [x] Reviews (`/reviews`) → Νέα καταχώρηση › Coach › Αξιολόγηση, listed in Ροή (M4)
 - [x] Wellbeing: injuries, readiness → Ημερολόγιο › Ευεξία (M4)
 - [x] Vault + repeat → Ημερολόγιο › Vault (M4)
 - [x] History, finished workouts → Ροή (M4)

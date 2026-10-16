@@ -4810,6 +4810,11 @@
     "wodTodayEmpty": "Pas d’entraînement en cours aujourd’hui.",
     "openInBox": "Ouvrir dans Box",
     "feedPosts": "De votre club",
-    "feedPostsEmpty": "Les publications de votre club apparaîtront ici."
+    "feedPostsEmpty": "Les publications de votre club apparaîtront ici.",
+    "entryGroup": {
+      "training": "Entraînement",
+      "wellbeing": "Bien-être",
+      "coach": "Coach"
+    }
   }
 }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
 import { fetchExecution } from "@/api/executions";
+import { fetchMyReviews, MY_REVIEWS_KEY } from "@/api/reviews";
 import { listTrainingLogEntries } from "@/api/training-log";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -17,6 +18,7 @@ import { useRepeatWorkout } from "@/components/client/use-repeat-workout";
 import { useWorkoutVault } from "@/components/client/use-workout-vault";
 import { formatElapsed, historyEntries, type HistoryEntry } from "@/components/client/vault";
 import { journalFlow } from "@/components/member-app/journal/journal-flow";
+import { ReviewCard } from "@/components/my-reviews";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
 import { useShareExport } from "@/components/share-export/useShareExport";
 import {
@@ -31,8 +33,9 @@ import { buildExecutionDocument, renderText } from "@/lib/document-export";
 
 /**
  * Ημερολόγιο › Ροή (brief §7.7, ADR-137): everything the member did, newest
- * first and grouped by day: finished executions (performance, repeat, share)
- * and logged workouts (edit, void). New entries start from Νέα καταχώρηση.
+ * first and grouped by day: finished executions (performance, repeat, share),
+ * logged workouts (edit, void) and written reviews. New entries start from
+ * Νέα καταχώρηση.
  */
 export function JournalFlow() {
   const i18n = useUiTranslations();
@@ -45,15 +48,25 @@ export function JournalFlow() {
     enabled: Boolean(token),
     queryFn: () => listTrainingLogEntries(token!),
   });
+  const reviews = useQuery({
+    queryKey: MY_REVIEWS_KEY,
+    enabled: Boolean(token),
+    queryFn: () => fetchMyReviews(token!),
+  });
   const { repeat, pendingId, error } = useRepeatWorkout();
   const [performance, setPerformance] = useState<HistoryEntry | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const days = useMemo(
-    () => journalFlow({ executions: historyEntries(vault.data ?? []), logs: logs.data ?? [] }),
-    [vault.data, logs.data],
+    () =>
+      journalFlow({
+        executions: historyEntries(vault.data ?? []),
+        logs: logs.data ?? [],
+        reviews: reviews.data?.reviews ?? [],
+      }),
+    [vault.data, logs.data, reviews.data],
   );
-  const failed = vault.isError ? vault : logs.isError ? logs : null;
+  const failed = [vault, logs, reviews].find((query) => query.isError) ?? null;
 
   return (
     <ClientPage
@@ -75,7 +88,7 @@ export function JournalFlow() {
         </p>
       ) : null}
 
-      {vault.isPending || logs.isPending ? (
+      {vault.isPending || logs.isPending || reviews.isPending ? (
         <LoadingLine />
       ) : failed ? (
         <QueryProblem error={failed.error} onRetry={() => void failed.refetch()} />
@@ -90,7 +103,14 @@ export function JournalFlow() {
               </h2>
               <ul className="flex flex-col gap-2">
                 {day.items.map((item) =>
-                  item.kind === "log" ? (
+                  item.kind === "review" ? (
+                    <li key={item.id}>
+                      <ReviewCard
+                        review={item.entry}
+                        time={<time dateTime={item.at}>{formatTime(item.at, locale)}</time>}
+                      />
+                    </li>
+                  ) : item.kind === "log" ? (
                     <TrainingLogEntryCard
                       key={item.id}
                       entry={item.entry}

@@ -12,15 +12,25 @@ import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/tra
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 /**
- * The kinds of entry a member can write today (brief §7.7). Each opens the
- * flow that already owns it; kinds that arrive in Phase 2 (Μέτρηση, Νερό ·
- * Ύπνος · Γεύμα, Πώς νιώθω, Λιγούρα, Σημείωση) join this list then, so the
- * sheet never shows a button that leads nowhere.
+ * The kinds of entry a member can write today (brief §7.7), grouped as the
+ * feature map groups them: Προπόνηση · Ευεξία · Coach. Each kind opens the
+ * flow that already owns it. Kinds that need new backend (Πώς νιώθω,
+ * Σημείωση) or arrive in Phase 2 (Μέτρηση, Νερό · Ύπνος · Γεύμα, Λιγούρα)
+ * join their group then, so the sheet never shows a button that leads
+ * nowhere, and a group with no kinds is not shown.
  */
 export type NewEntryKind = "workout" | "pr" | "injury" | "formReview" | "review";
+export type NewEntryGroup = "training" | "wellbeing" | "coach";
 
-export function newEntryKinds(options: { canRequestFormReview: boolean }): NewEntryKind[] {
-  return ["workout", "pr", "injury", ...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"];
+export function newEntryGroups(options: {
+  canRequestFormReview: boolean;
+}): { group: NewEntryGroup; kinds: NewEntryKind[] }[] {
+  const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
+    { group: "training", kinds: ["workout", "pr"] },
+    { group: "wellbeing", kinds: ["injury"] },
+    { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
+  ];
+  return groups.filter((entry) => entry.kinds.length > 0);
 }
 
 const ROUTES: Partial<Record<NewEntryKind, string>> = {
@@ -55,7 +65,7 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const { tokens } = useSession();
   const { entitlement } = useClientEntitlement();
   const [flow, setFlow] = useState<"menu" | "pr" | TrainingLogDialogState>("menu");
-  const kinds = newEntryKinds({ canRequestFormReview: hasCapability(entitlement, "request_form_reviews") });
+  const groups = newEntryGroups({ canRequestFormReview: hasCapability(entitlement, "request_form_reviews") });
 
   function choose(kind: NewEntryKind) {
     const route = ROUTES[kind];
@@ -80,10 +90,18 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
     );
   }
 
-  return <EntryMenu kinds={kinds} onChoose={choose} onClose={onClose} />;
+  return <EntryMenu groups={groups} onChoose={choose} onClose={onClose} />;
 }
 
-function EntryMenu({ kinds, onChoose, onClose }: { kinds: NewEntryKind[]; onChoose: (kind: NewEntryKind) => void; onClose: () => void }) {
+function EntryMenu({
+  groups,
+  onChoose,
+  onClose,
+}: {
+  groups: ReturnType<typeof newEntryGroups>;
+  onChoose: (kind: NewEntryKind) => void;
+  onClose: () => void;
+}) {
   const t = useTranslations("MemberApp");
   const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   return (
@@ -102,21 +120,34 @@ function EntryMenu({ kinds, onChoose, onClose }: { kinds: NewEntryKind[]; onChoo
         onClick={(event) => event.stopPropagation()}
       >
         <h2 className="mb-4 text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("newEntry")}</h2>
-        <ul className="grid grid-cols-2 gap-2">
-          {kinds.map((kind) => (
-            <li key={kind}>
-              <button
-                type="button"
-                onClick={() => onChoose(kind)}
-                className="flex min-h-16 w-full flex-col items-start justify-center rounded-2xl px-4 py-3 text-start"
-                style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}
+        <div className="flex flex-col gap-4">
+          {groups.map(({ group, kinds }) => (
+            <section key={group} aria-labelledby={`entry-group-${group}`}>
+              <h3
+                id={`entry-group-${group}`}
+                className="mb-2 text-xs font-semibold uppercase tracking-[0.18em]"
+                style={{ color: "var(--dim)" }}
               >
-                <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(`entryKind.${kind}`)}</span>
-                <span className="text-xs" style={{ color: "var(--dim)" }}>{t(`entryKindHint.${kind}`)}</span>
-              </button>
-            </li>
+                {t(`entryGroup.${group}`)}
+              </h3>
+              <ul className="grid grid-cols-2 gap-2">
+                {kinds.map((kind) => (
+                  <li key={kind}>
+                    <button
+                      type="button"
+                      onClick={() => onChoose(kind)}
+                      className="flex min-h-16 w-full flex-col items-start justify-center rounded-2xl px-4 py-3 text-start"
+                      style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}
+                    >
+                      <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(`entryKind.${kind}`)}</span>
+                      <span className="text-xs" style={{ color: "var(--dim)" }}>{t(`entryKindHint.${kind}`)}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ))}
-        </ul>
+        </div>
         <button
           type="button"
           onClick={onClose}

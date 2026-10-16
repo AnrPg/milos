@@ -4,6 +4,7 @@
 import { useEffect, useEffectEvent } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 
+import { MY_REVIEWS_KEY } from "@/api/reviews";
 import { useSession } from "@/components/session-provider";
 import { subscribeToTopic } from "@/lib/realtime";
 import { emitUserSync, normalizeUserSyncDetail } from "@/lib/user-sync";
@@ -62,7 +63,7 @@ export function RealtimeSyncBridge() {
     }
 
     if (detail.scopes.includes("my_reviews") || detail.scopes.includes("reviews")) {
-      void queryClient.invalidateQueries({ queryKey: ["my", "reviews"] });
+      void queryClient.invalidateQueries({ queryKey: MY_REVIEWS_KEY });
       void queryClient.invalidateQueries({ queryKey: ["my", "executions"] });
     }
 
