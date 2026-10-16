@@ -4948,7 +4948,6 @@
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
     "wodTodayEmpty": "No class workout today.",
-    "openInBox": "Open in Box",
     "feedPosts": "From your club",
     "feedPostsEmpty": "Posts from your club will show up here.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "All",
       "announcements": "Announcements only",
       "none": "Muted"
-    }
+    },
+    "wodNoWorkout": "No class WOD today.",
+    "wodScoreCount": "Scores today: {count}",
+    "wodLeaderboard": "Leaderboard",
+    "wodYou": "You",
+    "wodNoScore": "no score yet",
+    "wodLogScore": "Log your score",
+    "wodOptInHint": "Only you see your place until you turn on leaderboards.",
+    "wodOptInLink": "Turn on",
+    "announcementsEmpty": "No announcements yet.",
+    "announcementsOpen": "All announcements",
+    "channelShowAll": "All channels",
+    "channelSuggested": "Suggested",
+    "channelSuggestedHint": "you often book this class",
+    "channelsOfBox": "From the box",
+    "channelsClassGroups": "Class groups",
+    "channelsOther": "Other channels"
   }
 }

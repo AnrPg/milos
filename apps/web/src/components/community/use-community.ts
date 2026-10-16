@@ -6,8 +6,10 @@ import { useInfiniteQuery, useQuery, useQueryClient } from "@tanstack/react-quer
 import {
   CLUBS_KEY,
   FEED_KEY,
+  WOD_KEY,
   fetchFeed,
   fetchMyClubs,
+  fetchWodToday,
   type CommunityClub,
   type FeedFilter,
 } from "@/api/community";
@@ -22,6 +24,19 @@ export function useMyClubs() {
     queryKey: CLUBS_KEY,
     enabled: Boolean(token),
     queryFn: () => fetchMyClubs(token!),
+    staleTime: 60_000,
+  });
+}
+
+/** The #wod card of one gym's club for today in the member's time zone. */
+export function useWodToday(slug: string | null) {
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? null;
+  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC";
+  return useQuery({
+    queryKey: [...WOD_KEY, slug, timezone],
+    enabled: Boolean(token && slug),
+    queryFn: () => fetchWodToday(token!, slug!, timezone),
     staleTime: 60_000,
   });
 }
@@ -52,7 +67,10 @@ export function useClubRealtime(clubs: CommunityClub[] | undefined) {
 
   useEffect(() => {
     if (!token || !ids) return;
-    const refresh = () => void queryClient.invalidateQueries({ queryKey: FEED_KEY });
+    const refresh = () => {
+      void queryClient.invalidateQueries({ queryKey: FEED_KEY });
+      void queryClient.invalidateQueries({ queryKey: WOD_KEY });
+    };
     const unsubscribers = ids
       .split(",")
       .map((id) =>

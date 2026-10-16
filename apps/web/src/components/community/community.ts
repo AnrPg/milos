@@ -63,3 +63,24 @@ export function attachmentTypeOf(kind: string): "workout_execution" | "training_
   if (kind === "pr") return "pr";
   return null;
 }
+
+/** The club of the member's selected gym, else their first gym club. */
+export function gymClubFor(clubs: CommunityClub[], organizationId: string | null | undefined) {
+  const gyms = clubs.filter((club) => club.kind === "gym");
+  return gyms.find((club) => club.organization_id === organizationId) ?? gyms[0] ?? null;
+}
+
+/** The club's channel of one built-in kind. */
+export function builtInChannel(club: CommunityClub | null, kind: "announcements" | "wod" | "challenges") {
+  return club?.channels.find((channel) => channel.kind === kind) ?? null;
+}
+
+/** Channels grouped as the club page lists them: the box's own, then class groups, then the rest. */
+export function channelSections(channels: CommunityChannel[]) {
+  const box = channels.filter((channel) => BUILT_IN.has(channel.kind));
+  const classes = channels
+    .filter((channel) => channel.kind === "class_slot")
+    .sort((a, b) => Number(Boolean(b.suggested)) - Number(Boolean(a.suggested)) || (a.name ?? "").localeCompare(b.name ?? ""));
+  const other = channels.filter((channel) => !BUILT_IN.has(channel.kind) && channel.kind !== "class_slot");
+  return { box, classes, other };
+}

@@ -4948,7 +4948,6 @@
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
     "wodTodayEmpty": "Heute gibt es kein Kurstraining.",
-    "openInBox": "In Box öffnen",
     "feedPosts": "Aus deinem Club",
     "feedPostsEmpty": "Beiträge aus deinem Club erscheinen hier.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Alle",
       "announcements": "Nur Ankündigungen",
       "none": "Stumm"
-    }
+    },
+    "wodNoWorkout": "Heute gibt es kein Kurs-WOD.",
+    "wodScoreCount": "Scores heute: {count}",
+    "wodLeaderboard": "Rangliste",
+    "wodYou": "Du",
+    "wodNoScore": "noch kein Score",
+    "wodLogScore": "Trag deinen Score ein",
+    "wodOptInHint": "Nur du siehst deinen Platz, bis du Ranglisten aktivierst.",
+    "wodOptInLink": "Aktivieren",
+    "announcementsEmpty": "Noch keine Ankündigungen.",
+    "announcementsOpen": "Alle Ankündigungen",
+    "channelShowAll": "Alle Kanäle",
+    "channelSuggested": "Empfohlen",
+    "channelSuggestedHint": "du buchst diesen Kurs oft",
+    "channelsOfBox": "Von der Box",
+    "channelsClassGroups": "Kursgruppen",
+    "channelsOther": "Weitere Kanäle"
   }
 }

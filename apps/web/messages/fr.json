@@ -4948,7 +4948,6 @@
     "homeTitle": "Accueil",
     "wodToday": "Le WOD du jour à la salle",
     "wodTodayEmpty": "Pas d’entraînement en cours aujourd’hui.",
-    "openInBox": "Ouvrir dans Box",
     "feedPosts": "De votre club",
     "feedPostsEmpty": "Les publications de votre club apparaîtront ici.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Tout",
       "announcements": "Annonces seulement",
       "none": "Muet"
-    }
+    },
+    "wodNoWorkout": "Pas de WOD de cours aujourd'hui.",
+    "wodScoreCount": "Scores du jour : {count}",
+    "wodLeaderboard": "Classement",
+    "wodYou": "Toi",
+    "wodNoScore": "pas encore de score",
+    "wodLogScore": "Enregistre ton score",
+    "wodOptInHint": "Toi seul vois ta place tant que tu n'actives pas les classements.",
+    "wodOptInLink": "Activer",
+    "announcementsEmpty": "Pas encore d'annonce.",
+    "announcementsOpen": "Toutes les annonces",
+    "channelShowAll": "Tous les canaux",
+    "channelSuggested": "Suggéré",
+    "channelSuggestedHint": "tu réserves souvent ce cours",
+    "channelsOfBox": "De la box",
+    "channelsClassGroups": "Groupes de cours",
+    "channelsOther": "Autres canaux"
   }
 }

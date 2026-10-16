@@ -4948,7 +4948,6 @@
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
     "wodTodayEmpty": "Vandaag is er geen lestraining.",
-    "openInBox": "Openen in Box",
     "feedPosts": "Uit je club",
     "feedPostsEmpty": "Berichten uit je club verschijnen hier.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Alles",
       "announcements": "Alleen mededelingen",
       "none": "Gedempt"
-    }
+    },
+    "wodNoWorkout": "Vandaag geen les-WOD.",
+    "wodScoreCount": "Scores vandaag: {count}",
+    "wodLeaderboard": "Ranglijst",
+    "wodYou": "Jij",
+    "wodNoScore": "nog geen score",
+    "wodLogScore": "Vul je score in",
+    "wodOptInHint": "Alleen jij ziet je plek tot je ranglijsten aanzet.",
+    "wodOptInLink": "Aanzetten",
+    "announcementsEmpty": "Nog geen aankondigingen.",
+    "announcementsOpen": "Alle aankondigingen",
+    "channelShowAll": "Alle kanalen",
+    "channelSuggested": "Aanbevolen",
+    "channelSuggestedHint": "je boekt deze les vaak",
+    "channelsOfBox": "Van de box",
+    "channelsClassGroups": "Lesgroepen",
+    "channelsOther": "Andere kanalen"
   }
 }

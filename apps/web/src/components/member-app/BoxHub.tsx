@@ -4,6 +4,9 @@ import { useTranslations } from "next-intl";
 
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { AnnouncementsCard } from "@/components/community/AnnouncementsCard";
+import { gymClubFor } from "@/components/community/community";
+import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
 import { BoxToday } from "@/components/member-app/box/BoxToday";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
@@ -11,13 +14,16 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
- * Fixed order: today's workout · next booking · actions · membership.
+ * Fixed order: today's workout · next booking · actions · membership ·
+ * announcements (the gym club's #ανακοινώσεις, ADR-138).
  */
 export function BoxHub() {
   const t = useTranslations("MemberApp");
   const { membership } = useSelectedMembershipRole();
   const { entitlement } = useClientEntitlement();
   const features = entitledFeatures(entitlement);
+  const clubs = useMyClubs();
+  const gymClub = gymClubFor(clubs.data ?? [], membership?.organization.id);
   const title = membership?.settings?.brand_name?.trim() || membership?.organization.name || t("boxTitle");
   const actions = [
     { href: "/box/schedule", label: t("actionSchedule"), icon: HubIcons.calendar, shown: true },
@@ -47,6 +53,8 @@ export function BoxHub() {
         </div>
         <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>
       </HubCard>
+
+      {gymClub ? <AnnouncementsCard club={gymClub} /> : null}
     </HubPage>
   );
 }

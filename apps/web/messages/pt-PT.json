@@ -4948,7 +4948,6 @@
     "homeTitle": "Início",
     "wodToday": "O WOD de hoje no box",
     "wodTodayEmpty": "Hoje não há treino de aula.",
-    "openInBox": "Abrir no Box",
     "feedPosts": "Do seu clube",
     "feedPostsEmpty": "As publicações do seu clube aparecerão aqui.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Tudo",
       "announcements": "Só anúncios",
       "none": "Silenciado"
-    }
+    },
+    "wodNoWorkout": "Hoje não há WOD de aula.",
+    "wodScoreCount": "Pontuações de hoje: {count}",
+    "wodLeaderboard": "Classificação",
+    "wodYou": "Tu",
+    "wodNoScore": "ainda sem pontuação",
+    "wodLogScore": "Regista a tua pontuação",
+    "wodOptInHint": "Só tu vês o teu lugar até ativares as classificações.",
+    "wodOptInLink": "Ativar",
+    "announcementsEmpty": "Ainda não há anúncios.",
+    "announcementsOpen": "Todos os anúncios",
+    "channelShowAll": "Todos os canais",
+    "channelSuggested": "Sugerido",
+    "channelSuggestedHint": "reservas esta aula com frequência",
+    "channelsOfBox": "Da box",
+    "channelsClassGroups": "Grupos de aula",
+    "channelsOther": "Outros canais"
   }
 }

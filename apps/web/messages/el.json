@@ -4948,7 +4948,6 @@
     "homeTitle": "Αρχική",
     "wodToday": "Το WOD της ημέρας στο box",
     "wodTodayEmpty": "Δεν υπάρχει WOD μαθήματος σήμερα.",
-    "openInBox": "Άνοιγμα στο Box",
     "feedPosts": "Από το club σου",
     "feedPostsEmpty": "Οι αναρτήσεις του club σου θα εμφανίζονται εδώ.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Όλα",
       "announcements": "Μόνο ανακοινώσεις",
       "none": "Σίγαση"
-    }
+    },
+    "wodNoWorkout": "Σήμερα δεν υπάρχει WOD τάξης.",
+    "wodScoreCount": "Σκορ σήμερα: {count}",
+    "wodLeaderboard": "Κατάταξη",
+    "wodYou": "Εσύ",
+    "wodNoScore": "δεν έχεις σκορ",
+    "wodLogScore": "Καταχώρησε το σκορ σου",
+    "wodOptInHint": "Μόνο εσύ βλέπεις τη θέση σου μέχρι να ενεργοποιήσεις τα leaderboards.",
+    "wodOptInLink": "Ενεργοποίηση",
+    "announcementsEmpty": "Δεν υπάρχουν ακόμη ανακοινώσεις.",
+    "announcementsOpen": "Όλες οι ανακοινώσεις",
+    "channelShowAll": "Όλα τα κανάλια",
+    "channelSuggested": "Προτείνεται",
+    "channelSuggestedHint": "κάνεις συχνά κράτηση σε αυτή την τάξη",
+    "channelsOfBox": "Του box",
+    "channelsClassGroups": "Ομάδες τάξεων",
+    "channelsOther": "Άλλα κανάλια"
   }
 }

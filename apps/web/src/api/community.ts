@@ -15,10 +15,13 @@ export type CommunityFeedPage = components["schemas"]["CommunityFeedPage"];
 export type CommunityComment = components["schemas"]["CommunityComment"];
 export type PostCreate = components["schemas"]["CommunityPostCreateRequest"];
 export type AttachmentType = NonNullable<PostCreate["attachment_type"]>;
+export type WodTodayCard = components["schemas"]["WodTodayCard"];
+export type WodLeaderboardEntry = components["schemas"]["WodLeaderboardEntry"];
 
 export const NOTIFY_LEVELS: NotifyLevel[] = ["all", "announcements", "none"];
 export const CLUBS_KEY = ["community", "clubs"] as const;
 export const FEED_KEY = ["community", "feed"] as const;
+export const WOD_KEY = ["community", "wod-today"] as const;
 
 export type FeedFilter = { clubId?: string | null; channelId?: string | null; mine?: boolean };
 
@@ -95,4 +98,10 @@ export function setChannelJoined(token: string, slug: string, channelId: string,
     method: joined ? "POST" : "DELETE",
     token,
   });
+}
+
+/** The gym's #wod card for the member's local today: WOD, classes, leaderboard (D6). */
+export function fetchWodToday(token: string, slug: string, timezone: string) {
+  const query = new URLSearchParams({ timezone });
+  return apiRequest<WodTodayCard>(`${base(slug)}/wod-today?${query.toString()}`, { token });
 }

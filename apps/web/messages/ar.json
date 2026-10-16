@@ -4948,7 +4948,6 @@
     "homeTitle": "الرئيسية",
     "wodToday": "تمرين اليوم في النادي",
     "wodTodayEmpty": "لا يوجد تمرين حصة اليوم.",
-    "openInBox": "فتح في Box",
     "feedPosts": "من ناديك",
     "feedPostsEmpty": "ستظهر هنا منشورات ناديك.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "الكل",
       "announcements": "الإعلانات فقط",
       "none": "كتم"
-    }
+    },
+    "wodNoWorkout": "لا يوجد WOD للحصة اليوم.",
+    "wodScoreCount": "نتائج اليوم: {count}",
+    "wodLeaderboard": "الترتيب",
+    "wodYou": "أنت",
+    "wodNoScore": "لا نتيجة بعد",
+    "wodLogScore": "سجّل نتيجتك",
+    "wodOptInHint": "أنت وحدك ترى ترتيبك حتى تفعّل لوحات الترتيب.",
+    "wodOptInLink": "تفعيل",
+    "announcementsEmpty": "لا توجد إعلانات بعد.",
+    "announcementsOpen": "كل الإعلانات",
+    "channelShowAll": "كل القنوات",
+    "channelSuggested": "مقترح",
+    "channelSuggestedHint": "تحجز هذه الحصة كثيرًا",
+    "channelsOfBox": "من النادي",
+    "channelsClassGroups": "مجموعات الحصص",
+    "channelsOther": "قنوات أخرى"
   }
 }

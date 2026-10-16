@@ -60,3 +60,34 @@ describe("attachments", async () => {
     expect(attachmentTypeOf("note")).toBeNull();
   });
 });
+
+describe("club page helpers", async () => {
+  const { builtInChannel, channelSections, gymClubFor } = await import("./community");
+
+  it("picks the selected gym's club, else the first gym club", () => {
+    const clubs = [club("a", []), club("b", [])];
+    expect(gymClubFor(clubs, "org-b")?.id).toBe("b");
+    expect(gymClubFor(clubs, "org-x")?.id).toBe("a");
+    expect(gymClubFor([], "org-a")).toBeNull();
+  });
+
+  it("finds a built-in channel by kind", () => {
+    const gym = club("a", [channel("a1", "announcements", false), channel("a2", "wod", true)]);
+    expect(builtInChannel(gym, "wod")?.id).toBe("a2");
+    expect(builtInChannel(gym, "challenges")).toBeNull();
+    expect(builtInChannel(null, "wod")).toBeNull();
+  });
+
+  it("groups channels with offered class groups first", () => {
+    const group = (id: string, name: string, suggested: boolean) => ({ ...channel(id, "class_slot", false), name, suggested });
+    const sections = channelSections([
+      channel("w", "wod", true),
+      group("g1", "CrossFit 07:00", false),
+      group("g2", "CrossFit 18:00", true),
+      channel("s", "season", false),
+    ]);
+    expect(sections.box.map((c) => c.id)).toEqual(["w"]);
+    expect(sections.classes.map((c) => c.id)).toEqual(["g2", "g1"]);
+    expect(sections.other.map((c) => c.id)).toEqual(["s"]);
+  });
+});

@@ -4948,7 +4948,6 @@
     "homeTitle": "בית",
     "wodToday": "האימון היומי במכון",
     "wodTodayEmpty": "אין היום אימון בשיעורים.",
-    "openInBox": "פתיחה ב-Box",
     "feedPosts": "מהמועדון שלכם",
     "feedPostsEmpty": "הפוסטים של המועדון שלכם יופיעו כאן.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "הכול",
       "announcements": "הודעות בלבד",
       "none": "מושתק"
-    }
+    },
+    "wodNoWorkout": "אין היום WOD של שיעור.",
+    "wodScoreCount": "תוצאות היום: {count}",
+    "wodLeaderboard": "דירוג",
+    "wodYou": "את/ה",
+    "wodNoScore": "עדיין אין תוצאה",
+    "wodLogScore": "הזן את התוצאה שלך",
+    "wodOptInHint": "רק את/ה רואים את המיקום שלך עד שתפעילו את טבלאות הדירוג.",
+    "wodOptInLink": "הפעלה",
+    "announcementsEmpty": "אין עדיין הודעות.",
+    "announcementsOpen": "כל ההודעות",
+    "channelShowAll": "כל הערוצים",
+    "channelSuggested": "מומלץ",
+    "channelSuggestedHint": "את/ה מזמינים את השיעור הזה לעיתים קרובות",
+    "channelsOfBox": "מהמכון",
+    "channelsClassGroups": "קבוצות שיעורים",
+    "channelsOther": "ערוצים אחרים"
   }
 }

@@ -4948,7 +4948,6 @@
     "homeTitle": "Начало",
     "wodToday": "Тренировката на деня в залата",
     "wodTodayEmpty": "Днес няма тренировка в часовете.",
-    "openInBox": "Отвори в Box",
     "feedPosts": "От вашия клуб",
     "feedPostsEmpty": "Публикациите на вашия клуб ще се появяват тук.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Всички",
       "announcements": "Само съобщения",
       "none": "Заглушено"
-    }
+    },
+    "wodNoWorkout": "Днес няма WOD за тренировка.",
+    "wodScoreCount": "Резултати днес: {count}",
+    "wodLeaderboard": "Класиране",
+    "wodYou": "Ти",
+    "wodNoScore": "все още няма резултат",
+    "wodLogScore": "Въведи резултата си",
+    "wodOptInHint": "Само ти виждаш мястото си, докато не включиш класиранията.",
+    "wodOptInLink": "Включи",
+    "announcementsEmpty": "Все още няма съобщения.",
+    "announcementsOpen": "Всички съобщения",
+    "channelShowAll": "Всички канали",
+    "channelSuggested": "Предложено",
+    "channelSuggestedHint": "често резервираш тази тренировка",
+    "channelsOfBox": "От залата",
+    "channelsClassGroups": "Групи по тренировки",
+    "channelsOther": "Други канали"
   }
 }

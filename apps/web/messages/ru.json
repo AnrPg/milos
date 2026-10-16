@@ -4948,7 +4948,6 @@
     "homeTitle": "Главная",
     "wodToday": "Тренировка дня в зале",
     "wodTodayEmpty": "Сегодня нет тренировки на занятиях.",
-    "openInBox": "Открыть в Box",
     "feedPosts": "Из вашего клуба",
     "feedPostsEmpty": "Здесь появятся публикации вашего клуба.",
     "entryGroup": {
@@ -5120,6 +5119,22 @@
       "all": "Все",
       "announcements": "Только объявления",
       "none": "Без звука"
-    }
+    },
+    "wodNoWorkout": "Сегодня нет WOD занятия.",
+    "wodScoreCount": "Результатов сегодня: {count}",
+    "wodLeaderboard": "Рейтинг",
+    "wodYou": "Вы",
+    "wodNoScore": "пока нет результата",
+    "wodLogScore": "Внесите свой результат",
+    "wodOptInHint": "Только вы видите своё место, пока не включите рейтинги.",
+    "wodOptInLink": "Включить",
+    "announcementsEmpty": "Объявлений пока нет.",
+    "announcementsOpen": "Все объявления",
+    "channelShowAll": "Все каналы",
+    "channelSuggested": "Рекомендуем",
+    "channelSuggestedHint": "вы часто бронируете это занятие",
+    "channelsOfBox": "От зала",
+    "channelsClassGroups": "Группы занятий",
+    "channelsOther": "Другие каналы"
   }
 }
