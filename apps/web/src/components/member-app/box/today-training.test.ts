@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import type { AssignedWorkoutRecord } from "@/api/assigned-workouts";
 import type { ScheduleSlot } from "@/api/schedule";
 
-import { buildTodayTraining, defaultTodayItem, gymWodToday, logSourceFor } from "./today-training";
+import { buildTodayTraining, defaultTodayItem, logSourceFor } from "./today-training";
 
 const now = new Date(2026, 9, 15, 9, 0);
 const at = (hour: number, day = 15) => new Date(2026, 9, day, hour, 0).toISOString();
@@ -160,25 +160,32 @@ describe("logSourceFor", () => {
   });
 });
 
-describe("gymWodToday", () => {
-  it("is today's first class WOD, listed with every class of today that runs it, booked or not", () => {
-    const slots = [
-      slot("evening", at(19), { current_user_booking: null, workout: workout("w-fran", "Fran") }),
-      slot("morning", at(7), { current_user_booking: null, workout: workout("w-fran", "Fran") }),
-      slot("open", at(12), { workout: workout("w-open", "Open gym") }),
-      slot("tomorrow", at(7, 16)),
-    ];
+describe("bookingCheckIn", async () => {
+  const { bookingCheckIn } = await import("./today-training");
+  const base = new Date("2026-10-16T17:00:00Z");
+  const classAt = (status: string, extra: Record<string, unknown> = {}) =>
+    ({
+      id: "c",
+      scheduled_at: base.toISOString(),
+      duration_minutes: 60,
+      current_user_booking: { id: "b", status, inserted_at: base.toISOString(), ...extra },
+    }) as unknown as Parameters<typeof bookingCheckIn>[0];
+  const minutes = (n: number) => new Date(base.getTime() + n * 60_000);
 
-    expect(gymWodToday(slots, now)).toEqual({
-      workout: slots[1]!.workout,
-      classes: [
-        { slotId: "morning", scheduledAt: at(7) },
-        { slotId: "evening", scheduledAt: at(19) },
-      ],
-    });
+  it("opens 30 minutes before the class and closes when it ends", () => {
+    expect(bookingCheckIn(classAt("approved"), minutes(-31)).canCheckIn).toBe(false);
+    expect(bookingCheckIn(classAt("approved"), minutes(-30)).canCheckIn).toBe(true);
+    expect(bookingCheckIn(classAt("approved"), minutes(59))).toEqual({ checkedIn: false, canCheckIn: true, live: true });
+    expect(bookingCheckIn(classAt("approved"), minutes(60)).canCheckIn).toBe(false);
   });
 
-  it("is null on a day without a class WOD", () => {
-    expect(gymWodToday([slot("tomorrow", at(7, 16)), slot("bare", at(9), { workout: null })], now)).toBeNull();
+  it("needs an approved booking and stops once checked in or marked by staff", () => {
+    expect(bookingCheckIn(classAt("pending"), minutes(0)).canCheckIn).toBe(false);
+    expect(bookingCheckIn(classAt("approved", { attendance_status: "attended" }), minutes(0))).toEqual({
+      checkedIn: true,
+      canCheckIn: false,
+      live: true,
+    });
+    expect(bookingCheckIn(classAt("approved", { attendance_status: "no_show" }), minutes(0)).canCheckIn).toBe(false);
   });
 });

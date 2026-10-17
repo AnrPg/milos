@@ -23,4 +23,7 @@ defmodule MilosTraining.Execution.Ports.ExecutionStore do
   @callback set_execution_visibility(binary(), binary(), String.t()) ::
               {:ok, map()} | {:error, :not_found} | {:error, Ecto.Changeset.t()}
   @callback move_executions(binary(), [String.t()], String.t()) :: non_neg_integer()
+
+  # ADR-138 D6: one gym's finished executions of a workout in a window.
+  @callback list_completed_for_workout(binary(), binary(), DateTime.t(), DateTime.t()) :: [map()]
 end

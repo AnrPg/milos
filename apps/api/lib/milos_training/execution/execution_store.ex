@@ -59,4 +59,8 @@ defmodule MilosTraining.Execution.ExecutionStore do
   @impl true
   def progress_operation_applied?(execution_id, user_id, operation_id),
     do: adapter().progress_operation_applied?(execution_id, user_id, operation_id)
+
+  @impl true
+  def list_completed_for_workout(organization_id, workout_id, from, to),
+    do: adapter().list_completed_for_workout(organization_id, workout_id, from, to)
 end

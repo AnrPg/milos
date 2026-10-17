@@ -28,6 +28,8 @@ import {
 } from "@/i18n/locales";
 import { PageHeader } from "@/components/PageHeader";
 import { ReplayTourButton } from "@/components/onboarding/Onboarding";
+import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
+import { ThemeSetting } from "@/components/profile/ThemeSetting";
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -278,6 +280,12 @@ export function ProfilePage() {
             </p>
           ) : null}
         </CollapsibleSection>
+
+        <CollapsibleSection id="theme" title={tProfile("themeTitle")} description={tProfile("themeDescription")}>
+          <ThemeSetting />
+        </CollapsibleSection>
+
+        <OutboxSettingsCard />
 
         <CollapsibleSection
           id="security"

@@ -11,6 +11,7 @@ import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { fetchTrainingLogSources } from "@/api/training-log";
 import { useWorkoutLauncher } from "@/components/client/use-workout-launcher";
 import { HubButton, HubCard } from "@/components/member-app/HubParts";
+import { NextBookingActions } from "@/components/member-app/box/NextBookingActions";
 import {
   buildTodayTraining,
   defaultTodayItem,
@@ -186,6 +187,15 @@ export function BoxToday() {
             )}
 
             <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+            {selected.kind === "programme" && !selected.completed ? (
+              <Link
+                href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
+                className="self-start text-sm font-semibold"
+                style={{ color: "var(--primary-strong)" }}
+              >
+                {t("programmeManage")} ›
+              </Link>
+            ) : null}
             <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
             <WorkoutPreviewDetail
               sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
@@ -253,6 +263,7 @@ export function BoxToday() {
                 {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
               </span>
             </div>
+            <NextBookingActions slot={booking} />
             <Link
               href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
               className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold"

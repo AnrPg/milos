@@ -143,24 +143,25 @@ export function logSourceFor(item: TodayTrainingItem, sources: LogSources | unde
     : null;
 }
 
-export type GymWodToday = { workout: WorkoutPreview; classes: { slotId: string; scheduledAt: string }[] };
+export type BookingCheckIn = { checkedIn: boolean; canCheckIn: boolean; live: boolean };
 
 /**
- * The gym's WOD of the day for Αρχική (the future #wod-σήμερα card, ADR-138):
- * the workout of today's first class that has one, with every class of today
- * that runs it. Booking does not matter here; this is the gym's day, not mine.
+ * The next-booking card's check-in state (TD-105): checked in already, may
+ * check in now (approved booking, inside the window the server gave), and
+ * whether the class is running, so its live timer can be followed.
  */
-export function gymWodToday(slots: ScheduleSlot[], now: Date): GymWodToday | null {
-  const today = localIsoDate(now);
-  const todays = slots
-    .filter((slot) => slot.workout && localIsoDate(new Date(slot.scheduled_at)) === today)
-    .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
-  const first = todays[0];
-  if (!first?.workout) return null;
+export function bookingCheckIn(slot: ScheduleSlot, now: Date): BookingCheckIn {
+  const booking = slot.current_user_booking;
+  const at = now.getTime();
+  const starts = new Date(slot.scheduled_at).getTime();
+  const ends = starts + slot.duration_minutes * 60_000;
+  const approved = booking?.status === "approved";
+  const checkedIn = booking?.attendance_status === "attended";
+  const opens = booking?.check_in_opens_at ? new Date(booking.check_in_opens_at).getTime() : starts - 30 * 60_000;
+  const closes = booking?.check_in_closes_at ? new Date(booking.check_in_closes_at).getTime() : ends;
   return {
-    workout: first.workout,
-    classes: todays
-      .filter((slot) => slot.workout?.id === first.workout!.id)
-      .map((slot) => ({ slotId: slot.id, scheduledAt: slot.scheduled_at })),
+    checkedIn,
+    canCheckIn: approved && !checkedIn && !booking?.attendance_status && at >= opens && at < closes,
+    live: approved && at >= starts && at < ends,
   };
 }

@@ -42,4 +42,6 @@ defmodule MilosTraining.Gamification.Ports.GamificationStore do
   @callback get_user_preferences(user_id :: Ecto.UUID.t()) :: map() | nil
   @callback upsert_user_preferences(user_id :: Ecto.UUID.t(), params :: map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
+
+  @callback leaderboard_opted_in_user_ids([Ecto.UUID.t()]) :: [Ecto.UUID.t()]
 end

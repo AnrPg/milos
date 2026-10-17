@@ -11,6 +11,7 @@ defmodule MilosTraining.Identity.Domain.AccountExport do
       "role" => account.role && to_string(account.role),
       "email" => account.email,
       "preferred_locale" => account.preferred_locale,
+      "preferred_theme_slug" => account.preferred_theme_slug,
       "avatar_url" => account.avatar_url,
       "inserted_at" => account.inserted_at && to_string(account.inserted_at)
     }

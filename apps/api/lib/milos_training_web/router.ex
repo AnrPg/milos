@@ -278,6 +278,30 @@ defmodule MilosTrainingWeb.Router do
     post("/threads/:id/read", MessagingController, :mark_read)
   end
 
+  # ADR-138: a member's choices about their gym's club and its channels.
+  scope "/api/org/:organization_slug/community", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/wod-today", CommunityController, :wod_today)
+    put("/clubs/:id/notify-level", CommunityController, :set_notify_level)
+    post("/channels/:id/membership", CommunityController, :join_channel)
+    delete("/channels/:id/membership", CommunityController, :leave_channel)
+    post("/posts", CommunityPostController, :create)
+    delete("/posts/:id", CommunityPostController, :delete)
+    put("/posts/:id/hidden", CommunityPostController, :hide)
+    put("/posts/:id/pinned", CommunityPostController, :pin)
+    put("/posts/:id/kudos", CommunityPostController, :kudos)
+    get("/posts/:id/comments", CommunityPostController, :comments)
+    post("/posts/:id/comments", CommunityPostController, :comment)
+    delete("/comments/:id", CommunityPostController, :delete_comment)
+  end
+
   # ADR-118: standalone training log (class / offline workouts).
   scope "/api/org/:organization_slug/me/training-log", MilosTrainingWeb do
     pipe_through([
@@ -327,6 +351,7 @@ defmodule MilosTrainingWeb.Router do
     post("/bookings/waitlist", ScheduleController, :join_waitlist)
     post("/bookings/guests", ScheduleController, :create_guest_booking)
     delete("/bookings/:id", ScheduleController, :delete_booking)
+    post("/bookings/:id/check-in", ScheduleController, :check_in_class)
     get("/locations", ScheduleController, :locations)
     post("/check-ins", ScheduleController, :check_in)
     get("/workouts/:id", WorkoutController, :show)
@@ -865,6 +890,8 @@ defmodule MilosTrainingWeb.Router do
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)
     delete("/me/journal/notes/:id", JournalController, :delete_note)
+    get("/me/clubs", CommunityController, :my_clubs)
+    get("/me/feed", CommunityPostController, :feed)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

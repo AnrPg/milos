@@ -47,6 +47,9 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         Map.put(acc, workout_id, Workouts.get_workout(context, workout_id))
       end)
 
+    # TD-105: the member's own check-in state on each class they booked.
+    my_attendance = Scheduling.list_user_attendance(context, actor.id, Enum.map(slots, & &1.id))
+
     Enum.map(slots, fn slot ->
       workout = Map.get(workout_cache, slot.master_workout_id)
       current_booking = Enum.find(slot.bookings, &active_booking_for_user?(&1, actor.id))
@@ -80,7 +83,9 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
           current_booking &&
             current_booking
             |> enrich_booking(nickname_cache)
-            |> Map.put(:waitlist_position, waitlist_position(waitlist, current_booking)),
+            |> Map.put(:waitlist_position, waitlist_position(waitlist, current_booking))
+            |> Map.put(:attendance_status, Map.get(my_attendance, slot.id))
+            |> Map.merge(check_in_window(slot)),
         current_user_guest: current_guest && enrich_booking(current_guest, nickname_cache)
       }
 
@@ -220,6 +225,11 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
           }
         end)
     }
+  end
+
+  defp check_in_window(slot) do
+    {opens_at, closes_at} = Scheduling.self_check_in_window(slot)
+    %{check_in_opens_at: opens_at, check_in_closes_at: closes_at}
   end
 
   defp enrich_booking(booking, nickname_cache) do

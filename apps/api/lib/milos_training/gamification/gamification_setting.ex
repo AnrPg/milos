@@ -4,7 +4,7 @@ defmodule MilosTraining.Gamification.GamificationSetting do
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
-  @theme_slugs ~w(ember sage steel aurora royal volt noir daybreak paper lagoon sunset)
+  @theme_slugs MilosTraining.Themes.slugs()
 
   schema "gamification_settings" do
     field :organization_id, :binary_id

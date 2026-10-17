@@ -60,9 +60,28 @@ function CoachingContent() {
         </p>
       ) : null}
       <LatestFromCoach />
+      <ProgrammeLink />
       {showReviews ? <FormReviews /> : null}
       {showNutrition ? <NutritionPlanCard /> : null}
     </div>
+  );
+}
+
+/** The coach's programme: change a day, decline a workout, or ask for one (Box › Coach). */
+function ProgrammeLink() {
+  const i18n = useUiTranslations();
+  return (
+    <Link
+      href="/box/workouts"
+      className="flex min-h-11 items-center justify-between gap-3 rounded-2xl px-4 py-3"
+      style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+    >
+      <span>
+        <span className="block text-sm font-bold" style={{ color: "var(--text)" }}>{i18n("coachProgrammeTitle")}</span>
+        <span className="block text-xs" style={{ color: "var(--dim)" }}>{i18n("coachProgrammeHint")}</span>
+      </span>
+      <span aria-hidden="true" style={{ color: "var(--dim)" }}>›</span>
+    </Link>
   );
 }
 

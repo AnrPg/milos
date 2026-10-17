@@ -887,6 +887,1328 @@
         "title": "CoachingRelationship",
         "type": "object"
       },
+      "CommunityAuthor": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "CommunityAuthor",
+        "type": "object"
+      },
+      "CommunityChannel": {
+        "properties": {
+          "can_leave": {
+            "description": "You may join or leave it yourself",
+            "type": "boolean"
+          },
+          "can_post": {
+            "type": "boolean"
+          },
+          "context_type": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "joined": {
+            "description": "Its posts reach your feed",
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "announcements",
+              "wod",
+              "challenges",
+              "class_slot",
+              "season",
+              "custom"
+            ],
+            "type": "string"
+          },
+          "membership": {
+            "enum": [
+              "everyone",
+              "opt_in",
+              "invite"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "Null for built-in channels",
+            "nullable": true,
+            "type": "string"
+          },
+          "participant": {
+            "description": "You are a member of this channel",
+            "type": "boolean"
+          },
+          "suggested": {
+            "description": "Offered to you (you often book its class) and not joined yet",
+            "type": "boolean"
+          },
+          "write_policy": {
+            "enum": [
+              "staff",
+              "members",
+              "participants",
+              "system_and_members"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "write_policy",
+          "membership",
+          "joined",
+          "can_post",
+          "can_leave"
+        ],
+        "title": "CommunityChannel",
+        "type": "object"
+      },
+      "CommunityChannelMembershipResponse": {
+        "properties": {
+          "channel_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "joined": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "channel_id",
+          "joined"
+        ],
+        "title": "CommunityChannelMembershipResponse",
+        "type": "object"
+      },
+      "CommunityClub": {
+        "properties": {
+          "channels": {
+            "items": {
+              "properties": {
+                "can_leave": {
+                  "description": "You may join or leave it yourself",
+                  "type": "boolean"
+                },
+                "can_post": {
+                  "type": "boolean"
+                },
+                "context_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "joined": {
+                  "description": "Its posts reach your feed",
+                  "type": "boolean"
+                },
+                "kind": {
+                  "enum": [
+                    "announcements",
+                    "wod",
+                    "challenges",
+                    "class_slot",
+                    "season",
+                    "custom"
+                  ],
+                  "type": "string"
+                },
+                "membership": {
+                  "enum": [
+                    "everyone",
+                    "opt_in",
+                    "invite"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "description": "Null for built-in channels",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "participant": {
+                  "description": "You are a member of this channel",
+                  "type": "boolean"
+                },
+                "suggested": {
+                  "description": "Offered to you (you often book its class) and not joined yet",
+                  "type": "boolean"
+                },
+                "write_policy": {
+                  "enum": [
+                    "staff",
+                    "members",
+                    "participants",
+                    "system_and_members"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "write_policy",
+                "membership",
+                "joined",
+                "can_post",
+                "can_leave"
+              ],
+              "title": "CommunityChannel",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "gym",
+              "open",
+              "member_group",
+              "pt_squad",
+              "season"
+            ],
+            "type": "string"
+          },
+          "logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "notify_level": {
+            "enum": [
+              "all",
+              "announcements",
+              "none"
+            ],
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "organization_slug": {
+            "type": "string"
+          },
+          "primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "member",
+              "staff"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "organization_id",
+          "organization_slug",
+          "kind",
+          "name",
+          "role",
+          "notify_level",
+          "channels"
+        ],
+        "title": "CommunityClub",
+        "type": "object"
+      },
+      "CommunityClubsResponse": {
+        "properties": {
+          "clubs": {
+            "items": {
+              "properties": {
+                "channels": {
+                  "items": {
+                    "properties": {
+                      "can_leave": {
+                        "description": "You may join or leave it yourself",
+                        "type": "boolean"
+                      },
+                      "can_post": {
+                        "type": "boolean"
+                      },
+                      "context_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "joined": {
+                        "description": "Its posts reach your feed",
+                        "type": "boolean"
+                      },
+                      "kind": {
+                        "enum": [
+                          "announcements",
+                          "wod",
+                          "challenges",
+                          "class_slot",
+                          "season",
+                          "custom"
+                        ],
+                        "type": "string"
+                      },
+                      "membership": {
+                        "enum": [
+                          "everyone",
+                          "opt_in",
+                          "invite"
+                        ],
+                        "type": "string"
+                      },
+                      "name": {
+                        "description": "Null for built-in channels",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "participant": {
+                        "description": "You are a member of this channel",
+                        "type": "boolean"
+                      },
+                      "suggested": {
+                        "description": "Offered to you (you often book its class) and not joined yet",
+                        "type": "boolean"
+                      },
+                      "write_policy": {
+                        "enum": [
+                          "staff",
+                          "members",
+                          "participants",
+                          "system_and_members"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "kind",
+                      "write_policy",
+                      "membership",
+                      "joined",
+                      "can_post",
+                      "can_leave"
+                    ],
+                    "title": "CommunityChannel",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "gym",
+                    "open",
+                    "member_group",
+                    "pt_squad",
+                    "season"
+                  ],
+                  "type": "string"
+                },
+                "logo_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "notify_level": {
+                  "enum": [
+                    "all",
+                    "announcements",
+                    "none"
+                  ],
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "organization_slug": {
+                  "type": "string"
+                },
+                "primary_color": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "member",
+                    "staff"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "organization_id",
+                "organization_slug",
+                "kind",
+                "name",
+                "role",
+                "notify_level",
+                "channels"
+              ],
+              "title": "CommunityClub",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "clubs"
+        ],
+        "title": "CommunityClubsResponse",
+        "type": "object"
+      },
+      "CommunityComment": {
+        "properties": {
+          "author": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityAuthor",
+            "type": "object"
+          },
+          "body": {
+            "type": "string"
+          },
+          "can_delete": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "post_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "post_id",
+          "author",
+          "body",
+          "inserted_at",
+          "can_delete"
+        ],
+        "title": "CommunityComment",
+        "type": "object"
+      },
+      "CommunityCommentRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "CommunityCommentRequest",
+        "type": "object"
+      },
+      "CommunityCommentResponse": {
+        "properties": {
+          "comment": {
+            "properties": {
+              "author": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityAuthor",
+                "type": "object"
+              },
+              "body": {
+                "type": "string"
+              },
+              "can_delete": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "post_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "post_id",
+              "author",
+              "body",
+              "inserted_at",
+              "can_delete"
+            ],
+            "title": "CommunityComment",
+            "type": "object"
+          }
+        },
+        "required": [
+          "comment"
+        ],
+        "title": "CommunityCommentResponse",
+        "type": "object"
+      },
+      "CommunityCommentsResponse": {
+        "properties": {
+          "comments": {
+            "items": {
+              "properties": {
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "body": {
+                  "type": "string"
+                },
+                "can_delete": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "post_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "post_id",
+                "author",
+                "body",
+                "inserted_at",
+                "can_delete"
+              ],
+              "title": "CommunityComment",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "comments"
+        ],
+        "title": "CommunityCommentsResponse",
+        "type": "object"
+      },
+      "CommunityFeedPage": {
+        "properties": {
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "pinned": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "additionalProperties": true,
+                  "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "attachment_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "attachment_type": {
+                  "enum": [
+                    "training_log_entry",
+                    "workout_execution",
+                    "pr"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "body": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_delete": {
+                  "type": "boolean"
+                },
+                "can_moderate": {
+                  "type": "boolean"
+                },
+                "can_pin": {
+                  "type": "boolean"
+                },
+                "channel": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "club": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organization_slug": {
+                      "type": "string"
+                    },
+                    "primary_color": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "organization_slug"
+                  ],
+                  "type": "object"
+                },
+                "comment_count": {
+                  "type": "integer"
+                },
+                "hidden": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "kudos_by_me": {
+                  "type": "boolean"
+                },
+                "kudos_count": {
+                  "type": "integer"
+                },
+                "pinned": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "club",
+                "channel",
+                "author",
+                "pinned",
+                "hidden",
+                "kudos_count",
+                "comment_count",
+                "kudos_by_me",
+                "can_delete",
+                "can_moderate",
+                "can_pin",
+                "inserted_at"
+              ],
+              "title": "CommunityPost",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "posts": {
+            "items": {
+              "properties": {
+                "attachment": {
+                  "additionalProperties": true,
+                  "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "attachment_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "attachment_type": {
+                  "enum": [
+                    "training_log_entry",
+                    "workout_execution",
+                    "pr"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "body": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_delete": {
+                  "type": "boolean"
+                },
+                "can_moderate": {
+                  "type": "boolean"
+                },
+                "can_pin": {
+                  "type": "boolean"
+                },
+                "channel": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "club": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organization_slug": {
+                      "type": "string"
+                    },
+                    "primary_color": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "organization_slug"
+                  ],
+                  "type": "object"
+                },
+                "comment_count": {
+                  "type": "integer"
+                },
+                "hidden": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "kudos_by_me": {
+                  "type": "boolean"
+                },
+                "kudos_count": {
+                  "type": "integer"
+                },
+                "pinned": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "club",
+                "channel",
+                "author",
+                "pinned",
+                "hidden",
+                "kudos_count",
+                "comment_count",
+                "kudos_by_me",
+                "can_delete",
+                "can_moderate",
+                "can_pin",
+                "inserted_at"
+              ],
+              "title": "CommunityPost",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "pinned",
+          "posts"
+        ],
+        "title": "CommunityFeedPage",
+        "type": "object"
+      },
+      "CommunityNotifyLevelRequest": {
+        "properties": {
+          "notify_level": {
+            "enum": [
+              "all",
+              "announcements",
+              "none"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "notify_level"
+        ],
+        "title": "CommunityNotifyLevelRequest",
+        "type": "object"
+      },
+      "CommunityNotifyLevelResponse": {
+        "properties": {
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "notify_level": {
+            "enum": [
+              "all",
+              "announcements",
+              "none"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "club_id",
+          "notify_level"
+        ],
+        "title": "CommunityNotifyLevelResponse",
+        "type": "object"
+      },
+      "CommunityPost": {
+        "properties": {
+          "attachment": {
+            "additionalProperties": true,
+            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+            "nullable": true,
+            "type": "object"
+          },
+          "attachment_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "attachment_type": {
+            "enum": [
+              "training_log_entry",
+              "workout_execution",
+              "pr"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "author": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityAuthor",
+            "type": "object"
+          },
+          "body": {
+            "nullable": true,
+            "type": "string"
+          },
+          "can_delete": {
+            "type": "boolean"
+          },
+          "can_moderate": {
+            "type": "boolean"
+          },
+          "can_pin": {
+            "type": "boolean"
+          },
+          "channel": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kind": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "club": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_slug": {
+                "type": "string"
+              },
+              "primary_color": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "organization_slug"
+            ],
+            "type": "object"
+          },
+          "comment_count": {
+            "type": "integer"
+          },
+          "hidden": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "kudos_by_me": {
+            "type": "boolean"
+          },
+          "kudos_count": {
+            "type": "integer"
+          },
+          "pinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "club",
+          "channel",
+          "author",
+          "pinned",
+          "hidden",
+          "kudos_count",
+          "comment_count",
+          "kudos_by_me",
+          "can_delete",
+          "can_moderate",
+          "can_pin",
+          "inserted_at"
+        ],
+        "title": "CommunityPost",
+        "type": "object"
+      },
+      "CommunityPostCreateRequest": {
+        "properties": {
+          "attachment_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "attachment_type": {
+            "enum": [
+              "training_log_entry",
+              "workout_execution",
+              "pr"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "channel_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "client_operation_id": {
+            "maxLength": 120,
+            "type": "string"
+          }
+        },
+        "required": [
+          "channel_id"
+        ],
+        "title": "CommunityPostCreateRequest",
+        "type": "object"
+      },
+      "CommunityPostHiddenRequest": {
+        "properties": {
+          "hidden": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "hidden"
+        ],
+        "title": "CommunityPostHiddenRequest",
+        "type": "object"
+      },
+      "CommunityPostKudosRequest": {
+        "properties": {
+          "kudos": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kudos"
+        ],
+        "title": "CommunityPostKudosRequest",
+        "type": "object"
+      },
+      "CommunityPostPinnedRequest": {
+        "properties": {
+          "pinned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "pinned"
+        ],
+        "title": "CommunityPostPinnedRequest",
+        "type": "object"
+      },
+      "CommunityPostResponse": {
+        "properties": {
+          "post": {
+            "properties": {
+              "attachment": {
+                "additionalProperties": true,
+                "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                "nullable": true,
+                "type": "object"
+              },
+              "attachment_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "attachment_type": {
+                "enum": [
+                  "training_log_entry",
+                  "workout_execution",
+                  "pr"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "author": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityAuthor",
+                "type": "object"
+              },
+              "body": {
+                "nullable": true,
+                "type": "string"
+              },
+              "can_delete": {
+                "type": "boolean"
+              },
+              "can_moderate": {
+                "type": "boolean"
+              },
+              "can_pin": {
+                "type": "boolean"
+              },
+              "channel": {
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "type": "object"
+              },
+              "club": {
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "logo_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "type": "string"
+                  },
+                  "primary_color": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "organization_slug"
+                ],
+                "type": "object"
+              },
+              "comment_count": {
+                "type": "integer"
+              },
+              "hidden": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "kudos_by_me": {
+                "type": "boolean"
+              },
+              "kudos_count": {
+                "type": "integer"
+              },
+              "pinned": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "club",
+              "channel",
+              "author",
+              "pinned",
+              "hidden",
+              "kudos_count",
+              "comment_count",
+              "kudos_by_me",
+              "can_delete",
+              "can_moderate",
+              "can_pin",
+              "inserted_at"
+            ],
+            "title": "CommunityPost",
+            "type": "object"
+          }
+        },
+        "required": [
+          "post"
+        ],
+        "title": "CommunityPostResponse",
+        "type": "object"
+      },
       "ContentVideo": {
         "properties": {
           "archived_at": {
@@ -6924,6 +8246,190 @@
         ],
         "type": "object"
       },
+      "WodLeaderboardEntry": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "me": {
+            "type": "boolean"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "opted_in": {
+            "description": "False only on your own row before you opt in to leaderboards",
+            "type": "boolean"
+          },
+          "rank": {
+            "type": "integer"
+          },
+          "scale_level_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "unit": {
+            "nullable": true,
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "value": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "rank",
+          "user_id",
+          "me",
+          "opted_in"
+        ],
+        "title": "WodLeaderboardEntry",
+        "type": "object"
+      },
+      "WodTodayCard": {
+        "properties": {
+          "channel_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "scheduled_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "leaderboard": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "me": {
+                  "type": "boolean"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "opted_in": {
+                  "description": "False only on your own row before you opt in to leaderboards",
+                  "type": "boolean"
+                },
+                "rank": {
+                  "type": "integer"
+                },
+                "scale_level_slug": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "value": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "rank",
+                "user_id",
+                "me",
+                "opted_in"
+              ],
+              "title": "WodLeaderboardEntry",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "logged_by_me": {
+            "type": "boolean"
+          },
+          "score": {
+            "nullable": true,
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "score_type": {
+                "type": "string"
+              },
+              "unit": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "score_type"
+            ],
+            "type": "object"
+          },
+          "workout": {
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "type": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "title"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "date",
+          "classes",
+          "leaderboard",
+          "logged_by_me"
+        ],
+        "title": "WodTodayCard",
+        "type": "object"
+      },
       "WorkoutDslAuthoringResponse": {
         "additionalProperties": false,
         "properties": {
@@ -8030,6 +9536,11 @@
                         "nl",
                         "fr"
                       ],
+                      "type": "string"
+                    },
+                    "preferred_theme_slug": {
+                      "description": "The member's own theme; null follows the gym's",
+                      "nullable": true,
                       "type": "string"
                     },
                     "role": {
@@ -10159,6 +11670,567 @@
         ]
       }
     },
+    "/api/me/clubs": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.my_clubs",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "clubs": {
+                      "items": {
+                        "properties": {
+                          "channels": {
+                            "items": {
+                              "properties": {
+                                "can_leave": {
+                                  "description": "You may join or leave it yourself",
+                                  "type": "boolean"
+                                },
+                                "can_post": {
+                                  "type": "boolean"
+                                },
+                                "context_type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "joined": {
+                                  "description": "Its posts reach your feed",
+                                  "type": "boolean"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "announcements",
+                                    "wod",
+                                    "challenges",
+                                    "class_slot",
+                                    "season",
+                                    "custom"
+                                  ],
+                                  "type": "string"
+                                },
+                                "membership": {
+                                  "enum": [
+                                    "everyone",
+                                    "opt_in",
+                                    "invite"
+                                  ],
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "description": "Null for built-in channels",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "participant": {
+                                  "description": "You are a member of this channel",
+                                  "type": "boolean"
+                                },
+                                "suggested": {
+                                  "description": "Offered to you (you often book its class) and not joined yet",
+                                  "type": "boolean"
+                                },
+                                "write_policy": {
+                                  "enum": [
+                                    "staff",
+                                    "members",
+                                    "participants",
+                                    "system_and_members"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "kind",
+                                "write_policy",
+                                "membership",
+                                "joined",
+                                "can_post",
+                                "can_leave"
+                              ],
+                              "title": "CommunityChannel",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "open",
+                              "member_group",
+                              "pt_squad",
+                              "season"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "notify_level": {
+                            "enum": [
+                              "all",
+                              "announcements",
+                              "none"
+                            ],
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization_slug": {
+                            "type": "string"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "member",
+                              "staff"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "organization_id",
+                          "organization_slug",
+                          "kind",
+                          "name",
+                          "role",
+                          "notify_level",
+                          "channels"
+                        ],
+                        "title": "CommunityClub",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "clubs"
+                  ],
+                  "title": "CommunityClubsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Clubs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your clubs across every gym you belong to, with their channels",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/me/feed": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.feed",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "club_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "channel_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Only your own posts",
+            "in": "query",
+            "name": "mine",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pinned": {
+                      "items": {
+                        "properties": {
+                          "attachment": {
+                            "additionalProperties": true,
+                            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "attachment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attachment_type": {
+                            "enum": [
+                              "training_log_entry",
+                              "workout_execution",
+                              "pr"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "can_moderate": {
+                            "type": "boolean"
+                          },
+                          "can_pin": {
+                            "type": "boolean"
+                          },
+                          "channel": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "club": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "logo_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "organization_slug": {
+                                "type": "string"
+                              },
+                              "primary_color": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "organization_slug"
+                            ],
+                            "type": "object"
+                          },
+                          "comment_count": {
+                            "type": "integer"
+                          },
+                          "hidden": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kudos_by_me": {
+                            "type": "boolean"
+                          },
+                          "kudos_count": {
+                            "type": "integer"
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club",
+                          "channel",
+                          "author",
+                          "pinned",
+                          "hidden",
+                          "kudos_count",
+                          "comment_count",
+                          "kudos_by_me",
+                          "can_delete",
+                          "can_moderate",
+                          "can_pin",
+                          "inserted_at"
+                        ],
+                        "title": "CommunityPost",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "posts": {
+                      "items": {
+                        "properties": {
+                          "attachment": {
+                            "additionalProperties": true,
+                            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "attachment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attachment_type": {
+                            "enum": [
+                              "training_log_entry",
+                              "workout_execution",
+                              "pr"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "can_moderate": {
+                            "type": "boolean"
+                          },
+                          "can_pin": {
+                            "type": "boolean"
+                          },
+                          "channel": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "club": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "logo_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "organization_slug": {
+                                "type": "string"
+                              },
+                              "primary_color": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "organization_slug"
+                            ],
+                            "type": "object"
+                          },
+                          "comment_count": {
+                            "type": "integer"
+                          },
+                          "hidden": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kudos_by_me": {
+                            "type": "boolean"
+                          },
+                          "kudos_count": {
+                            "type": "integer"
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club",
+                          "channel",
+                          "author",
+                          "pinned",
+                          "hidden",
+                          "kudos_count",
+                          "comment_count",
+                          "kudos_by_me",
+                          "can_delete",
+                          "can_moderate",
+                          "can_pin",
+                          "inserted_at"
+                        ],
+                        "title": "CommunityPost",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "pinned",
+                    "posts"
+                  ],
+                  "title": "CommunityFeedPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Feed page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Posts from your clubs, newest first",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -10669,6 +12741,25 @@
                       "fr"
                     ],
                     "type": "string"
+                  },
+                  "preferred_theme_slug": {
+                    "description": "Your own theme; null follows your gym's",
+                    "enum": [
+                      "ember",
+                      "sage",
+                      "steel",
+                      "aurora",
+                      "royal",
+                      "volt",
+                      "noir",
+                      "daybreak",
+                      "paper",
+                      "lagoon",
+                      "sunset",
+                      null
+                    ],
+                    "nullable": true,
+                    "type": "string"
                   }
                 },
                 "type": "object"
@@ -10697,6 +12788,10 @@
                           "type": "string"
                         },
                         "preferred_locale": {
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "nullable": true,
                           "type": "string"
                         },
                         "role": {
@@ -41004,6 +43099,80 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/bookings/{id}/check-in": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScheduleController.check_in_class",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "attendance": {
+                      "properties": {
+                        "marked_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "scheduled_class_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "scheduled_class_id",
+                        "status",
+                        "marked_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "attendance"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Attendance"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outside the check-in window"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Check in to a class you booked (from 30 minutes before it starts until it ends)",
+        "tags": [
+          "Schedule"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/check-ins": {
       "post": {
         "callbacks": {},
@@ -41545,6 +43714,1511 @@
         "summary": "Run a class timer command (coaches and admins)",
         "tags": [
           "Class Timers"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/channels/{id}/membership": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.leave_channel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "channel_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "joined": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "channel_id",
+                    "joined"
+                  ],
+                  "title": "CommunityChannelMembershipResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Leave an opt-in channel",
+        "tags": [
+          "Community"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.join_channel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "channel_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "joined": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "channel_id",
+                    "joined"
+                  ],
+                  "title": "CommunityChannelMembershipResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Join an opt-in channel",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/clubs/{id}/notify-level": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.set_notify_level",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notify_level": {
+                    "enum": [
+                      "all",
+                      "announcements",
+                      "none"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "notify_level"
+                ],
+                "title": "CommunityNotifyLevelRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "club_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "notify_level": {
+                      "enum": [
+                        "all",
+                        "announcements",
+                        "none"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "club_id",
+                    "notify_level"
+                  ],
+                  "title": "CommunityNotifyLevelResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Level"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "How much you hear from a club",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/comments/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.delete_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete your comment (staff: any comment in their club)",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "attachment_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "attachment_type": {
+                    "enum": [
+                      "training_log_entry",
+                      "workout_execution",
+                      "pr"
+                    ],
+                    "type": "string"
+                  },
+                  "body": {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  "channel_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "maxLength": 120,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "channel_id"
+                ],
+                "title": "CommunityPostCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Post in a channel of your gym's club, optionally attaching a journal entry",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete your post (staff: any post in their club)",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts/{id}/comments": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.comments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comments": {
+                      "items": {
+                        "properties": {
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "post_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "post_id",
+                          "author",
+                          "body",
+                          "inserted_at",
+                          "can_delete"
+                        ],
+                        "title": "CommunityComment",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "comments"
+                  ],
+                  "title": "CommunityCommentsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comments"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A post's comments, oldest first",
+        "tags": [
+          "Community"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "CommunityCommentRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comment": {
+                      "properties": {
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "post_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "post_id",
+                        "author",
+                        "body",
+                        "inserted_at",
+                        "can_delete"
+                      ],
+                      "title": "CommunityComment",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "comment"
+                  ],
+                  "title": "CommunityCommentResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Comment on a post",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts/{id}/hidden": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.hide",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "hidden": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "hidden"
+                ],
+                "title": "CommunityPostHiddenRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Staff: hide or show a post",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts/{id}/kudos": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.kudos",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kudos": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "kudos"
+                ],
+                "title": "CommunityPostKudosRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give or take back kudos",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/posts/{id}/pinned": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityPostController.pin",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "pinned": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "pinned"
+                ],
+                "title": "CommunityPostPinnedRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Staff: pin or unpin an announcement",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/wod-today": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CommunityController.wod_today",
+        "parameters": [
+          {
+            "description": "Local date; today in `timezone` when omitted",
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "IANA time zone of the member, e.g. Europe/Athens",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "channel_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "classes": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "scheduled_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "leaderboard": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "me": {
+                            "type": "boolean"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opted_in": {
+                            "description": "False only on your own row before you opt in to leaderboards",
+                            "type": "boolean"
+                          },
+                          "rank": {
+                            "type": "integer"
+                          },
+                          "scale_level_slug": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "rank",
+                          "user_id",
+                          "me",
+                          "opted_in"
+                        ],
+                        "title": "WodLeaderboardEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "logged_by_me": {
+                      "type": "boolean"
+                    },
+                    "score": {
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "score_type": {
+                          "type": "string"
+                        },
+                        "unit": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "score_type"
+                      ],
+                      "type": "object"
+                    },
+                    "workout": {
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "type": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "classes",
+                    "leaderboard",
+                    "logged_by_me"
+                  ],
+                  "title": "WodTodayCard",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Card"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's #wod card for a day: its WOD, classes and leaderboard",
+        "tags": [
+          "Community"
         ]
       }
     },

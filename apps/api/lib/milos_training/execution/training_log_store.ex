@@ -65,4 +65,8 @@ defmodule MilosTraining.Execution.TrainingLogStore do
 
   @impl true
   def move_entries(user_id, from, to), do: adapter().move_entries(user_id, from, to)
+
+  @impl true
+  def list_for_workout(organization_id, workout_id, from, to),
+    do: adapter().list_for_workout(organization_id, workout_id, from, to)
 end

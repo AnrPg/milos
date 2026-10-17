@@ -23,4 +23,7 @@ defmodule MilosTraining.Execution.Ports.TrainingLogStore do
   @callback set_entry_visibility(binary(), binary(), String.t()) ::
               {:ok, entry()} | {:error, :not_found} | {:error, Ecto.Changeset.t()}
   @callback move_entries(binary(), [String.t()], String.t()) :: non_neg_integer()
+
+  # ADR-138 D6: one gym's live entries of a workout in a window.
+  @callback list_for_workout(binary(), binary(), DateTime.t(), DateTime.t()) :: [entry()]
 end

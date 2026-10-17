@@ -244,6 +244,19 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   end
 
   @impl true
+  def list_completed_for_workout(organization_id, workout_id, from, to) do
+    WorkoutExecution
+    |> where(
+      [e],
+      e.organization_id == ^organization_id and e.master_workout_id == ^workout_id and
+        not is_nil(e.completed_at_utc) and e.completed_at_utc >= ^from and
+        e.completed_at_utc < ^to
+    )
+    |> Repo.all()
+    |> Enum.map(&normalize/1)
+  end
+
+  @impl true
   def set_execution_visibility(id, user_id, rung) do
     with {:ok, id} <- Ecto.UUID.cast(id),
          %WorkoutExecution{} = execution <-

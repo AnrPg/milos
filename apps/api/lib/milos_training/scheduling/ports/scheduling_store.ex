@@ -46,6 +46,7 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
             }
   @callback record_attendance(TenantContext.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback list_user_attendance(TenantContext.t(), Ecto.UUID.t(), [Ecto.UUID.t()]) :: map()
   @callback get_attendance_for_user_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               map() | nil
   @callback get_approved_booking_for_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
@@ -131,4 +132,8 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback list_waitlist(TenantContext.t(), Ecto.UUID.t()) :: [map()]
   @callback promote_waitlisted_booking(TenantContext.t(), Ecto.UUID.t()) ::
               {:ok, map()} | {:error, term()}
+
+  # ADR-138 D7: recurring classes and who books them often.
+  @callback list_active_class_series(TenantContext.t()) :: [map()]
+  @callback series_booking_counts(TenantContext.t(), DateTime.t()) :: [map()]
 end
