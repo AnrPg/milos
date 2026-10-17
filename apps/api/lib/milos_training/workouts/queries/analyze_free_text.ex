@@ -20,6 +20,10 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
 
   Proofreader and structure failures never fail the analysis; a parser
   failure does.
+
+  Every agent call of one analysis is metered under one `operation_id`
+  (ADR-141), returned with the result; `options.metering` may carry the tenant
+  (`organization_id`, `user_id`) and a caller-chosen `operation_id`.
   """
 
   require Logger
@@ -30,6 +34,7 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
   @max_length 20_000
   @max_repairs 2
   @agent_timeout 150_000
+  @feature "workout_free_text"
 
   def call(text, options \\ %{})
 
@@ -39,7 +44,7 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
     cond do
       trimmed == "" -> {:error, :text_required}
       String.length(trimmed) > @max_length -> {:error, :text_too_long}
-      true -> analyze(trimmed, options)
+      true -> analyze(trimmed, with_metering(options))
     end
   end
 
@@ -66,6 +71,7 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
         raw
         |> FreeTextAnalysis.normalize(text, corrections)
         |> Map.put("quality", quality)
+        |> Map.put("operation_id", options.metering.operation_id)
 
       {:ok, result}
     else
@@ -73,6 +79,19 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
         Task.shutdown(proofreading, :brutal_kill)
         error
     end
+  end
+
+  defp with_metering(options) do
+    metering = Map.get(options, :metering, %{})
+
+    Map.put(
+      options,
+      :metering,
+      Map.merge(metering, %{
+        operation_id: Map.get(metering, :operation_id) || Ecto.UUID.generate(),
+        feature: @feature
+      })
+    )
   end
 
   defp infer_structure(text, options) do

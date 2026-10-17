@@ -32,6 +32,8 @@ defmodule MilosTraining.Application do
         MilosTraining.Infrastructure.Tenancy.PrivilegeGuard.check!()
         # ADR-123: in-app notification deliveries -> analytics events.
         MilosTraining.Application.RecordNotificationDelivered.attach()
+        # ADR-141: every billed model call -> ai_usage_records.
+        MilosTraining.Application.RecordAiUsage.attach()
         {:ok, pid}
 
       error ->

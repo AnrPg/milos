@@ -7064,6 +7064,11 @@ export interface components {
                     value?: unknown;
                 } | null;
             }[];
+            /**
+             * Format: uuid
+             * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-141)
+             */
+            operation_id?: string;
             /** @description How much the parser answer had to be repaired against the contract */
             quality?: {
                 corrections?: number;
@@ -18545,6 +18550,11 @@ export interface operations {
                                 value?: unknown;
                             } | null;
                         }[];
+                        /**
+                         * Format: uuid
+                         * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-141)
+                         */
+                        operation_id?: string;
                         /** @description How much the parser answer had to be repaired against the contract */
                         quality?: {
                             corrections?: number;
