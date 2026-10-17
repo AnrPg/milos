@@ -481,6 +481,379 @@
         "title": "AthleteInjuryWarningsRequest",
         "type": "object"
       },
+      "BoxPublicProfile": {
+        "properties": {
+          "about": {
+            "nullable": true,
+            "type": "string"
+          },
+          "audiences": {
+            "items": {
+              "enum": [
+                "beginners",
+                "women",
+                "over_40",
+                "seniors",
+                "teens",
+                "athletes",
+                "prenatal",
+                "adaptive"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "disciplines": {
+            "items": {
+              "enum": [
+                "crossfit",
+                "functional_fitness",
+                "hyrox",
+                "strength",
+                "powerlifting",
+                "olympic_lifting",
+                "bodybuilding",
+                "gymnastics",
+                "running",
+                "endurance",
+                "bootcamp",
+                "hiit",
+                "yoga",
+                "pilates",
+                "mobility",
+                "martial_arts",
+                "boxing",
+                "calisthenics",
+                "swimming",
+                "cycling",
+                "dance",
+                "kids"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "languages": {
+            "items": {
+              "pattern": "^[a-z]{2}$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "lock_version": {
+            "type": "integer"
+          },
+          "photos": {
+            "items": {
+              "properties": {
+                "content_type": {
+                  "type": "string"
+                },
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "purpose": {
+                  "enum": [
+                    "body_photo",
+                    "box_photo",
+                    "post_photo"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "ready"
+                  ],
+                  "type": "string"
+                },
+                "url": {
+                  "description": "Stable for public media; presigned and short-lived for private media.",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "purpose",
+                "status",
+                "content_type",
+                "width",
+                "height",
+                "url"
+              ],
+              "title": "Media",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "published": {
+            "type": "boolean"
+          },
+          "published_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "about",
+          "disciplines",
+          "languages",
+          "audiences",
+          "photos",
+          "published",
+          "published_at",
+          "lock_version"
+        ],
+        "title": "BoxPublicProfile",
+        "type": "object"
+      },
+      "BoxPublicProfileResponse": {
+        "properties": {
+          "profile": {
+            "properties": {
+              "about": {
+                "nullable": true,
+                "type": "string"
+              },
+              "audiences": {
+                "items": {
+                  "enum": [
+                    "beginners",
+                    "women",
+                    "over_40",
+                    "seniors",
+                    "teens",
+                    "athletes",
+                    "prenatal",
+                    "adaptive"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "disciplines": {
+                "items": {
+                  "enum": [
+                    "crossfit",
+                    "functional_fitness",
+                    "hyrox",
+                    "strength",
+                    "powerlifting",
+                    "olympic_lifting",
+                    "bodybuilding",
+                    "gymnastics",
+                    "running",
+                    "endurance",
+                    "bootcamp",
+                    "hiit",
+                    "yoga",
+                    "pilates",
+                    "mobility",
+                    "martial_arts",
+                    "boxing",
+                    "calisthenics",
+                    "swimming",
+                    "cycling",
+                    "dance",
+                    "kids"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "languages": {
+                "items": {
+                  "pattern": "^[a-z]{2}$",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "lock_version": {
+                "type": "integer"
+              },
+              "photos": {
+                "items": {
+                  "properties": {
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "height": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "purpose": {
+                      "enum": [
+                        "body_photo",
+                        "box_photo",
+                        "post_photo"
+                      ],
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "ready"
+                      ],
+                      "type": "string"
+                    },
+                    "url": {
+                      "description": "Stable for public media; presigned and short-lived for private media.",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "width": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "purpose",
+                    "status",
+                    "content_type",
+                    "width",
+                    "height",
+                    "url"
+                  ],
+                  "title": "Media",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "published": {
+                "type": "boolean"
+              },
+              "published_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "about",
+              "disciplines",
+              "languages",
+              "audiences",
+              "photos",
+              "published",
+              "published_at",
+              "lock_version"
+            ],
+            "title": "BoxPublicProfile",
+            "type": "object"
+          }
+        },
+        "required": [
+          "profile"
+        ],
+        "title": "BoxPublicProfileResponse",
+        "type": "object"
+      },
+      "BoxPublicProfileUpdate": {
+        "properties": {
+          "about": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "audiences": {
+            "items": {
+              "enum": [
+                "beginners",
+                "women",
+                "over_40",
+                "seniors",
+                "teens",
+                "athletes",
+                "prenatal",
+                "adaptive"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "disciplines": {
+            "items": {
+              "enum": [
+                "crossfit",
+                "functional_fitness",
+                "hyrox",
+                "strength",
+                "powerlifting",
+                "olympic_lifting",
+                "bodybuilding",
+                "gymnastics",
+                "running",
+                "endurance",
+                "bootcamp",
+                "hiit",
+                "yoga",
+                "pilates",
+                "mobility",
+                "martial_arts",
+                "boxing",
+                "calisthenics",
+                "swimming",
+                "cycling",
+                "dance",
+                "kids"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "languages": {
+            "items": {
+              "pattern": "^[a-zA-Z]{2}$",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "lock_version": {
+            "description": "The version the editor read.",
+            "type": "integer"
+          },
+          "photo_ids": {
+            "description": "Ready box_photo media, in display order.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "published": {
+            "type": "boolean"
+          }
+        },
+        "title": "BoxPublicProfileUpdate",
+        "type": "object"
+      },
       "ClassSlotInjuryWarnings": {
         "additionalProperties": false,
         "properties": {
@@ -3172,12 +3545,34 @@
       },
       "FacilityLocation": {
         "properties": {
+          "accessibility": {
+            "items": {
+              "enum": [
+                "step_free",
+                "accessible_toilet",
+                "parking",
+                "changing_room",
+                "showers",
+                "women_area"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
           "address": {
             "nullable": true,
             "type": "string"
           },
           "archived_at": {
             "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "city": {
+            "nullable": true,
+            "type": "string"
+          },
+          "country_code": {
             "nullable": true,
             "type": "string"
           },
@@ -3189,8 +3584,48 @@
             "format": "date-time",
             "type": "string"
           },
+          "latitude": {
+            "nullable": true,
+            "type": "number"
+          },
+          "longitude": {
+            "nullable": true,
+            "type": "number"
+          },
           "name": {
             "type": "string"
+          },
+          "neighbourhood": {
+            "nullable": true,
+            "type": "string"
+          },
+          "opening_hours": {
+            "items": {
+              "properties": {
+                "closes": {
+                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                  "type": "string"
+                },
+                "opens": {
+                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                  "type": "string"
+                },
+                "weekday": {
+                  "description": "ISO weekday, Monday = 1",
+                  "maximum": 7,
+                  "minimum": 1,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "weekday",
+                "opens",
+                "closes"
+              ],
+              "title": "OpeningHoursSpan",
+              "type": "object"
+            },
+            "type": "array"
           },
           "organization_id": {
             "format": "uuid",
@@ -3205,6 +3640,13 @@
           "id",
           "name",
           "address",
+          "latitude",
+          "longitude",
+          "neighbourhood",
+          "city",
+          "country_code",
+          "opening_hours",
+          "accessibility",
           "archived_at"
         ],
         "title": "FacilityLocation",
@@ -6539,6 +6981,170 @@
         "title": "JournalVisibilityResponse",
         "type": "object"
       },
+      "Media": {
+        "properties": {
+          "content_type": {
+            "type": "string"
+          },
+          "height": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "purpose": {
+            "enum": [
+              "body_photo",
+              "box_photo",
+              "post_photo"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "ready"
+            ],
+            "type": "string"
+          },
+          "url": {
+            "description": "Stable for public media; presigned and short-lived for private media.",
+            "nullable": true,
+            "type": "string"
+          },
+          "width": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "purpose",
+          "status",
+          "content_type",
+          "width",
+          "height",
+          "url"
+        ],
+        "title": "Media",
+        "type": "object"
+      },
+      "MediaResponse": {
+        "properties": {
+          "media": {
+            "properties": {
+              "content_type": {
+                "type": "string"
+              },
+              "height": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "purpose": {
+                "enum": [
+                  "body_photo",
+                  "box_photo",
+                  "post_photo"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "ready"
+                ],
+                "type": "string"
+              },
+              "url": {
+                "description": "Stable for public media; presigned and short-lived for private media.",
+                "nullable": true,
+                "type": "string"
+              },
+              "width": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "purpose",
+              "status",
+              "content_type",
+              "width",
+              "height",
+              "url"
+            ],
+            "title": "Media",
+            "type": "object"
+          }
+        },
+        "required": [
+          "media"
+        ],
+        "title": "MediaResponse",
+        "type": "object"
+      },
+      "MediaUpload": {
+        "properties": {
+          "expires_in": {
+            "type": "integer"
+          },
+          "max_bytes": {
+            "type": "integer"
+          },
+          "media_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "required_headers": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "type": "object"
+          },
+          "upload_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "media_id",
+          "upload_url",
+          "required_headers",
+          "expires_in",
+          "max_bytes"
+        ],
+        "title": "MediaUpload",
+        "type": "object"
+      },
+      "MediaUploadRequest": {
+        "properties": {
+          "byte_size": {
+            "maximum": 8388608,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "content_type": {
+            "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+            "enum": [
+              "image/jpeg",
+              "image/webp"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "content_type",
+          "byte_size"
+        ],
+        "title": "MediaUploadRequest",
+        "type": "object"
+      },
       "MyInjuryWarningsAcknowledged": {
         "additionalProperties": false,
         "properties": {
@@ -6790,6 +7396,31 @@
           "body"
         ],
         "title": "NutritionPlan",
+        "type": "object"
+      },
+      "OpeningHoursSpan": {
+        "properties": {
+          "closes": {
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+            "type": "string"
+          },
+          "opens": {
+            "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+            "type": "string"
+          },
+          "weekday": {
+            "description": "ISO weekday, Monday = 1",
+            "maximum": 7,
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "weekday",
+          "opens",
+          "closes"
+        ],
+        "title": "OpeningHoursSpan",
         "type": "object"
       },
       "OrganizationBranding": {
@@ -7172,6 +7803,129 @@
           "pr_timeline"
         ],
         "title": "ProgressStats",
+        "type": "object"
+      },
+      "RememberFilterRequest": {
+        "properties": {
+          "params": {
+            "additionalProperties": true,
+            "description": "The surface's filter values; the surface's query validates them.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "params"
+        ],
+        "title": "RememberFilterRequest",
+        "type": "object"
+      },
+      "SaveFilterRequest": {
+        "properties": {
+          "name": {
+            "maxLength": 40,
+            "minLength": 1,
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "description": "The surface's filter values; the surface's query validates them.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "name",
+          "params"
+        ],
+        "title": "SaveFilterRequest",
+        "type": "object"
+      },
+      "SavedFilter": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_used_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "params": {
+            "additionalProperties": true,
+            "description": "The surface's filter values; the surface's query validates them.",
+            "type": "object"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "params",
+          "last_used_at"
+        ],
+        "title": "SavedFilter",
+        "type": "object"
+      },
+      "SavedFilters": {
+        "properties": {
+          "last_used": {
+            "additionalProperties": true,
+            "description": "The surface's filter values; the surface's query validates them.",
+            "nullable": true,
+            "type": "object"
+          },
+          "saved": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "last_used_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "params": {
+                  "additionalProperties": true,
+                  "description": "The surface's filter values; the surface's query validates them.",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "params",
+                "last_used_at"
+              ],
+              "title": "SavedFilter",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "surface": {
+            "enum": [
+              "around_me",
+              "box_schedule",
+              "feed",
+              "club",
+              "journal",
+              "vault",
+              "progress",
+              "partners"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "surface",
+          "last_used",
+          "saved"
+        ],
+        "title": "SavedFilters",
         "type": "object"
       },
       "SemanticError": {
@@ -12231,6 +12985,481 @@
         ]
       }
     },
+    "/api/me/filters/{surface}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SavedFilterController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "enum": [
+                "around_me",
+                "box_schedule",
+                "feed",
+                "club",
+                "journal",
+                "vault",
+                "progress",
+                "partners"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "last_used": {
+                      "additionalProperties": true,
+                      "description": "The surface's filter values; the surface's query validates them.",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "saved": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_used_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "description": "The surface's filter values; the surface's query validates them.",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "params",
+                          "last_used_at"
+                        ],
+                        "title": "SavedFilter",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "surface": {
+                      "enum": [
+                        "around_me",
+                        "box_schedule",
+                        "feed",
+                        "club",
+                        "journal",
+                        "vault",
+                        "progress",
+                        "partners"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "surface",
+                    "last_used",
+                    "saved"
+                  ],
+                  "title": "SavedFilters",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Filters"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your last-used and saved filters of one list surface",
+        "tags": [
+          "Me"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SavedFilterController.save",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "enum": [
+                "around_me",
+                "box_schedule",
+                "feed",
+                "club",
+                "journal",
+                "vault",
+                "progress",
+                "partners"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "name": {
+                    "maxLength": 40,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "params": {
+                    "additionalProperties": true,
+                    "description": "The surface's filter values; the surface's query validates them.",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "name",
+                  "params"
+                ],
+                "title": "SaveFilterRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "last_used": {
+                      "additionalProperties": true,
+                      "description": "The surface's filter values; the surface's query validates them.",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "saved": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_used_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "description": "The surface's filter values; the surface's query validates them.",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "params",
+                          "last_used_at"
+                        ],
+                        "title": "SavedFilter",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "surface": {
+                      "enum": [
+                        "around_me",
+                        "box_schedule",
+                        "feed",
+                        "club",
+                        "journal",
+                        "vault",
+                        "progress",
+                        "partners"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "surface",
+                    "last_used",
+                    "saved"
+                  ],
+                  "title": "SavedFilters",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Filters"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save a named filter combination (same name replaces)",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/filters/{surface}/last-used": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SavedFilterController.remember",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "enum": [
+                "around_me",
+                "box_schedule",
+                "feed",
+                "club",
+                "journal",
+                "vault",
+                "progress",
+                "partners"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "params": {
+                    "additionalProperties": true,
+                    "description": "The surface's filter values; the surface's query validates them.",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "params"
+                ],
+                "title": "RememberFilterRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "last_used": {
+                      "additionalProperties": true,
+                      "description": "The surface's filter values; the surface's query validates them.",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "saved": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_used_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "description": "The surface's filter values; the surface's query validates them.",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "params",
+                          "last_used_at"
+                        ],
+                        "title": "SavedFilter",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "surface": {
+                      "enum": [
+                        "around_me",
+                        "box_schedule",
+                        "feed",
+                        "club",
+                        "journal",
+                        "vault",
+                        "progress",
+                        "partners"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "surface",
+                    "last_used",
+                    "saved"
+                  ],
+                  "title": "SavedFilters",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Filters"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remember the filter you just used on a surface",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/filters/{surface}/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SavedFilterController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "surface",
+            "required": true,
+            "schema": {
+              "enum": [
+                "around_me",
+                "box_schedule",
+                "feed",
+                "club",
+                "journal",
+                "vault",
+                "progress",
+                "partners"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "last_used": {
+                      "additionalProperties": true,
+                      "description": "The surface's filter values; the surface's query validates them.",
+                      "nullable": true,
+                      "type": "object"
+                    },
+                    "saved": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_used_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "params": {
+                            "additionalProperties": true,
+                            "description": "The surface's filter values; the surface's query validates them.",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "params",
+                          "last_used_at"
+                        ],
+                        "title": "SavedFilter",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "surface": {
+                      "enum": [
+                        "around_me",
+                        "box_schedule",
+                        "feed",
+                        "club",
+                        "journal",
+                        "vault",
+                        "progress",
+                        "partners"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "surface",
+                    "last_used",
+                    "saved"
+                  ],
+                  "title": "SavedFilters",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Filters"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete a saved filter",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -12698,6 +13927,133 @@
         ]
       }
     },
+    "/api/me/places": {
+      "get": {
+        "callbacks": {},
+        "description": "Distance is from lat/lng when given (the device position), otherwise from the user's home location.",
+        "operationId": "MilosTrainingWeb.MyPlacesController.index",
+        "parameters": [
+          {
+            "description": "",
+            "in": "query",
+            "name": "lat",
+            "required": false,
+            "schema": {
+              "maximum": 90,
+              "minimum": -90,
+              "type": "number"
+            }
+          },
+          {
+            "description": "",
+            "in": "query",
+            "name": "lng",
+            "required": false,
+            "schema": {
+              "maximum": 180,
+              "minimum": -180,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "places": {
+                      "items": {
+                        "properties": {
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "distance_km": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "home": {
+                            "description": "The user's home location in that gym",
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "latitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "slug": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "slug",
+                              "name"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "home",
+                          "distance_km",
+                          "organization"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "places"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Places"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Locations the user can book, nearest first",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/profile": {
       "patch": {
         "callbacks": {},
@@ -12965,6 +14321,12 @@
                         ],
                         "type": "string"
                       },
+                      "home_location_id": {
+                        "description": "The location this gym opens on for the person (Phase 2)",
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "id": {
                         "format": "uuid",
                         "type": "string"
@@ -13082,6 +14444,12 @@
                       ],
                       "type": "string"
                     },
+                    "home_location_id": {
+                      "description": "The location this gym opens on for the person (Phase 2)",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "id": {
                       "format": "uuid",
                       "type": "string"
@@ -13168,6 +14536,12 @@
                         "own",
                         "all"
                       ],
+                      "type": "string"
+                    },
+                    "home_location_id": {
+                      "description": "The location this gym opens on for the person (Phase 2)",
+                      "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
@@ -13295,6 +14669,12 @@
                         "own",
                         "all"
                       ],
+                      "type": "string"
+                    },
+                    "home_location_id": {
+                      "description": "The location this gym opens on for the person (Phase 2)",
+                      "format": "uuid",
+                      "nullable": true,
                       "type": "string"
                     },
                     "id": {
@@ -16065,6 +17445,21 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "audiences": {
+                            "items": {
+                              "enum": [
+                                "women",
+                                "teens",
+                                "kids",
+                                "over_40",
+                                "seniors",
+                                "prenatal",
+                                "adaptive"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
                           "credit_cost": {
                             "maximum": 10,
                             "minimum": 1,
@@ -16085,6 +17480,14 @@
                             "enum": [
                               "class",
                               "event"
+                            ],
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "beginner",
+                              "all_levels",
+                              "advanced"
                             ],
                             "type": "string"
                           },
@@ -16109,6 +17512,8 @@
                           "sort_order",
                           "credit_cost",
                           "kind",
+                          "level",
+                          "audiences",
                           "archived_at"
                         ],
                         "type": "object"
@@ -16145,6 +17550,23 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "audiences": {
+                    "description": "Groups the class is for; empty means everyone",
+                    "items": {
+                      "enum": [
+                        "women",
+                        "teens",
+                        "kids",
+                        "over_40",
+                        "seniors",
+                        "prenatal",
+                        "adaptive"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
                   "credit_cost": {
                     "description": "Visits one booking of this class type uses (ADR-097)",
                     "maximum": 10,
@@ -16156,6 +17578,15 @@
                     "enum": [
                       "class",
                       "event"
+                    ],
+                    "type": "string"
+                  },
+                  "level": {
+                    "description": "Who the class suits, for the schedule's level filter",
+                    "enum": [
+                      "beginner",
+                      "all_levels",
+                      "advanced"
                     ],
                     "type": "string"
                   },
@@ -16192,6 +17623,21 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "women",
+                              "teens",
+                              "kids",
+                              "over_40",
+                              "seniors",
+                              "prenatal",
+                              "adaptive"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "credit_cost": {
                           "maximum": 10,
                           "minimum": 1,
@@ -16212,6 +17658,14 @@
                           "enum": [
                             "class",
                             "event"
+                          ],
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
                           ],
                           "type": "string"
                         },
@@ -16236,6 +17690,8 @@
                         "sort_order",
                         "credit_cost",
                         "kind",
+                        "level",
+                        "audiences",
                         "archived_at"
                       ],
                       "type": "object"
@@ -16299,6 +17755,21 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "women",
+                              "teens",
+                              "kids",
+                              "over_40",
+                              "seniors",
+                              "prenatal",
+                              "adaptive"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "credit_cost": {
                           "maximum": 10,
                           "minimum": 1,
@@ -16319,6 +17790,14 @@
                           "enum": [
                             "class",
                             "event"
+                          ],
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
                           ],
                           "type": "string"
                         },
@@ -16343,6 +17822,8 @@
                         "sort_order",
                         "credit_cost",
                         "kind",
+                        "level",
+                        "audiences",
                         "archived_at"
                       ],
                       "type": "object"
@@ -16397,6 +17878,23 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "audiences": {
+                    "description": "Groups the class is for; empty means everyone",
+                    "items": {
+                      "enum": [
+                        "women",
+                        "teens",
+                        "kids",
+                        "over_40",
+                        "seniors",
+                        "prenatal",
+                        "adaptive"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array",
+                    "uniqueItems": true
+                  },
                   "credit_cost": {
                     "description": "Visits one booking of this class type uses (ADR-097)",
                     "maximum": 10,
@@ -16408,6 +17906,15 @@
                     "enum": [
                       "class",
                       "event"
+                    ],
+                    "type": "string"
+                  },
+                  "level": {
+                    "description": "Who the class suits, for the schedule's level filter",
+                    "enum": [
+                      "beginner",
+                      "all_levels",
+                      "advanced"
                     ],
                     "type": "string"
                   },
@@ -16444,6 +17951,21 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "women",
+                              "teens",
+                              "kids",
+                              "over_40",
+                              "seniors",
+                              "prenatal",
+                              "adaptive"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "credit_cost": {
                           "maximum": 10,
                           "minimum": 1,
@@ -16464,6 +17986,14 @@
                           "enum": [
                             "class",
                             "event"
+                          ],
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "all_levels",
+                            "advanced"
                           ],
                           "type": "string"
                         },
@@ -16488,6 +18018,8 @@
                         "sort_order",
                         "credit_cost",
                         "kind",
+                        "level",
+                        "audiences",
                         "archived_at"
                       ],
                       "type": "object"
@@ -25426,12 +26958,34 @@
                     "locations": {
                       "items": {
                         "properties": {
+                          "accessibility": {
+                            "items": {
+                              "enum": [
+                                "step_free",
+                                "accessible_toilet",
+                                "parking",
+                                "changing_room",
+                                "showers",
+                                "women_area"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
                           "address": {
                             "nullable": true,
                             "type": "string"
                           },
                           "archived_at": {
                             "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
                             "nullable": true,
                             "type": "string"
                           },
@@ -25443,8 +26997,48 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "latitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
                           "name": {
                             "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opening_hours": {
+                            "items": {
+                              "properties": {
+                                "closes": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "opens": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "weekday": {
+                                  "description": "ISO weekday, Monday = 1",
+                                  "maximum": 7,
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "weekday",
+                                "opens",
+                                "closes"
+                              ],
+                              "title": "OpeningHoursSpan",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "organization_id": {
                             "format": "uuid",
@@ -25459,6 +27053,13 @@
                           "id",
                           "name",
                           "address",
+                          "latitude",
+                          "longitude",
+                          "neighbourhood",
+                          "city",
+                          "country_code",
+                          "opening_hours",
+                          "accessibility",
                           "archived_at"
                         ],
                         "title": "FacilityLocation",
@@ -25496,15 +27097,84 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "accessibility": {
+                    "items": {
+                      "enum": [
+                        "step_free",
+                        "accessible_toilet",
+                        "parking",
+                        "changing_room",
+                        "showers",
+                        "women_area"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
                   "address": {
                     "maxLength": 300,
                     "nullable": true,
                     "type": "string"
                   },
+                  "city": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "country_code": {
+                    "nullable": true,
+                    "pattern": "^[A-Za-z]{2}$",
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "maximum": 90,
+                    "minimum": -90,
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "maximum": 180,
+                    "minimum": -180,
+                    "nullable": true,
+                    "type": "number"
+                  },
                   "name": {
                     "maxLength": 80,
                     "minLength": 2,
                     "type": "string"
+                  },
+                  "neighbourhood": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "opening_hours": {
+                    "items": {
+                      "properties": {
+                        "closes": {
+                          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                          "type": "string"
+                        },
+                        "opens": {
+                          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                          "type": "string"
+                        },
+                        "weekday": {
+                          "description": "ISO weekday, Monday = 1",
+                          "maximum": 7,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "weekday",
+                        "opens",
+                        "closes"
+                      ],
+                      "title": "OpeningHoursSpan",
+                      "type": "object"
+                    },
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -25521,12 +27191,34 @@
                   "properties": {
                     "location": {
                       "properties": {
+                        "accessibility": {
+                          "items": {
+                            "enum": [
+                              "step_free",
+                              "accessible_toilet",
+                              "parking",
+                              "changing_room",
+                              "showers",
+                              "women_area"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "address": {
                           "nullable": true,
                           "type": "string"
                         },
                         "archived_at": {
                           "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
                           "nullable": true,
                           "type": "string"
                         },
@@ -25538,8 +27230,48 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "latitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
                         "name": {
                           "type": "string"
+                        },
+                        "neighbourhood": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "opening_hours": {
+                          "items": {
+                            "properties": {
+                              "closes": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "opens": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "weekday": {
+                                "description": "ISO weekday, Monday = 1",
+                                "maximum": 7,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "weekday",
+                              "opens",
+                              "closes"
+                            ],
+                            "title": "OpeningHoursSpan",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "organization_id": {
                           "format": "uuid",
@@ -25554,6 +27286,13 @@
                         "id",
                         "name",
                         "address",
+                        "latitude",
+                        "longitude",
+                        "neighbourhood",
+                        "city",
+                        "country_code",
+                        "opening_hours",
+                        "accessibility",
                         "archived_at"
                       ],
                       "title": "FacilityLocation",
@@ -25612,15 +27351,84 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "accessibility": {
+                    "items": {
+                      "enum": [
+                        "step_free",
+                        "accessible_toilet",
+                        "parking",
+                        "changing_room",
+                        "showers",
+                        "women_area"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
                   "address": {
                     "maxLength": 300,
                     "nullable": true,
                     "type": "string"
                   },
+                  "city": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "country_code": {
+                    "nullable": true,
+                    "pattern": "^[A-Za-z]{2}$",
+                    "type": "string"
+                  },
+                  "latitude": {
+                    "maximum": 90,
+                    "minimum": -90,
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "longitude": {
+                    "maximum": 180,
+                    "minimum": -180,
+                    "nullable": true,
+                    "type": "number"
+                  },
                   "name": {
                     "maxLength": 80,
                     "minLength": 2,
                     "type": "string"
+                  },
+                  "neighbourhood": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "opening_hours": {
+                    "items": {
+                      "properties": {
+                        "closes": {
+                          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                          "type": "string"
+                        },
+                        "opens": {
+                          "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                          "type": "string"
+                        },
+                        "weekday": {
+                          "description": "ISO weekday, Monday = 1",
+                          "maximum": 7,
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "weekday",
+                        "opens",
+                        "closes"
+                      ],
+                      "title": "OpeningHoursSpan",
+                      "type": "object"
+                    },
+                    "type": "array"
                   }
                 },
                 "type": "object"
@@ -25637,12 +27445,34 @@
                   "properties": {
                     "location": {
                       "properties": {
+                        "accessibility": {
+                          "items": {
+                            "enum": [
+                              "step_free",
+                              "accessible_toilet",
+                              "parking",
+                              "changing_room",
+                              "showers",
+                              "women_area"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "address": {
                           "nullable": true,
                           "type": "string"
                         },
                         "archived_at": {
                           "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
                           "nullable": true,
                           "type": "string"
                         },
@@ -25654,8 +27484,48 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "latitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
                         "name": {
                           "type": "string"
+                        },
+                        "neighbourhood": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "opening_hours": {
+                          "items": {
+                            "properties": {
+                              "closes": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "opens": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "weekday": {
+                                "description": "ISO weekday, Monday = 1",
+                                "maximum": 7,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "weekday",
+                              "opens",
+                              "closes"
+                            ],
+                            "title": "OpeningHoursSpan",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "organization_id": {
                           "format": "uuid",
@@ -25670,6 +27540,13 @@
                         "id",
                         "name",
                         "address",
+                        "latitude",
+                        "longitude",
+                        "neighbourhood",
+                        "city",
+                        "country_code",
+                        "opening_hours",
+                        "accessibility",
                         "archived_at"
                       ],
                       "title": "FacilityLocation",
@@ -25742,12 +27619,34 @@
                   "properties": {
                     "location": {
                       "properties": {
+                        "accessibility": {
+                          "items": {
+                            "enum": [
+                              "step_free",
+                              "accessible_toilet",
+                              "parking",
+                              "changing_room",
+                              "showers",
+                              "women_area"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "address": {
                           "nullable": true,
                           "type": "string"
                         },
                         "archived_at": {
                           "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
                           "nullable": true,
                           "type": "string"
                         },
@@ -25759,8 +27658,48 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "latitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "nullable": true,
+                          "type": "number"
+                        },
                         "name": {
                           "type": "string"
+                        },
+                        "neighbourhood": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "opening_hours": {
+                          "items": {
+                            "properties": {
+                              "closes": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "opens": {
+                                "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                "type": "string"
+                              },
+                              "weekday": {
+                                "description": "ISO weekday, Monday = 1",
+                                "maximum": 7,
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "weekday",
+                              "opens",
+                              "closes"
+                            ],
+                            "title": "OpeningHoursSpan",
+                            "type": "object"
+                          },
+                          "type": "array"
                         },
                         "organization_id": {
                           "format": "uuid",
@@ -25775,6 +27714,13 @@
                         "id",
                         "name",
                         "address",
+                        "latitude",
+                        "longitude",
+                        "neighbourhood",
+                        "city",
+                        "country_code",
+                        "opening_hours",
+                        "accessibility",
                         "archived_at"
                       ],
                       "title": "FacilityLocation",
@@ -26231,6 +28177,644 @@
         "summary": "Active members whose PR dossier a coach may open (ADR-132)",
         "tags": [
           "Admin Users"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "profile": {
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women",
+                              "over_40",
+                              "seniors",
+                              "teens",
+                              "athletes",
+                              "prenatal",
+                              "adaptive"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "disciplines": {
+                          "items": {
+                            "enum": [
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "gymnastics",
+                              "running",
+                              "endurance",
+                              "bootcamp",
+                              "hiit",
+                              "yoga",
+                              "pilates",
+                              "mobility",
+                              "martial_arts",
+                              "boxing",
+                              "calisthenics",
+                              "swimming",
+                              "cycling",
+                              "dance",
+                              "kids"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "pattern": "^[a-z]{2}$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "content_type": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "purpose": {
+                                "enum": [
+                                  "body_photo",
+                                  "box_photo",
+                                  "post_photo"
+                                ],
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "ready"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "description": "Stable for public media; presigned and short-lived for private media.",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "purpose",
+                              "status",
+                              "content_type",
+                              "width",
+                              "height",
+                              "url"
+                            ],
+                            "title": "Media",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "published": {
+                          "type": "boolean"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "about",
+                        "disciplines",
+                        "languages",
+                        "audiences",
+                        "photos",
+                        "published",
+                        "published_at",
+                        "lock_version"
+                      ],
+                      "title": "BoxPublicProfile",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "title": "BoxPublicProfileResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's public profile (Σχετικά of the public box page)",
+        "tags": [
+          "Admin Settings"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "about": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "audiences": {
+                    "items": {
+                      "enum": [
+                        "beginners",
+                        "women",
+                        "over_40",
+                        "seniors",
+                        "teens",
+                        "athletes",
+                        "prenatal",
+                        "adaptive"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "disciplines": {
+                    "items": {
+                      "enum": [
+                        "crossfit",
+                        "functional_fitness",
+                        "hyrox",
+                        "strength",
+                        "powerlifting",
+                        "olympic_lifting",
+                        "bodybuilding",
+                        "gymnastics",
+                        "running",
+                        "endurance",
+                        "bootcamp",
+                        "hiit",
+                        "yoga",
+                        "pilates",
+                        "mobility",
+                        "martial_arts",
+                        "boxing",
+                        "calisthenics",
+                        "swimming",
+                        "cycling",
+                        "dance",
+                        "kids"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "languages": {
+                    "items": {
+                      "pattern": "^[a-zA-Z]{2}$",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "lock_version": {
+                    "description": "The version the editor read.",
+                    "type": "integer"
+                  },
+                  "photo_ids": {
+                    "description": "Ready box_photo media, in display order.",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "published": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "BoxPublicProfileUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "profile": {
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women",
+                              "over_40",
+                              "seniors",
+                              "teens",
+                              "athletes",
+                              "prenatal",
+                              "adaptive"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "disciplines": {
+                          "items": {
+                            "enum": [
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "gymnastics",
+                              "running",
+                              "endurance",
+                              "bootcamp",
+                              "hiit",
+                              "yoga",
+                              "pilates",
+                              "mobility",
+                              "martial_arts",
+                              "boxing",
+                              "calisthenics",
+                              "swimming",
+                              "cycling",
+                              "dance",
+                              "kids"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "pattern": "^[a-z]{2}$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "content_type": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "purpose": {
+                                "enum": [
+                                  "body_photo",
+                                  "box_photo",
+                                  "post_photo"
+                                ],
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "ready"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "description": "Stable for public media; presigned and short-lived for private media.",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "purpose",
+                              "status",
+                              "content_type",
+                              "width",
+                              "height",
+                              "url"
+                            ],
+                            "title": "Media",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "published": {
+                          "type": "boolean"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "about",
+                        "disciplines",
+                        "languages",
+                        "audiences",
+                        "photos",
+                        "published",
+                        "published_at",
+                        "lock_version"
+                      ],
+                      "title": "BoxPublicProfile",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "title": "BoxPublicProfileResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Edited meanwhile"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid profile"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Edit, publish or unpublish the gym's public profile",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile/photos": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.photo_upload",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve a box photo and get a presigned upload for it",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile/photos/{id}/complete": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.complete_photo",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "media": {
+                      "properties": {
+                        "content_type": {
+                          "type": "string"
+                        },
+                        "height": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "purpose": {
+                          "enum": [
+                            "body_photo",
+                            "box_photo",
+                            "post_photo"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "ready"
+                          ],
+                          "type": "string"
+                        },
+                        "url": {
+                          "description": "Stable for public media; presigned and short-lived for private media.",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "width": {
+                          "nullable": true,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "purpose",
+                        "status",
+                        "content_type",
+                        "width",
+                        "height",
+                        "url"
+                      ],
+                      "title": "Media",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "media"
+                  ],
+                  "title": "MediaResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Media"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Verify an uploaded box photo (type, size, no metadata) and mark it ready",
+        "tags": [
+          "Admin Settings"
         ]
       }
     },
@@ -28941,6 +31525,11 @@
                           ],
                           "type": "string"
                         },
+                        "home_location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "role": {
                           "type": "string"
                         },
@@ -29784,6 +32373,88 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/users/{id}/home-location": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.HomeLocationController.update_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "description": "An active location of the gym, or null to clear.",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "location_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership": {
+                      "properties": {
+                        "home_location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "user_id",
+                        "home_location_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set a member's home location (staff who manage memberships)",
+        "tags": [
+          "Locations"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/users/{id}/incidents": {
       "get": {
         "callbacks": {},
@@ -30478,6 +33149,11 @@
                             "own",
                             "all"
                           ],
+                          "type": "string"
+                        },
+                        "home_location_id": {
+                          "format": "uuid",
+                          "nullable": true,
                           "type": "string"
                         },
                         "role": {
@@ -45863,12 +48539,34 @@
                     "locations": {
                       "items": {
                         "properties": {
+                          "accessibility": {
+                            "items": {
+                              "enum": [
+                                "step_free",
+                                "accessible_toilet",
+                                "parking",
+                                "changing_room",
+                                "showers",
+                                "women_area"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
                           "address": {
                             "nullable": true,
                             "type": "string"
                           },
                           "archived_at": {
                             "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
                             "nullable": true,
                             "type": "string"
                           },
@@ -45880,8 +48578,48 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "latitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
                           "name": {
                             "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opening_hours": {
+                            "items": {
+                              "properties": {
+                                "closes": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "opens": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "weekday": {
+                                  "description": "ISO weekday, Monday = 1",
+                                  "maximum": 7,
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "weekday",
+                                "opens",
+                                "closes"
+                              ],
+                              "title": "OpeningHoursSpan",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "organization_id": {
                             "format": "uuid",
@@ -45896,6 +48634,13 @@
                           "id",
                           "name",
                           "address",
+                          "latitude",
+                          "longitude",
+                          "neighbourhood",
+                          "city",
+                          "country_code",
+                          "opening_hours",
+                          "accessibility",
                           "archived_at"
                         ],
                         "title": "FacilityLocation",
@@ -47261,6 +50006,78 @@
         "summary": "The signed-in user's training log (workouts or booked classes) with performance",
         "tags": [
           "Training Log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/home-location": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.HomeLocationController.update_mine",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "location_id": {
+                    "description": "An active location of the gym, or null to clear.",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "location_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "membership": {
+                      "properties": {
+                        "home_location_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "user_id",
+                        "home_location_id"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "membership"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Membership"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set my home location in this gym",
+        "tags": [
+          "Locations"
         ]
       }
     },
@@ -51086,6 +53903,31 @@
                       },
                       "type": "array"
                     },
+                    "coaches": {
+                      "description": "The coaches of the window's classes.",
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nickname",
+                          "avatar_url"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "days": {
                       "type": "integer"
                     },
@@ -51096,12 +53938,34 @@
                     "locations": {
                       "items": {
                         "properties": {
+                          "accessibility": {
+                            "items": {
+                              "enum": [
+                                "step_free",
+                                "accessible_toilet",
+                                "parking",
+                                "changing_room",
+                                "showers",
+                                "women_area"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
                           "address": {
                             "nullable": true,
                             "type": "string"
                           },
                           "archived_at": {
                             "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
                             "nullable": true,
                             "type": "string"
                           },
@@ -51113,8 +53977,48 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "latitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
                           "name": {
                             "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opening_hours": {
+                            "items": {
+                              "properties": {
+                                "closes": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "opens": {
+                                  "pattern": "^([01]\\d|2[0-3]):[0-5]\\d$",
+                                  "type": "string"
+                                },
+                                "weekday": {
+                                  "description": "ISO weekday, Monday = 1",
+                                  "maximum": 7,
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "weekday",
+                                "opens",
+                                "closes"
+                              ],
+                              "title": "OpeningHoursSpan",
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "organization_id": {
                             "format": "uuid",
@@ -51129,6 +54033,13 @@
                           "id",
                           "name",
                           "address",
+                          "latitude",
+                          "longitude",
+                          "neighbourhood",
+                          "city",
+                          "country_code",
+                          "opening_hours",
+                          "accessibility",
                           "archived_at"
                         ],
                         "title": "FacilityLocation",
@@ -51139,6 +54050,36 @@
                     "slots": {
                       "items": {
                         "additionalProperties": true,
+                        "properties": {
+                          "covered_by_package": {
+                            "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
+                            "type": "boolean"
+                          },
+                          "workout": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "properties": {
+                              "focus": {
+                                "description": "What the workout trains, read from its movements.",
+                                "items": {
+                                  "enum": [
+                                    "strength",
+                                    "endurance",
+                                    "gymnastics",
+                                    "olympic_lifting",
+                                    "mobility",
+                                    "legs",
+                                    "core",
+                                    "upper_body"
+                                  ],
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
                         "type": "object"
                       },
                       "type": "array"
