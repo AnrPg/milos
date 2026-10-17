@@ -292,13 +292,17 @@ Apostolos' preference to decide on visuals rather than text.
    two sections, «Σε αυτή την περιοχή» (locations in the map frame, live as you pan or zoom) and
    «Πιο μακριά» (all others), sorted by distance from the user (device location if allowed, else the
    user's neighbourhood), with distance on each row.
+   Layout: the map fills the screen behind the list; the list opens **in the middle** by default,
+   drags up for more list, and drags **down to hide** for a full map (board 2, Q9 comment).
    «Πιο μακριά» lists **only places the user can book** (their gym's locations and gyms they are a
-   member of). Where users discover other gyms at all is a separate decision (see below).
+   member of). Where users discover other gyms at all is decided under «Other gyms» below.
 7. **Layout:** the **day view** (week strip, one day's classes) is the default. There is **no week
    view**: the two views are Day (the strip) and Month (board 2, Q3). The switch is the **month
    name above the strip**, tappable (board 2, Q2). It offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
-   on that date. Tapping a class opens an **overlay** with class info (time, duration, coach, spots,
-   Κράτηση) and the WOD, its parameters in collapsed sections revealed progressively.
+   on that date. Tapping a class opens a **bottom sheet** (board 2, Q5) with class info and the WOD.
+   Its header shows time and duration, coach, spots, level, WOD focus, friends going, the
+   cancellation cutoff, the waitlist and whether the package covers it (board 2, Q6). The WOD shows
+   **movement names only** (board 2, Q7); the parameters stay out of the sheet.
 8. **Class row:** **compact** (time, name, coach, spots) plus a subtle duration («18:00 · 60′»);
    location only when several locations are shown.
    **Product rule:** members experience their gym as **one home location** (gyms with several
@@ -311,6 +315,20 @@ Apostolos' preference to decide on visuals rather than text.
 10. **No results:** a prominent «Δεν υπάρχουν μαθήματα» for the chosen date, with the next match as
     one quiet line beneath.
 
+
+### Other gyms for members who already have a gym (2026-10-17, Apostolos)
+
+Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billing.
+
+1. **Search by name always works**, for everyone, whatever the gym pays.
+2. **Paid shield:** a gym owner can buy an add-on that hides other gyms' trials and «Box με
+   δοκιμαστικό» from their members with an active package. Their members then find other gyms only
+   by searching a name. Events and open clubs hosted by other gyms are not affected.
+3. **Without the shield**, other gyms show to active members in **one quiet place only**: a single
+   collapsed line at the very end of the Γύρω μου results, «Άλλα box στην περιοχή (n)», that opens
+   the list when tapped. They are not a category chip, not pins on the map, not in the feed, and
+   never in notifications. (Placement proposed by Claude; Apostolos can move it.)
+4. People with no active package see «Box με δοκιμαστικό» as a normal Γύρω μου category.
 
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
