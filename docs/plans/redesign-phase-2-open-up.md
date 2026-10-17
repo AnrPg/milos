@@ -262,8 +262,8 @@ Apostolos' preference to decide on visuals rather than text.
 ### Box › Πρόγραμμα (2026-10-17, [board](https://claude.ai/artifact/3mJnPApB49f3UXTcySjZaY))
 
 1. **Filter row:** one horizontally scrolling chip row under the title. «Φίλτρα (n)» is the first
-   chip; nothing is pinned, the row scrolls away as a whole. *Pending: «Καθαρισμός» as a second
-   chip, or a ✕ inside «Φίλτρα (n)».*
+   chip; nothing is pinned, the row scrolls away as a whole. Clearing is a **✕ inside «Φίλτρα (n)»**,
+   shown only while a filter is on ([board 2](https://claude.ai/artifact/2DLyMwUaf4NxBAyc8wwDNG), Q1).
 2. **Which filters, where:**
    - **Chips on the row:** Είδος μαθήματος, Μαθήματα ή events, Διαθεσιμότητα, Πακέτο, Επίπεδο,
      Φίλοι.
@@ -294,8 +294,9 @@ Apostolos' preference to decide on visuals rather than text.
    user's neighbourhood), with distance on each row.
    «Πιο μακριά» lists **only places the user can book** (their gym's locations and gyms they are a
    member of). Where users discover other gyms at all is a separate decision (see below).
-7. **Layout:** the **day view** (week strip, one day's classes) is the default. A subtle view switch
-   offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
+7. **Layout:** the **day view** (week strip, one day's classes) is the default. There is **no week
+   view**: the two views are Day (the strip) and Month (board 2, Q3). The switch is the **month
+   name above the strip**, tappable (board 2, Q2). It offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
    on that date. Tapping a class opens an **overlay** with class info (time, duration, coach, spots,
    Κράτηση) and the WOD, its parameters in collapsed sections revealed progressively.
 8. **Class row:** **compact** (time, name, coach, spots) plus a subtle duration («18:00 · 60′»);
@@ -305,8 +306,8 @@ Apostolos' preference to decide on visuals rather than text.
    Needs a per-membership home location. The home location is the **default only**: members can
    still view and book other locations of their gym from the picker. Coaches and admins also have
    one home location, with a switch when they work at several.
-9. **Remembering:** last filters restored silently per gym (saved_filters `box_schedule`),
-   «Καθαρισμός» always first.
+9. **Remembering:** last filters restored silently per gym (saved_filters `box_schedule`), and the
+   ✕ in «Φίλτρα (n)» always clears them.
 10. **No results:** a prominent «Δεν υπάρχουν μαθήματα» for the chosen date, with the next match as
     one quiet line beneath.
 
