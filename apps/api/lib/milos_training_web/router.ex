@@ -268,6 +268,7 @@ defmodule MilosTrainingWeb.Router do
     get("/reviews", ReviewController, :index)
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
+    put("/home-location", HomeLocationController, :update_mine)
 
     get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
@@ -519,6 +520,7 @@ defmodule MilosTrainingWeb.Router do
     post("/organization/transfer", OwnerOrganizationController, :transfer)
     post("/organization/archive", OwnerOrganizationController, :archive)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    put("/users/:id/home-location", HomeLocationController, :update_member)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)

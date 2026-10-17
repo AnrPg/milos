@@ -126,12 +126,33 @@ defmodule MilosTraining.Organizations do
       %{} = membership ->
         %{
           roles: Enum.map(membership.roles, &to_string/1),
-          coach_scope: to_string(membership.coach_scope || :own)
+          coach_scope: to_string(membership.coach_scope || :own),
+          home_location_id: membership.home_location_id
         }
 
       nil ->
         nil
     end
+  end
+
+  @doc """
+  Sets the location a member's gym opens on (Phase 2). Callers decide who may
+  set it; the database keeps the location inside the same gym.
+  """
+  def put_home_location(context, user_id, location_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(context.organization_id, user_id) do
+        nil ->
+          {:error, :not_found}
+
+        membership ->
+          OrganizationStore.update_membership_settings(
+            context.organization_id,
+            membership.id,
+            %{home_location_id: location_id}
+          )
+      end
+    end)
   end
 
   @doc "Whether a coach lets admins read their private notes (ADR-101)."

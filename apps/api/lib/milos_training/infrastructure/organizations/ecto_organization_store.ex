@@ -268,7 +268,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         role: member.role,
         roles: member.roles,
         coach_scope: member.coach_scope,
-        notes_visible_to_admins: member.notes_visible_to_admins
+        notes_visible_to_admins: member.notes_visible_to_admins,
+        home_location_id: type(member.home_location_id, :binary_id)
       }
     )
     |> Repo.all()
@@ -836,13 +837,13 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     update_membership(organization_id, membership_id, %{roles: roles})
   end
 
-  # Coach scope (ADR-100) and notes visibility (ADR-101).
+  # Coach scope (ADR-100), notes visibility (ADR-101) and home location (Phase 2).
   @impl true
   def update_membership_settings(organization_id, membership_id, settings) do
     update_membership(
       organization_id,
       membership_id,
-      Map.take(settings, [:coach_scope, :notes_visible_to_admins])
+      Map.take(settings, [:coach_scope, :notes_visible_to_admins, :home_location_id])
     )
   end
 

@@ -18,6 +18,8 @@ defmodule MilosTraining.Organizations.OrganizationMembership do
     field :status, Ecto.Enum, values: MembershipPolicy.statuses(), default: :active
     field :joined_at, :utc_datetime_usec
     field :invited_by_user_id, :binary_id
+    # The location this person's gym opens on (Phase 2); nil = no default.
+    field :home_location_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -35,7 +37,8 @@ defmodule MilosTraining.Organizations.OrganizationMembership do
       :joined_at,
       :invited_by_user_id,
       :coach_scope,
-      :notes_visible_to_admins
+      :notes_visible_to_admins,
+      :home_location_id
     ])
     |> sync_roles()
     |> validate_required([:organization_id, :user_id, :role, :status])
@@ -44,6 +47,9 @@ defmodule MilosTraining.Organizations.OrganizationMembership do
     |> foreign_key_constraint(:organization_id)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:invited_by_user_id)
+    |> foreign_key_constraint(:home_location_id,
+      name: :organization_memberships_home_location_fkey
+    )
   end
 
   # `roles` is the role set; `role` mirrors its primary role. A caller that
