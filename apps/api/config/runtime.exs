@@ -6,9 +6,28 @@ if System.get_env("PHX_SERVER") do
   config :milos_training, MilosTrainingWeb.Endpoint, server: true
 end
 
+# Outbound Gemini calls honour HTTPS_PROXY (corporate egress, or a sandbox
+# proxy that attaches the API key itself), trusting SSL_CERT_FILE when set.
+gemini_req_options =
+  case System.get_env("HTTPS_PROXY") || System.get_env("https_proxy") do
+    proxy when is_binary(proxy) and proxy != "" ->
+      %URI{scheme: scheme, host: host, port: port} = URI.parse(proxy)
+      cacertfile = System.get_env("SSL_CERT_FILE")
+
+      [
+        connect_options:
+          [proxy: {String.to_existing_atom(scheme || "http"), host, port, []}] ++
+            if(cacertfile, do: [transport_opts: [cacertfile: cacertfile]], else: [])
+      ]
+
+    _none ->
+      []
+  end
+
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
 config :milos_training, :gemini,
+  req_options: gemini_req_options,
   api_key: System.get_env("GEMINI_API_KEY"),
   model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
   # Leave empty for models without thinking levels (e.g. gemini-2.5-*).
