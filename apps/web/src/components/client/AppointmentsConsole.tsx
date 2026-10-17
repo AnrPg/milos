@@ -43,7 +43,7 @@ function formatLabel(format: string | undefined, i18n: Translate) {
   return "";
 }
 
-/** `/appointments`: book PT sessions and assessments (ADR-098). */
+/** `/box/appointments`: book PT sessions and assessments (ADR-098). */
 export function AppointmentsConsole() {
   const i18n = useUiTranslations();
   return (

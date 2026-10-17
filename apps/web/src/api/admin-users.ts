@@ -1,6 +1,7 @@
 import type { DurationAdjustment } from "@/api/executions";
 import { apiRequest } from "@/api/client";
 import type { paths } from "@/api/generated/schema";
+import type { JournalComment } from "@/api/journal-comments";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 
 export type AllowanceExtensionRequest = NonNullable<
@@ -90,14 +91,13 @@ export type AdminUserPR = {
   higher_is_better: boolean;
   beaten_on: string;
   supporting_metrics?: Record<string, string | number>;
-  notes?: string | null;
+  comments?: JournalComment[];
   updated_at?: string | null;
   history: Array<{
     id: string;
     score: number | string;
     beaten_on: string;
     supporting_metrics: Record<string, string | number>;
-    notes?: string | null;
     inserted_at?: string | null;
   }>;
 };
@@ -168,7 +168,7 @@ export function programAdminUserWorkout(
     scheduled_for: string;
     slot_id?: string | null;
     copy_source: boolean;
-    admin_notes?: string;
+    instructions?: string;
     /** ADR-125 member programming mode; ignored for athletes. */
     mode?: MemberProgrammingMode;
   },

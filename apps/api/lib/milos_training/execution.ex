@@ -3,7 +3,6 @@ defmodule MilosTraining.Execution do
     CompleteExecution,
     LogTrainingEntry,
     StartExecution,
-    SubmitExecutionNote,
     UpdateExecutionProgress,
     UpdateTrainingLogEntry,
     VoidTrainingLogEntry
@@ -12,6 +11,7 @@ defmodule MilosTraining.Execution do
   alias MilosTraining.Execution.Domain.{
     ExecutionAnalytics,
     ExecutionKpis,
+    ModificationPatchValidator,
     TimerSequenceBuilder,
     TrainingLogPolicy
   }
@@ -27,13 +27,32 @@ defmodule MilosTraining.Execution do
     to: UpdateExecutionProgress,
     as: :call
 
-  defdelegate submit_execution_note(id, user_id, params), to: SubmitExecutionNote, as: :call
+  @doc "A structured change as stored on a comment (ADR-140 §1)."
+  defdelegate normalize_modification(patch), to: ModificationPatchValidator, as: :normalize
   defdelegate get_execution(id), to: GetExecution, as: :by_id
   defdelegate get_execution_for_user(id, user_id), to: GetExecution, as: :by_id_for_user
   defdelegate list_executions_for_user(user_id), to: GetExecution, as: :for_user
 
   def list_executions_for_coaching(user_id),
     do: ExecutionStore.list_executions_for_coaching(user_id)
+
+  # Journal ladder (ADR-139): executions and training-log entries as feed
+  # items, moved between rungs one by one or in bulk by a default change.
+  defdelegate list_execution_items(user_id, bound, limit, scope), to: ExecutionStore
+  defdelegate set_execution_visibility(id, user_id, rung), to: ExecutionStore
+  defdelegate move_executions(user_id, from, to), to: ExecutionStore
+
+  defdelegate list_training_log_items(user_id, bound, limit, scope),
+    to: TrainingLogStore,
+    as: :list_entry_items
+
+  defdelegate set_training_log_visibility(id, user_id, rung),
+    to: TrainingLogStore,
+    as: :set_entry_visibility
+
+  defdelegate move_training_log_entries(user_id, from, to),
+    to: TrainingLogStore,
+    as: :move_entries
 
   @doc "Execution KPI report for the current organization since `since`."
   def execution_kpis(%DateTime{} = since) do
@@ -108,6 +127,43 @@ defmodule MilosTraining.Execution do
   defdelegate list_logged_training_source_ids(user_id, source_type),
     to: GetTrainingLogEntries,
     as: :live_source_reference_ids
+
+  @doc """
+  ADR-138 D6: every finished result of a workout in one gym between `from`
+  and `to` (in-app executions and training-log entries alike), read in the
+  gym's scope.
+  """
+  def list_workout_results(%{organization_id: organization_id} = context, workout_id, from, to) do
+    MilosTraining.Execution.ExecutionStore.with_user_context(context, fn ->
+      executions =
+        organization_id
+        |> MilosTraining.Execution.ExecutionStore.list_completed_for_workout(workout_id, from, to)
+        |> Enum.map(&workout_result(&1, "execution", &1.completed_at_utc))
+
+      entries =
+        organization_id
+        |> MilosTraining.Execution.TrainingLogStore.list_for_workout(workout_id, from, to)
+        |> Enum.map(&workout_result(&1, "training_log", &1.performed_at_utc))
+
+      executions ++ entries
+    end)
+  end
+
+  defp workout_result(row, source, at) do
+    %{
+      id: row.id,
+      source: source,
+      user_id: row.user_id,
+      scale_level_slug: row.scale_level_slug,
+      section_scores: row.section_scores || [],
+      completed_at_utc: at,
+      journal_visibility: row.journal_visibility
+    }
+  end
+
+  defdelegate rank_workout_results(results, section),
+    to: MilosTraining.Execution.Domain.ScoreRanking,
+    as: :rank
 
   defdelegate list_training_log_completions_for_user(user_id),
     to: GetTrainingLogEntries,

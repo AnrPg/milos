@@ -69,6 +69,12 @@ defmodule MilosTrainingWeb.MeController do
               preferred_locale: %Schema{
                 type: :string,
                 enum: MilosTraining.Identity.supported_locales()
+              },
+              preferred_theme_slug: %Schema{
+                type: :string,
+                nullable: true,
+                enum: MilosTraining.Themes.slugs() ++ [nil],
+                description: "Your own theme; null follows your gym's"
               }
             }
           }
@@ -88,7 +94,8 @@ defmodule MilosTrainingWeb.MeController do
                  nickname: %Schema{type: :string},
                  role: %Schema{type: :string},
                  avatar_url: %Schema{type: :string, nullable: true},
-                 preferred_locale: %Schema{type: :string}
+                 preferred_locale: %Schema{type: :string},
+                 preferred_theme_slug: %Schema{type: :string, nullable: true}
                }
              }
            }
@@ -218,7 +225,8 @@ defmodule MilosTrainingWeb.MeController do
           nickname: updated_user.nickname,
           role: to_string(updated_user.role),
           avatar_url: updated_user.avatar_url,
-          preferred_locale: updated_user.preferred_locale
+          preferred_locale: updated_user.preferred_locale,
+          preferred_theme_slug: updated_user.preferred_theme_slug
         }
       })
     end

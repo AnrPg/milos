@@ -11,7 +11,7 @@ export type WorkoutDslVocabulary = {
   group_parameters?: string[];
   scale_parameters?: string[];
   header_parameters: string[];
-  note_markers: string[];
+  content_markers: string[];
   section_parameters: Record<string, string[]>;
   exercise_catalog?: Array<{
     id: string;
@@ -75,12 +75,14 @@ export function buildWorkoutDslSuggestions(
     );
   }
 
-  const noteMatch = currentLine.match(/^\s*(![a-z-]*)$/i);
-  if (noteMatch) {
+  // Content markers allowed where the cursor is (a cue only inside an exercise).
+  const markerMatch = currentLine.match(/^\s*(![a-z-]*)$/i);
+  if (markerMatch) {
+    const here = contextualParameters(beforeCursor, vocabulary).filter((value) => value.startsWith("!"));
     return resultFor(
       cursor,
-      noteMatch[1],
-      vocabulary.note_markers.map((value) => ({ value, kind: "canonical" as const })),
+      markerMatch[1],
+      (here.length > 0 ? here : vocabulary.content_markers).map((value) => ({ value, kind: "canonical" as const })),
     );
   }
 

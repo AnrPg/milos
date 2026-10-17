@@ -40,6 +40,14 @@ defmodule MilosTraining.Scheduling do
   defdelegate create_class_series(context, params), to: CreateClassSeries, as: :call
   defdelegate create_class_series(params), to: CreateClassSeries, as: :call
   defdelegate extend_class_series(context, series_id, horizon), to: ExtendClassSeries, as: :call
+
+  # ADR-138 D7: class-slot groups.
+  def list_active_class_series(%{organization_id: _} = context),
+    do: MilosTraining.Scheduling.SchedulingStore.list_active_class_series(context)
+
+  def series_booking_counts(%{organization_id: _} = context, %DateTime{} = since),
+    do: MilosTraining.Scheduling.SchedulingStore.series_booking_counts(context, since)
+
   defdelegate extend_class_series(series_id, horizon), to: ExtendClassSeries, as: :call
   defdelegate update_slot(context, id, params), to: UpdateSlot, as: :call
   defdelegate update_slot(id, params), to: UpdateSlot, as: :call
@@ -111,6 +119,15 @@ defmodule MilosTraining.Scheduling do
 
   defdelegate record_attendance(context, params), to: RecordAttendance, as: :call
   defdelegate record_attendance(params), to: RecordAttendance, as: :call
+
+  @doc "The member's attendance status per class, for the classes given."
+  def list_user_attendance(%{organization_id: _} = context, user_id, slot_ids),
+    do: MilosTraining.Scheduling.SchedulingStore.list_user_attendance(context, user_id, slot_ids)
+
+  defdelegate self_check_in_window(slot), to: MilosTraining.Scheduling.Domain.AttendancePolicy
+
+  defdelegate self_check_in(booking, slot, existing, now),
+    to: MilosTraining.Scheduling.Domain.AttendancePolicy
 
   defdelegate get_attendance_for_user_class(context, user_id, scheduled_class_id),
     to: GetAttendance,

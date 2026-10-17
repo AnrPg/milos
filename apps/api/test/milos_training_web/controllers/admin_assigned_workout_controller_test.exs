@@ -147,7 +147,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutControllerTest do
         Jason.encode!(%{
           athlete_ids: [athlete_one.id, athlete_two.id],
           scheduled_for: updated_date,
-          admin_notes: "Updated plan"
+          instructions: "Updated plan"
         })
       )
       |> json_response(200)

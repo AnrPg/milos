@@ -14,6 +14,7 @@ import { useSession } from "@/components/session-provider";
 import { semanticLabel } from "@/i18n/presentation";
 import { formatPRCardDetails } from "@/components/pantheon/pr-card-details";
 import { chronologicalPRHistory } from "@/components/pantheon/pr-history";
+import { latestCommentBody } from "@/lib/journal-comments";
 
 export function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -248,6 +249,7 @@ function CompactCard({
     month: "short", day: "numeric", year: "numeric",
   });
   const details = formatPRCardDetails(pr.supporting_metrics ?? {}, i18n);
+  const latestComment = latestCommentBody(pr.comments);
 
   return (
     <div
@@ -290,10 +292,10 @@ function CompactCard({
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
           </div>
           <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{dateStr}</p>
-          {(details || pr.notes) && (
+          {(details || latestComment) && (
             <div className="mt-2 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
               {details && <p className="truncate text-[11px]" style={{ color: "var(--text-soft)" }}>{details}</p>}
-              {pr.notes && <p className="mt-0.5 truncate text-[11px]" style={{ color: "var(--muted)" }}>{pr.notes}</p>}
+              {latestComment && <p className="mt-0.5 truncate text-[11px]" style={{ color: "var(--muted)" }}>{latestComment}</p>}
             </div>
           )}
         </div>
@@ -321,6 +323,7 @@ function FullCard({
     month: "short", day: "numeric", year: "numeric",
   });
   const details = formatPRCardDetails(pr.supporting_metrics ?? {}, i18n);
+  const latestComment = latestCommentBody(pr.comments);
 
   return (
     <div
@@ -367,10 +370,10 @@ function FullCard({
           <p className="mt-1.5 text-xs" style={{ color: "var(--dim)" }}>
             {pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {dateStr}
           </p>
-          {(details || pr.notes) && (
+          {(details || latestComment) && (
             <div className="mt-3 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
               {details && <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p>}
-              {pr.notes && <p className="mt-1 line-clamp-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{pr.notes}</p>}
+              {latestComment && <p className="mt-1 line-clamp-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{latestComment}</p>}
             </div>
           )}
         </div>

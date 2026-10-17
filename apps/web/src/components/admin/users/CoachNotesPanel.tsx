@@ -11,7 +11,10 @@ import {
   setNotesVisibility,
   updateCoachNote,
   type CoachNote,
+  type CoachNoteSubject,
+  type CoachNoteSubjectKind,
 } from "@/api/roles";
+import { notesAbout } from "@/components/admin/users/member-profile-tabs";
 import { roleErrorKey } from "@/components/admin/staff-home";
 import { formatDateTime } from "@/components/client/format";
 import { useSession } from "@/components/session-provider";
@@ -35,7 +38,32 @@ import { can, membershipRoles } from "@/lib/role-navigation";
 // and admins may read them unless the coach turned that off, and every such
 // read is logged for the coach to see.
 
-export function CoachNotesPanel({ userId }: { userId: string }) {
+/** A thing of the client's a note can be about, as the profile lists it. */
+export type CoachNoteSubjectOption = CoachNoteSubject & { label: string };
+
+const SUBJECT_KEYS: Record<CoachNoteSubjectKind, string> = {
+  execution: "cnSubjectExecution",
+  training_log: "cnSubjectTrainingLog",
+  pr: "cnSubjectPr",
+  injury: "cnSubjectInjury",
+  form_review: "cnSubjectFormReview",
+  assignment: "cnSubjectAssignment",
+};
+
+/**
+ * ADR-140 §5: `kinds` shows the notes about those kinds of thing (a profile
+ * tab); without it, every note and the privacy settings (Coaching › Coach
+ * notes). `subjects` are what a new note here can be about.
+ */
+export function CoachNotesPanel({
+  userId,
+  kinds,
+  subjects = [],
+}: {
+  userId: string;
+  kinds?: CoachNoteSubjectKind[];
+  subjects?: CoachNoteSubjectOption[];
+}) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens, currentUser } = useSession();
@@ -47,6 +75,8 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
   const notesKey = ["staff", "coach-notes", userId];
 
   const [draft, setDraft] = useState("");
+  const [subjectKey, setSubjectKey] = useState("");
+  const subjectFor = (key: string) => subjects.find((item) => `${item.kind}:${item.id}` === key) ?? null;
   const [editing, setEditing] = useState<{ id: string; body: string } | null>(null);
 
   const notes = useQuery({ queryKey: notesKey, enabled: Boolean(token), queryFn: () => fetchCoachNotes(token!, userId) });
@@ -57,9 +87,13 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
   });
   const refresh = () => queryClient.invalidateQueries({ queryKey: notesKey });
   const create = useMutation({
-    mutationFn: () => createCoachNote(token!, userId, draft.trim()),
+    mutationFn: () => {
+      const subject = subjectFor(subjectKey);
+      return createCoachNote(token!, userId, draft.trim(), subject ? { kind: subject.kind, id: subject.id } : null);
+    },
     onSuccess: async () => {
       setDraft("");
+      setSubjectKey("");
       await refresh();
     },
   });
@@ -86,6 +120,12 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
     : (membership?.notes_visible_to_admins ?? true);
   const noteReads = (reads.data ?? []).filter((read) => read.client_user_id === userId);
   const own = (note: CoachNote) => note.coach_user_id === currentUser?.id;
+  const shown = notesAbout(notes.data ?? [], kinds);
+  const subjectLabel = (note: CoachNote) => {
+    if (!note.subject_kind) return null;
+    const known = subjects.find((item) => item.kind === note.subject_kind && item.id === note.subject_id);
+    return known ? `${i18n(SUBJECT_KEYS[note.subject_kind])} · ${known.label}` : i18n(SUBJECT_KEYS[note.subject_kind]);
+  };
 
   return (
     <div className="space-y-4">
@@ -93,17 +133,20 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
         <StatusText tone="muted">{i18n("loading33ce417")}</StatusText>
       ) : notes.isError ? (
         <StatusText tone="error">{errorText(notes.error)}</StatusText>
-      ) : (notes.data ?? []).length === 0 ? (
+      ) : shown.length === 0 ? (
         <StatusText tone="muted">{i18n("rhNoCoachNotes")}</StatusText>
       ) : (
         <ul className="grid gap-2">
-          {(notes.data ?? []).map((note) => (
+          {shown.map((note) => (
             <li key={note.id} className="rounded-[1.2rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
               <p className="text-xs" style={{ color: "var(--muted)" }}>
                 {own(note) ? i18n("rhYou") : (note.coach_nickname ?? i18n("stfCoach"))}
                 {note.inserted_at ? ` · ${formatDateTime(note.inserted_at, locale)}` : ""}
                 {note.updated_at && note.inserted_at && note.updated_at !== note.inserted_at ? ` · ${i18n("rhEdited")}` : ""}
               </p>
+              {subjectLabel(note) ? (
+                <p className="mt-1 text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>{subjectLabel(note)}</p>
+              ) : null}
               {editing?.id === note.id ? (
                 <form
                   className="mt-2 space-y-2"
@@ -154,7 +197,7 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
         </ul>
       )}
 
-      {canWrite ? (
+      {canWrite && (!kinds || subjects.length > 0) ? (
         <form
           className="space-y-2"
           onSubmit={(event) => {
@@ -170,7 +213,30 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
           />
-          <button type="submit" disabled={create.isPending || !draft.trim()} className={primaryButtonClass} style={primaryButtonStyle}>
+          {subjects.length > 0 ? (
+            <label className="block text-xs" style={{ color: "var(--dim)" }}>
+              {i18n("cnAbout")}
+              <select
+                className={`${inputClass} mt-1`}
+                style={inputStyle}
+                value={subjectKey}
+                onChange={(event) => setSubjectKey(event.target.value)}
+              >
+                <option value="">{kinds ? i18n("cnAboutPick") : i18n("cnAboutNothing")}</option>
+                {subjects.map((item) => (
+                  <option key={`${item.kind}:${item.id}`} value={`${item.kind}:${item.id}`}>
+                    {i18n(SUBJECT_KEYS[item.kind])} · {item.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          <button
+            type="submit"
+            disabled={create.isPending || !draft.trim() || (Boolean(kinds) && !subjectKey)}
+            className={primaryButtonClass}
+            style={primaryButtonStyle}
+          >
             {create.isPending ? i18n("loading33ce417") : i18n("rhAddNote")}
           </button>
         </form>
@@ -178,7 +244,7 @@ export function CoachNotesPanel({ userId }: { userId: string }) {
 
       {failed ? <StatusText tone="error">{errorText(failed.error)}</StatusText> : null}
 
-      {isCoach && canWrite ? (
+      {isCoach && canWrite && !kinds ? (
         <details className="rounded-[1.2rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
           <summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("rhNotePrivacy")}</summary>
           <label className="mt-3 flex items-start gap-3">

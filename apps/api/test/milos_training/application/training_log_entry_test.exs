@@ -396,26 +396,26 @@ defmodule MilosTraining.Application.TrainingLogEntryTest do
 
       assert {:ok, updated} =
                UpdateTrainingLogEntry.call(context, member, entry.id, %{
-                 "notes" => "Felt great",
-                 "perceived_effort" => 8,
+                 "perceived_effort" => 9,
+                 "duration_seconds" => 1800,
                  "expected_version" => entry.lock_version
                })
 
-      assert updated.notes == "Felt great"
-      assert updated.perceived_effort == 8
+      assert updated.perceived_effort == 9
+      assert updated.duration_seconds == 1800
       assert updated.title == entry.title
       assert updated.lock_version == entry.lock_version + 1
 
       assert {:error, :stale_training_log_entry} =
                UpdateTrainingLogEntry.call(context, member, entry.id, %{
-                 "notes" => "lost update",
+                 "perceived_effort" => 1,
                  "expected_version" => entry.lock_version
                })
 
       assert {:ok, _voided} = VoidTrainingLogEntry.call(context, member, entry.id, %{})
 
       assert {:error, :training_log_entry_voided} =
-               UpdateTrainingLogEntry.call(context, member, entry.id, %{"notes" => "x"})
+               UpdateTrainingLogEntry.call(context, member, entry.id, %{"perceived_effort" => 4})
 
       assert {:error, :training_log_entry_voided} =
                VoidTrainingLogEntry.call(context, member, entry.id, %{})
@@ -439,7 +439,7 @@ defmodule MilosTraining.Application.TrainingLogEntryTest do
       assert {:error, :not_found} = ListTrainingLogEntries.get(context_b, member, entry.id)
 
       assert {:error, :not_found} =
-               UpdateTrainingLogEntry.call(context_b, member, entry.id, %{"notes" => "x"})
+               UpdateTrainingLogEntry.call(context_b, member, entry.id, %{"perceived_effort" => 4})
 
       assert {:error, :not_found} = VoidTrainingLogEntry.call(context_b, member, entry.id, %{})
 

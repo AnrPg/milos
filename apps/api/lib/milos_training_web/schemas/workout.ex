@@ -2,6 +2,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
   @moduledoc false
 
   alias OpenApiSpex.Schema
+  alias MilosTraining.Workouts.Domain.WorkoutContent
 
   @uuid %Schema{type: :string, format: :uuid}
   @nullable_uuid %Schema{type: :string, format: :uuid, nullable: true}
@@ -84,7 +85,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         load_progression: load_progression_schema(),
         excluded: %Schema{type: :boolean},
         note: @nullable_string,
-        notes: %Schema{type: :array, items: typed_note_schema()},
+        content: %Schema{type: :array, items: content_entry_schema()},
         prescription_metadata: %Schema{type: :object, additionalProperties: true}
       },
       additionalProperties: false
@@ -121,7 +122,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         rest_pause_seconds: @nullable_integer,
         pacing: @nullable_integer,
         note: @nullable_string,
-        notes: %Schema{type: :array, items: typed_note_schema()},
+        content: %Schema{type: :array, items: content_entry_schema()},
         prescription_metadata: %Schema{type: :object, additionalProperties: true},
         group_config: %Schema{type: :object, nullable: true, additionalProperties: true},
         excluded: %Schema{type: :boolean},
@@ -155,7 +156,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         rest_after_seconds: @nullable_integer,
         rest_before_next_section_seconds: @nullable_integer,
         note: @nullable_string,
-        notes: %Schema{type: :array, items: typed_note_schema()},
+        content: %Schema{type: :array, items: content_entry_schema()},
         section_metadata: %Schema{type: :object, additionalProperties: true},
         exercises: %Schema{type: :array, items: workout_item_schema()},
         sections: %Schema{type: :array, items: child_schema}
@@ -186,7 +187,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         estimated_duration_seconds: @nullable_integer,
         equipment: %Schema{type: :array, items: %Schema{type: :string}},
         tags: %Schema{type: :array, items: %Schema{type: :string}},
-        notes: %Schema{type: :array, items: typed_note_schema()},
+        content: %Schema{type: :array, items: content_entry_schema()},
         workout_metadata: %Schema{type: :object, additionalProperties: true},
         draft_data: %Schema{type: :object, additionalProperties: true, nullable: true},
         sections: %Schema{type: :array, items: section_schema()},
@@ -226,7 +227,7 @@ defmodule MilosTrainingWeb.Schemas.Workout do
         estimated_duration_seconds: @nullable_integer,
         equipment: %Schema{type: :array, items: %Schema{type: :string}},
         tags: %Schema{type: :array, items: %Schema{type: :string}},
-        notes: %Schema{type: :array, items: typed_note_schema()},
+        content: %Schema{type: :array, items: content_entry_schema()},
         workout_metadata: %Schema{type: :object, additionalProperties: true},
         created_by_id: @nullable_uuid,
         inserted_at: %Schema{type: :string, format: :"date-time", nullable: true},
@@ -261,14 +262,13 @@ defmodule MilosTrainingWeb.Schemas.Workout do
     }
   end
 
-  defp typed_note_schema do
+  # ADR-140 §4: Οδηγίες (instructions, scaling, safety, equipment), a cue
+  # beside an exercise, and the staff-only coach-brief.
+  defp content_entry_schema do
     %Schema{
       type: :object,
       properties: %{
-        type: %Schema{
-          type: :string,
-          enum: ~w(note coach-note athlete-note safety-note scaling-note equipment-note)
-        },
+        type: %Schema{type: :string, enum: WorkoutContent.types()},
         body: %Schema{type: :string, maxLength: 20_000},
         document: %Schema{type: :object, nullable: true, additionalProperties: true}
       },

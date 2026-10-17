@@ -1,0 +1,293 @@
+"use client";
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
+
+import { fetchAssignedWorkoutWeek } from "@/api/assigned-workouts";
+import { listMyExecutions } from "@/api/executions";
+import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
+import { fetchTrainingLogSources } from "@/api/training-log";
+import { useWorkoutLauncher } from "@/components/client/use-workout-launcher";
+import { HubButton, HubCard } from "@/components/member-app/HubParts";
+import { NextBookingActions } from "@/components/member-app/box/NextBookingActions";
+import {
+  buildTodayTraining,
+  defaultTodayItem,
+  localIsoDate,
+  logSourceFor,
+  type TodayTrainingItem,
+} from "@/components/member-app/box/today-training";
+import { useSession } from "@/components/session-provider";
+import {
+  TRAINING_LOG_SOURCES_KEY,
+  TrainingLogDialog,
+  type TrainingLogDialogState,
+} from "@/components/training-log/TrainingLog";
+import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
+import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { localizeError } from "@/i18n/presentation";
+import { useUiTranslations } from "@/i18n/ui";
+import { useUiLocale } from "@/i18n/use-ui-locale";
+
+const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+
+export function useBoxSchedule(token: string | null, now: Date) {
+  const window = useMemo(() => {
+    const start = new Date(now);
+    start.setHours(0, 0, 0, 0);
+    return { startAt: start.toISOString(), endAt: new Date(start.getTime() + WEEK_MS).toISOString() };
+  }, [now]);
+  return useQuery({
+    queryKey: ["box", "schedule", window.startAt],
+    enabled: Boolean(token),
+    queryFn: () => fetchSchedule(token!, { ...window, days: 7, classTypeIds: [] }),
+    staleTime: 60_000,
+  });
+}
+
+/** The next class the member holds a place in, still running or upcoming. */
+export function nextBooking(slots: ScheduleSlot[], now: Date) {
+  return (
+    slots
+      .filter((slot) => ["approved", "pending", "waitlisted"].includes(slot.current_user_booking?.status ?? ""))
+      .filter((slot) => new Date(slot.scheduled_at).getTime() + slot.duration_minutes * 60_000 > now.getTime())
+      .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at))[0] ?? null
+  );
+}
+
+/**
+ * Box's first two slots (brief §7.4, mockup 08): today's workout with
+ * Καταγραφή / Έναρξη ▶, then the next booking. Both keep their place with an
+ * empty state, so the screen never reflows (brief §4.2).
+ */
+export function BoxToday() {
+  const t = useTranslations("MemberApp");
+  const i18n = useUiTranslations();
+  const locale = useUiLocale();
+  const { tokens } = useSession();
+  const token = tokens?.access_token ?? null;
+  const now = useMemo(() => new Date(), []);
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
+  const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
+  const launcher = useWorkoutLauncher();
+
+  const schedule = useBoxSchedule(token, now);
+  const assignments = useQuery({
+    queryKey: ["box", "assignments", localIsoDate(now)],
+    enabled: Boolean(token),
+    queryFn: () => fetchAssignedWorkoutWeek(token!, localIsoDate(now)),
+    staleTime: 60_000,
+  });
+  const executions = useQuery({
+    queryKey: ["executions", "mine"],
+    enabled: Boolean(token),
+    queryFn: () => listMyExecutions(token!),
+    staleTime: 30_000,
+  });
+  const logSources = useQuery({
+    queryKey: TRAINING_LOG_SOURCES_KEY,
+    enabled: Boolean(token),
+    queryFn: () => fetchTrainingLogSources(token!),
+    staleTime: 60_000,
+  });
+
+  const today = useMemo(
+    () =>
+      buildTodayTraining({
+        now,
+        scheduleSlots: schedule.data?.slots ?? [],
+        assignments: assignments.data?.assignments ?? [],
+        executions: executions.data ?? [],
+      }),
+    [now, schedule.data, assignments.data, executions.data],
+  );
+  const selected =
+    today.items.find((item) => item.key === selectedKey) ?? defaultTodayItem(today.items);
+  const loading = schedule.isPending || assignments.isPending;
+  const booking = nextBooking(schedule.data?.slots ?? [], now);
+  const time = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  const day = (iso: string) =>
+    localIsoDate(new Date(iso)) === localIsoDate(now)
+      ? t("todayLabel")
+      : new Date(iso).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "short" });
+
+  function chipLabel(item: TodayTrainingItem) {
+    return item.kind === "class" && item.scheduledAt
+      ? t("classChip", { time: time(item.scheduledAt) })
+      : t("programmeChip", { title: item.sourceName });
+  }
+
+  function openLog(item: TodayTrainingItem) {
+    const source = logSourceFor(item, logSources.data);
+    setLogDialog(source ? { mode: "create", source } : { mode: "pick" });
+  }
+
+  function start(item: TodayTrainingItem) {
+    if (today.resumeExecutionId) return launcher.resume(today.resumeExecutionId);
+    return launcher.launch({
+      key: item.key,
+      masterWorkoutId: item.workout.id,
+      source: item.execution.source,
+      sourceReferenceId: item.execution.referenceId,
+    });
+  }
+
+  return (
+    <>
+      <HubCard eyebrow={t("todayWorkout")} highlighted>
+        {loading ? (
+          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
+        ) : !selected ? (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
+            <div className="flex gap-2">
+              <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
+              {today.resumeExecutionId ? (
+                <button
+                  type="button"
+                  className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  onClick={() => launcher.resume(today.resumeExecutionId!)}
+                >
+                  {t("resumeWorkout")} ▶
+                </button>
+              ) : null}
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {today.items.length > 1 ? (
+              <div role="tablist" aria-label={t("todaySources")} className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
+                {today.items.map((item) => {
+                  const current = item.key === selected.key;
+                  return (
+                    <button
+                      key={item.key}
+                      type="button"
+                      role="tab"
+                      aria-selected={current}
+                      onClick={() => setSelectedKey(item.key)}
+                      className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold"
+                      style={{
+                        background: current ? "color-mix(in srgb, var(--primary) 18%, transparent)" : "var(--panel-raised)",
+                        color: current ? "var(--primary-strong)" : "var(--text-soft)",
+                      }}
+                    >
+                      {chipLabel(item)}
+                      {item.completed ? " ✓" : ""}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : (
+              <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
+            )}
+
+            <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{selected.workout.title}</h2>
+            {selected.kind === "programme" && !selected.completed ? (
+              <Link
+                href={`/box/workouts?open_assignment=${encodeURIComponent(selected.execution.referenceId)}`}
+                className="self-start text-sm font-semibold"
+                style={{ color: "var(--primary-strong)" }}
+              >
+                {t("programmeManage")} ›
+              </Link>
+            ) : null}
+            <WorkoutContentBlock entries={selected.workout.content} lead={selected.instructions} />
+            <WorkoutPreviewDetail
+              sections={selected.workout.sections as Parameters<typeof WorkoutPreviewDetail>[0]["sections"]}
+              initiallyExpanded={false}
+              authoringMode={selected.workout.authoring_mode}
+              freeTextBody={selected.workout.free_text_body}
+              freeTextDocument={selected.workout.free_text_document}
+            />
+
+            {token ? (
+              <MyInjuryWarningsPanel
+                accessToken={token}
+                workoutId={selected.workout.id}
+                surface={selected.injuryContext.surface}
+                sourceContextId={selected.injuryContext.id}
+              />
+            ) : null}
+
+            {launcher.error ? (
+              <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>
+                {localizeError(launcher.error, i18n)}
+              </p>
+            ) : null}
+
+            <div className="flex gap-2">
+              <button
+                type="button"
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+                onClick={() => openLog(selected)}
+                disabled={selected.completed}
+              >
+                {selected.completed ? t("logged") : t("logWorkout")}
+              </button>
+              <button
+                type="button"
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
+                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                onClick={() => void start(selected)}
+                disabled={launcher.pendingKey !== null}
+              >
+                {today.resumeExecutionId ? t("resumeWorkout") : t("startWorkout")} ▶
+              </button>
+            </div>
+          </div>
+        )}
+      </HubCard>
+
+      <HubCard eyebrow={t("nextSession")}>
+        {schedule.isPending ? (
+          <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
+        ) : booking ? (
+          <div className="flex flex-col gap-3">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
+                  {day(booking.scheduled_at)} {time(booking.scheduled_at)} · {booking.name || booking.class_type?.name}
+                </p>
+                <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{booking.workout?.title ?? ""}</p>
+              </div>
+              <span
+                className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
+                style={{ background: "color-mix(in srgb, var(--success, #22c55e) 16%, transparent)", color: "var(--success, #22c55e)" }}
+              >
+                {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
+              </span>
+            </div>
+            <NextBookingActions slot={booking} />
+            <Link
+              href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
+              className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+            >
+              {t("manageBooking")}
+            </Link>
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("noBooking")}</p>
+            <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
+          </div>
+        )}
+      </HubCard>
+
+      {logDialog.mode !== "closed" && token ? (
+        <TrainingLogDialog
+          state={logDialog}
+          token={token}
+          onNavigate={setLogDialog}
+          onClose={() => setLogDialog({ mode: "closed" })}
+        />
+      ) : null}
+    </>
+  );
+}

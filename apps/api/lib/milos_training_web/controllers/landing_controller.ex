@@ -11,7 +11,7 @@ defmodule MilosTrainingWeb.LandingController do
   tags(["Landing"])
   security([%{"bearerAuth" => []}])
 
-  @theme_slugs ~w(ember sage steel aurora royal volt noir daybreak paper lagoon sunset)
+  @theme_slugs MilosTraining.Themes.slugs()
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
@@ -29,16 +29,16 @@ defmodule MilosTrainingWeb.LandingController do
     required: [:rank, :user_id, :nickname, :workouts_this_week, :prs_this_month]
   }
 
-  @coach_note_schema %Schema{
+  @coaching_message_schema %Schema{
     type: :object,
     properties: %{
       id: %Schema{type: :string, format: :uuid},
-      admin_id: %Schema{type: :string, format: :uuid},
-      athlete_id: %Schema{type: :string, format: :uuid},
+      thread_id: %Schema{type: :string, format: :uuid},
+      sender_id: %Schema{type: :string, format: :uuid},
       body: %Schema{type: :string},
       inserted_at: %Schema{type: :string, format: :"date-time"}
     },
-    required: [:id, :admin_id, :athlete_id, :body, :inserted_at]
+    required: [:id, :thread_id, :sender_id, :body, :inserted_at]
   }
 
   @membership_schema %Schema{
@@ -51,7 +51,6 @@ defmodule MilosTrainingWeb.LandingController do
       last_paid: %Schema{type: :string, format: :date, nullable: true},
       amount: %Schema{type: :integer, nullable: true},
       currency: %Schema{type: :string},
-      notes: %Schema{type: :string, nullable: true},
       entitlement_status: %Schema{type: :string},
       entitlement_source: %Schema{type: :string}
     },
@@ -85,11 +84,11 @@ defmodule MilosTrainingWeb.LandingController do
                required: [:settings],
                additionalProperties: true
              },
-             coach_notes: %Schema{type: :array, items: @coach_note_schema},
+             coaching_messages: %Schema{type: :array, items: @coaching_message_schema},
              membership: @membership_schema,
              recent_executions: %Schema{type: :array, items: %Schema{type: :object}}
            },
-           required: [:gamification, :coach_notes, :membership, :recent_executions]
+           required: [:gamification, :coaching_messages, :membership, :recent_executions]
          }}
     ]
   )

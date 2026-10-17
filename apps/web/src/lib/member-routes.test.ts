@@ -1,0 +1,33 @@
+import { describe, expect, it } from "vitest";
+
+import { currentMemberPath, MEMBER_ROUTE_MOVES } from "@/lib/member-routes";
+
+describe("currentMemberPath", () => {
+  it("maps every moved page to its new home", () => {
+    expect(currentMemberPath("/my-workouts")).toBe("/box/workouts");
+    expect(currentMemberPath("/my-workouts/history")).toBe("/journal");
+    expect(currentMemberPath("/my-workouts/pantheon")).toBe("/journal/pantheon");
+    expect(currentMemberPath("/schedule")).toBe("/box/schedule");
+    expect(currentMemberPath("/coaching")).toBe("/box/coach");
+    expect(currentMemberPath("/profile")).toBe("/me/settings");
+    expect(currentMemberPath("/account/billing")).toBe("/me/payments");
+    expect(currentMemberPath("/account/activity/chats")).toBe("/me/activity/chats");
+  });
+
+  it("keeps the query, hash and organization prefix", () => {
+    expect(currentMemberPath("/schedule?open_slot=s1")).toBe("/box/schedule?open_slot=s1");
+    expect(currentMemberPath("/profile#vault")).toBe("/me/settings#vault");
+    expect(currentMemberPath("/org/kypseli/my-workouts?open=a1")).toBe("/org/kypseli/box/workouts?open=a1");
+  });
+
+  it("leaves other paths alone", () => {
+    expect(currentMemberPath("/admin/coaching")).toBe("/admin/coaching");
+    expect(currentMemberPath("/schedules")).toBe("/schedules");
+    expect(currentMemberPath("/workouts/w1/execute")).toBe("/workouts/w1/execute");
+    expect(currentMemberPath("https://example.com/schedule")).toBe("https://example.com/schedule");
+  });
+
+  it("never maps a destination again", () => {
+    for (const [, to] of MEMBER_ROUTE_MOVES) expect(currentMemberPath(to)).toBe(to);
+  });
+});

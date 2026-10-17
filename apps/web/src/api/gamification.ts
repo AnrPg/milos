@@ -1,4 +1,5 @@
 import { apiRequest } from "@/api/client";
+import type { JournalComment, JournalCommentInput } from "@/api/journal-comments";
 
 export type GamificationPreferences = {
   id?: string;
@@ -40,7 +41,8 @@ export type PRRecord = {
   higher_is_better: boolean;
   beaten_on: string;
   supporting_metrics: PRSupportingMetrics;
-  notes: string | null;
+  /** Σχόλια on the PR (ADR-140 §1); absent where the reader may not see them. */
+  comments?: JournalComment[];
   inserted_at: string;
   updated_at: string;
 };
@@ -51,7 +53,6 @@ export type PRHistoryEntry = {
   score: number;
   beaten_on: string;
   supporting_metrics: PRSupportingMetrics;
-  notes: string | null;
   inserted_at: string;
 };
 
@@ -93,7 +94,8 @@ export async function createPR(
     higher_is_better?: boolean;
     beaten_on: string;
     supporting_metrics?: PRSupportingMetrics;
-    notes?: string | null;
+    /** Σχόλια written with the PR, saved in the same transaction. */
+    comments?: JournalCommentInput[];
     /** ADR-129: the gym the PR was set in; omit or null for a personal PR. */
     organization_slug?: string | null;
   },
@@ -116,7 +118,7 @@ export async function updatePR(
     higher_is_better: boolean;
     beaten_on: string;
     supporting_metrics: PRSupportingMetrics;
-    notes: string | null;
+    comments: JournalCommentInput[];
   }>,
 ): Promise<PRRecord> {
   const data = await apiRequest<{ pr: PRRecord }>(`/prs/${id}`, {
@@ -137,7 +139,7 @@ export async function editPR(
     higher_is_better: boolean;
     beaten_on: string;
     supporting_metrics: PRSupportingMetrics;
-    notes: string | null;
+    comments: JournalCommentInput[];
   }>,
 ): Promise<PRRecord> {
   const data = await apiRequest<{ pr: PRRecord }>(`/prs/${id}/edit`, {

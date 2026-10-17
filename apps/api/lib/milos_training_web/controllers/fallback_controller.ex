@@ -22,6 +22,63 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "validation_failed", errors: normalized_errors})
   end
 
+  # ADR-140 §6: a coaching message needs an active coaching relationship;
+  # a message from the box belongs to the gym's thread with the member.
+  def call(conn, {:error, :no_coaching_relationship}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "no_coaching_relationship",
+      error: "Only a coach with an active coaching relationship can send a coaching message"
+    })
+  end
+
+  def call(conn, {:error, :box_message_outside_box_thread}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "box_message_outside_box_thread",
+      error: "A message from the box is sent in the gym's thread with the member"
+    })
+  end
+
+  # ADR-138: club and channel governance.
+  def call(conn, {:error, :channel_not_optional}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "channel_not_optional",
+      error: "Every member is in this channel; it cannot be joined or left"
+    })
+  end
+
+  def call(conn, {:error, :invalid_timezone}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_timezone", error: "Unknown time zone"})
+  end
+
+  def call(conn, {:error, :invalid_notify_level}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_notify_level", error: "Unknown notification level"})
+  end
+
+  def call(conn, {:error, :cannot_post_in_channel}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "cannot_post_in_channel", error: "You cannot post in this channel"})
+  end
+
+  def call(conn, {:error, :attachment_not_shareable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "attachment_not_shareable",
+      error: "Only your own journal entries can be attached"
+    })
+  end
+
   def call(conn, {:error, :invalid_current_password}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1669,6 +1726,67 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-140 §3 injury updates.
+  def call(conn, {:error, :empty_update}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "empty_update", error: "Write something or change at least one field"})
+  end
+
+  def call(conn, {:error, :note_too_long}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "note_too_long", error: "The update text is too long"})
+  end
+
+  # ADR-139 ladder moves and reply requests.
+  @journal_errors %{
+    unknown_kind: {:unprocessable_entity, "Unknown journal entry kind"},
+    visibility_not_allowed: {:unprocessable_entity, "This entry cannot take that visibility"},
+    no_gym_for_entry: {:unprocessable_entity, "A personal entry has no coach to show it to"},
+    no_active_coach: {:unprocessable_entity, "You have no active coach in this entry's gym"},
+    question_required: {:unprocessable_entity, "Ask your coach a question"},
+    question_too_long: {:unprocessable_entity, "The question is too long"},
+    note_organization_unavailable: {:unprocessable_entity, "That gym is not available"},
+    stale: {:conflict, "This entry changed meanwhile; reload it"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do
+    {status, message} = Map.fetch!(@journal_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  def call(conn, {:error, :comment_conflict}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "comment_conflict", error: "This comment id belongs to another entry"})
+  end
+
+  def call(conn, {:error, :injury_already_active}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "injury_already_active", error: "This injury is already active"})
+  end
+
+  # ADR-140 §2 Πώς νιώθω.
+  def call(conn, {:error, :check_in_organization_unavailable}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "check_in_organization_unavailable",
+      error: "Check-ins can only be recorded in a gym you are an active member of"
+    })
+  end
+
+  def call(conn, {:error, :invalid_range}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_range", error: "from must be before to, at most a year apart"})
+  end
+
   # ADR-126 refund receipts, reconciliation and accounting exports.
   def call(conn, {:error, :reconciliation_reference_conflict}) do
     conn
@@ -1765,6 +1883,11 @@ defmodule MilosTrainingWeb.FallbackController do
     appointment_not_active: {:conflict, "The appointment is no longer active"},
     appointment_coach_not_staff: {:unprocessable_entity, "Choose a coach of this gym"},
     invalid_attendance_status: {:unprocessable_entity, "Attendance must be attended or no_show"},
+    # TD-105: member self check-in to a booked class.
+    check_in_not_open: {:conflict, "Check-in opens 30 minutes before the class"},
+    check_in_closed: {:conflict, "The class has ended"},
+    attendance_already_recorded: {:conflict, "Your attendance was already recorded"},
+    attendance_requires_approved_booking: {:conflict, "Only an approved booking can check in"},
     add_on_base_required:
       {:unprocessable_entity, "The member needs a compatible membership first"},
     corporate_package_requires_enrollment:

@@ -8,7 +8,11 @@ import { formatClock } from "./TimerDisplay";
 import {useUiTranslations} from "@/i18n/ui";
 import React, { useState } from "react";
 import type { TimerSegment } from "@/api/executions";
-import { isFreeTextModification, type ExerciseModification } from "@/api/executions";
+import type { ExerciseModification } from "@/api/executions";
+import type { JournalComment } from "@/api/journal-comments";
+import { CommentList } from "@/components/journal/CommentList";
+import { useTranslations } from "next-intl";
+import { changeComments, type FinishComments } from "@/lib/journal-comments";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { semanticLabel } from "@/i18n/presentation";
@@ -359,17 +363,26 @@ function patchFromEdit(
 function ModificationsEditorStep({
   segments,
   initialMods,
+  comments,
+  pendingCommentIds,
+  text,
+  onTextChange,
   onBack,
   onNext,
   onSkip,
 }: {
   segments: TimerSegment[];
   initialMods: ExerciseModification[];
+  comments: JournalComment[];
+  pendingCommentIds: string[];
+  text: string;
+  onTextChange: (text: string) => void;
   onBack: () => void;
   onNext: (mods: ExerciseModification[]) => void;
   onSkip: () => void;
 }) {
   const i18n = useUiTranslations();
+  const exerciseNames = React.useMemo(() => exerciseNameLookup(segments), [segments]);
   const rows = React.useMemo(() => buildExpandedRows(segments, i18n), [segments, i18n]);
   const sections = React.useMemo(() => {
     const grouped = new Map<string, ExpandedWorkoutRow[]>();
@@ -594,6 +607,14 @@ function ModificationsEditorStep({
             </section>
           );
         })}
+
+        <CommentsPanel
+          comments={comments.filter((comment) => !comment.change)}
+          pendingCommentIds={pendingCommentIds}
+          exerciseNames={exerciseNames}
+          text={text}
+          onTextChange={onTextChange}
+        />
       </div>
 
       <div className="p-4 pt-0">
@@ -612,44 +633,78 @@ function ModificationsEditorStep({
   );
 }
 
-const FREE_TEXT_MODIFICATION_ID = "free-text:modification";
+function exerciseNameLookup(segments: TimerSegment[]): Record<string, string> {
+  const names: Record<string, string> = {};
+  for (const segment of segments) {
+    for (const exercise of segment.exercises ?? []) names[exercise.id] = exercise.name;
+  }
+  return names;
+}
 
-function FreeTextModificationsStep({
-  initialMods,
+/**
+ * Σχόλια (ADR-140 §1): the comments written during the workout, listed as
+ * one list with whatever is written here, plus a field for a new one on the
+ * whole workout.
+ */
+function CommentsPanel({
+  comments,
+  pendingCommentIds,
+  exerciseNames,
+  text,
+  onTextChange,
+  autoFocus = false,
+}: {
+  comments: JournalComment[];
+  pendingCommentIds: string[];
+  exerciseNames: Record<string, string>;
+  text: string;
+  onTextChange: (text: string) => void;
+  autoFocus?: boolean;
+}) {
+  const t = useTranslations("MemberApp.comments");
+  return (
+    <section className="space-y-3 rounded-2xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+      <h3 className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+        {t("title")}
+      </h3>
+      <CommentList
+        comments={comments}
+        pendingIds={pendingCommentIds}
+        anchorLabel={(comment) => (comment.exercise_id ? (exerciseNames[comment.exercise_id] ?? null) : null)}
+      />
+      <textarea
+        aria-label={t("workoutComment")}
+        placeholder={t("workoutCommentPlaceholder")}
+        autoFocus={autoFocus}
+        maxLength={4000}
+        className="min-h-28 w-full resize-y rounded-xl p-3 text-sm leading-6 outline-none"
+        style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+        value={text}
+        onChange={(event) => onTextChange(event.target.value)}
+      />
+    </section>
+  );
+}
+
+/** A free-text workout has no rows to change: only comments. */
+function FreeTextCommentsStep({
+  comments,
+  pendingCommentIds,
+  text,
+  onTextChange,
   onBack,
   onNext,
   onSkip,
 }: {
-  initialMods: ExerciseModification[];
+  comments: JournalComment[];
+  pendingCommentIds: string[];
+  text: string;
+  onTextChange: (text: string) => void;
   onBack: () => void;
-  onNext: (mods: ExerciseModification[]) => void;
+  onNext: () => void;
   onSkip: () => void;
 }) {
   const i18n = useUiTranslations();
-  const existing = initialMods.find(isFreeTextModification);
-  const [note, setNote] = useState(existing ? String(existing.actual_value) : "");
-
-  function continueWithNote() {
-    const actualValue = note.trim();
-    const otherModifications = initialMods.filter((modification) => !isFreeTextModification(modification));
-
-    if (!actualValue) {
-      onNext(otherModifications);
-      return;
-    }
-
-    onNext([
-      ...otherModifications,
-      {
-        patch_id: FREE_TEXT_MODIFICATION_ID,
-        type: "other",
-        field: "note",
-        section_id: "free_text",
-        canonical_value: "",
-        actual_value: actualValue,
-      },
-    ]);
-  }
 
   return (
     <div className="flex h-dvh flex-col" style={{ background: "var(--bg)", color: "var(--text)" }}>
@@ -669,26 +724,21 @@ function FreeTextModificationsStep({
         </p>
       </div>
 
-      <div className="flex-1 px-4 pb-4">
-        <label className="block h-full rounded-2xl p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("notes7044004")}
-          </span>
-          <textarea
-            aria-label={i18n("notes7044004")}
-            autoFocus
-            className="mt-3 min-h-48 w-full resize-y rounded-xl p-3 text-sm leading-6 outline-none"
-            style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
-            value={note}
-            onChange={(event) => setNote(event.target.value)}
-          />
-        </label>
+      <div className="flex-1 overflow-y-auto px-4 pb-4">
+        <CommentsPanel
+          comments={comments}
+          pendingCommentIds={pendingCommentIds}
+          exerciseNames={{}}
+          text={text}
+          onTextChange={onTextChange}
+          autoFocus
+        />
       </div>
 
       <div className="p-4 pt-0">
         <button
           type="button"
-          onClick={continueWithNote}
+          onClick={onNext}
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
           style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
         >
@@ -704,6 +754,7 @@ function FreeTextModificationsStep({
 function ConfirmStep({
   scores,
   modifications,
+  text,
   segments,
   isSaving,
   feedback,
@@ -713,6 +764,7 @@ function ConfirmStep({
 }: {
   scores: SectionScore[];
   modifications: ExerciseModification[];
+  text: string;
   segments: TimerSegment[];
   clockAdjustments?: ClockAdjustmentSummary[];
   isSaving: boolean;
@@ -805,38 +857,34 @@ function ConfirmStep({
               {modifications.map((mod, i) => (
                 <div
                   key={(mod.patch_id ?? mod.exercise_id ?? mod.section_id) + "-" + (i)}
-                  className={`rounded-xl px-4 py-2.5 ${isFreeTextModification(mod) ? "" : "flex items-center justify-between"}`}
+                  className="flex items-center justify-between rounded-xl px-4 py-2.5"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
-                  {isFreeTextModification(mod) ? (
-                    <p className="whitespace-pre-wrap break-words text-sm leading-6" style={{ color: "var(--text)" }}>
-                      {String(mod.actual_value)}
-                    </p>
-                  ) : (
-                    <>
-                      <span className="truncate text-sm" style={{ color: "var(--muted)" }}>
-                        {mod.exercise_name ??
-                          (mod.exercise_id ? exerciseMap[mod.exercise_id] : null) ??
-                          mod.section_name ??
-                          mod.section_id}
-                      </span>
-                      <span
-                        className="ms-2 shrink-0 text-xs font-semibold"
-                        style={{ color: mod.type === "skipped" ? "var(--danger, var(--primary))" : "var(--warning)" }}
-                      >
-                        {mod.type === "skipped"
-                          ? i18n("skipped5a000ad")
-                          : `${mod.field}: ${String(mod.actual_value)}`}
-                      </span>
-                    </>
-                  )}
+                  <span className="truncate text-sm" style={{ color: "var(--muted)" }}>
+                    {mod.exercise_name ??
+                      (mod.exercise_id ? exerciseMap[mod.exercise_id] : null) ??
+                      mod.section_name ??
+                      mod.section_id}
+                  </span>
+                  <span
+                    className="ms-2 shrink-0 text-xs font-semibold"
+                    style={{ color: mod.type === "skipped" ? "var(--danger, var(--primary))" : "var(--warning)" }}
+                  >
+                    {mod.type === "skipped"
+                      ? i18n("skipped5a000ad")
+                      : `${mod.field}: ${String(mod.actual_value)}`}
+                  </span>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {scores.length === 0 && modifications.length === 0 && (
+        {text.trim() ? (
+          <ConfirmComment text={text.trim()} />
+        ) : null}
+
+        {scores.length === 0 && modifications.length === 0 && !text.trim() && (
           <p className="text-center text-sm py-8" style={{ color: "var(--dim)" }}>
             {i18n("noScoresOrModificationsLogged685c678")}
           </p>
@@ -869,10 +917,28 @@ function ConfirmStep({
 /** A clock the athlete changed mid-workout, shown before saving. */
 export type ClockAdjustmentSummary = { name: string; authoredSeconds: number; deltaSeconds: number };
 
+function ConfirmComment({ text }: { text: string }) {
+  const t = useTranslations("MemberApp.comments");
+  return (
+    <div>
+      <p className="mb-2 px-1 text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+        {t("workoutComment")}
+      </p>
+      <p
+        className="whitespace-pre-wrap break-words rounded-xl px-4 py-2.5 text-sm leading-6"
+        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+      >
+        {text}
+      </p>
+    </div>
+  );
+}
+
 export function FinishWizard({
   scores,
   segments,
-  initialModifications,
+  comments,
+  pendingCommentIds = [],
   clockAdjustments,
   freeText = false,
   isSaving,
@@ -882,19 +948,24 @@ export function FinishWizard({
 }: {
   scores: SectionScore[];
   segments: TimerSegment[];
-  initialModifications: ExerciseModification[];
+  /** Σχόλια already on the execution (ADR-140 §1). */
+  comments: JournalComment[];
+  pendingCommentIds?: string[];
   clockAdjustments?: ClockAdjustmentSummary[];
   freeText?: boolean;
   isSaving: boolean;
   feedback: string | null;
-  onConfirm: (editedScores: SectionScore[], modifications: ExerciseModification[]) => void;
+  onConfirm: (editedScores: SectionScore[], finish: FinishComments) => void;
   /** Leaves the wizard and returns to the (paused) workout. */
   onCancel?: () => void;
 }) {
   const i18n = useUiTranslations();
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [confirmedScores, setConfirmedScores] = useState<SectionScore[]>(scores);
-  const [confirmedMods, setConfirmedMods] = useState<ExerciseModification[]>(initialModifications);
+  const [confirmedMods, setConfirmedMods] = useState<ExerciseModification[]>(() =>
+    changeComments(comments).map((comment) => comment.change!),
+  );
+  const [text, setText] = useState("");
 
   function handleScoresNext(edited: SectionScore[]) {
     setConfirmedScores(edited);
@@ -907,7 +978,7 @@ export function FinishWizard({
   }
 
   function handleSave() {
-    onConfirm(confirmedScores, confirmedMods);
+    onConfirm(confirmedScores, { changes: confirmedMods, text: text.trim() || null });
   }
 
   if (step === 1) {
@@ -926,10 +997,13 @@ export function FinishWizard({
   if (step === 2) {
     if (freeText) {
       return (
-        <FreeTextModificationsStep
-          initialMods={confirmedMods}
+        <FreeTextCommentsStep
+          comments={comments}
+          pendingCommentIds={pendingCommentIds}
+          text={text}
+          onTextChange={setText}
           onBack={() => setStep(1)}
-          onNext={handleModsNext}
+          onNext={() => setStep(3)}
           onSkip={() => setStep(3)}
         />
       );
@@ -939,6 +1013,10 @@ export function FinishWizard({
       <ModificationsEditorStep
         segments={segments}
         initialMods={confirmedMods}
+        comments={comments}
+        pendingCommentIds={pendingCommentIds}
+        text={text}
+        onTextChange={setText}
         onBack={() => setStep(1)}
         onNext={handleModsNext}
         onSkip={() => setStep(3)}
@@ -950,6 +1028,7 @@ export function FinishWizard({
     <ConfirmStep
       scores={confirmedScores}
       modifications={confirmedMods}
+      text={text}
       segments={segments}
       clockAdjustments={clockAdjustments}
       isSaving={isSaving}

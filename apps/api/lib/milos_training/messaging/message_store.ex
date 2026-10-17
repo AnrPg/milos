@@ -17,12 +17,20 @@ defmodule MilosTraining.Messaging.MessageStore do
   @impl true
   def get_message(id), do: impl().get_message(id)
   @impl true
-  def list_recent_coaching_notes(user_id, limit),
-    do: impl().list_recent_coaching_notes(user_id, limit)
+  def list_recent_coaching_messages(user_id, limit),
+    do: impl().list_recent_coaching_messages(user_id, limit)
 
   @impl true
-  def list_recent_coaching_notes_for_organization(user_id, limit),
-    do: impl().list_recent_coaching_notes_for_organization(user_id, limit)
+  def list_recent_coaching_messages_for_organization(user_id, limit),
+    do: impl().list_recent_coaching_messages_for_organization(user_id, limit)
+
+  @impl true
+  def count_sent(sender_id, message_type, since),
+    do: impl().count_sent(sender_id, message_type, since)
+
+  @impl true
+  def count_awaiting_reply(coach_id, client_ids),
+    do: impl().count_awaiting_reply(coach_id, client_ids)
 
   @impl true
   def list_awaiting_staff_reply(staff_ids), do: impl().list_awaiting_staff_reply(staff_ids)

@@ -5,7 +5,7 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
@@ -13,9 +13,9 @@ import { useCallback, useState } from "react";
 import {
   fetchAthletes,
   fetchAthleteDrillDown,
-  writeAthleteNote,
   type AthleteDrillDown,
 } from "@/api/admin";
+import { CoachNotesPanel } from "@/components/admin/users/CoachNotesPanel";
 import { useSession } from "@/components/session-provider";
 import { FormReviewQueue } from "@/components/staff/FormReviewQueue";
 import { NutritionPlanEditor } from "@/components/staff/NutritionPlanEditor";
@@ -145,7 +145,6 @@ export function AdminCoaching() {
     [router],
   );
   const [selectedAthleteId, setSelectedAthleteId] = useState("");
-  const [noteBody, setNoteBody] = useState("");
   const [showDrillDown, setShowDrillDown] = useState(false);
 
   const athletesQuery = useQuery({
@@ -166,15 +165,6 @@ export function AdminCoaching() {
     },
   });
 
-  const writeNote = useMutation({
-    mutationFn: async () => {
-      if (!tokens?.access_token || !selectedAthleteId) throw new Error(i18n("athleteSelectionRequired7fd21d5"));
-      return writeAthleteNote(tokens.access_token, selectedAthleteId, noteBody);
-    },
-    onSuccess: () => {
-      setNoteBody("");
-    },
-  });
 
   const athletes = athletesQuery.data?.athletes ?? [];
   const selectedAthlete = athletes.find((a) => a.id === selectedAthleteId);
@@ -293,42 +283,13 @@ export function AdminCoaching() {
                   ) : null}
                 </section>
 
-                {/* Note form */}
+                {/* ADR-140 §7: private coach notes, the same panel as the member profile. */}
                 <section className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
                   <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-                    {i18n("coachingNotes5c7da9f")}
+                    {i18n("rhCoachNotes")}
                   </p>
-                  <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>
-                    {i18n("sendNoteTof1db90e")} {selectedAthlete.nickname}
-                  </h2>
-
-                  <div className="mt-4 space-y-3">
-                    <textarea
-                      className="min-h-24 w-full rounded-2xl border px-4 py-3 text-sm"
-                      style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-                      placeholder={i18n("writeACoachingNotebd3ca38")}
-                      value={noteBody}
-                      onChange={(e) => setNoteBody(e.target.value)}
-                    />
-                    <div className="flex flex-wrap items-center gap-3">
-                      <button
-                        type="button"
-                        className="rounded-full px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
-                        style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                        disabled={noteBody.trim().length === 0 || writeNote.isPending}
-                        onClick={() => void writeNote.mutateAsync()}
-                      >
-                        {writeNote.isPending ? i18n("sendingcf76551") : i18n("sendNote0bab5df")}
-                      </button>
-                      {writeNote.isSuccess ? (
-                        <p className="text-sm" style={{ color: "var(--success)" }}>{i18n("noteSaved5311c22")}</p>
-                      ) : null}
-                      {writeNote.isError ? (
-                        <p className="text-sm" style={{ color: "var(--primary)" }}>
-                          {writeNote.error instanceof Error ? localizeError(writeNote.error, i18n) : i18n("unableToSaveNote8506e1a")}
-                        </p>
-                      ) : null}
-                    </div>
+                  <div className="mt-4">
+                    <CoachNotesPanel userId={selectedAthleteId} />
                   </div>
                 </section>
               </>

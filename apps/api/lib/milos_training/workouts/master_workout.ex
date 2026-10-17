@@ -4,7 +4,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
 
   alias MilosTraining.Workouts.WorkoutSection
   alias MilosTraining.Workouts.WorkoutFolder
-  alias MilosTraining.Workouts.Domain.WorkoutAuthoringMetadata
+  alias MilosTraining.Workouts.Domain.{WorkoutAuthoringMetadata, WorkoutContent}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -28,7 +28,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     field :estimated_duration_seconds, :integer
     field :equipment, {:array, :string}, default: []
     field :tags, {:array, :string}, default: []
-    field :notes, {:array, :map}, default: []
+    field :content, {:array, :map}, default: []
     field :workout_metadata, :map, default: %{}
     field :authoring_mode, :string, default: "structured"
     field :dsl_version, :integer
@@ -99,7 +99,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
       :estimated_duration_seconds,
       :equipment,
       :tags,
-      :notes,
+      :content,
       :workout_metadata,
       :authoring_mode,
       :dsl_version,
@@ -122,7 +122,7 @@ defmodule MilosTraining.Workouts.MasterWorkout do
       less_than_or_equal_to: 86_400
     )
     |> validate_bounded_map(:workout_metadata, :workout)
-    |> validate_typed_notes()
+    |> validate_content()
     |> validate_inclusion(:authoring_mode, ["structured", "quick_text", "free_text"])
     |> validate_inclusion(:dsl_version, [1])
     |> validate_length(:dsl_source, max: 200_000)
@@ -138,11 +138,13 @@ defmodule MilosTraining.Workouts.MasterWorkout do
     end)
   end
 
-  defp validate_typed_notes(changeset) do
-    validate_change(changeset, :notes, fn :notes, notes ->
-      case WorkoutAuthoringMetadata.validate_notes(notes) do
+  defp validate_content(changeset) do
+    level = :workout
+
+    validate_change(changeset, :content, fn :content, content ->
+      case WorkoutContent.validate(content, level) do
         :ok -> []
-        {:error, reason} -> [notes: "are invalid: #{inspect(reason)}"]
+        {:error, reason} -> [content: "is invalid: #{inspect(reason)}"]
       end
     end)
   end

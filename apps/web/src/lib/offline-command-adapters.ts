@@ -1,3 +1,9 @@
+import {
+  deleteJournalComment,
+  saveJournalComment,
+  type JournalComment,
+  type JournalCommentDraft,
+} from "@/api/journal-comments";
 import { approveBooking, createBooking, rejectBooking, type ScheduleBooking } from "@/api/schedule";
 import {
   createTrainingLogEntry,
@@ -80,11 +86,38 @@ export const trainingLogCreateAdapter: OutboxCommandAdapter<
   describe: (payload) => payload.title ?? null,
 };
 
+export type JournalCommentDeletePayload = { id: string };
+
+/**
+ * ADR-140 §1: a comment save is an upsert by its client-generated id, so a
+ * replay converges; the id doubles as the idempotency key.
+ */
+export const journalCommentSaveAdapter: OutboxCommandAdapter<JournalCommentDraft, JournalComment> = {
+  kind: "journal_comment.save",
+  labelKey: "outboxKindJournalComment",
+  idempotencyKey: (payload) => payload.id,
+  send: (token, payload) => saveJournalComment(token, payload),
+  // The id was taken by another entry, or the entry is gone: replaying
+  // cannot succeed.
+  classify: classifyWith(["comment_conflict"], ["not_found"]),
+  describe: (payload) => payload.body?.slice(0, 60) ?? null,
+};
+
+export const journalCommentDeleteAdapter: OutboxCommandAdapter<JournalCommentDeletePayload, void> = {
+  kind: "journal_comment.delete",
+  labelKey: "outboxKindJournalCommentDelete",
+  idempotencyKey: (payload) => `delete:${payload.id}`,
+  send: (token, payload) => deleteJournalComment(token, payload.id),
+  classify: classifyWith([], ["not_found"]),
+};
+
 const REGISTERED_ADAPTERS = [
   bookingRequestAdapter,
   bookingApproveAdapter,
   bookingRejectAdapter,
   trainingLogCreateAdapter,
+  journalCommentSaveAdapter,
+  journalCommentDeleteAdapter,
 ] as const;
 
 const REGISTRY: ReadonlyMap<string, OutboxCommandAdapter> = new Map(

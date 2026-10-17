@@ -182,7 +182,7 @@ defmodule MilosTrainingWeb.AdminUserController do
             scheduled_for: %Schema{type: :string, format: :date},
             slot_id: %Schema{allOf: [@user_id], nullable: true},
             copy_source: %Schema{type: :boolean, default: true},
-            admin_notes: %Schema{type: :string, nullable: true},
+            instructions: %Schema{type: :string, nullable: true},
             mode: %Schema{
               type: :string,
               enum: ["class_workout", "class_variant", "personal"],

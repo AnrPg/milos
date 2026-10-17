@@ -17,6 +17,8 @@ defmodule MilosTraining.Identity.User do
     field :security_version, :integer, default: 1
     field :avatar_url, :string
     field :preferred_locale, :string, default: "en"
+    # Nil follows the gym's theme.
+    field :preferred_theme_slug, :string
     # Nullable: every account created before F-10 predates this column.
     field :email, :string
     field :completed_tours, {:array, :string}, default: []
@@ -76,12 +78,15 @@ defmodule MilosTraining.Identity.User do
 
   def profile_changeset(user, params) do
     user
-    |> cast(params, [:nickname, :password, :preferred_locale, :email])
+    |> cast(params, [:nickname, :password, :preferred_locale, :preferred_theme_slug, :email])
     |> maybe_validate_email()
     |> maybe_normalize_nickname()
     |> maybe_validate_nickname()
     |> maybe_validate_password()
     |> validate_inclusion(:preferred_locale, Locale.supported(), message: "is not supported")
+    |> validate_inclusion(:preferred_theme_slug, MilosTraining.Themes.slugs(),
+      message: "is not supported"
+    )
   end
 
   def tours_changeset(user, completed_tours) do

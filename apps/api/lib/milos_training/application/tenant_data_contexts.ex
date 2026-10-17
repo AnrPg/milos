@@ -12,6 +12,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Analytics,
     Appointments,
     Coaching,
+    Community,
     Content,
     Execution,
     Facility,
@@ -20,6 +21,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Gamification,
     Housekeeping,
     Inventory,
+    Journal,
     Messaging,
     Notifications,
     Nutrition,
@@ -33,9 +35,11 @@ defmodule MilosTraining.Application.TenantDataContexts do
 
   @purgeable [
     Analytics,
+    Community,
     Notifications,
     Execution,
     Pantheon,
+    Journal,
     Feedback,
     Wellbeing,
     Messaging,

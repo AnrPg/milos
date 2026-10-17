@@ -21,7 +21,7 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
     :ok
   end
 
-  test "sending a coaching note via messaging emits landing sync for the athlete" do
+  test "sending a coaching message via messaging emits landing sync for the athlete" do
     admin = admin_fixture()
     athlete = user_fixture(%{role: :athlete})
     context = legacy_tenant_context!(admin, :owner)
@@ -39,7 +39,7 @@ defmodule MilosTraining.Application.RealtimeSyncTest do
                thread_id: thread.id,
                sender_id: admin.id,
                body: "Stay sharp on pacing.",
-               message_type: :coaching_note
+               message_type: :coaching_message
              })
 
     assert :ok =

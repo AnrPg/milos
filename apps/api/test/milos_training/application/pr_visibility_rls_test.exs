@@ -189,13 +189,35 @@ defmodule MilosTraining.Application.PRVisibilityRLSTest do
     assert {:ok, %{prs: [_pr]}} = GetAdminUserPRs.call(ctx.coach_ctx, ctx.member.id)
   end
 
+  # ADR-139: each PR carries its own rung; the coach policy asks the record.
+  test "one PR moved to private disappears for coaches; others stay", ctx do
+    {:ok, other} = CreatePR.call(ctx.member_ctx, pr_params("Deadlift", ctx.gym_a.slug))
+    assert other.journal_visibility == "coach_can_view"
+
+    assert {:ok, %{journal_visibility: "private"}} =
+             Pantheon.with_user_context(ctx.member_ctx, fn ->
+               Pantheon.set_record_visibility(ctx.pr_a.id, ctx.member.id, "private")
+             end)
+
+    assert {:ok, %{prs: [%{id: visible_id}]}} = GetAdminUserPRs.call(ctx.coach_ctx, ctx.member.id)
+    assert visible_id == other.id
+  end
+
+  test "new gym PRs follow the member's default; personal PRs are private", ctx do
+    assert ctx.personal.journal_visibility == "private"
+
+    {:ok, _sharing} = SetPRCoachVisibility.call(ctx.member_ctx, %{"coach_visibility" => false})
+    {:ok, hidden} = CreatePR.call(ctx.member_ctx, pr_params("Clean", ctx.gym_a.slug))
+    assert hidden.journal_visibility == "private"
+  end
+
   test "the opt-out is owner-only and validated", ctx do
     assert {:error, :bad_request} =
              SetPRCoachVisibility.call(ctx.member_ctx, %{"coach_visibility" => "nope"})
 
     # A coach cannot read or write the member's preference row.
     assert RepoContext.run(ctx.coach_ctx, fn ->
-             Repo.query!("SELECT count(*) FROM user_pr_sharing_preferences").rows
+             Repo.query!("SELECT count(*) FROM journal_visibility_defaults").rows
            end) == [[0]]
   end
 

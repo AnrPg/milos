@@ -11,6 +11,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
 import { hasStructuredContent } from "@/lib/workout-execution-mode";
+import { ExerciseContent, WorkoutContentBlock, type WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 export type PreviewExercise = {
   id?: string;
@@ -50,6 +51,8 @@ export type PreviewExercise = {
   interval_assignment?: number | null;
   description?: string | null;
   note?: string | null;
+  /** Cues and other content (ADR-140 §4); the server folds `note` into it. */
+  content?: WorkoutContentEntry[] | null;
   variations?: Array<{
     id?: string;
     description?: string | null;
@@ -63,6 +66,7 @@ export type PreviewExercise = {
     load_progression?: PreviewExercise["load_progression"];
     excluded?: boolean;
     note?: string | null;
+    content?: WorkoutContentEntry[] | null;
     scale_level?: { id?: string; slug?: string; label?: string; sort_order?: number } | null;
   }>;
 };
@@ -75,11 +79,16 @@ export type PreviewSection = {
   score_config?: Record<string, unknown> | null;
   timer_config?: Record<string, unknown> | null;
   note?: string | null;
+  content?: WorkoutContentEntry[] | null;
   exercises: PreviewExercise[];
 };
 
 type Props = {
   sections: PreviewSection[];
+  /** The workout's own Οδηγίες, shown above its sections. */
+  content?: WorkoutContentEntry[] | null;
+  /** An assignment's Οδηγίες, read before the workout's. */
+  instructions?: string | null;
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
@@ -122,10 +131,25 @@ function resolveExercise(exercise: PreviewExercise, activeScale: string | null):
     set_prescriptions: variation.set_prescriptions ?? exercise.set_prescriptions,
     load_progression: variation.load_progression ?? exercise.load_progression,
     note: variation.note ?? exercise.note,
+    content: [...(exercise.content ?? []), ...(variation.content ?? [])],
     varied: true,
     variationLabel: variation.scale_level?.label ?? variation.scale_level?.slug,
     variationSlug: variation.scale_level?.slug,
   };
+}
+
+/** Previews built before content existed carry only `note`. */
+function contentWithNote(
+  content: WorkoutContentEntry[] | null | undefined,
+  note: string | null | undefined,
+  type: "instructions" | "cue",
+): WorkoutContentEntry[] {
+  if (content && content.length > 0) return content;
+  return note?.trim() ? [{ type, body: note }] : [];
+}
+
+function sectionContent(section: PreviewSection) {
+  return contentWithNote(section.content, section.note, "instructions");
 }
 
 function renderFreeTextDocument(document: Record<string, unknown> | null | undefined): ReactNode | null {
@@ -248,11 +272,9 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
         <div className="text-xs font-bold uppercase" style={{ color: "var(--primary)" }}>
           {exercise.name}
         </div>
-        {exercise.note ? (
-          <p className="mt-0.5 text-xs" style={{ color: "var(--muted)" }}>
-            {exercise.note}
-          </p>
-        ) : null}
+        <div className="mt-1">
+          <WorkoutContentBlock entries={contentWithNote(exercise.content, exercise.note, "instructions")} title={false} />
+        </div>
       </li>
     );
   }
@@ -383,11 +405,7 @@ function ExerciseRow({ exercise, groupColor }: { exercise: ResolvedExercise; gro
           {progression}
         </p>
       ) : null}
-      {exercise.note ? (
-        <p className="mt-1 text-xs italic" style={{ color: "var(--muted)" }}>
-          {exercise.note}
-        </p>
-      ) : null}
+      <ExerciseContent entries={contentWithNote(exercise.content, exercise.note, "cue")} />
     </li>
   );
 }
@@ -446,6 +464,8 @@ export function WorkoutPreviewDetail({
   authoringMode,
   freeTextBody,
   freeTextDocument,
+  content,
+  instructions,
 }: Props) {
   const i18n = useUiTranslations();
 
@@ -508,6 +528,7 @@ export function WorkoutPreviewDetail({
 
   return (
     <div className="space-y-3">
+      <WorkoutContentBlock entries={content} lead={instructions} />
       {sections.map((section, i) => {
         const key = section.id ?? String(i);
         const expanded = expandedSections.has(key);
@@ -604,12 +625,9 @@ export function WorkoutPreviewDetail({
               </div>
             ) : null}
 
-            {section.note ? (
-              <div
-                className="px-4 py-2 text-xs italic"
-                style={{ background: "var(--panel)", borderTop: "1px solid var(--border)", color: "var(--muted)" }}
-              >
-                {section.note}
+            {sectionContent(section).length > 0 ? (
+              <div className="px-3 py-2" style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}>
+                <WorkoutContentBlock entries={sectionContent(section)} title={false} />
               </div>
             ) : null}
 

@@ -21,7 +21,9 @@ export type OutboxCommandKind =
   | "booking.request"
   | "booking.approve"
   | "booking.reject"
-  | "training_log.create";
+  | "training_log.create"
+  | "journal_comment.save"
+  | "journal_comment.delete";
 
 export type OutboxSendContext = {
   idempotencyKey: string;

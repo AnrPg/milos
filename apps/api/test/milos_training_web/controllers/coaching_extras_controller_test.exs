@@ -155,11 +155,18 @@ defmodule MilosTrainingWeb.CoachingExtrasControllerTest do
       |> json_response(200)
       |> Map.fetch!("thread")
 
+    assert %{"code" => "no_coaching_relationship"} =
+             client_conn
+             |> send_json(:post, "#{base}/me/threads/#{thread["id"]}/messages", %{
+               body: "Is my program ok?",
+               message_type: "coaching_message"
+             })
+             |> json_response(422)
+
     message =
       client_conn
       |> send_json(:post, "#{base}/me/threads/#{thread["id"]}/messages", %{
-        body: "Is my program ok?",
-        message_type: "coaching_note"
+        body: "Is my program ok?"
       })
       |> json_response(201)
       |> Map.fetch!("message")

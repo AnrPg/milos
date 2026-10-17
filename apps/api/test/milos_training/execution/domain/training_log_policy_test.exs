@@ -15,7 +15,6 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicyTest do
                    "timezone" => "Europe/Athens",
                    "duration_seconds" => 2700,
                    "perceived_effort" => 7,
-                   "notes" => "  felt strong ",
                    "performed_exercises" => [
                      %{
                        "name" => "Back squat",
@@ -37,9 +36,8 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicyTest do
       assert details.performed_at_tz == "Europe/Athens"
       assert details.duration_seconds == 2700
       assert details.perceived_effort == 7
-      assert details.notes == "felt strong"
       assert details.section_scores == []
-      assert details.exercise_modifications == []
+      refute Map.has_key?(details, :notes)
 
       assert [
                %{
@@ -113,29 +111,13 @@ defmodule MilosTraining.Execution.Domain.TrainingLogPolicyTest do
                TrainingLogPolicy.normalize_details(params, now: @now, allowed_section_ids: [])
     end
 
-    test "reuses ADR-050 modification patches for structured sources only" do
-      patch = %{
-        "patch_id" => "segment:0:squat:1:reps",
-        "section_id" => "s1",
-        "exercise_id" => "squat",
-        "set_index" => 1,
-        "field" => "reps",
-        "canonical_value" => 10,
-        "actual_value" => 8
-      }
-
-      params = %{"performed_at" => "2026-10-11T07:30:00Z", "exercise_modifications" => [patch]}
-
-      assert {:ok, %{exercise_modifications: [%{"type" => "reps_changed"}]}} =
-               TrainingLogPolicy.normalize_details(params, now: @now, structured?: true)
-
-      assert {:error, [exercise_modifications: "require a workout source"]} =
-               TrainingLogPolicy.normalize_details(params, now: @now, structured?: false)
-    end
-
     test "update mode only returns the keys that were sent" do
-      assert {:ok, %{notes: "updated"} = changes} =
-               TrainingLogPolicy.normalize_details(%{"notes" => "updated"}, [now: @now], :update)
+      assert {:ok, %{perceived_effort: 6} = changes} =
+               TrainingLogPolicy.normalize_details(
+                 %{"perceived_effort" => 6},
+                 [now: @now],
+                 :update
+               )
 
       assert map_size(changes) == 1
     end

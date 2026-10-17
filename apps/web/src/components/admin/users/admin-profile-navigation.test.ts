@@ -24,6 +24,7 @@ describe("openAdminProfileSection", () => {
 
     expect(requested).toEqual(["finance"]);
     expect(window.location.hash).toBe("#finance");
+    expect(new URLSearchParams(window.location.search).get("tab")).toBe("finance");
     expect(section.scrollIntoView).toHaveBeenCalledWith({ behavior: "smooth", block: "start" });
     section.remove();
     vi.unstubAllGlobals();

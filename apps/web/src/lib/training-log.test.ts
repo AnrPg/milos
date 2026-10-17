@@ -4,6 +4,7 @@ import type { TrainingLogEntry } from "@/api/training-log";
 import {
   buildCreatePayload,
   buildUpdatePayload,
+  commentDraftFromForm,
   emptyTrainingLogForm,
   formFromEntry,
   sortEntriesNewestFirst,
@@ -27,11 +28,10 @@ function entry(overrides: Partial<TrainingLogEntry> = {}): TrainingLogEntry {
     performed_at_tz: "Europe/Athens",
     duration_seconds: 1800,
     perceived_effort: 6,
-    notes: "Windy",
     status: "logged",
     lock_version: 3,
     section_scores: [],
-    exercise_modifications: [],
+    comments: [],
     performed_exercises: [{ name: "Sprint", sets: 6, load: 10, load_unit: "lb" }],
     ...overrides,
   } as TrainingLogEntry;
@@ -76,7 +76,7 @@ describe("buildCreatePayload", () => {
         title: "  Hotel gym ",
         durationMinutes: "45",
         perceivedEffort: "7",
-        notes: "  ",
+        comment: "  ",
         exercises: [
           { name: " Squat ", sets: "5", reps: "5", load: "100", loadUnit: "kg" },
           { name: "", sets: "", reps: "", load: "", loadUnit: "kg" },
@@ -92,7 +92,7 @@ describe("buildCreatePayload", () => {
       title: "Hotel gym",
       duration_seconds: 2700,
       perceived_effort: 7,
-      notes: null,
+      comments: [],
       timezone: "Europe/Athens",
       idempotency_key: "log-key-123",
       section_scores: [],
@@ -135,13 +135,24 @@ describe("editing", () => {
       title: "Beach run",
       durationMinutes: "30",
       perceivedEffort: "6",
-      notes: "Windy",
+      comment: "",
       exercises: [{ name: "Sprint", sets: "6", reps: "", load: "10", loadUnit: "lb" }],
     });
 
-    const payload = buildUpdatePayload({ ...editForm, notes: "Calm" }, original, [], "UTC");
-    expect(payload).toMatchObject({ title: "Beach run", notes: "Calm", expected_version: 3 });
+    const withComment = { ...editForm, title: "Calm run", comment: " Calm " };
+    const payload = buildUpdatePayload(withComment, original, [], "UTC");
+    expect(payload).toMatchObject({ title: "Calm run", expected_version: 3 });
     expect(payload).not.toHaveProperty("section_scores");
+    expect(payload).not.toHaveProperty("comments");
+
+    // The comment is saved on its own, as a comment on the whole entry.
+    expect(commentDraftFromForm(withComment, original.id)).toMatchObject({
+      id: editForm.commentId,
+      entry_kind: "training_log",
+      entry_id: "entry-1",
+      body: "Calm",
+    });
+    expect(commentDraftFromForm(editForm, original.id)).toBeNull();
   });
 
   it("never sends a title for sourced entries", () => {

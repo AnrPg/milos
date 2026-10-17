@@ -1,4 +1,5 @@
 import type { AssignedWorkoutPreview } from "@/api/assigned-workouts";
+import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import { apiRequest } from "@/api/client";
 import type { operations, paths } from "@/api/generated/schema";
 
@@ -50,6 +51,7 @@ export type WorkoutPreviewExercise = {
   rest_pause_seconds?: number | null;
   pacing?: number | null;
   interval_assignment?: number | null;
+  content?: WorkoutContentEntry[];
   variations?: Array<{
     id?: string;
     description?: string | null;
@@ -71,6 +73,7 @@ export type WorkoutPreviewSection = {
   scoreable?: boolean;
   score_config?: Record<string, unknown> | null;
   timer_config?: Record<string, unknown> | null;
+  content?: WorkoutContentEntry[];
   exercises: WorkoutPreviewExercise[];
 };
 
@@ -81,6 +84,8 @@ export type WorkoutPreview = {
   authoring_mode?: "structured" | "quick_text" | "free_text";
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
+  /** Οδηγίες and the rest of the workout's content (ADR-140 §4). */
+  content?: WorkoutContentEntry[];
   sections: WorkoutPreviewSection[];
 };
 
@@ -97,6 +102,11 @@ export type ScheduleBooking = {
   waitlist_priority?: number | null;
   /** 1-based place in the queue, only while waitlisted. */
   waitlist_position?: number | null;
+  /** The member's own attendance on this class (TD-105), e.g. "attended". */
+  attendance_status?: string | null;
+  /** When the member may check themselves in (own booking only). */
+  check_in_opens_at?: string | null;
+  check_in_closes_at?: string | null;
 };
 
 export type ScheduleSlot = {
@@ -255,6 +265,15 @@ export async function createBooking(token: string, slotId: string, options?: Com
   });
 
   return response.booking;
+}
+
+/** Self check-in to a booked class, inside its window (TD-105). */
+export async function checkInToClass(token: string, bookingId: string) {
+  const response = await apiRequest<{ attendance: { scheduled_class_id: string; status: string; marked_at: string } }>(
+    `/bookings/${encodeURIComponent(bookingId)}/check-in`,
+    { method: "POST", token },
+  );
+  return response.attendance;
 }
 
 export async function joinWaitlist(token: string, slotId: string) {

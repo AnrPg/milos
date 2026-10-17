@@ -138,8 +138,11 @@ defmodule MilosTraining.Notifications do
     do: enqueue_member_booking_rejected(booking)
 
   def process_event("booking_timed_out", booking), do: enqueue_booking_timeout_alert(booking)
-  def process_event("workout_note_submitted", payload), do: enqueue_workout_note(payload)
-  def process_event("admin_note_written", payload), do: enqueue_admin_note(payload)
+
+  def process_event("coaching_message", payload),
+    do: enqueue_message_to_member(:coaching_message, payload)
+
+  def process_event("box_message", payload), do: enqueue_message_to_member(:box_message, payload)
   def process_event("challenge_completed", payload), do: enqueue_challenge_completed(payload)
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
@@ -317,50 +320,23 @@ defmodule MilosTraining.Notifications do
   def enqueue_booking_timeout_alert(booking),
     do: enqueue_for_users(staff_recipients(booking), :booking_timeout, booking)
 
-  def enqueue_workout_note(note_payload) do
-    note_payload
-    |> staff_recipients()
-    |> Enum.each(fn admin ->
-      result =
-        deliver_notification(
-          admin.id,
-          :workout_note,
-          note_payload
-          |> add_default_url()
-          |> Map.put_new(:dedupe_key, workout_note_dedupe_key(admin.id, note_payload))
-        )
-
-      unless delivered?(result) do
-        Logger.error(
-          "workout_note delivery failed admin_id=#{admin.id} execution_id=#{field(note_payload, :execution_id)}"
-        )
-      end
-    end)
-
-    :ok
-  end
-
-  def enqueue_admin_note(payload) when is_map(payload) do
-    athlete_id = field(payload, :athlete_id)
+  @doc """
+  A coaching message or a message from the box reached a member (ADR-140
+  §6): unlike chat, it shows in the member's inbox.
+  """
+  def enqueue_message_to_member(type, payload)
+      when type in [:coaching_message, :box_message] and is_map(payload) do
+    user_id = field(payload, :user_id)
 
     payload =
       payload
-      |> Map.put_new(:url, "/#coach-notes")
-      |> Map.put_new(:dedupe_key, admin_note_dedupe_key(athlete_id, payload))
+      |> Map.put_new(:dedupe_key, "#{type}:#{field(payload, :message_id)}")
+      |> Map.put_new(:url, "/account/activity/chats?thread=#{field(payload, :thread_id)}")
 
-    case deliver_notification(athlete_id, :admin_note, payload) do
-      {:ok, _notification} ->
-        :ok
-
-      :ok ->
-        :ok
-
-      {:error, reason} = error ->
-        Logger.error(
-          "admin_note delivery failed athlete_id=#{athlete_id} reason=#{inspect(reason)}"
-        )
-
-        error
+    case deliver_notification(user_id, type, payload) do
+      {:ok, _notification} -> :ok
+      :ok -> :ok
+      {:error, reason} -> {:error, reason}
     end
   end
 
@@ -842,15 +818,6 @@ defmodule MilosTraining.Notifications do
     end
   end
 
-  defp add_default_url(%{} = payload) do
-    execution_id = Map.get(payload, :execution_id) || Map.get(payload, "execution_id")
-
-    case execution_id do
-      value when is_binary(value) -> Map.put_new(payload, :url, "/workouts/#{value}/execute")
-      _ -> payload
-    end
-  end
-
   defp normalize_subscription_attrs(attrs, user_id) do
     keys = Map.get(attrs, :keys) || Map.get(attrs, "keys") || %{}
 
@@ -951,22 +918,6 @@ defmodule MilosTraining.Notifications do
       value when is_map(value) -> value
       _ -> nil
     end
-  end
-
-  defp workout_note_dedupe_key(user_id, payload) do
-    note_id =
-      payload
-      |> nested_map(:note)
-      |> case do
-        nil -> nil
-        note -> field(note, :id)
-      end
-
-    NotificationDedupe.workout_note_key(user_id, note_id)
-  end
-
-  defp admin_note_dedupe_key(user_id, payload) do
-    NotificationDedupe.admin_note_key(user_id, field(payload, :note_id))
   end
 
   defp challenge_completed_dedupe_key(user_id, payload) do

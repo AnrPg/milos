@@ -10,8 +10,9 @@ import { OfflineMessageSyncBridge } from "@/components/offline-message-sync-brid
 import { OutboxStatusPanel } from "@/components/outbox/OutboxStatusPanel";
 import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
-import { ThemeProvider } from "@/components/theme-provider";
+import { PersonalThemeBridge, ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
+import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { APP_THEMES, cssVariablesForTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY } from "@/lib/theme";
 import { isAppLocale, localeDirection } from "@/i18n/locales";
@@ -86,12 +87,14 @@ export default async function RootLayout({
           <QueryProvider>
             <ThemeProvider>
               <SessionProvider>
+                <PersonalThemeBridge />
                 <RealtimeSyncBridge />
                 <OfflineMessageSyncBridge />
                 <OutboxStatusPanel />
                 <ServiceWorkerBootstrap />
                 <TopNav />
                 {children}
+                <BottomTabBar />
                 <OnboardingHost />
               </SessionProvider>
             </ThemeProvider>

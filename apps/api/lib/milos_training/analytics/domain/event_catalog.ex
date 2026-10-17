@@ -37,6 +37,8 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     "review_submitted" => "review",
     "injury_reported" => "injury",
     "injury_healed" => "injury",
+    "injury_updated" => "injury",
+    "injury_reopened" => "injury",
     "notification_read" => "notification",
     "notification_clicked" => "notification"
   }

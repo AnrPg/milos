@@ -6,14 +6,6 @@ export type AthleteSummary = {
   role: string;
 };
 
-export type AdminAthleteNote = {
-  id: string;
-  admin_id: string;
-  athlete_id: string;
-  body: string;
-  inserted_at: string;
-};
-
 export type AthleteDrillDown = Record<string, unknown>;
 
 export type AttendanceRecord = {
@@ -40,14 +32,6 @@ export async function fetchAthleteDrillDown(
     ? "?" + new URLSearchParams(Object.entries(params).filter(([, v]) => Boolean(v)) as [string, string][]).toString()
     : "";
   return apiRequest<{ drill_down: AthleteDrillDown }>(`/admin/athletes/${athleteId}/drill-down${qs}`, { token });
-}
-
-export async function writeAthleteNote(token: string, athleteId: string, body: string) {
-  return apiRequest<{ note: AdminAthleteNote }>(`/admin/athletes/${athleteId}/notes`, {
-    method: "POST",
-    token,
-    body: { body },
-  });
 }
 
 export async function adminRecordAttendance(

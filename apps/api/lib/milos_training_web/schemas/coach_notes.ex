@@ -17,6 +17,8 @@ defmodule MilosTrainingWeb.Schemas.CoachNotes do
         coach_nickname: %Schema{type: :string, nullable: true},
         client_user_id: @uuid,
         body: %Schema{type: :string},
+        subject_kind: %Schema{type: :string, enum: subject_kinds(), nullable: true},
+        subject_id: %Schema{type: :string, format: :uuid, nullable: true},
         inserted_at: %Schema{type: :string, format: :"date-time"},
         updated_at: %Schema{type: :string, format: :"date-time"}
       },
@@ -38,6 +40,21 @@ defmodule MilosTrainingWeb.Schemas.CoachNotes do
         read_at: %Schema{type: :string, format: :"date-time"}
       },
       required: [:id, :note_id, :reader_user_id, :read_at]
+    }
+  end
+
+  defp subject_kinds, do: MilosTraining.Coaching.note_subject_kinds()
+
+  @doc "A new note: its body and, optionally, what it is about."
+  def create_schema do
+    %Schema{
+      type: :object,
+      properties: %{
+        body: %Schema{type: :string, minLength: 1, maxLength: 5000},
+        subject_kind: %Schema{type: :string, enum: subject_kinds()},
+        subject_id: @uuid
+      },
+      required: [:body]
     }
   end
 

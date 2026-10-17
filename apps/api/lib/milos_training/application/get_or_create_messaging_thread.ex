@@ -24,7 +24,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
   # Assignments and class slots are tenant data (ADR-133): they are only
   # reachable through a tenant context.
   def call(_actor, %{context_type: context_type})
-      when context_type in [:assignment, :class_slot],
+      when context_type in [:assignment, :class_slot, :box],
       do: {:error, :organization_context_required}
 
   def call(_actor, _params), do: {:error, :bad_request}
@@ -85,6 +85,34 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
     with %{} <- Identity.find_by_id(participant_id) || {:error, :not_found},
          :ok <- ensure_direct_participants_share_tenant(context, actor.id, participant_id) do
       call(actor, %{context_type: :direct, participant_id: participant_id})
+    end
+  end
+
+  # ADR-140 §6: the gym's thread with one member. Any staff member who may
+  # message for the box opens it and joins it, so whoever picks it up next
+  # continues the same conversation.
+  def call(%{organization_id: organization_id} = context, actor, %{
+        context_type: :box,
+        context_id: member_id
+      })
+      when is_binary(organization_id) and is_binary(member_id) do
+    with :ok <- Organizations.authorize_capability(context, :message_from_box),
+         true <- active_member?(member_id, organization_id) || {:error, :not_found},
+         {:ok, thread} <-
+           Messaging.with_tenant_context(context, fn ->
+             Messaging.get_or_create_thread(%{
+               context_type: :box,
+               context_id: member_id,
+               actor_id: actor.id,
+               participants: [member_id, actor.id]
+             })
+           end),
+         {:ok, _participant} <-
+           Messaging.with_tenant_context(context, fn ->
+             Messaging.add_participant(thread.id, actor.id)
+           end) do
+      Messaging.with_tenant_context(context, fn -> Messaging.get_thread(thread.id, actor.id) end)
+      |> TrackMessagingAnalytics.call()
     end
   end
 

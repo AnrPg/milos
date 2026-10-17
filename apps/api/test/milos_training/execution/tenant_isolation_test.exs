@@ -48,11 +48,10 @@ defmodule MilosTraining.Execution.TenantIsolationTest do
         INSERT INTO workout_executions
           (id, organization_id, user_id, source, status, started_at_utc, started_at_tz,
            current_segment_index, paused_elapsed_ms, total_elapsed_ms, section_elapsed_ms,
-           segment_cycle_counts, checked_exercise_ids, section_scores, exercise_notes,
-           exercise_modifications, lock_version, inserted_at)
+           segment_cycle_counts, checked_exercise_ids, section_scores, lock_version, inserted_at)
         VALUES
           ($1, $2, $3, 'self_selected', 'active', now(), 'UTC',
-           0, 0, 0, '{}', '{}', '{}', '{}', '{}', '{}', 1, now())
+           0, 0, 0, '{}', '{}', '{}', '{}', 1, now())
         """,
         [execution_id, org_id, owner_id]
       )

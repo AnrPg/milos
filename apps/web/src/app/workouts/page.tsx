@@ -298,7 +298,7 @@ function WorkoutsPageContent() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
       });
 
-      const segments = await fetchTimerSequence(
+      const { segments, briefing } = await fetchTimerSequence(
         tokens.access_token,
         selectedSlot.workout.id,
         {
@@ -312,9 +312,10 @@ function WorkoutsPageContent() {
         workoutId: selectedSlot.workout.id,
         scaleSlug: selectedScale,
         segments,
+        briefing,
         checkedExerciseIds: execution.checked_exercise_ids,
         sectionScores: execution.section_scores,
-        exerciseNotes: execution.exercise_notes,
+        comments: execution.comments,
         currentSegmentIndex: execution.current_segment_index,
         status: execution.status,
         segmentStartedAt: execution.segment_started_at_utc
@@ -353,6 +354,7 @@ function WorkoutsPageContent() {
       <WorkoutPreviewDetail
         hideScaleChips
         sections={workout.sections}
+        content={workout.content}
         authoringMode={workout.authoring_mode}
         freeTextBody={workout.free_text_body}
       />

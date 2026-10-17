@@ -86,6 +86,10 @@ defmodule MilosTraining.Gamification.GamificationStore do
   def leaderboard_opted_in?(user_id), do: adapter().leaderboard_opted_in?(user_id)
 
   @impl true
+  def leaderboard_opted_in_user_ids(user_ids),
+    do: adapter().leaderboard_opted_in_user_ids(user_ids)
+
+  @impl true
   def get_leaderboard(period, limit), do: adapter().get_leaderboard(period, limit)
 
   @impl true

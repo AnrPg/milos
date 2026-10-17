@@ -1,4 +1,4 @@
-import { sendMessage, type ChatMessage, type MessageType } from "@/api/messaging";
+import { sendMessage, type ChatMessage, type MessageTopic, type MessageType } from "@/api/messaging";
 import {
   deviceOutboxTransaction,
   MESSAGE_OPERATIONS_STORE,
@@ -17,6 +17,8 @@ export type QueuedMessageOperation = {
   threadId: string;
   body: string;
   messageType: MessageType;
+  /** What a message from the box is about. */
+  topic?: MessageTopic | null;
   createdAt: number;
   status: QueuedMessageStatus;
   attempts: number;
@@ -55,6 +57,7 @@ export async function queueMessageOperation(
   threadId: string,
   body: string,
   messageType: MessageType,
+  topic: MessageTopic | null = null,
 ) {
   await requestPersistentStorage();
 
@@ -64,6 +67,7 @@ export async function queueMessageOperation(
     threadId,
     body,
     messageType,
+    topic,
     createdAt: Date.now(),
     status: "pending",
     attempts: 0,
@@ -155,8 +159,11 @@ export async function deliverQueuedMessage(token: string, operation: QueuedMessa
     token,
     operation.threadId,
     operation.body,
-    operation.messageType,
-    operation.operationId,
+    {
+      messageType: operation.messageType,
+      clientOperationId: operation.operationId,
+      topic: operation.topic ?? null,
+    },
   );
 }
 
@@ -231,6 +238,7 @@ export function operationToDisplayMessage(
     sender_id: operation.ownerUserId,
     body: operation.body,
     message_type: operation.messageType,
+    topic: operation.topic ?? null,
     client_operation_id: operation.operationId,
     inserted_at: new Date(operation.createdAt).toISOString(),
     delivery_status: operation.status,

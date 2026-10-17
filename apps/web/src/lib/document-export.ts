@@ -1,4 +1,5 @@
-import { isFreeTextModification, type WorkoutExecution } from "@/api/executions";
+import type { WorkoutExecution } from "@/api/executions";
+import { sortComments } from "@/lib/journal-comments";
 import type { PRRecord } from "@/api/gamification";
 import type {
   ScaleLevel,
@@ -453,30 +454,30 @@ export function buildExecutionDocument(
     });
   }
 
-  if (execution.exercise_modifications.length > 0) {
+  const comments = sortComments(execution.comments ?? []);
+  const changes = comments.filter((comment) => comment.change);
+  const remarks = comments.filter((comment) => !comment.change);
+
+  if (changes.length > 0) {
     sections.push({
       icon: "🔧",
       title: labels.modifications,
-      items: execution.exercise_modifications.map((change) =>
-        isFreeTextModification(change)
-          ? { label: labels.modifications, value: displayValue(change.actual_value) }
-          : {
-              label: change.exercise_name ?? change.section_name ?? displayValue(change.field),
-              value: `${labels.prescribed}: ${displayValue(change.canonical_value)} → ${labels.actual}: ${displayValue(change.actual_value)}${change.unit ? ` ${displayValue(change.unit)}` : ""}`,
-              details: compact([change.note ?? undefined]),
-            },
-      ),
+      items: changes.map(({ change, body }) => ({
+        label: change?.exercise_name ?? change?.section_name ?? displayValue(change?.field),
+        value: `${labels.prescribed}: ${displayValue(change?.canonical_value)} → ${labels.actual}: ${displayValue(change?.actual_value)}${change?.unit ? ` ${displayValue(change.unit)}` : ""}`,
+        details: compact([body ?? undefined]),
+      })),
     });
   }
 
-  if (execution.exercise_notes.length > 0) {
+  if (remarks.length > 0) {
     sections.push({
       icon: "📝",
       title: labels.notes,
-      items: execution.exercise_notes.map((note) => ({
-        label: note.selected_text || labels.notes,
-        value: note.note_text || note.tags?.join(", ") || "—",
-        details: note.tags?.length ? [note.tags.join(" · ")] : undefined,
+      items: remarks.map((comment) => ({
+        label: comment.selected_text || labels.notes,
+        value: comment.body || comment.tags.join(", ") || "—",
+        details: comment.tags.length ? [comment.tags.join(" · ")] : undefined,
       })),
     });
   }
@@ -508,8 +509,13 @@ export function buildPRDocument(pr: PRRecord, labels: ExportLabels, locale: stri
   if (details.length > 0) {
     sections.push({ icon: "📊", title: labels.supportingDetails, items: details });
   }
-  if (pr.notes) {
-    sections.push({ icon: "📝", title: labels.notes, items: [{ value: pr.notes }] });
+  const comments = sortComments(pr.comments ?? []).filter((comment) => comment.body?.trim());
+  if (comments.length > 0) {
+    sections.push({
+      icon: "📝",
+      title: labels.notes,
+      items: comments.map((comment) => ({ value: comment.body ?? "" })),
+    });
   }
 
   return {

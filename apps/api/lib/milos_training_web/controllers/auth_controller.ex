@@ -335,6 +335,11 @@ defmodule MilosTrainingWeb.AuthController do
                type: :string,
                enum: MilosTraining.Identity.supported_locales()
              },
+             preferred_theme_slug: %Schema{
+               type: :string,
+               nullable: true,
+               description: "The member's own theme; null follows the gym's"
+             },
              completed_tours: %Schema{
                type: :array,
                items: %Schema{type: :string, enum: ~w(admin member athlete)}
@@ -456,6 +461,7 @@ defmodule MilosTrainingWeb.AuthController do
       avatar_url: user.avatar_url,
       vendor: vendor?(user),
       preferred_locale: user.preferred_locale,
+      preferred_theme_slug: Map.get(user, :preferred_theme_slug),
       completed_tours: Map.get(user, :completed_tours) || []
     })
   end

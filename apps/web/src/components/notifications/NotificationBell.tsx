@@ -79,10 +79,10 @@ function NotificationCard({
       return parts.length > 0 ? parts.join(" · ") : i18n("workoutAnnotationSubmittedd0b2f39");
     }
   
-    if (notification.type === "admin_note") {
+    if (notification.type === "coaching_message" || notification.type === "box_message") {
       return typeof notification.payload.body === "string"
         ? notification.payload.body
-        : i18n("yourCoachAddedANewNote3eec2b4");
+        : i18n(notification.type === "coaching_message" ? "notifCoachingMessageBody" : "notifBoxMessageBody");
     }
   
     if (notification.type === "workout_changed") {
@@ -328,8 +328,10 @@ function NotificationCard({
         return i18n("workoutRejected14068a6");
       case "athlete_message":
         return i18n("messageFromAthlete768702f");
-      case "admin_note":
-        return i18n("coachNotee98376b");
+      case "coaching_message":
+        return i18n("notifCoachingMessage");
+      case "box_message":
+        return i18n("notifBoxMessage");
       case "chat_message":
         return i18n("newMessage1ed2e7b");
       case "challenge_completed":
@@ -475,7 +477,7 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
     "workout_rejected",
     "workout_moved",
     "workout_assignment_requested",
-    "admin_note",
+    "coaching_message",
     // ADR-098 coaching
     "form_review_submitted",
     "form_review_completed",

@@ -50,11 +50,15 @@ defmodule MilosTraining.Pantheon.PRStore do
     do: adapter().list_organization_prs(user_id, organization_id)
 
   @impl true
-  def get_sharing_preference(user_id), do: adapter().get_sharing_preference(user_id)
+  def set_record_visibility(id, user_id, rung),
+    do: adapter().set_record_visibility(id, user_id, rung)
 
   @impl true
-  def put_coach_visibility(user_id, enabled?),
-    do: adapter().put_coach_visibility(user_id, enabled?)
+  def move_records(user_id, from, to), do: adapter().move_records(user_id, from, to)
+
+  @impl true
+  def list_record_items(user_id, bound, limit, scope),
+    do: adapter().list_record_items(user_id, bound, limit, scope)
 
   @impl true
   def list_owned_grants(user_id), do: adapter().list_owned_grants(user_id)

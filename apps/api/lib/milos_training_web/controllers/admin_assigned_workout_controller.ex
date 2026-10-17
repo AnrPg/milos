@@ -41,7 +41,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
                 items: %Schema{type: :string, format: :uuid}
               },
               scheduled_for: %Schema{type: :string, format: :date},
-              admin_notes: %Schema{type: :string},
+              instructions: %Schema{type: :string},
               source_slot_id: %Schema{
                 type: :string,
                 format: :uuid,
@@ -94,7 +94,7 @@ defmodule MilosTrainingWeb.AdminAssignedWorkoutController do
                 type: :array,
                 items: %Schema{type: :string, format: :uuid}
               },
-              admin_notes: %Schema{type: :string}
+              instructions: %Schema{type: :string}
             },
             required: [:scheduled_for, :athlete_ids]
           }

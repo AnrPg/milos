@@ -46,6 +46,11 @@ defmodule MilosTraining.Gamification do
   defdelegate get_leaderboard(period, limit), to: GetLeaderboard, as: :call
   defdelegate list_challenges(), to: ListChallenges, as: :call
   defdelegate leaderboard_opted_in?(user_id), to: LeaderboardOptedIn, as: :call
+
+  @doc "Which of these members opted in to leaderboards, in the session's gym."
+  def leaderboard_opted_in_user_ids(user_ids),
+    do: MilosTraining.Gamification.GamificationStore.leaderboard_opted_in_user_ids(user_ids)
+
   defdelegate refresh_leaderboard(), to: RefreshLeaderboard, as: :call
   defdelegate get_training_quote(date, subject_id), to: GetTrainingQuote, as: :for_subject
   defdelegate increment_advancement(user_id, occurred_at), to: IncrementAdvancement, as: :call

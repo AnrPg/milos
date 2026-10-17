@@ -331,40 +331,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/executions/{id}/modifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Log actual-workout modification patches */
-        post: operations["MilosTrainingWeb.ExecutionController.add_modifications"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/executions/{id}/notes": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Submit an execution note and notify admins */
-        post: operations["MilosTrainingWeb.ExecutionController.submit_note"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/executions/{id}/progress": {
         parameters: {
             query?: never;
@@ -420,6 +386,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/journal/comments/batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write or edit several comments at once (all or none) */
+        post: operations["MilosTrainingWeb.JournalCommentController.batch"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/journal/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Write or edit a comment on one of your entries */
+        put: operations["MilosTrainingWeb.JournalCommentController.save"];
+        post?: never;
+        /** Delete one of your comments */
+        delete: operations["MilosTrainingWeb.JournalCommentController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/avatar": {
         parameters: {
             query?: never;
@@ -452,6 +453,109 @@ export interface paths {
         options?: never;
         head?: never;
         patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your clubs across every gym you belong to, with their channels */
+        get: operations["MilosTrainingWeb.CommunityController.my_clubs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/feed": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Posts from your clubs, newest first */
+        get: operations["MilosTrainingWeb.CommunityPostController.feed"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your journal: every entry kind, newest first */
+        get: operations["MilosTrainingWeb.JournalController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/entries/{kind}/{id}/visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Move one of your entries on the visibility ladder */
+        put: operations["MilosTrainingWeb.JournalController.set_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/notes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write a Σημείωση */
+        post: operations["MilosTrainingWeb.JournalController.create_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/notes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete one of your notes */
+        delete: operations["MilosTrainingWeb.JournalController.delete_note"];
+        options?: never;
+        head?: never;
+        /** Edit one of your notes */
+        patch: operations["MilosTrainingWeb.JournalController.update_note"];
         trace?: never;
     };
     "/api/me/profile": {
@@ -2721,6 +2825,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Add an update to an injury (text and/or field changes) on its timeline */
+        patch: operations["MilosTrainingWeb.AdminWellbeingController.update"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/heal": {
         parameters: {
             query?: never;
@@ -2736,6 +2857,23 @@ export interface paths {
         head?: never;
         /** Mark an injury report healed */
         patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen a healed injury */
+        post: operations["MilosTrainingWeb.AdminWellbeingController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/wellbeing/injury-warnings": {
@@ -3159,6 +3297,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/bookings/{id}/check-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check in to a class you booked (from 30 minutes before it starts until it ends) */
+        post: operations["MilosTrainingWeb.ScheduleController.check_in_class"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/check-ins": {
         parameters: {
             query?: never;
@@ -3204,6 +3359,178 @@ export interface paths {
         put?: never;
         /** Run a class timer command (coaches and admins) */
         post: operations["MilosTrainingWeb.ClassTimerController.command"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/channels/{id}/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an opt-in channel */
+        post: operations["MilosTrainingWeb.CommunityController.join_channel"];
+        /** Leave an opt-in channel */
+        delete: operations["MilosTrainingWeb.CommunityController.leave_channel"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/clubs/{id}/notify-level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** How much you hear from a club */
+        put: operations["MilosTrainingWeb.CommunityController.set_notify_level"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your comment (staff: any comment in their club) */
+        delete: operations["MilosTrainingWeb.CommunityPostController.delete_comment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post in a channel of your gym's club, optionally attaching a journal entry */
+        post: operations["MilosTrainingWeb.CommunityPostController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your post (staff: any post in their club) */
+        delete: operations["MilosTrainingWeb.CommunityPostController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A post's comments, oldest first */
+        get: operations["MilosTrainingWeb.CommunityPostController.comments"];
+        put?: never;
+        /** Comment on a post */
+        post: operations["MilosTrainingWeb.CommunityPostController.comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Staff: hide or show a post */
+        put: operations["MilosTrainingWeb.CommunityPostController.hide"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give or take back kudos */
+        put: operations["MilosTrainingWeb.CommunityPostController.kudos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/posts/{id}/pinned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Staff: pin or unpin an announcement */
+        put: operations["MilosTrainingWeb.CommunityPostController.pin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/wod-today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's #wod card for a day: its WOD, classes and leaderboard */
+        get: operations["MilosTrainingWeb.CommunityController.wod_today"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4112,8 +4439,25 @@ export interface paths {
         /** Private notes about a client that you may read (reads are logged) */
         get: operations["MilosTrainingWeb.CoachNotesController.index"];
         put?: never;
-        /** Write a private note about one of your clients */
+        /** Write a private note about one of your clients, optionally about one thing of theirs */
         post: operations["MilosTrainingWeb.CoachNotesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/journal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's journal as their coach may read it (audited) */
+        get: operations["MilosTrainingWeb.JournalController.client_journal"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -4443,6 +4787,23 @@ export interface paths {
         };
         /** Owners, admins and coaches of this gym */
         get: operations["MilosTrainingWeb.StaffController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/my-client-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Πελάτες μου stats for the signed-in coach (ADR-140 §7) */
+        get: operations["MilosTrainingWeb.CoachingExtrasController.my_client_stats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5057,6 +5418,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellbeing/check-ins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current user's Πώς νιώθω timeline */
+        get: operations["MilosTrainingWeb.CheckInController.index"];
+        put?: never;
+        /** Submit a Πώς νιώθω check-in (a new timestamped entry) */
+        post: operations["MilosTrainingWeb.CheckInController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wellbeing/check-ins/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete one of the current user's check-ins */
+        delete: operations["MilosTrainingWeb.CheckInController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/wellbeing/injuries": {
         parameters: {
             query?: never;
@@ -5075,6 +5471,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wellbeing/injuries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Add an update to an injury (text and/or field changes) on its timeline */
+        patch: operations["MilosTrainingWeb.WellbeingController.update"];
+        trace?: never;
+    };
     "/api/wellbeing/injuries/{id}/heal": {
         parameters: {
             query?: never;
@@ -5090,6 +5503,23 @@ export interface paths {
         head?: never;
         /** Mark one of the current user's injuries healed */
         patch: operations["MilosTrainingWeb.WellbeingController.heal"];
+        trace?: never;
+    };
+    "/api/wellbeing/injuries/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen a healed injury */
+        post: operations["MilosTrainingWeb.WellbeingController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/workouts/{id}/timer-sequence": {
@@ -5323,6 +5753,10 @@ export interface components {
             id: string;
             /** Format: date-time */
             inserted_at?: string;
+            /** Format: uuid */
+            subject_id?: string | null;
+            /** @enum {string|null} */
+            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
             /** Format: date-time */
             updated_at?: string;
         };
@@ -5355,6 +5789,405 @@ export interface components {
             origin: "assigned" | "self_assigned" | "invited";
             /** Format: date-time */
             started_at?: string;
+        };
+        /** CommunityAuthor */
+        CommunityAuthor: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** CommunityChannel */
+        CommunityChannel: {
+            /** @description You may join or leave it yourself */
+            can_leave: boolean;
+            can_post: boolean;
+            context_type?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @description Its posts reach your feed */
+            joined: boolean;
+            /** @enum {string} */
+            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+            /** @enum {string} */
+            membership: "everyone" | "opt_in" | "invite";
+            /** @description Null for built-in channels */
+            name?: string | null;
+            /** @description You are a member of this channel */
+            participant?: boolean;
+            /** @description Offered to you (you often book its class) and not joined yet */
+            suggested?: boolean;
+            /** @enum {string} */
+            write_policy: "staff" | "members" | "participants" | "system_and_members";
+        };
+        /** CommunityChannelMembershipResponse */
+        CommunityChannelMembershipResponse: {
+            /** Format: uuid */
+            channel_id: string;
+            joined: boolean;
+        };
+        /** CommunityClub */
+        CommunityClub: {
+            channels: {
+                /** @description You may join or leave it yourself */
+                can_leave: boolean;
+                can_post: boolean;
+                context_type?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Its posts reach your feed */
+                joined: boolean;
+                /** @enum {string} */
+                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                /** @enum {string} */
+                membership: "everyone" | "opt_in" | "invite";
+                /** @description Null for built-in channels */
+                name?: string | null;
+                /** @description You are a member of this channel */
+                participant?: boolean;
+                /** @description Offered to you (you often book its class) and not joined yet */
+                suggested?: boolean;
+                /** @enum {string} */
+                write_policy: "staff" | "members" | "participants" | "system_and_members";
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+            logo_url?: string | null;
+            name: string;
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+            /** Format: uuid */
+            organization_id: string;
+            organization_slug: string;
+            primary_color?: string | null;
+            /** @enum {string} */
+            role: "member" | "staff";
+        };
+        /** CommunityClubsResponse */
+        CommunityClubsResponse: {
+            clubs: {
+                channels: {
+                    /** @description You may join or leave it yourself */
+                    can_leave: boolean;
+                    can_post: boolean;
+                    context_type?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Its posts reach your feed */
+                    joined: boolean;
+                    /** @enum {string} */
+                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                    /** @enum {string} */
+                    membership: "everyone" | "opt_in" | "invite";
+                    /** @description Null for built-in channels */
+                    name?: string | null;
+                    /** @description You are a member of this channel */
+                    participant?: boolean;
+                    /** @description Offered to you (you often book its class) and not joined yet */
+                    suggested?: boolean;
+                    /** @enum {string} */
+                    write_policy: "staff" | "members" | "participants" | "system_and_members";
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+                logo_url?: string | null;
+                name: string;
+                /** @enum {string} */
+                notify_level: "all" | "announcements" | "none";
+                /** Format: uuid */
+                organization_id: string;
+                organization_slug: string;
+                primary_color?: string | null;
+                /** @enum {string} */
+                role: "member" | "staff";
+            }[];
+        };
+        /** CommunityComment */
+        CommunityComment: {
+            /** CommunityAuthor */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            body: string;
+            can_delete: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** Format: uuid */
+            post_id: string;
+        };
+        /** CommunityCommentRequest */
+        CommunityCommentRequest: {
+            body: string;
+        };
+        /** CommunityCommentResponse */
+        CommunityCommentResponse: {
+            /** CommunityComment */
+            comment: {
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body: string;
+                can_delete: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uuid */
+                post_id: string;
+            };
+        };
+        /** CommunityCommentsResponse */
+        CommunityCommentsResponse: {
+            comments: {
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body: string;
+                can_delete: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** Format: uuid */
+                post_id: string;
+            }[];
+        };
+        /** CommunityFeedPage */
+        CommunityFeedPage: {
+            next_cursor?: string | null;
+            pinned: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            }[];
+            posts: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            }[];
+        };
+        /** CommunityNotifyLevelRequest */
+        CommunityNotifyLevelRequest: {
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+        };
+        /** CommunityNotifyLevelResponse */
+        CommunityNotifyLevelResponse: {
+            /** Format: uuid */
+            club_id: string;
+            /** @enum {string} */
+            notify_level: "all" | "announcements" | "none";
+        };
+        /** CommunityPost */
+        CommunityPost: {
+            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+            attachment?: {
+                [key: string]: unknown;
+            } | null;
+            /** Format: uuid */
+            attachment_id?: string | null;
+            /** @enum {string|null} */
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+            /** CommunityAuthor */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            body?: string | null;
+            can_delete: boolean;
+            can_moderate: boolean;
+            can_pin: boolean;
+            channel: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            club: {
+                /** Format: uuid */
+                id: string;
+                logo_url?: string | null;
+                name: string;
+                organization_slug: string;
+                primary_color?: string | null;
+            };
+            comment_count: number;
+            hidden: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            kudos_by_me: boolean;
+            kudos_count: number;
+            pinned: boolean;
+        };
+        /** CommunityPostCreateRequest */
+        CommunityPostCreateRequest: {
+            /** Format: uuid */
+            attachment_id?: string;
+            /** @enum {string} */
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+            body?: string;
+            /** Format: uuid */
+            channel_id: string;
+            client_operation_id?: string;
+        };
+        /** CommunityPostHiddenRequest */
+        CommunityPostHiddenRequest: {
+            hidden: boolean;
+        };
+        /** CommunityPostKudosRequest */
+        CommunityPostKudosRequest: {
+            kudos: boolean;
+        };
+        /** CommunityPostPinnedRequest */
+        CommunityPostPinnedRequest: {
+            pinned: boolean;
+        };
+        /** CommunityPostResponse */
+        CommunityPostResponse: {
+            /** CommunityPost */
+            post: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                };
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                pinned: boolean;
+            };
         };
         /** ContentVideo */
         ContentVideo: {
@@ -6432,6 +7265,225 @@ export interface components {
             /** Format: uuid */
             user_id?: string | null;
         };
+        /** JournalComment */
+        JournalComment: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** Format: uuid */
+            entry_id: string;
+            /** @enum {string} */
+            entry_kind: "execution" | "training_log" | "pr";
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            organization_id?: string | null;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags: string[];
+            /** Format: date-time */
+            updated_at?: string;
+            /** Format: uuid */
+            user_id?: string;
+            /** Format: date-time */
+            written_at: string;
+        };
+        /** JournalCommentBatch */
+        JournalCommentBatch: {
+            comments: (components["schemas"]["JournalCommentSave"] & {
+                /** Format: uuid */
+                id: string;
+            })[];
+        };
+        /**
+         * JournalCommentChange
+         * @description A structured change to the prescription (modification-patch shape); one per row and field, upserted by patch_id.
+         */
+        JournalCommentChange: {
+            actual_value?: (string | number | boolean) | null;
+            canonical_value?: (string | number | boolean) | null;
+            exercise_id?: string | null;
+            exercise_name?: string | null;
+            field: string;
+            interval_index?: number | null;
+            /** @description Accepted as the comment's text when no body is given; never stored. */
+            note?: string | null;
+            patch_id: string;
+            round_index?: number | null;
+            row_index?: number | null;
+            section_id: string;
+            section_name?: string | null;
+            segment_key?: string | null;
+            set_index?: number | null;
+            /** @enum {string|null} */
+            type?: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "sets_changed" | "exercise_substituted" | "distance_changed" | "calories_changed" | "field_changed" | "other" | null;
+            unit?: string | null;
+        };
+        /**
+         * JournalCommentInput
+         * @description A comment written together with its entry; the entry is implied.
+         */
+        JournalCommentInput: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            /** Format: uuid */
+            id?: string;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags?: string[];
+            /**
+             * Format: date-time
+             * @description When it was written on the device (never later than now).
+             */
+            written_at?: string | null;
+        };
+        /** JournalCommentResponse */
+        JournalCommentResponse: {
+            comment: components["schemas"]["JournalComment"];
+        };
+        /** JournalCommentSave */
+        JournalCommentSave: {
+            body?: string | null;
+            change?: components["schemas"]["JournalCommentChange"] | null;
+            /** Format: uuid */
+            entry_id: string;
+            /** @enum {string} */
+            entry_kind: "execution" | "training_log" | "pr";
+            /** @description Exercise id, or `row:<n>` for a training-log row. */
+            exercise_id?: string | null;
+            section_id?: string | null;
+            selected_text?: string | null;
+            selection_end?: number | null;
+            selection_start?: number | null;
+            tags?: string[];
+            /**
+             * Format: date-time
+             * @description When it was written on the device (never later than now).
+             */
+            written_at?: string | null;
+        };
+        /** JournalCommentsResponse */
+        JournalCommentsResponse: {
+            comments: components["schemas"]["JournalComment"][];
+        };
+        /** JournalFeedItem */
+        JournalFeedItem: {
+            choosable_visibilities: ("private" | "coach_can_view" | "coach_reply_requested")[];
+            entry: {
+                [key: string]: unknown;
+            };
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+            /** @enum {string} */
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            /** Format: date-time */
+            occurred_at: string;
+            /**
+             * Format: date
+             * @description Set for entries dated by day only (PRs).
+             */
+            occurred_on?: string | null;
+            occurred_tz?: string | null;
+            /** Format: uuid */
+            organization_id?: string | null;
+        };
+        /** JournalFeedPage */
+        JournalFeedPage: {
+            items: components["schemas"]["JournalFeedItem"][];
+            next_cursor?: string | null;
+        };
+        /** JournalNote */
+        JournalNote: {
+            body: string;
+            /** Format: uuid */
+            id: string;
+            journal_visibility: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            lock_version: number;
+            /** Format: uuid */
+            organization_id?: string | null;
+            /** @enum {string} */
+            topic: "technique" | "thought" | "mood" | "goal";
+            /** Format: uuid */
+            user_id?: string;
+            /** Format: date-time */
+            written_at: string;
+            written_tz?: string;
+        };
+        /** JournalNoteCreateRequest */
+        JournalNoteCreateRequest: {
+            body: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            /** @description The gym the note is written in; personal when absent. */
+            organization_slug?: string | null;
+            /** @enum {string} */
+            topic: "technique" | "thought" | "mood" | "goal";
+            /** Format: date-time */
+            written_at?: string | null;
+            written_tz?: string | null;
+        };
+        /** JournalNoteResponse */
+        JournalNoteResponse: {
+            note: components["schemas"]["JournalNote"];
+        };
+        /** JournalNoteUpdateRequest */
+        JournalNoteUpdateRequest: {
+            body?: string;
+            /** Format: uuid */
+            linked_id?: string | null;
+            /** @enum {string|null} */
+            linked_kind?: "execution" | "training_log" | "workout" | null;
+            lock_version?: number;
+            /** @enum {string} */
+            topic?: "technique" | "thought" | "mood" | "goal";
+            /** Format: date-time */
+            written_at?: string | null;
+            written_tz?: string | null;
+        };
+        /** JournalVisibilityRequest */
+        JournalVisibilityRequest: {
+            /**
+             * Format: uuid
+             * @description Which coach answers, when the member has several.
+             */
+            coach_user_id?: string;
+            /** @description Required for coach_reply_requested: sent to the coach as a message. */
+            question?: string;
+            /** @enum {string} */
+            visibility: "private" | "coach_can_view" | "coach_reply_requested";
+        };
+        /** JournalVisibilityResponse */
+        JournalVisibilityResponse: {
+            choosable_visibilities: string[];
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+            /** @enum {string} */
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            /** @description The message sent to the coach, for coach_reply_requested. */
+            reply_request?: {
+                /** Format: uuid */
+                id?: string;
+                /** Format: uuid */
+                thread_id?: string;
+            } | null;
+        };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
             /** @enum {string} */
@@ -6707,27 +7759,9 @@ export interface components {
         };
         /** TrainingLogCreateRequest */
         TrainingLogCreateRequest: {
+            comments?: components["schemas"]["JournalCommentInput"][];
             duration_seconds?: number | null;
-            exercise_modifications?: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             idempotency_key: string;
-            notes?: string | null;
             perceived_effort?: number | null;
             /** Format: date-time */
             performed_at: string;
@@ -6742,7 +7776,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -6764,25 +7797,8 @@ export interface components {
         TrainingLogEntry: {
             /** Format: uuid */
             booking_id?: string | null;
+            comments: components["schemas"]["JournalComment"][];
             duration_seconds?: number | null;
-            exercise_modifications: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             /** Format: uuid */
             id: string;
             idempotency_key?: string;
@@ -6791,7 +7807,6 @@ export interface components {
             lock_version: number;
             /** Format: uuid */
             master_workout_id?: string | null;
-            notes?: string | null;
             /** Format: uuid */
             organization_id?: string;
             perceived_effort?: number | null;
@@ -6809,7 +7824,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -6838,160 +7852,11 @@ export interface components {
         };
         /** TrainingLogEntryCollection */
         TrainingLogEntryCollection: {
-            entries: {
-                /** Format: uuid */
-                booking_id?: string | null;
-                duration_seconds?: number | null;
-                exercise_modifications: {
-                    actual_value: string | number | boolean;
-                    canonical_value: string | number | boolean;
-                    exercise_id?: string | null;
-                    exercise_name?: string | null;
-                    field: string;
-                    interval_index?: number | null;
-                    note?: string | null;
-                    patch_id: string;
-                    round_index?: number | null;
-                    row_index?: number | null;
-                    section_id: string;
-                    section_name?: string | null;
-                    segment_key?: string | null;
-                    set_index?: number | null;
-                    type?: string;
-                    unit?: string | null;
-                }[];
-                /** Format: uuid */
-                id: string;
-                idempotency_key?: string;
-                /** Format: date-time */
-                inserted_at?: string;
-                lock_version: number;
-                /** Format: uuid */
-                master_workout_id?: string | null;
-                notes?: string | null;
-                /** Format: uuid */
-                organization_id?: string;
-                perceived_effort?: number | null;
-                performed_at_tz?: string;
-                /** Format: date-time */
-                performed_at_utc: string;
-                performed_exercises: {
-                    calories?: number | null;
-                    distance?: number | null;
-                    /** @enum {string|null} */
-                    distance_unit?: "m" | "km" | "mi" | null;
-                    duration_seconds?: number | null;
-                    exercise_ref?: string | null;
-                    load?: number | null;
-                    /** @enum {string|null} */
-                    load_unit?: "kg" | "lb" | null;
-                    name: string;
-                    note?: string | null;
-                    reps?: number | null;
-                    row_index?: number;
-                    sets?: number | null;
-                }[];
-                scale_level_slug?: string | null;
-                section_scores: {
-                    section_id: string;
-                    unit?: string | null;
-                    value: number | string;
-                }[];
-                /** Format: uuid */
-                source_reference_id?: string | null;
-                /** @enum {string} */
-                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                /** @enum {string} */
-                status: "logged" | "voided";
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-                /** Format: uuid */
-                user_id?: string;
-                void_reason?: string | null;
-                /** Format: date-time */
-                voided_at?: string | null;
-                workout_type?: string | null;
-            }[];
+            entries: components["schemas"]["TrainingLogEntry"][];
         };
         /** TrainingLogEntryResponse */
         TrainingLogEntryResponse: {
-            /** TrainingLogEntry */
-            entry: {
-                /** Format: uuid */
-                booking_id?: string | null;
-                duration_seconds?: number | null;
-                exercise_modifications: {
-                    actual_value: string | number | boolean;
-                    canonical_value: string | number | boolean;
-                    exercise_id?: string | null;
-                    exercise_name?: string | null;
-                    field: string;
-                    interval_index?: number | null;
-                    note?: string | null;
-                    patch_id: string;
-                    round_index?: number | null;
-                    row_index?: number | null;
-                    section_id: string;
-                    section_name?: string | null;
-                    segment_key?: string | null;
-                    set_index?: number | null;
-                    type?: string;
-                    unit?: string | null;
-                }[];
-                /** Format: uuid */
-                id: string;
-                idempotency_key?: string;
-                /** Format: date-time */
-                inserted_at?: string;
-                lock_version: number;
-                /** Format: uuid */
-                master_workout_id?: string | null;
-                notes?: string | null;
-                /** Format: uuid */
-                organization_id?: string;
-                perceived_effort?: number | null;
-                performed_at_tz?: string;
-                /** Format: date-time */
-                performed_at_utc: string;
-                performed_exercises: {
-                    calories?: number | null;
-                    distance?: number | null;
-                    /** @enum {string|null} */
-                    distance_unit?: "m" | "km" | "mi" | null;
-                    duration_seconds?: number | null;
-                    exercise_ref?: string | null;
-                    load?: number | null;
-                    /** @enum {string|null} */
-                    load_unit?: "kg" | "lb" | null;
-                    name: string;
-                    note?: string | null;
-                    reps?: number | null;
-                    row_index?: number;
-                    sets?: number | null;
-                }[];
-                scale_level_slug?: string | null;
-                section_scores: {
-                    section_id: string;
-                    unit?: string | null;
-                    value: number | string;
-                }[];
-                /** Format: uuid */
-                source_reference_id?: string | null;
-                /** @enum {string} */
-                source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                /** @enum {string} */
-                status: "logged" | "voided";
-                title: string;
-                /** Format: date-time */
-                updated_at?: string;
-                /** Format: uuid */
-                user_id?: string;
-                void_reason?: string | null;
-                /** Format: date-time */
-                voided_at?: string | null;
-                workout_type?: string | null;
-            };
+            entry: components["schemas"]["TrainingLogEntry"];
         };
         /** TrainingLogSources */
         TrainingLogSources: {
@@ -7039,26 +7904,7 @@ export interface components {
         /** TrainingLogUpdateRequest */
         TrainingLogUpdateRequest: {
             duration_seconds?: number | null;
-            exercise_modifications?: {
-                actual_value: string | number | boolean;
-                canonical_value: string | number | boolean;
-                exercise_id?: string | null;
-                exercise_name?: string | null;
-                field: string;
-                interval_index?: number | null;
-                note?: string | null;
-                patch_id: string;
-                round_index?: number | null;
-                row_index?: number | null;
-                section_id: string;
-                section_name?: string | null;
-                segment_key?: string | null;
-                set_index?: number | null;
-                type?: string;
-                unit?: string | null;
-            }[];
             expected_version?: number;
-            notes?: string | null;
             perceived_effort?: number | null;
             /** Format: date-time */
             performed_at?: string;
@@ -7073,7 +7919,6 @@ export interface components {
                 /** @enum {string|null} */
                 load_unit?: "kg" | "lb" | null;
                 name: string;
-                note?: string | null;
                 reps?: number | null;
                 row_index?: number;
                 sets?: number | null;
@@ -7098,6 +7943,59 @@ export interface components {
             errors: {
                 [key: string]: unknown;
             };
+        };
+        /** WodLeaderboardEntry */
+        WodLeaderboardEntry: {
+            avatar_url?: string | null;
+            me: boolean;
+            nickname?: string | null;
+            /** @description False only on your own row before you opt in to leaderboards */
+            opted_in: boolean;
+            rank: number;
+            scale_level_slug?: string | null;
+            unit?: string | null;
+            /** Format: uuid */
+            user_id: string;
+            value?: string | null;
+        };
+        /** WodTodayCard */
+        WodTodayCard: {
+            /** Format: uuid */
+            channel_id?: string | null;
+            classes: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                scheduled_at: string;
+            }[];
+            /** Format: date */
+            date: string;
+            leaderboard: {
+                avatar_url?: string | null;
+                me: boolean;
+                nickname?: string | null;
+                /** @description False only on your own row before you opt in to leaderboards */
+                opted_in: boolean;
+                rank: number;
+                scale_level_slug?: string | null;
+                unit?: string | null;
+                /** Format: uuid */
+                user_id: string;
+                value?: string | null;
+            }[];
+            logged_by_me: boolean;
+            score?: {
+                id: string;
+                name?: string | null;
+                score_type: string;
+                unit?: string | null;
+            } | null;
+            workout?: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                type?: string | null;
+            } | null;
         };
         /** WorkoutDslAuthoringResponse */
         WorkoutDslAuthoringResponse: {
@@ -7155,6 +8053,7 @@ export interface components {
             version: 1;
             /** WorkoutDslVocabulary */
             vocabulary: {
+                content_markers: string[];
                 exercise_catalog: {
                     aliases: string[];
                     capabilities: string[];
@@ -7171,7 +8070,6 @@ export interface components {
                 };
                 group_parameters: string[];
                 header_parameters: string[];
-                note_markers: string[];
                 scale_parameters: string[];
                 section_formats: string[];
                 section_parameters: {
@@ -7203,6 +8101,7 @@ export interface components {
             version: 1;
             /** WorkoutDslVocabulary */
             vocabulary: {
+                content_markers: string[];
                 exercise_catalog: {
                     aliases: string[];
                     capabilities: string[];
@@ -7219,7 +8118,6 @@ export interface components {
                 };
                 group_parameters: string[];
                 header_parameters: string[];
-                note_markers: string[];
                 scale_parameters: string[];
                 section_formats: string[];
                 section_parameters: {
@@ -7265,6 +8163,7 @@ export interface components {
         };
         /** WorkoutDslVocabulary */
         WorkoutDslVocabulary: {
+            content_markers: string[];
             exercise_catalog: {
                 aliases: string[];
                 capabilities: string[];
@@ -7281,7 +8180,6 @@ export interface components {
             };
             group_parameters: string[];
             header_parameters: string[];
-            note_markers: string[];
             scale_parameters: string[];
             section_formats: string[];
             section_parameters: {
@@ -7496,6 +8394,8 @@ export interface operations {
                         nickname: string;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                        /** @description The member's own theme; null follows the gym's */
+                        preferred_theme_slug?: string | null;
                         role: string;
                         vendor: boolean;
                     };
@@ -8194,118 +9094,6 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.add_modifications": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Execution ID */
-                id: string;
-            };
-            cookie?: never;
-        };
-        /** @description Modifications */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    modifications: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        /** @enum {string|null} */
-                        type?: "skipped" | "weight_changed" | "reps_changed" | "time_changed" | "sets_changed" | "exercise_substituted" | "distance_changed" | "calories_changed" | "field_changed" | "other" | null;
-                        unit?: string | null;
-                    }[];
-                };
-            };
-        };
-        responses: {
-            /** @description Execution */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.ExecutionController.submit_note": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Execution ID */
-                id: string;
-            };
-            cookie?: never;
-        };
-        /** @description Execution note params */
-        requestBody?: {
-            content: {
-                "application/json": {
-                    exercise_id: string;
-                    /** Format: uuid */
-                    id?: string | null;
-                    note_text?: string | null;
-                    selected_text: string;
-                    selection_end: number;
-                    selection_start: number;
-                    tags?: string[];
-                };
-            };
-        };
-        responses: {
-            /** @description Execution */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-            /** @description Error */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
     "MilosTrainingWeb.ExecutionController.update_progress": {
         parameters: {
             query?: never;
@@ -8518,6 +9306,105 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.JournalCommentController.batch": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    comments: (components["schemas"]["JournalCommentSave"] & {
+                        /** Format: uuid */
+                        id: string;
+                    })[];
+                };
+            };
+        };
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: components["schemas"]["JournalComment"][];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalCommentController.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Comment id (generated by the client) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["JournalCommentSave"];
+            };
+        };
+        responses: {
+            /** @description Comment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comment: components["schemas"]["JournalComment"];
+                    };
+                };
+            };
+            /** @description Entry or comment not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Id belongs to another entry */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalCommentController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Comment id (generated by the client) */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.update_avatar": {
         parameters: {
             query?: never;
@@ -8593,6 +9480,380 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityController.my_clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Clubs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clubs: {
+                            channels: {
+                                /** @description You may join or leave it yourself */
+                                can_leave: boolean;
+                                can_post: boolean;
+                                context_type?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Its posts reach your feed */
+                                joined: boolean;
+                                /** @enum {string} */
+                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                                /** @enum {string} */
+                                membership: "everyone" | "opt_in" | "invite";
+                                /** @description Null for built-in channels */
+                                name?: string | null;
+                                /** @description You are a member of this channel */
+                                participant?: boolean;
+                                /** @description Offered to you (you often book its class) and not joined yet */
+                                suggested?: boolean;
+                                /** @enum {string} */
+                                write_policy: "staff" | "members" | "participants" | "system_and_members";
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
+                            logo_url?: string | null;
+                            name: string;
+                            /** @enum {string} */
+                            notify_level: "all" | "announcements" | "none";
+                            /** Format: uuid */
+                            organization_id: string;
+                            organization_slug: string;
+                            primary_color?: string | null;
+                            /** @enum {string} */
+                            role: "member" | "staff";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.feed": {
+        parameters: {
+            query?: {
+                club_id?: string;
+                channel_id?: string;
+                /** @description Only your own posts */
+                mine?: boolean;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        pinned: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        }[];
+                        posts: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.index": {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page */
+                cursor?: string;
+                /** @description Comma-separated kinds to list (all when absent) */
+                kinds?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["JournalFeedItem"][];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.set_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description Which coach answers, when the member has several.
+                     */
+                    coach_user_id?: string;
+                    /** @description Required for coach_reply_requested: sent to the coach as a message. */
+                    question?: string;
+                    /** @enum {string} */
+                    visibility: "private" | "coach_can_view" | "coach_reply_requested";
+                };
+            };
+        };
+        responses: {
+            /** @description New rung */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        choosable_visibilities: string[];
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
+                        /** @enum {string} */
+                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                        /** @description The message sent to the coach, for coach_reply_requested. */
+                        reply_request?: {
+                            /** Format: uuid */
+                            id?: string;
+                            /** Format: uuid */
+                            thread_id?: string;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Entry not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Rung not allowed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.create_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** Format: uuid */
+                    linked_id?: string | null;
+                    /** @enum {string|null} */
+                    linked_kind?: "execution" | "training_log" | "workout" | null;
+                    /** @description The gym the note is written in; personal when absent. */
+                    organization_slug?: string | null;
+                    /** @enum {string} */
+                    topic: "technique" | "thought" | "mood" | "goal";
+                    /** Format: date-time */
+                    written_at?: string | null;
+                    written_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Note */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        note: components["schemas"]["JournalNote"];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.delete_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.update_note": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string;
+                    /** Format: uuid */
+                    linked_id?: string | null;
+                    /** @enum {string|null} */
+                    linked_kind?: "execution" | "training_log" | "workout" | null;
+                    lock_version?: number;
+                    /** @enum {string} */
+                    topic?: "technique" | "thought" | "mood" | "goal";
+                    /** Format: date-time */
+                    written_at?: string | null;
+                    written_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Note */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        note: components["schemas"]["JournalNote"];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.update_profile": {
         parameters: {
             query?: never;
@@ -8610,6 +9871,11 @@ export interface operations {
                     password?: string;
                     /** @enum {string} */
                     preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                    /**
+                     * @description Your own theme; null follows your gym's
+                     * @enum {string|null}
+                     */
+                    preferred_theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
                 };
             };
         };
@@ -8627,6 +9893,7 @@ export interface operations {
                             id?: string;
                             nickname?: string;
                             preferred_locale?: string;
+                            preferred_theme_slug?: string | null;
                             role?: string;
                         };
                     };
@@ -9209,9 +10476,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string;
                     /** @description Assignee user ids (athletes or members). */
                     athlete_ids: string[];
+                    instructions?: string;
                     /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date */
@@ -9277,8 +10544,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string;
                     athlete_ids: string[];
+                    instructions?: string;
                     /** Format: date */
                     scheduled_for: string;
                 };
@@ -9357,12 +10624,12 @@ export interface operations {
                                 reason: string | null;
                             }[];
                             assigned_workouts: {
-                                admin_notes?: string | null;
                                 execution_scores: {
                                     [key: string]: unknown;
                                 }[];
                                 /** Format: uuid */
                                 id: string | null;
+                                instructions?: string | null;
                                 /** Format: uuid */
                                 master_workout_id?: string | null;
                                 /** Format: date */
@@ -9383,9 +10650,9 @@ export interface operations {
                                 [key: string]: unknown;
                             })[];
                             execution_history: {
+                                comment_count: number;
                                 /** Format: date-time */
                                 completed_at_utc?: string | null;
-                                exercise_note_count: number;
                                 /** Format: uuid */
                                 id: string | null;
                                 /** Format: uuid */
@@ -9413,7 +10680,8 @@ export interface operations {
                                 id?: string | null;
                                 /** Format: date-time */
                                 inserted_at: string | null;
-                                type: string;
+                                /** @enum {string} */
+                                type: "coaching_message" | "athlete_comment";
                             } & {
                                 [key: string]: unknown;
                             })[];
@@ -15779,10 +17047,10 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    admin_notes?: string | null;
                     /** @default true */
                     copy_source: boolean;
                     folder_id?: string | null;
+                    instructions?: string | null;
                     /** Format: uuid */
                     master_workout_id?: string;
                     /**
@@ -16346,6 +17614,26 @@ export interface operations {
                         injuries: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -16381,6 +17669,94 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWellbeingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body_area?: string;
+                    description?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    severity?: "mild" | "moderate" | "severe";
+                    tags?: string[];
+                    training_limitations?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWellbeingController.heal": {
         parameters: {
             query?: never;
@@ -16409,6 +17785,102 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWellbeingController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -16582,6 +18054,26 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -16860,6 +18352,7 @@ export interface operations {
                         version: 1;
                         /** WorkoutDslVocabulary */
                         vocabulary: {
+                            content_markers: string[];
                             exercise_catalog: {
                                 aliases: string[];
                                 capabilities: string[];
@@ -16876,7 +18369,6 @@ export interface operations {
                             };
                             group_parameters: string[];
                             header_parameters: string[];
-                            note_markers: string[];
                             scale_parameters: string[];
                             section_formats: string[];
                             section_parameters: {
@@ -16928,6 +18420,7 @@ export interface operations {
                         version: 1;
                         /** WorkoutDslVocabulary */
                         vocabulary: {
+                            content_markers: string[];
                             exercise_catalog: {
                                 aliases: string[];
                                 capabilities: string[];
@@ -16944,7 +18437,6 @@ export interface operations {
                             };
                             group_parameters: string[];
                             header_parameters: string[];
-                            note_markers: string[];
                             scale_parameters: string[];
                             section_formats: string[];
                             section_parameters: {
@@ -17232,6 +18724,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -17267,14 +18767,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -17284,10 +18776,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -17307,14 +18815,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -17346,6 +18846,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -17378,14 +18886,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -17416,6 +18916,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -17435,14 +18943,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -17478,14 +18978,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -17499,10 +18991,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -17522,14 +19030,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -17561,6 +19061,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -17593,14 +19101,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -17631,6 +19131,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -17650,14 +19158,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -17693,14 +19193,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -17835,6 +19327,14 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -17867,19 +19367,27 @@ export interface operations {
                         /** @enum {string} */
                         severity: "error" | "warning";
                     }[];
-                    notes?: {
-                        body: string;
-                        document?: {
-                            [key: string]: unknown;
-                        } | null;
-                        /** @enum {string} */
-                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                    }[];
                     sections?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
                         exercises: {
                             /** Format: uuid */
                             alternating_group_id?: string | null;
                             applied_variation?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -17899,14 +19407,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -17938,6 +19438,14 @@ export interface operations {
                                 sets?: number | null;
                             } | null;
                             cluster_rest_seconds?: number | null;
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             description?: string | null;
                             excluded?: boolean;
                             exercise_ref?: string | null;
@@ -17970,14 +19478,6 @@ export interface operations {
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             pacing?: number | null;
                             prescription_metadata?: {
@@ -18008,6 +19508,14 @@ export interface operations {
                             superset_group_id?: string | null;
                             tempo?: string | null;
                             variations?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -18027,14 +19535,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -18070,14 +19570,6 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
-                        notes?: {
-                            body: string;
-                            document?: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @enum {string} */
-                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
@@ -18091,10 +19583,26 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         sections?: {
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             exercises: {
                                 /** Format: uuid */
                                 alternating_group_id?: string | null;
                                 applied_variation?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -18114,14 +19622,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -18153,6 +19653,14 @@ export interface operations {
                                     sets?: number | null;
                                 } | null;
                                 cluster_rest_seconds?: number | null;
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 description?: string | null;
                                 excluded?: boolean;
                                 exercise_ref?: string | null;
@@ -18185,14 +19693,6 @@ export interface operations {
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 pacing?: number | null;
                                 prescription_metadata?: {
@@ -18223,6 +19723,14 @@ export interface operations {
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
                                 variations?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -18242,14 +19750,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -18285,14 +19785,6 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
@@ -18621,6 +20113,14 @@ export interface operations {
                 "application/json": {
                     /** @enum {string|null} */
                     authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    content?: {
+                        body: string;
+                        document?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** @enum {string} */
+                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                    }[];
                     description?: string | null;
                     /** @enum {string|null} */
                     difficulty?: "beginner" | "intermediate" | "advanced" | "all-levels" | null;
@@ -18653,19 +20153,27 @@ export interface operations {
                         /** @enum {string} */
                         severity: "error" | "warning";
                     }[];
-                    notes?: {
-                        body: string;
-                        document?: {
-                            [key: string]: unknown;
-                        } | null;
-                        /** @enum {string} */
-                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                    }[];
                     sections?: {
+                        content?: {
+                            body: string;
+                            document?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** @enum {string} */
+                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                        }[];
                         exercises: {
                             /** Format: uuid */
                             alternating_group_id?: string | null;
                             applied_variation?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -18685,14 +20193,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -18724,6 +20224,14 @@ export interface operations {
                                 sets?: number | null;
                             } | null;
                             cluster_rest_seconds?: number | null;
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             description?: string | null;
                             excluded?: boolean;
                             exercise_ref?: string | null;
@@ -18756,14 +20264,6 @@ export interface operations {
                             load_value?: number | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             pacing?: number | null;
                             prescription_metadata?: {
@@ -18794,6 +20294,14 @@ export interface operations {
                             superset_group_id?: string | null;
                             tempo?: string | null;
                             variations?: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 excluded?: boolean;
                                 exercise_name_override?: string | null;
                                 /** Format: uuid */
@@ -18813,14 +20321,6 @@ export interface operations {
                                 } | null;
                                 load_value?: number | null;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 prescription_metadata?: {
                                     [key: string]: unknown;
                                 };
@@ -18856,14 +20356,6 @@ export interface operations {
                         id?: string | null;
                         name: string;
                         note?: string | null;
-                        notes?: {
-                            body: string;
-                            document?: {
-                                [key: string]: unknown;
-                            } | null;
-                            /** @enum {string} */
-                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                        }[];
                         order?: number;
                         /** Format: uuid */
                         parent_section_id?: string | null;
@@ -18877,10 +20369,26 @@ export interface operations {
                             [key: string]: unknown;
                         };
                         sections?: {
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             exercises: {
                                 /** Format: uuid */
                                 alternating_group_id?: string | null;
                                 applied_variation?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -18900,14 +20408,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -18939,6 +20439,14 @@ export interface operations {
                                     sets?: number | null;
                                 } | null;
                                 cluster_rest_seconds?: number | null;
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 description?: string | null;
                                 excluded?: boolean;
                                 exercise_ref?: string | null;
@@ -18971,14 +20479,6 @@ export interface operations {
                                 load_value?: number | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 pacing?: number | null;
                                 prescription_metadata?: {
@@ -19009,6 +20509,14 @@ export interface operations {
                                 superset_group_id?: string | null;
                                 tempo?: string | null;
                                 variations?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     excluded?: boolean;
                                     exercise_name_override?: string | null;
                                     /** Format: uuid */
@@ -19028,14 +20536,6 @@ export interface operations {
                                     } | null;
                                     load_value?: number | null;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     prescription_metadata?: {
                                         [key: string]: unknown;
                                     };
@@ -19071,14 +20571,6 @@ export interface operations {
                             id?: string | null;
                             name: string;
                             note?: string | null;
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             order?: number;
                             /** Format: uuid */
                             parent_section_id?: string | null;
@@ -19134,6 +20626,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -19169,14 +20669,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -19186,10 +20678,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -19209,14 +20717,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -19248,6 +20748,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -19280,14 +20788,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -19318,6 +20818,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -19337,14 +20845,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -19380,14 +20880,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -19401,10 +20893,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -19424,14 +20932,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -19463,6 +20963,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -19495,14 +21003,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -19533,6 +21033,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -19552,14 +21060,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -19595,14 +21095,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -19927,6 +21419,45 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ScheduleController.check_in_class": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attendance */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attendance: {
+                            /** Format: date-time */
+                            marked_at: string;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            status: string;
+                        };
+                    };
+                };
+            };
+            /** @description Outside the check-in window */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ScheduleController.check_in": {
         parameters: {
             query?: never;
@@ -20172,6 +21703,586 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityController.join_channel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id: string;
+                        joined: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.leave_channel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id: string;
+                        joined: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.set_notify_level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    notify_level: "all" | "announcements" | "none";
+                };
+            };
+        };
+        responses: {
+            /** @description Level */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        club_id: string;
+                        /** @enum {string} */
+                        notify_level: "all" | "announcements" | "none";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.delete_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    attachment_id?: string;
+                    /** @enum {string} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+                    body?: string;
+                    /** Format: uuid */
+                    channel_id: string;
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Comment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityComment */
+                        comment: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kudos: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityPostController.pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    pinned: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityPost */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            };
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityController.wod_today": {
+        parameters: {
+            query?: {
+                /** @description Local date; today in `timezone` when omitted */
+                date?: string;
+                /** @description IANA time zone of the member, e.g. Europe/Athens */
+                timezone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        channel_id?: string | null;
+                        classes: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                        }[];
+                        /** Format: date */
+                        date: string;
+                        leaderboard: {
+                            avatar_url?: string | null;
+                            me: boolean;
+                            nickname?: string | null;
+                            /** @description False only on your own row before you opt in to leaderboards */
+                            opted_in: boolean;
+                            rank: number;
+                            scale_level_slug?: string | null;
+                            unit?: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                            value?: string | null;
+                        }[];
+                        logged_by_me: boolean;
+                        score?: {
+                            id: string;
+                            name?: string | null;
+                            score_type: string;
+                            unit?: string | null;
+                        } | null;
+                        workout?: {
+                            /** Format: uuid */
+                            id: string;
+                            title: string;
+                            type?: string | null;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.list_invitations": {
         parameters: {
             query?: never;
@@ -20342,16 +22453,16 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        coach_notes: {
-                            /** Format: uuid */
-                            admin_id: string;
-                            /** Format: uuid */
-                            athlete_id: string;
+                        coaching_messages: {
                             body: string;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at: string;
+                            /** Format: uuid */
+                            sender_id: string;
+                            /** Format: uuid */
+                            thread_id: string;
                         }[];
                         gamification: {
                             settings: {
@@ -20373,7 +22484,6 @@ export interface operations {
                             expiration_date?: string | null;
                             /** Format: date */
                             last_paid?: string | null;
-                            notes?: string | null;
                             package_code?: string | null;
                             package_name?: string | null;
                         } | null;
@@ -21592,7 +23702,7 @@ export interface operations {
     "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
-                context_type?: "direct" | "assignment" | "class_slot";
+                context_type?: "direct" | "assignment" | "class_slot" | "box";
             };
             header?: never;
             path?: never;
@@ -21611,7 +23721,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -21651,7 +23761,7 @@ export interface operations {
                      * @default direct
                      * @enum {string}
                      */
-                    context_type?: "direct" | "assignment" | "class_slot";
+                    context_type?: "direct" | "assignment" | "class_slot" | "box";
                     /** Format: uuid */
                     participant_id?: string;
                 };
@@ -21669,7 +23779,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -21735,7 +23845,7 @@ export interface operations {
                             /** Format: uuid */
                             context_id: string | null;
                             /** @enum {string} */
-                            context_type: "direct" | "assignment" | "class_slot";
+                            context_type: "direct" | "assignment" | "class_slot" | "box";
                             /** Format: uuid */
                             created_by_id: string;
                             /** Format: uuid */
@@ -21805,11 +23915,13 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at: string;
                             /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_message" | "box_message" | "system";
                             /** Format: uuid */
                             sender_id: string;
                             /** Format: uuid */
                             thread_id: string;
+                            /** @enum {string|null} */
+                            topic?: "booking" | "payment" | "membership" | "facility" | null;
                         }[];
                     };
                 };
@@ -21842,10 +23954,16 @@ export interface operations {
                     /** Format: uuid */
                     client_operation_id?: string;
                     /**
+                     * @description A coaching message needs an active coaching relationship; in the gym's thread with a member, staff always write a message from the box.
                      * @default chat
                      * @enum {string}
                      */
-                    message_type?: "chat" | "coaching_note";
+                    message_type?: "chat" | "coaching_message" | "box_message";
+                    /**
+                     * @description What a message from the box is about.
+                     * @enum {string}
+                     */
+                    topic?: "booking" | "payment" | "membership" | "facility";
                 };
             };
         };
@@ -21866,11 +23984,13 @@ export interface operations {
                             /** Format: date-time */
                             inserted_at: string;
                             /** @enum {string} */
-                            message_type: "chat" | "coaching_note" | "system";
+                            message_type: "chat" | "coaching_message" | "box_message" | "system";
                             /** Format: uuid */
                             sender_id: string;
                             /** Format: uuid */
                             thread_id: string;
+                            /** @enum {string|null} */
+                            topic?: "booking" | "payment" | "membership" | "facility" | null;
                         };
                     };
                 };
@@ -21963,81 +24083,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        entries: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        }[];
+                        entries: components["schemas"]["TrainingLogEntry"][];
                     };
                 };
             };
@@ -22053,27 +24099,9 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     duration_seconds?: number | null;
-                    exercise_modifications?: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        type?: string;
-                        unit?: string | null;
-                    }[];
                     idempotency_key: string;
-                    notes?: string | null;
                     perceived_effort?: number | null;
                     /** Format: date-time */
                     performed_at: string;
@@ -22088,7 +24116,6 @@ export interface operations {
                         /** @enum {string|null} */
                         load_unit?: "kg" | "lb" | null;
                         name: string;
-                        note?: string | null;
                         reps?: number | null;
                         row_index?: number;
                         sets?: number | null;
@@ -22116,82 +24143,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22202,82 +24154,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22338,82 +24215,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22442,26 +24244,7 @@ export interface operations {
             content: {
                 "application/json": {
                     duration_seconds?: number | null;
-                    exercise_modifications?: {
-                        actual_value: string | number | boolean;
-                        canonical_value: string | number | boolean;
-                        exercise_id?: string | null;
-                        exercise_name?: string | null;
-                        field: string;
-                        interval_index?: number | null;
-                        note?: string | null;
-                        patch_id: string;
-                        round_index?: number | null;
-                        row_index?: number | null;
-                        section_id: string;
-                        section_name?: string | null;
-                        segment_key?: string | null;
-                        set_index?: number | null;
-                        type?: string;
-                        unit?: string | null;
-                    }[];
                     expected_version?: number;
-                    notes?: string | null;
                     perceived_effort?: number | null;
                     /** Format: date-time */
                     performed_at?: string;
@@ -22476,7 +24259,6 @@ export interface operations {
                         /** @enum {string|null} */
                         load_unit?: "kg" | "lb" | null;
                         name: string;
-                        note?: string | null;
                         reps?: number | null;
                         row_index?: number;
                         sets?: number | null;
@@ -22500,82 +24282,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -22634,82 +24341,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** TrainingLogEntry */
-                        entry: {
-                            /** Format: uuid */
-                            booking_id?: string | null;
-                            duration_seconds?: number | null;
-                            exercise_modifications: {
-                                actual_value: string | number | boolean;
-                                canonical_value: string | number | boolean;
-                                exercise_id?: string | null;
-                                exercise_name?: string | null;
-                                field: string;
-                                interval_index?: number | null;
-                                note?: string | null;
-                                patch_id: string;
-                                round_index?: number | null;
-                                row_index?: number | null;
-                                section_id: string;
-                                section_name?: string | null;
-                                segment_key?: string | null;
-                                set_index?: number | null;
-                                type?: string;
-                                unit?: string | null;
-                            }[];
-                            /** Format: uuid */
-                            id: string;
-                            idempotency_key?: string;
-                            /** Format: date-time */
-                            inserted_at?: string;
-                            lock_version: number;
-                            /** Format: uuid */
-                            master_workout_id?: string | null;
-                            notes?: string | null;
-                            /** Format: uuid */
-                            organization_id?: string;
-                            perceived_effort?: number | null;
-                            performed_at_tz?: string;
-                            /** Format: date-time */
-                            performed_at_utc: string;
-                            performed_exercises: {
-                                calories?: number | null;
-                                distance?: number | null;
-                                /** @enum {string|null} */
-                                distance_unit?: "m" | "km" | "mi" | null;
-                                duration_seconds?: number | null;
-                                exercise_ref?: string | null;
-                                load?: number | null;
-                                /** @enum {string|null} */
-                                load_unit?: "kg" | "lb" | null;
-                                name: string;
-                                note?: string | null;
-                                reps?: number | null;
-                                row_index?: number;
-                                sets?: number | null;
-                            }[];
-                            scale_level_slug?: string | null;
-                            section_scores: {
-                                section_id: string;
-                                unit?: string | null;
-                                value: number | string;
-                            }[];
-                            /** Format: uuid */
-                            source_reference_id?: string | null;
-                            /** @enum {string} */
-                            source_type: "class" | "assigned_workout" | "library_workout" | "freeform";
-                            /** @enum {string} */
-                            status: "logged" | "voided";
-                            title: string;
-                            /** Format: date-time */
-                            updated_at?: string;
-                            /** Format: uuid */
-                            user_id?: string;
-                            void_reason?: string | null;
-                            /** Format: date-time */
-                            voided_at?: string | null;
-                            workout_type?: string | null;
-                        };
+                        entry: components["schemas"]["TrainingLogEntry"];
                     };
                 };
             };
@@ -23913,6 +25545,10 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
@@ -23934,6 +25570,10 @@ export interface operations {
             content: {
                 "application/json": {
                     body: string;
+                    /** Format: uuid */
+                    subject_id?: string;
+                    /** @enum {string} */
+                    subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment";
                 };
             };
         };
@@ -23957,9 +25597,44 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.client_journal": {
+        parameters: {
+            query?: {
+                /** @description `next_cursor` of the previous page */
+                cursor?: string;
+                /** @description Comma-separated kinds to list (all when absent) */
+                kinds?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Feed page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: components["schemas"]["JournalFeedItem"][];
+                        next_cursor?: string | null;
                     };
                 };
             };
@@ -24156,6 +25831,10 @@ export interface operations {
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            /** Format: uuid */
+                            subject_id?: string | null;
+                            /** @enum {string|null} */
+                            subject_kind?: "execution" | "training_log" | "pr" | "injury" | "form_review" | "assignment" | null;
                             /** Format: date-time */
                             updated_at?: string;
                         };
@@ -25455,6 +27134,30 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CoachingExtrasController.my_client_stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description My client stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        awaiting_reply: number;
+                        client_count: number;
+                        coaching_messages_this_week: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CoachingExtrasController.reply_queue": {
         parameters: {
             query?: never;
@@ -25521,6 +27224,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -25556,14 +27267,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -25573,10 +27276,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -25596,14 +27315,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -25635,6 +27346,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -25667,14 +27386,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -25705,6 +27416,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -25724,14 +27443,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -25767,14 +27478,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -25788,10 +27491,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -25811,14 +27530,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -25850,6 +27561,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -25882,14 +27601,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -25920,6 +27631,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -25939,14 +27658,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -25982,14 +27693,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -26073,6 +27776,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -26108,14 +27819,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -26125,10 +27828,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26148,14 +27867,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26187,6 +27898,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -26219,14 +27938,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -26257,6 +27968,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26276,14 +27995,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26319,14 +28030,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -26340,10 +28043,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26363,14 +28082,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26402,6 +28113,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -26434,14 +28153,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -26472,6 +28183,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26491,14 +28210,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26534,14 +28245,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -26590,6 +28293,14 @@ export interface operations {
                                 slug?: string;
                                 sort_order?: number;
                             } | null)[];
+                            content?: {
+                                body: string;
+                                document?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** @enum {string} */
+                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                            }[];
                             /** Format: uuid */
                             created_by_id?: string | null;
                             description?: string | null;
@@ -26625,14 +28336,6 @@ export interface operations {
                                 /** @enum {string} */
                                 severity: "error" | "warning";
                             }[];
-                            notes?: {
-                                body: string;
-                                document?: {
-                                    [key: string]: unknown;
-                                } | null;
-                                /** @enum {string} */
-                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                            }[];
                             scale_level?: {
                                 /** Format: uuid */
                                 id?: string | null;
@@ -26642,10 +28345,26 @@ export interface operations {
                                 sort_order?: number;
                             } | null;
                             sections: {
+                                content?: {
+                                    body: string;
+                                    document?: {
+                                        [key: string]: unknown;
+                                    } | null;
+                                    /** @enum {string} */
+                                    type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                }[];
                                 exercises: {
                                     /** Format: uuid */
                                     alternating_group_id?: string | null;
                                     applied_variation?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26665,14 +28384,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26704,6 +28415,14 @@ export interface operations {
                                         sets?: number | null;
                                     } | null;
                                     cluster_rest_seconds?: number | null;
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     description?: string | null;
                                     excluded?: boolean;
                                     exercise_ref?: string | null;
@@ -26736,14 +28455,6 @@ export interface operations {
                                     load_value?: number | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     pacing?: number | null;
                                     prescription_metadata?: {
@@ -26774,6 +28485,14 @@ export interface operations {
                                     superset_group_id?: string | null;
                                     tempo?: string | null;
                                     variations?: {
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         excluded?: boolean;
                                         exercise_name_override?: string | null;
                                         /** Format: uuid */
@@ -26793,14 +28512,6 @@ export interface operations {
                                         } | null;
                                         load_value?: number | null;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         prescription_metadata?: {
                                             [key: string]: unknown;
                                         };
@@ -26836,14 +28547,6 @@ export interface operations {
                                 id?: string | null;
                                 name: string;
                                 note?: string | null;
-                                notes?: {
-                                    body: string;
-                                    document?: {
-                                        [key: string]: unknown;
-                                    } | null;
-                                    /** @enum {string} */
-                                    type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                }[];
                                 order?: number;
                                 /** Format: uuid */
                                 parent_section_id?: string | null;
@@ -26857,10 +28560,26 @@ export interface operations {
                                     [key: string]: unknown;
                                 };
                                 sections?: {
+                                    content?: {
+                                        body: string;
+                                        document?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** @enum {string} */
+                                        type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                    }[];
                                     exercises: {
                                         /** Format: uuid */
                                         alternating_group_id?: string | null;
                                         applied_variation?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -26880,14 +28599,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -26919,6 +28630,14 @@ export interface operations {
                                             sets?: number | null;
                                         } | null;
                                         cluster_rest_seconds?: number | null;
+                                        content?: {
+                                            body: string;
+                                            document?: {
+                                                [key: string]: unknown;
+                                            } | null;
+                                            /** @enum {string} */
+                                            type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                        }[];
                                         description?: string | null;
                                         excluded?: boolean;
                                         exercise_ref?: string | null;
@@ -26951,14 +28670,6 @@ export interface operations {
                                         load_value?: number | null;
                                         name: string;
                                         note?: string | null;
-                                        notes?: {
-                                            body: string;
-                                            document?: {
-                                                [key: string]: unknown;
-                                            } | null;
-                                            /** @enum {string} */
-                                            type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                        }[];
                                         order?: number;
                                         pacing?: number | null;
                                         prescription_metadata?: {
@@ -26989,6 +28700,14 @@ export interface operations {
                                         superset_group_id?: string | null;
                                         tempo?: string | null;
                                         variations?: {
+                                            content?: {
+                                                body: string;
+                                                document?: {
+                                                    [key: string]: unknown;
+                                                } | null;
+                                                /** @enum {string} */
+                                                type: "instructions" | "scaling" | "safety" | "equipment" | "cue" | "coach-brief";
+                                            }[];
                                             excluded?: boolean;
                                             exercise_name_override?: string | null;
                                             /** Format: uuid */
@@ -27008,14 +28727,6 @@ export interface operations {
                                             } | null;
                                             load_value?: number | null;
                                             note?: string | null;
-                                            notes?: {
-                                                body: string;
-                                                document?: {
-                                                    [key: string]: unknown;
-                                                } | null;
-                                                /** @enum {string} */
-                                                type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                            }[];
                                             prescription_metadata?: {
                                                 [key: string]: unknown;
                                             };
@@ -27051,14 +28762,6 @@ export interface operations {
                                     id?: string | null;
                                     name: string;
                                     note?: string | null;
-                                    notes?: {
-                                        body: string;
-                                        document?: {
-                                            [key: string]: unknown;
-                                        } | null;
-                                        /** @enum {string} */
-                                        type: "note" | "coach-note" | "athlete-note" | "safety-note" | "scaling-note" | "equipment-note";
-                                    }[];
                                     order?: number;
                                     /** Format: uuid */
                                     parent_section_id?: string | null;
@@ -28438,7 +30141,6 @@ export interface operations {
                                     id: string;
                                     /** Format: date-time */
                                     inserted_at?: string;
-                                    notes?: string | null;
                                     score: number;
                                     supporting_metrics?: {
                                         [key: string]: unknown;
@@ -28447,7 +30149,6 @@ export interface operations {
                                 /** Format: uuid */
                                 id: string;
                                 name: string;
-                                notes?: string | null;
                                 /** Format: uuid */
                                 organization_id?: string | null;
                                 supporting_metrics?: {
@@ -28500,10 +30201,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score: number;
                     higher_is_better?: boolean;
                     name: string;
-                    notes?: string;
                     /** @description Gym the PR was achieved in (ADR-129). Must be one of the caller's active memberships; the gym's coaches can then read it. Omit for a personal PR. */
                     organization_slug?: string | null;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
@@ -28582,10 +30283,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on?: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score?: number;
                     higher_is_better?: boolean;
                     name?: string;
-                    notes?: string;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
                     /** @enum {string} */
@@ -28639,10 +30340,10 @@ export interface operations {
                 "application/json": {
                     /** Format: date */
                     beaten_on?: string;
+                    comments?: components["schemas"]["JournalCommentInput"][];
                     current_score?: number;
                     higher_is_better?: boolean;
                     name?: string;
-                    notes?: string;
                     /** @description Optional typed result context. Accepted keys: reps, sets, load_kg, duration_seconds, distance_m, calories, rounds, variation. */
                     supporting_metrics?: Record<string, never>;
                     /** @enum {string} */
@@ -28767,6 +30468,132 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CheckInController.index": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Questions and submissions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        check_ins: {
+                            answers: {
+                                note: string | null;
+                                question_key: string;
+                                value: number;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** Format: uuid */
+                            organization_id: string | null;
+                            /** Format: date-time */
+                            recorded_at: string;
+                            recorded_tz: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        questions: {
+                            key: string;
+                            max: number;
+                            min: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CheckInController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    answers: {
+                        note?: string | null;
+                        question_key: string;
+                        value: number;
+                    }[];
+                    organization_slug?: string | null;
+                    recorded_tz?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Check-in */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        check_in: {
+                            answers: {
+                                note: string | null;
+                                question_key: string;
+                                value: number;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** Format: uuid */
+                            organization_id: string | null;
+                            /** Format: date-time */
+                            recorded_at: string;
+                            recorded_tz: string;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CheckInController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "MilosTrainingWeb.WellbeingController.index": {
         parameters: {
             query?: never;
@@ -28786,6 +30613,26 @@ export interface operations {
                         injuries: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -28856,6 +30703,114 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellbeingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body_area?: string;
+                    description?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    severity?: "mild" | "moderate" | "severe";
+                    tags?: string[];
+                    training_limitations?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */
@@ -28919,6 +30874,102 @@ export interface operations {
                         injury: {
                             body_area: string;
                             description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
+                            /** Format: date */
+                            healed_on?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            params: {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            reported_by_id: string;
+                            /** @enum {string} */
+                            reported_by_role: "self" | "admin";
+                            /** @enum {string} */
+                            severity: "mild" | "moderate" | "severe";
+                            /** Format: date */
+                            started_on?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "healed";
+                            tags: string[];
+                            training_limitations?: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            user_id: string;
+                            /** @enum {string} */
+                            visibility: "admin_only" | "user_and_admin";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellbeingController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Injury report */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        injury: {
+                            body_area: string;
+                            description?: string | null;
+                            events: {
+                                /** Format: uuid */
+                                actor_id: string | null;
+                                /** @enum {string} */
+                                event_type: "reported" | "updated" | "marked_healed" | "reopened";
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                occurred_at: string;
+                                payload: {
+                                    changes?: {
+                                        field: string;
+                                        from: unknown;
+                                        to: unknown;
+                                    }[];
+                                    note?: string | null;
+                                } & {
+                                    [key: string]: unknown;
+                                };
+                            }[];
                             /** Format: date */
                             healed_on?: string | null;
                             /** Format: uuid */

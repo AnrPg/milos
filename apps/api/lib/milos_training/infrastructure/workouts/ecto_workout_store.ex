@@ -14,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.AssignedWorkoutAthlete,
     Workouts.Domain.AssignmentAudiencePolicy,
     Workouts.Domain.WorkoutAuthoring,
+    Workouts.Domain.WorkoutContent,
     Workouts.Domain.WorkoutMaterializer,
     Workouts.ExerciseVariation,
     Workouts.MasterWorkout,
@@ -38,7 +39,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           workout =
             workout
             |> Repo.preload(@workout_preloads)
-            |> normalize_workout(note_visibility: :admin)
+            |> normalize_workout(audience: :staff)
 
           {:ok, workout}
 
@@ -139,7 +140,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         published =
           published
           |> Repo.preload(@workout_preloads)
-          |> normalize_workout(note_visibility: :admin)
+          |> normalize_workout(audience: :staff)
           |> Map.merge(authoring_state(published))
 
         {:ok, published}
@@ -203,7 +204,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           estimated_duration_seconds: workout.estimated_duration_seconds,
           equipment: workout.equipment,
           tags: workout.tags,
-          notes: workout.notes,
+          content: workout.content,
           workout_metadata: workout.workout_metadata,
           authoring_mode: workout.authoring_mode,
           dsl_version: workout.dsl_version,
@@ -224,7 +225,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         if workout.status == :published do
           workout
           |> Repo.preload(@workout_preloads)
-          |> normalize_workout(note_visibility: :admin)
+          |> normalize_workout(audience: :staff)
           |> Map.put(:draft_data, workout.draft_data)
           |> Map.merge(authoring_state(workout))
         else
@@ -251,7 +252,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Repo.preload(@workout_preloads)
     |> Enum.map(fn workout ->
       workout
-      |> normalize_workout(note_visibility: :admin)
+      |> normalize_workout(audience: :staff)
       |> Map.update!(:sections, &summarize_sections_for_list/1)
     end)
   end
@@ -531,7 +532,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
         workout_id = Map.get(params, :master_workout_id) || Map.get(params, "master_workout_id")
         scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
-        admin_notes = normalize_admin_notes_input(params)
+        instructions = normalize_instructions_input(params)
 
         source_slot_id =
           Map.get(params, :source_scheduled_class_id) ||
@@ -541,7 +542,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         # date and notes when both share the same source slot, so a class
         # variant never silently loses (or gains) its class link.
         existing =
-          case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+          case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, instructions) do
             %AssignedWorkout{source_scheduled_class_id: ^source_slot_id} = assignment ->
               assignment
 
@@ -583,12 +584,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
       %AssignedWorkout{} = assignment ->
         scheduled_for = Map.get(params, :scheduled_for) || Map.get(params, "scheduled_for")
-        admin_notes = normalize_admin_notes_input(params)
+        instructions = normalize_instructions_input(params)
 
         case find_conflicting_assignment(
                assignment.master_workout_id,
                scheduled_for,
-               admin_notes,
+               instructions,
                assignment.id
              ) do
           nil ->
@@ -1028,8 +1029,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   end
 
   defp normalize_workout(%MasterWorkout{} = workout, opts \\ []) do
-    note_visibility = Keyword.get(opts, :note_visibility, :athlete)
-    sections = normalize_sections(workout.sections, note_visibility: note_visibility)
+    audience = Keyword.get(opts, :audience, :member)
+    sections = normalize_sections(workout.sections, audience: audience)
 
     normalized = %{
       id: workout.id,
@@ -1046,7 +1047,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       estimated_duration_seconds: workout.estimated_duration_seconds,
       equipment: workout.equipment,
       tags: workout.tags,
-      notes: visible_notes(workout.notes, note_visibility),
+      content: visible_content(workout.content, audience),
       workout_metadata: workout.workout_metadata,
       created_by_id: workout.created_by_id,
       folder_id: workout.folder_id,
@@ -1066,7 +1067,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       id: assignment.id,
       master_workout_id: assignment.master_workout_id,
       scheduled_for: Date.to_iso8601(assignment.scheduled_for),
-      admin_notes: assignment.admin_notes,
+      instructions: assignment.instructions,
       inserted_at: assignment.inserted_at,
       athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
       source_slot_id: assignment.source_scheduled_class_id,
@@ -1107,7 +1108,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Map.new(fn {id, [first | _rest]} -> {id, first} end)
   end
 
-  defp normalize_exercise(%WorkoutExercise{} = exercise, note_visibility) do
+  defp normalize_exercise(%WorkoutExercise{} = exercise, audience) do
     %{
       id: exercise.id,
       name: exercise.name,
@@ -1131,18 +1132,22 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       pacing: exercise.pacing,
       interval_assignment: exercise.interval_assignment,
       note: exercise.note,
-      notes: visible_notes(exercise.notes, note_visibility),
+      content:
+        visible_content(
+          WorkoutContent.with_note(exercise.content, exercise.note, item_level(exercise)),
+          audience
+        ),
       prescription_metadata: exercise.prescription_metadata,
-      group_config: visible_group_config(exercise.group_config, note_visibility),
+      group_config: visible_group_config(exercise.group_config, audience),
       order: exercise.order,
       variations:
         exercise.variations
         |> Enum.sort_by(&{&1.scale_level.sort_order || 0, &1.scale_level.slug})
-        |> Enum.map(&normalize_variation(&1, note_visibility))
+        |> Enum.map(&normalize_variation(&1, audience))
     }
   end
 
-  defp normalize_variation(%ExerciseVariation{} = variation, note_visibility) do
+  defp normalize_variation(%ExerciseVariation{} = variation, audience) do
     %{
       id: variation.id,
       exercise_name_override: variation.exercise_name_override,
@@ -1155,7 +1160,11 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       load_progression: variation.load_progression,
       excluded: variation.excluded,
       note: variation.note,
-      notes: visible_notes(variation.notes, note_visibility),
+      content:
+        visible_content(
+          WorkoutContent.with_note(variation.content, variation.note, :variation),
+          audience
+        ),
       prescription_metadata: variation.prescription_metadata,
       scale_level: normalize_scale_level(variation.scale_level)
     }
@@ -1291,7 +1300,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     )
     |> maybe_put(:equipment, get_map_value(draft_data, :equipment))
     |> maybe_put(:tags, get_map_value(draft_data, :tags))
-    |> maybe_put(:notes, get_map_value(draft_data, :notes))
+    |> maybe_put(:content, get_map_value(draft_data, :content))
     |> maybe_put(:workout_metadata, get_map_value(draft_data, :workout_metadata))
   end
 
@@ -1425,24 +1434,24 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       estimated_duration_seconds: workout.estimated_duration_seconds,
       equipment: workout.equipment,
       tags: workout.tags,
-      notes: visible_notes(workout.notes, :athlete),
+      content: visible_content(workout.content, :member),
       workout_metadata: workout.workout_metadata,
       authoring_mode: workout.authoring_mode,
       free_text_body: workout.free_text_body,
       free_text_document: workout.free_text_document,
-      sections: normalize_sections(workout.sections, note_visibility: :athlete)
+      sections: normalize_sections(workout.sections, audience: :member)
     }
   end
 
   defp normalize_sections(sections, opts) do
-    note_visibility = Keyword.get(opts, :note_visibility, :athlete)
+    audience = Keyword.get(opts, :audience, :member)
 
     exercise_mapper =
-      Keyword.get(opts, :exercise_mapper, &normalize_exercise(&1, note_visibility))
+      Keyword.get(opts, :exercise_mapper, &normalize_exercise(&1, audience))
 
     sections
     |> Enum.group_by(& &1.parent_section_id)
-    |> flatten_sections(nil, nil, exercise_mapper, note_visibility)
+    |> flatten_sections(nil, nil, exercise_mapper, audience)
   end
 
   defp flatten_sections(
@@ -1450,7 +1459,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
          parent_section_id,
          inherited_timer_config,
          exercise_mapper,
-         note_visibility
+         audience
        ) do
     grouped_sections
     |> Map.get(parent_section_id, [])
@@ -1468,7 +1477,11 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         score_config: section.score_config,
         timer_config: effective_timer_config,
         note: section.note,
-        notes: visible_notes(section.notes, note_visibility),
+        content:
+          visible_content(
+            WorkoutContent.with_note(section.content, section.note, :section),
+            audience
+          ),
         rest_before_next_section_seconds: section.rest_before_next_section_seconds,
         section_metadata: section.section_metadata,
         exercises:
@@ -1484,7 +1497,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
             section.id,
             effective_timer_config,
             exercise_mapper,
-            note_visibility
+            audience
           )
       ]
     end)
@@ -1682,23 +1695,23 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Enum.map(& &1.athlete_id)
   end
 
-  defp find_assignment_by_workout_date_and_notes(nil, _scheduled_for, _admin_notes), do: nil
-  defp find_assignment_by_workout_date_and_notes(_workout_id, nil, _admin_notes), do: nil
+  defp find_assignment_by_workout_date_and_notes(nil, _scheduled_for, _instructions), do: nil
+  defp find_assignment_by_workout_date_and_notes(_workout_id, nil, _instructions), do: nil
 
-  defp find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, admin_notes) do
+  defp find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, instructions) do
     AssignedWorkout
     |> scoped_to_tenant()
     |> where(
       [assignment],
       assignment.master_workout_id == ^workout_id and assignment.scheduled_for == ^scheduled_for
     )
-    |> maybe_scope_by_admin_notes(admin_notes)
+    |> maybe_scope_by_instructions(instructions)
     |> Repo.one()
   end
 
-  defp find_conflicting_assignment(_master_workout_id, nil, _admin_notes, _current_id), do: nil
+  defp find_conflicting_assignment(_master_workout_id, nil, _instructions, _current_id), do: nil
 
-  defp find_conflicting_assignment(master_workout_id, scheduled_for, admin_notes, current_id) do
+  defp find_conflicting_assignment(master_workout_id, scheduled_for, instructions, current_id) do
     base_query =
       AssignedWorkout
       |> scoped_to_tenant()
@@ -1709,13 +1722,13 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       )
 
     base_query
-    |> maybe_scope_by_admin_notes(admin_notes)
+    |> maybe_scope_by_instructions(instructions)
     |> Repo.one()
   end
 
-  defp normalize_admin_notes_input(params) do
+  defp normalize_instructions_input(params) do
     params
-    |> Map.get(:admin_notes, Map.get(params, "admin_notes"))
+    |> Map.get(:instructions, Map.get(params, "instructions"))
     |> case do
       value when is_binary(value) ->
         case String.trim(value) do
@@ -1728,12 +1741,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     end
   end
 
-  defp maybe_scope_by_admin_notes(query, nil) do
-    where(query, [assignment], is_nil(assignment.admin_notes))
+  defp maybe_scope_by_instructions(query, nil) do
+    where(query, [assignment], is_nil(assignment.instructions))
   end
 
-  defp maybe_scope_by_admin_notes(query, admin_notes) do
-    where(query, [assignment], assignment.admin_notes == ^admin_notes)
+  defp maybe_scope_by_instructions(query, instructions) do
+    where(query, [assignment], assignment.instructions == ^instructions)
   end
 
   defp consolidate_assigned_workouts(
@@ -1796,7 +1809,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "estimated_duration_seconds" => workout.estimated_duration_seconds,
       "equipment" => workout.equipment,
       "tags" => workout.tags,
-      "notes" => workout.notes,
+      "content" => workout.content,
       "workout_metadata" => workout.workout_metadata,
       "sections" => draft_sections_from_db(workout.sections)
     }
@@ -1817,7 +1830,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
         "name" => section.name,
         "subtitle" => section.subtitle,
         "note" => section.note,
-        "notes" => section.notes,
+        "content" => section.content,
         "rest_before_next_section_seconds" => section.rest_before_next_section_seconds,
         "section_metadata" => section.section_metadata,
         "scoreable" => section.scoreable,
@@ -1858,7 +1871,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "pacing" => exercise.pacing,
       "interval_assignment" => exercise.interval_assignment,
       "note" => exercise.note,
-      "notes" => exercise.notes,
+      "content" => exercise.content,
       "prescription_metadata" => exercise.prescription_metadata,
       "group_config" => exercise.group_config,
       "variations" => Enum.map(exercise.variations, &draft_variation_from_db/1)
@@ -1880,28 +1893,24 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       "load_progression" => variation.load_progression,
       "excluded" => variation.excluded,
       "note" => variation.note,
-      "notes" => variation.notes,
+      "content" => variation.content,
       "prescription_metadata" => variation.prescription_metadata
     }
   end
 
-  defp visible_notes(notes, :admin), do: notes || []
+  defp visible_content(content, audience), do: WorkoutContent.visible(content, audience)
 
-  defp visible_notes(notes, _visibility) do
-    Enum.reject(notes || [], fn note ->
-      type = Map.get(note, "type") || Map.get(note, :type)
-      type == "coach-note"
-    end)
-  end
+  defp item_level(%WorkoutExercise{item_type: :header}), do: :header
+  defp item_level(_exercise), do: :exercise
 
-  defp visible_group_config(nil, _visibility), do: nil
+  defp visible_group_config(nil, _audience), do: nil
 
-  defp visible_group_config(config, visibility) do
-    notes = Map.get(config, "notes") || Map.get(config, :notes) || []
+  defp visible_group_config(config, audience) do
+    content = Map.get(config, "content") || Map.get(config, :content) || []
 
     config
     |> stringify_keys_deep()
-    |> Map.put("notes", visible_notes(notes, visibility))
+    |> Map.put("content", visible_content(content, audience))
   end
 
   defp blank?(value), do: is_nil(value) or String.trim(to_string(value)) == ""
@@ -2038,7 +2047,8 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       assignment_id: assignment.id,
       master_workout_id: assignment.master_workout_id,
       athlete_status: link.athlete_status,
-      organization_id: assignment.organization_id
+      organization_id: assignment.organization_id,
+      instructions: assignment.instructions
     })
     |> Repo.one()
     |> case do

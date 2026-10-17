@@ -40,7 +40,7 @@ defmodule MilosTrainingWeb.TrainingLogControllerTest do
         timezone: "Europe/Athens",
         duration_seconds: 2400,
         perceived_effort: 7,
-        notes: "Sand sprints",
+        comments: [%{id: Ecto.UUID.generate(), body: "Sand sprints"}],
         idempotency_key: "api-" <> Ecto.UUID.generate(),
         performed_exercises: [
           %{name: "Sprint", sets: 8, distance: 100, distance_unit: "m"},
@@ -96,24 +96,27 @@ defmodule MilosTrainingWeb.TrainingLogControllerTest do
       |> get(log_path(organization, "/entries/#{id}"))
       |> json_response(200)
 
-    assert shown["entry"]["notes"] == "Sand sprints"
+    # The comment written with the entry was saved once, replay included.
+    assert [%{"body" => "Sand sprints", "entry_kind" => "training_log"}] =
+             shown["entry"]["comments"]
 
     updated =
       build_conn()
       |> put_bearer_token(member)
       |> patch(log_path(organization, "/entries/#{id}"), %{
-        notes: "Sand sprints + swim",
+        perceived_effort: 8,
         expected_version: entry["lock_version"]
       })
       |> json_response(200)
 
-    assert updated["entry"]["notes"] == "Sand sprints + swim"
+    assert updated["entry"]["perceived_effort"] == 8
+    assert [%{"body" => "Sand sprints"}] = updated["entry"]["comments"]
 
     stale =
       build_conn()
       |> put_bearer_token(member)
       |> patch(log_path(organization, "/entries/#{id}"), %{
-        notes: "stale",
+        perceived_effort: 2,
         expected_version: entry["lock_version"]
       })
       |> json_response(409)
@@ -132,7 +135,7 @@ defmodule MilosTrainingWeb.TrainingLogControllerTest do
     frozen =
       build_conn()
       |> put_bearer_token(member)
-      |> patch(log_path(organization, "/entries/#{id}"), %{notes: "after void"})
+      |> patch(log_path(organization, "/entries/#{id}"), %{perceived_effort: 3})
       |> json_response(409)
 
     assert frozen["code"] == "training_log_entry_voided"

@@ -28,6 +28,9 @@ export type RoleAccess = RoleAccessResponse;
 export type CoachingRelationship = RelationshipsResponse["relationships"][number];
 export type CoachNote = NotesResponse["notes"][number];
 export type CoachNoteRead = ReadsResponse["reads"][number];
+/** What a coach note is about, when it is about one thing (ADR-140 §5). */
+export type CoachNoteSubjectKind = NonNullable<CoachNote["subject_kind"]>;
+export type CoachNoteSubject = { kind: CoachNoteSubjectKind; id: string };
 export type CleaningArea = AreasResponse["areas"][number];
 export type CleaningEntry = EntriesResponse["entries"][number];
 export type MembershipStatus = MembershipStatusResponse["membership_status"];
@@ -89,6 +92,17 @@ export async function archiveOrganization(token: string, confirm: string) {
   });
 }
 
+export type MyClientStats = {
+  client_count: number;
+  coaching_messages_this_week: number;
+  awaiting_reply: number;
+};
+
+/** Πελάτες μου stats for the signed-in coach (ADR-140 §7). */
+export async function fetchMyClientStats(token: string) {
+  return apiRequest<MyClientStats>("/staff/my-client-stats", { token });
+}
+
 export async function fetchCoachingRelationships(token: string, filter: { coachUserId?: string; clientUserId?: string } = {}) {
   const params = new URLSearchParams();
   if (filter.coachUserId) params.set("coach_user_id", filter.coachUserId);
@@ -117,11 +131,11 @@ export async function fetchCoachNotes(token: string, clientUserId: string) {
   return response.notes;
 }
 
-export async function createCoachNote(token: string, clientUserId: string, body: string) {
+export async function createCoachNote(token: string, clientUserId: string, body: string, subject?: CoachNoteSubject | null) {
   const response = await apiRequest<NoteResponse>(`/staff/clients/${clientUserId}/coach-notes`, {
     method: "POST",
     token,
-    body: { body },
+    body: { body, ...(subject ? { subject_kind: subject.kind, subject_id: subject.id } : {}) },
   });
   return response.note;
 }

@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.GetWorkoutExecution do
+  alias MilosTraining.Application.JournalComments
   alias MilosTraining.Execution
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.{Organizations, Workouts}
@@ -9,7 +10,10 @@ defmodule MilosTraining.Application.GetWorkoutExecution do
     ExecutionStore.with_authorization_context(context, fn ->
       with %{} = execution <- Execution.get_execution(execution_id) || {:error, :not_found},
            :ok <- authorize_execution_access(execution, actor) do
-        {:ok, attach_workout_summary(execution, execution_context(context, execution, actor))}
+        {:ok,
+         execution
+         |> JournalComments.attach("execution")
+         |> attach_workout_summary(execution_context(context, execution, actor))}
       end
     end)
   end
@@ -18,7 +22,10 @@ defmodule MilosTraining.Application.GetWorkoutExecution do
     ExecutionStore.with_user_context(%{user_id: actor.id, account: actor}, fn ->
       with %{} = execution <-
              Execution.get_execution_for_user(execution_id, actor.id) || {:error, :not_found} do
-        {:ok, attach_workout_summary(execution, execution_context(nil, execution, actor))}
+        {:ok,
+         execution
+         |> JournalComments.attach("execution")
+         |> attach_workout_summary(execution_context(nil, execution, actor))}
       end
     end)
   end

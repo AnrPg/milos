@@ -17,6 +17,14 @@ vi.mock("@/api/gamification", async (importOriginal) => {
 
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
+  useFormatter: () => ({ dateTime: () => "" }),
+}));
+
+vi.mock("@/hooks/useJournalCommentWriter", () => ({
+  useJournalCommentWriter: () => ({
+    save: vi.fn(async (comment: unknown) => ({ comment, synced: true })),
+    remove: vi.fn(async () => undefined),
+  }),
 }));
 
 vi.mock("@/components/session-provider", () => ({
@@ -38,7 +46,7 @@ const pr: PRRecord = {
   higher_is_better: true,
   beaten_on: "2026-07-01",
   supporting_metrics: {},
-  notes: null,
+  comments: [],
   inserted_at: "2026-07-01T10:00:00Z",
   updated_at: "2026-07-01T10:00:00Z",
 };
@@ -86,6 +94,18 @@ describe("PRFormModal", () => {
 
     await waitFor(() => expect(editPR).toHaveBeenCalledOnce());
     expect(updatePR).not.toHaveBeenCalled();
+  });
+
+  it("sends a written comment with the PR so both are saved together", async () => {
+    renderModal();
+
+    fireEvent.change(screen.getByLabelText("commentOptional"), { target: { value: "  Belt on  " } });
+    fireEvent.click(screen.getByRole("button", { name: "applyPrEdits" }));
+
+    await waitFor(() => expect(editPR).toHaveBeenCalledOnce());
+    expect(editPR.mock.calls[0][2].comments).toEqual([
+      { id: expect.any(String), body: "Belt on", tags: [] },
+    ]);
   });
 
   it("records a new result when a better PR is submitted", async () => {

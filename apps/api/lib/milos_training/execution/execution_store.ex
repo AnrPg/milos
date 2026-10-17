@@ -46,6 +46,21 @@ defmodule MilosTraining.Execution.ExecutionStore do
   def last_progress_at(execution_id), do: adapter().last_progress_at(execution_id)
 
   @impl true
+  def list_execution_items(user_id, bound, limit, scope),
+    do: adapter().list_execution_items(user_id, bound, limit, scope)
+
+  @impl true
+  def set_execution_visibility(id, user_id, rung),
+    do: adapter().set_execution_visibility(id, user_id, rung)
+
+  @impl true
+  def move_executions(user_id, from, to), do: adapter().move_executions(user_id, from, to)
+
+  @impl true
   def progress_operation_applied?(execution_id, user_id, operation_id),
     do: adapter().progress_operation_applied?(execution_id, user_id, operation_id)
+
+  @impl true
+  def list_completed_for_workout(organization_id, workout_id, from, to),
+    do: adapter().list_completed_for_workout(organization_id, workout_id, from, to)
 end

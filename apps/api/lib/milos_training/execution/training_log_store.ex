@@ -54,4 +54,19 @@ defmodule MilosTraining.Execution.TrainingLogStore do
   @impl true
   def list_live_source_reference_ids(user_id, source_type),
     do: adapter().list_live_source_reference_ids(user_id, source_type)
+
+  @impl true
+  def list_entry_items(user_id, bound, limit, scope),
+    do: adapter().list_entry_items(user_id, bound, limit, scope)
+
+  @impl true
+  def set_entry_visibility(id, user_id, rung),
+    do: adapter().set_entry_visibility(id, user_id, rung)
+
+  @impl true
+  def move_entries(user_id, from, to), do: adapter().move_entries(user_id, from, to)
+
+  @impl true
+  def list_for_workout(organization_id, workout_id, from, to),
+    do: adapter().list_for_workout(organization_id, workout_id, from, to)
 end

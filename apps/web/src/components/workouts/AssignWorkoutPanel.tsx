@@ -35,7 +35,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
   const [slots, setSlots] = useState<ScheduleSlot[]>([]);
   const [selectedSlotId, setSelectedSlotId] = useState("");
   const [scheduledFor, setScheduledFor] = useState(() => formatLocalDate(new Date()));
-  const [adminNotes, setAdminNotes] = useState("");
+  const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(true);
   const [athletesLoading, setAthletesLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -130,7 +130,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
         master_workout_id: workoutId,
         athlete_ids: selectedIds,
         scheduled_for: scheduledFor,
-        admin_notes: adminNotes.trim() || undefined,
+        instructions: instructions.trim() || undefined,
       });
 
       onAssigned();
@@ -231,6 +231,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               <div className="mt-3">
                 <WorkoutPreviewDetail
                   sections={workout.sections}
+                  content={workout.content}
                   initiallyExpanded
                   hideScaleChips
                   authoringMode={workout.authoring_mode}
@@ -347,7 +348,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
           {/* Admin notes */}
           <label className="block">
             <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
-              {i18n("adminNotesdff73a2")}
+              {i18n("instructionsdff73a2")}
             </span>
             <textarea
               className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
@@ -358,9 +359,9 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 minHeight: "5rem",
                 resize: "vertical",
               }}
-              onChange={(e) => setAdminNotes(e.target.value)}
+              onChange={(e) => setInstructions(e.target.value)}
               placeholder={i18n("optionalProgrammingContextOrCuesa25eaae")}
-              value={adminNotes}
+              value={instructions}
             />
           </label>
         </div>

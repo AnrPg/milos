@@ -36,3 +36,4 @@ docs/HANDOFF_CODEX.md
 .env
 .env.local
 *.secret
+.DS_Store

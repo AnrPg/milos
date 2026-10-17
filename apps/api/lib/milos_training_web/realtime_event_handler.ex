@@ -19,7 +19,6 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "notifications:changed")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "user:sync")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "execution:progress_updated")
-    Phoenix.PubSub.subscribe(MilosTraining.PubSub, "workout:note_submitted")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "workout:completed")
     Phoenix.PubSub.subscribe(MilosTraining.PubSub, "class_timer:updated")
     {:ok, %{}}
@@ -115,11 +114,6 @@ defmodule MilosTrainingWeb.RealtimeEventHandler do
 
   def handle_info({:execution_progress_updated, execution}, state) do
     Realtime.broadcast_execution_progress(execution)
-    {:noreply, state}
-  end
-
-  def handle_info({:workout_note_submitted, note_payload}, state) do
-    Realtime.broadcast_execution_note(note_payload.execution_id, note_payload)
     {:noreply, state}
   end
 

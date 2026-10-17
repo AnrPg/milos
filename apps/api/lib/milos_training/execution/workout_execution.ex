@@ -28,11 +28,11 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     field(:segment_cycle_counts, :map, default: %{})
     field(:checked_exercise_ids, {:array, :string}, default: [])
     field(:section_scores, {:array, :map}, default: [])
-    field(:exercise_notes, {:array, :map}, default: [])
-    field(:exercise_modifications, {:array, :map}, default: [])
     field(:lock_version, :integer, default: 1)
     field(:kpi_counters, :map, default: %{})
     field(:duration_adjustments, :map, default: %{})
+    # ADR-139 ladder rung, set at start from the member's `workout` default.
+    field(:journal_visibility, :string, default: "coach_can_view")
 
     timestamps(updated_at: false)
   end
@@ -55,7 +55,8 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :resume_countdown_ends_at_utc,
       :total_elapsed_ms,
       :section_elapsed_ms,
-      :segment_cycle_counts
+      :segment_cycle_counts,
+      :journal_visibility
     ])
     |> validate_required([:user_id, :started_at_utc, :source, :status])
     |> validate_inclusion(:source, @sources)
@@ -65,6 +66,13 @@ defmodule MilosTraining.Execution.WorkoutExecution do
     |> validate_number(:total_elapsed_ms, greater_than_or_equal_to: 0)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:master_workout_id)
+  end
+
+  @doc "Moves the entry on the journal ladder (ADR-139)."
+  def visibility_changeset(%__MODULE__{} = entry, rung) do
+    entry
+    |> change(journal_visibility: rung)
+    |> check_constraint(:journal_visibility, name: :workout_executions_journal_visibility_check)
   end
 
   def complete_changeset(execution, params) do
@@ -82,7 +90,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :segment_cycle_counts,
       :checked_exercise_ids,
       :section_scores,
-      :exercise_notes,
       :kpi_counters,
       :duration_adjustments
     ])
@@ -106,8 +113,6 @@ defmodule MilosTraining.Execution.WorkoutExecution do
       :segment_cycle_counts,
       :checked_exercise_ids,
       :section_scores,
-      :exercise_notes,
-      :exercise_modifications,
       :kpi_counters,
       :duration_adjustments
     ])

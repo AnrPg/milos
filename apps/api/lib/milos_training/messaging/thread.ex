@@ -2,7 +2,9 @@ defmodule MilosTraining.Messaging.Thread do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @context_types [:direct, :assignment, :class_slot]
+  # `box`: the gym's thread with one member (context_id is the member);
+  # any permitted staff member can continue it (ADR-140 §6).
+  @context_types [:direct, :assignment, :class_slot, :box]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

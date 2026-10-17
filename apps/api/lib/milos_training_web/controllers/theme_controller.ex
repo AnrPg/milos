@@ -9,7 +9,7 @@ defmodule MilosTrainingWeb.ThemeController do
 
   tags(["Theme"])
 
-  @theme_slugs ~w(ember sage steel aurora royal volt noir daybreak paper lagoon sunset)
+  @theme_slugs MilosTraining.Themes.slugs()
 
   @theme_schema %Schema{
     type: :object,

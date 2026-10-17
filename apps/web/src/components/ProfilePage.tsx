@@ -7,23 +7,18 @@
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 
 import { SESSION_UPDATED_EVENT } from "@/api/client";
 import { signOutAllDevices } from "@/api/auth";
-import { fetchMyReviews } from "@/api/reviews";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
-import { fetchGamificationPreferences, updateGamificationPreferences } from "@/api/gamification";
-import { ReviewList } from "@/components/my-reviews";
-import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
-import { WorkoutVault } from "@/components/client/WorkoutVault";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
+import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
-import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
-import { useSelectedMembershipRole } from "@/lib/membership-role";
 import {
   isAppLocale,
   LOCALE_NAMES,
@@ -33,61 +28,8 @@ import {
 } from "@/i18n/locales";
 import { PageHeader } from "@/components/PageHeader";
 import { ReplayTourButton } from "@/components/onboarding/Onboarding";
-import { TrainingHistory } from "@/components/history/TrainingHistory";
-import { defaultHistoryKind } from "@/lib/training-history";
-import { fetchMyTrainingHistory } from "@/api/training-history";
-
-function CollapsibleSection({
-  id,
-  title,
-  description,
-  defaultOpen = false,
-  children,
-}: {
-  id: string;
-  title: string;
-  description?: string;
-  defaultOpen?: boolean;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(defaultOpen);
-
-  return (
-    <section
-      id={id}
-      className="overflow-hidden rounded-[2.4rem]"
-      style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-    >
-      <button
-        className="flex w-full items-center justify-between gap-4 p-8 text-start"
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-      >
-        <div>
-          <p
-            className="text-sm font-semibold uppercase tracking-[0.24em]"
-            style={{ color: "var(--primary)" }}
-          >
-            {title}
-          </p>
-          {description && (
-            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>
-              {description}
-            </p>
-          )}
-        </div>
-        <span className="text-xl font-light" style={{ color: "var(--dim)" }}>
-          {open ? "−" : "+"}
-        </span>
-      </button>
-      {open && (
-        <div className="border-t px-8 pb-8 pt-6" style={{ borderColor: "var(--border)" }}>
-          {children}
-        </div>
-      )}
-    </section>
-  );
-}
+import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
+import { ThemeSetting } from "@/components/profile/ThemeSetting";
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -126,33 +68,11 @@ type CurrentUserWithAvatar = {
 export function ProfilePage() {
   const i18n = useUiTranslations();
   const locale = useLocale();
-  const dayLabels = Array.from({ length: 7 }, (_, dayOffset) =>
-    new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: "UTC" }).format(
-      new Date(Date.UTC(2024, 0, 7 + dayOffset)),
-    ),
-  );
   const tProfile = useTranslations("Profile");
-  const tPrSharing = useTranslations("PrSharing");
+  const tMe = useTranslations("MemberApp");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
-  const showSelfServiceSurfaces = showsTenantSelfServiceSurfaces(user);
-  const { role: surfaceRole, membership } = useSelectedMembershipRole();
-  // Clients (members and athletes) get a Vault of completed workouts (ADR-098).
-  const showVault = showSelfServiceSurfaces && Boolean(membership) && surfaceRole !== "admin";
-  const [profileTab, setProfileTab] = useState<"account" | "vault">(() =>
-    typeof window !== "undefined" && window.location.hash === "#vault" ? "vault" : "account",
-  );
-  const activeProfileTab = showVault ? profileTab : "account";
-
-  useEffect(() => {
-    function syncFromHash() {
-      if (window.location.hash === "#vault") setProfileTab("vault");
-    }
-    // Client-side navigation can set the hash after the first render.
-    syncFromHash();
-    window.addEventListener("hashchange", syncFromHash);
-    return () => window.removeEventListener("hashchange", syncFromHash);
-  }, []);
+  useLegacySectionRedirects();
   const push = usePushNotifications(tokens?.access_token);
 
   const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
@@ -172,45 +92,6 @@ export function ProfilePage() {
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const queryClient = useQueryClient();
-
-  const reviewsQuery = useQuery({
-    queryKey: ["my", "reviews"],
-    enabled: Boolean(tokens?.access_token) && showSelfServiceSurfaces,
-    queryFn: async () => fetchMyReviews(tokens!.access_token),
-  });
-
-  const prefsQuery = useQuery({
-    queryKey: ["gamification", "preferences"],
-    enabled: Boolean(tokens?.access_token) && showSelfServiceSurfaces,
-    queryFn: async () => fetchGamificationPreferences(tokens!.access_token),
-  });
-
-  const [offDaysDraft, setOffDaysDraft] = useState<number[] | null>(null);
-  const offDays = offDaysDraft ?? prefsQuery.data?.off_days ?? [];
-
-  const updatePrefsMutation = useMutation({
-    mutationFn: async (days: number[]) => {
-      if (!tokens) throw new Error(i18n("notAuthenticated0c91acb"));
-      return updateGamificationPreferences(tokens.access_token, { off_days: days });
-    },
-    onSuccess: (data) => {
-      void queryClient.invalidateQueries({ queryKey: ["gamification", "preferences"] });
-      void queryClient.invalidateQueries({ queryKey: ["landing"] });
-      setOffDaysDraft(data.off_days);
-    },
-  });
-
-  function toggleOffDay(dow: number) {
-    const current = offDays;
-    const next = current.includes(dow)
-      ? current.filter((d) => d !== dow)
-      : current.length >= 3
-        ? current
-        : [...current, dow];
-    setOffDaysDraft(next);
-    updatePrefsMutation.mutate(next);
-  }
 
   function broadcastUserUpdate(updatedUser: Partial<CurrentUserWithAvatar> & { id: string }) {
     if (!tokens) return;
@@ -337,38 +218,17 @@ export function ProfilePage() {
       <div className="mx-auto max-w-3xl space-y-4">
         <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
 
-        {showVault ? (
-          <div role="tablist" aria-label={tProfile("eyebrow")} className="flex gap-1 rounded-full p-1" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            {(["account", "vault"] as const).map((tab) => (
-              <button
-                key={tab}
-                id={`profile-tab-${tab}`}
-                type="button"
-                role="tab"
-                aria-selected={activeProfileTab === tab}
-                aria-controls={`profile-panel-${tab}`}
-                onClick={() => {
-                  setProfileTab(tab);
-                  window.history.replaceState(null, "", tab === "vault" ? "#vault" : window.location.pathname);
-                }}
-                className="flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                style={{
-                  background: activeProfileTab === tab ? "var(--border)" : "transparent",
-                  color: activeProfileTab === tab ? "var(--text)" : "var(--dim)",
-                }}
-              >
-                {tab === "vault" ? i18n("clProfileTabVault") : i18n("clProfileTabAccount")}
-              </button>
-            ))}
-          </div>
-        ) : null}
-
-        {activeProfileTab === "vault" ? (
-          <div id="profile-panel-vault" role="tabpanel" aria-labelledby="profile-tab-vault">
-            <WorkoutVault />
-          </div>
-        ) : (
-        <div id="profile-panel-account" role={showVault ? "tabpanel" : undefined} aria-labelledby={showVault ? "profile-tab-account" : undefined} className="space-y-4">
+        <Link
+          href="/me/sharing"
+          className="flex items-center justify-between gap-4 rounded-[2.4rem] p-8"
+          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+        >
+          <span>
+            <span className="block text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>{tMe("meSharing")}</span>
+            <span className="mt-1 block text-sm" style={{ color: "var(--muted)" }}>{tMe("meSharingHint")}</span>
+          </span>
+          <span aria-hidden="true" className="text-xl" style={{ color: "var(--dim)" }}>›</span>
+        </Link>
 
         <div className="flex justify-end">
           <button
@@ -382,14 +242,6 @@ export function ProfilePage() {
           </button>
         </div>
 
-        {tokens?.access_token && showSelfServiceSurfaces && (user?.role === "member" || user?.role === "athlete") ? (
-          <TrainingHistory
-            id="history"
-            queryKey={["me", user.id]}
-            fetchPage={(kind, offset) => fetchMyTrainingHistory(tokens.access_token, kind, offset)}
-            defaultKind={defaultHistoryKind(user.role)}
-          />
-        ) : null}
 
         <CollapsibleSection
           id="language-region"
@@ -428,6 +280,12 @@ export function ProfilePage() {
             </p>
           ) : null}
         </CollapsibleSection>
+
+        <CollapsibleSection id="theme" title={tProfile("themeTitle")} description={tProfile("themeDescription")}>
+          <ThemeSetting />
+        </CollapsibleSection>
+
+        <OutboxSettingsCard />
 
         <CollapsibleSection
           id="security"
@@ -543,57 +401,6 @@ export function ProfilePage() {
           </form>
         </CollapsibleSection>
 
-        {showSelfServiceSurfaces ? (
-          <CollapsibleSection
-            id="training-schedule"
-            title={i18n("trainingSchedule80e51e2")}
-            description={i18n("markYourWeeklyRestDaysUpTo5ee5b72a")}
-          >
-            <div className="space-y-5">
-              <p className="text-sm" style={{ color: "var(--muted)" }}>
-                {i18n("offDaysAreTransparentToYourStreakMissingb808660")}
-              </p>
-              <div className="flex flex-wrap gap-2">
-                {dayLabels.map((label, dow) => {
-                  const selected = offDays.includes(dow);
-                  const disabled = !selected && offDays.length >= 5;
-                  return (
-                    <button
-                      key={dow}
-                      type="button"
-                      disabled={disabled || updatePrefsMutation.isPending}
-                      onClick={() => toggleOffDay(dow)}
-                      className="rounded-xl px-4 py-2 text-sm font-semibold transition-opacity disabled:opacity-40"
-                      style={{
-                        background: selected ? "var(--primary)" : "var(--panel-muted)",
-                        color: selected ? "var(--primary-contrast)" : "var(--text-soft)",
-                        border: selected
-                          ? "1px solid var(--primary)"
-                          : "1px solid var(--border)",
-                      }}
-                    >
-                      {label}
-                    </button>
-                  );
-                })}
-              </div>
-              {updatePrefsMutation.isError && (
-                <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-                  {i18n("failedToSavePleaseTryAgainb68b7e7")}
-                </p>
-              )}
-            </div>
-          </CollapsibleSection>
-        ) : null}
-
-        <CollapsibleSection
-          id="pr-sharing"
-          title={tPrSharing("settingsTitle")}
-          description={tPrSharing("settingsDescription")}
-        >
-          <PRSharingSettings />
-        </CollapsibleSection>
-
         <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
           <div className="space-y-5">
             {avatarPreview && (
@@ -659,29 +466,28 @@ export function ProfilePage() {
           />
         ) : null}
 
-        {showSelfServiceSurfaces ? (
-          <CollapsibleSection
-            id="account-activity"
-            title={i18n("accountActivity2263296")}
-            description={i18n("yourReviewsAndHistory4a3fb33")}
-          >
-            <div className="space-y-4">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--muted)" }}>
-                {i18n("myReviewsHistorycdeb034")}
-              </p>
-              {reviewsQuery.isLoading ? (
-                <p className="text-sm" style={{ color: "var(--dim)" }}>
-                  {i18n("loadingReviews1c4171c")}
-                </p>
-              ) : (
-                <ReviewList reviews={(reviewsQuery.data?.reviews ?? []) as Parameters<typeof ReviewList>[0]["reviews"]} />
-              )}
-            </div>
-          </CollapsibleSection>
-        ) : null}
-        </div>
-        )}
       </div>
     </main>
   );
 }
+
+/**
+ * Sections that left Ρυθμίσεις in ADR-137 keep working from old links:
+ * the Vault and training history live in Ημερολόγιο › Vault, PR sharing and
+ * rest days in Εγώ › Κοινοποίηση & ορατότητα.
+ */
+function useLegacySectionRedirects() {
+  const router = useRouter();
+  useEffect(() => {
+    const target = LEGACY_SECTION_TARGETS[window.location.hash];
+    if (target) router.replace(target);
+  }, [router]);
+}
+
+const LEGACY_SECTION_TARGETS: Record<string, string> = {
+  "#vault": "/journal/vault",
+  "#history": "/journal/vault#history",
+  "#pr-sharing": "/me/sharing#pr-sharing",
+  "#training-schedule": "/me/sharing#training-schedule",
+  "#account-activity": "/journal/reviews",
+};

@@ -654,11 +654,12 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
       |> json_response(400)
     end
 
-    test "submitting a note persists it and creates admin notifications", %{conn: conn} do
-      admin = create_admin!("execution_note_admin")
-      athlete_conn = authenticate_as_member(conn, "execution_note_athlete")
+    test "comments on an execution are one list, upserted by id and by change, without notifying staff",
+         %{conn: conn} do
+      admin = create_admin!("execution_comment_admin")
+      athlete_conn = authenticate_as_member(conn, "execution_comment_athlete")
       workout = workout_with_scale!(admin)
-
+      section_id = workout.sections |> hd() |> Map.fetch!(:id)
       exercise_id = workout.sections |> hd() |> Map.fetch!(:exercises) |> hd() |> Map.fetch!(:id)
 
       execution_id =
@@ -671,49 +672,107 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
         |> json_response(201)
         |> get_in(["execution", "id"])
 
-      response =
+      note_id = Ecto.UUID.generate()
+
+      comment =
         athlete_conn
         |> recycle()
-        |> post("/api/executions/#{execution_id}/notes", %{
+        |> json_put("/api/journal/comments/#{note_id}", %{
+          entry_kind: "execution",
+          entry_id: execution_id,
           exercise_id: exercise_id,
           selected_text: "Thruster",
           selection_start: 0,
           selection_end: 8,
           tags: ["form"],
-          note_text: "Needed more rest"
+          body: "Needed more rest"
         })
         |> json_response(200)
+        |> Map.fetch!("comment")
 
-      assert response["execution"]["exercise_notes"] == [
-               %{
-                 "exercise_id" => exercise_id,
-                 "id" => response["execution"]["exercise_notes"] |> hd() |> Map.fetch!("id"),
-                 "inserted_at" =>
-                   response["execution"]["exercise_notes"] |> hd() |> Map.fetch!("inserted_at"),
-                 "note_text" => "Needed more rest",
-                 "selected_text" => "Thruster",
-                 "selection_end" => 8,
-                 "selection_start" => 0,
-                 "tags" => ["form"],
-                 "updated_at" =>
-                   response["execution"]["exercise_notes"] |> hd() |> Map.fetch!("updated_at")
-               }
-             ]
+      assert %{"id" => ^note_id, "body" => "Needed more rest", "tags" => ["form"]} = comment
 
-      notifications = wait_for_notifications(admin.id)
+      change = %{
+        patch_id: "segment:0:#{exercise_id}:1:reps",
+        section_id: section_id,
+        exercise_id: exercise_id,
+        set_index: 1,
+        field: "reps",
+        canonical_value: 10,
+        actual_value: 8,
+        note: "Grip gave out"
+      }
 
-      assert Enum.any?(notifications, fn notification ->
-               notification.type == "workout_note" and
-                 notification.payload["execution_id"] == execution_id and
-                 get_in(notification.payload, ["note", "selected_text"]) == "Thruster"
-             end)
+      [first_change] =
+        athlete_conn
+        |> recycle()
+        |> json_post("/api/journal/comments/batch", %{
+          comments: [
+            %{
+              id: Ecto.UUID.generate(),
+              entry_kind: "execution",
+              entry_id: execution_id,
+              change: change
+            }
+          ]
+        })
+        |> json_response(200)
+        |> Map.fetch!("comments")
+
+      assert first_change["body"] == "Grip gave out"
+      assert first_change["change"]["type"] == "reps_changed"
+      refute Map.has_key?(first_change["change"], "note")
+
+      # The same change from another surface updates the same comment.
+      [second_change] =
+        athlete_conn
+        |> recycle()
+        |> json_post("/api/journal/comments/batch", %{
+          comments: [
+            %{
+              id: Ecto.UUID.generate(),
+              entry_kind: "execution",
+              entry_id: execution_id,
+              change: %{change | actual_value: 7}
+            }
+          ]
+        })
+        |> json_response(200)
+        |> Map.fetch!("comments")
+
+      assert second_change["id"] == first_change["id"]
+      assert second_change["change"]["actual_value"] == 7
+
+      comments =
+        athlete_conn
+        |> recycle()
+        |> get("/api/executions/#{execution_id}")
+        |> json_response(200)
+        |> get_in(["execution", "comments"])
+
+      assert Enum.map(comments, & &1["id"]) == [note_id, first_change["id"]]
+
+      athlete_conn
+      |> recycle()
+      |> delete("/api/journal/comments/#{note_id}")
+      |> response(204)
+
+      assert [%{"id" => remaining}] =
+               athlete_conn
+               |> recycle()
+               |> get("/api/executions/#{execution_id}")
+               |> json_response(200)
+               |> get_in(["execution", "comments"])
+
+      assert remaining == first_change["id"]
+      assert Notifications.list_for_user(admin.id) == []
     end
 
-    test "submitting a note rejects exercises and text ranges outside the workout", %{conn: conn} do
-      admin = create_admin!("note_validation_admin")
-      athlete_conn = authenticate_as_member(conn, "note_validation_member")
+    test "comments are only written by the entry's owner and validate their change", %{conn: conn} do
+      admin = create_admin!("comment_validation_admin")
+      athlete_conn = authenticate_as_member(conn, "comment_validation_member")
+      other_conn = authenticate_as_member(build_conn(), "comment_validation_other")
       workout = workout_with_scale!(admin)
-      exercise_id = workout.sections |> hd() |> Map.fetch!(:exercises) |> hd() |> Map.fetch!(:id)
 
       execution_id =
         athlete_conn
@@ -725,44 +784,39 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
         |> json_response(201)
         |> get_in(["execution", "id"])
 
+      other_conn
+      |> json_put("/api/journal/comments/#{Ecto.UUID.generate()}", %{
+        entry_kind: "execution",
+        entry_id: execution_id,
+        body: "Not mine"
+      })
+      |> json_response(404)
+
       athlete_conn
       |> recycle()
-      |> post("/api/executions/#{execution_id}/notes", %{
-        exercise_id: Ecto.UUID.generate(),
-        selected_text: "Thruster",
-        selection_start: 0,
-        selection_end: 8,
-        tags: ["form"]
+      |> json_put("/api/journal/comments/#{Ecto.UUID.generate()}", %{
+        entry_kind: "execution",
+        entry_id: execution_id,
+        change: %{
+          patch_id: "x",
+          section_id: "s",
+          field: "reps",
+          canonical_value: 5,
+          actual_value: 5
+        }
       })
       |> json_response(400)
 
       athlete_conn
       |> recycle()
-      |> post("/api/executions/#{execution_id}/notes", %{
-        exercise_id: exercise_id,
-        selected_text: "Not the label",
-        selection_start: 0,
-        selection_end: 8,
-        tags: ["form"]
+      |> json_put("/api/journal/comments/#{Ecto.UUID.generate()}", %{
+        entry_kind: "execution",
+        entry_id: execution_id,
+        body: "   "
       })
-      |> json_response(400)
+      |> json_response(422)
     end
   end
-
-  defp wait_for_notifications(user_id, attempts \\ 10)
-
-  defp wait_for_notifications(user_id, attempts) when attempts > 0 do
-    notifications = Notifications.list_for_user(user_id)
-
-    if notifications == [] do
-      Process.sleep(20)
-      wait_for_notifications(user_id, attempts - 1)
-    else
-      notifications
-    end
-  end
-
-  defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
 
   describe "workout vault and repeats (ADR-098)" do
     test "a client repeats a completed workout as a new dated entry and sees it in the vault",
@@ -961,5 +1015,14 @@ defmodule MilosTrainingWeb.ExecutionControllerTest do
     {:ok, admin} = Identity.update_role(user, :admin)
     {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(admin, :owner)
     admin
+  end
+
+  defp json_put(conn, path, body), do: json_request(conn, :put, path, body)
+  defp json_post(conn, path, body), do: json_request(conn, :post, path, body)
+
+  defp json_request(conn, method, path, body) do
+    conn
+    |> put_req_header("content-type", "application/json")
+    |> dispatch(@endpoint, method, path, Jason.encode!(body))
   end
 end

@@ -12,16 +12,26 @@ import { semanticLabel } from "@/i18n/presentation";
 import { useSession } from "@/components/session-provider";
 import { ClientCard, ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
 import { FeatureGate } from "@/components/client/FeatureGate";
+import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
+import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
+import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { formatDay } from "@/components/client/format";
 import { scaleWeekly, sourceShares, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 
-/** `/progress`: advanced statistics (needs `view_advanced_analytics`). */
+/**
+ * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
+ * then personal records, the history export and, with
+ * `view_advanced_analytics`, the detailed statistics.
+ */
 export function ProgressConsole() {
   const i18n = useUiTranslations();
   return (
     <ClientPage title={i18n("clProgressTitle")} intro={i18n("clProgressIntro")}>
+      <ProgressOverview />
+      <PantheonSection />
+      <HistoryExportCard />
       <FeatureGate feature="progress">
         <ProgressContent />
       </FeatureGate>
@@ -312,7 +322,7 @@ function PRTimeline({ entries }: { entries: PRTimelineEntry[] }) {
         <div className="flex flex-col items-start gap-3">
           <EmptyLine>{i18n("clPrTimelineEmpty")}</EmptyLine>
           <Link
-            href="/my-workouts/pantheon"
+            href="/journal/pantheon"
             className="rounded-full px-4 py-2 text-sm font-semibold"
             style={{ background: "var(--border)", color: "var(--text)" }}
           >

@@ -51,7 +51,7 @@ defmodule MilosTraining.Application.GetLandingPage do
           "monthly" => []
         }
       },
-      "coach_notes" => [],
+      "coaching_messages" => [],
       "membership" => nil,
       "recent_executions" => []
     }
@@ -138,7 +138,7 @@ defmodule MilosTraining.Application.GetLandingPage do
         "active_challenges" => active_challenges,
         "leaderboard" => GetLeaderboardSnippet.call(user)
       },
-      "coach_notes" => coach_notes_payload(context, user),
+      "coaching_messages" => coaching_messages_payload(user),
       "membership" => membership_payload(context, user.id),
       "recent_executions" =>
         executions
@@ -166,11 +166,23 @@ defmodule MilosTraining.Application.GetLandingPage do
     end
   end
 
-  defp coach_notes_payload(%{role: :athlete}, %{id: user_id}) do
-    Messaging.list_recent_coaching_notes(user_id, 5)
+  # «Τελευταία από τον coach» (ADR-140 §6): the coaching messages this
+  # member received, whatever their role in the gym. A coach's own sent
+  # messages are not theirs to read here.
+  defp coaching_messages_payload(%{id: user_id}) do
+    user_id
+    |> Messaging.list_recent_coaching_messages(5)
+    |> Enum.reject(&(&1.sender_id == user_id))
+    |> Enum.map(fn message ->
+      %{
+        "id" => message.id,
+        "thread_id" => message.thread_id,
+        "sender_id" => message.sender_id,
+        "body" => message.body,
+        "inserted_at" => message.inserted_at
+      }
+    end)
   end
-
-  defp coach_notes_payload(_context, _user), do: []
 
   defp membership_payload(context, user_id) do
     case Finance.get_member_profile(context, user_id) do
@@ -190,7 +202,6 @@ defmodule MilosTraining.Application.GetLandingPage do
           last_paid: last_payment && last_payment.paid_on,
           amount: last_payment && last_payment.amount_cents,
           currency: (last_payment && last_payment.currency) || "EUR",
-          notes: profile.membership.notes,
           entitlement_status: profile.entitlement.status,
           entitlement_source: profile.entitlement.source
         }

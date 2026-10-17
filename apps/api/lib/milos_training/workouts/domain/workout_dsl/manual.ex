@@ -35,8 +35,13 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Manual do
       `bw`; distances use `m` or `km`.
     - Exercise names must match a canonical catalog name or exact registered
       alias. Autocomplete is the safest way to enter them.
-    - Notes use typed markers: #{Enum.join(Vocabulary.note_markers(), ", ")}.
-      Coach-only notes are never exposed in athlete-facing workout responses.
+    - Content uses typed markers: #{Enum.join(Vocabulary.content_markers(), ", ")}.
+      `!instructions` (Οδηγίες) with `!scaling`, `!safety` and `!equipment`
+      describe the workout, a section, a group or a header; `!cue` sits only
+      inside an exercise or its scale. `!coach-brief` is for staff and never
+      reaches members. Older markers (`!note`, `!athlete-note`, `!coach-note`,
+      `!scaling-note`, `!safety-note`, `!equipment-note`) still parse and are
+      rewritten to these.
 
     ## Nesting
 
@@ -68,7 +73,7 @@ defmodule MilosTraining.Workouts.Domain.WorkoutDsl.Manual do
     ## Composition and scaling
 
     `[group: superset]` and `[group: alternating]` contain two or more
-    exercises. Group title, sets, rest and typed notes are canonical.
+    exercises. Group title, sets, rest and typed content are canonical.
     `[scale: slug]` inside an exercise overrides or excludes that exercise for
     an active scale. Unknown scale slugs block publication.
 

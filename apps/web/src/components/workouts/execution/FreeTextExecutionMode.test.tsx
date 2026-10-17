@@ -22,7 +22,7 @@ const updateExecutionProgress = vi.fn();
 
 vi.mock("@/api/executions", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/executions")>()),
-  fetchExecution: () => Promise.resolve({ id: "execution-1", lock_version: 1, exercise_modifications: [] }),
+  fetchExecution: () => Promise.resolve({ id: "execution-1", lock_version: 1, comments: [] }),
   updateExecutionProgress: (...args: unknown[]) => updateExecutionProgress(...args),
 }));
 

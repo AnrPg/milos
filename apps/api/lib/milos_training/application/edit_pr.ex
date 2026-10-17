@@ -1,11 +1,22 @@
 defmodule MilosTraining.Application.EditPR do
-  alias MilosTraining.Application.{InvalidateLandingPages, PRSearchIndex}
+  alias MilosTraining.Application.{InvalidateLandingPages, JournalComments, PRSearchIndex}
   alias MilosTraining.Pantheon
   alias MilosTraining.Pantheon.Domain.PRResultMetrics
 
   # Owner-only under RLS: runs in the acting user's scope (ADR-129).
-  def call(%{user_id: user_id} = context, id, params),
-    do: Pantheon.with_user_context(context, fn -> call(id, user_id, params) end)
+  # Comments sent with the change (ADR-140 §1) are saved with it.
+  def call(%{user_id: user_id} = context, id, params) do
+    JournalComments.write_with_comments(
+      context,
+      "pr",
+      params["comments"] || params[:comments],
+      fn ->
+        Pantheon.with_user_context(context, fn ->
+          call(id, user_id, Map.drop(params, ["comments", :comments]))
+        end)
+      end
+    )
+  end
 
   def call(id, user_id, params) do
     case Pantheon.get_record_for_user(id, user_id) do

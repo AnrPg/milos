@@ -65,3 +65,12 @@ export function invitationUrl(origin: string, invitation: { role: string; token?
 export function joinUrl(origin: string, slug: string) {
   return `${origin}/join/${encodeURIComponent(slug)}`;
 }
+
+/** An existing account accepts an invitation code (`POST /memberships/redeem`). */
+export function redeemInvitation(token: string, invitationToken: string) {
+  return apiRequest<OrganizationMembership>("/memberships/redeem", {
+    method: "POST",
+    token,
+    body: { invitation_token: invitationToken },
+  });
+}

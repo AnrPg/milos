@@ -212,14 +212,19 @@ describe("document export adapters", () => {
       segment_cycle_counts: {},
       checked_exercise_ids: [],
       section_scores: [{ section_id: "s1", section_name: "For time", value: 450, unit: "seconds" }],
-      exercise_notes: [{ id: "n1", exercise_id: "x1", selected_text: "Pull-ups", note_text: "Strict" }],
-      exercise_modifications: [{
-        field: "reps",
-        section_id: "s1",
-        exercise_name: "Thruster",
-        canonical_value: 21,
-        actual_value: 18,
-      }],
+      comments: [
+        {
+          id: "c1", entry_kind: "execution", entry_id: "e1", exercise_id: "x1", selected_text: "Pull-ups",
+          body: "Strict", tags: [], written_at: "2026-07-18T08:03:00Z",
+        },
+        {
+          id: "c2", entry_kind: "execution", entry_id: "e1", tags: [], written_at: "2026-07-18T08:04:00Z",
+          change: {
+            patch_id: "s1:reps", field: "reps", section_id: "s1", exercise_name: "Thruster",
+            canonical_value: 21, actual_value: 18,
+          },
+        },
+      ],
       lock_version: 1,
       inserted_at: "2026-07-18T08:00:00Z",
     }, labels, "en");
@@ -238,7 +243,10 @@ describe("document export adapters", () => {
       higher_is_better: true,
       beaten_on: "2026-07-18",
       supporting_metrics: { reps: 3, sets: 2 },
-      notes: "Smooth, no belt",
+      comments: [{
+        id: "c1", entry_kind: "pr", entry_id: "p1", body: "Smooth, no belt", tags: [],
+        written_at: "2026-07-18T08:01:00Z",
+      }],
       inserted_at: "2026-07-18T08:00:00Z",
       updated_at: "2026-07-18T08:00:00Z",
     }, labels, "en");
@@ -273,8 +281,8 @@ describe("document export adapters", () => {
       completed_at_utc: "2026-07-18T08:07:30Z", completed_at_tz: "Europe/Athens",
       current_segment_index: 1, segment_started_at_utc: null, paused_elapsed_ms: 0,
       resume_countdown_ends_at_utc: null, total_elapsed_ms: 450_000, section_elapsed_ms: {},
-      segment_cycle_counts: {}, checked_exercise_ids: [], section_scores: [], exercise_notes: [],
-      exercise_modifications: [], lock_version: 1, inserted_at: "2026-07-18T08:00:00Z",
+      segment_cycle_counts: {}, checked_exercise_ids: [], section_scores: [], comments: [],
+      lock_version: 1, inserted_at: "2026-07-18T08:00:00Z",
     };
     const document = buildExecutionHistoryDocument([
       execution,
@@ -296,7 +304,6 @@ describe("document export adapters", () => {
       higher_is_better: true,
       beaten_on: "2026-07-18",
       supporting_metrics: {},
-      notes: null,
       inserted_at: "2026-07-18T08:00:00Z",
       updated_at: "2026-07-18T08:00:00Z",
     }, labels, "en");
