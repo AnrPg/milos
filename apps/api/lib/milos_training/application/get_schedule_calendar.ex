@@ -190,6 +190,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       id: workout.id,
       title: workout.title,
       type: workout.type,
+      focus: Workouts.workout_focus(workout),
       sections:
         Enum.map(workout.sections || [], fn section ->
           %{

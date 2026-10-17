@@ -106,6 +106,22 @@ defmodule MilosTrainingWeb.ScheduleController do
                      type: :boolean,
                      description:
                        "Members only: whether the viewer's package includes this class, regardless of visits left."
+                   },
+                   workout: %Schema{
+                     type: :object,
+                     nullable: true,
+                     additionalProperties: true,
+                     properties: %{
+                       focus: %Schema{
+                         type: :array,
+                         description: "What the workout trains, read from its movements.",
+                         items: %Schema{
+                           type: :string,
+                           enum:
+                             ~w(strength endurance gymnastics olympic_lifting mobility legs core upper_body)
+                         }
+                       }
+                     }
                    }
                  }
                }

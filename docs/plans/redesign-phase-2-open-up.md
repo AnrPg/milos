@@ -277,7 +277,10 @@ Apostolos' preference to decide on visuals rather than text.
      posted workout's movements. *Built:* level (`beginner`, `all_levels`, `advanced`) and
      audiences (`women_only`, `teens`, `seniors`, `kids`; empty = everyone) live on the **class
      type**, the gym's catalog of programs, so one-off slots and series both inherit them and a
-     «Ladies WOD» is its own type.
+     «Ladies WOD» is its own type. WOD focus is computed per slot (`workout.focus`) from the catalog-resolved
+     movements: a modality or region counts when at least a third of the movements carry it, and
+     any olympic lift tags the session `olympic_lifting`. «Φίλοι» reads follows, so its data ships
+     with P2-M2 and the chip turns on there.
 3. **«Φίλτρα (n)»** opens a **full-screen page** (sections per filter, «Καθαρισμός» and «Δείξε N»
    at the bottom).
 4. **Classes outside the package** (when «Στο πακέτο μου» is off): shown **dimmed** with an
