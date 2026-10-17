@@ -9,10 +9,8 @@ import { fetchMyEntitlement } from "@/api/my-finance";
 import { fetchBookablePlaces } from "@/api/places";
 import { CLASS_LEVELS, fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
-import { BookingModal } from "@/components/schedule/BookingModal";
 import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
 import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
-import { SlotPopup } from "@/components/schedule/SlotPopup";
 import { useSession } from "@/components/session-provider";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
 import { useUiTranslations } from "@/i18n/ui";
@@ -21,6 +19,7 @@ import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 
 import { ClassRow } from "./ClassRow";
+import { ClassSheet } from "./ClassSheet";
 import { MONTH_GRID_DAYS, MonthGrid, monthGridStart, shiftMonth, type DayCount } from "./MonthGrid";
 import {
   DEFAULT_SCHEDULE_FILTERS,
@@ -58,7 +57,6 @@ function localDay(iso: string) {
  */
 export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId?: string | null }) {
   const t = useTranslations("BoxSchedule");
-  const scheduleT = useTranslations("Schedule");
   const i18n = useUiTranslations();
   const locale = useLocale();
   const { tokens } = useSession();
@@ -72,7 +70,6 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const [view, setView] = useState<ScheduleView>("day");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [openSlotId, setOpenSlotId] = useState<string | null>(initialOpenSlotId);
-  const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -220,15 +217,13 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
     },
   ];
 
-  async function book() {
-    if (!bookingTarget) return;
+  async function book(slot: ScheduleSlot) {
     setBusy(true);
     setActionError(null);
     try {
       // ADR-120: booking requests go through the durable outbox.
-      const outcome = await submitCommand("booking.request", { slotId: bookingTarget.id, label: bookingTarget.name });
+      const outcome = await submitCommand("booking.request", { slotId: slot.id, label: slot.name });
       setNotice(outcome.status === "queued" ? i18n("outboxQueuedNotice") : null);
-      setBookingTarget(null);
       setOpenSlotId(null);
       if (outcome.status === "delivered") reload();
     } catch (error) {
@@ -357,44 +352,26 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       ) : null}
 
       {openSlot ? (
-        <SlotPopup
+        <ClassSheet
           key={openSlot.id}
           slot={openSlot}
-          isAdmin={false}
-          accessToken={token ?? ""}
+          coachName={openSlot.coach_user_id ? coaches.get(openSlot.coach_user_id) ?? null : null}
           locations={data?.locations ?? []}
+          accessToken={token ?? ""}
           guestsIncluded={includesGuestPasses(entitlementQuery.data?.entitlement)}
-          onClose={() => setOpenSlotId(null)}
-          onBook={() => setBookingTarget(openSlot)}
-          onCancelBooking={({ lateCancellation }) => {
+          busy={busy}
+          error={actionError}
+          onBook={() => void book(openSlot)}
+          onClose={() => {
+            setOpenSlotId(null);
+            setActionError(null);
+          }}
+          onChanged={reload}
+          onCancelled={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
+            setOpenSlotId(null);
             reload();
           }}
-          onSlotChanged={reload}
-          onEdit={() => undefined}
-          onDelete={() => undefined}
-          onApproveBooking={() => undefined}
-          onRejectBooking={() => undefined}
-        />
-      ) : null}
-
-      {bookingTarget ? (
-        <BookingModal
-          busy={busy}
-          title={scheduleT("bookClassSlot")}
-          confirmLabel={scheduleT("confirmBooking")}
-          description={scheduleT("bookClassDescription", {
-            workoutTitle: bookingTarget.workout?.title ?? bookingTarget.name,
-            scheduledAt: new Intl.DateTimeFormat(locale, {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-              hour: "numeric",
-              minute: "2-digit",
-            }).format(new Date(bookingTarget.scheduled_at)),
-          })}
-          onCancel={() => setBookingTarget(null)}
-          onConfirm={() => void book()}
         />
       ) : null}
     </main>

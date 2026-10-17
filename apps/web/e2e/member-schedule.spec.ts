@@ -131,7 +131,37 @@ async function stubApi(page: Page) {
         class_types: [crossfit, oly, openGym],
         coaches: [{ id: "coach-1", nickname: "Nikos", avatar_url: null }],
         slots: [
-          slot("s-1", crossfit, 7),
+          slot("s-1", crossfit, 7, {
+            cancel_free_until: at(1),
+            waitlist_count: 0,
+            workout: {
+              id: "wod-1",
+              title: "Fran",
+              type: "for_time",
+              authoring_mode: "structured",
+              focus: ["strength", "legs"],
+              sections: [
+                {
+                  id: "sec-1",
+                  name: "Warm-up",
+                  order: 1,
+                  exercises: [
+                    { id: "e-1", name: "Row", order: 1 },
+                    { id: "e-2", name: "Air squat", order: 2 },
+                  ],
+                },
+                {
+                  id: "sec-2",
+                  name: "Metcon",
+                  order: 2,
+                  exercises: [
+                    { id: "e-3", name: "Thruster", order: 1 },
+                    { id: "e-4", name: "Pull-up", order: 2 },
+                  ],
+                },
+              ],
+            },
+          }),
           slot("s-2", oly, 9, { spots_remaining: 0, approved_booking_count: 12 }),
           slot("s-3", crossfit, 18, {
             current_user_booking: { id: "b-1", user_id: user.id, status: "approved", inserted_at: at(8) },
@@ -192,6 +222,19 @@ test.describe("member schedule", () => {
     tomorrow.setDate(tomorrow.getDate() + 1);
     await grid.getByRole("gridcell", { name: new RegExp(`^\\S+ ${tomorrow.getDate()} `) }).first().click();
     await expect(page.getByText("Δεν υπάρχουν μαθήματα")).toBeVisible();
+  });
+
+  test("opens a class as a sheet with its facts, the WOD names and Κράτηση at the bottom", async ({ page }) => {
+    await page.goto("/box/schedule");
+    await page.getByRole("main").getByRole("button", { name: /CrossFit/ }).first().click();
+    const sheet = page.getByRole("dialog", { name: "CrossFit" });
+    await expect(sheet.getByText("Thruster · Pull-up")).toBeVisible();
+    await expect(sheet.getByText("Δύναμη · Πόδια")).toBeVisible();
+    await expect(sheet.getByText(/Χωρίς χρέωση έως/)).toBeVisible();
+    await expect(sheet.getByRole("button", { name: "Κράτηση" })).toBeVisible();
+    await shot(page, "class-sheet");
+    await sheet.getByRole("button", { name: "Κλείσιμο ✕" }).click();
+    await expect(sheet).toHaveCount(0);
   });
 
   test("picks a location from the list over the map", async ({ page }) => {

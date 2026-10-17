@@ -5242,7 +5242,17 @@
     "monthAria": "Monat",
     "previousMonth": "Vorheriger Monat",
     "nextMonth": "Nächster Monat",
-    "classesOnDay": "{count, plural, =0 {keine Kurse} one {# Kurs} other {# Kurse}}"
+    "classesOnDay": "{count, plural, =0 {keine Kurse} one {# Kurs} other {# Kurse}}",
+    "book": "Buchen",
+    "waitlist": "Warteliste",
+    "cancelTitle": "Stornieren",
+    "cancelFreeUntil": "Kostenlos bis {when}",
+    "cancelAnytime": "Jederzeit kostenlos",
+    "inPackage": "Inklusive",
+    "cost": "Kosten",
+    "location": "Standort",
+    "wod": "Workout",
+    "wodNotPosted": "Das Workout ist noch nicht online."
   },
   "LocationPicker": {
     "title": "Standort",

@@ -5242,7 +5242,17 @@
     "monthAria": "חודש",
     "previousMonth": "החודש הקודם",
     "nextMonth": "החודש הבא",
-    "classesOnDay": "{count, plural, =0 {אין שיעורים} one {שיעור אחד} other {# שיעורים}}"
+    "classesOnDay": "{count, plural, =0 {אין שיעורים} one {שיעור אחד} other {# שיעורים}}",
+    "book": "הזמנה",
+    "waitlist": "רשימת המתנה",
+    "cancelTitle": "ביטול",
+    "cancelFreeUntil": "ללא חיוב עד {when}",
+    "cancelAnytime": "ללא חיוב בכל עת",
+    "inPackage": "כלול",
+    "cost": "עלות",
+    "location": "מיקום",
+    "wod": "אימון",
+    "wodNotPosted": "האימון עוד לא פורסם."
   },
   "LocationPicker": {
     "title": "מיקום",

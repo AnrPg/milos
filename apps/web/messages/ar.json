@@ -5242,7 +5242,17 @@
     "monthAria": "الشهر",
     "previousMonth": "الشهر السابق",
     "nextMonth": "الشهر التالي",
-    "classesOnDay": "{count, plural, zero {لا حصص} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}"
+    "classesOnDay": "{count, plural, zero {لا حصص} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}",
+    "book": "احجز",
+    "waitlist": "قائمة الانتظار",
+    "cancelTitle": "الإلغاء",
+    "cancelFreeUntil": "مجاني حتى {when}",
+    "cancelAnytime": "مجاني في أي وقت",
+    "inPackage": "مشمولة",
+    "cost": "التكلفة",
+    "location": "الموقع",
+    "wod": "التمرين",
+    "wodNotPosted": "لم يُنشر التمرين بعد."
   },
   "LocationPicker": {
     "title": "الموقع",

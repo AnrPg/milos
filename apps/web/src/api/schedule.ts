@@ -155,6 +155,8 @@ export type ScheduleSlot = {
   coach_user_id?: string | null;
   /** Members only: whether their package includes this class, visits aside. */
   covered_by_package?: boolean;
+  /** Members only: until when withdrawing is free; null when no cutoff applies. */
+  cancel_free_until?: string | null;
   waitlist_count?: number;
   bookings: ScheduleBooking[];
   /** ADR-125: the acting member's own version of this class (members only). */

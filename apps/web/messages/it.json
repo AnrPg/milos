@@ -5242,7 +5242,17 @@
     "monthAria": "Mese",
     "previousMonth": "Mese precedente",
     "nextMonth": "Mese successivo",
-    "classesOnDay": "{count, plural, =0 {nessuna lezione} one {# lezione} other {# lezioni}}"
+    "classesOnDay": "{count, plural, =0 {nessuna lezione} one {# lezione} other {# lezioni}}",
+    "book": "Prenota",
+    "waitlist": "Lista d'attesa",
+    "cancelTitle": "Cancellazione",
+    "cancelFreeUntil": "Gratis fino alle {when}",
+    "cancelAnytime": "Sempre gratis",
+    "inPackage": "Incluso",
+    "cost": "Costo",
+    "location": "Sede",
+    "wod": "Allenamento",
+    "wodNotPosted": "L'allenamento non è ancora pubblicato."
   },
   "LocationPicker": {
     "title": "Sede",

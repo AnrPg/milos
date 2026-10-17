@@ -5242,7 +5242,17 @@
     "monthAria": "Месяц",
     "previousMonth": "Предыдущий месяц",
     "nextMonth": "Следующий месяц",
-    "classesOnDay": "{count, plural, =0 {нет занятий} one {# занятие} few {# занятия} many {# занятий} other {# занятия}}"
+    "classesOnDay": "{count, plural, =0 {нет занятий} one {# занятие} few {# занятия} many {# занятий} other {# занятия}}",
+    "book": "Записаться",
+    "waitlist": "Лист ожидания",
+    "cancelTitle": "Отмена",
+    "cancelFreeUntil": "Бесплатно до {when}",
+    "cancelAnytime": "Бесплатно в любое время",
+    "inPackage": "Входит",
+    "cost": "Стоимость",
+    "location": "Локация",
+    "wod": "Тренировка",
+    "wodNotPosted": "Тренировка ещё не опубликована."
   },
   "LocationPicker": {
     "title": "Локация",

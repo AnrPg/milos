@@ -5242,7 +5242,17 @@
     "monthAria": "Maand",
     "previousMonth": "Vorige maand",
     "nextMonth": "Volgende maand",
-    "classesOnDay": "{count, plural, =0 {geen lessen} one {# les} other {# lessen}}"
+    "classesOnDay": "{count, plural, =0 {geen lessen} one {# les} other {# lessen}}",
+    "book": "Boeken",
+    "waitlist": "Wachtlijst",
+    "cancelTitle": "Annuleren",
+    "cancelFreeUntil": "Gratis tot {when}",
+    "cancelAnytime": "Altijd gratis",
+    "inPackage": "Inbegrepen",
+    "cost": "Kosten",
+    "location": "Locatie",
+    "wod": "Workout",
+    "wodNotPosted": "De workout staat er nog niet."
   },
   "LocationPicker": {
     "title": "Locatie",
