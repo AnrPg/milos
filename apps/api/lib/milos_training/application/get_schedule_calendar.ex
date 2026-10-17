@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
-  alias MilosTraining.{Facility, Identity, Scheduling, Workouts}
+  alias MilosTraining.{Facility, Finance, Identity, Scheduling, Workouts}
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, actor, params) do
@@ -11,6 +11,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
           class_type_ids: class_type_ids
         })
         |> enrich_slots(context, actor)
+        |> put_package_coverage(context, actor)
 
       class_types = schedule_class_types(context, slots)
 
@@ -99,6 +100,25 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         |> Map.put(:my_version, my_version(variants, slot.id))
       end
     end)
+  end
+
+  # Phase 2 «μόνο ό,τι καλύπτει το πακέτο μου»: for members, whether their
+  # package includes each class (scope only, not remaining visits).
+  defp put_package_coverage(slots, context, actor) do
+    if admin_role?(context, actor) do
+      slots
+    else
+      requests =
+        Enum.map(slots, fn slot ->
+          slot
+          |> BookingPolicy.entitlement_request()
+          |> Map.merge(%{starts_at: slot.scheduled_at, location_id: slot.location_id})
+        end)
+
+      slots
+      |> Enum.zip(Finance.package_coverage(context, actor.id, requests))
+      |> Enum.map(fn {slot, covered?} -> Map.put(slot, :covered_by_package, covered?) end)
+    end
   end
 
   # ADR-125: per-member class variants. A member only ever receives their own

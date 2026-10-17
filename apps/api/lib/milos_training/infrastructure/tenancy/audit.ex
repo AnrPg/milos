@@ -70,7 +70,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
-    media_account_objects
+    media_account_objects saved_filters
   )
 
   def report do

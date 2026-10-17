@@ -86,6 +86,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     nutrition/nutrition_store
     community/community_store
     media/media_store
+    identity/saved_filter_store
     organizations/public_profile_store
   )
 

@@ -98,7 +98,17 @@ defmodule MilosTrainingWeb.ScheduleController do
              locations: %Schema{type: :array, items: @location_schema},
              slots: %Schema{
                type: :array,
-               items: %Schema{type: :object, additionalProperties: true}
+               items: %Schema{
+                 type: :object,
+                 additionalProperties: true,
+                 properties: %{
+                   covered_by_package: %Schema{
+                     type: :boolean,
+                     description:
+                       "Members only: whether the viewer's package includes this class, regardless of visits left."
+                   }
+                 }
+               }
              }
            },
            required: [:start_date, :end_date, :days, :class_types, :slots]

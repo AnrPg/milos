@@ -1524,7 +1524,12 @@ defmodule MilosTrainingWeb.FallbackController do
              :media_upload_missing,
              :invalid_media,
              :too_many_photos,
-             :public_profile_empty
+             :public_profile_empty,
+             :unknown_filter_surface,
+             :invalid_filter,
+             :filter_too_large,
+             :invalid_filter_name,
+             :too_many_saved_filters
            ] do
     conn
     |> put_status(:unprocessable_entity)

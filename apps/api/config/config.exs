@@ -101,6 +101,10 @@ config :milos_training,
        :community_store,
        MilosTraining.Infrastructure.Community.EctoCommunityStore
 
+config :milos_training,
+       :saved_filter_store,
+       MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
+
 config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
 
 config :milos_training,
