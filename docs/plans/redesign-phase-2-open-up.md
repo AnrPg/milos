@@ -261,14 +261,20 @@ Apostolos' preference to decide on visuals rather than text.
 
 ### Box › Πρόγραμμα (2026-10-17, [board](https://claude.ai/artifact/3mJnPApB49f3UXTcySjZaY))
 
-1. **Filter row:** one horizontally scrolling chip row under the title, in this order:
-   «Καθαρισμός» (only while a filter is on) · «Φίλτρα (n)» · filter chips. Nothing is pinned; the row
-   scrolls away as a whole.
-2. **Which filters, where:** catalog of 15 filters (type, events, coach, time, weekdays, spots,
-   package, my bookings, friends, duration, level, workout focus, audience, language, cost), each
-   placed as chip / only in Φίλτρα / off. Default placement from the board: chips for Είδος,
-   Διαθεσιμότητα, Πακέτο, Οι κρατήσεις μου; language and cost off; the rest only in Φίλτρα.
-   *Pending confirmation.*
+1. **Filter row:** one horizontally scrolling chip row under the title. «Φίλτρα (n)» is the first
+   chip; nothing is pinned, the row scrolls away as a whole. *Pending: «Καθαρισμός» as a second
+   chip, or a ✕ inside «Φίλτρα (n)».*
+2. **Which filters, where:**
+   - **Chips on the row:** Είδος μαθήματος, Μαθήματα ή events, Διαθεσιμότητα, Πακέτο, Επίπεδο,
+     Φίλοι.
+   - **Only in Φίλτρα:** Coach, Ώρα, Οι κρατήσεις μου, Διάρκεια, Εστίαση προπόνησης, Κοινό.
+   - **Not offered:** Ημέρες (confusing next to the date strip), Γλώσσα, Κόστος.
+   - Διαθεσιμότητα options: Έχει θέσεις · Πλήρη (με λίστα αναμονής) · Πλήρη · Όλα.
+   - Οι κρατήσεις μου options: Όλα (default) · Μόνο όσα έκλεισα · Έκλεισα ή περιμένω σε αναμονή;
+     own bookings always carry a ✓ in the list.
+   - Tapping a multi-option chip opens a **small menu under the chip**; on/off chips just toggle.
+   - New data this needs: a level and audience tag per class (series/type), and the WOD focus
+     derived from the posted workout's movements.
 3. **«Φίλτρα (n)»** opens a **full-screen page** (sections per filter, «Καθαρισμός» and «Δείξε N»
    at the bottom).
 4. **Classes outside the package** (when «Στο πακέτο μου» is off): shown **dimmed** with an
@@ -279,7 +285,8 @@ Apostolos' preference to decide on visuals rather than text.
    two sections, «Σε αυτή την περιοχή» (locations in the map frame, live as you pan or zoom) and
    «Πιο μακριά» (all others), sorted by distance from the user (device location if allowed, else the
    user's neighbourhood), with distance on each row.
-   *Pending: does «Πιο μακριά» list only bookable places or every gym in the app.*
+   «Πιο μακριά» lists **only places the user can book** (their gym's locations and gyms they are a
+   member of). Where users discover other gyms at all is a separate decision (see below).
 7. **Layout:** the **day view** (week strip, one day's classes) is the default. A subtle view switch
    offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
    on that date. Tapping a class opens an **overlay** with class info (time, duration, coach, spots,
@@ -288,8 +295,9 @@ Apostolos' preference to decide on visuals rather than text.
    location only when several locations are shown.
    **Product rule:** members experience their gym as **one home location** (gyms with several
    locations usually have a separate entry per location); only the owner oversees all locations.
-   Needs a per-membership home location. *Pending: can members view/book other locations of their
-   gym; are coaches/admins like members or like the owner.*
+   Needs a per-membership home location. The home location is the **default only**: members can
+   still view and book other locations of their gym from the picker. Coaches and admins also have
+   one home location, with a switch when they work at several.
 9. **Remembering:** last filters restored silently per gym (saved_filters `box_schedule`),
    «Καθαρισμός» always first.
 10. **No results:** a prominent «Δεν υπάρχουν μαθήματα» for the chosen date, with the next match as
