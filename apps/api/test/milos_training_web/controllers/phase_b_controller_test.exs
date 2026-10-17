@@ -64,6 +64,48 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
              settings["scheduling"]
   end
 
+  test "class types carry a level and audiences for the schedule filters", %{
+    admin_conn: admin_conn,
+    base: base
+  } do
+    default =
+      admin_conn
+      |> send_json(:post, "#{base}/admin/class-types", %{name: "WOD"})
+      |> json_response(201)
+      |> Map.fetch!("class_type")
+
+    assert %{"level" => "all_levels", "audiences" => []} = default
+
+    tagged =
+      admin_conn
+      |> send_json(:patch, "#{base}/admin/class-types/#{default["id"]}", %{
+        name: "Ladies foundations",
+        level: "beginner",
+        audiences: ["women_only"]
+      })
+      |> json_response(200)
+      |> Map.fetch!("class_type")
+
+    assert %{"level" => "beginner", "audiences" => ["women_only"]} = tagged
+
+    admin_conn
+    |> send_json(:post, "#{base}/admin/class-types", %{name: "Bad", level: "expert"})
+    |> json_response(422)
+
+    admin_conn
+    |> send_json(:post, "#{base}/admin/class-types", %{name: "Bad", audiences: ["pets"]})
+    |> json_response(422)
+
+    schedule =
+      admin_conn
+      |> recycle()
+      |> get("#{base}/schedule?start_date=#{Date.utc_today()}&days=7")
+      |> json_response(200)
+
+    assert %{"level" => "beginner", "audiences" => ["women_only"]} =
+             Enum.find(schedule["class_types"], &(&1["id"] == default["id"]))
+  end
+
   test "locations, waitlists, guests and check-ins through the API", %{
     conn: conn,
     admin: admin,

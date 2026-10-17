@@ -19,6 +19,9 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true] when action in [:create, :update, :delete]
 
+  @levels ~w(beginner all_levels advanced)
+  @audiences ~w(women_only teens seniors kids)
+
   @class_type_schema %Schema{
     type: :object,
     properties: %{
@@ -28,12 +31,24 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
       sort_order: %Schema{type: :integer},
       credit_cost: %Schema{type: :integer, minimum: 1, maximum: 10},
       kind: %Schema{type: :string, enum: ["class", "event"]},
+      level: %Schema{type: :string, enum: @levels},
+      audiences: %Schema{type: :array, items: %Schema{type: :string, enum: @audiences}},
       archived_at: %Schema{type: :string, format: :"date-time", nullable: true},
       inserted_at: %Schema{type: :string, format: :"date-time"},
       updated_at: %Schema{type: :string, format: :"date-time"},
       future_classes_reassigned: %Schema{type: :integer}
     },
-    required: [:id, :name, :slug, :sort_order, :credit_cost, :kind, :archived_at]
+    required: [
+      :id,
+      :name,
+      :slug,
+      :sort_order,
+      :credit_cost,
+      :kind,
+      :level,
+      :audiences,
+      :archived_at
+    ]
   }
 
   @write_schema %Schema{
@@ -51,6 +66,17 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
         type: :string,
         enum: ["class", "event"],
         description: "Events draw on event visits instead of class visits (ADR-097)"
+      },
+      level: %Schema{
+        type: :string,
+        enum: @levels,
+        description: "Who the class suits, for the schedule's level filter"
+      },
+      audiences: %Schema{
+        type: :array,
+        uniqueItems: true,
+        items: %Schema{type: :string, enum: @audiences},
+        description: "Groups the class is for; empty means everyone"
       }
     },
     required: [:name]

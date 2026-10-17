@@ -273,8 +273,11 @@ Apostolos' preference to decide on visuals rather than text.
    - Οι κρατήσεις μου options: Όλα (default) · Μόνο όσα έκλεισα · Έκλεισα ή περιμένω σε αναμονή;
      own bookings always carry a ✓ in the list.
    - Tapping a multi-option chip opens a **small menu under the chip**; on/off chips just toggle.
-   - New data this needs: a level and audience tag per class (series/type), and the WOD focus
-     derived from the posted workout's movements.
+   - New data this needs: a level and audience tag per class, and the WOD focus derived from the
+     posted workout's movements. *Built:* level (`beginner`, `all_levels`, `advanced`) and
+     audiences (`women_only`, `teens`, `seniors`, `kids`; empty = everyone) live on the **class
+     type**, the gym's catalog of programs, so one-off slots and series both inherit them and a
+     «Ladies WOD» is its own type.
 3. **«Φίλτρα (n)»** opens a **full-screen page** (sections per filter, «Καθαρισμός» and «Δείξε N»
    at the bottom).
 4. **Classes outside the package** (when «Στο πακέτο μου» is off): shown **dimmed** with an
