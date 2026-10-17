@@ -22,6 +22,12 @@ const PlacesMap = dynamic(() => import("./PlacesMap"), {
 
 type Position = { latitude: number; longitude: number };
 
+/** Where the list sits over the map: hidden (full map), the middle by default, or most of the screen. */
+type Sheet = "hidden" | "middle" | "full";
+const SHEET_HEIGHT: Record<Sheet, string> = { hidden: "2.75rem", middle: "50%", full: "85%" };
+const SHEET_UP: Record<Sheet, Sheet> = { hidden: "middle", middle: "full", full: "full" };
+const SHEET_DOWN: Record<Sheet, Sheet> = { hidden: "hidden", middle: "hidden", full: "middle" };
+
 function inBounds(place: BookablePlace, bounds: MapBounds | null) {
   if (!bounds || typeof place.latitude !== "number" || typeof place.longitude !== "number") return false;
   return (
@@ -34,7 +40,7 @@ function inBounds(place: BookablePlace, bounds: MapBounds | null) {
 
 /**
  * The Πρόγραμμα location screen (plan §5a decision 6): a street map behind a
- * list you drag up, with «Σε αυτή την περιοχή» (live with the map frame) and
+ * list that opens in the middle, drags up for more list and down to hide, with «Σε αυτή την περιοχή» (live with the map frame) and
  * «Πιο μακριά». Only places the person can book are listed, nearest first.
  */
 export function LocationPicker() {
@@ -49,7 +55,7 @@ export function LocationPicker() {
   const [position, setPosition] = useState<Position | null>(null);
   const [locating, setLocating] = useState(false);
   const [bounds, setBounds] = useState<MapBounds | null>(null);
-  const [expanded, setExpanded] = useState(false);
+  const [sheet, setSheet] = useState<Sheet>("middle");
   const [error, setError] = useState<string | null>(null);
 
   const placesQuery = useQuery({
@@ -76,8 +82,8 @@ export function LocationPicker() {
   );
 
   const bind = useDrag(({ last, movement: [, dy], tap }) => {
-    if (tap) setExpanded((value) => !value);
-    else if (last && Math.abs(dy) > 40) setExpanded(dy < 0);
+    if (tap) setSheet((value) => (value === "full" ? "middle" : SHEET_UP[value]));
+    else if (last && Math.abs(dy) > 40) setSheet((value) => (dy < 0 ? SHEET_UP[value] : SHEET_DOWN[value]));
   });
 
   function locate() {
@@ -206,7 +212,7 @@ export function LocationPicker() {
           aria-label={t("listAria")}
           className="absolute inset-x-0 bottom-0 flex flex-col rounded-t-3xl shadow-[0_-12px_30px_rgba(0,0,0,0.35)] transition-[height] duration-200"
           style={{
-            height: expanded ? "85%" : "45%",
+            height: SHEET_HEIGHT[sheet],
             background: "var(--bg)",
             borderTop: "1px solid var(--border)",
           }}
@@ -214,13 +220,16 @@ export function LocationPicker() {
           <button
             type="button"
             {...bind()}
-            aria-expanded={expanded}
-            aria-label={expanded ? t("collapseList") : t("expandList")}
+            aria-expanded={sheet !== "hidden"}
+            aria-label={sheet === "full" ? t("collapseList") : t("expandList")}
             className="flex h-7 shrink-0 touch-none items-center justify-center"
           >
             <span className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
           </button>
-          <div className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6">
+          <div
+            hidden={sheet === "hidden"}
+            className="mx-auto flex w-full max-w-xl flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6"
+          >
             {error ? (
               <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
                 {error}
