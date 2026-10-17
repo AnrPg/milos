@@ -54051,6 +54051,12 @@
                       "items": {
                         "additionalProperties": true,
                         "properties": {
+                          "cancel_free_until": {
+                            "description": "Members only: until when withdrawing is free; null when no cutoff applies.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "covered_by_package": {
                             "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
                             "type": "boolean"

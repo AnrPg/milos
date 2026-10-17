@@ -119,4 +119,48 @@ defmodule MilosTraining.Application.SchedulePackageCoverageTest do
     assert id == coach.id
     assert nickname == coach.nickname
   end
+
+  test "the schedule tells a member until when cancelling is free", %{slot: slot} do
+    {:ok, package} =
+      Finance.create_package(%{
+        name: "Cutoff six",
+        package_type: "class_pack",
+        fields: %{
+          "group_classes.visits" => %{"limit" => 8, "period" => "subscription_period"},
+          "booking.cancellation_cutoff_hours" => 6
+        }
+      })
+
+    member = user_fixture()
+    context = legacy_tenant_context(member)
+
+    {:ok, membership} =
+      Finance.upsert_membership(member.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "direct"
+      })
+
+    {:ok, _subscription} = Finance.assign_package(membership.id, package.id, %{})
+
+    {:ok, %{slots: slots}} =
+      GetScheduleCalendar.call(context, member, %{
+        "start_date" => Date.to_iso8601(Date.utc_today())
+      })
+
+    listed = Enum.find(slots, &(&1.id == slot.id))
+    assert listed.cancel_free_until == DateTime.add(listed.scheduled_at, -6 * 3600, :second)
+  end
+
+  test "without a cutoff, cancelling stays free", %{slot: slot} do
+    member = user_fixture()
+    context = legacy_tenant_context(member)
+
+    {:ok, %{slots: slots}} =
+      GetScheduleCalendar.call(context, member, %{
+        "start_date" => Date.to_iso8601(Date.utc_today())
+      })
+
+    assert Enum.find(slots, &(&1.id == slot.id)).cancel_free_until == nil
+  end
 end

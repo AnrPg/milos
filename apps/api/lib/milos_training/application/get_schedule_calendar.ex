@@ -1,5 +1,6 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
   alias MilosTraining.{Facility, Finance, Identity, Scheduling, Workouts}
+  alias MilosTraining.Application.BookingTerms
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, actor, params) do
@@ -12,6 +13,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         })
         |> enrich_slots(context, actor)
         |> put_package_coverage(context, actor)
+        |> put_cancel_free_until(context, actor)
 
       class_types = schedule_class_types(context, slots)
 
@@ -119,6 +121,18 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       slots
       |> Enum.zip(Finance.package_coverage(context, actor.id, requests))
       |> Enum.map(fn {slot, covered?} -> Map.put(slot, :covered_by_package, covered?) end)
+    end
+  end
+
+  # The class sheet's «ακύρωση χωρίς χρέωση έως» line: when withdrawing stops
+  # being free for this member, from the same terms WithdrawBooking applies.
+  defp put_cancel_free_until(slots, context, actor) do
+    if admin_role?(context, actor) do
+      slots
+    else
+      slots
+      |> Enum.zip(BookingTerms.cancel_free_until(context, actor.id, slots))
+      |> Enum.map(fn {slot, until} -> Map.put(slot, :cancel_free_until, until) end)
     end
   end
 

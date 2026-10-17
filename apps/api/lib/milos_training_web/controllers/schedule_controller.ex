@@ -115,6 +115,13 @@ defmodule MilosTrainingWeb.ScheduleController do
                  type: :object,
                  additionalProperties: true,
                  properties: %{
+                   cancel_free_until: %Schema{
+                     type: :string,
+                     format: :"date-time",
+                     nullable: true,
+                     description:
+                       "Members only: until when withdrawing is free; null when no cutoff applies."
+                   },
                    covered_by_package: %Schema{
                      type: :boolean,
                      description:

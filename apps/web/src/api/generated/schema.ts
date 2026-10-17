@@ -25820,6 +25820,11 @@ export interface operations {
                             updated_at?: string;
                         }[];
                         slots: ({
+                            /**
+                             * Format: date-time
+                             * @description Members only: until when withdrawing is free; null when no cutoff applies.
+                             */
+                            cancel_free_until?: string | null;
                             /** @description Members only: whether the viewer's package includes this class, regardless of visits left. */
                             covered_by_package?: boolean;
                             workout?: ({
