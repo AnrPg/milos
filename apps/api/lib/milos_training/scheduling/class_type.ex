@@ -6,7 +6,7 @@ defmodule MilosTraining.Scheduling.ClassType do
   @foreign_key_type :binary_id
 
   @levels ~w(beginner all_levels advanced)
-  @audiences ~w(women_only teens seniors kids)
+  @audiences ~w(women teens kids over_40 seniors prenatal adaptive)
 
   schema "class_types" do
     field :organization_id, :binary_id

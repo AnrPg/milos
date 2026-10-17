@@ -20,7 +20,7 @@ defmodule MilosTrainingWeb.AdminClassTypeController do
        [json_render_error_v2: true] when action in [:create, :update, :delete]
 
   @levels ~w(beginner all_levels advanced)
-  @audiences ~w(women_only teens seniors kids)
+  @audiences ~w(women teens kids over_40 seniors prenatal adaptive)
 
   @class_type_schema %Schema{
     type: :object,

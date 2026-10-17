@@ -14,7 +14,8 @@ defmodule MilosTraining.Repo.Migrations.ClassTypeLevelAudiences do
            )
 
     create constraint(:class_types, :class_types_audiences_check,
-             check: "audiences <@ ARRAY['women_only', 'teens', 'seniors', 'kids']::text[]"
+             check:
+               "audiences <@ ARRAY['women', 'teens', 'kids', 'over_40', 'seniors', 'prenatal', 'adaptive']::text[]"
            )
   end
 end

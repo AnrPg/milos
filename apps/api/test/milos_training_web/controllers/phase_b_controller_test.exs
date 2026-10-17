@@ -81,12 +81,12 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
       |> send_json(:patch, "#{base}/admin/class-types/#{default["id"]}", %{
         name: "Ladies foundations",
         level: "beginner",
-        audiences: ["women_only"]
+        audiences: ["women"]
       })
       |> json_response(200)
       |> Map.fetch!("class_type")
 
-    assert %{"level" => "beginner", "audiences" => ["women_only"]} = tagged
+    assert %{"level" => "beginner", "audiences" => ["women"]} = tagged
 
     admin_conn
     |> send_json(:post, "#{base}/admin/class-types", %{name: "Bad", level: "expert"})
@@ -102,7 +102,7 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
       |> get("#{base}/schedule?start_date=#{Date.utc_today()}&days=7")
       |> json_response(200)
 
-    assert %{"level" => "beginner", "audiences" => ["women_only"]} =
+    assert %{"level" => "beginner", "audiences" => ["women"]} =
              Enum.find(schedule["class_types"], &(&1["id"] == default["id"]))
   end
 

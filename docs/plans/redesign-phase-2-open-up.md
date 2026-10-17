@@ -275,7 +275,8 @@ Apostolos' preference to decide on visuals rather than text.
    - Tapping a multi-option chip opens a **small menu under the chip**; on/off chips just toggle.
    - New data this needs: a level and audience tag per class, and the WOD focus derived from the
      posted workout's movements. *Built:* level (`beginner`, `all_levels`, `advanced`) and
-     audiences (`women_only`, `teens`, `seniors`, `kids`; empty = everyone) live on the **class
+     audiences (`women`, `teens`, `kids`, `over_40`, `seniors`, `prenatal`, `adaptive`, the keys of
+     the gym profile's audiences minus its levels, plus kids; empty = everyone) live on the **class
      type**, the gym's catalog of programs, so one-off slots and series both inherit them and a
      «Ladies WOD» is its own type. WOD focus is computed per slot (`workout.focus`) from the catalog-resolved
      movements: a modality or region counts when at least a third of the movements carry it, and

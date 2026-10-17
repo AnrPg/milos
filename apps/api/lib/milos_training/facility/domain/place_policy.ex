@@ -4,7 +4,7 @@ defmodule MilosTraining.Facility.Domain.PlacePolicy do
   coordinates, neighbourhood, weekly opening hours and accessibility.
   """
 
-  @accessibility ~w(step_free accessible_toilet parking changing_room showers women_only_area)
+  @accessibility ~w(step_free accessible_toilet parking changing_room showers women_area)
   @time ~r/^([01]\d|2[0-3]):[0-5]\d$/
 
   @doc "Accessibility features a location can declare."
