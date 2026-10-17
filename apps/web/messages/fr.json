@@ -5236,7 +5236,13 @@
     "statusPast": "Terminé",
     "spotsLeft": "{count, plural, one {# place} other {# places}}",
     "minutes": "{count}′",
-    "outsidePackage": "Hors forfait"
+    "outsidePackage": "Hors forfait",
+    "showMonth": "{month} : afficher le mois",
+    "showDay": "{month} : revenir au jour",
+    "monthAria": "Mois",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "classesOnDay": "{count, plural, =0 {aucun cours} one {# cours} other {# cours}}"
   },
   "LocationPicker": {
     "title": "Lieu",

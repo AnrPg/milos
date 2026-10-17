@@ -5236,7 +5236,13 @@
     "statusPast": "Terminada",
     "spotsLeft": "{count, plural, one {# vaga} other {# vagas}}",
     "minutes": "{count}′",
-    "outsidePackage": "Fora do pacote"
+    "outsidePackage": "Fora do pacote",
+    "showMonth": "{month}: ver o mês",
+    "showDay": "{month}: voltar ao dia",
+    "monthAria": "Mês",
+    "previousMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte",
+    "classesOnDay": "{count, plural, =0 {sem aulas} one {# aula} other {# aulas}}"
   },
   "LocationPicker": {
     "title": "Local",

@@ -5236,7 +5236,13 @@
     "statusPast": "Over",
     "spotsLeft": "{count, plural, one {# spot} other {# spots}}",
     "minutes": "{count}′",
-    "outsidePackage": "Not in package"
+    "outsidePackage": "Not in package",
+    "showMonth": "{month}: show the month",
+    "showDay": "{month}: back to the day",
+    "monthAria": "Month",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "classesOnDay": "{count, plural, =0 {no classes} one {# class} other {# classes}}"
   },
   "LocationPicker": {
     "title": "Location",

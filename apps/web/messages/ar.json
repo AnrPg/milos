@@ -5236,7 +5236,13 @@
     "statusPast": "انتهت",
     "spotsLeft": "{count, plural, zero {لا أماكن} one {مكان واحد} two {مكانان} few {# أماكن} many {# مكانًا} other {# مكان}}",
     "minutes": "{count}′",
-    "outsidePackage": "خارج الباقة"
+    "outsidePackage": "خارج الباقة",
+    "showMonth": "{month}: عرض الشهر",
+    "showDay": "{month}: العودة إلى اليوم",
+    "monthAria": "الشهر",
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "classesOnDay": "{count, plural, zero {لا حصص} one {حصة واحدة} two {حصتان} few {# حصص} many {# حصة} other {# حصة}}"
   },
   "LocationPicker": {
     "title": "الموقع",

@@ -182,6 +182,18 @@ test.describe("member schedule", () => {
     await expect(page.getByRole("main").getByText("CrossFit")).toHaveCount(0);
   });
 
+  test("switches to the month grid from the month name and back to a day", async ({ page }) => {
+    await page.goto("/box/schedule");
+    await page.getByRole("button", { name: /δείξε τον μήνα/ }).click();
+    const grid = page.getByRole("grid", { name: "Μήνας" });
+    await expect(grid.getByRole("gridcell", { name: /4 μαθήματα/ })).toBeVisible();
+    await shot(page, "month");
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    await grid.getByRole("gridcell", { name: new RegExp(`^\\S+ ${tomorrow.getDate()} `) }).first().click();
+    await expect(page.getByText("Δεν υπάρχουν μαθήματα")).toBeVisible();
+  });
+
   test("picks a location from the list over the map", async ({ page }) => {
     await page.goto("/box/schedule/location");
     await expect(page.getByRole("heading", { name: "Τοποθεσία" })).toBeVisible();

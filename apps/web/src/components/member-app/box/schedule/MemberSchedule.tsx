@@ -21,6 +21,7 @@ import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 
 import { ClassRow } from "./ClassRow";
+import { MONTH_GRID_DAYS, MonthGrid, monthGridStart, shiftMonth } from "./MonthGrid";
 import {
   DEFAULT_SCHEDULE_FILTERS,
   activeFilterCount,
@@ -32,10 +33,13 @@ import {
 } from "./schedule-filters";
 import { ScheduleFiltersPage } from "./ScheduleFiltersPage";
 import { useSchedulePreferences } from "./use-schedule-preferences";
-import { WeekStrip, weekStart } from "./WeekStrip";
+import { WeekStrip } from "./WeekStrip";
 
-/** Classes are fetched two weeks at a time, so the «next match» can look ahead. */
-const WINDOW_DAYS = 14;
+/**
+ * Both views read the six-week month grid around the selected date, so
+ * switching views needs no fetch and the «next match» can look ahead.
+ */
+type ScheduleView = "day" | "month";
 
 function addDays(isoDate: string, days: number) {
   const date = parseLocalDate(isoDate);
@@ -64,6 +68,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const submitCommand = useOutboxCommand();
 
   const [selectedDate, setSelectedDate] = useState(() => formatLocalIsoDate(new Date()));
+  const [view, setView] = useState<ScheduleView>("day");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [openSlotId, setOpenSlotId] = useState<string | null>(initialOpenSlotId);
   const [bookingTarget, setBookingTarget] = useState<ScheduleSlot | null>(null);
@@ -71,14 +76,15 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const [notice, setNotice] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
-  const windowStart = weekStart(selectedDate);
+  // The grid starts on the Monday of the 1st, so the selected day's week is always inside it.
+  const windowStart = monthGridStart(selectedDate);
   const windowQuery = useQuery({
     queryKey: ["member-schedule", organizationId, windowStart],
     enabled: Boolean(token && organizationId),
     queryFn: () =>
       fetchSchedule(token!, {
         startAt: parseLocalDate(windowStart).toISOString(),
-        endAt: parseLocalDate(addDays(windowStart, WINDOW_DAYS)).toISOString(),
+        endAt: parseLocalDate(addDays(windowStart, MONTH_GRID_DAYS)).toISOString(),
         days: 7,
         classTypeIds: [],
       }),
@@ -150,6 +156,14 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const daySlots = matching
     .filter((slot) => localDay(slot.scheduled_at) === selectedDate)
     .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
+  const dayCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    matching.forEach((slot) => {
+      const day = localDay(slot.scheduled_at);
+      counts.set(day, (counts.get(day) ?? 0) + 1);
+    });
+    return counts;
+  }, [matching]);
   const dayEnd = parseLocalDate(addDays(selectedDate, 1));
   const upcoming = daySlots.length === 0 ? nextMatch(matching, dayEnd) : null;
   const openSlot = slots.find((slot) => slot.id === openSlotId) ?? null;
@@ -255,7 +269,25 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         chips={chips}
       />
 
-      <WeekStrip selectedDate={selectedDate} onSelect={setSelectedDate} />
+      <ViewSwitch
+        view={view}
+        selectedDate={selectedDate}
+        onToggle={() => setView(view === "day" ? "month" : "day")}
+        onShiftMonth={(months) => setSelectedDate(shiftMonth(selectedDate, months))}
+      />
+
+      {view === "month" ? (
+        <MonthGrid
+          selectedDate={selectedDate}
+          counts={dayCounts}
+          onSelect={(day) => {
+            setSelectedDate(day);
+            setView("day");
+          }}
+        />
+      ) : (
+        <WeekStrip selectedDate={selectedDate} onSelect={setSelectedDate} />
+      )}
 
       {notice ? (
         <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>
@@ -268,7 +300,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         </p>
       ) : null}
 
-      <section aria-live="polite" className="flex flex-col gap-2">
+      <section aria-live="polite" hidden={view === "month"} className="flex flex-col gap-2">
         {windowQuery.isError ? (
           <div className="flex flex-col items-center gap-3 py-10 text-center">
             <p className="text-base font-bold" style={{ color: "var(--text)" }}>
@@ -364,6 +396,67 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         />
       ) : null}
     </main>
+  );
+}
+
+/**
+ * The month name above the calendar is the view switch (board 2, Q2): tap it
+ * for the month grid, tap again for the day. The month view adds arrows.
+ */
+function ViewSwitch({
+  view,
+  selectedDate,
+  onToggle,
+  onShiftMonth,
+}: {
+  view: ScheduleView;
+  selectedDate: string;
+  onToggle: () => void;
+  onShiftMonth: (months: number) => void;
+}) {
+  const t = useTranslations("BoxSchedule");
+  const locale = useLocale();
+  const month = new Intl.DateTimeFormat(locale, { month: "long", year: "numeric" }).format(parseLocalDate(selectedDate));
+  const arrow = "grid h-9 w-9 place-items-center rounded-full text-lg";
+
+  return (
+    <div className="flex items-center justify-between gap-2">
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-expanded={view === "month"}
+        aria-label={view === "day" ? t("showMonth", { month }) : t("showDay", { month })}
+        className="flex min-h-9 items-center gap-1 text-base font-bold"
+        style={{ color: "var(--text)" }}
+      >
+        <span className="first-letter:uppercase">{month}</span>
+        <span aria-hidden="true" className="text-xs" style={{ color: "var(--dim)" }}>
+          {view === "day" ? "▾" : "▴"}
+        </span>
+      </button>
+      {view === "month" ? (
+        <span className="flex gap-1">
+          <button
+            type="button"
+            onClick={() => onShiftMonth(-1)}
+            aria-label={t("previousMonth")}
+            className={arrow}
+            style={{ color: "var(--dim)" }}
+          >
+            <span aria-hidden="true">‹</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => onShiftMonth(1)}
+            aria-label={t("nextMonth")}
+            className={arrow}
+            style={{ color: "var(--dim)" }}
+          >
+            <span aria-hidden="true">›</span>
+          </button>
+        </span>
+      ) : null}
+    </div>
   );
 }
 

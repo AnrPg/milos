@@ -5236,7 +5236,13 @@
     "statusPast": "Terminada",
     "spotsLeft": "{count, plural, one {# plaza} other {# plazas}}",
     "minutes": "{count}′",
-    "outsidePackage": "Fuera del paquete"
+    "outsidePackage": "Fuera del paquete",
+    "showMonth": "{month}: ver el mes",
+    "showDay": "{month}: volver al día",
+    "monthAria": "Mes",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "classesOnDay": "{count, plural, =0 {sin clases} one {# clase} other {# clases}}"
   },
   "LocationPicker": {
     "title": "Ubicación",
