@@ -7,7 +7,7 @@ defmodule MilosTraining.FakeWorkoutIconSuggester do
   @behaviour MilosTraining.Application.Ports.WorkoutIconSuggester
 
   @impl true
-  def suggest(%{title: title}) do
+  def suggest(%{title: title}, _metering) do
     cond do
       title =~ ~r/deload/i -> {:ok, "💆"}
       title =~ ~r/mobility/i -> {:ok, " 🧘 "}

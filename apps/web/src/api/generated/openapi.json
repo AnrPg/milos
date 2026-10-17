@@ -5083,6 +5083,11 @@
             },
             "type": "array"
           },
+          "operation_id": {
+            "description": "Groups the model calls of this analysis in the gym's AI usage records (ADR-141)",
+            "format": "uuid",
+            "type": "string"
+          },
           "quality": {
             "description": "How much the parser answer had to be repaired against the contract",
             "properties": {
@@ -33884,6 +33889,11 @@
                         "type": "object"
                       },
                       "type": "array"
+                    },
+                    "operation_id": {
+                      "description": "Groups the model calls of this analysis in the gym's AI usage records (ADR-141)",
+                      "format": "uuid",
+                      "type": "string"
                     },
                     "quality": {
                       "description": "How much the parser answer had to be repaired against the contract",

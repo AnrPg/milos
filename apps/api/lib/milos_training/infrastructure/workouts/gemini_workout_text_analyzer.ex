@@ -25,12 +25,17 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
 
   The key never leaves the server. Output is untrusted and is validated by
   the Workouts domain (`Contract`, `Proofreading`, `FreeTextAnalysis`).
+
+  Every billed call (each tool round and repair included) is reported to
+  `MilosTraining.AiUsage` with the response's token usage and the caller's
+  `options.metering` (ADR-141).
   """
 
   @behaviour MilosTraining.Workouts.Ports.WorkoutTextAnalyzer
 
   require Logger
 
+  alias MilosTraining.AiUsage
   alias MilosTraining.Infrastructure.Workouts.GeminiPrompts
   alias MilosTraining.Workouts.Domain.WorkoutAssistant.Tools
 
@@ -59,6 +64,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
     run(GeminiPrompts.structure(locale), [user_turn(text)], [], %{
       source: text,
       agent: "structure",
+      metering: AiUsage.metering(options),
       max_rounds: 0
     })
   end
@@ -84,6 +90,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
     run(GeminiPrompts.parser(locale, outline), turns, @parser_tools, %{
       source: text,
       agent: "parser",
+      metering: AiUsage.metering(options),
       max_rounds: @parser_tool_rounds
     })
   end
@@ -95,6 +102,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
     run(GeminiPrompts.proofreader(locale), [user_turn(text)], @proofreader_tools, %{
       source: text,
       agent: "proofreader",
+      metering: AiUsage.metering(options),
       max_rounds: @proofreader_tool_rounds
     })
   end
@@ -181,7 +189,11 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       ]
       |> Keyword.merge(Keyword.get(config, :req_options, []))
 
-    case Req.post(request_options) do
+    started = System.monotonic_time(:millisecond)
+    response = Req.post(request_options)
+    meter(response, model, context, System.monotonic_time(:millisecond) - started)
+
+    case response do
       {:ok, %Req.Response{status: 200, body: %{"candidates" => [%{"content" => content} | _]}}} ->
         {:ok, content}
 
@@ -200,6 +212,29 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
         {:error, :analyzer_unavailable}
     end
   end
+
+  # Billed whenever Gemini answered, even if the answer turns out unusable.
+  defp meter({:ok, %Req.Response{status: 200, body: %{} = body}}, model, context, duration_ms) do
+    case AiUsage.token_usage_from_gemini(Map.get(body, "usageMetadata")) do
+      nil ->
+        :ok
+
+      usage ->
+        AiUsage.report_generation(
+          usage,
+          duration_ms,
+          Map.merge(context.metering, %{
+            provider: "gemini",
+            model: model,
+            model_version: Map.get(body, "modelVersion"),
+            agent: context.agent,
+            occurred_at: DateTime.utc_now()
+          })
+        )
+    end
+  end
+
+  defp meter(_response, _model, _context, _duration_ms), do: :ok
 
   defp put_tools(body, [], _final_round), do: body
 
