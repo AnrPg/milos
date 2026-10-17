@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.Ports.TenantObjectStore do
   cannot address arbitrary buckets.
   """
 
-  @type bucket :: :documents | :avatars | :branding
+  @type bucket :: :documents | :avatars | :branding | :media_public | :media_private
   @type object :: %{key: String.t(), size: non_neg_integer()}
   @type probe :: %{head: binary(), byte_size: non_neg_integer() | nil}
 

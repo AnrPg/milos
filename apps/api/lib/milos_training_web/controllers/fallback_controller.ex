@@ -1511,6 +1511,50 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "already_completed", error: "Execution already completed"})
   end
 
+  # ADR-148 media uploads and ADR-142 public profiles.
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_media_purpose,
+             :invalid_media_type,
+             :invalid_media_size,
+             :media_too_large,
+             :media_type_mismatch,
+             :media_has_metadata,
+             :media_unreadable,
+             :media_upload_missing,
+             :invalid_media,
+             :too_many_photos,
+             :public_profile_empty
+           ] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: to_string(reason), error: "The upload or profile was rejected."})
+  end
+
+  def call(conn, {:error, :media_not_found}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "media_not_found", error: "Media not found."})
+  end
+
+  def call(conn, {:error, :media_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "media_key_forbidden", error: "Forbidden."})
+  end
+
+  def call(conn, {:error, :media_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{code: "media_storage_unavailable", error: "Storage is unavailable; try again."})
+  end
+
+  def call(conn, {:error, :stale_profile}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "stale_profile", error: "The profile changed meanwhile; reload it."})
+  end
+
   def call(conn, {:error, :forbidden}) do
     conn
     |> put_status(:forbidden)

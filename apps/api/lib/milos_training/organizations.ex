@@ -509,6 +509,33 @@ defmodule MilosTraining.Organizations do
     end
   end
 
+  # Public profile of a gym (ADR-142).
+  def get_public_profile(context),
+    do: MilosTraining.Organizations.PublicProfileStore.get(context)
+
+  def upsert_public_profile(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.upsert(context, params)
+
+  defdelegate box_disciplines(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :disciplines
+
+  defdelegate box_audiences(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :audiences
+
+  defdelegate box_profile_max_photos(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :max_photos
+
+  defdelegate normalize_box_photo_ids(ids),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :normalize_photo_ids
+
+  defdelegate box_profile_publishable?(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :publishable?
+
   defp legacy_membership_role(:admin), do: :owner
   defp legacy_membership_role(:athlete), do: :athlete
   defp legacy_membership_role(_role), do: :member

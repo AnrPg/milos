@@ -22,6 +22,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Housekeeping,
     Inventory,
     Journal,
+    Media,
     Messaging,
     Notifications,
     Nutrition,
@@ -36,6 +37,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
   @purgeable [
     Analytics,
     Community,
+    Media,
     Notifications,
     Execution,
     Pantheon,

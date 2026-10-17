@@ -34,6 +34,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.OwnerOrganizationController => [:manage_organization_lifecycle],
     W.AdminWorkoutTimerPreviewController => [:manage_workouts],
     W.AdminBrandingController => [:manage_settings],
+    W.AdminPublicProfileController => [:manage_settings],
     W.AdminWorkoutFreeTextController => [:manage_workouts],
     W.AdminOnboardingController => [:manage_settings],
     W.TrainingHistoryController => [:view_client_training]

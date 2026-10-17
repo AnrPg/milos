@@ -24,6 +24,7 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-milos-minio-change-me}
       MINIO_BUCKET: ${MINIO_BUCKET:-milos-invoices}
       MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}
+      MINIO_MEDIA_BUCKET: ${MINIO_MEDIA_BUCKET:-milos-media}
       PHX_HOST: ${PHX_HOST:-localhost}
       PHX_SERVER: "true"
       PORT: 4000

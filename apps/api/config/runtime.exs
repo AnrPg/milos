@@ -50,7 +50,8 @@ config :milos_training,
   minio_access_key: minio_access_key,
   minio_secret_key: minio_secret_key,
   minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
-  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")
+  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars"),
+  minio_media_bucket: System.get_env("MINIO_MEDIA_BUCKET", "milos-media")
 
 meili_url =
   System.get_env("MEILI_URL") ||

@@ -19,11 +19,21 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorageTest do
 
     assert resource == [
              "arn:aws:s3:::milos-avatars/users/*/avatars/*",
-             "arn:aws:s3:::milos-avatars/organizations/*/branding/logo/*"
+             "arn:aws:s3:::milos-avatars/organizations/*/branding/logo/*",
+             "arn:aws:s3:::milos-avatars/organizations/*/media/public/*"
            ]
   end
 
-  test "only branding objects have a public URL" do
+  test "only branding and public media objects have a public URL" do
+    assert {:ok, media_url} =
+             MinioStorage.public_object_url(
+               :media_public,
+               "organizations/o/media/public/box/x.jpg"
+             )
+
+    assert String.ends_with?(media_url, "/organizations/o/media/public/box/x.jpg")
+    assert {:error, :not_public} = MinioStorage.public_object_url(:media_private, "x")
+
     assert {:ok, url} =
              MinioStorage.public_object_url(:branding, "organizations/o/branding/logo/x.png")
 

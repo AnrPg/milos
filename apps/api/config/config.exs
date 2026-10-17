@@ -40,7 +40,8 @@ config :milos_training, Oban,
        {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob},
        {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob},
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
-       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob}
+       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
+       {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob}
      ]}
   ],
   queues: [
@@ -99,6 +100,12 @@ config :milos_training,
 config :milos_training,
        :community_store,
        MilosTraining.Infrastructure.Community.EctoCommunityStore
+
+config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+config :milos_training,
+       :public_profile_store,
+       MilosTraining.Infrastructure.Organizations.EctoPublicProfileStore
 
 config :milos_training,
        :coaching_note_store,
