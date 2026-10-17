@@ -256,9 +256,45 @@ the 12 locales (`npm run i18n:check`).
 
 ## 5a. UX decisions (filled in per screen, from the UX conversations)
 
-| Screen | Date | Decisions |
-|---|---|---|
-| _none yet_ | | |
+Sessions run on mockup boards (published artifacts with alternatives to pick and comment on), per
+Apostolos' preference to decide on visuals rather than text.
+
+### Box › Πρόγραμμα (2026-10-17, [board](https://claude.ai/artifact/3mJnPApB49f3UXTcySjZaY))
+
+1. **Filter row:** one horizontally scrolling chip row under the title, in this order:
+   «Καθαρισμός» (only while a filter is on) · «Φίλτρα (n)» · filter chips. Nothing is pinned; the row
+   scrolls away as a whole.
+2. **Which filters, where:** catalog of 15 filters (type, events, coach, time, weekdays, spots,
+   package, my bookings, friends, duration, level, workout focus, audience, language, cost), each
+   placed as chip / only in Φίλτρα / off. Default placement from the board: chips for Είδος,
+   Διαθεσιμότητα, Πακέτο, Οι κρατήσεις μου; language and cost off; the rest only in Φίλτρα.
+   *Pending confirmation.*
+3. **«Φίλτρα (n)»** opens a **full-screen page** (sections per filter, «Καθαρισμός» and «Δείξε N»
+   at the bottom).
+4. **Classes outside the package** (when «Στο πακέτο μου» is off): shown **dimmed** with an
+   «Εκτός πακέτου» tag.
+5. **Time filter:** a **from–to range** slider.
+6. **Location:** the schedule shows the location in the **title as a switch ▾**. Tapping it opens a
+   **location picker screen**: an accurate street map on top (gym name over each pin) and a list in
+   two sections, «Σε αυτή την περιοχή» (locations in the map frame, live as you pan or zoom) and
+   «Πιο μακριά» (all others), sorted by distance from the user (device location if allowed, else the
+   user's neighbourhood), with distance on each row.
+   *Pending: does «Πιο μακριά» list only bookable places or every gym in the app.*
+7. **Layout:** the **day view** (week strip, one day's classes) is the default. A subtle view switch
+   offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
+   on that date. Tapping a class opens an **overlay** with class info (time, duration, coach, spots,
+   Κράτηση) and the WOD, its parameters in collapsed sections revealed progressively.
+8. **Class row:** **compact** (time, name, coach, spots) plus a subtle duration («18:00 · 60′»);
+   location only when several locations are shown.
+   **Product rule:** members experience their gym as **one home location** (gyms with several
+   locations usually have a separate entry per location); only the owner oversees all locations.
+   Needs a per-membership home location. *Pending: can members view/book other locations of their
+   gym; are coaches/admins like members or like the owner.*
+9. **Remembering:** last filters restored silently per gym (saved_filters `box_schedule`),
+   «Καθαρισμός» always first.
+10. **No results:** a prominent «Δεν υπάρχουν μαθήματα» for the chosen date, with the next match as
+    one quiet line beneath.
+
 
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
