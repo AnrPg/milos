@@ -96,6 +96,19 @@ defmodule MilosTrainingWeb.ScheduleController do
                items: %Schema{type: :object, additionalProperties: true}
              },
              locations: %Schema{type: :array, items: @location_schema},
+             coaches: %Schema{
+               type: :array,
+               description: "The coaches of the window's classes.",
+               items: %Schema{
+                 type: :object,
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   nickname: %Schema{type: :string},
+                   avatar_url: %Schema{type: :string, nullable: true}
+                 },
+                 required: [:id, :nickname, :avatar_url]
+               }
+             },
              slots: %Schema{
                type: :array,
                items: %Schema{

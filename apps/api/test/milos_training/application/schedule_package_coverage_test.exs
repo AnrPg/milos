@@ -102,4 +102,21 @@ defmodule MilosTraining.Application.SchedulePackageCoverageTest do
 
     refute coverage(context, member, slot.id)
   end
+
+  test "the schedule names the coaches of its classes" do
+    admin = admin_fixture()
+    context = legacy_tenant_context(admin, :owner)
+    coach = user_fixture()
+    legacy_tenant_context(coach, :coach)
+    slot_fixture(workout_fixture(admin), %{coach_user_id: coach.id})
+
+    {:ok, %{coaches: coaches}} =
+      GetScheduleCalendar.call(context, admin, %{
+        "start_date" => Date.to_iso8601(Date.utc_today())
+      })
+
+    assert [%{id: id, nickname: nickname}] = coaches
+    assert id == coach.id
+    assert nickname == coach.nickname
+  end
 end

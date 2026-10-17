@@ -22,6 +22,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
          days: days,
          class_types: class_types,
          locations: Facility.list_locations(context, include_archived: true),
+         coaches: schedule_coaches(slots),
          slots: slots
        }}
     end
@@ -295,6 +296,18 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     do: Enum.find_index(waitlist, &(&1.id == id)) + 1
 
   defp waitlist_position(_waitlist, _booking), do: nil
+
+  # Phase 2 Πρόγραμμα: the coaches of the window's classes, for the row and
+  # the Coach filter, so members need no staff listing.
+  defp schedule_coaches(slots) do
+    slots
+    |> Enum.map(&Map.get(&1, :coach_user_id))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Identity.list_by_ids()
+    |> Enum.map(&%{id: &1.id, nickname: &1.nickname, avatar_url: &1.avatar_url})
+    |> Enum.sort_by(& &1.nickname)
+  end
 
   defp schedule_class_types(context, slots) do
     active =
