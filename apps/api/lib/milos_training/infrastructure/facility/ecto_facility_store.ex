@@ -159,6 +159,13 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
       organization_id: location.organization_id,
       name: location.name,
       address: location.address,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      neighbourhood: location.neighbourhood,
+      city: location.city,
+      country_code: location.country_code,
+      opening_hours: location.opening_hours,
+      accessibility: location.accessibility,
       archived_at: location.archived_at,
       inserted_at: location.inserted_at,
       updated_at: location.updated_at

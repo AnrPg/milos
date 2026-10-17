@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgis/postgis:16-3.5-alpine
         env:
           POSTGRES_DB: milos_training_test
           POSTGRES_PASSWORD: postgres
@@ -96,7 +96,7 @@ jobs:
     runs-on: self-hosted
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgis/postgis:16-3.5-alpine
         env:
           POSTGRES_DB: milos_training_backup_drill
           POSTGRES_PASSWORD: postgres
@@ -123,7 +123,7 @@ jobs:
             -v "$PWD/ops/postgres/backup:/backup:ro" \
             -v "/tmp/milos-ci-backups:/backups/postgres" \
             -v "/tmp/milos-ci-wal:/wal-archive" \
-            postgres:16-alpine /backup/run-backup.sh
+            postgis/postgis:16-3.5-alpine /backup/run-backup.sh
           touch /tmp/milos-ci-wal/000000010000000000000001
           docker run --rm \
             -e BACKUP_ROOT=/backups/postgres \
@@ -131,7 +131,7 @@ jobs:
             -v "$PWD/ops/postgres/backup:/backup:ro" \
             -v "/tmp/milos-ci-backups:/backups/postgres:ro" \
             -v "/tmp/milos-ci-wal:/wal-archive:ro" \
-            postgres:16-alpine /backup/restore-drill.sh
+            postgis/postgis:16-3.5-alpine /backup/restore-drill.sh
 
   image-build:
     runs-on: self-hosted

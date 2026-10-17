@@ -125,7 +125,7 @@ services:
     networks: [app]
 
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     command:
       - postgres
       - -c
@@ -154,7 +154,7 @@ services:
       retries: 10
 
   postgres-backup:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     profiles: ["backup"]
     environment:
       PGHOST: postgres
@@ -177,7 +177,7 @@ services:
     restart: "no"
 
   postgres-restore-drill:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     profiles: ["backup"]
     environment:
       BACKUP_ROOT: /backups/postgres

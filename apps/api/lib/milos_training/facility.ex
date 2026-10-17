@@ -4,7 +4,11 @@ defmodule MilosTraining.Facility do
   that consume package visits go through `Application.CheckInOpenGym`.
   """
 
+  alias MilosTraining.Facility.Domain.PlacePolicy
   alias MilosTraining.Facility.FacilityStore
+
+  @doc "Accessibility features a location can declare (ADR-141)."
+  def accessibility_features, do: PlacePolicy.accessibility_features()
 
   def list_locations(context, opts \\ []), do: FacilityStore.list_locations(context, opts)
   def get_location(context, id), do: FacilityStore.get_location(context, id)
