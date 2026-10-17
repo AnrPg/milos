@@ -298,11 +298,12 @@ Apostolos' preference to decide on visuals rather than text.
    member of). Where users discover other gyms at all is decided under «Other gyms» below.
 7. **Layout:** the **day view** (week strip, one day's classes) is the default. There is **no week
    view**: the two views are Day (the strip) and Month (board 2, Q3). The switch is the **month
-   name above the strip**, tappable (board 2, Q2). It offers a **month grid** with dots counting each day's classes; tapping a date opens the day view
+   name above the strip**, tappable (board 2, Q2). It offers a **month grid** with a dot per matching class, the member's own bookings **green** and first, at most three dots and a «+» beyond (board 2, Q4); tapping a date opens the day view
    on that date. Tapping a class opens a **bottom sheet** (board 2, Q5) with class info and the WOD.
    Its header shows time and duration, coach, spots, level, WOD focus, friends going, the
    cancellation cutoff, the waitlist and whether the package covers it (board 2, Q6). The WOD shows
-   **movement names only** (board 2, Q7); the parameters stay out of the sheet.
+   **movement names only** (board 2, Q7); the parameters stay out of the sheet. «Κράτηση» is
+   **fixed at the bottom** of the sheet (board 2, Q8).
 8. **Class row:** **compact** (time, name, coach, spots) plus a subtle duration («18:00 · 60′»);
    location only when several locations are shown.
    **Product rule:** members experience their gym as **one home location** (gyms with several

@@ -21,11 +21,12 @@ import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
 
 import { ClassRow } from "./ClassRow";
-import { MONTH_GRID_DAYS, MonthGrid, monthGridStart, shiftMonth } from "./MonthGrid";
+import { MONTH_GRID_DAYS, MonthGrid, monthGridStart, shiftMonth, type DayCount } from "./MonthGrid";
 import {
   DEFAULT_SCHEDULE_FILTERS,
   activeFilterCount,
   atLocation,
+  isBookedByMe,
   matchesScheduleFilters,
   nextMatch,
   type ScheduleFilters,
@@ -157,10 +158,11 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
     .filter((slot) => localDay(slot.scheduled_at) === selectedDate)
     .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
   const dayCounts = useMemo(() => {
-    const counts = new Map<string, number>();
+    const counts = new Map<string, DayCount>();
     matching.forEach((slot) => {
       const day = localDay(slot.scheduled_at);
-      counts.set(day, (counts.get(day) ?? 0) + 1);
+      const count = counts.get(day) ?? { total: 0, mine: 0 };
+      counts.set(day, { total: count.total + 1, mine: count.mine + (isBookedByMe(slot) ? 1 : 0) });
     });
     return counts;
   }, [matching]);

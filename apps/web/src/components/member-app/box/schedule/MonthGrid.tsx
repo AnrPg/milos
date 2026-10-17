@@ -31,12 +31,16 @@ function shift(isoDate: string, days: number) {
   return formatLocalIsoDate(date);
 }
 
-/** A busy day shows at most this many dots. */
-const MAX_DOTS = 4;
+/** A busy day shows at most this many dots, then a «+» (board 2, Q4). */
+const MAX_DOTS = 3;
+
+/** One day's matching classes, and how many of them the member booked. */
+export type DayCount = { total: number; mine: number };
 
 /**
  * The month view (plan §5a decision 7): one dot per class that matches the
- * filters; tapping a date opens the day view on it.
+ * filters, the member's own bookings green and first, at most three and a
+ * «+» beyond; tapping a date opens the day view on it.
  */
 export function MonthGrid({
   selectedDate,
@@ -44,7 +48,7 @@ export function MonthGrid({
   onSelect,
 }: {
   selectedDate: string;
-  counts: Map<string, number>;
+  counts: Map<string, DayCount>;
   onSelect: (isoDate: string) => void;
 }) {
   const t = useTranslations("BoxSchedule");
@@ -76,7 +80,8 @@ export function MonthGrid({
             const date = parseLocalDate(day);
             const inMonth = date.getMonth() === month;
             const selected = day === selectedDate;
-            const count = counts.get(day) ?? 0;
+            const { total, mine } = counts.get(day) ?? { total: 0, mine: 0 };
+            const dots = Math.min(total, MAX_DOTS);
             return (
               <button
                 key={day}
@@ -84,7 +89,7 @@ export function MonthGrid({
                 role="gridcell"
                 aria-selected={selected}
                 aria-current={day === today ? "date" : undefined}
-                aria-label={`${full.format(date)}, ${t("classesOnDay", { count })}`}
+                aria-label={`${full.format(date)}, ${t("classesOnDay", { count: total })}`}
                 onClick={() => onSelect(day)}
                 className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-sm font-bold"
                 style={{
@@ -95,14 +100,17 @@ export function MonthGrid({
                 }}
               >
                 {date.getDate()}
-                <span aria-hidden="true" className="flex h-1.5 items-center gap-0.5">
-                  {Array.from({ length: Math.min(count, MAX_DOTS) }, (_, index) => (
+                <span aria-hidden="true" className="flex h-2 items-center gap-0.5">
+                  {Array.from({ length: dots }, (_, index) => (
                     <span
                       key={index}
                       className="h-1 w-1 rounded-full"
-                      style={{ background: selected ? "var(--bg)" : "var(--primary)" }}
+                      style={{
+                        background: index < mine ? "var(--success)" : selected ? "var(--bg)" : "var(--primary)",
+                      }}
                     />
                   ))}
+                  {total > MAX_DOTS ? <span className="text-[9px] leading-none">+</span> : null}
                 </span>
               </button>
             );
