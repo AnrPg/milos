@@ -852,6 +852,7 @@ defmodule MilosTrainingWeb.Router do
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)
     get("/search/users", MeController, :search_users)
+    get("/places", MyPlacesController, :index)
   end
 
   scope "/api", MilosTrainingWeb do

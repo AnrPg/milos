@@ -4,8 +4,11 @@ defmodule MilosTraining.Facility do
   that consume package visits go through `Application.CheckInOpenGym`.
   """
 
-  alias MilosTraining.Facility.Domain.PlacePolicy
+  alias MilosTraining.Facility.Domain.{GeoDistance, PlacePolicy}
   alias MilosTraining.Facility.FacilityStore
+
+  @doc "Kilometres between two `{latitude, longitude}` points; nil when either is missing."
+  def distance_km(from, to), do: GeoDistance.km(from, to)
 
   @doc "Accessibility features a location can declare (ADR-141)."
   def accessibility_features, do: PlacePolicy.accessibility_features()
