@@ -245,9 +245,20 @@ check-in and referral all need them.
 - Account-level Πρόοδος and history, journal and Vault filter rows, Box title ▾ with merged today
   card and source labels.
 
+**How each milestone runs (Apostolos, 2026-10-17):** the fine details of every screen are not decided.
+Each milestone builds its backend first (data, API, OpenAPI); then, before any screen is written,
+Claude opens an interactive UX conversation about that screen, records the outcome in §5a, and only
+then builds the web side from those decisions. The mockup gives direction, not a pixel spec.
+
 Every milestone: tests first where practical; compile, format, credo, type-check and lint per
 slice; full API and web suites once at the end of the milestone; OpenAPI regenerated; all copy in
 the 12 locales (`npm run i18n:check`).
+
+## 5a. UX decisions (filled in per screen, from the UX conversations)
+
+| Screen | Date | Decisions |
+|---|---|---|
+| _none yet_ | | |
 
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
