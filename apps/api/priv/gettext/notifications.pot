@@ -251,3 +251,15 @@ msgstr ""
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr ""
+
+msgid "Follow request"
+msgstr ""
+
+msgid "%{nickname} wants to follow you."
+msgstr ""
+
+msgid "Follow request accepted"
+msgstr ""
+
+msgid "You now follow %{nickname}."
+msgstr ""

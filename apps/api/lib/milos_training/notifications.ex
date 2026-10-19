@@ -144,6 +144,28 @@ defmodule MilosTraining.Notifications do
 
   def process_event("box_message", payload), do: enqueue_message_to_member(:box_message, payload)
   def process_event("challenge_completed", payload), do: enqueue_challenge_completed(payload)
+
+  # ADR-142: follows of people.
+  def process_event("follow_requested", payload),
+    do:
+      enqueue_simple(:follow_requested, payload, %{
+        follow_id: field(payload, :follow_id),
+        follower_id: field(payload, :follower_id),
+        follower_nickname: field(payload, :follower_nickname),
+        dedupe_key: "follow_requested:#{field(payload, :follow_id)}",
+        url: "/me/follow-requests"
+      })
+
+  def process_event("follow_accepted", payload),
+    do:
+      enqueue_simple(:follow_accepted, payload, %{
+        follow_id: field(payload, :follow_id),
+        person_id: field(payload, :person_id),
+        person_nickname: field(payload, :person_nickname),
+        dedupe_key: "follow_accepted:#{field(payload, :follow_id)}",
+        url: "/people/#{field(payload, :person_id)}"
+      })
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)

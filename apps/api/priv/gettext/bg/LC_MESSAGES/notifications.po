@@ -252,3 +252,15 @@ msgstr "Достъпът ви изтече. Подновете абонамен�
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Предстоящите ви записвания бяха отменени: %{count}."
+
+msgid "Follow request"
+msgstr "Заявка за следване"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} иска да те следва."
+
+msgid "Follow request accepted"
+msgstr "Заявката за следване е приета"
+
+msgid "You now follow %{nickname}."
+msgstr "Вече следваш %{nickname}."

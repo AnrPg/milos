@@ -25,6 +25,7 @@ defmodule MilosTraining.Community.Ports.CommunityStore do
   @callback get_post(context(), id(), id()) :: map() | nil
   @callback list_posts(context(), map()) :: [map()]
   @callback list_pinned_posts(context(), [id()], id()) :: [map()]
+  @callback list_public_posts(context(), [id()], id() | nil, map()) :: [map()]
   @callback moderate_post(context(), id(), map()) :: {:ok, map()} | {:error, term()}
   @callback react(context(), map(), id(), String.t()) :: :ok | {:error, term()}
   @callback unreact(context(), map(), id(), String.t()) :: :ok

@@ -40,7 +40,9 @@ defmodule MilosTraining.Notifications.Notification do
     :coach_note_viewed,
     :subscription_expiring,
     :subscription_grace,
-    :access_ended
+    :access_ended,
+    :follow_requested,
+    :follow_accepted
   ]
 
   schema "notifications" do

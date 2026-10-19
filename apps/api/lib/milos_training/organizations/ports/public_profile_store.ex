@@ -8,4 +8,10 @@ defmodule MilosTraining.Organizations.Ports.PublicProfileStore do
   @callback pending_suggestions() :: [map()]
   @callback resolve_suggestion(id :: String.t(), status :: String.t()) ::
               :ok | {:error, :not_found}
+
+  # Visitors (no session): which published gym a slug or alias names, and the
+  # public face of published gyms by id.
+  @callback public_box_by_slug(slug :: String.t()) ::
+              %{organization_id: String.t(), slug: String.t()} | nil
+  @callback public_boxes(organization_ids :: [String.t()]) :: [map()]
 end

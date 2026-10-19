@@ -252,3 +252,15 @@ msgstr "Je toegang is afgelopen. Verleng je abonnement om weer lessen te boeken.
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Je komende boekingen zijn geannuleerd: %{count}."
+
+msgid "Follow request"
+msgstr "Volgverzoek"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} wil je volgen."
+
+msgid "Follow request accepted"
+msgstr "Volgverzoek geaccepteerd"
+
+msgid "You now follow %{nickname}."
+msgstr "Je volgt nu %{nickname}."

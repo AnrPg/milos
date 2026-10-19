@@ -323,6 +323,22 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     |> Repo.all()
   end
 
+  # Posts staff made public, from any of `organization_ids`; readable from
+  # any session (ADR-142).
+  @impl true
+  def list_public_posts(_context, [], _viewer_id, _page), do: []
+
+  def list_public_posts(_context, organization_ids, viewer_id, page) do
+    Post
+    |> where([p], p.organization_id in ^organization_ids and p.audience == "public")
+    |> where([p], is_nil(p.deleted_at) and is_nil(p.hidden_at))
+    |> before(Map.get(page, :before))
+    |> order_by([p], desc: p.inserted_at, desc: p.id)
+    |> limit(^Map.get(page, :limit, 20))
+    |> with_counts(viewer_id)
+    |> Repo.all()
+  end
+
   defp visible_to(query, viewer_id, moderated_organization_ids) do
     where(
       query,

@@ -79,8 +79,8 @@ Cards posted 2026-10-17; work proceeds on the recommended option unless the answ
 | # | Decision | Default taken | ADR |
 |---|---|---|---|
 | D1 | Geo engine | **PostGIS** (`postgis/postgis:16-3.5-alpine` in compose, CI, backup jobs); `geography(Point, 4326)` + GiST | ADR-141 |
-| D2 | Public box page without login | **Public link**: readable logged out (server-rendered for sharing); actions sign up first and then continue | ADR-142 |
-| D3 | Following people | **Approval**: a follow of a person is a request; boxes and open clubs are followed at once | ADR-142 |
+| D2 | Public box page without login | **Changed on board 4:** logged out shows only Σχετικά (server-rendered, Open Graph); Πρόγραμμα, Events, Δημόσια and actions need an account | ADR-142 |
+| D3 | Following people | **Approval** (confirmed on board 4): a follow of a person is a request; boxes and open clubs are followed at once | ADR-142 |
 | D4 | Map tiles | MapLibre GL with a tile URL from config (`NEXT_PUBLIC_MAP_STYLE_URL`), default OpenFreeMap; no vendor lock, no key in the repo | ADR-141 |
 | D5 | Neighbourhoods | Owner picks the location pin; neighbourhood is a normalised name stored on the location, chosen from a suggestion list (reverse geocoding when a geocoder is configured, else typed) | ADR-141 |
 | D6 | Member groups | Channels of kind `member_group` inside the gym club (mockup 03 lists them under the club's Κανάλια), not separate clubs; open clubs are clubs of kind `open` | ADR-143 |
@@ -371,6 +371,43 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
 8. **Publishing:** the owner edits a **draft** and presses «Δημοσίευση»; a checklist shows what is
    missing and «Μη δημοσιευμένες αλλαγές» shows after edits (Q8). Needs a published snapshot kept
    apart from the draft.
+
+### Public box page, follows and audiences (2026-10-19, [board 4](https://claude.ai/artifact/Ngx8eEDJpYX572E3a6LUrq))
+
+1. **Phone layout:** the published **cover photo across the top** with the logo overlapping it,
+   the name, then one line «neighbourhood · distance» (distance only when the visitor shared a
+   location; no disciplines, member or follower counts in that line). Tabs Σχετικά · Πρόγραμμα ·
+   Events · Δημόσια stick under the header. Empty tabs keep their slot with an empty state (§4.2).
+2. **Desktop:** designed for desktop on its own terms, following desktop UI/UX practice, while every
+   phone decision here stays as is (Apostolos left the layout to Claude).
+3. **Σχετικά order:** text (with «Περισσότερα»), photo strip, disciplines (chips, «+N»),
+   «Καλωσορίζει: …», services, amenities, languages, then locations with map and hours.
+4. **Coaches:** the owner picks which coaches show, in a «Coaches» step of Δημόσια σελίδα; they go
+   live with «Δημοσίευση». Each shows first name, photo and the class types they teach.
+5. **Amenities:** a two-column list, icon and label. Icons are Lucide line icons copied in as SVG;
+   towels need a different icon than `bath`.
+6. **Photos:** tapping the cover or a strip photo opens a full-screen swipe viewer (counter,
+   thumbnails, ✕ or swipe down).
+7. **Πρόγραμμα for visitors:** the members' Πρόγραμμα (week strip, compact rows, class sheet)
+   without «Κράτηση» and package dimming; chip row with class type, level and audience.
+8. **Logged out (D2 changed):** logged out you see only **Σχετικά**; Πρόγραμμα, Events and Δημόσια
+   ask you to sign in. The page stays server-rendered with Open Graph tags for sharing.
+9. **Buttons:** «Ακολούθησε» and «Ζήτα δοκιμαστικό» both sit in a **fixed bottom bar** (trial
+   from M3). A person's follow button reads «Ακολούθησε» → «Εκκρεμεί» → «Ακολουθείς ✓», and
+   unfollowing asks first. A member of the gym sees «Μέλος · Άνοιξε το club» instead.
+10. **Following people (D3 confirmed):** every follow of a person is a request they approve; boxes
+    (and open clubs, M4) are followed at once. **Anyone** with an account may send a request.
+11. **Requests:** a row «Αιτήματα ακολούθησης (n)» at the top of ♡ Ειδοποιήσεις opens a list with
+    «Αποδοχή» / «Απόρριψη». M2 puts ♡ in the Feed header as the brief says.
+12. **Εγώ:** the tiles stay; a tappable line under the name reads «124 ακόλουθοι · 87
+    ακολουθείς». It opens one connections screen with separate sections for followers, people you
+    follow, boxes, clubs and PR sharing (who shares PRs with you and with whom you share).
+13. **Audience picker:** one «Ποιος το βλέπει» row under the text opens a sheet: channels grouped by
+    club, then Ακόλουθοι and Δημόσια, each saying who sees it. It starts on the audience of your
+    last post. The first public post shows a one-time note «Δημόσια: το βλέπει οποιοσδήποτε, και
+    εκτός Milos».
+14. **Link preview:** the published cover with name and «discipline · neighbourhood»; gyms
+    without a cover get a generated card (logo, name, disciplines, neighbourhood, brand colour).
 
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable

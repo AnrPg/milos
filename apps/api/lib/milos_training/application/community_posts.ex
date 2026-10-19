@@ -1,7 +1,8 @@
 defmodule MilosTraining.Application.CommunityPosts do
   @moduledoc """
   Posting in a gym's club (ADR-138, M7): compose with an optional journal
-  attachment, moderation (D8), kudos and comments. Runs in the gym's scope;
+  attachment, moderation (D8), kudos and comments. Staff may make a post
+  public (ADR-142): it then also shows on the box page and to its followers. Runs in the gym's scope;
   every change is announced on the club's realtime topic.
   """
 
@@ -15,6 +16,7 @@ defmodule MilosTraining.Application.CommunityPosts do
          attrs =
            Map.merge(attachment, %{
              body: param(params, :body),
+             audience: param(params, :audience),
              client_operation_id: param(params, :client_operation_id)
            }),
          {:ok, post} <-

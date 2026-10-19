@@ -18,6 +18,8 @@ defmodule MilosTrainingWeb.Schemas.PublicProfile do
         :services,
         :cover,
         :photos,
+        :coaches,
+        :coach_candidates,
         :published,
         :published_at,
         :unpublished_changes,
@@ -33,6 +35,16 @@ defmodule MilosTrainingWeb.Schemas.PublicProfile do
         services: %Schema{type: :array, items: service()},
         cover: %Schema{Media.media() | nullable: true},
         photos: %Schema{type: :array, items: Media.media()},
+        coaches: %Schema{
+          type: :array,
+          items: coach(),
+          description: "The coaches the page shows, in the owner's order."
+        },
+        coach_candidates: %Schema{
+          type: :array,
+          items: coach(),
+          description: "The gym's staff the owner may pick from."
+        },
         published: %Schema{type: :boolean},
         unpublished_changes: %Schema{
           type: :boolean,
@@ -77,7 +89,25 @@ defmodule MilosTrainingWeb.Schemas.PublicProfile do
           maxItems: Organizations.box_profile_max_photos(),
           description: "Ready box_photo media of the gallery, in display order."
         },
+        coach_ids: %Schema{
+          type: :array,
+          items: %Schema{type: :string, format: :uuid},
+          description: "Staff shown as coaches on the page, in display order."
+        },
         lock_version: %Schema{type: :integer, description: "The version the editor read."}
+      }
+    }
+  end
+
+  defp coach do
+    %Schema{
+      title: "BoxPublicProfileCoach",
+      type: :object,
+      required: [:id],
+      properties: %{
+        id: %Schema{type: :string, format: :uuid},
+        nickname: %Schema{type: :string, nullable: true},
+        avatar_url: %Schema{type: :string, nullable: true}
       }
     }
   end

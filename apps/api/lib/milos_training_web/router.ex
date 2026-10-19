@@ -60,6 +60,12 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-142: the public box page; the web server renders it, so many
+  # visitors can arrive from one address.
+  pipeline :public_box_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "public-box")
+  end
+
   pipeline :execution_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 240,
@@ -177,6 +183,12 @@ defmodule MilosTrainingWeb.Router do
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
     get("/box-vocabulary", MilosTrainingWeb.BoxVocabularyController, :show)
+  end
+
+  scope "/api/public/boxes", MilosTrainingWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/:slug", PublicBoxController, :show)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
@@ -928,6 +940,28 @@ defmodule MilosTrainingWeb.Router do
     delete("/me/journal/notes/:id", JournalController, :delete_note)
     get("/me/clubs", CommunityController, :my_clubs)
     get("/me/feed", CommunityPostController, :feed)
+    # ADR-142: follows, profile posts and people.
+    get("/me/social", FollowController, :summary)
+    post("/me/follows", FollowController, :create)
+    get("/me/follows/:target_type/:target_id", FollowController, :show)
+    delete("/me/follows/:target_type/:target_id", FollowController, :delete)
+    get("/me/follow-requests", FollowController, :requests)
+    post("/me/follow-requests/:id/accept", FollowController, :accept)
+    delete("/me/follow-requests/:id", FollowController, :remove)
+    get("/me/followers", FollowController, :followers)
+    delete("/me/followers/:id", FollowController, :remove)
+    get("/me/following", FollowController, :following)
+    post("/profile-posts", ProfilePostController, :create)
+    delete("/profile-posts/:id", ProfilePostController, :delete)
+    put("/profile-posts/:id/kudos", ProfilePostController, :kudos)
+    get("/profile-posts/:id/comments", ProfilePostController, :comments)
+    post("/profile-posts/:id/comments", ProfilePostController, :comment)
+    delete("/profile-post-comments/:id", ProfilePostController, :delete_comment)
+    get("/people/:id", PeopleController, :show)
+    get("/people/:id/posts", PeopleController, :posts)
+    # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
+    get("/boxes/:slug/schedule", PublicBoxController, :schedule)
+    get("/boxes/:slug/posts", PublicBoxController, :posts)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

@@ -82,6 +82,25 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "cannot_post_in_channel", error: "You cannot post in this channel"})
   end
 
+  # ADR-142: audiences and follows.
+  def call(conn, {:error, :invalid_audience}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_audience", error: "You cannot post to this audience"})
+  end
+
+  def call(conn, {:error, :invalid_follow_target}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_follow_target", error: "This cannot be followed"})
+  end
+
+  def call(conn, {:error, :cannot_follow_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_follow_self", error: "You cannot follow yourself"})
+  end
+
   def call(conn, {:error, :attachment_not_shareable}) do
     conn
     |> put_status(:unprocessable_entity)

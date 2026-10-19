@@ -252,3 +252,15 @@ msgstr "Your access has ended. Renew your subscription to book classes again."
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Your upcoming bookings were cancelled: %{count}."
+
+msgid "Follow request"
+msgstr "Follow request"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} wants to follow you."
+
+msgid "Follow request accepted"
+msgstr "Follow request accepted"
+
+msgid "You now follow %{nickname}."
+msgstr "You now follow %{nickname}."

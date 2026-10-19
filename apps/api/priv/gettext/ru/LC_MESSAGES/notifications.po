@@ -252,3 +252,15 @@ msgstr "Доступ закончился. Продлите подписку, ч
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Ваши предстоящие записи отменены: %{count}."
+
+msgid "Follow request"
+msgstr "Запрос на подписку"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} хочет подписаться на вас."
+
+msgid "Follow request accepted"
+msgstr "Запрос на подписку принят"
+
+msgid "You now follow %{nickname}."
+msgstr "Теперь вы подписаны на %{nickname}."
