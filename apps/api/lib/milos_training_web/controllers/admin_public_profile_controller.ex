@@ -7,7 +7,9 @@ defmodule MilosTrainingWeb.AdminPublicProfileController do
   alias MilosTraining.Application.{
     BoxPublicProfile,
     CompleteMediaUpload,
+    PublishBoxPublicProfile,
     RequestMediaUpload,
+    SuggestBoxTag,
     UpdateBoxPublicProfile
   }
 
@@ -20,7 +22,7 @@ defmodule MilosTrainingWeb.AdminPublicProfileController do
   security([%{"bearerAuth" => []}])
 
   plug OpenApiSpex.Plug.CastAndValidate,
-       [json_render_error_v2: true] when action in [:update, :photo_upload]
+       [json_render_error_v2: true] when action in [:update, :publish, :suggest, :photo_upload]
 
   operation(:show,
     summary: "The gym's public profile (Σχετικά of the public box page)",
@@ -34,7 +36,7 @@ defmodule MilosTrainingWeb.AdminPublicProfileController do
   end
 
   operation(:update,
-    summary: "Edit, publish or unpublish the gym's public profile",
+    summary: "Edit the draft of the gym's public profile; visitors see it after publishing",
     request_body: %RequestBody{
       required: true,
       content: %{"application/json" => %MediaType{schema: PublicProfile.update_request()}}
@@ -50,6 +52,64 @@ defmodule MilosTrainingWeb.AdminPublicProfileController do
     with {:ok, profile} <-
            UpdateBoxPublicProfile.call(conn.assigns.tenant_context, conn.body_params) do
       json(conn, %{profile: profile})
+    end
+  end
+
+  operation(:publish,
+    summary: "Publish the draft: visitors see it from now on",
+    request_body: %RequestBody{
+      required: false,
+      content: %{"application/json" => %MediaType{schema: PublicProfile.publish_request()}}
+    },
+    responses: [
+      ok: {"Profile", "application/json", PublicProfile.profile_response()},
+      conflict: {"Edited meanwhile", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Something is missing", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def publish(conn, _params) do
+    params = Map.new(conn.body_params || %{}, fn {key, value} -> {to_string(key), value} end)
+
+    with {:ok, profile} <- PublishBoxPublicProfile.publish(conn.assigns.tenant_context, params) do
+      json(conn, %{profile: profile})
+    end
+  end
+
+  operation(:unpublish,
+    summary: "Hide the public page; the draft is kept",
+    responses: [ok: {"Profile", "application/json", PublicProfile.profile_response()}]
+  )
+
+  def unpublish(conn, _params) do
+    with {:ok, profile} <- PublishBoxPublicProfile.unpublish(conn.assigns.tenant_context) do
+      json(conn, %{profile: profile})
+    end
+  end
+
+  operation(:suggest,
+    summary: "Suggest a tag missing from a list, for review",
+    request_body: %RequestBody{
+      required: true,
+      content: %{"application/json" => %MediaType{schema: PublicProfile.suggestion_request()}}
+    },
+    responses: [
+      created:
+        {"Suggestion", "application/json",
+         %Schema{
+           type: :object,
+           required: [:suggestion],
+           properties: %{suggestion: PublicProfile.suggestion()}
+         }},
+      unprocessable_entity: {"Invalid suggestion", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def suggest(conn, _params) do
+    params = Map.new(conn.body_params, fn {key, value} -> {to_string(key), value} end)
+
+    with {:ok, suggestion} <- SuggestBoxTag.call(conn.assigns.tenant_context, params) do
+      conn |> put_status(:created) |> json(%{suggestion: suggestion})
     end
   end
 

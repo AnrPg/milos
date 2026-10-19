@@ -537,6 +537,35 @@ defmodule MilosTraining.Organizations do
   def upsert_public_profile(context, params),
     do: MilosTraining.Organizations.PublicProfileStore.upsert(context, params)
 
+  def create_tag_suggestion(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.create_suggestion(context, params)
+
+  def pending_tag_suggestions,
+    do: MilosTraining.Organizations.PublicProfileStore.pending_suggestions()
+
+  def resolve_tag_suggestion(id, status),
+    do: MilosTraining.Organizations.PublicProfileStore.resolve_suggestion(id, status)
+
+  defdelegate box_vocabulary(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :vocabulary
+
+  defdelegate box_amenities(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :amenities
+
+  defdelegate box_services(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :services
+
+  defdelegate box_suggestion_lists(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :suggestion_lists
+
+  defdelegate box_profile_missing(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :missing
+
   defdelegate box_disciplines(),
     to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
     as: :disciplines

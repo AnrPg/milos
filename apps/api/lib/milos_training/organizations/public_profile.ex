@@ -15,7 +15,12 @@ defmodule MilosTraining.Organizations.PublicProfile do
     field :disciplines, {:array, :string}, default: []
     field :languages, {:array, :string}, default: []
     field :audiences, {:array, :string}, default: []
+    field :amenities, {:array, :string}, default: []
+    field :services, {:array, :string}, default: []
+    field :cover_photo_id, :binary_id
     field :photo_ids, {:array, :binary_id}, default: []
+    # What visitors see: the draft as it was at the last «Δημοσίευση».
+    field :published_snapshot, :map
     field :published_at, :utc_datetime_usec
     field :lock_version, :integer, default: 1
 
@@ -30,7 +35,11 @@ defmodule MilosTraining.Organizations.PublicProfile do
       :disciplines,
       :languages,
       :audiences,
+      :amenities,
+      :services,
+      :cover_photo_id,
       :photo_ids,
+      :published_snapshot,
       :published_at
     ])
     |> validate_required([:organization_id])
@@ -40,10 +49,24 @@ defmodule MilosTraining.Organizations.PublicProfile do
     |> validate_subset(:disciplines, BoxProfilePolicy.disciplines())
     |> update_change(:audiences, &Enum.uniq/1)
     |> validate_subset(:audiences, BoxProfilePolicy.audiences())
+    |> update_change(:amenities, &Enum.uniq/1)
+    |> validate_subset(:amenities, BoxProfilePolicy.amenities())
+    |> update_change(:services, &Enum.uniq/1)
+    |> validate_subset(:services, BoxProfilePolicy.services())
+    |> validate_audiences_consistent()
     |> validate_languages()
     |> validate_length(:photo_ids, max: BoxProfilePolicy.max_photos())
     |> optimistic_lock(:lock_version)
     |> unique_constraint(:organization_id)
+  end
+
+  defp validate_audiences_consistent(changeset) do
+    audiences = get_field(changeset, :audiences) || []
+    disciplines = get_field(changeset, :disciplines) || []
+
+    if BoxProfilePolicy.audiences_consistent?(audiences, disciplines),
+      do: changeset,
+      else: add_error(changeset, :audiences, "returning_from_injury needs physio_rehab")
   end
 
   defp validate_languages(changeset) do

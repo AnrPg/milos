@@ -13,4 +13,15 @@ defmodule MilosTraining.Organizations.PublicProfileStore do
   @impl true
   def upsert(context, params),
     do: RepoContext.run(context, fn -> adapter().upsert(context, params) end)
+
+  @impl true
+  def create_suggestion(context, params),
+    do: RepoContext.run(context, fn -> adapter().create_suggestion(context, params) end)
+
+  # Platform review: the adapter reads across gyms through a narrow SQL function.
+  @impl true
+  def pending_suggestions, do: adapter().pending_suggestions()
+
+  @impl true
+  def resolve_suggestion(id, status), do: adapter().resolve_suggestion(id, status)
 end

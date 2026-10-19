@@ -176,6 +176,7 @@ defmodule MilosTrainingWeb.Router do
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
+    get("/box-vocabulary", MilosTrainingWeb.BoxVocabularyController, :show)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
@@ -597,6 +598,9 @@ defmodule MilosTrainingWeb.Router do
     get("/branding", AdminBrandingController, :show)
     get("/public-profile", AdminPublicProfileController, :show)
     put("/public-profile", AdminPublicProfileController, :update)
+    post("/public-profile/publish", AdminPublicProfileController, :publish)
+    post("/public-profile/unpublish", AdminPublicProfileController, :unpublish)
+    post("/public-profile/suggestions", AdminPublicProfileController, :suggest)
     post("/public-profile/photos", AdminPublicProfileController, :photo_upload)
     post("/public-profile/photos/:id/complete", AdminPublicProfileController, :complete_photo)
     post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
@@ -805,6 +809,8 @@ defmodule MilosTrainingWeb.Router do
       :platform_write_rate_limited
     ])
 
+    get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    patch("/tag-suggestions/:id", PlatformTagSuggestionController, :resolve)
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
     delete("/organizations/:id", PlatformOrganizationController, :delete)

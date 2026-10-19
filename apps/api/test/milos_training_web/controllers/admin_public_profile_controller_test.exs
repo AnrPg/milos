@@ -40,15 +40,33 @@ defmodule MilosTrainingWeb.AdminPublicProfileControllerTest do
              |> post("#{ctx.base}/photos/#{upload["media_id"]}/complete")
              |> json_response(200)
 
-    assert %{"profile" => %{"published" => true, "photos" => [%{"id" => ^id}]}} =
+    assert %{"profile" => %{"published" => false, "missing" => [], "cover" => %{"id" => ^id}}} =
              ctx.conn
              |> put_bearer_token(ctx.owner)
              |> put(ctx.base, %{
                about: "Box",
                disciplines: ["crossfit"],
-               photo_ids: [id],
-               published: true
+               amenities: ["showers"],
+               cover_photo_id: id
              })
+             |> json_response(200)
+
+    assert %{"profile" => %{"published" => true, "unpublished_changes" => false}} =
+             ctx.conn
+             |> put_bearer_token(ctx.owner)
+             |> post("#{ctx.base}/publish", %{})
+             |> json_response(200)
+
+    assert %{"suggestion" => %{"status" => "pending"}} =
+             ctx.conn
+             |> put_bearer_token(ctx.owner)
+             |> post("#{ctx.base}/suggestions", %{list: "amenities", name: "Ice bath"})
+             |> json_response(201)
+
+    assert %{"profile" => %{"published" => false}} =
+             ctx.conn
+             |> put_bearer_token(ctx.owner)
+             |> post("#{ctx.base}/unpublish")
              |> json_response(200)
 
     assert %{"profile" => %{"about" => "Box", "disciplines" => ["crossfit"]}} =
@@ -60,6 +78,11 @@ defmodule MilosTrainingWeb.AdminPublicProfileControllerTest do
     |> put_bearer_token(ctx.owner)
     |> put(ctx.base, %{disciplines: ["quidditch"]})
     |> json_response(422)
+  end
+
+  test "the vocabulary is public and grouped", ctx do
+    assert %{"discipline_groups" => [%{"key" => "strength", "items" => ["strength" | _]} | _]} =
+             ctx.conn |> get("/api/box-vocabulary") |> json_response(200)
   end
 
   test "members cannot reach the editor", ctx do
