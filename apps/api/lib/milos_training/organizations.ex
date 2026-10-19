@@ -126,12 +126,33 @@ defmodule MilosTraining.Organizations do
       %{} = membership ->
         %{
           roles: Enum.map(membership.roles, &to_string/1),
-          coach_scope: to_string(membership.coach_scope || :own)
+          coach_scope: to_string(membership.coach_scope || :own),
+          home_location_id: membership.home_location_id
         }
 
       nil ->
         nil
     end
+  end
+
+  @doc """
+  Sets the location a member's gym opens on (Phase 2). Callers decide who may
+  set it; the database keeps the location inside the same gym.
+  """
+  def put_home_location(context, user_id, location_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(context.organization_id, user_id) do
+        nil ->
+          {:error, :not_found}
+
+        membership ->
+          OrganizationStore.update_membership_settings(
+            context.organization_id,
+            membership.id,
+            %{home_location_id: location_id}
+          )
+      end
+    end)
   end
 
   @doc "Whether a coach lets admins read their private notes (ADR-101)."
@@ -508,6 +529,62 @@ defmodule MilosTraining.Organizations do
         end
     end
   end
+
+  # Public profile of a gym (ADR-142).
+  def get_public_profile(context),
+    do: MilosTraining.Organizations.PublicProfileStore.get(context)
+
+  def upsert_public_profile(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.upsert(context, params)
+
+  def create_tag_suggestion(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.create_suggestion(context, params)
+
+  def pending_tag_suggestions,
+    do: MilosTraining.Organizations.PublicProfileStore.pending_suggestions()
+
+  def resolve_tag_suggestion(id, status),
+    do: MilosTraining.Organizations.PublicProfileStore.resolve_suggestion(id, status)
+
+  defdelegate box_vocabulary(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :vocabulary
+
+  defdelegate box_amenities(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :amenities
+
+  defdelegate box_services(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :services
+
+  defdelegate box_suggestion_lists(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :suggestion_lists
+
+  defdelegate box_profile_missing(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :missing
+
+  defdelegate box_disciplines(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :disciplines
+
+  defdelegate box_audiences(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :audiences
+
+  defdelegate box_profile_max_photos(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :max_photos
+
+  defdelegate normalize_box_photo_ids(ids),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :normalize_photo_ids
+
+  defdelegate box_profile_publishable?(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :publishable?
 
   defp legacy_membership_role(:admin), do: :owner
   defp legacy_membership_role(:athlete), do: :athlete

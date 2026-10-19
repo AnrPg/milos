@@ -111,21 +111,27 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
   end
 
   @impl MilosTraining.Application.Ports.TenantObjectStore
-  def public_object_url(:branding, key) when is_binary(key) do
-    {_storage_config, _url_config, bucket_name} = bucket_config(:branding)
+  def public_object_url(bucket, key)
+      when bucket in [:branding, :media_public] and is_binary(key) do
+    {_storage_config, _url_config, bucket_name} = bucket_config(bucket)
     {:ok, avatar_public_url(bucket_name, key)}
   end
 
   def public_object_url(_bucket, _key), do: {:error, :not_public}
 
-  defp ensure_public_read_policy(:branding, config, bucket_name),
-    do: ensure_avatar_read_policy(config, bucket_name)
+  defp ensure_public_read_policy(bucket, config, bucket_name)
+       when bucket in [:branding, :media_public],
+       do: ensure_avatar_read_policy(config, bucket_name)
 
   defp ensure_public_read_policy(_bucket, _config, _bucket_name), do: :ok
 
   defp bucket_config(:documents), do: ex_aws_config()
   defp bucket_config(:avatars), do: avatar_ex_aws_config()
   defp bucket_config(:branding), do: avatar_ex_aws_config()
+  # ADR-148: public box photos share the public media bucket; post and body
+  # photos live in a private bucket read only through presigned URLs.
+  defp bucket_config(:media_public), do: avatar_ex_aws_config()
+  defp bucket_config(:media_private), do: media_ex_aws_config()
 
   defp list_objects_page(config, bucket_name, prefix, token, acc) do
     options =
@@ -200,8 +206,11 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     {document_config, _document_url, document_bucket} = ex_aws_config()
     {avatar_config, _avatar_url, avatar_bucket} = avatar_ex_aws_config()
 
+    {media_config, _media_url, media_bucket} = media_ex_aws_config()
+
     with :ok <- ensure_bucket(document_config, document_bucket),
          :ok <- ensure_bucket(avatar_config, avatar_bucket),
+         :ok <- ensure_bucket(media_config, media_bucket),
          :ok <- ensure_avatar_read_policy(avatar_config, avatar_bucket) do
       :ok
     end
@@ -440,6 +449,17 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
      build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
   end
 
+  defp media_ex_aws_config do
+    endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
+    public_endpoint = public_endpoint(endpoint)
+    access_key = Application.get_env(:milos_training, :minio_access_key, "minioadmin")
+    secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
+    bucket = Application.get_env(:milos_training, :minio_media_bucket, "milos-media")
+
+    {build_ex_aws_overrides(endpoint, access_key, secret_key),
+     build_ex_aws_config(public_endpoint, access_key, secret_key), bucket}
+  end
+
   defp ensure_bucket(config, bucket) do
     case bucket_probe_operation(bucket) |> ExAws.request(config) do
       {:ok, _response} ->
@@ -477,7 +497,8 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
           Action: ["s3:GetObject"],
           Resource: [
             "arn:aws:s3:::#{bucket}/users/*/avatars/*",
-            "arn:aws:s3:::#{bucket}/organizations/*/branding/logo/*"
+            "arn:aws:s3:::#{bucket}/organizations/*/branding/logo/*",
+            "arn:aws:s3:::#{bucket}/organizations/*/media/public/*"
           ]
         }
       ]

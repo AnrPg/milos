@@ -96,9 +96,55 @@ defmodule MilosTrainingWeb.ScheduleController do
                items: %Schema{type: :object, additionalProperties: true}
              },
              locations: %Schema{type: :array, items: @location_schema},
+             coaches: %Schema{
+               type: :array,
+               description: "The coaches of the window's classes.",
+               items: %Schema{
+                 type: :object,
+                 properties: %{
+                   id: %Schema{type: :string, format: :uuid},
+                   nickname: %Schema{type: :string},
+                   avatar_url: %Schema{type: :string, nullable: true}
+                 },
+                 required: [:id, :nickname, :avatar_url]
+               }
+             },
              slots: %Schema{
                type: :array,
-               items: %Schema{type: :object, additionalProperties: true}
+               items: %Schema{
+                 type: :object,
+                 additionalProperties: true,
+                 properties: %{
+                   cancel_free_until: %Schema{
+                     type: :string,
+                     format: :"date-time",
+                     nullable: true,
+                     description:
+                       "Members only: until when withdrawing is free; null when no cutoff applies."
+                   },
+                   covered_by_package: %Schema{
+                     type: :boolean,
+                     description:
+                       "Members only: whether the viewer's package includes this class, regardless of visits left."
+                   },
+                   workout: %Schema{
+                     type: :object,
+                     nullable: true,
+                     additionalProperties: true,
+                     properties: %{
+                       focus: %Schema{
+                         type: :array,
+                         description: "What the workout trains, read from its movements.",
+                         items: %Schema{
+                           type: :string,
+                           enum:
+                             ~w(strength endurance gymnastics olympic_lifting mobility legs core upper_body)
+                         }
+                       }
+                     }
+                   }
+                 }
+               }
              }
            },
            required: [:start_date, :end_date, :days, :class_types, :slots]

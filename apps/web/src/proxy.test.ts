@@ -59,3 +59,16 @@ describe("retired organization slugs (ADR-122)", () => {
     expect(response.headers.get("x-middleware-rewrite")).toBe("https://gym.example/schedule");
   });
 });
+
+describe("map origins", () => {
+  test("allow the map style's origin plus any extra tile origins", async () => {
+    const { configuredMapOrigins } = await import("@/lib/map-style");
+    expect(configuredMapOrigins({})).toBe("https://tiles.openfreemap.org");
+    expect(
+      configuredMapOrigins({
+        NEXT_PUBLIC_MAP_STYLE_URL: "https://maps.example.net/style.json",
+        NEXT_PUBLIC_MAP_ORIGINS: "https://tiles.example.net",
+      }),
+    ).toBe("https://maps.example.net https://tiles.example.net");
+  });
+});

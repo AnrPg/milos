@@ -1,5 +1,12 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.{ExerciseDescriptors, TimerConfig, WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.{
+    ExerciseDescriptors,
+    TimerConfig,
+    WorkoutDsl,
+    WorkoutFocus,
+    WorkoutType
+  }
+
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
@@ -110,6 +117,9 @@ defmodule MilosTraining.Workouts do
 
   @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-124)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
+
+  @doc "What a workout trains, read from its movements (Πρόγραμμα «Εστίαση» filter)."
+  def workout_focus(workout), do: WorkoutFocus.from_workout(workout)
 
   @doc """
   Descriptors of the exercises an athlete runs at `scale_slug` (TD-088): the

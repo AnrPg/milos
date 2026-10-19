@@ -26,6 +26,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
     community_post_comments
+    media_tenant_objects organization_public_profiles profile_tag_suggestions
     housekeeping_areas
     housekeeping_entries
     inventory_machines
@@ -70,6 +71,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
+    media_account_objects saved_filters
   )
 
   def report do

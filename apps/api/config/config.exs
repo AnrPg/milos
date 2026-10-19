@@ -40,7 +40,8 @@ config :milos_training, Oban,
        {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob},
        {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob},
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
-       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob}
+       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
+       {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob}
      ]}
   ],
   queues: [
@@ -58,6 +59,12 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
 config :milos_training,
        :workout_icon_suggester,
        MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester
+
+config :milos_training, :geocoder, MilosTraining.Infrastructure.Facility.PhotonGeocoder
+
+config :milos_training,
+       :map_link_resolver,
+       MilosTraining.Infrastructure.Facility.HttpMapLinkResolver
 
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
@@ -99,6 +106,16 @@ config :milos_training,
 config :milos_training,
        :community_store,
        MilosTraining.Infrastructure.Community.EctoCommunityStore
+
+config :milos_training,
+       :saved_filter_store,
+       MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
+
+config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+config :milos_training,
+       :public_profile_store,
+       MilosTraining.Infrastructure.Organizations.EctoPublicProfileStore
 
 config :milos_training,
        :coaching_note_store,

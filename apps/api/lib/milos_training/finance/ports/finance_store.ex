@@ -32,6 +32,7 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
               {:ok, map()} | {:error, term()}
   @callback get_entitlement(Ecto.UUID.t()) :: map() | nil
   @callback get_effective_entitlement(Ecto.UUID.t()) :: map() | nil
+  @callback package_coverage(Ecto.UUID.t(), [map()]) :: [boolean()]
   @callback reserve_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback finalize_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback release_entitlement(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}

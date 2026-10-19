@@ -36,6 +36,24 @@ defmodule MilosTraining.Finance.Domain.EntitlementPolicy do
     end
   end
 
+  @doc """
+  Phase 2 «μόνο ό,τι καλύπτει το πακέτο μου»: whether one subscription's
+  plan includes a request (channel, capability, class type, time window,
+  location, and an allowance of that kind), regardless of how much of the
+  allowance is left. Strict: no observe leniency, no admin bypass.
+  """
+  def covers?(nil, _plan, _request), do: false
+
+  def covers?(entitlement, plan, request) do
+    request = Map.merge(Map.delete(request, :actor_role), %{limit: :unlimited, committed: 0})
+
+    case authorize_customer(Map.put(entitlement, :plan, plan), request, mode: :enforce_all) do
+      {:ok, _decision} -> true
+      :ok -> true
+      _denied -> false
+    end
+  end
+
   defp authorize_customer(nil, _request, opts) do
     case Keyword.get(opts, :mode, :observe) do
       :observe -> {:ok, %{observed?: true, reason: :finance_profile_missing}}

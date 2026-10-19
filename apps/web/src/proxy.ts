@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { configuredMapOrigins } from "@/lib/map-style";
 import { retiredOrganizationSlugRedirect } from "@/lib/organization-slug-alias";
 
 type MediaOriginEnv = Record<string, string | undefined>;
@@ -22,15 +23,16 @@ export async function proxy(request: NextRequest) {
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const mediaOrigins = configuredMediaOrigins();
+  const mapOrigins = configuredMapOrigins();
   const development = process.env.NODE_ENV !== "production";
 
   const csp = [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mediaOrigins}`,
+    `img-src 'self' data: blob: ${mediaOrigins} ${mapOrigins}`,
     "font-src 'self' data:",
-    `connect-src 'self' ${mediaOrigins} ws: wss:`,
+    `connect-src 'self' ${mediaOrigins} ${mapOrigins} ws: wss:`,
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "object-src 'none'",

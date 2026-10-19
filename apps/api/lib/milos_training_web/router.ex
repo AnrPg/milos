@@ -87,6 +87,11 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-141: address lookups go to a shared OpenStreetMap geocoder.
+  pipeline :geocode_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
+  end
+
   pipeline :search_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
@@ -171,6 +176,7 @@ defmodule MilosTrainingWeb.Router do
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
+    get("/box-vocabulary", MilosTrainingWeb.BoxVocabularyController, :show)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
@@ -268,6 +274,7 @@ defmodule MilosTrainingWeb.Router do
     get("/reviews", ReviewController, :index)
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
+    put("/home-location", HomeLocationController, :update_mine)
 
     get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
@@ -413,6 +420,20 @@ defmodule MilosTrainingWeb.Router do
       :api,
       :authenticated,
       :authenticated_rate_limited,
+      :admin_only,
+      :geocode_rate_limited
+    ])
+
+    get("/geocode", AdminFacilityController, :search_addresses)
+    get("/geocode/reverse", AdminFacilityController, :reverse_geocode)
+    get("/geocode/link", AdminFacilityController, :resolve_map_link)
+  end
+
+  scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
       :tenant_staff
     ])
 
@@ -519,6 +540,7 @@ defmodule MilosTrainingWeb.Router do
     post("/organization/transfer", OwnerOrganizationController, :transfer)
     post("/organization/archive", OwnerOrganizationController, :archive)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    put("/users/:id/home-location", HomeLocationController, :update_member)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
@@ -574,6 +596,13 @@ defmodule MilosTrainingWeb.Router do
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     get("/branding", AdminBrandingController, :show)
+    get("/public-profile", AdminPublicProfileController, :show)
+    put("/public-profile", AdminPublicProfileController, :update)
+    post("/public-profile/publish", AdminPublicProfileController, :publish)
+    post("/public-profile/unpublish", AdminPublicProfileController, :unpublish)
+    post("/public-profile/suggestions", AdminPublicProfileController, :suggest)
+    post("/public-profile/photos", AdminPublicProfileController, :photo_upload)
+    post("/public-profile/photos/:id/complete", AdminPublicProfileController, :complete_photo)
     post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
     put("/branding/logo", AdminBrandingController, :finalize_logo)
     delete("/branding/logo", AdminBrandingController, :remove_logo)
@@ -780,6 +809,8 @@ defmodule MilosTrainingWeb.Router do
       :platform_write_rate_limited
     ])
 
+    get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    patch("/tag-suggestions/:id", PlatformTagSuggestionController, :resolve)
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
     delete("/organizations/:id", PlatformOrganizationController, :delete)
@@ -846,6 +877,7 @@ defmodule MilosTrainingWeb.Router do
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)
     get("/search/users", MeController, :search_users)
+    get("/places", MyPlacesController, :index)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -886,6 +918,10 @@ defmodule MilosTrainingWeb.Router do
     put("/journal/comments/:id", JournalCommentController, :save)
     delete("/journal/comments/:id", JournalCommentController, :delete)
     get("/me/journal", JournalController, :index)
+    get("/me/filters/:surface", SavedFilterController, :show)
+    put("/me/filters/:surface/last-used", SavedFilterController, :remember)
+    post("/me/filters/:surface", SavedFilterController, :save)
+    delete("/me/filters/:surface/:id", SavedFilterController, :delete)
     put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)

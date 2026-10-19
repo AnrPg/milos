@@ -64,6 +64,109 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
              settings["scheduling"]
   end
 
+  test "class types carry a level and audiences for the schedule filters", %{
+    admin_conn: admin_conn,
+    base: base
+  } do
+    default =
+      admin_conn
+      |> send_json(:post, "#{base}/admin/class-types", %{name: "WOD"})
+      |> json_response(201)
+      |> Map.fetch!("class_type")
+
+    assert %{"level" => "all_levels", "audiences" => []} = default
+
+    tagged =
+      admin_conn
+      |> send_json(:patch, "#{base}/admin/class-types/#{default["id"]}", %{
+        name: "Ladies foundations",
+        level: "beginner",
+        audiences: ["women_only"]
+      })
+      |> json_response(200)
+      |> Map.fetch!("class_type")
+
+    assert %{"level" => "beginner", "audiences" => ["women_only"]} = tagged
+
+    admin_conn
+    |> send_json(:post, "#{base}/admin/class-types", %{name: "Bad", level: "expert"})
+    |> json_response(422)
+
+    admin_conn
+    |> send_json(:post, "#{base}/admin/class-types", %{name: "Bad", audiences: ["pets"]})
+    |> json_response(422)
+
+    schedule =
+      admin_conn
+      |> recycle()
+      |> get("#{base}/schedule?start_date=#{Date.utc_today()}&days=7")
+      |> json_response(200)
+
+    assert %{"level" => "beginner", "audiences" => ["women_only"]} =
+             Enum.find(schedule["class_types"], &(&1["id"] == default["id"]))
+  end
+
+  test "admins look up addresses and pins for a location", %{
+    conn: conn,
+    admin_conn: admin_conn,
+    base: base
+  } do
+    assert [%{"neighbourhood" => "Κυψέλη", "latitude" => lat}] =
+             admin_conn
+             |> get("#{base}/admin/geocode?q=#{URI.encode("Φωκίωνος Νέγρη 12")}&language=el")
+             |> json_response(200)
+             |> Map.fetch!("places")
+
+    assert is_float(lat)
+
+    assert %{"places" => []} =
+             admin_conn |> recycle() |> get("#{base}/admin/geocode?q=ab") |> json_response(200)
+
+    assert %{"code" => "geocoder_unavailable"} =
+             admin_conn |> recycle() |> get("#{base}/admin/geocode?q=down") |> json_response(503)
+
+    assert %{"place" => %{"address" => "Φωκίωνος Νέγρη 12", "latitude" => 38.0001}} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/reverse?latitude=38.0001&longitude=23.73")
+             |> json_response(200)
+
+    assert %{"place" => nil} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/reverse?latitude=10&longitude=10")
+             |> json_response(200)
+
+    long = "https://www.google.com/maps/place/Box/@37.99,23.70,15z/data=!3d38.0012!4d23.7351"
+
+    assert %{"place" => %{"latitude" => 38.0012, "neighbourhood" => "Κυψέλη"}} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/link?url=#{URI.encode_www_form(long)}")
+             |> json_response(200)
+
+    assert %{"place" => %{"longitude" => 23.7345526}} =
+             admin_conn
+             |> recycle()
+             |> get(
+               "#{base}/admin/geocode/link?url=#{URI.encode_www_form("https://maps.app.goo.gl/kypseli")}"
+             )
+             |> json_response(200)
+
+    for bad <- ["https://evil.example/@38,23", "https://maps.app.goo.gl/unknown", "not a link"] do
+      admin_conn
+      |> recycle()
+      |> get("#{base}/admin/geocode/link?url=#{URI.encode_www_form(bad)}")
+      |> json_response(422)
+    end
+
+    {_user, member_conn} = member(conn)
+
+    member_conn
+    |> get("#{base}/admin/geocode?q=#{URI.encode("Νέγρη")}")
+    |> json_response(403)
+  end
+
   test "locations, waitlists, guests and check-ins through the API", %{
     conn: conn,
     admin: admin,
