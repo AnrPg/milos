@@ -392,5 +392,5 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [ ] P2-M1 · [ ] P2-M2 · [ ] P2-M3 · [ ] P2-M4 · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [ ] P2-M2 · [ ] P2-M3 · [ ] P2-M4 · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
