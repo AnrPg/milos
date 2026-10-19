@@ -9,7 +9,10 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
 
   @behaviour MilosTraining.Application.Ports.WorkoutIconSuggester
 
+  alias MilosTraining.AiUsage
+
   @endpoint "https://generativelanguage.googleapis.com/v1beta/models"
+  @default_model "gemini-2.5-flash-lite"
 
   @instructions """
   You pick the icon for a workout file in a gym coach's library.
@@ -23,19 +26,19 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
   """
 
   @impl true
-  def suggest(summary) do
+  def suggest(summary, metering) do
     config = Application.get_env(:milos_training, :gemini, [])
 
     case Keyword.get(config, :api_key) do
       key when is_binary(key) and key != "" ->
-        request(key, Keyword.get(config, :icon_model), summary)
+        request(key, Keyword.get(config, :icon_model) || @default_model, summary, metering)
 
       _missing ->
         {:error, :not_configured}
     end
   end
 
-  defp request(api_key, model, summary) do
+  defp request(api_key, model, summary, metering) do
     body = %{
       systemInstruction: %{parts: [%{text: @instructions}]},
       contents: [%{role: "user", parts: [%{text: describe(summary)}]}],
@@ -46,14 +49,25 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
       }
     }
 
-    "#{@endpoint}/#{model || "gemini-2.5-flash-lite"}:generateContent"
-    |> Req.post(
-      json: body,
-      headers: [{"x-goog-api-key", api_key}],
-      receive_timeout: 10_000,
-      retry: false
-    )
-    |> case do
+    started = System.monotonic_time(:millisecond)
+
+    response =
+      Req.post(
+        [
+          url: "#{@endpoint}/#{model}:generateContent",
+          json: body,
+          headers: [{"x-goog-api-key", api_key}],
+          receive_timeout: 10_000,
+          retry: false
+        ]
+        |> Keyword.merge(
+          Keyword.get(Application.get_env(:milos_training, :gemini, []), :req_options, [])
+        )
+      )
+
+    meter(response, model, metering, System.monotonic_time(:millisecond) - started)
+
+    case response do
       {:ok, %Req.Response{status: 200, body: %{"candidates" => [candidate | _]}}} ->
         extract_text(candidate)
 
@@ -64,6 +78,31 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
         {:error, reason}
     end
   end
+
+  # ADR-152: every answered call is billed, whatever its text.
+  defp meter({:ok, %Req.Response{status: 200, body: %{} = body}}, model, metering, duration_ms) do
+    case AiUsage.token_usage_from_gemini(Map.get(body, "usageMetadata")) do
+      nil ->
+        :ok
+
+      usage ->
+        AiUsage.report_generation(
+          usage,
+          duration_ms,
+          metering
+          |> AiUsage.metering_context()
+          |> Map.merge(%{
+            provider: "gemini",
+            model: model,
+            model_version: Map.get(body, "modelVersion"),
+            agent: "icon",
+            occurred_at: DateTime.utc_now()
+          })
+        )
+    end
+  end
+
+  defp meter(_response, _model, _metering, _duration_ms), do: :ok
 
   defp extract_text(%{"content" => %{"parts" => [%{"text" => text} | _]}}), do: {:ok, text}
   defp extract_text(_candidate), do: {:error, :empty_suggestion}

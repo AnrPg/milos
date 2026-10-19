@@ -95,6 +95,12 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
           }
         }
       },
+      operation_id: %Schema{
+        type: :string,
+        format: :uuid,
+        description:
+          "Groups the model calls of this analysis in the gym's AI usage records (ADR-152)"
+      },
       summary: %Schema{
         type: :object,
         properties: %{

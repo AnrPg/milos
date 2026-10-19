@@ -150,3 +150,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-142 | The gym's public profile, drafts and canonical tags | Accepted |
 | ADR-148 | Media uploads | Accepted |
 | ADR-151 | Filters and saved filters | Accepted |
+| ADR-152 | AI usage metering per call, operation and gym | Accepted |

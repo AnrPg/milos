@@ -40,7 +40,7 @@ defmodule MilosTraining.Application.SuggestWorkoutIcon do
   end
 
   defp suggest(context, workout) do
-    with {:ok, raw} <- suggester().suggest(summary(workout)),
+    with {:ok, raw} <- suggester().suggest(summary(workout), metering(context)),
          {:ok, icon} <- validate(raw),
          {:ok, _updated} <- Workouts.set_workout_icon(context, workout.id, icon, "ai") do
       broadcast_refresh(context, workout.id)
@@ -95,6 +95,16 @@ defmodule MilosTraining.Application.SuggestWorkoutIcon do
       reason: "workout_icon_suggested",
       payload: %{workout_id: workout_id}
     )
+  end
+
+  # ADR-152: one suggestion is one metered operation of the gym.
+  defp metering(context) do
+    %{
+      organization_id: Map.get(context, :organization_id),
+      user_id: Map.get(context, :user_id),
+      operation_id: Ecto.UUID.generate(),
+      feature: "workout_icon"
+    }
   end
 
   defp suggester, do: Application.fetch_env!(:milos_training, :workout_icon_suggester)

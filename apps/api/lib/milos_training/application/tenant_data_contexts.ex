@@ -9,6 +9,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
   """
 
   alias MilosTraining.{
+    AiUsage,
     Analytics,
     Appointments,
     Coaching,
@@ -35,6 +36,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
   alias MilosTraining.TenantData.Domain.RetentionReview
 
   @purgeable [
+    AiUsage,
     Analytics,
     Community,
     Media,

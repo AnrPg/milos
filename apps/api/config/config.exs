@@ -126,6 +126,10 @@ config :milos_training,
        MilosTraining.Infrastructure.Coaching.EctoRelationshipStore
 
 config :milos_training,
+       :ai_usage_store,
+       MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore
+
+config :milos_training,
        :nutrition_store,
        MilosTraining.Infrastructure.Nutrition.EctoNutritionStore
 
