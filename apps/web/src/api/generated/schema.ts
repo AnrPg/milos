@@ -7532,7 +7532,7 @@ export interface components {
             }[];
             /**
              * Format: uuid
-             * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-141)
+             * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-152)
              */
             operation_id?: string;
             /** @description How much the parser answer had to be repaired against the contract */
@@ -20137,7 +20137,7 @@ export interface operations {
                         }[];
                         /**
                          * Format: uuid
-                         * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-141)
+                         * @description Groups the model calls of this analysis in the gym's AI usage records (ADR-152)
                          */
                         operation_id?: string;
                         /** @description How much the parser answer had to be repaired against the contract */
