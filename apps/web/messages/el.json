@@ -5252,7 +5252,8 @@
     "cost": "Κόστος",
     "location": "Τοποθεσία",
     "wod": "Προπόνηση",
-    "wodNotPosted": "Η προπόνηση δεν έχει ανέβει ακόμη."
+    "wodNotPosted": "Η προπόνηση δεν έχει ανέβει ακόμη.",
+    "audienceEveryone": "Όλοι"
   },
   "LocationPicker": {
     "title": "Τοποθεσία",

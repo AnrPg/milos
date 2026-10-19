@@ -5252,7 +5252,8 @@
     "cost": "Custo",
     "location": "Local",
     "wod": "Treino",
-    "wodNotPosted": "O treino ainda não foi publicado."
+    "wodNotPosted": "O treino ainda não foi publicado.",
+    "audienceEveryone": "Todos"
   },
   "LocationPicker": {
     "title": "Local",

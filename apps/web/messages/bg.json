@@ -5252,7 +5252,8 @@
     "cost": "Цена",
     "location": "Локация",
     "wod": "Тренировка",
-    "wodNotPosted": "Тренировката още не е публикувана."
+    "wodNotPosted": "Тренировката още не е публикувана.",
+    "audienceEveryone": "Всички"
   },
   "LocationPicker": {
     "title": "Локация",

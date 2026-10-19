@@ -5252,7 +5252,8 @@
     "cost": "Kosten",
     "location": "Standort",
     "wod": "Workout",
-    "wodNotPosted": "Das Workout ist noch nicht online."
+    "wodNotPosted": "Das Workout ist noch nicht online.",
+    "audienceEveryone": "Alle"
   },
   "LocationPicker": {
     "title": "Standort",

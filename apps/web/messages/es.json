@@ -5252,7 +5252,8 @@
     "cost": "Coste",
     "location": "Ubicación",
     "wod": "Entreno",
-    "wodNotPosted": "El entreno aún no está publicado."
+    "wodNotPosted": "El entreno aún no está publicado.",
+    "audienceEveryone": "Todos"
   },
   "LocationPicker": {
     "title": "Ubicación",

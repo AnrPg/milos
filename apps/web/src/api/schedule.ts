@@ -235,6 +235,8 @@ export type ClassTypePayload = {
   sort_order?: number;
   credit_cost?: number;
   kind?: "class" | "event";
+  level?: ClassLevel;
+  audiences?: ClassAudience[];
 };
 
 export async function createClassType(token: string, payload: ClassTypePayload) {

@@ -5252,7 +5252,8 @@
     "cost": "Coût",
     "location": "Lieu",
     "wod": "Séance",
-    "wodNotPosted": "La séance n'est pas encore publiée."
+    "wodNotPosted": "La séance n'est pas encore publiée.",
+    "audienceEveryone": "Tout le monde"
   },
   "LocationPicker": {
     "title": "Lieu",

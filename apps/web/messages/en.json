@@ -5252,7 +5252,8 @@
     "cost": "Cost",
     "location": "Location",
     "wod": "Workout",
-    "wodNotPosted": "The workout isn't posted yet."
+    "wodNotPosted": "The workout isn't posted yet.",
+    "audienceEveryone": "Everyone"
   },
   "LocationPicker": {
     "title": "Location",

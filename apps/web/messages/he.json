@@ -5252,7 +5252,8 @@
     "cost": "עלות",
     "location": "מיקום",
     "wod": "אימון",
-    "wodNotPosted": "האימון עוד לא פורסם."
+    "wodNotPosted": "האימון עוד לא פורסם.",
+    "audienceEveryone": "כולם"
   },
   "LocationPicker": {
     "title": "מיקום",

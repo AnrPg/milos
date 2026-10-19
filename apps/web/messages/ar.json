@@ -5252,7 +5252,8 @@
     "cost": "التكلفة",
     "location": "الموقع",
     "wod": "التمرين",
-    "wodNotPosted": "لم يُنشر التمرين بعد."
+    "wodNotPosted": "لم يُنشر التمرين بعد.",
+    "audienceEveryone": "الجميع"
   },
   "LocationPicker": {
     "title": "الموقع",
