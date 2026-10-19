@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.RecordAiUsageTest do
   @moduledoc """
-  ADR-141: billed model calls become the gym's usage records, priced on the
+  ADR-152: billed model calls become the gym's usage records, priced on the
   day of the call, grouped per operation and summarised per feature, and are
   isolated per tenant - under the RLS-enforcing runtime role.
   """

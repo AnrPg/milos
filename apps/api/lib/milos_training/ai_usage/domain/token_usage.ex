@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Domain.TokenUsage do
   @moduledoc """
-  Billable token counts of one model call (ADR-141), normalized from the
+  Billable token counts of one model call (ADR-152), normalized from the
   provider's usage report so every count is billed exactly once:
 
     * `input_tokens` – prompt tokens billed at the input rate (the prompt,

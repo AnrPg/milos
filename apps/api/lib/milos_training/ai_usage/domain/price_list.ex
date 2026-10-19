@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Domain.PriceList do
   @moduledoc """
-  Paid-tier list prices of the models Milos calls (ADR-141), dated so a call
+  Paid-tier list prices of the models Milos calls (ADR-152), dated so a call
   is always priced at the rate in force on the day it was made.
 
   Rates are nano-USD per token, which is the published USD-per-1M-tokens price

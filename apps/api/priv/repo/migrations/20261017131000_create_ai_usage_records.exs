@@ -1,7 +1,7 @@
 defmodule MilosTraining.Repo.Migrations.CreateAiUsageRecords do
   use Ecto.Migration
 
-  # ADR-141: one row per billed model call (Gemini today). Calls that serve one
+  # ADR-152: one row per billed model call (Gemini today). Calls that serve one
   # user action (a free-text workout analysis is several agent calls) share an
   # operation_id. Cost is stored at the price in force when the call was made,
   # in integer nano-USD, so reports never re-price history. Append-only.

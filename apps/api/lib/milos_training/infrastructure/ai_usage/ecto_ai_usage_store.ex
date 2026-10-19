@@ -1,5 +1,5 @@
 defmodule MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore do
-  @moduledoc "Ecto adapter of the AI usage store (ADR-141)."
+  @moduledoc "Ecto adapter of the AI usage store (ADR-152)."
 
   @behaviour MilosTraining.AiUsage.Ports.AiUsageStore
 

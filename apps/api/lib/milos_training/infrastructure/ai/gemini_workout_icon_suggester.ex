@@ -79,7 +79,7 @@ defmodule MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester do
     end
   end
 
-  # ADR-141: every answered call is billed, whatever its text.
+  # ADR-152: every answered call is billed, whatever its text.
   defp meter({:ok, %Req.Response{status: 200, body: %{} = body}}, model, metering, duration_ms) do
     case AiUsage.token_usage_from_gemini(Map.get(body, "usageMetadata")) do
       nil ->

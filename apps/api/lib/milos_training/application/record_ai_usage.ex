@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.RecordAiUsage do
   @moduledoc """
-  Records every billed model call (ADR-141) for the gym it was made for.
+  Records every billed model call (ADR-152) for the gym it was made for.
 
   Model adapters emit `[:milos, :ai, :generation]` once per call; `attach/0`
   (called once at application start) subscribes `handle_event/4`, which runs

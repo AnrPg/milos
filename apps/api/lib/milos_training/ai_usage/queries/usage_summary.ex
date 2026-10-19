@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Queries.UsageSummary do
   @moduledoc """
-  A tenant's AI usage over a period (ADR-141), per feature and model: user
+  A tenant's AI usage over a period (ADR-152), per feature and model: user
   actions (operations), model calls, billed tokens and cost, with the mean
   cost per operation. Period bounds are `[from, to)`.
   """

@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Commands.RecordUsage do
   @moduledoc """
-  Persists one billed model call for the tenant in `context` (ADR-141),
+  Persists one billed model call for the tenant in `context` (ADR-152),
   priced at the list price in force on the day of the call. A model missing
   from the price list is still recorded, with no cost, so it shows up as
   unpriced in reports instead of silently costing nothing.

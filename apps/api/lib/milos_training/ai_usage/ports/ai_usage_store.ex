@@ -1,5 +1,5 @@
 defmodule MilosTraining.AiUsage.Ports.AiUsageStore do
-  @moduledoc "Persistence port of the AI usage context (ADR-141)."
+  @moduledoc "Persistence port of the AI usage context (ADR-152)."
 
   @type summary_params :: %{
           optional(:from) => DateTime.t(),

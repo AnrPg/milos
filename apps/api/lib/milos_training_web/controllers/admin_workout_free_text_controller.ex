@@ -99,7 +99,7 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
         type: :string,
         format: :uuid,
         description:
-          "Groups the model calls of this analysis in the gym's AI usage records (ADR-141)"
+          "Groups the model calls of this analysis in the gym's AI usage records (ADR-152)"
       },
       summary: %Schema{
         type: :object,

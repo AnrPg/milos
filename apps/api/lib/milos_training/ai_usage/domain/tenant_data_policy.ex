@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Domain.TenantDataPolicy do
   @moduledoc """
-  AI usage tenant data retention and purge policy (ADR-117, ADR-141).
+  AI usage tenant data retention and purge policy (ADR-117, ADR-152).
 
   Declares the tables this context owns, in delete (dependency) order, and
   how they are treated when a tenant is purged.

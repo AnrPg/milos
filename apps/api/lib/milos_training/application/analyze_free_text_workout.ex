@@ -3,7 +3,7 @@ defmodule MilosTraining.Application.AnalyzeFreeTextWorkout do
   Admin use case: ask the workout assistant to read a free-text workout and
   return canonical fields, actionable issues and missing-field suggestions in
   the coach's language. The model calls it makes are recorded as the gym's AI
-  usage (ADR-141).
+  usage (ADR-152).
   """
 
   alias MilosTraining.Workouts
@@ -14,7 +14,7 @@ defmodule MilosTraining.Application.AnalyzeFreeTextWorkout do
 
     Workouts.analyze_free_text(text, %{
       locale: supported_locale(locale),
-      # ADR-141: the model calls are metered for the coach's gym.
+      # ADR-152: the model calls are metered for the coach's gym.
       metering: %{
         organization_id: Map.get(context, :organization_id),
         user_id: Map.get(context, :user_id)

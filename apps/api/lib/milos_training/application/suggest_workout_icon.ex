@@ -97,7 +97,7 @@ defmodule MilosTraining.Application.SuggestWorkoutIcon do
     )
   end
 
-  # ADR-141: one suggestion is one metered operation of the gym.
+  # ADR-152: one suggestion is one metered operation of the gym.
   defp metering(context) do
     %{
       organization_id: Map.get(context, :organization_id),

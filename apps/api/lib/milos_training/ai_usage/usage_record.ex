@@ -1,5 +1,5 @@
 defmodule MilosTraining.AiUsage.UsageRecord do
-  @moduledoc "One billed model call (ADR-141). Append-only."
+  @moduledoc "One billed model call (ADR-152). Append-only."
 
   use Ecto.Schema
   import Ecto.Changeset

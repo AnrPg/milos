@@ -1,4 +1,4 @@
-# ADR-141: AI usage metering per call, operation and gym
+# ADR-152: AI usage metering per call, operation and gym
 Date: 2026-10-17
 Status: Accepted
 

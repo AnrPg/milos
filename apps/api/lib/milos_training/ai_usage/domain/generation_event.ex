@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Domain.GenerationEvent do
   @moduledoc """
-  The `[:milos, :ai, :generation]` telemetry event (ADR-141): emitted by every
+  The `[:milos, :ai, :generation]` telemetry event (ADR-152): emitted by every
   model adapter once per billed call, so metering never depends on which
   feature or agent made the call.
 

@@ -1,7 +1,7 @@
 defmodule Mix.Tasks.Milos.Ai.MeasureFreeText do
   use Mix.Task
 
-  @shortdoc "Measures the model usage and cost of free-text workout analyses (ADR-141)"
+  @shortdoc "Measures the model usage and cost of free-text workout analyses (ADR-152)"
 
   @moduledoc """
   Runs the real free-text workout analysis (structure, proofreader, parser,

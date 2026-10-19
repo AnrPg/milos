@@ -146,4 +146,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-138 | Community context: clubs, channels and posts | Accepted |
 | ADR-139 | Journal visibility ladder, notes and check-ins | Accepted (§8 check-ins superseded by ADR-140) |
 | ADR-140 | Journal text ontology: notes, comments, instructions, messages | Accepted |
-| ADR-141 | AI usage metering per call, operation and gym | Accepted |
+| ADR-152 | AI usage metering per call, operation and gym | Accepted |

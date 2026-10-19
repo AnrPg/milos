@@ -22,7 +22,7 @@ defmodule MilosTraining.Workouts.Queries.AnalyzeFreeText do
   failure does.
 
   Every agent call of one analysis is metered under one `operation_id`
-  (ADR-141), returned with the result; `options.metering` may carry the tenant
+  (ADR-152), returned with the result; `options.metering` may carry the tenant
   (`organization_id`, `user_id`) and a caller-chosen `operation_id`.
   """
 

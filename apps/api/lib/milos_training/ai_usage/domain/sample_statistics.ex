@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Domain.SampleStatistics do
   @moduledoc """
-  Descriptive statistics of repeated measurements (ADR-141): mean, sample
+  Descriptive statistics of repeated measurements (ADR-152): mean, sample
   standard deviation (n − 1) and the standard error of the mean (sd / √n).
   With a single measurement the spread is unknown (`nil`), never zero.
   """

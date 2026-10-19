@@ -28,7 +28,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
 
   Every billed call (each tool round and repair included) is reported to
   `MilosTraining.AiUsage` with the response's token usage and the caller's
-  `options.metering` (ADR-141).
+  `options.metering` (ADR-152).
   """
 
   @behaviour MilosTraining.Workouts.Ports.WorkoutTextAnalyzer

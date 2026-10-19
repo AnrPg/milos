@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.Ports.WorkoutIconSuggester do
           movements: [String.t()]
         }
 
-  @typedoc "Who the call is made for, so its model usage is metered (ADR-141)."
+  @typedoc "Who the call is made for, so its model usage is metered (ADR-152)."
   @type metering :: %{
           optional(:organization_id) => String.t(),
           optional(:user_id) => String.t() | nil,

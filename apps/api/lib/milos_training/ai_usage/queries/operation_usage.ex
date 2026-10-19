@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage.Queries.OperationUsage do
   @moduledoc """
-  Every model call of one user action (ADR-141), e.g. the structure,
+  Every model call of one user action (ADR-152), e.g. the structure,
   proofreader, parser and repair calls of one free-text workout analysis,
   with their totals.
   """

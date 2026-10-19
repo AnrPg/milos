@@ -1,6 +1,6 @@
 defmodule MilosTraining.AiUsage do
   @moduledoc """
-  AI usage metering (ADR-141): what each model call cost, per gym, feature
+  AI usage metering (ADR-152): what each model call cost, per gym, feature
   and user action.
 
   Model adapters call `report_generation/3` once per billed call; the
