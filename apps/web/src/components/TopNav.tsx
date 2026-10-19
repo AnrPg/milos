@@ -38,7 +38,8 @@ import { OrganizationSelector } from "@/components/organization-selector";
 
 export { adminHref } from "@/lib/organization-slug";
 
-const CANVAS_PATHS = ["/login"];
+// The public box page draws its own header over the cover (ADR-142).
+const CANVAS_PATHS = ["/login", "/b"];
 
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };

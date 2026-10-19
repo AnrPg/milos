@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 18301);
+// Server-side reads (the public box page) go to a stub API the specs start on this port.
+export const stubApiPort = Number(process.env.PLAYWRIGHT_STUB_API_PORT ?? 18302);
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 const launchOptions = executablePath ? { executablePath } : undefined;
 
@@ -19,6 +21,7 @@ export default defineConfig({
   webServer: {
     command: `NEXT_DIST_DIR=.next-playwright npm run dev -- -H 127.0.0.1 -p ${port}`,
     url: `http://127.0.0.1:${port}`,
+    env: { API_PROXY_TARGET: `http://127.0.0.1:${stubApiPort}` },
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },

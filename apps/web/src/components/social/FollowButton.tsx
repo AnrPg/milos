@@ -69,7 +69,7 @@ export function FollowButton({
     return (
       <div className={`flex flex-col gap-2 ${wide ? "w-full" : ""}`}>
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-          {current === "requested" ? t("withdrawConfirm") : t("unfollowConfirm")}
+          {current === "requested" ? t("withdrawConfirm") : targetType === "organization" ? t("unfollowBoxConfirm") : t("unfollowConfirm")}
         </p>
         <div className="flex gap-2">
           <button
@@ -115,7 +115,14 @@ export function FollowButton({
           style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
           onClick={() => setConfirming(true)}
         >
-          {current === "requested" ? t("requested") : t("following")}
+          {current === "requested" ? t("requested") : (
+            <span className="inline-flex items-center gap-1.5">
+              {t("following")}
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M20 6 9 17l-5-5" />
+              </svg>
+            </span>
+          )}
         </button>
       )}
       {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
