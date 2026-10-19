@@ -7,6 +7,7 @@ Source of truth: `docs/product/2026-10-15-milos-product-vision-and-ia.md` (the b
 `docs/product/mockups/milos-ia-mockup.html` (screens 03–06, 09, 19–22, 29, 30, 34). The Greek write-up
 `docs/product/Ο χάρτης του Milos.md` (2026-10-17) agrees with both and is used for copy.
 Phase 1 plan: `docs/plans/redesign-phase-1-member-app.md` (what exists).
+Handoff for the next agent: `docs/handoff/2026-10-19-redesign-handoff.md` (state after P2-M1).
 
 Pitch: «Φέρνεις νέους πελάτες με τους δικούς σου όρους.»
 
