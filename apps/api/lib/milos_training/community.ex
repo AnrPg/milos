@@ -93,6 +93,11 @@ defmodule MilosTraining.Community do
   defdelegate following_count(user_id), to: SocialStore
   def follow_target_types, do: FollowPolicy.target_types()
 
+  # Social settings (ADR-142 decision 12).
+  defdelegate social_settings(context, user_id), to: SocialStore, as: :get_social_settings
+  defdelegate put_social_settings(context, user_id, attrs), to: SocialStore
+  defdelegate booking_sharer_ids(context), to: SocialStore
+
   # Profile posts (ADR-142).
   defdelegate create_profile_post(context, audience, attrs), to: ProfilePosts, as: :create
   defdelegate fetch_profile_post(context, post_id), to: ProfilePosts, as: :fetch

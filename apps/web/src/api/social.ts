@@ -108,3 +108,10 @@ export function fetchBoxSchedule(token: string, slug: string, window?: { startAt
 export function fetchBoxPosts(token: string, slug: string, cursor: string | null = null) {
   return apiRequest<PublicBoxPosts>(paged(`/boxes/${encodeURIComponent(slug)}/posts`, cursor), { token });
 }
+
+export type BookingSharing = components["schemas"]["BookingSharing"];
+
+/** Board 5 Q6: show followers the classes you book (the «Φίλοι» chip), or stop. */
+export function setBookingSharing(token: string, enabled: boolean) {
+  return apiRequest<BookingSharing>("/me/social/booking-sharing", { method: "PUT", token, body: { enabled } });
+}

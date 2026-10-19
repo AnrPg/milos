@@ -869,6 +869,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/social/booking-sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Show followers the classes you book, or stop (board 5 Q6) */
+        put: operations["MilosTrainingWeb.FollowController.booking_sharing"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/tours/{audience}/complete": {
         parameters: {
             query?: never;
@@ -6308,6 +6325,18 @@ export interface components {
             /** Format: uuid */
             workout_id: string;
         };
+        /**
+         * BookingSharing
+         * @description Whether followers see the classes you book, and whether the one-time offer was answered
+         */
+        BookingSharing: {
+            enabled: boolean;
+            offered: boolean;
+        };
+        /** BookingSharingRequest */
+        BookingSharingRequest: {
+            enabled: boolean;
+        };
         /** BoxPublicProfile */
         BoxPublicProfile: {
             about: string | null;
@@ -9076,6 +9105,14 @@ export interface components {
         };
         /** SocialSummary */
         SocialSummary: {
+            /**
+             * BookingSharing
+             * @description Whether followers see the classes you book, and whether the one-time offer was answered
+             */
+            booking_sharing: {
+                enabled: boolean;
+                offered: boolean;
+            };
             followers_count: number;
             following_count: number;
             posts_count: number;
@@ -12078,10 +12115,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * BookingSharing
+                         * @description Whether followers see the classes you book, and whether the one-time offer was answered
+                         */
+                        booking_sharing: {
+                            enabled: boolean;
+                            offered: boolean;
+                        };
                         followers_count: number;
                         following_count: number;
                         posts_count: number;
                         requests_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.booking_sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        enabled: boolean;
+                        offered: boolean;
                     };
                 };
             };
@@ -27895,6 +27969,13 @@ export interface operations {
                             cancel_free_until?: string | null;
                             /** @description Members only: whether the viewer's package includes this class, regardless of visits left. */
                             covered_by_package?: boolean;
+                            /** @description Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip). */
+                            friends_going?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
                             workout?: ({
                                 /** @description What the workout trains, read from its movements. */
                                 focus?: ("strength" | "endurance" | "gymnastics" | "olympic_lifting" | "mobility" | "legs" | "core" | "upper_body")[];

@@ -5264,7 +5264,11 @@
     "location": "Локация",
     "wod": "Тренировка",
     "wodNotPosted": "Тренировка ещё не опубликована.",
-    "audienceEveryone": "Все"
+    "audienceEveryone": "Все",
+    "chipFriends": "Друзья",
+    "friendsOnly": "Только куда идут друзья",
+    "friendsGoing": "{others, plural, =0 {Идёт: {name}} other {Идут: {name} и ещё #}}",
+    "friendsLabel": "Идут"
   },
   "LocationPicker": {
     "title": "Локация",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Ваши PR в Пантеоне",
     "prsNotShared": "Не делится с вами своими PR.",
     "prsNone": "PR пока нет.",
-    "unfollowBoxConfirm": "Отписаться от бокса? Его публичные посты исчезнут из вашей ленты."
+    "unfollowBoxConfirm": "Отписаться от бокса? Его публичные посты исчезнут из вашей ленты.",
+    "bookingSharingTitle": "Показывать подписчикам, на какие занятия вы ходите?",
+    "bookingSharingBody": "Вы появитесь в разделе «Друзья» в расписании подписчиков. Изменить можно в любой момент в разделе «Доступ и видимость».",
+    "bookingSharingYes": "Да, показывать",
+    "bookingSharingNo": "Не сейчас",
+    "bookingSharingSectionTitle": "Записи для подписчиков",
+    "bookingSharingSectionHint": "Ваши подписчики видят, на какие занятия вы записаны.",
+    "bookingSharingOn": "Подписчики видят, на какие занятия вы ходите.",
+    "bookingSharingOff": "Ваши записи скрыты.",
+    "bookingSharingTurnOn": "Показывать мои записи",
+    "bookingSharingTurnOff": "Оставить скрытыми"
   },
   "BoxPage": {
     "allWeek": "Вся неделя",

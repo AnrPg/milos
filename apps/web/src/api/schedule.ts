@@ -133,6 +133,8 @@ export type ScheduleBooking = {
   check_in_closes_at?: string | null;
 };
 
+export type FriendGoing = { id: string; nickname?: string | null; avatar_url?: string | null };
+
 export type ScheduleSlot = {
   id: string;
   master_workout_id: string;
@@ -157,6 +159,8 @@ export type ScheduleSlot = {
   covered_by_package?: boolean;
   /** Members only: until when withdrawing is free; null when no cutoff applies. */
   cancel_free_until?: string | null;
+  /** Members only: people you follow who share their bookings and are going (ADR-142 decision 12). */
+  friends_going?: FriendGoing[];
   waitlist_count?: number;
   bookings: ScheduleBooking[];
   /** ADR-125: the acting member's own version of this class (members only). */

@@ -7,6 +7,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
 
   alias MilosTraining.Community.{
     Follow,
+    SocialSettings,
     ProfilePost,
     ProfilePostComment,
     ProfilePostReaction
@@ -148,6 +149,24 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
       Repo.query!("SELECT milos_following_count($1)", [Ecto.UUID.dump!(user_id)])
 
     count
+  end
+
+  # Social settings -----------------------------------------------------------
+
+  @impl true
+  def get_social_settings(_context, user_id), do: Repo.get(SocialSettings, user_id)
+
+  @impl true
+  def put_social_settings(_context, user_id, attrs) do
+    (Repo.get(SocialSettings, user_id) || %SocialSettings{user_id: user_id})
+    |> SocialSettings.changeset(attrs)
+    |> Repo.insert_or_update()
+  end
+
+  @impl true
+  def booking_sharer_ids(_context) do
+    %{rows: rows} = Repo.query!("SELECT milos_booking_sharers()", [])
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
   end
 
   # Profile posts -------------------------------------------------------------

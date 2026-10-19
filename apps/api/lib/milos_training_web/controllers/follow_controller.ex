@@ -131,4 +131,16 @@ defmodule MilosTrainingWeb.FollowController do
   def summary(conn, _params) do
     with {:ok, summary} <- SocialProfile.me(conn.assigns.user_context), do: json(conn, summary)
   end
+
+  operation(:booking_sharing,
+    summary: "Show followers the classes you book, or stop (board 5 Q6)",
+    request_body: S.body(S.booking_sharing_request()),
+    responses: [ok: {"Setting", "application/json", S.booking_sharing()}]
+  )
+
+  def booking_sharing(conn, _params) do
+    with {:ok, setting} <-
+           SocialProfile.set_booking_sharing(conn.assigns.user_context, conn.body_params.enabled),
+         do: json(conn, setting)
+  end
 end

@@ -19,6 +19,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { useMyClubs } from "@/components/community/use-community";
 import { HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
+import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { FollowButton } from "@/components/social/FollowButton";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -128,6 +129,7 @@ function Followers() {
   return (
     <>
       <FollowRequestsRow />
+      <BookingSharingOffer />
       <List
         query={query}
         empty={t("followersEmpty")}

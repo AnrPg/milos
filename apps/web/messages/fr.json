@@ -5264,7 +5264,11 @@
     "location": "Lieu",
     "wod": "Séance",
     "wodNotPosted": "La séance n'est pas encore publiée.",
-    "audienceEveryone": "Tout le monde"
+    "audienceEveryone": "Tout le monde",
+    "chipFriends": "Amis",
+    "friendsOnly": "Seulement là où vont des amis",
+    "friendsGoing": "{others, plural, =0 {{name} y va} other {{name} et # autres y vont}}",
+    "friendsLabel": "Participent"
   },
   "LocationPicker": {
     "title": "Lieu",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Tes PRs sont dans le Panthéon",
     "prsNotShared": "Ne partage pas ses PRs avec toi.",
     "prsNone": "Pas encore de PRs.",
-    "unfollowBoxConfirm": "Ne plus suivre cette box ? Ses publications publiques quitteront ton fil."
+    "unfollowBoxConfirm": "Ne plus suivre cette box ? Ses publications publiques quitteront ton fil.",
+    "bookingSharingTitle": "Tes abonnés peuvent-ils voir à quels cours tu vas ?",
+    "bookingSharingBody": "Tu apparaîtras dans «Amis» du planning de tes abonnés. Modifiable à tout moment dans Partage et visibilité.",
+    "bookingSharingYes": "Oui, ils peuvent",
+    "bookingSharingNo": "Pas maintenant",
+    "bookingSharingSectionTitle": "Réservations pour les abonnés",
+    "bookingSharingSectionHint": "Les personnes qui te suivent voient les cours que tu as réservés.",
+    "bookingSharingOn": "Tes abonnés voient à quels cours tu vas.",
+    "bookingSharingOff": "Tes réservations sont privées.",
+    "bookingSharingTurnOn": "Montrer mes réservations",
+    "bookingSharingTurnOff": "Les garder privées"
   },
   "BoxPage": {
     "allWeek": "Toute la semaine",

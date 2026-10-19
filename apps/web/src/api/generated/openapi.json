@@ -481,6 +481,35 @@
         "title": "AthleteInjuryWarningsRequest",
         "type": "object"
       },
+      "BookingSharing": {
+        "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "offered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "offered"
+        ],
+        "title": "BookingSharing",
+        "type": "object"
+      },
+      "BookingSharingRequest": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "BookingSharingRequest",
+        "type": "object"
+      },
       "BoxPublicProfile": {
         "properties": {
           "about": {
@@ -10338,6 +10367,23 @@
       },
       "SocialSummary": {
         "properties": {
+          "booking_sharing": {
+            "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "offered": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "enabled",
+              "offered"
+            ],
+            "title": "BookingSharing",
+            "type": "object"
+          },
           "followers_count": {
             "type": "integer"
           },
@@ -10355,7 +10401,8 @@
           "posts_count",
           "followers_count",
           "following_count",
-          "requests_count"
+          "requests_count",
+          "booking_sharing"
         ],
         "title": "SocialSummary",
         "type": "object"
@@ -18094,6 +18141,23 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "booking_sharing": {
+                      "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "offered": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "offered"
+                      ],
+                      "title": "BookingSharing",
+                      "type": "object"
+                    },
                     "followers_count": {
                       "type": "integer"
                     },
@@ -18111,7 +18175,8 @@
                     "posts_count",
                     "followers_count",
                     "following_count",
-                    "requests_count"
+                    "requests_count",
+                    "booking_sharing"
                   ],
                   "title": "SocialSummary",
                   "type": "object"
@@ -18127,6 +18192,67 @@
           }
         ],
         "summary": "Your counts for Εγώ: posts, followers, following, waiting requests",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/social/booking-sharing": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.booking_sharing",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ],
+                "title": "BookingSharingRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "offered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "offered"
+                  ],
+                  "title": "BookingSharing",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Setting"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show followers the classes you book, or stop (board 5 Q6)",
         "tags": [
           "Follows"
         ]
@@ -59721,6 +59847,30 @@
                           "covered_by_package": {
                             "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
                             "type": "boolean"
+                          },
+                          "friends_going": {
+                            "description": "Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip).",
+                            "items": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "workout": {
                             "additionalProperties": true,

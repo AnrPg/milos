@@ -138,6 +138,64 @@ defmodule MilosTraining.Community.SocialRLSTest do
     end)
   end
 
+  test "booking sharing is the owner's setting; followers learn only who shares", %{
+    conn: conn,
+    people: people
+  } do
+    {author_s, author} = people.author
+    {follower_s, follower} = people.follower
+    {stranger_s, stranger} = people.stranger
+
+    as_session(conn, follower_s, nil, false, fn ->
+      insert_follow(conn, follower, author, "requested")
+    end)
+
+    as_session(conn, stranger_s, nil, false, fn ->
+      insert_follow(conn, stranger, author, "requested")
+    end)
+
+    as_session(conn, author_s, nil, false, fn ->
+      Postgrex.query!(
+        conn,
+        "UPDATE community_follows SET status = 'active', accepted_at = now() WHERE user_id = $1",
+        [follower]
+      )
+
+      # Nobody writes someone else's settings.
+      assert_raise Postgrex.Error, ~r/row-level security/, fn ->
+        insert_settings(conn, follower, true)
+      end
+
+      insert_settings(conn, author, true)
+    end)
+
+    as_session(conn, follower_s, nil, false, fn ->
+      # The row itself stays private...
+      assert %{rows: []} = Postgrex.query!(conn, "SELECT 1 FROM community_social_settings", [])
+      # ...an active follower learns only that the author shares.
+      assert sharers(conn) == [author_s]
+    end)
+
+    # A request that was never accepted shares nothing.
+    as_session(conn, stranger_s, nil, false, fn -> assert sharers(conn) == [] end)
+  end
+
+  defp insert_settings(conn, user, share) do
+    Postgrex.query!(
+      conn,
+      """
+      INSERT INTO community_social_settings (user_id, share_bookings, share_bookings_offered_at, inserted_at, updated_at)
+      VALUES ($1, $2, now(), now(), now())
+      """,
+      [user, share]
+    )
+  end
+
+  defp sharers(conn) do
+    %{rows: rows} = Postgrex.query!(conn, "SELECT milos_booking_sharers()", [])
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
   defp insert_follow(conn, follower, target, status) do
     Postgrex.query!(
       conn,

@@ -5264,7 +5264,11 @@
     "location": "Sede",
     "wod": "Allenamento",
     "wodNotPosted": "L'allenamento non è ancora pubblicato.",
-    "audienceEveryone": "Tutti"
+    "audienceEveryone": "Tutti",
+    "chipFriends": "Amici",
+    "friendsOnly": "Solo dove vanno amici",
+    "friendsGoing": "{others, plural, =0 {Ci va {name}} other {Ci vanno {name} e altri #}}",
+    "friendsLabel": "Partecipano"
   },
   "LocationPicker": {
     "title": "Sede",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "I tuoi PR sono nel Pantheon",
     "prsNotShared": "Non condivide i suoi PR con te.",
     "prsNone": "Ancora nessun PR.",
-    "unfollowBoxConfirm": "Smettere di seguire questo box? I suoi post pubblici spariranno dal tuo feed."
+    "unfollowBoxConfirm": "Smettere di seguire questo box? I suoi post pubblici spariranno dal tuo feed.",
+    "bookingSharingTitle": "I tuoi follower possono vedere a quali lezioni vai?",
+    "bookingSharingBody": "Comparirai in «Amici» nel calendario dei tuoi follower. Puoi cambiarlo quando vuoi in Condivisione e visibilità.",
+    "bookingSharingYes": "Sì, possono",
+    "bookingSharingNo": "Non ora",
+    "bookingSharingSectionTitle": "Prenotazioni per i follower",
+    "bookingSharingSectionHint": "Chi ti segue vede a quali lezioni hai prenotato.",
+    "bookingSharingOn": "I tuoi follower vedono a quali lezioni vai.",
+    "bookingSharingOff": "Le tue prenotazioni sono private.",
+    "bookingSharingTurnOn": "Mostra le mie prenotazioni",
+    "bookingSharingTurnOff": "Tienile private"
   },
   "BoxPage": {
     "allWeek": "Tutta la settimana",

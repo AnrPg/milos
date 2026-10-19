@@ -5264,7 +5264,11 @@
     "location": "Локация",
     "wod": "Тренировка",
     "wodNotPosted": "Тренировката още не е публикувана.",
-    "audienceEveryone": "Всички"
+    "audienceEveryone": "Всички",
+    "chipFriends": "Приятели",
+    "friendsOnly": "Само където ходят приятели",
+    "friendsGoing": "{others, plural, =0 {Ходи: {name}} other {Ходят: {name} и още #}}",
+    "friendsLabel": "Ходят"
   },
   "LocationPicker": {
     "title": "Локация",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Твоите PR са в Пантеона",
     "prsNotShared": "Не споделя своите PR с теб.",
     "prsNone": "Още няма PR.",
-    "unfollowBoxConfirm": "Да спреш да следваш бокса? Публичните му публикации ще изчезнат от лентата ти."
+    "unfollowBoxConfirm": "Да спреш да следваш бокса? Публичните му публикации ще изчезнат от лентата ти.",
+    "bookingSharingTitle": "Да виждат ли последователите ти на кои класове ходиш?",
+    "bookingSharingBody": "Ще се появяваш в «Приятели» в графика на последователите си. Можеш да го промениш по всяко време от Споделяне и видимост.",
+    "bookingSharingYes": "Да, да виждат",
+    "bookingSharingNo": "Не сега",
+    "bookingSharingSectionTitle": "Записвания за последователи",
+    "bookingSharingSectionHint": "Тези, които те следват, виждат за кои класове си записан.",
+    "bookingSharingOn": "Последователите ти виждат на кои класове ходиш.",
+    "bookingSharingOff": "Записванията ти са лични.",
+    "bookingSharingTurnOn": "Покажи записванията ми",
+    "bookingSharingTurnOff": "Запази ги лични"
   },
   "BoxPage": {
     "allWeek": "Цялата седмица",

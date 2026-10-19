@@ -254,9 +254,36 @@ defmodule MilosTrainingWeb.Schemas.Social do
         posts_count: %Schema{type: :integer},
         followers_count: %Schema{type: :integer},
         following_count: %Schema{type: :integer},
-        requests_count: %Schema{type: :integer}
+        requests_count: %Schema{type: :integer},
+        booking_sharing: booking_sharing()
       },
-      required: [:posts_count, :followers_count, :following_count, :requests_count]
+      required: [
+        :posts_count,
+        :followers_count,
+        :following_count,
+        :requests_count,
+        :booking_sharing
+      ]
+    }
+  end
+
+  def booking_sharing do
+    %Schema{
+      title: "BookingSharing",
+      type: :object,
+      description:
+        "Whether followers see the classes you book, and whether the one-time offer was answered",
+      properties: %{enabled: %Schema{type: :boolean}, offered: %Schema{type: :boolean}},
+      required: [:enabled, :offered]
+    }
+  end
+
+  def booking_sharing_request do
+    %Schema{
+      title: "BookingSharingRequest",
+      type: :object,
+      properties: %{enabled: %Schema{type: :boolean}},
+      required: [:enabled]
     }
   end
 

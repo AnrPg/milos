@@ -5264,7 +5264,11 @@
     "location": "Location",
     "wod": "Workout",
     "wodNotPosted": "The workout isn't posted yet.",
-    "audienceEveryone": "Everyone"
+    "audienceEveryone": "Everyone",
+    "chipFriends": "Friends",
+    "friendsOnly": "Only where friends go",
+    "friendsGoing": "{others, plural, =0 {{name} is going} other {{name} and # more are going}}",
+    "friendsLabel": "Going"
   },
   "LocationPicker": {
     "title": "Location",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Your PRs are in the Pantheon",
     "prsNotShared": "They don't share their PRs with you.",
     "prsNone": "No PRs yet.",
-    "unfollowBoxConfirm": "Stop following this box? Its public posts will leave your feed."
+    "unfollowBoxConfirm": "Stop following this box? Its public posts will leave your feed.",
+    "bookingSharingTitle": "Let your followers see which classes you go to?",
+    "bookingSharingBody": "You'll show up under «Friends» in your followers' schedule. Change it any time in Sharing & visibility.",
+    "bookingSharingYes": "Yes, let them see",
+    "bookingSharingNo": "Not now",
+    "bookingSharingSectionTitle": "Bookings for followers",
+    "bookingSharingSectionHint": "People who follow you see which classes you've booked.",
+    "bookingSharingOn": "Your followers see which classes you go to.",
+    "bookingSharingOff": "Your bookings are private.",
+    "bookingSharingTurnOn": "Show my bookings",
+    "bookingSharingTurnOff": "Keep them private"
   },
   "BoxPage": {
     "allWeek": "Whole week",

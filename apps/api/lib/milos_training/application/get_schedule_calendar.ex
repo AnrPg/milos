@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
-  alias MilosTraining.{Facility, Finance, Identity, Scheduling, Workouts}
+  alias MilosTraining.{Community, Facility, Finance, Identity, Scheduling, Workouts}
   alias MilosTraining.Application.BookingTerms
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
@@ -14,6 +14,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
         |> enrich_slots(context, actor)
         |> put_package_coverage(context, actor)
         |> put_cancel_free_until(context, actor)
+        |> put_friends_going(context, actor)
 
       class_types = schedule_class_types(context, slots)
 
@@ -100,6 +101,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       else
         base
         |> Map.put(:bookings, [])
+        |> Map.put(:raw_bookings, slot.bookings)
         |> Map.put(:my_version, my_version(variants, slot.id))
       end
     end)
@@ -135,6 +137,50 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       |> Enum.map(fn {slot, until} -> Map.put(slot, :cancel_free_until, until) end)
     end
   end
+
+  # ADR-142 decision 12 (the «Φίλοι» chip): people the member follows who
+  # share their bookings with followers and hold a place in the class. The
+  # bookings are already loaded; only who shares comes from the account side.
+  defp put_friends_going(slots, context, actor) do
+    sharers =
+      if admin_role?(context, actor),
+        do: MapSet.new(),
+        else: MapSet.new(Community.booking_sharer_ids(%{user_id: actor.id}))
+
+    going =
+      Map.new(slots, fn slot ->
+        {slot.id,
+         slot
+         |> Map.get(:raw_bookings, [])
+         |> Enum.filter(&friend_booking?(&1, sharers))
+         |> Enum.map(& &1.user_id)
+         |> Enum.uniq()}
+      end)
+
+    people =
+      going
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Identity.list_by_ids()
+      |> Map.new(
+        &{&1.id, %{id: &1.id, nickname: &1.nickname, avatar_url: Map.get(&1, :avatar_url)}}
+      )
+
+    Enum.map(slots, fn slot ->
+      friends =
+        going |> Map.get(slot.id, []) |> Enum.map(&Map.get(people, &1)) |> Enum.reject(&is_nil/1)
+
+      slot
+      |> Map.delete(:raw_bookings)
+      |> Map.put(:friends_going, friends)
+    end)
+  end
+
+  defp friend_booking?(booking, sharers),
+    do:
+      MapSet.member?(sharers, booking.user_id) and is_nil(Map.get(booking, :guest_name)) and
+        booking.status in [:pending, :approved]
 
   # ADR-125: per-member class variants. A member only ever receives their own
   # variant (`assignee_id` = actor); staff receive every member's.

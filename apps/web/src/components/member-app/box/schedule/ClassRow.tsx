@@ -32,6 +32,7 @@ export function ClassRow({
   );
   const outside = slot.covered_by_package === false;
   const detail = [coachName, locationName].filter(Boolean).join(" · ");
+  const friends = slot.friends_going ?? [];
 
   let status: { text: string; color: string };
   switch (state.kind) {
@@ -83,6 +84,11 @@ export function ClassRow({
         {detail ? (
           <span className="truncate text-xs" style={{ color: "var(--dim)" }}>
             {detail}
+          </span>
+        ) : null}
+        {friends.length > 0 ? (
+          <span className="truncate text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>
+            {t("friendsGoing", { name: friends[0].nickname ?? "?", others: friends.length - 1 })}
           </span>
         ) : null}
       </span>

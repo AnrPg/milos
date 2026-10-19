@@ -215,6 +215,13 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       multiple: true,
       onChange: (levels) => update({ levels: levels as ScheduleFilters["levels"] }),
     },
+    {
+      key: "friends",
+      kind: "toggle",
+      label: t("chipFriends"),
+      active: filters.friends,
+      onToggle: () => update({ friends: !filters.friends }),
+    },
   ];
 
   async function book(slot: ScheduleSlot) {

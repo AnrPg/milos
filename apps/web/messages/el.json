@@ -5264,7 +5264,11 @@
     "location": "Τοποθεσία",
     "wod": "Προπόνηση",
     "wodNotPosted": "Η προπόνηση δεν έχει ανέβει ακόμη.",
-    "audienceEveryone": "Όλοι"
+    "audienceEveryone": "Όλοι",
+    "chipFriends": "Φίλοι",
+    "friendsOnly": "Μόνο όπου πάνε φίλοι",
+    "friendsGoing": "{others, plural, =0 {Πάει: {name}} other {Πάνε: {name} και # ακόμα}}",
+    "friendsLabel": "Πάνε"
   },
   "LocationPicker": {
     "title": "Τοποθεσία",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Τα PRs σου είναι στο Pantheon",
     "prsNotShared": "Δεν μοιράζεται τα PRs του μαζί σου.",
     "prsNone": "Δεν έχει PRs ακόμα.",
-    "unfollowBoxConfirm": "Να σταματήσεις να ακολουθείς το box; Δεν θα βλέπεις τις δημόσιες αναρτήσεις του στη Ροή."
+    "unfollowBoxConfirm": "Να σταματήσεις να ακολουθείς το box; Δεν θα βλέπεις τις δημόσιες αναρτήσεις του στη Ροή.",
+    "bookingSharingTitle": "Να βλέπουν οι ακόλουθοί σου σε ποια μαθήματα πας;",
+    "bookingSharingBody": "Θα φαίνεσαι στο «Φίλοι» του Προγράμματος σε όσους σε ακολουθούν. Το αλλάζεις όποτε θες από Κοινοποίηση & ορατότητα.",
+    "bookingSharingYes": "Ναι, να βλέπουν",
+    "bookingSharingNo": "Όχι τώρα",
+    "bookingSharingSectionTitle": "Κρατήσεις για ακολούθους",
+    "bookingSharingSectionHint": "Όσοι σε ακολουθούν βλέπουν σε ποια μαθήματα έχεις κράτηση.",
+    "bookingSharingOn": "Οι ακόλουθοί σου βλέπουν σε ποια μαθήματα πας.",
+    "bookingSharingOff": "Οι κρατήσεις σου είναι ιδιωτικές.",
+    "bookingSharingTurnOn": "Δείξε τις κρατήσεις μου",
+    "bookingSharingTurnOff": "Κράτα τις ιδιωτικές"
   },
   "BoxPage": {
     "allWeek": "Όλη η εβδομάδα",

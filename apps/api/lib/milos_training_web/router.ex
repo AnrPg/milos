@@ -942,6 +942,7 @@ defmodule MilosTrainingWeb.Router do
     get("/me/feed", CommunityPostController, :feed)
     # ADR-142: follows, profile posts and people.
     get("/me/social", FollowController, :summary)
+    put("/me/social/booking-sharing", FollowController, :booking_sharing)
     post("/me/follows", FollowController, :create)
     get("/me/follows/:target_type/:target_id", FollowController, :show)
     delete("/me/follows/:target_type/:target_id", FollowController, :delete)

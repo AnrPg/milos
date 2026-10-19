@@ -5264,7 +5264,11 @@
     "location": "מיקום",
     "wod": "אימון",
     "wodNotPosted": "האימון עוד לא פורסם.",
-    "audienceEveryone": "כולם"
+    "audienceEveryone": "כולם",
+    "chipFriends": "חברים",
+    "friendsOnly": "רק איפה שחברים הולכים",
+    "friendsGoing": "{others, plural, =0 {הולך/ת: {name}} other {הולכים: {name} ועוד #}}",
+    "friendsLabel": "הולכים"
   },
   "LocationPicker": {
     "title": "מיקום",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "השיאים שלך בפנתיאון",
     "prsNotShared": "לא משתף איתך את השיאים שלו.",
     "prsNone": "עוד אין שיאים.",
-    "unfollowBoxConfirm": "להפסיק לעקוב אחרי הבוקס? הפוסטים הציבוריים שלו ייעלמו מהפיד שלך."
+    "unfollowBoxConfirm": "להפסיק לעקוב אחרי הבוקס? הפוסטים הציבוריים שלו ייעלמו מהפיד שלך.",
+    "bookingSharingTitle": "שהעוקבים שלך יראו לאילו שיעורים אתה הולך?",
+    "bookingSharingBody": "תופיע תחת «חברים» בלו״ז של העוקבים שלך. אפשר לשנות בכל עת בשיתוף ונראות.",
+    "bookingSharingYes": "כן, שיראו",
+    "bookingSharingNo": "לא עכשיו",
+    "bookingSharingSectionTitle": "הזמנות לעוקבים",
+    "bookingSharingSectionHint": "מי שעוקב אחריך רואה לאילו שיעורים הזמנת מקום.",
+    "bookingSharingOn": "העוקבים שלך רואים לאילו שיעורים אתה הולך.",
+    "bookingSharingOff": "ההזמנות שלך פרטיות.",
+    "bookingSharingTurnOn": "הצג את ההזמנות שלי",
+    "bookingSharingTurnOff": "השאר פרטיות"
   },
   "BoxPage": {
     "allWeek": "כל השבוע",

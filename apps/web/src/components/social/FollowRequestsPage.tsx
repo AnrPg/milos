@@ -16,6 +16,7 @@ import {
 import { clientErrorMessage } from "@/components/client/errors";
 import { HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
+import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -35,6 +36,7 @@ export function FollowRequestsPage() {
 
   return (
     <HubPage title={t("requestsTitle")}>
+      <BookingSharingOffer />
       {requests.isPending ? <p style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
       {requests.isSuccess && entries.length === 0 ? (
         <p className="rounded-3xl p-5 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>

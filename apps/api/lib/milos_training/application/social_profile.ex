@@ -20,8 +20,32 @@ defmodule MilosTraining.Application.SocialProfile do
          Community.count_outgoing_follows(context, user_id, Community.follow_target_types(), [
            "active"
          ]),
-       requests_count: Community.count_incoming_follows(context, "user", user_id, "requested")
+       requests_count: Community.count_incoming_follows(context, "user", user_id, "requested"),
+       booking_sharing: booking_sharing(context, user_id)
      }}
+  end
+
+  @doc """
+  Board 5 Q6: whether followers see the classes the member books (off until
+  they say so) and whether the one-time offer was answered.
+  """
+  def booking_sharing(context, user_id) do
+    settings = Community.social_settings(context, user_id)
+
+    %{
+      enabled: (settings && settings.share_bookings) || false,
+      offered: not is_nil(settings && settings.share_bookings_offered_at)
+    }
+  end
+
+  def set_booking_sharing(%{user_id: user_id} = context, enabled, now \\ DateTime.utc_now())
+      when is_boolean(enabled) do
+    with {:ok, _settings} <-
+           Community.put_social_settings(context, user_id, %{
+             share_bookings: enabled,
+             share_bookings_offered_at: now
+           }),
+         do: {:ok, booking_sharing(context, user_id)}
   end
 
   def person(%{user_id: viewer_id} = context, person_id) do

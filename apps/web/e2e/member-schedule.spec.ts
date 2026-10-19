@@ -162,7 +162,14 @@ async function stubApi(page: Page) {
               ],
             },
           }),
-          slot("s-2", oly, 9, { spots_remaining: 0, approved_booking_count: 12 }),
+          slot("s-2", oly, 9, {
+            spots_remaining: 0,
+            approved_booking_count: 12,
+            friends_going: [
+              { id: "friend-1", nickname: "Μαρία", avatar_url: null },
+              { id: "friend-2", nickname: "Κώστας", avatar_url: null },
+            ],
+          }),
           slot("s-3", crossfit, 18, {
             current_user_booking: { id: "b-1", user_id: user.id, status: "approved", inserted_at: at(8) },
           }),
@@ -199,6 +206,17 @@ test.describe("member schedule", () => {
 
     await page.getByRole("button", { name: "Καθαρισμός όλων των φίλτρων" }).click();
     await expect(list.getByText("Open gym")).toBeVisible();
+  });
+
+  test("«Φίλοι» keeps the classes people you follow are going to (ADR-142 decision 12)", async ({ page }) => {
+    await page.goto("/box/schedule");
+    const list = page.getByRole("main");
+    await expect(list.getByText("Πάνε: Μαρία και 1 ακόμα")).toBeVisible();
+    await page.getByRole("button", { name: "Φίλοι" }).click();
+    await expect(list.getByText("Open gym")).toHaveCount(0);
+    await expect(list.getByText("Olympic lifting")).toBeVisible();
+    await list.getByRole("button", { name: /Olympic lifting/ }).click();
+    await expect(page.getByRole("dialog", { name: "Olympic lifting" }).getByText("Μαρία, Κώστας")).toBeVisible();
   });
 
   test("opens the full filter page", async ({ page }) => {

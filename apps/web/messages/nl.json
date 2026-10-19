@@ -5264,7 +5264,11 @@
     "location": "Locatie",
     "wod": "Workout",
     "wodNotPosted": "De workout staat er nog niet.",
-    "audienceEveryone": "Iedereen"
+    "audienceEveryone": "Iedereen",
+    "chipFriends": "Vrienden",
+    "friendsOnly": "Alleen waar vrienden gaan",
+    "friendsGoing": "{others, plural, =0 {{name} gaat} other {{name} en # anderen gaan}}",
+    "friendsLabel": "Gaan"
   },
   "LocationPicker": {
     "title": "Locatie",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "Je PR's staan in het Pantheon",
     "prsNotShared": "Deelt geen PR's met jou.",
     "prsNone": "Nog geen PR's.",
-    "unfollowBoxConfirm": "Deze box niet meer volgen? De openbare berichten verdwijnen uit je feed."
+    "unfollowBoxConfirm": "Deze box niet meer volgen? De openbare berichten verdwijnen uit je feed.",
+    "bookingSharingTitle": "Mogen je volgers zien naar welke lessen je gaat?",
+    "bookingSharingBody": "Je verschijnt bij «Vrienden» in het rooster van je volgers. Altijd te wijzigen bij Delen en zichtbaarheid.",
+    "bookingSharingYes": "Ja, dat mag",
+    "bookingSharingNo": "Niet nu",
+    "bookingSharingSectionTitle": "Boekingen voor volgers",
+    "bookingSharingSectionHint": "Wie je volgt, ziet welke lessen je hebt geboekt.",
+    "bookingSharingOn": "Je volgers zien naar welke lessen je gaat.",
+    "bookingSharingOff": "Je boekingen zijn privé.",
+    "bookingSharingTurnOn": "Mijn boekingen tonen",
+    "bookingSharingTurnOff": "Privé houden"
   },
   "BoxPage": {
     "allWeek": "Hele week",

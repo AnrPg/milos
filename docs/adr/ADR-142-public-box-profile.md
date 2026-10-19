@@ -63,6 +63,15 @@ work, and visitors must be able to filter gyms by the same words everywhere
     member follows and their own, and public posts of followed boxes the
     member does not belong to, ordered by `(inserted_at, id)` with one keyset
     cursor. Every post carries `origin` (`club` or `profile`) and `audience`.
+12. **Bookings for followers (board 5 Q6, the «Φίλοι» chip).** Bookings stay
+    private by default (vision §4.5). A member turns sharing on for all their
+    followers in account-scoped `community_social_settings`, offered once after
+    they accept their first follower and changeable in Κοινοποίηση &
+    ορατότητα. The member schedule adds `friends_going` to each class: people
+    the viewer actively follows who share and hold a place (pending or
+    approved). Only the owner reads the settings row; `milos_booking_sharers()`
+    (SECURITY DEFINER, bound to `app.user_id`) tells a follower who among the
+    people they follow shares, and nothing more.
 
 ## Rationale
 A snapshot makes «Δημοσίευση» a real moment and lets owners work in several
@@ -89,3 +98,5 @@ when they change gyms.
   audiences, in profiles and class types.
 - Migration `20261020100000` adds the public lookups, follows, profile posts
   and their policies, the public read policies on club posts and `coach_ids`.
+- Migration `20261020110000` adds `community_social_settings` and
+  `milos_booking_sharers()`.

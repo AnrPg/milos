@@ -108,6 +108,17 @@ defmodule MilosTraining.Community.SocialStore do
     do: call(context, :delete_profile_comment, [id, now])
 
   @impl true
+  def get_social_settings(context, user_id),
+    do: call(context, :get_social_settings, [user_id])
+
+  @impl true
+  def put_social_settings(context, user_id, attrs),
+    do: call(context, :put_social_settings, [user_id, attrs])
+
+  @impl true
+  def booking_sharer_ids(context), do: call(context, :booking_sharer_ids, [])
+
+  @impl true
   def follower_counts(type, ids), do: adapter().follower_counts(type, ids)
 
   @impl true

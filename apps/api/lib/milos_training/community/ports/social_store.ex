@@ -25,6 +25,9 @@ defmodule MilosTraining.Community.Ports.SocialStore do
   @callback count_outgoing(context(), id(), [String.t()], [String.t()]) :: non_neg_integer()
   @callback active_target_ids(context(), id(), String.t()) :: [id()]
   @callback follow_statuses(context(), id(), String.t(), [id()]) :: %{id() => String.t()}
+  @callback get_social_settings(context(), id()) :: map() | nil
+  @callback put_social_settings(context(), id(), map()) :: {:ok, map()} | {:error, term()}
+  @callback booking_sharer_ids(context()) :: [id()]
   @callback follower_counts(String.t(), [id()]) :: %{id() => non_neg_integer()}
   @callback following_count(id()) :: non_neg_integer()
 

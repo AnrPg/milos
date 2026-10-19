@@ -5264,7 +5264,11 @@
     "location": "الموقع",
     "wod": "التمرين",
     "wodNotPosted": "لم يُنشر التمرين بعد.",
-    "audienceEveryone": "الجميع"
+    "audienceEveryone": "الجميع",
+    "chipFriends": "الأصدقاء",
+    "friendsOnly": "فقط حيث يذهب الأصدقاء",
+    "friendsGoing": "{others, plural, =0 {يذهب: {name}} other {يذهب: {name} و# آخرون}}",
+    "friendsLabel": "يذهبون"
   },
   "LocationPicker": {
     "title": "الموقع",
@@ -5571,7 +5575,17 @@
     "myPrsLink": "أرقامك القياسية في البانثيون",
     "prsNotShared": "لا يشارك أرقامه القياسية معك.",
     "prsNone": "لا توجد أرقام قياسية بعد.",
-    "unfollowBoxConfirm": "إيقاف متابعة هذه الصالة؟ ستختفي منشوراتها العامة من موجزك."
+    "unfollowBoxConfirm": "إيقاف متابعة هذه الصالة؟ ستختفي منشوراتها العامة من موجزك.",
+    "bookingSharingTitle": "هل يرى متابعوك الحصص التي تذهب إليها؟",
+    "bookingSharingBody": "ستظهر ضمن «الأصدقاء» في جدول متابعيك. يمكنك تغيير ذلك في أي وقت من المشاركة والظهور.",
+    "bookingSharingYes": "نعم، ليروا",
+    "bookingSharingNo": "ليس الآن",
+    "bookingSharingSectionTitle": "الحجوزات للمتابعين",
+    "bookingSharingSectionHint": "يرى من يتابعك الحصص التي حجزتها.",
+    "bookingSharingOn": "يرى متابعوك الحصص التي تذهب إليها.",
+    "bookingSharingOff": "حجوزاتك خاصة.",
+    "bookingSharingTurnOn": "أظهر حجوزاتي",
+    "bookingSharingTurnOff": "أبقِها خاصة"
   },
   "BoxPage": {
     "allWeek": "الأسبوع كاملًا",
