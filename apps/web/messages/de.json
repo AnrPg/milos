@@ -5166,7 +5166,9 @@
     "joinSubmit": "Beitreten",
     "joinPending": "Wird beigetreten…",
     "joinInvalid": "Das sieht nicht nach einem Einladungscode oder Beitrittslink aus.",
-    "joinDone": "Du bist {name} beigetreten."
+    "joinDone": "Du bist {name} beigetreten.",
+    "audiencePublic": "Öffentlich",
+    "audienceFollowers": "Follower"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filter} other {Filter (#)}}",

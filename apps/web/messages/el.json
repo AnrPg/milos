@@ -5166,7 +5166,9 @@
     "joinSubmit": "Μπες",
     "joinPending": "Γίνεται…",
     "joinInvalid": "Αυτό δεν μοιάζει με κωδικό πρόσκλησης ή join link.",
-    "joinDone": "Μπήκες στο {name}."
+    "joinDone": "Μπήκες στο {name}.",
+    "audiencePublic": "Δημόσιο",
+    "audienceFollowers": "Ακόλουθοι"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Φίλτρα} other {Φίλτρα (#)}}",

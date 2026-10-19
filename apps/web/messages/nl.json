@@ -5166,7 +5166,9 @@
     "joinSubmit": "Deelnemen",
     "joinPending": "Bezig…",
     "joinInvalid": "Dat lijkt geen uitnodigingscode of deelnamelink.",
-    "joinDone": "Je bent lid geworden van {name}."
+    "joinDone": "Je bent lid geworden van {name}.",
+    "audiencePublic": "Openbaar",
+    "audienceFollowers": "Volgers"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filters} other {Filters (#)}}",

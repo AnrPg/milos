@@ -5166,7 +5166,9 @@
     "joinSubmit": "Entra",
     "joinPending": "Iscrizione…",
     "joinInvalid": "Non sembra un codice d'invito né un link di iscrizione.",
-    "joinDone": "Sei entrato in {name}."
+    "joinDone": "Sei entrato in {name}.",
+    "audiencePublic": "Pubblico",
+    "audienceFollowers": "Follower"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filtri} other {Filtri (#)}}",

@@ -5166,7 +5166,9 @@
     "joinSubmit": "انضم",
     "joinPending": "جارٍ الانضمام…",
     "joinInvalid": "لا يبدو هذا رمز دعوة أو رابط انضمام.",
-    "joinDone": "انضممت إلى {name}."
+    "joinDone": "انضممت إلى {name}.",
+    "audiencePublic": "عام",
+    "audienceFollowers": "المتابعون"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {عوامل التصفية} other {عوامل التصفية (#)}}",

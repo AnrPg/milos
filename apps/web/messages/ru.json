@@ -5166,7 +5166,9 @@
     "joinSubmit": "Вступить",
     "joinPending": "Вступаем…",
     "joinInvalid": "Это не похоже на код приглашения или ссылку для вступления.",
-    "joinDone": "Вы вступили в {name}."
+    "joinDone": "Вы вступили в {name}.",
+    "audiencePublic": "Публично",
+    "audienceFollowers": "Подписчики"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Фильтры} other {Фильтры (#)}}",

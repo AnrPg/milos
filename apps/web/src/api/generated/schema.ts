@@ -208,6 +208,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/boxes/{slug}/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Posts a published box made public, newest first (signed in) */
+        get: operations["MilosTrainingWeb.PublicBoxController.posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/boxes/{slug}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A published box's classes in a window (read-only; signed in) */
+        get: operations["MilosTrainingWeb.PublicBoxController.schedule"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -558,6 +592,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/follow-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People waiting for you to accept them */
+        get: operations["MilosTrainingWeb.FollowController.requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/follow-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Decline a follow request, or remove a follower */
+        delete: operations["MilosTrainingWeb.FollowController.remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/follow-requests/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a follow request */
+        post: operations["MilosTrainingWeb.FollowController.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/followers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People who follow you */
+        get: operations["MilosTrainingWeb.FollowController.followers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/followers/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Decline a follow request, or remove a follower */
+        delete: operations["MilosTrainingWeb.FollowController.remove (2)"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/following": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People (type user) or boxes (type organization) you follow */
+        get: operations["MilosTrainingWeb.FollowController.following"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/follows": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Follow a person (a request they accept) or a published box (at once) */
+        post: operations["MilosTrainingWeb.FollowController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/follows/{target_type}/{target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether you follow a person or box */
+        get: operations["MilosTrainingWeb.FollowController.show"];
+        put?: never;
+        post?: never;
+        /** Unfollow, or withdraw a request */
+        delete: operations["MilosTrainingWeb.FollowController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -673,6 +844,23 @@ export interface paths {
         };
         /** Search visible users by nickname */
         get: operations["MilosTrainingWeb.MeController.search_users (2)"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your counts for Εγώ: posts, followers, following, waiting requests */
+        get: operations["MilosTrainingWeb.FollowController.summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5174,6 +5362,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/people/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A person: name, avatar, counts and both follow relationships */
+        get: operations["MilosTrainingWeb.PeopleController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/people/{id}/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A person's followers and public posts you may read */
+        get: operations["MilosTrainingWeb.PeopleController.posts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organization-purges": {
         parameters: {
             query?: never;
@@ -5625,6 +5847,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/profile-post-comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your comment, or any comment on your post */
+        delete: operations["MilosTrainingWeb.ProfilePostController.delete_comment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile-posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post to your followers or to everyone, optionally attaching a journal entry */
+        post: operations["MilosTrainingWeb.ProfilePostController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile-posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your post */
+        delete: operations["MilosTrainingWeb.ProfilePostController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile-posts/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A post's comments, oldest first */
+        get: operations["MilosTrainingWeb.ProfilePostController.comments"];
+        put?: never;
+        /** Comment on a post */
+        post: operations["MilosTrainingWeb.ProfilePostController.comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/profile-posts/{id}/kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give or take back kudos */
+        put: operations["MilosTrainingWeb.ProfilePostController.kudos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/prs": {
         parameters: {
             query?: never;
@@ -5706,6 +6014,23 @@ export interface paths {
         put?: never;
         /** Get a shareable text for a PR */
         post: operations["MilosTrainingWeb.PRController.share"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/boxes/{slug}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A published box: who it is, its «Σχετικά» and its locations */
+        get: operations["MilosTrainingWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -5988,6 +6313,20 @@ export interface components {
             about: string | null;
             amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
             audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** @description The gym's staff the owner may pick from. */
+            coach_candidates: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            /** @description The coaches the page shows, in the owner's order. */
+            coaches: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
             /** Media */
             cover: {
                 content_type: string;
@@ -6029,6 +6368,13 @@ export interface components {
             /** Format: date-time */
             updated_at?: string | null;
         };
+        /** BoxPublicProfileCoach */
+        BoxPublicProfileCoach: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
         /** BoxPublicProfilePublish */
         BoxPublicProfilePublish: {
             /** @description The version the editor read. */
@@ -6041,6 +6387,20 @@ export interface components {
                 about: string | null;
                 amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                 audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                /** @description The gym's staff the owner may pick from. */
+                coach_candidates: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                /** @description The coaches the page shows, in the owner's order. */
+                coaches: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
                 /** Media */
                 cover: {
                     content_type: string;
@@ -6088,6 +6448,8 @@ export interface components {
             about?: string | null;
             amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
             audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** @description Staff shown as coaches on the page, in display order. */
+            coach_ids?: string[];
             /** Format: uuid */
             cover_photo_id?: string | null;
             disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -6435,6 +6797,8 @@ export interface components {
                 attachment_id?: string | null;
                 /** @enum {string|null} */
                 attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
                 author: {
                     avatar_url?: string | null;
@@ -6451,7 +6815,7 @@ export interface components {
                     id: string;
                     kind?: string | null;
                     name?: string | null;
-                };
+                } | null;
                 club: {
                     /** Format: uuid */
                     id: string;
@@ -6459,7 +6823,7 @@ export interface components {
                     name: string;
                     organization_slug: string;
                     primary_color?: string | null;
-                };
+                } | null;
                 comment_count: number;
                 hidden: boolean;
                 /** Format: uuid */
@@ -6468,6 +6832,8 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
                 pinned: boolean;
             }[];
             posts: {
@@ -6479,6 +6845,8 @@ export interface components {
                 attachment_id?: string | null;
                 /** @enum {string|null} */
                 attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
                 author: {
                     avatar_url?: string | null;
@@ -6495,7 +6863,7 @@ export interface components {
                     id: string;
                     kind?: string | null;
                     name?: string | null;
-                };
+                } | null;
                 club: {
                     /** Format: uuid */
                     id: string;
@@ -6503,7 +6871,7 @@ export interface components {
                     name: string;
                     organization_slug: string;
                     primary_color?: string | null;
-                };
+                } | null;
                 comment_count: number;
                 hidden: boolean;
                 /** Format: uuid */
@@ -6512,6 +6880,8 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
                 pinned: boolean;
             }[];
         };
@@ -6527,7 +6897,10 @@ export interface components {
             /** @enum {string} */
             notify_level: "all" | "announcements" | "none";
         };
-        /** CommunityPost */
+        /**
+         * CommunityPost
+         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+         */
         CommunityPost: {
             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
             attachment?: {
@@ -6537,6 +6910,8 @@ export interface components {
             attachment_id?: string | null;
             /** @enum {string|null} */
             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+            /** @enum {string} */
+            audience: "club_channel" | "followers" | "public";
             /** CommunityAuthor */
             author: {
                 avatar_url?: string | null;
@@ -6553,7 +6928,7 @@ export interface components {
                 id: string;
                 kind?: string | null;
                 name?: string | null;
-            };
+            } | null;
             club: {
                 /** Format: uuid */
                 id: string;
@@ -6561,7 +6936,7 @@ export interface components {
                 name: string;
                 organization_slug: string;
                 primary_color?: string | null;
-            };
+            } | null;
             comment_count: number;
             hidden: boolean;
             /** Format: uuid */
@@ -6570,6 +6945,8 @@ export interface components {
             inserted_at: string;
             kudos_by_me: boolean;
             kudos_count: number;
+            /** @enum {string} */
+            origin: "club" | "profile";
             pinned: boolean;
         };
         /** CommunityPostCreateRequest */
@@ -6578,6 +6955,11 @@ export interface components {
             attachment_id?: string;
             /** @enum {string} */
             attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+            /**
+             * @description public (staff only) also shows the post on the box page and to its followers
+             * @enum {string}
+             */
+            audience?: "club_channel" | "public";
             body?: string;
             /** Format: uuid */
             channel_id: string;
@@ -6597,7 +6979,10 @@ export interface components {
         };
         /** CommunityPostResponse */
         CommunityPostResponse: {
-            /** CommunityPost */
+            /**
+             * CommunityPost
+             * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+             */
             post: {
                 /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
                 attachment?: {
@@ -6607,6 +6992,8 @@ export interface components {
                 attachment_id?: string | null;
                 /** @enum {string|null} */
                 attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
                 author: {
                     avatar_url?: string | null;
@@ -6623,7 +7010,7 @@ export interface components {
                     id: string;
                     kind?: string | null;
                     name?: string | null;
-                };
+                } | null;
                 club: {
                     /** Format: uuid */
                     id: string;
@@ -6631,7 +7018,7 @@ export interface components {
                     name: string;
                     organization_slug: string;
                     primary_color?: string | null;
-                };
+                } | null;
                 comment_count: number;
                 hidden: boolean;
                 /** Format: uuid */
@@ -6640,6 +7027,8 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
                 pinned: boolean;
             };
         };
@@ -7480,6 +7869,82 @@ export interface components {
                 user_id: string;
             };
         };
+        /** FollowEntry */
+        FollowEntry: {
+            box?: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            } | null;
+            /** Format: uuid */
+            follow_id: string;
+            person?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Whether you follow them */
+                my_status: "none" | "requested" | "active";
+                nickname?: string | null;
+            } | null;
+            /** Format: date-time */
+            since: string;
+            /** @enum {string} */
+            status: "none" | "requested" | "active";
+        };
+        /** FollowPage */
+        FollowPage: {
+            entries: {
+                box?: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                } | null;
+                /** Format: uuid */
+                follow_id: string;
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Whether you follow them */
+                    my_status: "none" | "requested" | "active";
+                    nickname?: string | null;
+                } | null;
+                /** Format: date-time */
+                since: string;
+                /** @enum {string} */
+                status: "none" | "requested" | "active";
+            }[];
+            next_cursor?: string | null;
+        };
+        /** FollowPerson */
+        FollowPerson: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @description Whether you follow them */
+            my_status: "none" | "requested" | "active";
+            nickname?: string | null;
+        };
+        /** FollowRequest */
+        FollowRequest: {
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "user" | "organization" | "club";
+        };
+        /** FollowStatusResponse */
+        FollowStatusResponse: {
+            /** @enum {string} */
+            status: "none" | "requested" | "active";
+        };
         /** FormReview */
         FormReview: {
             /** Format: uuid */
@@ -8145,6 +8610,89 @@ export interface components {
             score: number;
             unit: string;
         };
+        /** PersonPostsResponse */
+        PersonPostsResponse: {
+            next_cursor?: string | null;
+            posts: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                } | null;
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                } | null;
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
+                pinned: boolean;
+            }[];
+        };
+        /** PersonProfile */
+        PersonProfile: {
+            avatar_url?: string | null;
+            followers_count: number;
+            following_count: number;
+            follows_me: boolean;
+            /** Format: uuid */
+            id: string;
+            is_me: boolean;
+            /** @enum {string} */
+            my_status: "none" | "requested" | "active";
+            nickname?: string | null;
+        };
+        /** PersonRef */
+        PersonRef: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** ProfilePostCreateRequest */
+        ProfilePostCreateRequest: {
+            /** Format: uuid */
+            attachment_id?: string;
+            /** @enum {string} */
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+            /** @enum {string} */
+            audience: "followers" | "public";
+            body?: string;
+            client_operation_id?: string;
+        };
         /** ProgressStats */
         ProgressStats: {
             consistency: {
@@ -8196,6 +8744,280 @@ export interface components {
                 /** Format: date */
                 week_start: string;
             }[];
+        };
+        /** PublicBox */
+        PublicBox: {
+            logo_url?: string | null;
+            name: string;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            /** @description Canonical slug; redirect when it differs */
+            slug: string;
+        };
+        /** PublicBoxClass */
+        PublicBoxClass: {
+            capacity?: number | null;
+            class_type?: {
+                audiences: string[];
+                /** Format: uuid */
+                id: string;
+                level?: string | null;
+                name: string;
+            } | null;
+            coach?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            name: string;
+            /** Format: date-time */
+            scheduled_at: string;
+            spots_remaining?: number | null;
+        };
+        /**
+         * PublicBoxCoach
+         * @description A coach the owner shows, with what they teach in the coming weeks
+         */
+        PublicBoxCoach: {
+            avatar_url?: string | null;
+            class_types: string[];
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** PublicBoxLocation */
+        PublicBoxLocation: {
+            accessibility?: string[] | null;
+            address?: string | null;
+            city?: string | null;
+            country_code?: string | null;
+            /** Format: uuid */
+            id: string;
+            latitude?: number | null;
+            longitude?: number | null;
+            name: string;
+            neighbourhood?: string | null;
+            /** @description Weekly spans: weekday (1 = Monday), opens, closes */
+            opening_hours?: {
+                [key: string]: unknown;
+            }[] | null;
+        };
+        /** PublicBoxPhoto */
+        PublicBoxPhoto: {
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            url: string;
+            width?: number | null;
+        };
+        /** PublicBoxPostsResponse */
+        PublicBoxPostsResponse: {
+            /** PublicBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            };
+            next_cursor?: string | null;
+            posts: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                } | null;
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug: string;
+                    primary_color?: string | null;
+                } | null;
+                comment_count: number;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
+                pinned: boolean;
+            }[];
+        };
+        /**
+         * PublicBoxProfile
+         * @description The published snapshot only; never the draft
+         */
+        PublicBoxProfile: {
+            about?: string | null;
+            amenities: string[];
+            audiences: string[];
+            coaches: {
+                avatar_url?: string | null;
+                class_types: string[];
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            cover?: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                url: string;
+                width?: number | null;
+            } | null;
+            disciplines: string[];
+            languages: string[];
+            photos: {
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                url: string;
+                width?: number | null;
+            }[];
+            services: string[];
+        };
+        /** PublicBoxResponse */
+        PublicBoxResponse: {
+            /** PublicBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            };
+            followers_count: number;
+            locations: {
+                accessibility?: string[] | null;
+                address?: string | null;
+                city?: string | null;
+                country_code?: string | null;
+                /** Format: uuid */
+                id: string;
+                latitude?: number | null;
+                longitude?: number | null;
+                name: string;
+                neighbourhood?: string | null;
+                /** @description Weekly spans: weekday (1 = Monday), opens, closes */
+                opening_hours?: {
+                    [key: string]: unknown;
+                }[] | null;
+            }[];
+            /**
+             * PublicBoxProfile
+             * @description The published snapshot only; never the draft
+             */
+            profile: {
+                about?: string | null;
+                amenities: string[];
+                audiences: string[];
+                coaches: {
+                    avatar_url?: string | null;
+                    class_types: string[];
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                cover?: {
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    url: string;
+                    width?: number | null;
+                } | null;
+                disciplines: string[];
+                languages: string[];
+                photos: {
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    url: string;
+                    width?: number | null;
+                }[];
+                services: string[];
+            };
+            /** Format: date-time */
+            published_at?: string | null;
+        };
+        /** PublicBoxScheduleResponse */
+        PublicBoxScheduleResponse: {
+            /** PublicBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            };
+            /** Format: date-time */
+            end_at: string;
+            slots: {
+                capacity?: number | null;
+                class_type?: {
+                    audiences: string[];
+                    /** Format: uuid */
+                    id: string;
+                    level?: string | null;
+                    name: string;
+                } | null;
+                coach?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name: string;
+                /** Format: date-time */
+                scheduled_at: string;
+                spots_remaining?: number | null;
+            }[];
+            /** Format: date-time */
+            start_at: string;
         };
         /** RememberFilterRequest */
         RememberFilterRequest: {
@@ -8251,6 +9073,13 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** SocialSummary */
+        SocialSummary: {
+            followers_count: number;
+            following_count: number;
+            posts_count: number;
+            requests_count: number;
         };
         /** StaffMember */
         StaffMember: {
@@ -9326,6 +10155,157 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PublicBoxController.posts": {
+        parameters: {
+            query?: {
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Posts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PublicBox */
+                        box: {
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            /** @description Canonical slug; redirect when it differs */
+                            slug: string;
+                        };
+                        next_cursor?: string | null;
+                        posts: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PublicBoxController.schedule": {
+        parameters: {
+            query?: {
+                start_at?: string;
+                end_at?: string;
+            };
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Classes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PublicBox */
+                        box: {
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            /** @description Canonical slug; redirect when it differs */
+                            slug: string;
+                        };
+                        /** Format: date-time */
+                        end_at: string;
+                        slots: {
+                            capacity?: number | null;
+                            class_type?: {
+                                audiences: string[];
+                                /** Format: uuid */
+                                id: string;
+                                level?: string | null;
+                                name: string;
+                            } | null;
+                            coach?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name: string;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            spots_remaining?: number | null;
+                        }[];
+                        /** Format: date-time */
+                        start_at: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
@@ -10186,6 +11166,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -10202,7 +11184,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -10210,7 +11192,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -10219,6 +11201,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         }[];
                         posts: {
@@ -10230,6 +11214,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -10246,7 +11232,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -10254,7 +11240,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -10263,6 +11249,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         }[];
                     };
@@ -10445,6 +11433,304 @@ export interface operations {
                         }[];
                         /** @enum {string} */
                         surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.requests": {
+        parameters: {
+            query?: {
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            /** Format: uuid */
+                            follow_id: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Whether you follow them */
+                                my_status: "none" | "requested" | "active";
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: date-time */
+                            since: string;
+                            /** @enum {string} */
+                            status: "none" | "requested" | "active";
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.followers": {
+        parameters: {
+            query?: {
+                cursor?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Followers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            /** Format: uuid */
+                            follow_id: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Whether you follow them */
+                                my_status: "none" | "requested" | "active";
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: date-time */
+                            since: string;
+                            /** @enum {string} */
+                            status: "none" | "requested" | "active";
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.remove (2)": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.following": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                type?: "user" | "organization";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Following */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            /** Format: uuid */
+                            follow_id: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Whether you follow them */
+                                my_status: "none" | "requested" | "active";
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: date-time */
+                            since: string;
+                            /** @enum {string} */
+                            status: "none" | "requested" | "active";
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    target_id: string;
+                    /** @enum {string} */
+                    target_type: "user" | "organization" | "club";
+                };
+            };
+        };
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "none" | "requested" | "active";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target_type: "user" | "organization" | "club";
+                target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "none" | "requested" | "active";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target_type: "user" | "organization" | "club";
+                target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Status */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        status: "none" | "requested" | "active";
                     };
                 };
             };
@@ -10771,6 +12057,31 @@ export interface operations {
                             nickname?: string;
                             role?: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Counts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        followers_count: number;
+                        following_count: number;
+                        posts_count: number;
+                        requests_count: number;
                     };
                 };
             };
@@ -16620,6 +17931,20 @@ export interface operations {
                             about: string | null;
                             amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                             audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** @description The gym's staff the owner may pick from. */
+                            coach_candidates: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** @description The coaches the page shows, in the owner's order. */
+                            coaches: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
                             /** Media */
                             cover: {
                                 content_type: string;
@@ -16679,6 +18004,8 @@ export interface operations {
                     about?: string | null;
                     amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                     audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                    /** @description Staff shown as coaches on the page, in display order. */
+                    coach_ids?: string[];
                     /** Format: uuid */
                     cover_photo_id?: string | null;
                     disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -16704,6 +18031,20 @@ export interface operations {
                             about: string | null;
                             amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                             audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** @description The gym's staff the owner may pick from. */
+                            coach_candidates: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** @description The coaches the page shows, in the owner's order. */
+                            coaches: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
                             /** Media */
                             cover: {
                                 content_type: string;
@@ -16873,6 +18214,20 @@ export interface operations {
                             about: string | null;
                             amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                             audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** @description The gym's staff the owner may pick from. */
+                            coach_candidates: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** @description The coaches the page shows, in the owner's order. */
+                            coaches: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
                             /** Media */
                             cover: {
                                 content_type: string;
@@ -17008,6 +18363,20 @@ export interface operations {
                             about: string | null;
                             amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
                             audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** @description The gym's staff the owner may pick from. */
+                            coach_candidates: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** @description The coaches the page shows, in the owner's order. */
+                            coaches: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
                             /** Media */
                             cover: {
                                 content_type: string;
@@ -23420,6 +24789,11 @@ export interface operations {
                     attachment_id?: string;
                     /** @enum {string} */
                     attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+                    /**
+                     * @description public (staff only) also shows the post on the box page and to its followers
+                     * @enum {string}
+                     */
+                    audience?: "club_channel" | "public";
                     body?: string;
                     /** Format: uuid */
                     channel_id: string;
@@ -23435,7 +24809,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** CommunityPost */
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
                         post: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
                             attachment?: {
@@ -23445,6 +24822,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -23461,7 +24840,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -23469,7 +24848,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -23478,6 +24857,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         };
                     };
@@ -23618,7 +24999,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** CommunityPost */
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
                         post: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
                             attachment?: {
@@ -23628,6 +25012,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -23644,7 +25030,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -23652,7 +25038,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -23661,6 +25047,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         };
                     };
@@ -23692,7 +25080,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** CommunityPost */
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
                         post: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
                             attachment?: {
@@ -23702,6 +25093,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -23718,7 +25111,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -23726,7 +25119,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -23735,6 +25128,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         };
                     };
@@ -23766,7 +25161,10 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** CommunityPost */
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
                         post: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
                             attachment?: {
@@ -23776,6 +25174,8 @@ export interface operations {
                             attachment_id?: string | null;
                             /** @enum {string|null} */
                             attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
                             author: {
                                 avatar_url?: string | null;
@@ -23792,7 +25192,7 @@ export interface operations {
                                 id: string;
                                 kind?: string | null;
                                 name?: string | null;
-                            };
+                            } | null;
                             club: {
                                 /** Format: uuid */
                                 id: string;
@@ -23800,7 +25200,7 @@ export interface operations {
                                 name: string;
                                 organization_slug: string;
                                 primary_color?: string | null;
-                            };
+                            } | null;
                             comment_count: number;
                             hidden: boolean;
                             /** Format: uuid */
@@ -23809,6 +25209,8 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
                             pinned: boolean;
                         };
                     };
@@ -30562,6 +31964,113 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PeopleController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Person */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        avatar_url?: string | null;
+                        followers_count: number;
+                        following_count: number;
+                        follows_me: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        is_me: boolean;
+                        /** @enum {string} */
+                        my_status: "none" | "requested" | "active";
+                        nickname?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PeopleController.posts": {
+        parameters: {
+            query?: {
+                cursor?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Posts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        posts: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationPurgeController.index": {
         parameters: {
             query?: never;
@@ -31911,6 +33420,304 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ProfilePostController.delete_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ProfilePostController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    attachment_id?: string;
+                    /** @enum {string} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+                    /** @enum {string} */
+                    audience: "followers" | "public";
+                    body?: string;
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ProfilePostController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ProfilePostController.comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ProfilePostController.comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Comment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityComment */
+                        comment: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ProfilePostController.kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kudos: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug: string;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PRController.index": {
         parameters: {
             query?: {
@@ -32180,6 +33987,101 @@ export interface operations {
                 };
             };
             /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PublicBoxController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The gym's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Box */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PublicBox */
+                        box: {
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            /** @description Canonical slug; redirect when it differs */
+                            slug: string;
+                        };
+                        followers_count: number;
+                        locations: {
+                            accessibility?: string[] | null;
+                            address?: string | null;
+                            city?: string | null;
+                            country_code?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            latitude?: number | null;
+                            longitude?: number | null;
+                            name: string;
+                            neighbourhood?: string | null;
+                            /** @description Weekly spans: weekday (1 = Monday), opens, closes */
+                            opening_hours?: {
+                                [key: string]: unknown;
+                            }[] | null;
+                        }[];
+                        /**
+                         * PublicBoxProfile
+                         * @description The published snapshot only; never the draft
+                         */
+                        profile: {
+                            about?: string | null;
+                            amenities: string[];
+                            audiences: string[];
+                            coaches: {
+                                avatar_url?: string | null;
+                                class_types: string[];
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            cover?: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                url: string;
+                                width?: number | null;
+                            } | null;
+                            disciplines: string[];
+                            languages: string[];
+                            photos: {
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                url: string;
+                                width?: number | null;
+                            }[];
+                            services: string[];
+                        };
+                        /** Format: date-time */
+                        published_at?: string | null;
+                    };
+                };
+            };
+            /** @description No published box with this slug */
             404: {
                 headers: {
                     [name: string]: unknown;

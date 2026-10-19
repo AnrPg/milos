@@ -5166,7 +5166,9 @@
     "joinSubmit": "Join",
     "joinPending": "Joining…",
     "joinInvalid": "That does not look like an invitation code or a join link.",
-    "joinDone": "You joined {name}."
+    "joinDone": "You joined {name}.",
+    "audiencePublic": "Public",
+    "audienceFollowers": "Followers"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filters} other {Filters (#)}}",

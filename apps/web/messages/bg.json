@@ -5166,7 +5166,9 @@
     "joinSubmit": "Влез",
     "joinPending": "Присъединяване…",
     "joinInvalid": "Това не прилича на код за покана или линк за присъединяване.",
-    "joinDone": "Присъедини се към {name}."
+    "joinDone": "Присъедини се към {name}.",
+    "audiencePublic": "Публично",
+    "audienceFollowers": "Последователи"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Филтри} other {Филтри (#)}}",

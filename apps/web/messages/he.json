@@ -5166,7 +5166,9 @@
     "joinSubmit": "הצטרפות",
     "joinPending": "מצטרפים…",
     "joinInvalid": "זה לא נראה כמו קוד הזמנה או קישור הצטרפות.",
-    "joinDone": "הצטרפת ל-{name}."
+    "joinDone": "הצטרפת ל-{name}.",
+    "audiencePublic": "ציבורי",
+    "audienceFollowers": "עוקבים"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {מסננים} other {מסננים (#)}}",

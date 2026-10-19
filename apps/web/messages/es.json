@@ -5166,7 +5166,9 @@
     "joinSubmit": "Unirme",
     "joinPending": "Uniéndote…",
     "joinInvalid": "Eso no parece un código de invitación ni un enlace para unirte.",
-    "joinDone": "Te has unido a {name}."
+    "joinDone": "Te has unido a {name}.",
+    "audiencePublic": "Público",
+    "audienceFollowers": "Seguidores"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filtros} other {Filtros (#)}}",

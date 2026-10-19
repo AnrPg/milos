@@ -5166,7 +5166,9 @@
     "joinSubmit": "Rejoindre",
     "joinPending": "Adhésion…",
     "joinInvalid": "Cela ne ressemble ni à un code d'invitation ni à un lien d'adhésion.",
-    "joinDone": "Tu as rejoint {name}."
+    "joinDone": "Tu as rejoint {name}.",
+    "audiencePublic": "Public",
+    "audienceFollowers": "Abonnés"
   },
   "Filters": {
     "filtersCount": "{count, plural, =0 {Filtres} other {Filtres (#)}}",
