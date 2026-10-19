@@ -46,6 +46,24 @@ defmodule MilosTrainingWeb.Schemas.Facility do
     }
   end
 
+  @doc "An address suggestion from the geocoder (ADR-141)."
+  def geocode_place_schema do
+    %Schema{
+      title: "GeocodePlace",
+      type: :object,
+      properties: %{
+        label: %Schema{type: :string},
+        address: @nullable_string,
+        neighbourhood: @nullable_string,
+        city: @nullable_string,
+        country_code: @nullable_string,
+        latitude: %Schema{type: :number},
+        longitude: %Schema{type: :number}
+      },
+      required: [:label, :address, :neighbourhood, :city, :country_code, :latitude, :longitude]
+    }
+  end
+
   @doc "One weekly opening span (ADR-141); `closes` before `opens` crosses midnight."
   def opening_hours_span_schema do
     %Schema{

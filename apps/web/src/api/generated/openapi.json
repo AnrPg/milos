@@ -5619,6 +5619,46 @@
         "title": "FreeTextWorkoutAnalysis",
         "type": "object"
       },
+      "GeocodePlace": {
+        "properties": {
+          "address": {
+            "nullable": true,
+            "type": "string"
+          },
+          "city": {
+            "nullable": true,
+            "type": "string"
+          },
+          "country_code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number"
+          },
+          "longitude": {
+            "type": "number"
+          },
+          "neighbourhood": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "address",
+          "neighbourhood",
+          "city",
+          "country_code",
+          "latitude",
+          "longitude"
+        ],
+        "title": "GeocodePlace",
+        "type": "object"
+      },
       "InventoryLowReport": {
         "properties": {
           "id": {
@@ -26941,6 +26981,239 @@
         "summary": "Fetch finance analytics summary",
         "tags": [
           "Admin Finance"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/geocode": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.search_addresses",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "near_latitude",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "near_longitude",
+            "required": false,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "maxLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "places": {
+                      "items": {
+                        "properties": {
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "label",
+                          "address",
+                          "neighbourhood",
+                          "city",
+                          "country_code",
+                          "latitude",
+                          "longitude"
+                        ],
+                        "title": "GeocodePlace",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "places"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Places"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Geocoder unavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Address suggestions for pinning a location (ADR-141)",
+        "tags": [
+          "Admin Facility"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/geocode/reverse": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.reverse_geocode",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "latitude",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "longitude",
+            "required": true,
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "maxLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "place": {
+                      "nullable": true,
+                      "properties": {
+                        "address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "latitude": {
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "type": "number"
+                        },
+                        "neighbourhood": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "address",
+                        "neighbourhood",
+                        "city",
+                        "country_code",
+                        "latitude",
+                        "longitude"
+                      ],
+                      "title": "GeocodePlace",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "place"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Place"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Geocoder unavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The address and neighbourhood at a map point (ADR-141)",
+        "tags": [
+          "Admin Facility"
         ]
       }
     },

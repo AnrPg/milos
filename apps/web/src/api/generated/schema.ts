@@ -2135,6 +2135,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/geocode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Address suggestions for pinning a location (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.search_addresses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/geocode/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The address and neighbourhood at a map point (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.reverse_geocode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/locations": {
         parameters: {
             query?: never;
@@ -7328,6 +7362,16 @@ export interface components {
             workout: {
                 [key: string]: unknown;
             };
+        };
+        /** GeocodePlace */
+        GeocodePlace: {
+            address: string | null;
+            city: string | null;
+            country_code: string | null;
+            label: string;
+            latitude: number;
+            longitude: number;
+            neighbourhood: string | null;
         };
         /** InventoryLowReport */
         InventoryLowReport: {
@@ -15727,6 +15771,98 @@ export interface operations {
         responses: {
             /** @description Finance summary */
             200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.search_addresses": {
+        parameters: {
+            query: {
+                q: string;
+                near_latitude?: number;
+                near_longitude?: number;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        places: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Geocoder unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.reverse_geocode": {
+        parameters: {
+            query: {
+                latitude: number;
+                longitude: number;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GeocodePlace */
+                        place: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Geocoder unavailable */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

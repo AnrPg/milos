@@ -108,6 +108,79 @@ defmodule MilosTrainingWeb.AdminFacilityController do
     end
   end
 
+  @geocode_place FacilitySchemas.geocode_place_schema()
+  @number %Schema{type: :number}
+  @language_parameter %Parameter{
+    name: :language,
+    in: :query,
+    required: false,
+    schema: %Schema{type: :string, maxLength: 8}
+  }
+
+  operation(:search_addresses,
+    summary: "Address suggestions for pinning a location (ADR-141)",
+    parameters: [
+      %Parameter{
+        name: :q,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, maxLength: 200}
+      },
+      %Parameter{name: :near_latitude, in: :query, required: false, schema: @number},
+      %Parameter{name: :near_longitude, in: :query, required: false, schema: @number},
+      @language_parameter
+    ],
+    responses: [
+      ok:
+        {"Places", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{places: %Schema{type: :array, items: @geocode_place}},
+           required: [:places]
+         }},
+      service_unavailable: {"Geocoder unavailable", "application/json", @error}
+    ]
+  )
+
+  def search_addresses(conn, %{q: query} = params) do
+    near =
+      case params do
+        %{near_latitude: lat, near_longitude: lng} -> {lat, lng}
+        _without -> nil
+      end
+
+    with {:ok, places} <-
+           Facility.search_addresses(query, near: near, language: Map.get(params, :language)) do
+      json(conn, %{places: places})
+    end
+  end
+
+  operation(:reverse_geocode,
+    summary: "The address and neighbourhood at a map point (ADR-141)",
+    parameters: [
+      %Parameter{name: :latitude, in: :query, required: true, schema: @number},
+      %Parameter{name: :longitude, in: :query, required: true, schema: @number},
+      @language_parameter
+    ],
+    responses: [
+      ok:
+        {"Place", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{place: %Schema{@geocode_place | nullable: true}},
+           required: [:place]
+         }},
+      service_unavailable: {"Geocoder unavailable", "application/json", @error}
+    ]
+  )
+
+  def reverse_geocode(conn, %{latitude: lat, longitude: lng} = params) do
+    with {:ok, place} <-
+           Facility.reverse_geocode(lat, lng, language: Map.get(params, :language)) do
+      json(conn, %{place: place})
+    end
+  end
+
   operation(:index_check_ins,
     summary: "List open-gym check-ins of a day or a member",
     parameters: [

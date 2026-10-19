@@ -79,6 +79,8 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFacilityController, :create_location} => [:manage_settings],
     {W.AdminFacilityController, :update_location} => [:manage_settings],
     {W.AdminFacilityController, :archive_location} => [:manage_settings],
+    {W.AdminFacilityController, :search_addresses} => [:manage_settings],
+    {W.AdminFacilityController, :reverse_geocode} => [:manage_settings],
     {W.AdminFacilityController, :index_check_ins} => [:check_in],
     {W.AdminFacilityController, :create_check_in} => [:check_in],
     {W.AdminClassTypeController, :index} => [:manage_schedule, :run_classes, :manage_workouts],

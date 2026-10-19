@@ -13,6 +13,23 @@ defmodule MilosTraining.Facility do
   @doc "Accessibility features a location can declare (ADR-141)."
   def accessibility_features, do: PlacePolicy.accessibility_features()
 
+  @doc """
+  Address suggestions for pinning a location (ADR-141). `near` biases them
+  towards a `{latitude, longitude}`; `language` is a locale code.
+  """
+  def search_addresses(query, opts \\ []) when is_binary(query) do
+    case String.trim(query) do
+      query when byte_size(query) < 3 -> {:ok, []}
+      query -> geocoder().search(String.slice(query, 0, 200), Keyword.put_new(opts, :limit, 5))
+    end
+  end
+
+  @doc "The address and neighbourhood at a dropped pin, or nil when there is none."
+  def reverse_geocode(latitude, longitude, opts \\ []),
+    do: geocoder().reverse(latitude, longitude, opts)
+
+  defp geocoder, do: Application.fetch_env!(:milos_training, :geocoder)
+
   def list_locations(context, opts \\ []), do: FacilityStore.list_locations(context, opts)
   def get_location(context, id), do: FacilityStore.get_location(context, id)
   def create_location(context, params), do: FacilityStore.create_location(context, params)

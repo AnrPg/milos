@@ -52,6 +52,12 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  def call(conn, {:error, :geocoder_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{code: "geocoder_unavailable", error: "Address search is unavailable right now"})
+  end
+
   def call(conn, {:error, :invalid_timezone}) do
     conn
     |> put_status(:unprocessable_entity)

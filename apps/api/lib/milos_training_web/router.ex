@@ -87,6 +87,11 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-141: address lookups go to a shared OpenStreetMap geocoder.
+  pipeline :geocode_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
+  end
+
   pipeline :search_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
@@ -409,6 +414,19 @@ defmodule MilosTrainingWeb.Router do
   # ADR-129: members' PRs are readable by the gym's coaches, so the dossier PR
   # tab admits coaches as well as owners/admins. Owners/admins who are not
   # coaches get a role-safe empty state; the database enforces the rest.
+  scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :geocode_rate_limited
+    ])
+
+    get("/geocode", AdminFacilityController, :search_addresses)
+    get("/geocode/reverse", AdminFacilityController, :reverse_geocode)
+  end
+
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
     pipe_through([
       :api,

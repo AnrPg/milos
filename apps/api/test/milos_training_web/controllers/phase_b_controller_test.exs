@@ -106,6 +106,44 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
              Enum.find(schedule["class_types"], &(&1["id"] == default["id"]))
   end
 
+  test "admins look up addresses and pins for a location", %{
+    conn: conn,
+    admin_conn: admin_conn,
+    base: base
+  } do
+    assert [%{"neighbourhood" => "Κυψέλη", "latitude" => lat}] =
+             admin_conn
+             |> get("#{base}/admin/geocode?q=#{URI.encode("Φωκίωνος Νέγρη 12")}&language=el")
+             |> json_response(200)
+             |> Map.fetch!("places")
+
+    assert is_float(lat)
+
+    assert %{"places" => []} =
+             admin_conn |> recycle() |> get("#{base}/admin/geocode?q=ab") |> json_response(200)
+
+    assert %{"code" => "geocoder_unavailable"} =
+             admin_conn |> recycle() |> get("#{base}/admin/geocode?q=down") |> json_response(503)
+
+    assert %{"place" => %{"address" => "Φωκίωνος Νέγρη 12", "latitude" => 38.0001}} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/reverse?latitude=38.0001&longitude=23.73")
+             |> json_response(200)
+
+    assert %{"place" => nil} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/reverse?latitude=10&longitude=10")
+             |> json_response(200)
+
+    {_user, member_conn} = member(conn)
+
+    member_conn
+    |> get("#{base}/admin/geocode?q=#{URI.encode("Νέγρη")}")
+    |> json_response(403)
+  end
+
   test "locations, waitlists, guests and check-ins through the API", %{
     conn: conn,
     admin: admin,
