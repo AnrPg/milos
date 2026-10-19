@@ -30,6 +30,7 @@ import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
+import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -1371,6 +1372,10 @@ export function AdminSettingsHub() {
               description={i18n("scheduleClassificationAndFiltersc6f2df8")}
             >
               <ClassTypeSettings token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection id="public-page" title={i18n("admPublicPageTitle")} description={i18n("admPublicPageDescription")}>
+              <PublicPageLink />
             </CollapsibleSection>
 
             <CollapsibleSection

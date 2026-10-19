@@ -215,6 +215,10 @@ defmodule MilosTraining.Finance do
 
   defdelegate reserve_entitlement(user_id, request), to: ReserveEntitlement, as: :call
 
+  @doc "Per booking request, whether the member's package includes it (scope only)."
+  def package_coverage(context, user_id, requests),
+    do: scoped(context, fn -> FinanceStore.package_coverage(user_id, requests) end)
+
   def reserve_entitlement(context, user_id, request),
     do: scoped(context, fn -> reserve_entitlement(user_id, request) end)
 

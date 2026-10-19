@@ -284,7 +284,8 @@ defmodule MilosTrainingWeb.AdminUserController do
           role: %Schema{type: :string},
           roles: %Schema{type: :array, items: %Schema{type: :string}},
           coach_scope: %Schema{type: :string, enum: ["own", "all"]},
-          status: %Schema{type: :string}
+          status: %Schema{type: :string},
+          home_location_id: %Schema{type: :string, format: :uuid, nullable: true}
         },
         required: [:user_id, :role, :roles, :coach_scope]
       }
@@ -788,7 +789,8 @@ defmodule MilosTrainingWeb.AdminUserController do
       role: to_string(membership.role),
       roles: Enum.map(membership.roles, &to_string/1),
       coach_scope: to_string(membership.coach_scope),
-      status: to_string(membership.status)
+      status: to_string(membership.status),
+      home_location_id: membership.home_location_id
     }
   end
 

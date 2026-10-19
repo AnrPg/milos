@@ -88,6 +88,12 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
       roles: %Schema{type: :array, items: %Schema{type: :string}},
       coach_scope: %Schema{type: :string, enum: ["own", "all"]},
       notes_visible_to_admins: %Schema{type: :boolean, description: "ADR-101"},
+      home_location_id: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description: "The location this gym opens on for the person (Phase 2)"
+      },
       capabilities: %Schema{
         type: :object,
         description: "capability => scope (all, own, status), ADR-099",
@@ -372,6 +378,7 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
       roles: Enum.map(membership.roles, &to_string/1),
       coach_scope: to_string(membership.coach_scope),
       notes_visible_to_admins: membership.notes_visible_to_admins != false,
+      home_location_id: membership.home_location_id,
       capabilities:
         membership.roles
         |> MilosTraining.Organizations.capabilities_for(

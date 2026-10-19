@@ -246,13 +246,21 @@ export function PlatformOrganizationsPage() {
           <h1 className="text-3xl font-semibold text-[var(--text)]">{copy.title}</h1>
           <p className="mt-1 text-sm text-[var(--text-soft)]">{copy.subtitle}</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setProvisioningOpen(true)}
-          className="bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white"
-        >
-          {copy.create}
-        </button>
+        <div className="flex flex-wrap gap-3">
+          <Link
+            href="/platform/tag-suggestions"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {copy.tagSuggestions}
+          </Link>
+          <button
+            type="button"
+            onClick={() => setProvisioningOpen(true)}
+            className="bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white"
+          >
+            {copy.create}
+          </button>
+        </div>
       </header>
 
       {error ? (

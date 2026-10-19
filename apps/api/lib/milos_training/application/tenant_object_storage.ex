@@ -13,16 +13,18 @@ defmodule MilosTraining.Application.TenantObjectStorage do
   inventoried with, and purged like, the tenant's documents.
   """
 
-  alias MilosTraining.Application.OwnershipKeys
+  alias MilosTraining.Application.{MediaStorage, OwnershipKeys}
 
   @doc "Objects currently stored for a tenant and for the given accounts."
   def inventory(organization_id, user_ids) when is_binary(organization_id) do
     with {:ok, documents} <- list_tenant_objects(organization_id),
          {:ok, branding} <- list_branding_objects(organization_id),
+         {:ok, media} <- MediaStorage.list_tenant(organization_id),
          {:ok, avatars} <- list_user_objects(user_ids) do
-      # Uploaded logos (ADR-121) are tenant objects too; they live in the
-      # public media bucket but are purged like any other tenant document.
-      {:ok, %{documents: documents ++ branding, avatars: avatars}}
+      # Uploaded logos (ADR-121) and media (ADR-148) are tenant objects too;
+      # they live in the media buckets but are purged like any other tenant
+      # document.
+      {:ok, %{documents: documents ++ branding ++ media, avatars: avatars}}
     end
   end
 
@@ -102,15 +104,21 @@ defmodule MilosTraining.Application.TenantObjectStorage do
     retained = Enum.map(retained_relative_prefixes, &(prefix <> &1))
 
     with {:ok, objects} <- list_tenant_objects(organization_id),
-         {:ok, branding} <- list_branding_objects(organization_id) do
+         {:ok, branding} <- list_branding_objects(organization_id),
+         {:ok, media} <- MediaStorage.list_tenant(organization_id) do
       {kept, doomed} =
         Enum.split_with(objects, fn %{key: key} ->
           Enum.any?(retained, &String.starts_with?(key, &1))
         end)
 
       with {:ok, deleted} <- delete(:documents, doomed),
-           {:ok, deleted_branding} <- delete(:branding, branding) do
-        {:ok, %{deleted_objects: deleted + deleted_branding, retained_objects: length(kept)}}
+           {:ok, deleted_branding} <- delete(:branding, branding),
+           {:ok, deleted_media} <- MediaStorage.delete({:tenant, organization_id}, media) do
+        {:ok,
+         %{
+           deleted_objects: deleted + deleted_branding + deleted_media,
+           retained_objects: length(kept)
+         }}
       end
     end
   end
@@ -124,10 +132,18 @@ defmodule MilosTraining.Application.TenantObjectStorage do
     end
   end
 
-  @doc "Deletes all objects owned by the given accounts (avatars)."
+  @doc "Deletes all objects owned by the given accounts (avatars, account media)."
   def purge_user_objects(user_ids) when is_list(user_ids) do
-    with {:ok, objects} <- list_user_objects(user_ids) do
-      delete(:avatars, objects)
+    with {:ok, objects} <- list_user_objects(user_ids),
+         {:ok, avatars} <- delete(:avatars, objects) do
+      Enum.reduce_while(user_ids, {:ok, avatars}, fn user_id, {:ok, total} ->
+        with {:ok, media} <- MediaStorage.list_account(user_id),
+             {:ok, deleted} <- MediaStorage.delete({:account, user_id}, media) do
+          {:cont, {:ok, total + deleted}}
+        else
+          error -> {:halt, error}
+        end
+      end)
     end
   end
 

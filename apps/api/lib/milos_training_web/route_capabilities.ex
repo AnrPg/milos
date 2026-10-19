@@ -34,6 +34,8 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.OwnerOrganizationController => [:manage_organization_lifecycle],
     W.AdminWorkoutTimerPreviewController => [:manage_workouts],
     W.AdminBrandingController => [:manage_settings],
+    W.AdminPublicProfileController => [:manage_settings],
+    W.HomeLocationController => [:manage_memberships],
     W.AdminWorkoutFreeTextController => [:manage_workouts],
     W.AdminOnboardingController => [:manage_settings],
     W.TrainingHistoryController => [:view_client_training]
@@ -77,6 +79,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFacilityController, :create_location} => [:manage_settings],
     {W.AdminFacilityController, :update_location} => [:manage_settings],
     {W.AdminFacilityController, :archive_location} => [:manage_settings],
+    {W.AdminFacilityController, :search_addresses} => [:manage_settings],
+    {W.AdminFacilityController, :reverse_geocode} => [:manage_settings],
+    {W.AdminFacilityController, :resolve_map_link} => [:manage_settings],
     {W.AdminFacilityController, :index_check_ins} => [:check_in],
     {W.AdminFacilityController, :create_check_in} => [:check_in],
     {W.AdminClassTypeController, :index} => [:manage_schedule, :run_classes, :manage_workouts],

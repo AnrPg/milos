@@ -13,9 +13,11 @@ defmodule MilosTraining.Organizations.Domain.TenantDataPolicy do
             purge_order: 1000,
             disposition: :purge,
             basis:
-              "Memberships, invitations, settings, retired slug aliases and provisioning events are removed with the organization row; the platform purge record replaces them as the audit trail.",
+              "Memberships, invitations, settings, the public profile and its tag suggestions, retired slug aliases and provisioning events are removed with the organization row; the platform purge record replaces them as the audit trail.",
             excluded_columns: ["token_digest", "intended_email_digest"],
             tables: [
+              %{table: "profile_tag_suggestions"},
+              %{table: "organization_public_profiles"},
               %{table: "registration_invitations"},
               %{table: "organization_domains"},
               %{table: "organization_slug_aliases"},

@@ -25,7 +25,29 @@ export type ClassTypeRecord = {
   /** Visits one booking uses (1..10, ADR-097). */
   credit_cost?: number;
   kind?: "class" | "event";
+  /** Who the class suits (Phase 2 Επίπεδο filter). */
+  level?: ClassLevel;
+  /** Groups the class is for; empty means everyone (Κοινό filter). */
+  audiences?: ClassAudience[];
 };
+
+export const CLASS_LEVELS = ["beginner", "all_levels", "advanced"] as const;
+export type ClassLevel = (typeof CLASS_LEVELS)[number];
+export const CLASS_AUDIENCES = ["women_only", "teens", "kids", "over_40", "seniors", "prenatal_postnatal", "adaptive"] as const;
+export type ClassAudience = (typeof CLASS_AUDIENCES)[number];
+export const WORKOUT_FOCUSES = [
+  "strength",
+  "endurance",
+  "gymnastics",
+  "olympic_lifting",
+  "mobility",
+  "legs",
+  "core",
+  "upper_body",
+] as const;
+export type WorkoutFocus = (typeof WORKOUT_FOCUSES)[number];
+
+export type ScheduleCoach = { id: string; nickname: string; avatar_url: string | null };
 
 export type ScheduleLocation = {
   id: string;
@@ -87,6 +109,8 @@ export type WorkoutPreview = {
   /** Οδηγίες and the rest of the workout's content (ADR-140 §4). */
   content?: WorkoutContentEntry[];
   sections: WorkoutPreviewSection[];
+  /** What the workout trains, read from its movements. */
+  focus?: WorkoutFocus[];
 };
 
 export type ScheduleBooking = {
@@ -128,6 +152,11 @@ export type ScheduleSlot = {
   /** The member's own guest booking for this class, if any. */
   current_user_guest?: ScheduleBooking | null;
   location_id?: string | null;
+  coach_user_id?: string | null;
+  /** Members only: whether their package includes this class, visits aside. */
+  covered_by_package?: boolean;
+  /** Members only: until when withdrawing is free; null when no cutoff applies. */
+  cancel_free_until?: string | null;
   waitlist_count?: number;
   bookings: ScheduleBooking[];
   /** ADR-125: the acting member's own version of this class (members only). */
@@ -160,6 +189,7 @@ export type ScheduleWindow = {
   class_types: ClassTypeRecord[];
   slots: ScheduleSlot[];
   locations?: ScheduleLocation[];
+  coaches?: ScheduleCoach[];
 };
 
 export type ScheduleSlotPayload = {
@@ -205,6 +235,8 @@ export type ClassTypePayload = {
   sort_order?: number;
   credit_cost?: number;
   kind?: "class" | "event";
+  level?: ClassLevel;
+  audiences?: ClassAudience[];
 };
 
 export async function createClassType(token: string, payload: ClassTypePayload) {

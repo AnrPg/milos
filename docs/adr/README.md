@@ -146,3 +146,7 @@ must have an ADR. See `template.md` for the format.
 | ADR-138 | Community context: clubs, channels and posts | Accepted |
 | ADR-139 | Journal visibility ladder, notes and check-ins | Accepted (§8 check-ins superseded by ADR-140) |
 | ADR-140 | Journal text ontology: notes, comments, instructions, messages | Accepted |
+| ADR-141 | Places, location pins and geocoding | Accepted |
+| ADR-142 | The gym's public profile, drafts and canonical tags | Accepted |
+| ADR-148 | Media uploads | Accepted |
+| ADR-151 | Filters and saved filters | Accepted |

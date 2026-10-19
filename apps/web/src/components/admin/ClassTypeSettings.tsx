@@ -8,13 +8,18 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
+  CLASS_AUDIENCES,
+  CLASS_LEVELS,
   archiveClassType,
   createClassType,
   listAdminClassTypes,
   updateClassType,
+  type ClassLevel,
+  type ClassTypePayload,
   type ClassTypeRecord,
 } from "@/api/schedule";
 
@@ -68,7 +73,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
 
   // ADR-097: visits one booking uses, and whether bookings count as events.
   const ruleMutation = useMutation({
-    mutationFn: ({ type, patch }: { type: ClassTypeRecord; patch: { credit_cost?: number; kind?: "class" | "event" } }) =>
+    mutationFn: ({ type, patch }: { type: ClassTypeRecord; patch: ClassTypeRulePatch }) =>
       updateClassType(token, type.id, { name: type.name, sort_order: type.sort_order, ...patch }),
     onSuccess: async () => {
       setError(null);
@@ -267,6 +272,8 @@ export function ClassTypeSettings({ token }: { token: string }) {
   );
 }
 
+type ClassTypeRulePatch = Pick<ClassTypePayload, "credit_cost" | "kind" | "level" | "audiences">;
+
 function ClassTypeRules({
   type,
   disabled,
@@ -274,10 +281,12 @@ function ClassTypeRules({
 }: {
   type: ClassTypeRecord;
   disabled: boolean;
-  onChange: (patch: { credit_cost?: number; kind?: "class" | "event" }) => void;
+  onChange: (patch: ClassTypeRulePatch) => void;
 }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("BoxSchedule");
   const cost = type.credit_cost ?? 1;
+  const audiences = type.audiences ?? [];
   const stepStyle = { background: "var(--border)", color: "var(--text-soft)" };
 
   return (
@@ -315,6 +324,54 @@ function ClassTypeRules({
         />
         {i18n("admClassTypeEvent")}
       </label>
+      {/* Plan §5a decision 2: members filter Πρόγραμμα by these two tags. */}
+      <label className="flex items-center gap-2">
+        {t("chipLevel")}
+        <select
+          value={type.level ?? "all_levels"}
+          disabled={disabled}
+          onChange={(event) => onChange({ level: event.target.value as ClassLevel })}
+          className="rounded-lg px-2 py-1 text-xs font-semibold"
+          style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
+        >
+          {CLASS_LEVELS.map((level) => (
+            <option key={level} value={level}>
+              {t(`level_${level}`)}
+            </option>
+          ))}
+        </select>
+      </label>
+      <span className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("audience")}>
+        {t("audience")}
+        {audiences.length === 0 ? (
+          <span className="font-semibold" style={{ color: "var(--text)" }}>
+            {t("audienceEveryone")}
+          </span>
+        ) : null}
+        {CLASS_AUDIENCES.map((audience) => {
+          const on = audiences.includes(audience);
+          return (
+            <button
+              key={audience}
+              type="button"
+              aria-pressed={on}
+              disabled={disabled}
+              onClick={() =>
+                onChange({
+                  audiences: on ? audiences.filter((value) => value !== audience) : [...audiences, audience],
+                })
+              }
+              className="rounded-full px-2.5 py-0.5 font-semibold disabled:opacity-50"
+              style={{
+                background: on ? "color-mix(in srgb, var(--primary) 18%, transparent)" : "var(--border)",
+                color: on ? "var(--primary-strong)" : "var(--text-soft)",
+              }}
+            >
+              {t(`audience_${audience}`)}
+            </button>
+          );
+        })}
+      </span>
     </div>
   );
 }

@@ -191,6 +191,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-vocabulary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Disciplines by group, audiences, amenities and services */
+        get: operations["MilosTrainingWeb.BoxVocabularyController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -489,6 +506,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/filters/{surface}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your last-used and saved filters of one list surface */
+        get: operations["MilosTrainingWeb.SavedFilterController.show"];
+        put?: never;
+        /** Save a named filter combination (same name replaces) */
+        post: operations["MilosTrainingWeb.SavedFilterController.save"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/filters/{surface}/last-used": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Remember the filter you just used on a surface */
+        put: operations["MilosTrainingWeb.SavedFilterController.remember"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/filters/{surface}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete a saved filter */
+        delete: operations["MilosTrainingWeb.SavedFilterController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -556,6 +625,26 @@ export interface paths {
         head?: never;
         /** Edit one of your notes */
         patch: operations["MilosTrainingWeb.JournalController.update_note"];
+        trace?: never;
+    };
+    "/api/me/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Locations the user can book, nearest first
+         * @description Distance is from lat/lng when given (the device position), otherwise from the user's home location.
+         */
+        get: operations["MilosTrainingWeb.MyPlacesController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/me/profile": {
@@ -2063,6 +2152,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/geocode": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Address suggestions for pinning a location (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.search_addresses"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/geocode/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The pin and address behind a pasted Google Maps link (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.resolve_map_link"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/geocode/reverse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The address and neighbourhood at a map point (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.reverse_geocode"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/locations": {
         parameters: {
             query?: never;
@@ -2181,6 +2321,109 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminUserController.pr_members"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's public profile (Σχετικά of the public box page) */
+        get: operations["MilosTrainingWeb.AdminPublicProfileController.show"];
+        /** Edit the draft of the gym's public profile; visitors see it after publishing */
+        put: operations["MilosTrainingWeb.AdminPublicProfileController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a box photo and get a presigned upload for it */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/photos/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded box photo (type, size, no metadata) and mark it ready */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.complete_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish the draft: visitors see it from now on */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest a tag missing from a list, for review */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.suggest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide the public page; the draft is kept */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.unpublish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2576,6 +2819,23 @@ export interface paths {
         /** A user's training log (workouts or booked classes) with performance */
         get: operations["MilosTrainingWeb.TrainingHistoryController.for_user"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/users/{id}/home-location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set a member's home location (staff who manage memberships) */
+        put: operations["MilosTrainingWeb.HomeLocationController.update_member"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3790,6 +4050,23 @@ export interface paths {
         /** The signed-in user's training log (workouts or booked classes) with performance */
         get: operations["MilosTrainingWeb.TrainingHistoryController.mine"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/home-location": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Set my home location in this gym */
+        put: operations["MilosTrainingWeb.HomeLocationController.update_mine"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5209,6 +5486,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/tag-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pending tag suggestions from every gym */
+        get: operations["MilosTrainingWeb.PlatformTagSuggestionController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/tag-suggestions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark a suggestion added to its list or declined */
+        patch: operations["MilosTrainingWeb.PlatformTagSuggestionController.resolve"];
+        trace?: never;
+    };
     "/api/pr-sharing": {
         parameters: {
             query?: never;
@@ -5671,6 +5982,149 @@ export interface components {
             user_ids: string[];
             /** Format: uuid */
             workout_id: string;
+        };
+        /** BoxPublicProfile */
+        BoxPublicProfile: {
+            about: string | null;
+            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** Media */
+            cover: {
+                content_type: string;
+                height: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                purpose: "body_photo" | "box_photo" | "post_photo";
+                /** @enum {string} */
+                status: "pending" | "ready";
+                /** @description Stable for public media; presigned and short-lived for private media. */
+                url: string | null;
+                width: number | null;
+            } | null;
+            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+            languages: string[];
+            lock_version: number;
+            /** @description What the draft still needs before it can be published. */
+            missing: ("about" | "disciplines")[];
+            photos: {
+                content_type: string;
+                height: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                purpose: "body_photo" | "box_photo" | "post_photo";
+                /** @enum {string} */
+                status: "pending" | "ready";
+                /** @description Stable for public media; presigned and short-lived for private media. */
+                url: string | null;
+                width: number | null;
+            }[];
+            published: boolean;
+            /** Format: date-time */
+            published_at: string | null;
+            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+            /** @description The draft differs from what visitors see. */
+            unpublished_changes: boolean;
+            /** Format: date-time */
+            updated_at?: string | null;
+        };
+        /** BoxPublicProfilePublish */
+        BoxPublicProfilePublish: {
+            /** @description The version the editor read. */
+            lock_version?: number;
+        };
+        /** BoxPublicProfileResponse */
+        BoxPublicProfileResponse: {
+            /** BoxPublicProfile */
+            profile: {
+                about: string | null;
+                amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                /** Media */
+                cover: {
+                    content_type: string;
+                    height: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    /** @enum {string} */
+                    status: "pending" | "ready";
+                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    url: string | null;
+                    width: number | null;
+                } | null;
+                disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                languages: string[];
+                lock_version: number;
+                /** @description What the draft still needs before it can be published. */
+                missing: ("about" | "disciplines")[];
+                photos: {
+                    content_type: string;
+                    height: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    /** @enum {string} */
+                    status: "pending" | "ready";
+                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    url: string | null;
+                    width: number | null;
+                }[];
+                published: boolean;
+                /** Format: date-time */
+                published_at: string | null;
+                services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                /** @description The draft differs from what visitors see. */
+                unpublished_changes: boolean;
+                /** Format: date-time */
+                updated_at?: string | null;
+            };
+        };
+        /** BoxPublicProfileUpdate */
+        BoxPublicProfileUpdate: {
+            about?: string | null;
+            amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** Format: uuid */
+            cover_photo_id?: string | null;
+            disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+            languages?: string[];
+            /** @description The version the editor read. */
+            lock_version?: number;
+            /** @description Ready box_photo media of the gallery, in display order. */
+            photo_ids?: string[];
+            services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** BoxTagSuggestion */
+        BoxTagSuggestion: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            list: string;
+            name: string;
+            organization_name?: string;
+            /** @enum {string} */
+            status: "pending" | "added" | "declined";
+        };
+        /** BoxTagSuggestionRequest */
+        BoxTagSuggestionRequest: {
+            /** @enum {string} */
+            list: "disciplines" | "audiences" | "amenities" | "services";
+            name: string;
+        };
+        /** BoxVocabulary */
+        BoxVocabulary: {
+            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            discipline_groups: {
+                items: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                key: string;
+            }[];
+            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -6465,14 +6919,26 @@ export interface components {
         };
         /** FacilityLocation */
         FacilityLocation: {
+            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
             address: string | null;
             /** Format: date-time */
             archived_at: string | null;
+            city: string | null;
+            country_code: string | null;
             /** Format: uuid */
             id: string;
             /** Format: date-time */
             inserted_at?: string;
+            latitude: number | null;
+            longitude: number | null;
             name: string;
+            neighbourhood: string | null;
+            opening_hours: {
+                closes: string;
+                opens: string;
+                /** @description ISO weekday, Monday = 1 */
+                weekday: number;
+            }[];
             /** Format: uuid */
             organization_id?: string;
             /** Format: date-time */
@@ -7092,6 +7558,16 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** GeocodePlace */
+        GeocodePlace: {
+            address: string | null;
+            city: string | null;
+            country_code: string | null;
+            label: string;
+            latitude: number;
+            longitude: number;
+            neighbourhood: string | null;
+        };
         /** InventoryLowReport */
         InventoryLowReport: {
             /** Format: uuid */
@@ -7484,6 +7960,57 @@ export interface components {
                 thread_id?: string;
             } | null;
         };
+        /** Media */
+        Media: {
+            content_type: string;
+            height: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            purpose: "body_photo" | "box_photo" | "post_photo";
+            /** @enum {string} */
+            status: "pending" | "ready";
+            /** @description Stable for public media; presigned and short-lived for private media. */
+            url: string | null;
+            width: number | null;
+        };
+        /** MediaResponse */
+        MediaResponse: {
+            /** Media */
+            media: {
+                content_type: string;
+                height: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                purpose: "body_photo" | "box_photo" | "post_photo";
+                /** @enum {string} */
+                status: "pending" | "ready";
+                /** @description Stable for public media; presigned and short-lived for private media. */
+                url: string | null;
+                width: number | null;
+            };
+        };
+        /** MediaUpload */
+        MediaUpload: {
+            expires_in: number;
+            max_bytes: number;
+            /** Format: uuid */
+            media_id: string;
+            required_headers: {
+                [key: string]: string;
+            };
+            upload_url: string;
+        };
+        /** MediaUploadRequest */
+        MediaUploadRequest: {
+            byte_size: number;
+            /**
+             * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+             * @enum {string}
+             */
+            content_type: "image/jpeg" | "image/webp";
+        };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
             /** @enum {string} */
@@ -7548,6 +8075,13 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         } | null;
+        /** OpeningHoursSpan */
+        OpeningHoursSpan: {
+            closes: string;
+            opens: string;
+            /** @description ISO weekday, Monday = 1 */
+            weekday: number;
+        };
         /** OrganizationBranding */
         OrganizationBranding: {
             /** @description True when brand_logo_url is derived from an uploaded logo object (ADR-121). */
@@ -7657,6 +8191,53 @@ export interface components {
                 /** Format: date */
                 week_start: string;
             }[];
+        };
+        /** RememberFilterRequest */
+        RememberFilterRequest: {
+            /** @description The surface's filter values; the surface's query validates them. */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** SaveFilterRequest */
+        SaveFilterRequest: {
+            name: string;
+            /** @description The surface's filter values; the surface's query validates them. */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** SavedFilter */
+        SavedFilter: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            last_used_at: string;
+            name: string;
+            /** @description The surface's filter values; the surface's query validates them. */
+            params: {
+                [key: string]: unknown;
+            };
+        };
+        /** SavedFilters */
+        SavedFilters: {
+            /** @description The surface's filter values; the surface's query validates them. */
+            last_used: {
+                [key: string]: unknown;
+            } | null;
+            saved: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_used_at: string;
+                name: string;
+                /** @description The surface's filter values; the surface's query validates them. */
+                params: {
+                    [key: string]: unknown;
+                };
+            }[];
+            /** @enum {string} */
+            surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
         };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
@@ -8712,6 +9293,34 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.BoxVocabularyController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Vocabulary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                        audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                        discipline_groups: {
+                            items: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            key: string;
+                        }[];
+                        services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
@@ -9656,6 +10265,186 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.SavedFilterController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SavedFilterController.save": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    name: string;
+                    /** @description The surface's filter values; the surface's query validates them. */
+                    params: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SavedFilterController.remember": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The surface's filter values; the surface's query validates them. */
+                    params: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SavedFilterController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.JournalController.index": {
         parameters: {
             query?: {
@@ -9854,6 +10643,49 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyPlacesController.index": {
+        parameters: {
+            query?: {
+                lat?: number;
+                lng?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        places: {
+                            address?: string | null;
+                            city?: string | null;
+                            distance_km: number | null;
+                            /** @description The user's home location in that gym */
+                            home: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            latitude?: number | null;
+                            longitude?: number | null;
+                            name: string;
+                            neighbourhood?: string | null;
+                            organization: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                                slug: string;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.update_profile": {
         parameters: {
             query?: never;
@@ -9985,6 +10817,11 @@ export interface operations {
                         };
                         /** @enum {string} */
                         coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
                         /** @description ADR-101 */
@@ -10031,6 +10868,11 @@ export interface operations {
                         };
                         /** @enum {string} */
                         coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
                         /** @description ADR-101 */
@@ -10064,6 +10906,11 @@ export interface operations {
                         };
                         /** @enum {string} */
                         coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
                         /** @description ADR-101 */
@@ -10115,6 +10962,11 @@ export interface operations {
                         };
                         /** @enum {string} */
                         coach_scope?: "own" | "all";
+                        /**
+                         * Format: uuid
+                         * @description The location this gym opens on for the person (Phase 2)
+                         */
+                        home_location_id?: string | null;
                         /** Format: uuid */
                         id: string;
                         /** @description ADR-101 */
@@ -11344,6 +12196,7 @@ export interface operations {
                         class_types: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -11352,6 +12205,8 @@ export interface operations {
                             inserted_at?: string;
                             /** @enum {string} */
                             kind: "class" | "event";
+                            /** @enum {string} */
+                            level: "beginner" | "all_levels" | "advanced";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -11373,6 +12228,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Groups the class is for; empty means everyone */
+                    audiences?: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                     /** @description Visits one booking of this class type uses (ADR-097) */
                     credit_cost?: number;
                     /**
@@ -11380,6 +12237,11 @@ export interface operations {
                      * @enum {string}
                      */
                     kind?: "class" | "event";
+                    /**
+                     * @description Who the class suits, for the schedule's level filter
+                     * @enum {string}
+                     */
+                    level?: "beginner" | "all_levels" | "advanced";
                     name: string;
                     /** @default 0 */
                     sort_order?: number;
@@ -11397,6 +12259,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -11405,6 +12268,8 @@ export interface operations {
                             inserted_at?: string;
                             /** @enum {string} */
                             kind: "class" | "event";
+                            /** @enum {string} */
+                            level: "beginner" | "all_levels" | "advanced";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -11439,6 +12304,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -11447,6 +12313,8 @@ export interface operations {
                             inserted_at?: string;
                             /** @enum {string} */
                             kind: "class" | "event";
+                            /** @enum {string} */
+                            level: "beginner" | "all_levels" | "advanced";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -11479,6 +12347,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Groups the class is for; empty means everyone */
+                    audiences?: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                     /** @description Visits one booking of this class type uses (ADR-097) */
                     credit_cost?: number;
                     /**
@@ -11486,6 +12356,11 @@ export interface operations {
                      * @enum {string}
                      */
                     kind?: "class" | "event";
+                    /**
+                     * @description Who the class suits, for the schedule's level filter
+                     * @enum {string}
+                     */
+                    level?: "beginner" | "all_levels" | "advanced";
                     name: string;
                     /** @default 0 */
                     sort_order?: number;
@@ -11503,6 +12378,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -11511,6 +12387,8 @@ export interface operations {
                             inserted_at?: string;
                             /** @enum {string} */
                             kind: "class" | "event";
+                            /** @enum {string} */
+                            level: "beginner" | "all_levels" | "advanced";
                             name: string;
                             slug: string;
                             sort_order: number;
@@ -15127,6 +16005,143 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminFacilityController.search_addresses": {
+        parameters: {
+            query: {
+                q: string;
+                near_latitude?: number;
+                near_longitude?: number;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        places: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Geocoder unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.resolve_map_link": {
+        parameters: {
+            query: {
+                url: string;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GeocodePlace */
+                        place: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not a usable map link */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.reverse_geocode": {
+        parameters: {
+            query: {
+                latitude: number;
+                longitude: number;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GeocodePlace */
+                        place: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Geocoder unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminFacilityController.index_locations": {
         parameters: {
             query?: never;
@@ -15144,14 +16159,26 @@ export interface operations {
                 content: {
                     "application/json": {
                         locations: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
@@ -15172,8 +16199,20 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    accessibility?: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                     address?: string | null;
+                    city?: string | null;
+                    country_code?: string | null;
+                    latitude?: number | null;
+                    longitude?: number | null;
                     name?: string;
+                    neighbourhood?: string | null;
+                    opening_hours?: {
+                        closes: string;
+                        opens: string;
+                        /** @description ISO weekday, Monday = 1 */
+                        weekday: number;
+                    }[];
                 };
             };
         };
@@ -15187,14 +16226,26 @@ export interface operations {
                     "application/json": {
                         /** FacilityLocation */
                         location: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
@@ -15228,8 +16279,20 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    accessibility?: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                     address?: string | null;
+                    city?: string | null;
+                    country_code?: string | null;
+                    latitude?: number | null;
+                    longitude?: number | null;
                     name?: string;
+                    neighbourhood?: string | null;
+                    opening_hours?: {
+                        closes: string;
+                        opens: string;
+                        /** @description ISO weekday, Monday = 1 */
+                        weekday: number;
+                    }[];
                 };
             };
         };
@@ -15243,14 +16306,26 @@ export interface operations {
                     "application/json": {
                         /** FacilityLocation */
                         location: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
@@ -15303,14 +16378,26 @@ export interface operations {
                     "application/json": {
                         /** FacilityLocation */
                         location: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
@@ -15502,6 +16589,461 @@ export interface operations {
                          * @enum {string}
                          */
                         visibility: "coach" | "coach_role_required";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    about?: string | null;
+                    amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                    audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                    /** Format: uuid */
+                    cover_photo_id?: string | null;
+                    disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                    languages?: string[];
+                    /** @description The version the editor read. */
+                    lock_version?: number;
+                    /** @description Ready box_photo media of the gallery, in display order. */
+                    photo_ids?: string[];
+                    services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Edited meanwhile */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid profile */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.complete_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            content_type: string;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo";
+                            /** @enum {string} */
+                            status: "pending" | "ready";
+                            /** @description Stable for public media; presigned and short-lived for private media. */
+                            url: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description The version the editor read. */
+                    lock_version?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Edited meanwhile */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Something is missing */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    list: "disciplines" | "audiences" | "amenities" | "services";
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Suggestion */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxTagSuggestion */
+                        suggestion: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            list: string;
+                            name: string;
+                            organization_name?: string;
+                            /** @enum {string} */
+                            status: "pending" | "added" | "declined";
+                        };
+                    };
+                };
+            };
+            /** @description Invalid suggestion */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
                     };
                 };
             };
@@ -16576,6 +18118,8 @@ export interface operations {
                         membership: {
                             /** @enum {string} */
                             coach_scope: "own" | "all";
+                            /** Format: uuid */
+                            home_location_id?: string | null;
                             role: string;
                             roles: string[];
                             status?: string;
@@ -16921,6 +18465,45 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.HomeLocationController.update_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description An active location of the gym, or null to clear.
+                     */
+                    location_id: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        membership: {
+                            /** Format: uuid */
+                            home_location_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminUserController.incidents": {
         parameters: {
             query?: never;
@@ -17250,6 +18833,8 @@ export interface operations {
                         membership: {
                             /** @enum {string} */
                             coach_scope: "own" | "all";
+                            /** Format: uuid */
+                            home_location_id?: string | null;
                             role: string;
                             roles: string[];
                             status?: string;
@@ -22556,14 +24141,26 @@ export interface operations {
                 content: {
                     "application/json": {
                         locations: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
@@ -23174,6 +24771,43 @@ export interface operations {
                         next_offset: number | null;
                         offset: number;
                         total: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.HomeLocationController.update_mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: uuid
+                     * @description An active location of the gym, or null to clear.
+                     */
+                    location_id: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Membership */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        membership: {
+                            /** Format: uuid */
+                            home_location_id: string | null;
+                            /** Format: uuid */
+                            user_id: string;
+                        };
                     };
                 };
             };
@@ -24805,26 +26439,59 @@ export interface operations {
                         class_types: {
                             [key: string]: unknown;
                         }[];
+                        /** @description The coaches of the window's classes. */
+                        coaches?: {
+                            avatar_url: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                        }[];
                         days: number;
                         /** Format: date */
                         end_date: string;
                         locations?: {
+                            accessibility: ("step_free" | "accessible_toilet" | "parking" | "changing_room" | "showers" | "women_area")[];
                             address: string | null;
                             /** Format: date-time */
                             archived_at: string | null;
+                            city: string | null;
+                            country_code: string | null;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             inserted_at?: string;
+                            latitude: number | null;
+                            longitude: number | null;
                             name: string;
+                            neighbourhood: string | null;
+                            opening_hours: {
+                                closes: string;
+                                opens: string;
+                                /** @description ISO weekday, Monday = 1 */
+                                weekday: number;
+                            }[];
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: date-time */
                             updated_at?: string;
                         }[];
-                        slots: {
+                        slots: ({
+                            /**
+                             * Format: date-time
+                             * @description Members only: until when withdrawing is free; null when no cutoff applies.
+                             */
+                            cancel_free_until?: string | null;
+                            /** @description Members only: whether the viewer's package includes this class, regardless of visits left. */
+                            covered_by_package?: boolean;
+                            workout?: ({
+                                /** @description What the workout trains, read from its movements. */
+                                focus?: ("strength" | "endurance" | "gymnastics" | "olympic_lifting" | "mobility" | "legs" | "core" | "upper_body")[];
+                            } & {
+                                [key: string]: unknown;
+                            }) | null;
+                        } & {
                             [key: string]: unknown;
-                        }[];
+                        })[];
                         /** Format: date */
                         start_date: string;
                     };
@@ -29860,6 +31527,74 @@ export interface operations {
                         }[];
                         purge_open: boolean;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformTagSuggestionController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggestions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        suggestions: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            list: string;
+                            name: string;
+                            organization_name?: string;
+                            /** @enum {string} */
+                            status: "pending" | "added" | "declined";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformTagSuggestionController.resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "added" | "declined";
+                };
+            };
+        };
+        responses: {
+            /** @description Resolved */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not pending */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

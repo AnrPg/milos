@@ -1081,6 +1081,47 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
     end
   end
 
+  # Read-only: for each booking request, does any of the member's usable
+  # subscriptions on that local day include it (scope, not remaining count)?
+  @impl true
+  def package_coverage(_user_id, []), do: []
+
+  def package_coverage(user_id, requests) do
+    case tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      nil ->
+        Enum.map(requests, fn _request -> false end)
+
+      %Membership{} = membership ->
+        entitlement = entitlement_for_membership(membership)
+        requests = Enum.map(requests, &(&1 |> atom_key_map() |> put_local_start()))
+
+        subscriptions_on =
+          requests
+          |> Enum.map(&local_date/1)
+          |> Enum.uniq()
+          |> Map.new(&{&1, effective_subscriptions(membership.id, &1)})
+
+        Enum.map(requests, fn request ->
+          Enum.any?(subscriptions_on[local_date(request)], fn subscription ->
+            EntitlementPolicy.covers?(
+              entitlement,
+              subscription.params_snapshot || %{},
+              resolve_request_allowance(subscription, request)
+            )
+          end)
+        end)
+    end
+  end
+
+  defp local_date(%{starts_at: %DateTime{} = starts_at}) do
+    timezone = Map.get(get_finance_settings(), :entitlement_timezone) || "Etc/UTC"
+
+    case DateTime.shift_zone(starts_at, timezone) do
+      {:ok, local} -> DateTime.to_date(local)
+      _error -> DateTime.to_date(starts_at)
+    end
+  end
+
   @impl true
   def reserve_entitlement(user_id, request) do
     request = atom_key_map(request)

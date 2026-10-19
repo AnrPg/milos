@@ -491,7 +491,7 @@ export function ScheduleConsole({
         auto_approve: slot.auto_approve,
         booking_timeout_minutes: slot.booking_timeout_minutes,
         location_id: slot.location_id ?? null,
-        ...(canManageSchedule ? { coach_user_id: (slot as ScheduleSlot & { coach_user_id?: string | null }).coach_user_id ?? null } : {}),
+        ...(canManageSchedule ? { coach_user_id: slot.coach_user_id ?? null } : {}),
       },
     });
   }

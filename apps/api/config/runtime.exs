@@ -8,6 +8,10 @@ end
 
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
+# ADR-141: point at a self-hosted Photon in production.
+config :milos_training, :photon,
+  base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
+
 config :milos_training, :gemini,
   api_key: System.get_env("GEMINI_API_KEY"),
   model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
@@ -50,7 +54,8 @@ config :milos_training,
   minio_access_key: minio_access_key,
   minio_secret_key: minio_secret_key,
   minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
-  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")
+  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars"),
+  minio_media_bucket: System.get_env("MINIO_MEDIA_BUCKET", "milos-media")
 
 meili_url =
   System.get_env("MEILI_URL") ||
