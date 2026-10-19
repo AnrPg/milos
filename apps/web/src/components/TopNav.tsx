@@ -235,7 +235,8 @@ export function TopNav() {
 
         <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
           {/* Phones open notifications from the avatar menu (ADR-103). */}
-          {showTenantShell ? <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName="hidden sm:flex" /> : null}
+          {/* Mounted for every signed-in account: ♡ in the Feed opens it too (ADR-142). */}
+          <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName={`hidden ${showTenantShell ? "sm:flex" : ""}`} />
 
           {showTenantShell ? (
             <div className="relative shrink-0">

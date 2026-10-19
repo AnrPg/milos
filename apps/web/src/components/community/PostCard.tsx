@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -15,6 +16,7 @@ import {
   setPostPinned,
   type CommunityPost,
 } from "@/api/community";
+import { SOCIAL_KEY } from "@/api/social";
 import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import { channelName, clubInitials } from "@/components/community/community";
@@ -48,7 +50,10 @@ export function PostCard({ post }: { post: CommunityPost }) {
     setError(null);
     try {
       await action();
-      await queryClient.invalidateQueries({ queryKey: FEED_KEY });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: FEED_KEY }),
+        queryClient.invalidateQueries({ queryKey: SOCIAL_KEY }),
+      ]);
     } catch (caught) {
       setError(clientErrorMessage(caught, tUi));
     } finally {
@@ -83,7 +88,9 @@ export function PostCard({ post }: { post: CommunityPost }) {
           </span>
         )}
         <div className="min-w-0">
-          <p className="truncate font-bold" style={{ color: "var(--text)" }}>{author}</p>
+          <Link href={`/people/${post.author.id}`} className="block truncate font-bold" style={{ color: "var(--text)" }}>
+            {author}
+          </Link>
           <p className="text-xs" style={{ color: "var(--dim)" }}>
             <time dateTime={post.inserted_at}>{formatDateTime(post.inserted_at, locale)}</time>
           </p>

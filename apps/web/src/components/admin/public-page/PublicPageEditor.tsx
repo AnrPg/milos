@@ -33,10 +33,11 @@ type Draft = {
   amenities: string[];
   cover: MediaItem | null;
   photos: MediaItem[];
+  coachIds: string[];
 };
 
-type Step = "about" | "photos" | "offer" | "people" | "amenities";
-const STEPS: Step[] = ["about", "photos", "offer", "people", "amenities"];
+type Step = "about" | "photos" | "offer" | "people" | "coaches" | "amenities";
+const STEPS: Step[] = ["about", "photos", "offer", "people", "coaches", "amenities"];
 const MAX_PHOTOS = 12;
 const MAX_LANGUAGES = 10;
 const MAX_ABOUT = 2000;
@@ -53,6 +54,7 @@ function toDraft(profile: BoxPublicProfile): Draft {
     amenities: profile.amenities,
     cover: profile.cover,
     photos: profile.photos,
+    coachIds: profile.coaches.map((coach) => coach.id),
   };
 }
 
@@ -130,6 +132,7 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
       amenities: draft.amenities,
       cover_photo_id: draft.cover?.id ?? null,
       photo_ids: draft.photos.map((photo) => photo.id),
+      coach_ids: draft.coachIds,
       lock_version: server.lock_version,
     });
 
@@ -369,6 +372,14 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
           </div>
         ) : null}
 
+        {step === "coaches" ? (
+          <CoachesStep
+            candidates={server.coach_candidates}
+            picked={draft.coachIds}
+            onChange={(coachIds) => setDraft({ ...draft, coachIds })}
+          />
+        ) : null}
+
         {step === "amenities" ? card("amenities", t("amenities"), t("amenitiesEmpty")) : null}
 
         <div className="flex justify-between gap-3">
@@ -456,6 +467,65 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
 }
 
 /** «Δεν το βρίσκεις; Πρότεινέ το» (board 3b Q5): goes to review, never onto the page. */
+/**
+ * Board 4 Q4: the owner picks which of the gym's staff the page shows as
+ * coaches; they go live with «Δημοσίευση». Shown in the gym's staff order.
+ */
+function CoachesStep({
+  candidates,
+  picked,
+  onChange,
+}: {
+  candidates: BoxPublicProfile["coach_candidates"];
+  picked: string[];
+  onChange: (ids: string[]) => void;
+}) {
+  const t = useTranslations("AdminPublicPage");
+  if (candidates.length === 0) {
+    return (
+      <p className="rounded-3xl p-5 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--muted)" }}>
+        {t("coachesNone")}
+      </p>
+    );
+  }
+  const toggle = (id: string) => {
+    const next = new Set(picked);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    onChange(candidates.map((coach) => coach.id).filter((candidate) => next.has(candidate)));
+  };
+  return (
+    <div className="flex flex-col gap-3">
+      <p className="text-sm" style={{ color: "var(--muted)" }}>{t("coachesHint")}</p>
+      <ul className="flex flex-col overflow-hidden rounded-3xl" style={{ border: "1px solid var(--border)" }}>
+        {candidates.map((coach, at) => {
+          const on = picked.includes(coach.id);
+          return (
+            <li key={coach.id} style={{ borderTop: at === 0 ? "none" : "1px solid var(--border)" }}>
+              <label className="flex min-h-14 cursor-pointer items-center gap-3 px-4 py-2">
+                {coach.avatar_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- user-uploaded media origin
+                  <img src={coach.avatar_url} alt="" className="h-10 w-10 shrink-0 rounded-full object-cover" />
+                ) : (
+                  <span
+                    aria-hidden="true"
+                    className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold"
+                    style={{ background: "var(--panel-raised)", color: "var(--text)" }}
+                  >
+                    {(coach.nickname ?? "?").slice(0, 1).toUpperCase()}
+                  </span>
+                )}
+                <span className="flex-1 truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{coach.nickname ?? "?"}</span>
+                <input type="checkbox" role="switch" checked={on} onChange={() => toggle(coach.id)} className="h-5 w-5" />
+              </label>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 function SuggestTag({ token, list, initial }: { token: string; list: TagList; initial: string }) {
   const t = useTranslations("AdminPublicPage");
   const [name, setName] = useState(initial);

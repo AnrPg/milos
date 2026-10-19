@@ -11,6 +11,9 @@ export type MediaItem = {
   url: string | null;
 };
 
+/** A staff member shown, or offered, as a coach on the public page (board 4 Q4). */
+export type BoxCoach = { id: string; nickname: string | null; avatar_url: string | null };
+
 /** The draft of the gym's public «Σχετικά» (ADR-142, plan §5a board 3). */
 export type BoxPublicProfile = {
   about: string | null;
@@ -21,6 +24,10 @@ export type BoxPublicProfile = {
   languages: string[];
   cover: MediaItem | null;
   photos: MediaItem[];
+  /** The coaches the page shows, in the gym's staff order. */
+  coaches: BoxCoach[];
+  /** The gym's staff the owner may pick from. */
+  coach_candidates: BoxCoach[];
   published: boolean;
   published_at: string | null;
   /** The draft differs from what visitors see. */
@@ -32,7 +39,7 @@ export type BoxPublicProfile = {
 
 export type BoxPublicProfileDraft = Partial<
   Pick<BoxPublicProfile, "about" | "disciplines" | "audiences" | "amenities" | "services" | "languages">
-> & { cover_photo_id?: string | null; photo_ids?: string[]; lock_version?: number };
+> & { cover_photo_id?: string | null; photo_ids?: string[]; coach_ids?: string[]; lock_version?: number };
 
 /** The canonical tag lists (board 3b); keys only, translated in `BoxTags`. */
 export type BoxVocabulary = {

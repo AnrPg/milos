@@ -51,6 +51,11 @@ const PNG = Buffer.from(
   "base64",
 );
 
+const STAFF = [
+  { id: "coach-1", nickname: "Στέλιος", avatar_url: null },
+  { id: "coach-2", nickname: "Κώστας", avatar_url: null },
+];
+
 type Calls = { saves: Array<Record<string, unknown>>; published: number; suggestions: Array<Record<string, unknown>> };
 
 async function stubApi(page: Page, calls: Calls, start: Record<string, unknown> = {}) {
@@ -68,6 +73,8 @@ async function stubApi(page: Page, calls: Calls, start: Record<string, unknown> 
     unpublished_changes: false,
     missing: ["about", "disciplines"],
     lock_version: 0,
+    coaches: [],
+    coach_candidates: STAFF,
     ...start,
   };
   await page.route("**/api/**", (route) => route.fulfill(json({})));
@@ -100,6 +107,7 @@ async function stubApi(page: Page, calls: Calls, start: Record<string, unknown> 
         ...body,
         photos,
         cover,
+        coaches: STAFF.filter((coach) => ((body.coach_ids as string[] | undefined) ?? []).includes(coach.id)),
         lock_version: (profile.lock_version as number) + 1,
         unpublished_changes: Boolean(profile.published),
       };
@@ -206,6 +214,14 @@ test.describe("admin public page editor", () => {
     await amenities.getByRole("button", { name: "Αποστολή" }).click();
     await expect(amenities.getByText("Ευχαριστούμε, θα το δούμε.")).toBeVisible();
     expect(calls.suggestions).toEqual([{ list: "amenities", name: "Ρινγκ πυγμαχίας" }]);
+    await amenities.getByRole("button", { name: "Τέλος" }).click();
+
+    // Board 4 Q4: the owner picks which staff the page shows as coaches.
+    await page.getByRole("button", { name: "Coaches", exact: true }).click();
+    await page.getByRole("switch", { name: "Κώστας" }).check();
+    await page.getByRole("button", { name: "Αποθήκευση πρόχειρου" }).click();
+    await expect(page.getByRole("switch", { name: "Κώστας" })).toBeChecked();
+    expect(calls.saves.at(-1)).toMatchObject({ coach_ids: ["coach-2"] });
   });
 });
 

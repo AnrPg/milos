@@ -11,7 +11,7 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
 
 import {
@@ -31,6 +31,7 @@ import {
 } from "@/components/notifications/notification-origin";
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useOrganizationSlug } from "@/lib/organization-slug";
+import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -503,6 +504,28 @@ export function openNotifications() {
   window.dispatchEvent(new Event(OPEN_EVENT));
 }
 
+// The unread count, shared with other entry points such as ♡ in the Feed
+// header (plan §5a Q11), without a second request.
+let unreadSnapshot = 0;
+const unreadListeners = new Set<() => void>();
+
+function publishUnread(count: number) {
+  if (count === unreadSnapshot) return;
+  unreadSnapshot = count;
+  unreadListeners.forEach((listener) => listener());
+}
+
+export function useUnreadNotifications() {
+  return useSyncExternalStore(
+    (listener) => {
+      unreadListeners.add(listener);
+      return () => unreadListeners.delete(listener);
+    },
+    () => unreadSnapshot,
+    () => 0,
+  );
+}
+
 export function NotificationBell({
   onUnreadChange,
   triggerClassName = "flex",
@@ -698,7 +721,9 @@ export function NotificationBell({
   }, [i18n, markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
   useEffect(() => {
-    onUnreadChange?.(typeof unreadCount === "number" ? unreadCount : 0);
+    const count = typeof unreadCount === "number" ? unreadCount : 0;
+    onUnreadChange?.(count);
+    publishUnread(count);
   }, [onUnreadChange, unreadCount]);
 
   useEffect(() => {
@@ -786,6 +811,8 @@ export function NotificationBell({
                 {i18n("closebbfa773")}
               </button>
             </div>
+
+            <FollowRequestsRow onNavigate={() => setOpen(false)} />
 
             <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
               {FILTER_TABS.map((tab) => (

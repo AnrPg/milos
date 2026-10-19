@@ -37,6 +37,51 @@ export function postableChannels(clubs: CommunityClub[]) {
   );
 }
 
+/**
+ * Where a post goes (ADR-142, plan §5a Q13): a club channel (staff may also
+ * make it public on the box page), or the member's own profile for their
+ * followers or for everyone.
+ */
+export type ComposeTarget =
+  | { kind: "channel"; channelId: string; public: boolean }
+  | { kind: "profile"; audience: "followers" | "public" };
+
+/** Every target the sheet offers: channels grouped by club, then the profile audiences. */
+export function composeTargetGroups(clubs: CommunityClub[]) {
+  return clubs
+    .map((club) => {
+      const channels = club.channels.filter((channel) => channel.can_post);
+      const publicChannel = club.role === "staff" ? (channels.find((c) => c.kind === "announcements") ?? channels[0]) : undefined;
+      return { club, channels, publicChannel };
+    })
+    .filter((group) => group.channels.length > 0);
+}
+
+export function sameTarget(a: ComposeTarget, b: ComposeTarget) {
+  if (a.kind === "channel" && b.kind === "channel") return a.channelId === b.channelId && a.public === b.public;
+  if (a.kind === "profile" && b.kind === "profile") return a.audience === b.audience;
+  return false;
+}
+
+/** The remembered target when it is still offered, else the club's default channel, else followers. */
+export function initialComposeTarget(
+  clubs: CommunityClub[],
+  remembered: ComposeTarget | null,
+  clubId?: string | null,
+): ComposeTarget {
+  const groups = composeTargetGroups(clubs);
+  const offered = (target: ComposeTarget) =>
+    target.kind === "profile" ||
+    groups.some((group) =>
+      target.public
+        ? group.publicChannel?.id === target.channelId
+        : group.channels.some((channel) => channel.id === target.channelId),
+    );
+  if (!clubId && remembered && offered(remembered)) return remembered;
+  const channelId = defaultChannelId(clubs, clubId);
+  return channelId ? { kind: "channel", channelId, public: false } : { kind: "profile", audience: "followers" };
+}
+
 /** The default compose target: the club's #wod-σήμερα, else its first writable channel. */
 export function defaultChannelId(clubs: CommunityClub[], clubId?: string | null): string | null {
   const options = postableChannels(clubs).filter((option) => !clubId || option.club.id === clubId);
