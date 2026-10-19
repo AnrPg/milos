@@ -574,6 +574,10 @@ defmodule MilosTraining.Organizations do
     to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
     as: :audiences
 
+  defdelegate default_box_languages(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :default_languages
+
   defdelegate box_profile_max_photos(),
     to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
     as: :max_photos

@@ -32,8 +32,20 @@ defmodule MilosTraining.Application.BoxPublicProfileTest do
               photos: [],
               published: false,
               missing: ["about", "disciplines"],
+              languages: ["el", "en"],
               lock_version: 0
             }} = BoxPublicProfile.get(a.context)
+  end
+
+  test "the first save keeps Greek and English unless languages are sent", %{a: a, b: b} do
+    assert {:ok, %{languages: ["el", "en"]}} =
+             UpdateBoxPublicProfile.call(a.context, %{"about" => "Box"})
+
+    assert {:ok, %{languages: ["de"]}} =
+             UpdateBoxPublicProfile.call(b.context, %{"languages" => ["de"]})
+
+    assert {:ok, %{languages: ["el", "en"]}} =
+             UpdateBoxPublicProfile.call(a.context, %{"about" => "Box Κυψέλη"})
   end
 
   test "upload, verify, attach, reorder and release box photos", %{a: a} do

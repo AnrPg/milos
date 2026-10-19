@@ -4,7 +4,8 @@ defmodule MilosTraining.Application.BoxPublicProfile do
   box page): the draft with its photos resolved to URLs, whether it is
   published, whether the draft differs from what visitors see, and what is
   still missing before it can be published. A gym without a stored profile
-  reads as an empty, unpublished one.
+  reads as an empty, unpublished one
+  (with the default languages pre-picked).
   """
 
   alias MilosTraining.Application.MediaUrls
@@ -65,7 +66,7 @@ defmodule MilosTraining.Application.BoxPublicProfile do
       organization_id: context.organization_id,
       about: nil,
       disciplines: [],
-      languages: [],
+      languages: Organizations.default_box_languages(),
       audiences: [],
       amenities: [],
       services: [],

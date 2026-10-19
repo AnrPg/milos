@@ -25,6 +25,7 @@ defmodule MilosTraining.Application.UpdateBoxPublicProfile do
          attrs =
            params
            |> Map.take(@fields)
+           |> default_languages(current)
            |> Map.merge(%{"photo_ids" => photo_ids, "cover_photo_id" => cover_id}),
          {:ok, profile} <- Organizations.upsert_public_profile(context, attrs) do
       :ok = settle_media(context, current, profile)
@@ -33,6 +34,12 @@ defmodule MilosTraining.Application.UpdateBoxPublicProfile do
   end
 
   def call(_context, _params), do: {:error, :invalid_public_profile}
+
+  # The first save stores the languages the editor showed pre-picked.
+  defp default_languages(attrs, nil),
+    do: Map.put_new(attrs, "languages", Organizations.default_box_languages())
+
+  defp default_languages(attrs, _current), do: attrs
 
   @doc """
   Marks what the profile uses as attached and releases what `before` used

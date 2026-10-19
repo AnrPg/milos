@@ -68,6 +68,9 @@ defmodule MilosTraining.Organizations.Domain.BoxProfilePolicy do
     do: "returning_from_injury" not in audiences or "physio_rehab" in disciplines
 
   def max_about, do: @max_about
+
+  @doc "Board 3b Q6: a gym that never saved its profile starts with Greek and English."
+  def default_languages, do: ~w(el en)
   def max_photos, do: @max_photos
 
   @doc "Lowercase ISO 639-1 codes, unique, at most 10."
