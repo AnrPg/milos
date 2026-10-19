@@ -191,6 +191,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/box-vocabulary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Disciplines by group, audiences, amenities and services */
+        get: operations["MilosTrainingWeb.BoxVocabularyController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -2319,7 +2336,7 @@ export interface paths {
         };
         /** The gym's public profile (Σχετικά of the public box page) */
         get: operations["MilosTrainingWeb.AdminPublicProfileController.show"];
-        /** Edit, publish or unpublish the gym's public profile */
+        /** Edit the draft of the gym's public profile; visitors see it after publishing */
         put: operations["MilosTrainingWeb.AdminPublicProfileController.update"];
         post?: never;
         delete?: never;
@@ -2356,6 +2373,57 @@ export interface paths {
         put?: never;
         /** Verify an uploaded box photo (type, size, no metadata) and mark it ready */
         post: operations["MilosTrainingWeb.AdminPublicProfileController.complete_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish the draft: visitors see it from now on */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest a tag missing from a list, for review */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.suggest"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/public-profile/unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide the public page; the draft is kept */
+        post: operations["MilosTrainingWeb.AdminPublicProfileController.unpublish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5418,6 +5486,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/platform/tag-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pending tag suggestions from every gym */
+        get: operations["MilosTrainingWeb.PlatformTagSuggestionController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/tag-suggestions/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Mark a suggestion added to its list or declined */
+        patch: operations["MilosTrainingWeb.PlatformTagSuggestionController.resolve"];
+        trace?: never;
+    };
     "/api/pr-sharing": {
         parameters: {
             query?: never;
@@ -5884,10 +5986,27 @@ export interface components {
         /** BoxPublicProfile */
         BoxPublicProfile: {
             about: string | null;
-            audiences: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-            disciplines: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** Media */
+            cover: {
+                content_type: string;
+                height: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                purpose: "body_photo" | "box_photo" | "post_photo";
+                /** @enum {string} */
+                status: "pending" | "ready";
+                /** @description Stable for public media; presigned and short-lived for private media. */
+                url: string | null;
+                width: number | null;
+            } | null;
+            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
             languages: string[];
             lock_version: number;
+            /** @description What the draft still needs before it can be published. */
+            missing: ("about" | "disciplines")[];
             photos: {
                 content_type: string;
                 height: number | null;
@@ -5904,18 +6023,43 @@ export interface components {
             published: boolean;
             /** Format: date-time */
             published_at: string | null;
+            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+            /** @description The draft differs from what visitors see. */
+            unpublished_changes: boolean;
             /** Format: date-time */
             updated_at?: string | null;
+        };
+        /** BoxPublicProfilePublish */
+        BoxPublicProfilePublish: {
+            /** @description The version the editor read. */
+            lock_version?: number;
         };
         /** BoxPublicProfileResponse */
         BoxPublicProfileResponse: {
             /** BoxPublicProfile */
             profile: {
                 about: string | null;
-                audiences: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-                disciplines: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+                amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                /** Media */
+                cover: {
+                    content_type: string;
+                    height: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    /** @enum {string} */
+                    status: "pending" | "ready";
+                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    url: string | null;
+                    width: number | null;
+                } | null;
+                disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
                 languages: string[];
                 lock_version: number;
+                /** @description What the draft still needs before it can be published. */
+                missing: ("about" | "disciplines")[];
                 photos: {
                     content_type: string;
                     height: number | null;
@@ -5932,6 +6076,9 @@ export interface components {
                 published: boolean;
                 /** Format: date-time */
                 published_at: string | null;
+                services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                /** @description The draft differs from what visitors see. */
+                unpublished_changes: boolean;
                 /** Format: date-time */
                 updated_at?: string | null;
             };
@@ -5939,14 +6086,45 @@ export interface components {
         /** BoxPublicProfileUpdate */
         BoxPublicProfileUpdate: {
             about?: string | null;
-            audiences?: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-            disciplines?: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+            amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            /** Format: uuid */
+            cover_photo_id?: string | null;
+            disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
             languages?: string[];
             /** @description The version the editor read. */
             lock_version?: number;
-            /** @description Ready box_photo media, in display order. */
+            /** @description Ready box_photo media of the gallery, in display order. */
             photo_ids?: string[];
-            published?: boolean;
+            services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** BoxTagSuggestion */
+        BoxTagSuggestion: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            list: string;
+            name: string;
+            organization_name?: string;
+            /** @enum {string} */
+            status: "pending" | "added" | "declined";
+        };
+        /** BoxTagSuggestionRequest */
+        BoxTagSuggestionRequest: {
+            /** @enum {string} */
+            list: "disciplines" | "audiences" | "amenities" | "services";
+            name: string;
+        };
+        /** BoxVocabulary */
+        BoxVocabulary: {
+            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+            discipline_groups: {
+                items: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                key: string;
+            }[];
+            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -9115,6 +9293,34 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.BoxVocabularyController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Vocabulary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                        audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                        discipline_groups: {
+                            items: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            key: string;
+                        }[];
+                        services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
@@ -11990,7 +12196,7 @@ export interface operations {
                         class_types: {
                             /** Format: date-time */
                             archived_at: string | null;
-                            audiences: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -12023,7 +12229,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @description Groups the class is for; empty means everyone */
-                    audiences?: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                    audiences?: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                     /** @description Visits one booking of this class type uses (ADR-097) */
                     credit_cost?: number;
                     /**
@@ -12053,7 +12259,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
-                            audiences: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -12098,7 +12304,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
-                            audiences: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -12142,7 +12348,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @description Groups the class is for; empty means everyone */
-                    audiences?: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                    audiences?: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                     /** @description Visits one booking of this class type uses (ADR-097) */
                     credit_cost?: number;
                     /**
@@ -12172,7 +12378,7 @@ export interface operations {
                         class_type: {
                             /** Format: date-time */
                             archived_at: string | null;
-                            audiences: ("women" | "teens" | "kids" | "over_40" | "seniors" | "prenatal" | "adaptive")[];
+                            audiences: ("women_only" | "teens" | "kids" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive")[];
                             credit_cost: number;
                             future_classes_reassigned?: number;
                             /** Format: uuid */
@@ -16407,10 +16613,27 @@ export interface operations {
                         /** BoxPublicProfile */
                         profile: {
                             about: string | null;
-                            audiences: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-                            disciplines: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
                             languages: string[];
                             lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
                             photos: {
                                 content_type: string;
                                 height: number | null;
@@ -16427,6 +16650,9 @@ export interface operations {
                             published: boolean;
                             /** Format: date-time */
                             published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
@@ -16446,14 +16672,17 @@ export interface operations {
             content: {
                 "application/json": {
                     about?: string | null;
-                    audiences?: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-                    disciplines?: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+                    amenities?: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                    audiences?: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                    /** Format: uuid */
+                    cover_photo_id?: string | null;
+                    disciplines?: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
                     languages?: string[];
                     /** @description The version the editor read. */
                     lock_version?: number;
-                    /** @description Ready box_photo media, in display order. */
+                    /** @description Ready box_photo media of the gallery, in display order. */
                     photo_ids?: string[];
-                    published?: boolean;
+                    services?: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
                 };
             };
         };
@@ -16468,10 +16697,27 @@ export interface operations {
                         /** BoxPublicProfile */
                         profile: {
                             about: string | null;
-                            audiences: ("beginners" | "women" | "over_40" | "seniors" | "teens" | "athletes" | "prenatal" | "adaptive")[];
-                            disciplines: ("crossfit" | "functional_fitness" | "hyrox" | "strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "gymnastics" | "running" | "endurance" | "bootcamp" | "hiit" | "yoga" | "pilates" | "mobility" | "martial_arts" | "boxing" | "calisthenics" | "swimming" | "cycling" | "dance" | "kids")[];
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
                             languages: string[];
                             lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
                             photos: {
                                 content_type: string;
                                 height: number | null;
@@ -16488,6 +16734,9 @@ export interface operations {
                             published: boolean;
                             /** Format: date-time */
                             published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
@@ -16585,6 +16834,215 @@ export interface operations {
                             /** @description Stable for public media; presigned and short-lived for private media. */
                             url: string | null;
                             width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description The version the editor read. */
+                    lock_version?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Edited meanwhile */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Something is missing */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    list: "disciplines" | "audiences" | "amenities" | "services";
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Suggestion */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxTagSuggestion */
+                        suggestion: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            list: string;
+                            name: string;
+                            organization_name?: string;
+                            /** @enum {string} */
+                            status: "pending" | "added" | "declined";
+                        };
+                    };
+                };
+            };
+            /** @description Invalid suggestion */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPublicProfileController.unpublish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxPublicProfile */
+                        profile: {
+                            about: string | null;
+                            amenities: ("showers" | "changing_rooms" | "lockers" | "towels" | "parking" | "bike_parking" | "public_transport_nearby" | "air_conditioning" | "sauna" | "cold_plunge" | "childcare" | "wheelchair_accessible" | "accessible_restroom" | "gender_neutral_restroom" | "wifi" | "water_refill" | "outdoor_area" | "drop_in_friendly")[];
+                            audiences: ("beginners" | "women_only" | "kids" | "teens" | "over_40" | "seniors" | "prenatal_postnatal" | "adaptive" | "athletes" | "students" | "lgbtq_friendly" | "returning_from_injury")[];
+                            /** Media */
+                            cover: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            } | null;
+                            disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
+                            languages: string[];
+                            lock_version: number;
+                            /** @description What the draft still needs before it can be published. */
+                            missing: ("about" | "disciplines")[];
+                            photos: {
+                                content_type: string;
+                                height: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                /** @enum {string} */
+                                status: "pending" | "ready";
+                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                url: string | null;
+                                width: number | null;
+                            }[];
+                            published: boolean;
+                            /** Format: date-time */
+                            published_at: string | null;
+                            services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+                            /** @description The draft differs from what visitors see. */
+                            unpublished_changes: boolean;
+                            /** Format: date-time */
+                            updated_at?: string | null;
                         };
                     };
                 };
@@ -31069,6 +31527,74 @@ export interface operations {
                         }[];
                         purge_open: boolean;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformTagSuggestionController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggestions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        suggestions: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            list: string;
+                            name: string;
+                            organization_name?: string;
+                            /** @enum {string} */
+                            status: "pending" | "added" | "declined";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformTagSuggestionController.resolve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "added" | "declined";
+                };
+            };
+        };
+        responses: {
+            /** @description Resolved */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not pending */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

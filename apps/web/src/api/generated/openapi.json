@@ -487,47 +487,152 @@
             "nullable": true,
             "type": "string"
           },
-          "audiences": {
+          "amenities": {
             "items": {
               "enum": [
-                "beginners",
-                "women",
-                "over_40",
-                "seniors",
-                "teens",
-                "athletes",
-                "prenatal",
-                "adaptive"
+                "showers",
+                "changing_rooms",
+                "lockers",
+                "towels",
+                "parking",
+                "bike_parking",
+                "public_transport_nearby",
+                "air_conditioning",
+                "sauna",
+                "cold_plunge",
+                "childcare",
+                "wheelchair_accessible",
+                "accessible_restroom",
+                "gender_neutral_restroom",
+                "wifi",
+                "water_refill",
+                "outdoor_area",
+                "drop_in_friendly"
               ],
               "type": "string"
             },
             "type": "array"
           },
+          "audiences": {
+            "items": {
+              "enum": [
+                "beginners",
+                "women_only",
+                "kids",
+                "teens",
+                "over_40",
+                "seniors",
+                "prenatal_postnatal",
+                "adaptive",
+                "athletes",
+                "students",
+                "lgbtq_friendly",
+                "returning_from_injury"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "cover": {
+            "nullable": true,
+            "properties": {
+              "content_type": {
+                "type": "string"
+              },
+              "height": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "purpose": {
+                "enum": [
+                  "body_photo",
+                  "box_photo",
+                  "post_photo"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "ready"
+                ],
+                "type": "string"
+              },
+              "url": {
+                "description": "Stable for public media; presigned and short-lived for private media.",
+                "nullable": true,
+                "type": "string"
+              },
+              "width": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "purpose",
+              "status",
+              "content_type",
+              "width",
+              "height",
+              "url"
+            ],
+            "title": "Media",
+            "type": "object"
+          },
           "disciplines": {
             "items": {
               "enum": [
-                "crossfit",
-                "functional_fitness",
-                "hyrox",
                 "strength",
                 "powerlifting",
                 "olympic_lifting",
                 "bodybuilding",
+                "strongman",
+                "kettlebell",
+                "crossfit",
+                "functional_fitness",
+                "hyrox",
+                "hiit",
+                "bootcamp",
+                "circuit_training",
+                "calisthenics",
                 "gymnastics",
                 "running",
-                "endurance",
-                "bootcamp",
-                "hiit",
-                "yoga",
-                "pilates",
-                "mobility",
-                "martial_arts",
-                "boxing",
-                "calisthenics",
-                "swimming",
+                "indoor_cycling",
                 "cycling",
+                "rowing",
+                "endurance",
+                "ems_training",
+                "yoga",
+                "hot_yoga",
+                "pilates",
+                "pilates_reformer",
+                "barre",
+                "mobility",
+                "stretching",
+                "tai_chi_qigong",
+                "boxing",
+                "kickboxing",
+                "muay_thai",
+                "mma",
+                "bjj_grappling",
+                "wrestling",
+                "martial_arts",
+                "self_defense",
                 "dance",
-                "kids"
+                "dance_fitness",
+                "pole_aerial",
+                "swimming",
+                "aqua_fitness",
+                "outdoor_training",
+                "climbing_bouldering",
+                "physio_rehab",
+                "sports_massage",
+                "recovery"
               ],
               "type": "string"
             },
@@ -542,6 +647,17 @@
           },
           "lock_version": {
             "type": "integer"
+          },
+          "missing": {
+            "description": "What the draft still needs before it can be published.",
+            "items": {
+              "enum": [
+                "about",
+                "disciplines"
+              ],
+              "type": "string"
+            },
+            "type": "array"
           },
           "photos": {
             "items": {
@@ -604,6 +720,24 @@
             "nullable": true,
             "type": "string"
           },
+          "services": {
+            "items": {
+              "enum": [
+                "personal_training",
+                "small_group_training",
+                "open_gym",
+                "nutrition_coaching",
+                "online_coaching",
+                "corporate"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "unpublished_changes": {
+            "description": "The draft differs from what visitors see.",
+            "type": "boolean"
+          },
           "updated_at": {
             "format": "date-time",
             "nullable": true,
@@ -615,12 +749,27 @@
           "disciplines",
           "languages",
           "audiences",
+          "amenities",
+          "services",
+          "cover",
           "photos",
           "published",
           "published_at",
+          "unpublished_changes",
+          "missing",
           "lock_version"
         ],
         "title": "BoxPublicProfile",
+        "type": "object"
+      },
+      "BoxPublicProfilePublish": {
+        "properties": {
+          "lock_version": {
+            "description": "The version the editor read.",
+            "type": "integer"
+          }
+        },
+        "title": "BoxPublicProfilePublish",
         "type": "object"
       },
       "BoxPublicProfileResponse": {
@@ -631,47 +780,152 @@
                 "nullable": true,
                 "type": "string"
               },
-              "audiences": {
+              "amenities": {
                 "items": {
                   "enum": [
-                    "beginners",
-                    "women",
-                    "over_40",
-                    "seniors",
-                    "teens",
-                    "athletes",
-                    "prenatal",
-                    "adaptive"
+                    "showers",
+                    "changing_rooms",
+                    "lockers",
+                    "towels",
+                    "parking",
+                    "bike_parking",
+                    "public_transport_nearby",
+                    "air_conditioning",
+                    "sauna",
+                    "cold_plunge",
+                    "childcare",
+                    "wheelchair_accessible",
+                    "accessible_restroom",
+                    "gender_neutral_restroom",
+                    "wifi",
+                    "water_refill",
+                    "outdoor_area",
+                    "drop_in_friendly"
                   ],
                   "type": "string"
                 },
                 "type": "array"
               },
+              "audiences": {
+                "items": {
+                  "enum": [
+                    "beginners",
+                    "women_only",
+                    "kids",
+                    "teens",
+                    "over_40",
+                    "seniors",
+                    "prenatal_postnatal",
+                    "adaptive",
+                    "athletes",
+                    "students",
+                    "lgbtq_friendly",
+                    "returning_from_injury"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "cover": {
+                "nullable": true,
+                "properties": {
+                  "content_type": {
+                    "type": "string"
+                  },
+                  "height": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "purpose": {
+                    "enum": [
+                      "body_photo",
+                      "box_photo",
+                      "post_photo"
+                    ],
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "pending",
+                      "ready"
+                    ],
+                    "type": "string"
+                  },
+                  "url": {
+                    "description": "Stable for public media; presigned and short-lived for private media.",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "width": {
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "purpose",
+                  "status",
+                  "content_type",
+                  "width",
+                  "height",
+                  "url"
+                ],
+                "title": "Media",
+                "type": "object"
+              },
               "disciplines": {
                 "items": {
                   "enum": [
-                    "crossfit",
-                    "functional_fitness",
-                    "hyrox",
                     "strength",
                     "powerlifting",
                     "olympic_lifting",
                     "bodybuilding",
+                    "strongman",
+                    "kettlebell",
+                    "crossfit",
+                    "functional_fitness",
+                    "hyrox",
+                    "hiit",
+                    "bootcamp",
+                    "circuit_training",
+                    "calisthenics",
                     "gymnastics",
                     "running",
-                    "endurance",
-                    "bootcamp",
-                    "hiit",
-                    "yoga",
-                    "pilates",
-                    "mobility",
-                    "martial_arts",
-                    "boxing",
-                    "calisthenics",
-                    "swimming",
+                    "indoor_cycling",
                     "cycling",
+                    "rowing",
+                    "endurance",
+                    "ems_training",
+                    "yoga",
+                    "hot_yoga",
+                    "pilates",
+                    "pilates_reformer",
+                    "barre",
+                    "mobility",
+                    "stretching",
+                    "tai_chi_qigong",
+                    "boxing",
+                    "kickboxing",
+                    "muay_thai",
+                    "mma",
+                    "bjj_grappling",
+                    "wrestling",
+                    "martial_arts",
+                    "self_defense",
                     "dance",
-                    "kids"
+                    "dance_fitness",
+                    "pole_aerial",
+                    "swimming",
+                    "aqua_fitness",
+                    "outdoor_training",
+                    "climbing_bouldering",
+                    "physio_rehab",
+                    "sports_massage",
+                    "recovery"
                   ],
                   "type": "string"
                 },
@@ -686,6 +940,17 @@
               },
               "lock_version": {
                 "type": "integer"
+              },
+              "missing": {
+                "description": "What the draft still needs before it can be published.",
+                "items": {
+                  "enum": [
+                    "about",
+                    "disciplines"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
               },
               "photos": {
                 "items": {
@@ -748,6 +1013,24 @@
                 "nullable": true,
                 "type": "string"
               },
+              "services": {
+                "items": {
+                  "enum": [
+                    "personal_training",
+                    "small_group_training",
+                    "open_gym",
+                    "nutrition_coaching",
+                    "online_coaching",
+                    "corporate"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "unpublished_changes": {
+                "description": "The draft differs from what visitors see.",
+                "type": "boolean"
+              },
               "updated_at": {
                 "format": "date-time",
                 "nullable": true,
@@ -759,9 +1042,14 @@
               "disciplines",
               "languages",
               "audiences",
+              "amenities",
+              "services",
+              "cover",
               "photos",
               "published",
               "published_at",
+              "unpublished_changes",
+              "missing",
               "lock_version"
             ],
             "title": "BoxPublicProfile",
@@ -781,47 +1069,106 @@
             "nullable": true,
             "type": "string"
           },
-          "audiences": {
+          "amenities": {
             "items": {
               "enum": [
-                "beginners",
-                "women",
-                "over_40",
-                "seniors",
-                "teens",
-                "athletes",
-                "prenatal",
-                "adaptive"
+                "showers",
+                "changing_rooms",
+                "lockers",
+                "towels",
+                "parking",
+                "bike_parking",
+                "public_transport_nearby",
+                "air_conditioning",
+                "sauna",
+                "cold_plunge",
+                "childcare",
+                "wheelchair_accessible",
+                "accessible_restroom",
+                "gender_neutral_restroom",
+                "wifi",
+                "water_refill",
+                "outdoor_area",
+                "drop_in_friendly"
               ],
               "type": "string"
             },
             "type": "array"
           },
+          "audiences": {
+            "items": {
+              "enum": [
+                "beginners",
+                "women_only",
+                "kids",
+                "teens",
+                "over_40",
+                "seniors",
+                "prenatal_postnatal",
+                "adaptive",
+                "athletes",
+                "students",
+                "lgbtq_friendly",
+                "returning_from_injury"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "cover_photo_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "disciplines": {
             "items": {
               "enum": [
-                "crossfit",
-                "functional_fitness",
-                "hyrox",
                 "strength",
                 "powerlifting",
                 "olympic_lifting",
                 "bodybuilding",
+                "strongman",
+                "kettlebell",
+                "crossfit",
+                "functional_fitness",
+                "hyrox",
+                "hiit",
+                "bootcamp",
+                "circuit_training",
+                "calisthenics",
                 "gymnastics",
                 "running",
-                "endurance",
-                "bootcamp",
-                "hiit",
-                "yoga",
-                "pilates",
-                "mobility",
-                "martial_arts",
-                "boxing",
-                "calisthenics",
-                "swimming",
+                "indoor_cycling",
                 "cycling",
+                "rowing",
+                "endurance",
+                "ems_training",
+                "yoga",
+                "hot_yoga",
+                "pilates",
+                "pilates_reformer",
+                "barre",
+                "mobility",
+                "stretching",
+                "tai_chi_qigong",
+                "boxing",
+                "kickboxing",
+                "muay_thai",
+                "mma",
+                "bjj_grappling",
+                "wrestling",
+                "martial_arts",
+                "self_defense",
                 "dance",
-                "kids"
+                "dance_fitness",
+                "pole_aerial",
+                "swimming",
+                "aqua_fitness",
+                "outdoor_training",
+                "climbing_bouldering",
+                "physio_rehab",
+                "sports_massage",
+                "recovery"
               ],
               "type": "string"
             },
@@ -839,7 +1186,7 @@
             "type": "integer"
           },
           "photo_ids": {
-            "description": "Ready box_photo media, in display order.",
+            "description": "Ready box_photo media of the gallery, in display order.",
             "items": {
               "format": "uuid",
               "type": "string"
@@ -847,11 +1194,224 @@
             "maxItems": 12,
             "type": "array"
           },
-          "published": {
-            "type": "boolean"
+          "services": {
+            "items": {
+              "enum": [
+                "personal_training",
+                "small_group_training",
+                "open_gym",
+                "nutrition_coaching",
+                "online_coaching",
+                "corporate"
+              ],
+              "type": "string"
+            },
+            "type": "array"
           }
         },
         "title": "BoxPublicProfileUpdate",
+        "type": "object"
+      },
+      "BoxTagSuggestion": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "list": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "added",
+              "declined"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "list",
+          "name",
+          "status"
+        ],
+        "title": "BoxTagSuggestion",
+        "type": "object"
+      },
+      "BoxTagSuggestionRequest": {
+        "properties": {
+          "list": {
+            "enum": [
+              "disciplines",
+              "audiences",
+              "amenities",
+              "services"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 60,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "list",
+          "name"
+        ],
+        "title": "BoxTagSuggestionRequest",
+        "type": "object"
+      },
+      "BoxVocabulary": {
+        "properties": {
+          "amenities": {
+            "items": {
+              "enum": [
+                "showers",
+                "changing_rooms",
+                "lockers",
+                "towels",
+                "parking",
+                "bike_parking",
+                "public_transport_nearby",
+                "air_conditioning",
+                "sauna",
+                "cold_plunge",
+                "childcare",
+                "wheelchair_accessible",
+                "accessible_restroom",
+                "gender_neutral_restroom",
+                "wifi",
+                "water_refill",
+                "outdoor_area",
+                "drop_in_friendly"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "audiences": {
+            "items": {
+              "enum": [
+                "beginners",
+                "women_only",
+                "kids",
+                "teens",
+                "over_40",
+                "seniors",
+                "prenatal_postnatal",
+                "adaptive",
+                "athletes",
+                "students",
+                "lgbtq_friendly",
+                "returning_from_injury"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "discipline_groups": {
+            "items": {
+              "properties": {
+                "items": {
+                  "items": {
+                    "enum": [
+                      "strength",
+                      "powerlifting",
+                      "olympic_lifting",
+                      "bodybuilding",
+                      "strongman",
+                      "kettlebell",
+                      "crossfit",
+                      "functional_fitness",
+                      "hyrox",
+                      "hiit",
+                      "bootcamp",
+                      "circuit_training",
+                      "calisthenics",
+                      "gymnastics",
+                      "running",
+                      "indoor_cycling",
+                      "cycling",
+                      "rowing",
+                      "endurance",
+                      "ems_training",
+                      "yoga",
+                      "hot_yoga",
+                      "pilates",
+                      "pilates_reformer",
+                      "barre",
+                      "mobility",
+                      "stretching",
+                      "tai_chi_qigong",
+                      "boxing",
+                      "kickboxing",
+                      "muay_thai",
+                      "mma",
+                      "bjj_grappling",
+                      "wrestling",
+                      "martial_arts",
+                      "self_defense",
+                      "dance",
+                      "dance_fitness",
+                      "pole_aerial",
+                      "swimming",
+                      "aqua_fitness",
+                      "outdoor_training",
+                      "climbing_bouldering",
+                      "physio_rehab",
+                      "sports_massage",
+                      "recovery"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "key": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "key",
+                "items"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "services": {
+            "items": {
+              "enum": [
+                "personal_training",
+                "small_group_training",
+                "open_gym",
+                "nutrition_coaching",
+                "online_coaching",
+                "corporate"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "discipline_groups",
+          "audiences",
+          "amenities",
+          "services"
+        ],
+        "title": "BoxVocabulary",
         "type": "object"
       },
       "ClassSlotInjuryWarnings": {
@@ -10903,6 +11463,167 @@
         ]
       }
     },
+    "/api/box-vocabulary": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.BoxVocabularyController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "amenities": {
+                      "items": {
+                        "enum": [
+                          "showers",
+                          "changing_rooms",
+                          "lockers",
+                          "towels",
+                          "parking",
+                          "bike_parking",
+                          "public_transport_nearby",
+                          "air_conditioning",
+                          "sauna",
+                          "cold_plunge",
+                          "childcare",
+                          "wheelchair_accessible",
+                          "accessible_restroom",
+                          "gender_neutral_restroom",
+                          "wifi",
+                          "water_refill",
+                          "outdoor_area",
+                          "drop_in_friendly"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "audiences": {
+                      "items": {
+                        "enum": [
+                          "beginners",
+                          "women_only",
+                          "kids",
+                          "teens",
+                          "over_40",
+                          "seniors",
+                          "prenatal_postnatal",
+                          "adaptive",
+                          "athletes",
+                          "students",
+                          "lgbtq_friendly",
+                          "returning_from_injury"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "discipline_groups": {
+                      "items": {
+                        "properties": {
+                          "items": {
+                            "items": {
+                              "enum": [
+                                "strength",
+                                "powerlifting",
+                                "olympic_lifting",
+                                "bodybuilding",
+                                "strongman",
+                                "kettlebell",
+                                "crossfit",
+                                "functional_fitness",
+                                "hyrox",
+                                "hiit",
+                                "bootcamp",
+                                "circuit_training",
+                                "calisthenics",
+                                "gymnastics",
+                                "running",
+                                "indoor_cycling",
+                                "cycling",
+                                "rowing",
+                                "endurance",
+                                "ems_training",
+                                "yoga",
+                                "hot_yoga",
+                                "pilates",
+                                "pilates_reformer",
+                                "barre",
+                                "mobility",
+                                "stretching",
+                                "tai_chi_qigong",
+                                "boxing",
+                                "kickboxing",
+                                "muay_thai",
+                                "mma",
+                                "bjj_grappling",
+                                "wrestling",
+                                "martial_arts",
+                                "self_defense",
+                                "dance",
+                                "dance_fitness",
+                                "pole_aerial",
+                                "swimming",
+                                "aqua_fitness",
+                                "outdoor_training",
+                                "climbing_bouldering",
+                                "physio_rehab",
+                                "sports_massage",
+                                "recovery"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "key": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "items"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "services": {
+                      "items": {
+                        "enum": [
+                          "personal_training",
+                          "small_group_training",
+                          "open_gym",
+                          "nutrition_coaching",
+                          "online_coaching",
+                          "corporate"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "discipline_groups",
+                    "audiences",
+                    "amenities",
+                    "services"
+                  ],
+                  "title": "BoxVocabulary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Vocabulary"
+          }
+        },
+        "summary": "Disciplines by group, audiences, amenities and services",
+        "tags": [
+          "Public profile"
+        ]
+      }
+    },
     "/api/calendar/export-links": {
       "get": {
         "callbacks": {},
@@ -17488,12 +18209,12 @@
                           "audiences": {
                             "items": {
                               "enum": [
-                                "women",
+                                "women_only",
                                 "teens",
                                 "kids",
                                 "over_40",
                                 "seniors",
-                                "prenatal",
+                                "prenatal_postnatal",
                                 "adaptive"
                               ],
                               "type": "string"
@@ -17594,12 +18315,12 @@
                     "description": "Groups the class is for; empty means everyone",
                     "items": {
                       "enum": [
-                        "women",
+                        "women_only",
                         "teens",
                         "kids",
                         "over_40",
                         "seniors",
-                        "prenatal",
+                        "prenatal_postnatal",
                         "adaptive"
                       ],
                       "type": "string"
@@ -17666,12 +18387,12 @@
                         "audiences": {
                           "items": {
                             "enum": [
-                              "women",
+                              "women_only",
                               "teens",
                               "kids",
                               "over_40",
                               "seniors",
-                              "prenatal",
+                              "prenatal_postnatal",
                               "adaptive"
                             ],
                             "type": "string"
@@ -17798,12 +18519,12 @@
                         "audiences": {
                           "items": {
                             "enum": [
-                              "women",
+                              "women_only",
                               "teens",
                               "kids",
                               "over_40",
                               "seniors",
-                              "prenatal",
+                              "prenatal_postnatal",
                               "adaptive"
                             ],
                             "type": "string"
@@ -17922,12 +18643,12 @@
                     "description": "Groups the class is for; empty means everyone",
                     "items": {
                       "enum": [
-                        "women",
+                        "women_only",
                         "teens",
                         "kids",
                         "over_40",
                         "seniors",
-                        "prenatal",
+                        "prenatal_postnatal",
                         "adaptive"
                       ],
                       "type": "string"
@@ -17994,12 +18715,12 @@
                         "audiences": {
                           "items": {
                             "enum": [
-                              "women",
+                              "women_only",
                               "teens",
                               "kids",
                               "over_40",
                               "seniors",
-                              "prenatal",
+                              "prenatal_postnatal",
                               "adaptive"
                             ],
                             "type": "string"
@@ -28573,47 +29294,152 @@
                           "nullable": true,
                           "type": "string"
                         },
-                        "audiences": {
+                        "amenities": {
                           "items": {
                             "enum": [
-                              "beginners",
-                              "women",
-                              "over_40",
-                              "seniors",
-                              "teens",
-                              "athletes",
-                              "prenatal",
-                              "adaptive"
+                              "showers",
+                              "changing_rooms",
+                              "lockers",
+                              "towels",
+                              "parking",
+                              "bike_parking",
+                              "public_transport_nearby",
+                              "air_conditioning",
+                              "sauna",
+                              "cold_plunge",
+                              "childcare",
+                              "wheelchair_accessible",
+                              "accessible_restroom",
+                              "gender_neutral_restroom",
+                              "wifi",
+                              "water_refill",
+                              "outdoor_area",
+                              "drop_in_friendly"
                             ],
                             "type": "string"
                           },
                           "type": "array"
                         },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women_only",
+                              "kids",
+                              "teens",
+                              "over_40",
+                              "seniors",
+                              "prenatal_postnatal",
+                              "adaptive",
+                              "athletes",
+                              "students",
+                              "lgbtq_friendly",
+                              "returning_from_injury"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "cover": {
+                          "nullable": true,
+                          "properties": {
+                            "content_type": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "purpose": {
+                              "enum": [
+                                "body_photo",
+                                "box_photo",
+                                "post_photo"
+                              ],
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "ready"
+                              ],
+                              "type": "string"
+                            },
+                            "url": {
+                              "description": "Stable for public media; presigned and short-lived for private media.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "width": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "purpose",
+                            "status",
+                            "content_type",
+                            "width",
+                            "height",
+                            "url"
+                          ],
+                          "title": "Media",
+                          "type": "object"
+                        },
                         "disciplines": {
                           "items": {
                             "enum": [
-                              "crossfit",
-                              "functional_fitness",
-                              "hyrox",
                               "strength",
                               "powerlifting",
                               "olympic_lifting",
                               "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "calisthenics",
                               "gymnastics",
                               "running",
-                              "endurance",
-                              "bootcamp",
-                              "hiit",
-                              "yoga",
-                              "pilates",
-                              "mobility",
-                              "martial_arts",
-                              "boxing",
-                              "calisthenics",
-                              "swimming",
+                              "indoor_cycling",
                               "cycling",
+                              "rowing",
+                              "endurance",
+                              "ems_training",
+                              "yoga",
+                              "hot_yoga",
+                              "pilates",
+                              "pilates_reformer",
+                              "barre",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
                               "dance",
-                              "kids"
+                              "dance_fitness",
+                              "pole_aerial",
+                              "swimming",
+                              "aqua_fitness",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "physio_rehab",
+                              "sports_massage",
+                              "recovery"
                             ],
                             "type": "string"
                           },
@@ -28628,6 +29454,17 @@
                         },
                         "lock_version": {
                           "type": "integer"
+                        },
+                        "missing": {
+                          "description": "What the draft still needs before it can be published.",
+                          "items": {
+                            "enum": [
+                              "about",
+                              "disciplines"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
                         },
                         "photos": {
                           "items": {
@@ -28690,6 +29527,24 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "services": {
+                          "items": {
+                            "enum": [
+                              "personal_training",
+                              "small_group_training",
+                              "open_gym",
+                              "nutrition_coaching",
+                              "online_coaching",
+                              "corporate"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unpublished_changes": {
+                          "description": "The draft differs from what visitors see.",
+                          "type": "boolean"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -28701,9 +29556,14 @@
                         "disciplines",
                         "languages",
                         "audiences",
+                        "amenities",
+                        "services",
+                        "cover",
                         "photos",
                         "published",
                         "published_at",
+                        "unpublished_changes",
+                        "missing",
                         "lock_version"
                       ],
                       "title": "BoxPublicProfile",
@@ -28745,47 +29605,106 @@
                     "nullable": true,
                     "type": "string"
                   },
-                  "audiences": {
+                  "amenities": {
                     "items": {
                       "enum": [
-                        "beginners",
-                        "women",
-                        "over_40",
-                        "seniors",
-                        "teens",
-                        "athletes",
-                        "prenatal",
-                        "adaptive"
+                        "showers",
+                        "changing_rooms",
+                        "lockers",
+                        "towels",
+                        "parking",
+                        "bike_parking",
+                        "public_transport_nearby",
+                        "air_conditioning",
+                        "sauna",
+                        "cold_plunge",
+                        "childcare",
+                        "wheelchair_accessible",
+                        "accessible_restroom",
+                        "gender_neutral_restroom",
+                        "wifi",
+                        "water_refill",
+                        "outdoor_area",
+                        "drop_in_friendly"
                       ],
                       "type": "string"
                     },
                     "type": "array"
                   },
+                  "audiences": {
+                    "items": {
+                      "enum": [
+                        "beginners",
+                        "women_only",
+                        "kids",
+                        "teens",
+                        "over_40",
+                        "seniors",
+                        "prenatal_postnatal",
+                        "adaptive",
+                        "athletes",
+                        "students",
+                        "lgbtq_friendly",
+                        "returning_from_injury"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "cover_photo_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "disciplines": {
                     "items": {
                       "enum": [
-                        "crossfit",
-                        "functional_fitness",
-                        "hyrox",
                         "strength",
                         "powerlifting",
                         "olympic_lifting",
                         "bodybuilding",
+                        "strongman",
+                        "kettlebell",
+                        "crossfit",
+                        "functional_fitness",
+                        "hyrox",
+                        "hiit",
+                        "bootcamp",
+                        "circuit_training",
+                        "calisthenics",
                         "gymnastics",
                         "running",
-                        "endurance",
-                        "bootcamp",
-                        "hiit",
-                        "yoga",
-                        "pilates",
-                        "mobility",
-                        "martial_arts",
-                        "boxing",
-                        "calisthenics",
-                        "swimming",
+                        "indoor_cycling",
                         "cycling",
+                        "rowing",
+                        "endurance",
+                        "ems_training",
+                        "yoga",
+                        "hot_yoga",
+                        "pilates",
+                        "pilates_reformer",
+                        "barre",
+                        "mobility",
+                        "stretching",
+                        "tai_chi_qigong",
+                        "boxing",
+                        "kickboxing",
+                        "muay_thai",
+                        "mma",
+                        "bjj_grappling",
+                        "wrestling",
+                        "martial_arts",
+                        "self_defense",
                         "dance",
-                        "kids"
+                        "dance_fitness",
+                        "pole_aerial",
+                        "swimming",
+                        "aqua_fitness",
+                        "outdoor_training",
+                        "climbing_bouldering",
+                        "physio_rehab",
+                        "sports_massage",
+                        "recovery"
                       ],
                       "type": "string"
                     },
@@ -28803,7 +29722,7 @@
                     "type": "integer"
                   },
                   "photo_ids": {
-                    "description": "Ready box_photo media, in display order.",
+                    "description": "Ready box_photo media of the gallery, in display order.",
                     "items": {
                       "format": "uuid",
                       "type": "string"
@@ -28811,8 +29730,19 @@
                     "maxItems": 12,
                     "type": "array"
                   },
-                  "published": {
-                    "type": "boolean"
+                  "services": {
+                    "items": {
+                      "enum": [
+                        "personal_training",
+                        "small_group_training",
+                        "open_gym",
+                        "nutrition_coaching",
+                        "online_coaching",
+                        "corporate"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
                   }
                 },
                 "title": "BoxPublicProfileUpdate",
@@ -28834,47 +29764,152 @@
                           "nullable": true,
                           "type": "string"
                         },
-                        "audiences": {
+                        "amenities": {
                           "items": {
                             "enum": [
-                              "beginners",
-                              "women",
-                              "over_40",
-                              "seniors",
-                              "teens",
-                              "athletes",
-                              "prenatal",
-                              "adaptive"
+                              "showers",
+                              "changing_rooms",
+                              "lockers",
+                              "towels",
+                              "parking",
+                              "bike_parking",
+                              "public_transport_nearby",
+                              "air_conditioning",
+                              "sauna",
+                              "cold_plunge",
+                              "childcare",
+                              "wheelchair_accessible",
+                              "accessible_restroom",
+                              "gender_neutral_restroom",
+                              "wifi",
+                              "water_refill",
+                              "outdoor_area",
+                              "drop_in_friendly"
                             ],
                             "type": "string"
                           },
                           "type": "array"
                         },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women_only",
+                              "kids",
+                              "teens",
+                              "over_40",
+                              "seniors",
+                              "prenatal_postnatal",
+                              "adaptive",
+                              "athletes",
+                              "students",
+                              "lgbtq_friendly",
+                              "returning_from_injury"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "cover": {
+                          "nullable": true,
+                          "properties": {
+                            "content_type": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "purpose": {
+                              "enum": [
+                                "body_photo",
+                                "box_photo",
+                                "post_photo"
+                              ],
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "ready"
+                              ],
+                              "type": "string"
+                            },
+                            "url": {
+                              "description": "Stable for public media; presigned and short-lived for private media.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "width": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "purpose",
+                            "status",
+                            "content_type",
+                            "width",
+                            "height",
+                            "url"
+                          ],
+                          "title": "Media",
+                          "type": "object"
+                        },
                         "disciplines": {
                           "items": {
                             "enum": [
-                              "crossfit",
-                              "functional_fitness",
-                              "hyrox",
                               "strength",
                               "powerlifting",
                               "olympic_lifting",
                               "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "calisthenics",
                               "gymnastics",
                               "running",
-                              "endurance",
-                              "bootcamp",
-                              "hiit",
-                              "yoga",
-                              "pilates",
-                              "mobility",
-                              "martial_arts",
-                              "boxing",
-                              "calisthenics",
-                              "swimming",
+                              "indoor_cycling",
                               "cycling",
+                              "rowing",
+                              "endurance",
+                              "ems_training",
+                              "yoga",
+                              "hot_yoga",
+                              "pilates",
+                              "pilates_reformer",
+                              "barre",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
                               "dance",
-                              "kids"
+                              "dance_fitness",
+                              "pole_aerial",
+                              "swimming",
+                              "aqua_fitness",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "physio_rehab",
+                              "sports_massage",
+                              "recovery"
                             ],
                             "type": "string"
                           },
@@ -28889,6 +29924,17 @@
                         },
                         "lock_version": {
                           "type": "integer"
+                        },
+                        "missing": {
+                          "description": "What the draft still needs before it can be published.",
+                          "items": {
+                            "enum": [
+                              "about",
+                              "disciplines"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
                         },
                         "photos": {
                           "items": {
@@ -28951,6 +29997,24 @@
                           "nullable": true,
                           "type": "string"
                         },
+                        "services": {
+                          "items": {
+                            "enum": [
+                              "personal_training",
+                              "small_group_training",
+                              "open_gym",
+                              "nutrition_coaching",
+                              "online_coaching",
+                              "corporate"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unpublished_changes": {
+                          "description": "The draft differs from what visitors see.",
+                          "type": "boolean"
+                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -28962,9 +30026,14 @@
                         "disciplines",
                         "languages",
                         "audiences",
+                        "amenities",
+                        "services",
+                        "cover",
                         "photos",
                         "published",
                         "published_at",
+                        "unpublished_changes",
+                        "missing",
                         "lock_version"
                       ],
                       "title": "BoxPublicProfile",
@@ -29007,7 +30076,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Edit, publish or unpublish the gym's public profile",
+        "summary": "Edit the draft of the gym's public profile; visitors see it after publishing",
         "tags": [
           "Admin Settings"
         ]
@@ -29189,6 +30258,784 @@
           }
         ],
         "summary": "Verify an uploaded box photo (type, size, no metadata) and mark it ready",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile/publish": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.publish",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "lock_version": {
+                    "description": "The version the editor read.",
+                    "type": "integer"
+                  }
+                },
+                "title": "BoxPublicProfilePublish",
+                "type": "object"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "profile": {
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "amenities": {
+                          "items": {
+                            "enum": [
+                              "showers",
+                              "changing_rooms",
+                              "lockers",
+                              "towels",
+                              "parking",
+                              "bike_parking",
+                              "public_transport_nearby",
+                              "air_conditioning",
+                              "sauna",
+                              "cold_plunge",
+                              "childcare",
+                              "wheelchair_accessible",
+                              "accessible_restroom",
+                              "gender_neutral_restroom",
+                              "wifi",
+                              "water_refill",
+                              "outdoor_area",
+                              "drop_in_friendly"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women_only",
+                              "kids",
+                              "teens",
+                              "over_40",
+                              "seniors",
+                              "prenatal_postnatal",
+                              "adaptive",
+                              "athletes",
+                              "students",
+                              "lgbtq_friendly",
+                              "returning_from_injury"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "cover": {
+                          "nullable": true,
+                          "properties": {
+                            "content_type": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "purpose": {
+                              "enum": [
+                                "body_photo",
+                                "box_photo",
+                                "post_photo"
+                              ],
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "ready"
+                              ],
+                              "type": "string"
+                            },
+                            "url": {
+                              "description": "Stable for public media; presigned and short-lived for private media.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "width": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "purpose",
+                            "status",
+                            "content_type",
+                            "width",
+                            "height",
+                            "url"
+                          ],
+                          "title": "Media",
+                          "type": "object"
+                        },
+                        "disciplines": {
+                          "items": {
+                            "enum": [
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "calisthenics",
+                              "gymnastics",
+                              "running",
+                              "indoor_cycling",
+                              "cycling",
+                              "rowing",
+                              "endurance",
+                              "ems_training",
+                              "yoga",
+                              "hot_yoga",
+                              "pilates",
+                              "pilates_reformer",
+                              "barre",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "swimming",
+                              "aqua_fitness",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "physio_rehab",
+                              "sports_massage",
+                              "recovery"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "pattern": "^[a-z]{2}$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "missing": {
+                          "description": "What the draft still needs before it can be published.",
+                          "items": {
+                            "enum": [
+                              "about",
+                              "disciplines"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "content_type": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "purpose": {
+                                "enum": [
+                                  "body_photo",
+                                  "box_photo",
+                                  "post_photo"
+                                ],
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "ready"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "description": "Stable for public media; presigned and short-lived for private media.",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "purpose",
+                              "status",
+                              "content_type",
+                              "width",
+                              "height",
+                              "url"
+                            ],
+                            "title": "Media",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "published": {
+                          "type": "boolean"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "services": {
+                          "items": {
+                            "enum": [
+                              "personal_training",
+                              "small_group_training",
+                              "open_gym",
+                              "nutrition_coaching",
+                              "online_coaching",
+                              "corporate"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unpublished_changes": {
+                          "description": "The draft differs from what visitors see.",
+                          "type": "boolean"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "about",
+                        "disciplines",
+                        "languages",
+                        "audiences",
+                        "amenities",
+                        "services",
+                        "cover",
+                        "photos",
+                        "published",
+                        "published_at",
+                        "unpublished_changes",
+                        "missing",
+                        "lock_version"
+                      ],
+                      "title": "BoxPublicProfile",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "title": "BoxPublicProfileResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Edited meanwhile"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Something is missing"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Publish the draft: visitors see it from now on",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile/suggestions": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.suggest",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "list": {
+                    "enum": [
+                      "disciplines",
+                      "audiences",
+                      "amenities",
+                      "services"
+                    ],
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 60,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "list",
+                  "name"
+                ],
+                "title": "BoxTagSuggestionRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "suggestion": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "list": {
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_name": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "added",
+                            "declined"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "list",
+                        "name",
+                        "status"
+                      ],
+                      "title": "BoxTagSuggestion",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "suggestion"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestion"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid suggestion"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Suggest a tag missing from a list, for review",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/public-profile/unpublish": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPublicProfileController.unpublish",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "profile": {
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "amenities": {
+                          "items": {
+                            "enum": [
+                              "showers",
+                              "changing_rooms",
+                              "lockers",
+                              "towels",
+                              "parking",
+                              "bike_parking",
+                              "public_transport_nearby",
+                              "air_conditioning",
+                              "sauna",
+                              "cold_plunge",
+                              "childcare",
+                              "wheelchair_accessible",
+                              "accessible_restroom",
+                              "gender_neutral_restroom",
+                              "wifi",
+                              "water_refill",
+                              "outdoor_area",
+                              "drop_in_friendly"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "audiences": {
+                          "items": {
+                            "enum": [
+                              "beginners",
+                              "women_only",
+                              "kids",
+                              "teens",
+                              "over_40",
+                              "seniors",
+                              "prenatal_postnatal",
+                              "adaptive",
+                              "athletes",
+                              "students",
+                              "lgbtq_friendly",
+                              "returning_from_injury"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "cover": {
+                          "nullable": true,
+                          "properties": {
+                            "content_type": {
+                              "type": "string"
+                            },
+                            "height": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "purpose": {
+                              "enum": [
+                                "body_photo",
+                                "box_photo",
+                                "post_photo"
+                              ],
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "pending",
+                                "ready"
+                              ],
+                              "type": "string"
+                            },
+                            "url": {
+                              "description": "Stable for public media; presigned and short-lived for private media.",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "width": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "purpose",
+                            "status",
+                            "content_type",
+                            "width",
+                            "height",
+                            "url"
+                          ],
+                          "title": "Media",
+                          "type": "object"
+                        },
+                        "disciplines": {
+                          "items": {
+                            "enum": [
+                              "strength",
+                              "powerlifting",
+                              "olympic_lifting",
+                              "bodybuilding",
+                              "strongman",
+                              "kettlebell",
+                              "crossfit",
+                              "functional_fitness",
+                              "hyrox",
+                              "hiit",
+                              "bootcamp",
+                              "circuit_training",
+                              "calisthenics",
+                              "gymnastics",
+                              "running",
+                              "indoor_cycling",
+                              "cycling",
+                              "rowing",
+                              "endurance",
+                              "ems_training",
+                              "yoga",
+                              "hot_yoga",
+                              "pilates",
+                              "pilates_reformer",
+                              "barre",
+                              "mobility",
+                              "stretching",
+                              "tai_chi_qigong",
+                              "boxing",
+                              "kickboxing",
+                              "muay_thai",
+                              "mma",
+                              "bjj_grappling",
+                              "wrestling",
+                              "martial_arts",
+                              "self_defense",
+                              "dance",
+                              "dance_fitness",
+                              "pole_aerial",
+                              "swimming",
+                              "aqua_fitness",
+                              "outdoor_training",
+                              "climbing_bouldering",
+                              "physio_rehab",
+                              "sports_massage",
+                              "recovery"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "pattern": "^[a-z]{2}$",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "lock_version": {
+                          "type": "integer"
+                        },
+                        "missing": {
+                          "description": "What the draft still needs before it can be published.",
+                          "items": {
+                            "enum": [
+                              "about",
+                              "disciplines"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "content_type": {
+                                "type": "string"
+                              },
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "purpose": {
+                                "enum": [
+                                  "body_photo",
+                                  "box_photo",
+                                  "post_photo"
+                                ],
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "pending",
+                                  "ready"
+                                ],
+                                "type": "string"
+                              },
+                              "url": {
+                                "description": "Stable for public media; presigned and short-lived for private media.",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "purpose",
+                              "status",
+                              "content_type",
+                              "width",
+                              "height",
+                              "url"
+                            ],
+                            "title": "Media",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "published": {
+                          "type": "boolean"
+                        },
+                        "published_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "services": {
+                          "items": {
+                            "enum": [
+                              "personal_training",
+                              "small_group_training",
+                              "open_gym",
+                              "nutrition_coaching",
+                              "online_coaching",
+                              "corporate"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "unpublished_changes": {
+                          "description": "The draft differs from what visitors see.",
+                          "type": "boolean"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "about",
+                        "disciplines",
+                        "languages",
+                        "audiences",
+                        "amenities",
+                        "services",
+                        "cover",
+                        "photos",
+                        "published",
+                        "published_at",
+                        "unpublished_changes",
+                        "missing",
+                        "lock_version"
+                      ],
+                      "title": "BoxPublicProfile",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "title": "BoxPublicProfileResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Hide the public page; the draft is kept",
         "tags": [
           "Admin Settings"
         ]
@@ -69047,6 +70894,143 @@
         "summary": "Summarize what renaming an organization's path slug affects (ADR-122)",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/tag-suggestions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformTagSuggestionController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "suggestions": {
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "list": {
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_name": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "added",
+                              "declined"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "list",
+                          "name",
+                          "status"
+                        ],
+                        "title": "BoxTagSuggestion",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "suggestions"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pending tag suggestions from every gym",
+        "tags": [
+          "Platform"
+        ]
+      }
+    },
+    "/api/platform/tag-suggestions/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformTagSuggestionController.resolve",
+        "parameters": [
+          {
+            "description": "",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "added",
+                      "declined"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Resolved"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not pending"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark a suggestion added to its list or declined",
+        "tags": [
+          "Platform"
         ]
       }
     },

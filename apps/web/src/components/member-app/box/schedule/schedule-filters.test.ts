@@ -84,12 +84,12 @@ describe("matchesScheduleFilters", () => {
 
   it("matches level, audience, focus, coach, kind and duration", () => {
     const tagged = slot({
-      class_type: { id: "type-1", name: "Ladies", slug: "ladies", sort_order: 0, archived_at: null, kind: "event", level: "beginner", audiences: ["women"] },
+      class_type: { id: "type-1", name: "Ladies", slug: "ladies", sort_order: 0, archived_at: null, kind: "event", level: "beginner", audiences: ["women_only"] },
       coach_user_id: "coach-1",
       duration_minutes: 30,
       workout: { id: "w", title: "W", type: "wod", sections: [], focus: ["strength", "legs"] },
     });
-    expect(matches(tagged, { levels: ["beginner"], audiences: ["women"], focus: ["legs"], coachIds: ["coach-1"], kind: "event", durations: ["short"] })).toBe(true);
+    expect(matches(tagged, { levels: ["beginner"], audiences: ["women_only"], focus: ["legs"], coachIds: ["coach-1"], kind: "event", durations: ["short"] })).toBe(true);
     expect(matches(tagged, { levels: ["advanced"] })).toBe(false);
     expect(matches(tagged, { audiences: ["teens"] })).toBe(false);
     expect(matches(tagged, { focus: ["mobility"] })).toBe(false);

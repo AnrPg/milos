@@ -33,7 +33,7 @@ export type ClassTypeRecord = {
 
 export const CLASS_LEVELS = ["beginner", "all_levels", "advanced"] as const;
 export type ClassLevel = (typeof CLASS_LEVELS)[number];
-export const CLASS_AUDIENCES = ["women", "teens", "kids", "over_40", "seniors", "prenatal", "adaptive"] as const;
+export const CLASS_AUDIENCES = ["women_only", "teens", "kids", "over_40", "seniors", "prenatal_postnatal", "adaptive"] as const;
 export type ClassAudience = (typeof CLASS_AUDIENCES)[number];
 export const WORKOUT_FOCUSES = [
   "strength",
