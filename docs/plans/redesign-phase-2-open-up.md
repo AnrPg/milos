@@ -331,6 +331,30 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
    never in notifications. (Placement proposed by Claude; Apostolos can move it.)
 4. People with no active package see «Box με δοκιμαστικό» as a normal Γύρω μου category.
 
+### Admin › locations and public «Σχετικά» (2026-10-19, [board](https://claude.ai/artifact/JoK6kFLZ1bLnQGJSWSiURe))
+
+1. **Location editor** is **its own page** opened from Ρυθμίσεις › Τοποθεσίες (board 3, Q1). Order,
+   top to bottom: name, address, neighbourhood, then the **map at full content width** (never
+   squeezed into a side column), then opening hours.
+2. **Pin:** search the address, pick a suggestion, the pin drops; drag to fine-tune (board 3, Q2;
+   unanswered, Claude's pick). Address search and reverse geocoding run through our API, which
+   proxies an OpenStreetMap geocoder (Photon), so the web never calls it directly.
+3. **Neighbourhood** is filled from the pin by reverse geocoding and stays editable (Q3).
+4. **Opening hours:** a row per weekday, each with one or more spans and «+», plus «copy Monday to
+   the weekdays» (Q4).
+5. **«Δημόσια σελίδα»** is its own admin page, edited **step by step** (κείμενο, φωτογραφίες, τι
+   διδάσκει, για ποιους) the first time (Q5); afterwards each step is reachable on its own.
+6. **Photos:** a separate **cover** slot on top, then the gallery; any gallery photo can be made the
+   cover (Q6). Needs a `cover_photo_id` on the profile.
+7. **Tags (disciplines, audiences, languages):** tap-to-pick (Q7), but a plain wall of chips is too
+   cluttered. The canonical lists must be **exhaustive** and researched against comparable
+   platforms, and the picker follows current best practice for clear screens. Members see **only
+   the tags the owner picked**, never the whole list. Picker design goes back to Apostolos as a
+   mockup before it is built.
+8. **Publishing:** the owner edits a **draft** and presses «Δημοσίευση»; a checklist shows what is
+   missing and «Μη δημοσιευμένες αλλαγές» shows after edits (Q8). Needs a published snapshot kept
+   apart from the draft.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
