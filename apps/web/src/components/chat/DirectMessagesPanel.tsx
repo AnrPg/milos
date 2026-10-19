@@ -8,6 +8,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 
 import {
   createDirectThread,
@@ -173,7 +174,9 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   const visibleThreads = threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id));
 
-  return (
+  // Portalled to the body: inside the header's stacking context the member
+  // tab bar would cover the composer.
+  return createPortal(
     <div
       className="fixed inset-0 z-[70]"
       style={{ background: "rgba(0,0,0,0.55)" }}
@@ -386,6 +389,7 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
         </>
       )}
       </aside>
-    </div>
+    </div>,
+    document.body,
   );
 }
