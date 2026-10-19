@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Your followers see which classes you go to.",
     "bookingSharingOff": "Your bookings are private.",
     "bookingSharingTurnOn": "Show my bookings",
-    "bookingSharingTurnOff": "Keep them private"
+    "bookingSharingTurnOff": "Keep them private",
+    "searchPeople": "Search people",
+    "searchBoxes": "Search boxes",
+    "searchClubs": "Search clubs",
+    "searchNoMatch": "Nothing matches that search."
   },
   "BoxPage": {
     "allWeek": "Whole week",
@@ -5638,6 +5642,7 @@
       "schedule": "Schedule",
       "events": "Events",
       "posts": "Public"
-    }
+    },
+    "openInMaps": "Open in Maps"
   }
 }

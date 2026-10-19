@@ -411,17 +411,22 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
 
 ### Public box page detail, profiles and the «Φίλοι» chip (2026-10-19, [board 5](https://claude.ai/artifact/WaBjAhn2a3fHqa8iTqNL4n))
 
-Built on board 5's recommendations; Apostolos has not answered it yet, so any answer that differs
-reopens the screen it names.
+Apostolos picked every recommended option and every extra on 2026-10-19.
 
-1. **Desktop box page:** content on the left, a sticky side card on the right with the logo, name,
-   the follow and trial buttons and the opening hours.
+1. **Desktop box page:** a full-width cover, then the logo and name; content capped at 1200 px,
+   on the left, and a sticky side card on the right with the follow and trial buttons, the map,
+   the address and the week's hours. The map opens the location in Google Maps (Apple Maps on
+   Apple devices) in a new tab. Photos open in a centred lightbox with arrows and thumbnails.
 2. **Logged-out tabs:** Πρόγραμμα, Events and Δημόσια show a faded preview under an inline card
    «Σύνδεση» / «Δημιουργία λογαριασμού», which returns to the same tab afterwards.
-3. **A person's profile:** header (photo, name, counts, follow button) with tabs like the vision's
-   Εγώ; followers-only posts stay hidden until the request is accepted.
+3. **A person's profile:** header (photo, name, counts, full-width follow button) with tabs
+   Αναρτήσεις · PRs · Clubs like the vision's Εγώ; followers-only posts stay hidden until the request
+   is accepted. Someone who follows you shows «Σε ακολουθεί» under the name, and the button reads
+   «Ακολούθησε κι εσύ».
 4. **Connections:** one screen with tabs across the top (followers, following, boxes, clubs, PRs);
-   pending requests sit at the top of Followers.
+   each list has a search (case and accents ignored), and pending requests sit at the top of
+   Followers. PRs shows «Μοιράζονται μαζί σου» and «Μοιράζεσαι με», with «Διαχείριση» opening
+   Κοινοποίηση.
 5. **Profile post in the feed:** the audience («Ακόλουθοι» or «Δημόσια») takes the top line that a
    club post uses for «Club › #channel».
 6. **Booking sharing («Φίλοι»):** off until you turn it on. Milos offers it once, after your first

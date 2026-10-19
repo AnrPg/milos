@@ -11572,6 +11572,8 @@ export interface operations {
         parameters: {
             query?: {
                 cursor?: string;
+                /** @description Keep only names containing this (case and accents ignored) */
+                q?: string;
             };
             header?: never;
             path?: never;
@@ -11643,6 +11645,8 @@ export interface operations {
         parameters: {
             query?: {
                 cursor?: string;
+                /** @description Keep only names containing this (case and accents ignored) */
+                q?: string;
                 type?: "user" | "organization";
             };
             header?: never;

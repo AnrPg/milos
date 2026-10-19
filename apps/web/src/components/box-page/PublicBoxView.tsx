@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useSyncExternalStore } from "react";
@@ -18,6 +19,11 @@ import { LockedTab } from "./LockedTab";
 import { PhotoViewer } from "./PhotoViewer";
 import { VisitorSchedule } from "./VisitorSchedule";
 
+const PlacesMap = dynamic(() => import("@/components/member-app/box/schedule/PlacesMap"), {
+  ssr: false,
+  loading: () => <div className="h-full w-full animate-pulse" style={{ background: "var(--panel-raised)" }} />,
+});
+
 const TABS = ["about", "schedule", "events", "posts"] as const;
 type Tab = (typeof TABS)[number];
 
@@ -30,11 +36,24 @@ function subscribeHash(onChange: () => void) {
 const readHash = () => window.location.hash.slice(1);
 const serverHash = () => "";
 
+// Apple devices open the map in Apple Maps, everyone else in Google Maps.
+const noSubscribe = () => () => undefined;
+const readApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
+const serverApple = () => false;
+
+function mapsUrl(location: { latitude: number; longitude: number }, name: string, apple: boolean) {
+  const at = `${location.latitude},${location.longitude}`;
+  return apple
+    ? `https://maps.apple.com/?ll=${at}&q=${encodeURIComponent(name)}`
+    : `https://www.google.com/maps/search/?api=1&query=${at}`;
+}
+
 /**
  * The public box page (ADR-142; plan §5a board 4, board 5 Q1–Q2). Phones:
  * cover, logo and name, sticky tabs, and a fixed bottom bar with the actions.
- * Desktop: the content on the left and a sticky card with the actions,
- * today's hours and the address on the right.
+ * Desktop (board 5 Q1): a full-width cover, content capped at 1200 px, and a
+ * sticky card on the right with the actions, the map, the address and the
+ * week's hours; the map opens in Google or Apple Maps.
  */
 export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   const t = useTranslations("BoxPage");
@@ -55,6 +74,8 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   const line = place?.neighbourhood ?? place?.city ?? null;
   const brand = page.box.primary_color ?? "var(--primary)";
   const firstHours = page.locations.find((location) => (location.opening_hours ?? []).length > 0);
+  const apple = useSyncExternalStore(noSubscribe, readApple, serverApple);
+  const pinned = page.locations.find((location) => location.latitude != null && location.longitude != null);
 
   function select(next: Tab) {
     window.history.replaceState(null, "", next === "about" ? window.location.pathname : `#${next}`);
@@ -93,10 +114,10 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   const roundButtonClass = "grid h-10 w-10 place-items-center rounded-full";
 
   return (
-    <div className="mx-auto w-full max-w-6xl lg:px-6 lg:pt-6">
+    <div className="w-full">
       <header className="relative">
         <div
-          className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-80 lg:rounded-3xl"
+          className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-96"
           style={{ background: `linear-gradient(135deg, ${brand}, color-mix(in srgb, ${brand} 35%, var(--bg)))` }}
         >
           {page.profile.cover ? (
@@ -105,7 +126,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
               <img src={page.profile.cover.url} alt="" className="h-full w-full object-cover" />
             </button>
           ) : null}
-          <div className="absolute inset-x-0 top-0 flex justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))]">
+          <div className="absolute inset-x-0 top-0 mx-auto flex max-w-[75rem] justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:px-6 lg:pt-6">
             <button type="button" onClick={back} aria-label={t("back")} className={`${roundButtonClass} rtl:rotate-180`} style={{ background: "rgba(0,0,0,0.45)", color: "#fff" }}>
               <Icon name="chevron-left" />
             </button>
@@ -122,14 +143,16 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
           </div>
         </div>
         <span role="status" className="sr-only">{copied ? t("linkCopied") : ""}</span>
-        <div className="flex flex-col gap-1 px-4 lg:hidden">
-          <Logo page={page} className="-mt-10" />
-          <h1 className="mt-2 text-2xl font-extrabold" style={{ color: "var(--text)" }}>{page.box.name}</h1>
-          {line ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{line}</p> : null}
+        <div className="mx-auto flex max-w-[75rem] flex-col gap-1 px-4 lg:flex-row lg:items-end lg:gap-5 lg:px-6">
+          <Logo page={page} className="-mt-10 lg:-mt-14" size={80} />
+          <div className="min-w-0 lg:pb-1">
+            <h1 className="mt-2 text-2xl font-extrabold lg:text-3xl" style={{ color: "var(--text)" }}>{page.box.name}</h1>
+            {line ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{line}</p> : null}
+          </div>
         </div>
       </header>
 
-      <div className="lg:mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10">
+      <div className="mx-auto max-w-[75rem] lg:mt-8 lg:grid lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-10 lg:px-6">
         <main className="min-w-0">
           <div
             ref={tabsRef}
@@ -172,24 +195,42 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
 
         <aside className="hidden lg:sticky lg:top-6 lg:block">
           <div className="flex flex-col gap-4 rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="flex items-center gap-3">
-              <Logo page={page} size={56} />
-              <div className="min-w-0">
-                <h1 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{page.box.name}</h1>
-                {line ? <p className="text-sm" style={{ color: "var(--text-soft)" }}>{line}</p> : null}
-              </div>
-            </div>
             {actions}
-            {firstHours ? (
-              <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
-                <OpeningHours spans={(firstHours.opening_hours ?? []) as { weekday: number; opens: string; closes: string }[]} />
-              </div>
+            {pinned ? (
+              <a
+                href={mapsUrl({ latitude: pinned.latitude!, longitude: pinned.longitude! }, page.box.name, apple)}
+                target="_blank"
+                rel="noreferrer"
+                aria-label={t("openInMaps")}
+                className="relative block h-40 overflow-hidden rounded-2xl"
+                style={{ border: "1px solid var(--border)" }}
+              >
+                <span aria-hidden="true" className="pointer-events-none block h-full w-full">
+                  <PlacesMap
+                    places={[{ id: pinned.id, name: page.box.name, latitude: pinned.latitude!, longitude: pinned.longitude!, selected: true }]}
+                    ariaLabel={t("mapAria")}
+                    onBoundsChange={() => undefined}
+                    onSelect={() => undefined}
+                  />
+                </span>
+                <span
+                  className="absolute start-2 top-2 rounded-full px-3 py-1 text-xs font-bold"
+                  style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }}
+                >
+                  {t("openInMaps")}
+                </span>
+              </a>
             ) : null}
             {page.locations[0]?.address ? (
               <button type="button" onClick={() => select("about")} className="flex items-start gap-3 text-start text-sm" style={{ color: "var(--text-soft)" }}>
                 <Icon name="map-pin" />
                 <span>{[page.locations[0].address, page.locations[0].neighbourhood].filter(Boolean).join(", ")}</span>
               </button>
+            ) : null}
+            {firstHours ? (
+              <div className="pt-4" style={{ borderTop: "1px solid var(--border)" }}>
+                <OpeningHours spans={(firstHours.opening_hours ?? []) as { weekday: number; opens: string; closes: string }[]} />
+              </div>
             ) : null}
           </div>
         </aside>

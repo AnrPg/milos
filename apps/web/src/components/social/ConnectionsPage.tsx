@@ -24,6 +24,7 @@ import { FollowButton } from "@/components/social/FollowButton";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useSocialSummary } from "@/components/social/use-social";
+import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
 
 const TABS = ["followers", "following", "boxes", "clubs", "prs"] as const;
@@ -101,13 +102,45 @@ function usePaged(key: readonly unknown[], fetch: (token: string, cursor: string
   });
 }
 
-function List({ query, empty, render }: { query: ReturnType<typeof usePaged>; empty: string; render: (entry: FollowEntry) => React.ReactNode }) {
+/** Board 5 Q4: every list in Συνδέσεις has a search; the API matches names. */
+function useSearch() {
+  const [text, setText] = useState("");
+  const term = useDebounced(text.trim(), 250);
+  return { text, setText, term };
+}
+
+function SearchField({ search, label }: { search: ReturnType<typeof useSearch>; label: string }) {
+  return (
+    <input
+      type="search"
+      value={search.text}
+      onChange={(event) => search.setText(event.target.value)}
+      placeholder={label}
+      aria-label={label}
+      maxLength={80}
+      className="min-h-11 w-full rounded-2xl px-4 text-sm outline-none"
+      style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+    />
+  );
+}
+
+function List({
+  query,
+  empty,
+  searching,
+  render,
+}: {
+  query: ReturnType<typeof usePaged>;
+  empty: string;
+  searching: boolean;
+  render: (entry: FollowEntry) => React.ReactNode;
+}) {
   const t = useTranslations("Social");
   const entries = query.data?.pages.flatMap((page) => page.entries) ?? [];
   return (
     <>
       {query.isPending ? <p style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
-      {query.isSuccess && entries.length === 0 ? <Empty text={empty} /> : null}
+      {query.isSuccess && entries.length === 0 ? <Empty text={searching ? t("searchNoMatch") : empty} /> : null}
       <ul className="flex flex-col gap-2">{entries.map(render)}</ul>
       {query.hasNextPage ? (
         <button
@@ -125,14 +158,17 @@ function List({ query, empty, render }: { query: ReturnType<typeof usePaged>; em
 
 function Followers() {
   const t = useTranslations("Social");
-  const query = usePaged([...SOCIAL_KEY, "followers"], fetchFollowers);
+  const search = useSearch();
+  const query = usePaged([...SOCIAL_KEY, "followers", search.term], (token, cursor) => fetchFollowers(token, cursor, search.term));
   return (
     <>
       <FollowRequestsRow />
       <BookingSharingOffer />
+      <SearchField search={search} label={t("searchPeople")} />
       <List
         query={query}
         empty={t("followersEmpty")}
+        searching={search.term !== ""}
         render={(entry) =>
           entry.person ? (
             <PersonRow key={entry.follow_id} entry={entry}>
@@ -148,23 +184,30 @@ function Followers() {
 
 function People({ type }: { type: "user" | "organization" }) {
   const t = useTranslations("Social");
-  const query = usePaged([...SOCIAL_KEY, "following", type], (token, cursor) => fetchFollowing(token, type, cursor));
+  const search = useSearch();
+  const query = usePaged([...SOCIAL_KEY, "following", type, search.term], (token, cursor) =>
+    fetchFollowing(token, type, cursor, search.term),
+  );
   return (
-    <List
-      query={query}
-      empty={type === "user" ? t("followingEmpty") : t("boxesEmpty")}
-      render={(entry) =>
-        entry.person ? (
-          <PersonRow key={entry.follow_id} entry={entry}>
-            <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.status} />
-          </PersonRow>
-        ) : entry.box ? (
-          <Row key={entry.follow_id} href={`/b/${entry.box.slug}`} name={entry.box.name} image={entry.box.logo_url}>
-            <FollowButton targetType="organization" targetId={entry.box.organization_id} initialStatus={entry.status} />
-          </Row>
-        ) : null
-      }
-    />
+    <>
+      <SearchField search={search} label={type === "user" ? t("searchPeople") : t("searchBoxes")} />
+      <List
+        query={query}
+        empty={type === "user" ? t("followingEmpty") : t("boxesEmpty")}
+        searching={search.term !== ""}
+        render={(entry) =>
+          entry.person ? (
+            <PersonRow key={entry.follow_id} entry={entry}>
+              <FollowButton targetType="user" targetId={entry.person.id} initialStatus={entry.status} />
+            </PersonRow>
+          ) : entry.box ? (
+            <Row key={entry.follow_id} href={`/b/${entry.box.slug}`} name={entry.box.name} image={entry.box.logo_url}>
+              <FollowButton targetType="organization" targetId={entry.box.organization_id} initialStatus={entry.status} />
+            </Row>
+          ) : null
+        }
+      />
+    </>
   );
 }
 
@@ -226,15 +269,28 @@ function RemoveFollower({ followId }: { followId: string }) {
 function Clubs() {
   const t = useTranslations("Social");
   const clubs = useMyClubs();
+  const search = useSearch();
   if (clubs.isPending) return <p style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if ((clubs.data ?? []).length === 0) return <Empty text={t("clubsEmpty")} />;
+  // The member's own clubs are few and already loaded, so they filter here.
+  const term = foldName(search.term);
+  const shown = (clubs.data ?? []).filter((club) => foldName(club.name).includes(term));
   return (
-    <ul className="flex flex-col gap-2">
-      {(clubs.data ?? []).map((club) => (
-        <Row key={club.id} href={`/clubs/${club.id}`} name={club.name} image={club.logo_url ?? undefined} />
-      ))}
-    </ul>
+    <>
+      <SearchField search={search} label={t("searchClubs")} />
+      {shown.length === 0 ? <Empty text={t("searchNoMatch")} /> : null}
+      <ul className="flex flex-col gap-2">
+        {shown.map((club) => (
+          <Row key={club.id} href={`/clubs/${club.id}`} name={club.name} image={club.logo_url ?? undefined} />
+        ))}
+      </ul>
+    </>
   );
+}
+
+/** Case- and accent-insensitive, as the API matches names. */
+function foldName(text: string) {
+  return text.normalize("NFD").replace(/\p{Mn}/gu, "").toLowerCase();
 }
 
 function PrSharing() {

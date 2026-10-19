@@ -17,6 +17,13 @@ defmodule MilosTrainingWeb.FollowController do
 
   @id %Parameter{name: :id, in: :path, required: true, schema: S.uuid()}
   @cursor %Parameter{name: :cursor, in: :query, required: false, schema: %Schema{type: :string}}
+  @search %Parameter{
+    name: :q,
+    in: :query,
+    required: false,
+    description: "Keep only names containing this (case and accents ignored)",
+    schema: %Schema{type: :string, maxLength: 80}
+  }
   @target [
     %Parameter{
       name: :target_type,
@@ -97,7 +104,7 @@ defmodule MilosTrainingWeb.FollowController do
 
   operation(:followers,
     summary: "People who follow you",
-    parameters: [@cursor],
+    parameters: [@cursor, @search],
     responses: [ok: {"Followers", "application/json", S.people_page()}]
   )
 
@@ -109,6 +116,7 @@ defmodule MilosTrainingWeb.FollowController do
     summary: "People (type user) or boxes (type organization) you follow",
     parameters: [
       @cursor,
+      @search,
       %Parameter{
         name: :type,
         in: :query,

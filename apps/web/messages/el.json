@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Οι ακόλουθοί σου βλέπουν σε ποια μαθήματα πας.",
     "bookingSharingOff": "Οι κρατήσεις σου είναι ιδιωτικές.",
     "bookingSharingTurnOn": "Δείξε τις κρατήσεις μου",
-    "bookingSharingTurnOff": "Κράτα τις ιδιωτικές"
+    "bookingSharingTurnOff": "Κράτα τις ιδιωτικές",
+    "searchPeople": "Αναζήτηση ατόμων",
+    "searchBoxes": "Αναζήτηση box",
+    "searchClubs": "Αναζήτηση clubs",
+    "searchNoMatch": "Κανένα αποτέλεσμα για αυτή την αναζήτηση."
   },
   "BoxPage": {
     "allWeek": "Όλη η εβδομάδα",
@@ -5638,6 +5642,7 @@
       "schedule": "Πρόγραμμα",
       "events": "Events",
       "posts": "Δημόσια"
-    }
+    },
+    "openInMaps": "Άνοιγμα στους Χάρτες"
   }
 }

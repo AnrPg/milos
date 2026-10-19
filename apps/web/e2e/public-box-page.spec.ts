@@ -38,8 +38,8 @@ const publicBox = {
       neighbourhood: "Kypseli",
       city: "Athens",
       country_code: "GR",
-      latitude: null,
-      longitude: null,
+      latitude: 38.0035,
+      longitude: 23.7369,
       accessibility: [],
       opening_hours: [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({ weekday, opens: "07:00", closes: "22:00" })),
     },
@@ -167,6 +167,13 @@ test.describe("public box page", () => {
     await expect(page.getByText("Ελληνικά · English")).toBeVisible();
     await expect(page.getByText("Stelios")).toBeVisible();
     await expect(page.getByRole("button", { name: "2 more disciplines" })).toBeVisible();
+    if ((page.viewportSize()?.width ?? 0) >= 1024) {
+      // Desktop (board 5 Q1): the side card's map opens the location in Maps.
+      await expect(page.getByRole("link", { name: "Open in Maps" })).toHaveAttribute(
+        "href",
+        "https://www.google.com/maps/search/?api=1&query=38.0035,23.7369",
+      );
+    }
 
     await page.getByRole("tab", { name: "Schedule" }).click();
     await expect(page).toHaveURL(/#schedule$/);

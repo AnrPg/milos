@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Je volgers zien naar welke lessen je gaat.",
     "bookingSharingOff": "Je boekingen zijn privé.",
     "bookingSharingTurnOn": "Mijn boekingen tonen",
-    "bookingSharingTurnOff": "Privé houden"
+    "bookingSharingTurnOff": "Privé houden",
+    "searchPeople": "Personen zoeken",
+    "searchBoxes": "Boxen zoeken",
+    "searchClubs": "Clubs zoeken",
+    "searchNoMatch": "Geen resultaten voor deze zoekopdracht."
   },
   "BoxPage": {
     "allWeek": "Hele week",
@@ -5638,6 +5642,7 @@
       "schedule": "Rooster",
       "events": "Events",
       "posts": "Openbaar"
-    }
+    },
+    "openInMaps": "Openen in Kaarten"
   }
 }

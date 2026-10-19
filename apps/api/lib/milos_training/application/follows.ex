@@ -52,20 +52,24 @@ defmodule MilosTraining.Application.Follows do
     with {:ok, _follow} <- Community.remove_incoming_follow(context, follow_id), do: :ok
   end
 
+  @doc "The member's followers; `q` keeps those whose name contains it."
   def followers(%{user_id: user_id} = context, params) do
-    page(params, fn page ->
+    page(params, :user_id, &people_names/1, fn page ->
       Community.list_incoming_follows(context, "user", user_id, "active", page)
     end)
     |> present_people(:user_id, context)
   end
 
-  @doc "What the member follows: `type` `user` (people) or `organization` (boxes)."
+  @doc """
+  What the member follows: `type` `user` (people) or `organization` (boxes);
+  `q` keeps those whose name contains it.
+  """
   def following(%{user_id: user_id} = context, params) do
     type = params[:type] || params["type"] || "user"
 
     with true <- type in ~w(user organization) || {:error, :invalid_follow_target} do
       result =
-        page(params, fn page ->
+        page(params, :target_id, names_for(type), fn page ->
           Community.list_outgoing_follows(context, user_id, [type], ~w(requested active), page)
         end)
 
@@ -93,14 +97,55 @@ defmodule MilosTraining.Application.Follows do
   # Open clubs are followable from P2-M4.
   defp target(_type, _id), do: nil
 
-  defp page(params, fetch) do
+  defp page(params, fetch), do: page(params, nil, nil, fetch)
+
+  defp page(params, key, names, fetch) do
     with {:ok, before} <- Community.decode_feed_cursor(params[:cursor] || params["cursor"]) do
-      rows = fetch.(%{before: before, limit: @page + 1})
+      among = among(search(params), key, names, fetch)
+      rows = fetch.(Map.merge(%{before: before, limit: @page + 1}, among))
       {page, rest} = Enum.split(rows, @page)
 
       {:ok, page,
        if(rest != [] and page != [], do: Community.encode_feed_cursor(List.last(page)))}
     end
+  end
+
+  # Board 5 Q4: each connections list has a search. Names live in Identity
+  # and Organizations, so the member's own follows are matched here and the
+  # page is then read among the matches.
+  defp among(nil, _key, _names, _fetch), do: %{}
+
+  defp among(query, key, names, fetch) do
+    ids = fetch.(%{limit: :all}) |> Enum.map(&Map.fetch!(&1, key))
+    folded = fold(query)
+
+    matches =
+      for {id, name} <- names.(ids), name && String.contains?(fold(name), folded), do: id
+
+    %{among: matches}
+  end
+
+  defp search(params) do
+    case String.trim(params[:q] || params["q"] || "") do
+      "" -> nil
+      query -> query
+    end
+  end
+
+  defp names_for("user"), do: &people_names/1
+  defp names_for("organization"), do: &box_names/1
+
+  defp people_names(ids), do: Enum.map(Identity.list_by_ids(ids), &{&1.id, &1.nickname})
+
+  defp box_names(ids),
+    do: Enum.map(Organizations.public_boxes(ids), &{&1.organization_id, &1.name})
+
+  # Case- and accent-insensitive, so «μαρια» finds «Μαρία».
+  defp fold(text) do
+    text
+    |> String.downcase()
+    |> :unicode.characters_to_nfd_binary()
+    |> String.replace(~r/\p{Mn}/u, "")
   end
 
   defp present_people({:ok, follows, cursor}, key, %{user_id: viewer_id} = context) do

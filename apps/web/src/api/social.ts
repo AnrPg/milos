@@ -71,16 +71,17 @@ export function declineFollowRequest(token: string, followId: string) {
   return apiRequest<void>(`/me/follow-requests/${followId}`, { method: "DELETE", token });
 }
 
-export function fetchFollowers(token: string, cursor: string | null = null) {
-  return apiRequest<FollowPage>(paged("/me/followers", cursor), { token });
+/** `q` keeps names containing it, ignoring case and accents (board 5 Q4). */
+export function fetchFollowers(token: string, cursor: string | null = null, q = "") {
+  return apiRequest<FollowPage>(paged("/me/followers", cursor, q ? { q } : {}), { token });
 }
 
 export function removeFollower(token: string, followId: string) {
   return apiRequest<void>(`/me/followers/${followId}`, { method: "DELETE", token });
 }
 
-export function fetchFollowing(token: string, type: "user" | "organization", cursor: string | null = null) {
-  return apiRequest<FollowPage>(paged("/me/following", cursor, { type }), { token });
+export function fetchFollowing(token: string, type: "user" | "organization", cursor: string | null = null, q = "") {
+  return apiRequest<FollowPage>(paged("/me/following", cursor, q ? { type, q } : { type }), { token });
 }
 
 export function fetchPerson(token: string, id: string) {

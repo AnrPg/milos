@@ -16807,6 +16807,16 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -16995,6 +17005,16 @@
             "name": "cursor",
             "required": false,
             "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
               "type": "string"
             }
           },

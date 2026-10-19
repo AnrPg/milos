@@ -81,6 +81,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   def list_incoming(_context, type, target_id, status, page) do
     Follow
     |> where([f], f.target_type == ^type and f.target_id == ^target_id and f.status == ^status)
+    |> among(:user_id, Map.get(page, :among))
     |> page(page)
     |> Repo.all()
     |> Enum.map(&normalize_follow/1)
@@ -90,6 +91,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   def list_outgoing(_context, follower_id, types, statuses, page) do
     Follow
     |> where([f], f.user_id == ^follower_id and f.target_type in ^types and f.status in ^statuses)
+    |> among(:target_id, Map.get(page, :among))
     |> page(page)
     |> Repo.all()
     |> Enum.map(&normalize_follow/1)
@@ -303,8 +305,15 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
     query
     |> before(Map.get(page, :before))
     |> order_by([f], desc: f.inserted_at, desc: f.id)
-    |> limit(^Map.get(page, :limit, 50))
+    |> page_limit(Map.get(page, :limit, 50))
   end
+
+  defp page_limit(query, :all), do: query
+  defp page_limit(query, limit), do: limit(query, ^limit)
+
+  # Only the follows whose other side is one of `ids` (a name search).
+  defp among(query, _field, nil), do: query
+  defp among(query, field, ids), do: where(query, [f], field(f, ^field) in ^ids)
 
   defp before(query, nil), do: query
 

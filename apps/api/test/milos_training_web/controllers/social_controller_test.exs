@@ -303,6 +303,49 @@ defmodule MilosTraining.Web.SocialControllerTest do
                as.(author) |> get("/api/me/social") |> json_response(200)
     end
 
+    test "connections search by name, ignoring case and accents (board 5 Q4)", ctx do
+      %{as: as, member: me} = ctx
+      n = System.unique_integer([:positive])
+      maria = user_fixture(%{nickname: "Μαρία#{n}"})
+      kostas = user_fixture(%{nickname: "Kostas#{n}"})
+
+      for user <- [maria, kostas] do
+        assert %{"status" => "requested"} =
+                 as.(user)
+                 |> send_json(:post, "/api/me/follows", %{target_type: "user", target_id: me.id})
+                 |> json_response(200)
+      end
+
+      assert %{"entries" => requests} =
+               as.(me) |> get("/api/me/follow-requests") |> json_response(200)
+
+      for %{"follow_id" => id} <- requests,
+          do: assert(as.(me) |> post("/api/me/follow-requests/#{id}/accept") |> response(204))
+
+      names = fn path ->
+        as.(me)
+        |> get(path)
+        |> json_response(200)
+        |> Map.fetch!("entries")
+        |> Enum.map(& &1["person"]["nickname"])
+      end
+
+      assert Enum.sort(names.("/api/me/followers")) ==
+               Enum.sort([maria.nickname, kostas.nickname])
+
+      assert names.("/api/me/followers?q=μαρια") == [maria.nickname]
+      assert names.("/api/me/followers?q=KOST") == [kostas.nickname]
+      assert names.("/api/me/followers?q=nobody") == []
+
+      assert %{"status" => "requested"} =
+               as.(me)
+               |> send_json(:post, "/api/me/follows", %{target_type: "user", target_id: kostas.id})
+               |> json_response(200)
+
+      assert names.("/api/me/following?type=user&q=kostas") == [kostas.nickname]
+      assert names.("/api/me/following?type=user&q=μαρ") == []
+    end
+
     test "comments and kudos on a profile post follow its audience", ctx do
       %{as: as, member: author, stranger: stranger} = ctx
 

@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "העוקבים שלך רואים לאילו שיעורים אתה הולך.",
     "bookingSharingOff": "ההזמנות שלך פרטיות.",
     "bookingSharingTurnOn": "הצג את ההזמנות שלי",
-    "bookingSharingTurnOff": "השאר פרטיות"
+    "bookingSharingTurnOff": "השאר פרטיות",
+    "searchPeople": "חיפוש אנשים",
+    "searchBoxes": "חיפוש מכונים",
+    "searchClubs": "חיפוש מועדונים",
+    "searchNoMatch": "אין תוצאות לחיפוש הזה."
   },
   "BoxPage": {
     "allWeek": "כל השבוע",
@@ -5638,6 +5642,7 @@
       "schedule": "לו״ז",
       "events": "אירועים",
       "posts": "ציבורי"
-    }
+    },
+    "openInMaps": "פתיחה במפות"
   }
 }

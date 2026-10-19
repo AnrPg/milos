@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "يرى متابعوك الحصص التي تذهب إليها.",
     "bookingSharingOff": "حجوزاتك خاصة.",
     "bookingSharingTurnOn": "أظهر حجوزاتي",
-    "bookingSharingTurnOff": "أبقِها خاصة"
+    "bookingSharingTurnOff": "أبقِها خاصة",
+    "searchPeople": "ابحث عن أشخاص",
+    "searchBoxes": "ابحث عن صالات",
+    "searchClubs": "ابحث عن نوادٍ",
+    "searchNoMatch": "لا توجد نتائج لهذا البحث."
   },
   "BoxPage": {
     "allWeek": "الأسبوع كاملًا",
@@ -5638,6 +5642,7 @@
       "schedule": "الجدول",
       "events": "الفعاليات",
       "posts": "عام"
-    }
+    },
+    "openInMaps": "افتح في الخرائط"
   }
 }

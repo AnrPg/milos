@@ -58,9 +58,14 @@ async function stub(page: Page) {
     state.followers = 1;
     return route.fulfill({ status: 204, body: "" });
   });
-  await page.route("**/api/me/followers**", (route) =>
-    route.fulfill(json({ entries: [{ follow_id: "follow-1", status: "active", since, person: { ...nikos, my_status: "none" } }], next_cursor: null })),
-  );
+  await page.route("**/api/me/followers**", (route) => {
+    // The API matches names (board 5 Q4); this stub knows only Nikos.
+    const q = new URL(route.request().url()).searchParams.get("q") ?? "";
+    const entries = "nikos".includes(q.toLowerCase())
+      ? [{ follow_id: "follow-1", status: "active", since, person: { ...nikos, my_status: "none" } }]
+      : [];
+    return route.fulfill(json({ entries, next_cursor: null }));
+  });
   await page.route("**/api/me/following**", (route) =>
     route.fulfill(json({ entries: [{ follow_id: "follow-2", status: "active", since, person: { id: "person-3", nickname: "Eleni", avatar_url: null, my_status: "active" } }], next_cursor: null })),
   );
@@ -96,6 +101,10 @@ test.describe("social", () => {
     await page.goto("/me/connections");
     await expect(page.getByRole("tab", { name: "1 follower" })).toHaveAttribute("aria-selected", "true");
     await expect(page.getByRole("link", { name: /Nikos/ })).toHaveAttribute("href", "/people/person-2");
+    await page.getByRole("searchbox", { name: "Search people" }).fill("maria");
+    await expect(page.getByText("Nothing matches that search.")).toBeVisible();
+    await page.getByRole("searchbox", { name: "Search people" }).fill("NIK");
+    await expect(page.getByRole("link", { name: /Nikos/ })).toBeVisible();
     await page.getByRole("tab", { name: "Following 2" }).click();
     await expect(page).toHaveURL(/tab=following/);
     await expect(page.getByRole("link", { name: /Eleni/ })).toBeVisible();

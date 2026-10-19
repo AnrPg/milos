@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Последователите ти виждат на кои класове ходиш.",
     "bookingSharingOff": "Записванията ти са лични.",
     "bookingSharingTurnOn": "Покажи записванията ми",
-    "bookingSharingTurnOff": "Запази ги лични"
+    "bookingSharingTurnOff": "Запази ги лични",
+    "searchPeople": "Търсене на хора",
+    "searchBoxes": "Търсене на зали",
+    "searchClubs": "Търсене на клубове",
+    "searchNoMatch": "Няма резултати за това търсене."
   },
   "BoxPage": {
     "allWeek": "Цялата седмица",
@@ -5638,6 +5642,7 @@
       "schedule": "График",
       "events": "Събития",
       "posts": "Публични"
-    }
+    },
+    "openInMaps": "Отвори в Карти"
   }
 }

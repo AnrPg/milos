@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Подписчики видят, на какие занятия вы ходите.",
     "bookingSharingOff": "Ваши записи скрыты.",
     "bookingSharingTurnOn": "Показывать мои записи",
-    "bookingSharingTurnOff": "Оставить скрытыми"
+    "bookingSharingTurnOff": "Оставить скрытыми",
+    "searchPeople": "Поиск людей",
+    "searchBoxes": "Поиск залов",
+    "searchClubs": "Поиск клубов",
+    "searchNoMatch": "По этому запросу ничего не найдено."
   },
   "BoxPage": {
     "allWeek": "Вся неделя",
@@ -5638,6 +5642,7 @@
       "schedule": "Расписание",
       "events": "События",
       "posts": "Публичное"
-    }
+    },
+    "openInMaps": "Открыть в Картах"
   }
 }

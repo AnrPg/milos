@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useId, useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -21,6 +21,7 @@ import {
 import { OpeningHoursEditor } from "@/components/admin/location/OpeningHoursEditor";
 import type { Pin } from "@/components/admin/location/LocationPinMap";
 import { useSession } from "@/components/session-provider";
+import { useDebounced } from "@/hooks/useDebounced";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
@@ -52,15 +53,6 @@ function toForm(location: FacilityLocation): Form {
         : null,
     opening_hours: location.opening_hours ?? [],
   };
-}
-
-function useDebounced<T>(value: T, delay: number) {
-  const [debounced, setDebounced] = useState(value);
-  useEffect(() => {
-    const timer = window.setTimeout(() => setDebounced(value), delay);
-    return () => window.clearTimeout(timer);
-  }, [value, delay]);
-  return debounced;
 }
 
 /**

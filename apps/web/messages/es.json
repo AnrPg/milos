@@ -5585,7 +5585,11 @@
     "bookingSharingOn": "Tus seguidores ven a qué clases vas.",
     "bookingSharingOff": "Tus reservas son privadas.",
     "bookingSharingTurnOn": "Mostrar mis reservas",
-    "bookingSharingTurnOff": "Mantenerlas privadas"
+    "bookingSharingTurnOff": "Mantenerlas privadas",
+    "searchPeople": "Buscar personas",
+    "searchBoxes": "Buscar boxes",
+    "searchClubs": "Buscar clubs",
+    "searchNoMatch": "No hay resultados para esta búsqueda."
   },
   "BoxPage": {
     "allWeek": "Toda la semana",
@@ -5638,6 +5642,7 @@
       "schedule": "Horario",
       "events": "Eventos",
       "posts": "Público"
-    }
+    },
+    "openInMaps": "Abrir en Mapas"
   }
 }

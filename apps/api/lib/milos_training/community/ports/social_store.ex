@@ -9,7 +9,8 @@ defmodule MilosTraining.Community.Ports.SocialStore do
   @type id :: binary()
   @type page :: %{
           optional(:before) => {DateTime.t(), id()} | nil,
-          optional(:limit) => pos_integer()
+          optional(:limit) => pos_integer() | :all,
+          optional(:among) => [id()]
         }
 
   # Follows.
