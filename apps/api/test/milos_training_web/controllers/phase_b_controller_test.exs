@@ -137,6 +137,29 @@ defmodule MilosTrainingWeb.PhaseBControllerTest do
              |> get("#{base}/admin/geocode/reverse?latitude=10&longitude=10")
              |> json_response(200)
 
+    long = "https://www.google.com/maps/place/Box/@37.99,23.70,15z/data=!3d38.0012!4d23.7351"
+
+    assert %{"place" => %{"latitude" => 38.0012, "neighbourhood" => "Κυψέλη"}} =
+             admin_conn
+             |> recycle()
+             |> get("#{base}/admin/geocode/link?url=#{URI.encode_www_form(long)}")
+             |> json_response(200)
+
+    assert %{"place" => %{"longitude" => 23.7345526}} =
+             admin_conn
+             |> recycle()
+             |> get(
+               "#{base}/admin/geocode/link?url=#{URI.encode_www_form("https://maps.app.goo.gl/kypseli")}"
+             )
+             |> json_response(200)
+
+    for bad <- ["https://evil.example/@38,23", "https://maps.app.goo.gl/unknown", "not a link"] do
+      admin_conn
+      |> recycle()
+      |> get("#{base}/admin/geocode/link?url=#{URI.encode_www_form(bad)}")
+      |> json_response(422)
+    end
+
     {_user, member_conn} = member(conn)
 
     member_conn

@@ -2152,6 +2152,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/geocode/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The pin and address behind a pasted Google Maps link (ADR-141) */
+        get: operations["MilosTrainingWeb.AdminFacilityController.resolve_map_link"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/geocode/reverse": {
         parameters: {
             query?: never;
@@ -15817,6 +15834,51 @@ export interface operations {
             };
             /** @description Geocoder unavailable */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminFacilityController.resolve_map_link": {
+        parameters: {
+            query: {
+                url: string;
+                language?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Place */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GeocodePlace */
+                        place: {
+                            address: string | null;
+                            city: string | null;
+                            country_code: string | null;
+                            label: string;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not a usable map link */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

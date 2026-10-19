@@ -425,6 +425,7 @@ defmodule MilosTrainingWeb.Router do
 
     get("/geocode", AdminFacilityController, :search_addresses)
     get("/geocode/reverse", AdminFacilityController, :reverse_geocode)
+    get("/geocode/link", AdminFacilityController, :resolve_map_link)
   end
 
   scope "/api/org/:organization_slug/admin", MilosTrainingWeb do

@@ -58,6 +58,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "geocoder_unavailable", error: "Address search is unavailable right now"})
   end
 
+  def call(conn, {:error, reason}) when reason in [:not_a_map_link, :map_link_unresolved] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: Atom.to_string(reason), error: "No map point could be read from this link"})
+  end
+
   def call(conn, {:error, :invalid_timezone}) do
     conn
     |> put_status(:unprocessable_entity)

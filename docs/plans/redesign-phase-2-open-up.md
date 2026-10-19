@@ -336,8 +336,8 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
 1. **Location editor** is **its own page** opened from Ρυθμίσεις › Τοποθεσίες (board 3, Q1). Order,
    top to bottom: name, address, neighbourhood, then the **map at full content width** (never
    squeezed into a side column), then opening hours.
-2. **Pin:** search the address, pick a suggestion, the pin drops; drag to fine-tune (board 3, Q2;
-   unanswered, Claude's pick). Address search and reverse geocoding run through our API, which
+2. **Pin, all three ways** (board 3, Q2): search the address and drag the dropped pin, tap the
+   map, or paste a Google Maps link (short links are expanded server-side, Google hosts only). Address search and reverse geocoding run through our API, which
    proxies an OpenStreetMap geocoder (Photon), so the web never calls it directly.
 3. **Neighbourhood** is filled from the pin by reverse geocoding and stays editable (Q3).
 4. **Opening hours:** a row per weekday, each with one or more spans and «+», plus «copy Monday to
@@ -346,11 +346,27 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
    διδάσκει, για ποιους) the first time (Q5); afterwards each step is reachable on its own.
 6. **Photos:** a separate **cover** slot on top, then the gallery; any gallery photo can be made the
    cover (Q6). Needs a `cover_photo_id` on the profile.
-7. **Tags (disciplines, audiences, languages):** tap-to-pick (Q7), but a plain wall of chips is too
-   cluttered. The canonical lists must be **exhaustive** and researched against comparable
-   platforms, and the picker follows current best practice for clear screens. Members see **only
-   the tags the owner picked**, never the whole list. Picker design goes back to Apostolos as a
-   mockup before it is built.
+7. **Tags** ([board 3b](https://claude.ai/artifact/2KzyqpFmyX2gT1HgoJdeRw), researched against
+   ClassPass, Urban Sports Club, Mindbody, Wellhub and Google Business Profile; notes in
+   `/mnt/project-files/phase-2/research/gym-tag-vocabularies.md`):
+   - **Five canonical lists**, all kept as proposed: 46 disciplines in 9 groups (Δύναμη,
+     Λειτουργική / CrossFit, Αντοχή, Σώμα-νους, Πολεμικές τέχνες, Χορός, Νερό, Ύπαιθρος,
+     Αποκατάσταση), 12 audiences, 18 amenities, 6 services, and languages (ISO 639-1). `kids`
+     moves from disciplines to audiences. `women_only` reads «Τμήματα μόνο για γυναίκες» /
+     "Ladies-only classes". Weight loss, medical conditions, religion and body size are never
+     tags. Keys are never renamed.
+   - **Form:** one card per list showing only the picked tags and «Επεξεργασία» (3b Q1).
+   - **Picker:** side panel on desktop, bottom sheet on phones: search on top, «Επιλεγμένα (n)»
+     first, suggestions from what is already picked, then collapsed groups with counts; typing
+     flattens to matches; «Τέλος» applies (3b Q2).
+   - **No main disciplines**; all picked ones count the same (3b Q3).
+   - **Visitors** see only what was picked: disciplines as chips with «+N», a «Καλωσορίζει: …»
+     line for audiences, amenities as small icons, languages by their own name; empty sections
+     disappear (3b Q4).
+   - **Missing item:** «Δεν το βρίσκεις; Πρότεινέ το» sends a suggestion for review; no free-text
+     tags (3b Q5).
+   - **Languages:** Ελληνικά and English pre-picked, common ones as chips, search for the rest by
+     Greek, English or own name; up to 10 (3b Q6).
 8. **Publishing:** the owner edits a **draft** and presses «Δημοσίευση»; a checklist shows what is
    missing and «Μη δημοσιευμένες αλλαγές» shows after edits (Q8). Needs a published snapshot kept
    apart from the draft.

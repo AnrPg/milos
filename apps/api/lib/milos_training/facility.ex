@@ -4,7 +4,7 @@ defmodule MilosTraining.Facility do
   that consume package visits go through `Application.CheckInOpenGym`.
   """
 
-  alias MilosTraining.Facility.Domain.{GeoDistance, PlacePolicy}
+  alias MilosTraining.Facility.Domain.{GeoDistance, MapLink, PlacePolicy}
   alias MilosTraining.Facility.FacilityStore
 
   @doc "Kilometres between two `{latitude, longitude}` points; nil when either is missing."
@@ -27,6 +27,44 @@ defmodule MilosTraining.Facility do
   @doc "The address and neighbourhood at a dropped pin, or nil when there is none."
   def reverse_geocode(latitude, longitude, opts \\ []),
     do: geocoder().reverse(latitude, longitude, opts)
+
+  @doc """
+  The pin and address behind a pasted Google Maps link. Short links are
+  expanded first; the address comes from reverse geocoding the point.
+  """
+  def resolve_map_link(url, opts \\ []) when is_binary(url) do
+    url = String.trim(url)
+
+    with true <- MapLink.link?(url) || {:error, :not_a_map_link},
+         {:ok, long_url} <- expand_map_link(url),
+         {:ok, {latitude, longitude}} <- MapLink.coordinates(long_url) do
+      case reverse_geocode(latitude, longitude, opts) do
+        {:ok, %{} = place} -> {:ok, place}
+        _none_or_down -> {:ok, bare_place(latitude, longitude)}
+      end
+    else
+      {:error, :no_coordinates} -> {:error, :map_link_unresolved}
+      error -> error
+    end
+  end
+
+  defp expand_map_link(url) do
+    if MapLink.short_host?(URI.parse(url).host),
+      do: Application.fetch_env!(:milos_training, :map_link_resolver).expand(url),
+      else: {:ok, url}
+  end
+
+  defp bare_place(latitude, longitude) do
+    %{
+      label: "#{latitude}, #{longitude}",
+      address: nil,
+      neighbourhood: nil,
+      city: nil,
+      country_code: nil,
+      latitude: latitude,
+      longitude: longitude
+    }
+  end
 
   defp geocoder, do: Application.fetch_env!(:milos_training, :geocoder)
 

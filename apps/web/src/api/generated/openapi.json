@@ -27106,6 +27106,109 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/geocode/link": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminFacilityController.resolve_map_link",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "url",
+            "required": true,
+            "schema": {
+              "maxLength": 2000,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "language",
+            "required": false,
+            "schema": {
+              "maxLength": 8,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "place": {
+                      "properties": {
+                        "address": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "country_code": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "label": {
+                          "type": "string"
+                        },
+                        "latitude": {
+                          "type": "number"
+                        },
+                        "longitude": {
+                          "type": "number"
+                        },
+                        "neighbourhood": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "label",
+                        "address",
+                        "neighbourhood",
+                        "city",
+                        "country_code",
+                        "latitude",
+                        "longitude"
+                      ],
+                      "title": "GeocodePlace",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "place"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Place"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not a usable map link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The pin and address behind a pasted Google Maps link (ADR-141)",
+        "tags": [
+          "Admin Facility"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/geocode/reverse": {
       "get": {
         "callbacks": {},

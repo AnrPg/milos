@@ -62,6 +62,10 @@ config :milos_training,
 
 config :milos_training, :geocoder, MilosTraining.Infrastructure.Facility.PhotonGeocoder
 
+config :milos_training,
+       :map_link_resolver,
+       MilosTraining.Infrastructure.Facility.HttpMapLinkResolver
+
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
 # ADR-123: a started execution not completed within this many hours is recorded

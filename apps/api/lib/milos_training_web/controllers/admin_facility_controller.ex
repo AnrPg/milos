@@ -181,6 +181,31 @@ defmodule MilosTrainingWeb.AdminFacilityController do
     end
   end
 
+  operation(:resolve_map_link,
+    summary: "The pin and address behind a pasted Google Maps link (ADR-141)",
+    parameters: [
+      %Parameter{
+        name: :url,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, maxLength: 2_000}
+      },
+      @language_parameter
+    ],
+    responses: [
+      ok:
+        {"Place", "application/json",
+         %Schema{type: :object, properties: %{place: @geocode_place}, required: [:place]}},
+      unprocessable_entity: {"Not a usable map link", "application/json", @error}
+    ]
+  )
+
+  def resolve_map_link(conn, %{url: url} = params) do
+    with {:ok, place} <- Facility.resolve_map_link(url, language: Map.get(params, :language)) do
+      json(conn, %{place: place})
+    end
+  end
+
   operation(:index_check_ins,
     summary: "List open-gym check-ins of a day or a member",
     parameters: [
