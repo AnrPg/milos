@@ -65,6 +65,7 @@ export function nextBooking(slots: ScheduleSlot[], now: Date) {
  */
 export function BoxToday() {
   const t = useTranslations("MemberApp");
+  const tCheckIn = useTranslations("CheckIn");
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -264,13 +265,23 @@ export function BoxToday() {
               </span>
             </div>
             <NextBookingActions slot={booking} />
-            <Link
-              href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
-              className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            >
-              {t("manageBooking")}
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                {t("manageBooking")}
+              </Link>
+              <Link
+                href="/box/check-in"
+                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                <QrGlyph />
+                {tCheckIn("qrCheckIn")}
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -289,5 +300,17 @@ export function BoxToday() {
         />
       ) : null}
     </>
+  );
+}
+
+/** The QR glyph on «QR check-in» (ADR-155). */
+function QrGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3M21 14v.01M14 21h3M21 18v3h-3" />
+    </svg>
   );
 }
