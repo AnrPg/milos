@@ -1072,6 +1072,7 @@ defmodule MilosTrainingWeb.Router do
     put("/me/wellness/preferences", WellnessController, :update_preferences)
     delete("/me/wellness", WellnessController, :erase)
     post("/me/wellness/meal-photos", WellnessController, :upload_meal_photo)
+    get("/me/wellness/export", WellnessController, :export)
     post("/journal/comments/batch", JournalCommentController, :batch)
     put("/journal/comments/:id", JournalCommentController, :save)
     delete("/journal/comments/:id", JournalCommentController, :delete)

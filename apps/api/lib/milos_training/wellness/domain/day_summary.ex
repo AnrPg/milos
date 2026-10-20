@@ -6,6 +6,7 @@ defmodule MilosTraining.Wellness.Domain.DaySummary do
   `none` — and cravings are a count, never a grade.
   """
 
+  alias MilosTraining.Nutrition.Domain.PortionPolicy
   alias MilosTraining.Wellness.Domain.{Meal, Sleep, Water}
 
   @doc """
@@ -87,6 +88,7 @@ defmodule MilosTraining.Wellness.Domain.DaySummary do
 
     %{
       count: length(entries),
+      portions: PortionPolicy.logged(Enum.map(entries, & &1.value)),
       status:
         cond do
           entries == [] -> "none"

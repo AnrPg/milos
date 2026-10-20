@@ -77,6 +77,7 @@ defmodule MilosTraining.Wellness do
 
   @sections ~w(wellness cravings)
   def erasable_sections, do: @sections
+  defdelegate export(user_id, sections), to: WellnessStore
   defdelegate erase(user_id, sections, now), to: WellnessStore
   defdelegate transaction(fun), to: WellnessStore
 

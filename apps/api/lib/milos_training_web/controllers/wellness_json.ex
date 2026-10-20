@@ -30,6 +30,7 @@ defmodule MilosTrainingWeb.WellnessJSON do
       cravings: Enum.map(payload.cravings, &craving/1),
       photos: payload.photos,
       photo_capabilities: payload.photo_capabilities,
+      plans: payload.plans,
       consented: payload.consented
     }
   end

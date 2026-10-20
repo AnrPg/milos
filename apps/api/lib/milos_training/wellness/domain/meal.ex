@@ -10,7 +10,7 @@ defmodule MilosTraining.Wellness.Domain.Meal do
 
   alias MilosTraining.Wellness.Domain.EntryValue
 
-  @slots ~w(breakfast lunch dinner snack)
+  @slots MilosTraining.Nutrition.Domain.PortionPolicy.slots()
   @main_slots ~w(breakfast lunch dinner)
   @plan_fits ~w(in_plan off_plan)
   @portions ~w(protein carbs veg fat)

@@ -14,7 +14,8 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
     description: """
     The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
     (minutes or quality required; both ends give minutes). meal: {slot?
-    breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+    (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+    in_plan|off_plan, note?, media_id?,
     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
     """,
     additionalProperties: true
@@ -153,8 +154,16 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
       },
       meals: %Schema{
         type: :object,
-        properties: %{count: %Schema{type: :integer}, status: @status},
-        required: [:count, :status]
+        properties: %{
+          count: %Schema{type: :integer},
+          portions: %Schema{
+            type: :object,
+            description: "Hand portions logged that day",
+            additionalProperties: %Schema{type: :number}
+          },
+          status: @status
+        },
+        required: [:count, :portions, :status]
       },
       cravings: %Schema{
         type: :object,
@@ -224,6 +233,19 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
     required: [:content_types, :max_bytes]
   }
 
+  @plan %Schema{
+    type: :object,
+    properties: %{
+      id: @uuid,
+      organization_id: @uuid,
+      title: %Schema{type: :string},
+      portions: MilosTrainingWeb.Schemas.Coaching.portions(),
+      meal_slots: MilosTrainingWeb.Schemas.Coaching.meal_slots(),
+      updated_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [:id, :organization_id, :title, :meal_slots]
+  }
+
   def overview do
     %Schema{
       title: "WellnessOverview",
@@ -242,6 +264,11 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
           additionalProperties: @photo
         },
         photo_capabilities: @photo_capabilities,
+        plans: %Schema{
+          type: :array,
+          description: "Coaches' plans as the member sees them (no calories); empty when hidden",
+          items: @plan
+        },
         consented: %Schema{
           type: :boolean,
           description: "Whether the health-data consent is active (needed to log anything)"
@@ -257,6 +284,7 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
         :cravings,
         :photos,
         :photo_capabilities,
+        :plans,
         :consented
       ]
     }
@@ -318,6 +346,34 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
       properties: @preferences.properties,
       description: "Any subset of the fields",
       additionalProperties: false
+    }
+  end
+
+  def export_response do
+    %Schema{
+      title: "WellnessExport",
+      type: :object,
+      properties: %{
+        exported_at: @datetime,
+        sections: %Schema{
+          type: :object,
+          properties: %{
+            wellness: %Schema{
+              type: :object,
+              properties: %{
+                preferences: %Schema{type: :object, additionalProperties: true},
+                entries: %Schema{type: :array, items: @entry}
+              }
+            },
+            cravings: %Schema{
+              type: :object,
+              properties: %{cravings: %Schema{type: :array, items: @craving}}
+            }
+          }
+        },
+        photos: %Schema{type: :object, additionalProperties: @photo}
+      },
+      required: [:exported_at, :sections, :photos]
     }
   end
 

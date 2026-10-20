@@ -186,6 +186,25 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
     |> Repo.insert_or_update()
   end
 
+  @impl true
+  def export(user_id, sections) do
+    Map.new(sections, fn
+      "wellness" ->
+        {"wellness",
+         Entry
+         |> where([e], e.user_id == ^user_id and is_nil(e.deleted_at))
+         |> order_by([e], asc: e.occurred_at, asc: e.id)
+         |> Repo.all()}
+
+      "cravings" ->
+        {"cravings",
+         Craving
+         |> where([c], c.user_id == ^user_id and is_nil(c.deleted_at))
+         |> order_by([c], asc: c.occurred_at, asc: c.id)
+         |> Repo.all()}
+    end)
+  end
+
   # «Διαγραφή όλων»: soft-deleted rows are gone for the member at once; the
   # rows themselves go, too, since nothing else references them.
   @impl true

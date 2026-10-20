@@ -67,6 +67,22 @@ defmodule MilosTraining.Application.WellnessInput do
 
   defp instant(_value, _now), do: {:error, :invalid_occurred_at}
 
+  @doc "The `sections` param (list or comma-separated) of «Διαγραφή όλων» and export."
+  def sections(params), do: params |> param("sections") |> split_sections()
+
+  defp split_sections(sections) when is_binary(sections),
+    do: sections |> String.split(",", trim: true) |> split_sections()
+
+  defp split_sections([_ | _] = sections) do
+    sections = Enum.uniq(sections)
+
+    if Enum.all?(sections, &(&1 in MilosTraining.Wellness.erasable_sections())),
+      do: {:ok, sections},
+      else: {:error, :unknown_wellness_section}
+  end
+
+  defp split_sections(_sections), do: {:error, :unknown_wellness_section}
+
   @doc "Reads a request key given as a string or an atom."
   def param(params, key) when is_map(params),
     do: MilosTraining.Wellness.Domain.EntryValue.get(params, key)

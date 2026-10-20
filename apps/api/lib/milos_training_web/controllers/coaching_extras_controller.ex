@@ -261,7 +261,9 @@ defmodule MilosTrainingWeb.CoachingExtrasController do
           daily_calories: %Schema{type: :integer, minimum: 1, maximum: 10_000, nullable: true},
           protein_grams: %Schema{type: :integer, minimum: 0, maximum: 1000, nullable: true},
           carbs_grams: %Schema{type: :integer, minimum: 0, maximum: 2000, nullable: true},
-          fat_grams: %Schema{type: :integer, minimum: 0, maximum: 1000, nullable: true}
+          fat_grams: %Schema{type: :integer, minimum: 0, maximum: 1000, nullable: true},
+          portion_targets: CoachingSchemas.portions(),
+          meal_slots: CoachingSchemas.meal_slots()
         },
         required: [:title, :body]
       }),

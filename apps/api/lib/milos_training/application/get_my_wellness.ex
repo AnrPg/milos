@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.GetMyWellness do
   """
 
   alias MilosTraining.Application.{MealPhotos, WellnessConsent, WellnessInput}
-  alias MilosTraining.{Wellbeing, Wellness}
+  alias MilosTraining.{Nutrition, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, params) do
     with {:ok, from, to} <-
@@ -46,6 +46,7 @@ defmodule MilosTraining.Application.GetMyWellness do
       end)
       |> with_photos(context)
       |> with_consent(context)
+      |> with_plans(context)
     end
   end
 
@@ -57,6 +58,29 @@ defmodule MilosTraining.Application.GetMyWellness do
        photos: MealPhotos.present(context, ids),
        photo_capabilities: MealPhotos.capabilities()
      })}
+  end
+
+  # The coaches' plans, as the member may see them (board 14, Q5): daily
+  # portions and meal slots, never calories. Hidden with the «plan» item.
+  defp with_plans({:ok, payload}, context) do
+    plans =
+      if "plan" in (payload.preferences.hidden_items || []),
+        do: [],
+        else: context |> Nutrition.list_own_plans() |> Enum.map(&plan/1)
+
+    {:ok, Map.put(payload, :plans, plans)}
+  end
+
+  defp plan(plan) do
+    %{
+      id: plan.id,
+      organization_id: plan.organization_id,
+      title: plan.title,
+      portions: Nutrition.effective_portions(plan),
+      meal_slots:
+        if(plan.meal_slots == [], do: Nutrition.default_meal_slots(), else: plan.meal_slots),
+      updated_at: plan.updated_at
+    }
   end
 
   defp with_consent({:ok, payload}, %{user_id: user_id} = context),

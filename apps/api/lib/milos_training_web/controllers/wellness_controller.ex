@@ -8,6 +8,7 @@ defmodule MilosTrainingWeb.WellnessController do
     ChangeCraving,
     ChangeWellnessEntry,
     EraseMyWellness,
+    ExportMyWellness,
     GetMyWellness,
     LogCraving,
     LogWellnessEntry,
@@ -185,6 +186,27 @@ defmodule MilosTrainingWeb.WellnessController do
   def erase(conn, params) do
     with {:ok, counts} <- EraseMyWellness.call(conn.assigns.user_context, params) do
       json(conn, %{erased: counts})
+    end
+  end
+
+  operation(:export,
+    summary: "Your wellness and/or cravings as JSON, meal photos as signed links",
+    parameters: [
+      %Parameter{
+        name: :sections,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, example: "wellness,cravings"}
+      }
+    ],
+    responses: [ok: {"Export", "application/json", Schemas.export_response()}]
+  )
+
+  def export(conn, params) do
+    with {:ok, export} <- ExportMyWellness.call(conn.assigns.user_context, params) do
+      conn
+      |> put_resp_header("content-disposition", ~s(attachment; filename="milos-wellness.json"))
+      |> json(export)
     end
   end
 

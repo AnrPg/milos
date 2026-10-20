@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.EraseMyWellness do
   alias MilosTraining.Wellness
 
   def call(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
-    with {:ok, sections} <- sections(WellnessInput.param(params, "sections")),
+    with {:ok, sections} <- WellnessInput.sections(params),
          {:ok, counts} <-
            Wellness.with_context(context, fn ->
              Wellness.transaction(fn -> Wellness.erase(user_id, sections, now) end)
@@ -19,17 +19,4 @@ defmodule MilosTraining.Application.EraseMyWellness do
       {:ok, counts}
     end
   end
-
-  defp sections(sections) when is_binary(sections),
-    do: sections |> String.split(",", trim: true) |> sections()
-
-  defp sections([_ | _] = sections) do
-    sections = Enum.uniq(sections)
-
-    if Enum.all?(sections, &(&1 in Wellness.erasable_sections())),
-      do: {:ok, sections},
-      else: {:error, :unknown_wellness_section}
-  end
-
-  defp sections(_sections), do: {:error, :unknown_wellness_section}
 end

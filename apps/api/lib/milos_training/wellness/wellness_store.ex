@@ -57,6 +57,8 @@ defmodule MilosTraining.Wellness.WellnessStore do
   def mark_water_reminded(user_id, day), do: adapter().mark_water_reminded(user_id, day)
 
   @impl true
+  def export(user_id, sections), do: adapter().export(user_id, sections)
+  @impl true
   def erase(user_id, sections, now), do: adapter().erase(user_id, sections, now)
   @impl true
   def transaction(fun), do: adapter().transaction(fun)

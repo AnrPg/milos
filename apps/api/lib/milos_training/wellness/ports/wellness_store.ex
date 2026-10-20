@@ -35,6 +35,7 @@ defmodule MilosTraining.Wellness.Ports.WellnessStore do
   @callback water_reminders_due(DateTime.t(), pos_integer()) :: [{id(), Date.t()}]
   @callback mark_water_reminded(id(), Date.t()) :: :ok
 
+  @callback export(id(), [String.t()]) :: %{String.t() => [Entry.t() | Craving.t()]}
   @callback erase(id(), [String.t()], DateTime.t()) :: %{String.t() => non_neg_integer()}
   @callback transaction((-> term())) :: {:ok, term()} | {:error, term()}
 end

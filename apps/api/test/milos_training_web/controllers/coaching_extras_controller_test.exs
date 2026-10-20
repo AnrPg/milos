@@ -224,8 +224,54 @@ defmodule MilosTrainingWeb.CoachingExtrasControllerTest do
     })
     |> json_response(200)
 
-    assert %{"nutrition_plan" => %{"title" => "Cutting phase", "daily_calories" => 2200}} =
+    # ADR-159: calories stay with the staff; the member reads hand portions,
+    # derived from grams until the coach writes their own.
+    assert %{
+             "nutrition_plan" =>
+               %{"title" => "Cutting phase", "portions" => %{"protein" => 7}} = plan
+           } =
              client_conn |> recycle() |> get("#{base}/me/nutrition-plan") |> json_response(200)
+
+    refute Map.has_key?(plan, "daily_calories")
+
+    assert %{"nutrition_plan" => %{"daily_calories" => 2200}} =
+             coach_conn
+             |> recycle()
+             |> get("#{base}/staff/clients/#{client_user.id}/nutrition-plan")
+             |> json_response(200)
+
+    coach_conn
+    |> recycle()
+    |> send_json(:put, "#{base}/staff/clients/#{client_user.id}/nutrition-plan", %{
+      title: "Cutting phase",
+      body: "High protein, moderate carbs.",
+      protein_grams: 180,
+      portion_targets: %{protein: 6, carbs: 4.5, veg: 5},
+      meal_slots: ["breakfast", "lunch", "pre_workout", "dinner"]
+    })
+    |> json_response(200)
+
+    assert coach_conn
+           |> recycle()
+           |> send_json(:put, "#{base}/staff/clients/#{client_user.id}/nutrition-plan", %{
+             title: "Cutting phase",
+             body: "High protein, moderate carbs.",
+             portion_targets: %{protein: 6.25}
+           })
+           |> json_response(422)
+
+    today = Date.utc_today() |> Date.to_iso8601()
+
+    assert %{"plans" => [%{"portions" => portions, "meal_slots" => slots} = own]} =
+             conn
+             |> recycle()
+             |> put_bearer_token(client_user)
+             |> get("/api/me/wellness?from=#{today}&to=#{today}")
+             |> json_response(200)
+
+    assert portions == %{"protein" => 6, "carbs" => 4.5, "veg" => 5}
+    assert slots == ["breakfast", "lunch", "pre_workout", "dinner"]
+    refute Map.has_key?(own, "daily_calories")
 
     assert Enum.any?(
              Notifications.list_for_user(client_user.id),
