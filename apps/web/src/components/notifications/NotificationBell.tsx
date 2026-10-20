@@ -58,6 +58,15 @@ function NotificationCard({
   const i18n = useUiTranslations();
   const tTrials = useTranslations("Trials");
   const tClubs = useTranslations("Clubs");
+  const tAround = useTranslations("Around");
+  // ADR-154: a saved Γύρω μου filter's daily alert names the filter and how many are new.
+  function aroundText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "around_new_matches") return null;
+    if (part === "title") return tAround("notifTitle");
+    const name = typeof notification.payload.filter_name === "string" ? notification.payload.filter_name : "";
+    const count = Number(notification.payload.count ?? 0);
+    return tAround("notifBody", { name, count: Number.isFinite(count) ? count : 0 });
+  }
   // ADR-143: group, report and open-club notifications carry their names (events: ADR-153).
   function communityText(notification: NotificationRecord, part: "title" | "body") {
     if (!(COMMUNITY_NOTICES as readonly string[]).includes(notification.type)) return null;
@@ -111,6 +120,8 @@ function NotificationCard({
   }
 
   function notificationBody(notification: NotificationRecord) {
+    const around = aroundText(notification, "body");
+    if (around !== null) return around;
     const trial = trialText(notification, "body");
     if (trial !== null) return trial;
     const community = communityText(notification, "body");
@@ -353,6 +364,8 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const around = aroundText(notification, "title");
+    if (around !== null) return around;
     const trial = trialText(notification, "title");
     if (trial !== null) return trial;
     const community = communityText(notification, "title");

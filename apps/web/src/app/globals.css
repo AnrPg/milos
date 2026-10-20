@@ -288,6 +288,30 @@ input[type="number"] {
   outline-offset: 2px;
 }
 
+/* Γύρω μου pins (ADR-154): events round in the brand colour, boxes square. */
+.milos-around-pin .milos-map-pin__dot {
+  width: 16px;
+  height: 16px;
+}
+.milos-around-pin[data-kind="events"] .milos-map-pin__dot {
+  background: var(--primary);
+}
+.milos-around-pin[data-kind="boxes"] .milos-map-pin__dot {
+  border-radius: 3px;
+  transform: none;
+  background: var(--text);
+  border-color: var(--bg);
+}
+.milos-around-pin[data-kind="clubs"] .milos-map-pin__dot,
+.milos-around-pin[data-kind="posts"] .milos-map-pin__dot {
+  background: var(--dim);
+}
+.milos-around-pin[data-selected="true"] .milos-map-pin__dot {
+  width: 22px;
+  height: 22px;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 45%, transparent);
+}
+
 /* Two-thumb range slider: the track ignores the pointer, the thumbs take it. */
 .milos-range-thumb::-webkit-slider-thumb {
   pointer-events: auto;

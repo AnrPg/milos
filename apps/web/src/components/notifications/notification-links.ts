@@ -27,6 +27,11 @@ function preferredUrl(notification: LinkableNotification) {
   ) {
     return `/events/${encodeURIComponent(eventId)}`;
   }
+  // ADR-154: a saved Γύρω μου filter's alert opens Γύρω μου with that filter.
+  const filterId = notification.payload.filter_id;
+  if (notification.type === "around_new_matches") {
+    return typeof filterId === "string" && filterId ? `/around?filter=${encodeURIComponent(filterId)}` : "/around";
+  }
   return null;
 }
 

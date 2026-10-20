@@ -54,12 +54,15 @@ export function FilterChipRow({
   onOpenFilters,
   onClear,
   chips,
+  leading,
 }: {
   ariaLabel: string;
   activeCount: number;
   onOpenFilters: () => void;
   onClear: () => void;
   chips: FilterChip[];
+  /** Shown right after «Φίλτρα (n)», e.g. saved filters (Γύρω μου). */
+  leading?: ReactNode;
 }) {
   const t = useTranslations("Filters");
   const [open, setOpen] = useState<{ key: string; anchor: HTMLElement } | null>(null);
@@ -86,6 +89,8 @@ export function FilterChipRow({
           </button>
         ) : null}
       </span>
+
+      {leading}
 
       {chips.map((chip) =>
         chip.kind === "toggle" ? (

@@ -124,8 +124,7 @@ function narrowingFacets(filter: AroundFilter) {
 
 /** Facets that can hide results (everything but where; turning posts on never hides). */
 export function narrowingCount(filter: AroundFilter) {
-  const withoutPosts = { ...filter, kinds: filter.kinds.filter((kind) => kind !== "posts") };
-  const kindsHide = !DEFAULT_KINDS.every((kind) => withoutPosts.kinds.includes(kind));
+  const kindsHide = !DEFAULT_KINDS.every((kind) => filter.kinds.includes(kind));
   return [kindsHide, ...narrowingFacets(filter).slice(1)].filter(Boolean).length;
 }
 
