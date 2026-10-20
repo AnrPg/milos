@@ -4333,7 +4333,13 @@
     "apiErrorAttendanceAlreadyRecorded": "La tua presenza è già registrata.",
     "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in.",
     "coachProgrammeTitle": "Il mio programma",
-    "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach."
+    "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach.",
+    "stfPortionsTitle": "Porzioni giornaliere a mano",
+    "stfPortionsHint": "Ciò che il membro vede in Benessere al posto dei numeri. Vanno bene anche le mezze.",
+    "stfPortionsFromGrams": "Compila dai grammi",
+    "stfInvalidPortions": "Le porzioni vanno da 0 a 20, a metà.",
+    "stfMealSlots": "Pasti della giornata",
+    "stfMealSlotsHint": "I pasti su cui registra il membro. Lascia vuoto per colazione, pranzo, cena e spuntino."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -4857,7 +4863,9 @@
         "review": "Valutazione",
         "note": "Nota",
         "check_in": "Come mi sento",
-        "body": "Corpo"
+        "body": "Corpo",
+        "wellness": "Benessere",
+        "craving": "Voglia di cibo"
       },
       "loadMore": "Voci precedenti",
       "loadingMore": "Caricamento…",
@@ -4954,7 +4962,9 @@
       "formReview": "Video della tecnica",
       "review": "Recensione",
       "checkIn": "Come mi sento",
-      "note": "Nota o pensiero"
+      "note": "Nota o pensiero",
+      "wellness": "Acqua · Sonno · Pasto",
+      "craving": "Voglia di cibo"
     },
     "entryKindHint": {
       "workout": "Punteggio, RPE, note",
@@ -4963,7 +4973,9 @@
       "formReview": "Chiedi un parere al tuo coach",
       "review": "Valuta una lezione o un allenamento",
       "checkIn": "Poche domande rapide",
-      "note": "Tecnica, obiettivo, umore"
+      "note": "Tecnica, obiettivo, umore",
+      "wellness": "Un bicchiere, la notte scorsa, un pasto",
+      "craving": "Annotala o chiedi supporto"
     },
     "homeTitle": "Home",
     "wodToday": "Il WOD di oggi in palestra",
@@ -5075,7 +5087,220 @@
     "checkedIn": "Check-in fatto ✓",
     "followClassTimer": "Timer della classe dal vivo",
     "classCheckIn": "Check-in",
-    "programmeManage": "Cambia giorno o rifiuta"
+    "programmeManage": "Cambia giorno o rifiuta",
+    "wellness": {
+      "eyebrow": "Benessere",
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "loading": "Caricamento…",
+      "customize": "Personalizza",
+      "previousDay": "Giorno precedente",
+      "nextDay": "Giorno successivo",
+      "close": "Chiudi",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "delete": "Elimina",
+      "cancel": "Annulla",
+      "undo": "Annulla aggiunta",
+      "open": "Apri",
+      "onlyMe": "Lo vedi solo tu. Puoi condividere singole voci più avanti.",
+      "whoSees": "Chi lo vede:",
+      "less": "Meno {what}",
+      "more": "Più {what}",
+      "item": {
+        "water": "Acqua",
+        "sleep": "Sonno",
+        "meals": "Pasti",
+        "plan": "Piano del coach",
+        "mood": "Umore",
+        "cravings": "Voglia di cibo"
+      },
+      "water": {
+        "add": "+1 bicchiere",
+        "glasses": "{filled} di {goal} bicchieri",
+        "added": "Bicchiere aggiunto ({ml} ml)",
+        "dropsLabel": "Bicchieri di oggi",
+        "remove": "Togli questo bicchiere"
+      },
+      "sleep": {
+        "title": "Sonno",
+        "night": "Notte",
+        "nap": "Pisolino",
+        "bed": "Sono andato a letto",
+        "wake": "Mi sono svegliato",
+        "napMinutes": "Minuti",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Qualità (da 1 a 5)",
+        "qualityValue": "Qualità {quality}/5",
+        "napValue": "Pisolino {minutes} min",
+        "empty": "Non registrato",
+        "tap": "Tocca per registrare la notte",
+        "fromDevice": "da {source}",
+        "corrected": "da {source}, corretto da te"
+      },
+      "source": {
+        "manual": "te",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Pasto",
+        "slot": "Quale pasto",
+        "logged": "Registrato",
+        "addSnack": "+ Spuntino",
+        "fitLabel": {
+          "plan": "E il piano?",
+          "own": "Come volevi?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Nel piano",
+            "off_plan": "Fuori piano"
+          },
+          "own": {
+            "in_plan": "Come volevo",
+            "off_plan": "Diversamente"
+          }
+        },
+        "photo": "Foto (facoltativa)",
+        "photoAdd": "Aggiungi una foto",
+        "photoChange": "Cambia foto",
+        "photoRemove": "Togli",
+        "photoUploading": "Caricamento…",
+        "photoFailed": "La foto non è stata caricata. Riprova o salva senza.",
+        "photoPrivate": "Privata, come le foto del corpo. Non finisce mai in un post senza chiedertelo.",
+        "note": "Una riga al riguardo (facoltativa)",
+        "portions": "Porzioni a mano (facoltative)",
+        "portionsHint": "Palmo, mano a coppa, pugno, pollice. Vanno bene le metà. Niente bilancia, niente calorie.",
+        "hungerLabel": "Fame e sazietà (facoltative)",
+        "hunger": "Quanta fame prima (da 1 a 5)",
+        "fullness": "Quanto sazio dopo (da 1 a 5)"
+      },
+      "slot": {
+        "breakfast": "Colazione",
+        "morning_snack": "Spuntino di metà mattina",
+        "lunch": "Pranzo",
+        "afternoon_snack": "Merenda",
+        "dinner": "Cena",
+        "evening_snack": "Spuntino serale",
+        "snack": "Spuntino",
+        "pre_workout": "Prima dell'allenamento",
+        "post_workout": "Dopo l'allenamento"
+      },
+      "portion": {
+        "protein": "Proteine (palmo)",
+        "carbs": "Carboidrati (mano a coppa)",
+        "veg": "Verdure (pugno)",
+        "fat": "Grassi (pollice)"
+      },
+      "plan": {
+        "title": "Alimentazione · {title}",
+        "showNumbers": "Mostra i numeri",
+        "hideNumbers": "Nascondi i numeri",
+        "of": "{logged} di {target}",
+        "noPortions": "Il piano del tuo coach non ha ancora porzioni giornaliere."
+      },
+      "mood": {
+        "mood": "Umore {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Come ti senti?",
+        "open": "Rispondi a «Come mi sento»"
+      },
+      "craving": {
+        "title": "Voglia di cibo",
+        "tileTitle": "Registrala o chiedi supporto",
+        "tileHint": "Sul momento; com'è andata può arrivare dopo",
+        "count": "{count, plural, one {# oggi} other {# oggi}}",
+        "edit": "Modifica",
+        "support": "Ho bisogno di supporto",
+        "supportNoBuddy": "Quando sceglierai un buddy, riceverà un breve messaggio. Mai i dettagli.",
+        "intensity": "Quanto è forte?",
+        "trigger": "Cosa l'ha scatenata?",
+        "outcome": "Cosa è successo?",
+        "note": "Cosa volevo (facoltativo)",
+        "notePlaceholder": "es. qualcosa di dolce dopo cena",
+        "tryNow": "Prova ora",
+        "tryWater": "Un bicchiere d'acqua",
+        "tryWalk": "Una passeggiata di 10 minuti",
+        "tryWait": "Aspetta 10 minuti e respira lentamente",
+        "waterCounted": "Contato",
+        "private": "La vedi solo tu. Ti chiederemo una volta, tra 20 minuti, com'è andata.",
+        "howDidItGo": "Com'è andata?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Stanchezza",
+        "boredom": "Noia",
+        "social": "Sociale",
+        "hunger": "Fame",
+        "other": "Altro"
+      },
+      "outcome": {
+        "resisted": "L'ho superata",
+        "ate_off_plan": "Ho mangiato qualcosa fuori piano",
+        "ongoing": "Ce l'ho ancora"
+      },
+      "week": {
+        "title": "Questa settimana",
+        "range": "{from} – {to}",
+        "previous": "Settimana precedente",
+        "next": "Settimana successiva",
+        "item": "Voce",
+        "line": "Sonno all'obiettivo {nights} notti su {days} · acqua all'obiettivo {water} giorni su {days}",
+        "dot": {
+          "full": "All'obiettivo",
+          "half": "In parte",
+          "empty": "Niente registrato",
+          "warm": "Voglia registrata"
+        }
+      },
+      "consent": {
+        "title": "La tua acqua, il sonno, i pasti e le voglie",
+        "body": "Ciò che registri qui sono dati sanitari. Restano tuoi e privati: il coach vede una voce solo se la condividi, e puoi esportare o eliminare tutto in qualsiasi momento.",
+        "items": "Cosa vuoi vedere?",
+        "later": "Puoi cambiarlo quando vuoi da «Personalizza».",
+        "agree": "Accetto e inizio"
+      },
+      "settings": {
+        "items": "Voci e ordine",
+        "hiddenKeeps": "Una voce che spegni sparisce dalla scheda, dalla settimana e da Nuova voce. I suoi dati restano finché non li elimini.",
+        "moveUp": "Sposta su {item}",
+        "moveDown": "Sposta giù {item}",
+        "water": "Acqua",
+        "glass": "Il tuo bicchiere",
+        "ml": "{ml} ml",
+        "goalGlasses": "Obiettivo giornaliero (bicchieri)",
+        "reminder": "Promemoria pomeridiano",
+        "reminderHint": "Una volta, dopo le 15:00, se sei sotto metà dell'obiettivo",
+        "goalYours": "Gli obiettivi sono tuoi. Un coach può suggerirne uno, mai imporlo.",
+        "sleep": "Sonno",
+        "sleepGoal": "Obiettivo di sonno (ore)",
+        "data": "I tuoi dati",
+        "section": {
+          "wellness": "Acqua, sonno e pasti",
+          "cravings": "Voglie"
+        },
+        "export": "Esporta (JSON)",
+        "erase": "Elimina tutto",
+        "eraseConfirm": "Sì, elimina per sempre",
+        "eraseWarning": "Elimina per sempre ogni voce di questa sezione, con le foto dei pasti.",
+        "erased": "Eliminato."
+      },
+      "feed": {
+        "water": "{count, plural, one {# bicchiere} other {# bicchieri}}",
+        "meals": "{count, plural, one {# pasto} other {# pasti}}",
+        "craving": "Voglia · {intensity}/10",
+        "empty": "Benessere"
+      },
+      "error": {
+        "health_data_consent_required": "Accetta prima che conserviamo dati sanitari.",
+        "occurred_in_future": "Quell'ora è nel futuro.",
+        "occurred_too_long_ago": "Puoi completare o correggere fino a 7 giorni prima.",
+        "invalid_wellness_value": "Controlla i valori e riprova.",
+        "invalid_media": "La foto non è pronta. Sceglila di nuovo."
+      }
+    }
   },
   "Community": {
     "all": "Tutti",

@@ -4333,7 +4333,13 @@
     "apiErrorAttendanceAlreadyRecorded": "Your attendance was already recorded.",
     "apiErrorAttendanceRequiresApprovedBooking": "Only an approved booking can check in.",
     "coachProgrammeTitle": "My programme",
-    "coachProgrammeHint": "Change a day, decline a workout or ask your coach for one."
+    "coachProgrammeHint": "Change a day, decline a workout or ask your coach for one.",
+    "stfPortionsTitle": "Daily hand portions",
+    "stfPortionsHint": "What the member sees on the Wellness page instead of numbers. Halves are fine.",
+    "stfPortionsFromGrams": "Fill from the grams",
+    "stfInvalidPortions": "Portions go from 0 to 20, in halves.",
+    "stfMealSlots": "Meals in the day",
+    "stfMealSlotsHint": "The meals the member logs against. Leave empty for breakfast, lunch, dinner and a snack."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4857,7 +4863,9 @@
         "review": "Rating",
         "note": "Note",
         "check_in": "How I feel",
-        "body": "Body"
+        "body": "Body",
+        "wellness": "Wellness",
+        "craving": "Craving"
       },
       "loadMore": "Older entries",
       "loadingMore": "Loading…",
@@ -4954,7 +4962,9 @@
       "formReview": "Technique video",
       "review": "Review",
       "checkIn": "How I feel",
-      "note": "Note or thought"
+      "note": "Note or thought",
+      "wellness": "Water · Sleep · Meal",
+      "craving": "Craving"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
@@ -4963,7 +4973,9 @@
       "formReview": "Ask your coach for feedback",
       "review": "Rate a class or workout",
       "checkIn": "A few quick questions",
-      "note": "Technique, goal, mood"
+      "note": "Technique, goal, mood",
+      "wellness": "A glass, last night, a meal",
+      "craving": "Note it or ask for support"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -5075,7 +5087,220 @@
     "checkedIn": "Checked in ✓",
     "followClassTimer": "Live class timer",
     "classCheckIn": "Check in",
-    "programmeManage": "Change the day or decline"
+    "programmeManage": "Change the day or decline",
+    "wellness": {
+      "eyebrow": "Wellness",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "loading": "Loading…",
+      "customize": "Customise",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "close": "Close",
+      "save": "Save",
+      "saving": "Saving…",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "undo": "Undo",
+      "open": "Open",
+      "onlyMe": "Only you see this. You can share single entries later.",
+      "whoSees": "Who sees it:",
+      "less": "Less {what}",
+      "more": "More {what}",
+      "item": {
+        "water": "Water",
+        "sleep": "Sleep",
+        "meals": "Meals",
+        "plan": "Coach's plan",
+        "mood": "Mood",
+        "cravings": "Craving"
+      },
+      "water": {
+        "add": "+1 glass",
+        "glasses": "{filled} of {goal} glasses",
+        "added": "Added a glass ({ml} ml)",
+        "dropsLabel": "Glasses today",
+        "remove": "Remove this glass"
+      },
+      "sleep": {
+        "title": "Sleep",
+        "night": "Night",
+        "nap": "Nap",
+        "bed": "Went to bed",
+        "wake": "Woke up",
+        "napMinutes": "Minutes",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Quality (1 to 5)",
+        "qualityValue": "Quality {quality}/5",
+        "napValue": "Nap {minutes} min",
+        "empty": "Not logged",
+        "tap": "Tap to log the night",
+        "fromDevice": "from {source}",
+        "corrected": "from {source}, corrected by you"
+      },
+      "source": {
+        "manual": "you",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Meal",
+        "slot": "Which meal",
+        "logged": "Logged",
+        "addSnack": "+ Snack",
+        "fitLabel": {
+          "plan": "And the plan?",
+          "own": "As you meant it?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "In plan",
+            "off_plan": "Off plan"
+          },
+          "own": {
+            "in_plan": "As I meant it",
+            "off_plan": "Differently"
+          }
+        },
+        "photo": "Photo (optional)",
+        "photoAdd": "Add a photo",
+        "photoChange": "Change photo",
+        "photoRemove": "Remove",
+        "photoUploading": "Uploading…",
+        "photoFailed": "The photo didn't upload. Try again or save without it.",
+        "photoPrivate": "Private, like body photos. It never goes to a post without asking you.",
+        "note": "A line about it (optional)",
+        "portions": "Hand portions (optional)",
+        "portionsHint": "Palm, cupped hand, fist, thumb. Halves are fine. No weighing, no calories.",
+        "hungerLabel": "Hunger and fullness (optional)",
+        "hunger": "How hungry before (1 to 5)",
+        "fullness": "How full after (1 to 5)"
+      },
+      "slot": {
+        "breakfast": "Breakfast",
+        "morning_snack": "Morning snack",
+        "lunch": "Lunch",
+        "afternoon_snack": "Afternoon snack",
+        "dinner": "Dinner",
+        "evening_snack": "Evening snack",
+        "snack": "Snack",
+        "pre_workout": "Before training",
+        "post_workout": "After training"
+      },
+      "portion": {
+        "protein": "Protein (palm)",
+        "carbs": "Carbs (cupped hand)",
+        "veg": "Vegetables (fist)",
+        "fat": "Fats (thumb)"
+      },
+      "plan": {
+        "title": "Nutrition · {title}",
+        "showNumbers": "Show numbers",
+        "hideNumbers": "Hide numbers",
+        "of": "{logged} of {target}",
+        "noPortions": "Your coach's plan has no daily portions yet."
+      },
+      "mood": {
+        "mood": "Mood {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "How do you feel?",
+        "open": "Answer «How I feel»"
+      },
+      "craving": {
+        "title": "Craving",
+        "tileTitle": "Log it, or ask for support",
+        "tileHint": "In the moment; the outcome can come later",
+        "count": "{count, plural, one {# today} other {# today}}",
+        "edit": "Edit",
+        "support": "I need support",
+        "supportNoBuddy": "Once you set a buddy, they get a short message. Never the details.",
+        "intensity": "How strong?",
+        "trigger": "What set it off?",
+        "outcome": "What happened?",
+        "note": "What I wanted (optional)",
+        "notePlaceholder": "e.g. something sweet after dinner",
+        "tryNow": "Try now",
+        "tryWater": "A glass of water",
+        "tryWalk": "A 10-minute walk",
+        "tryWait": "Wait 10 minutes and breathe slowly",
+        "waterCounted": "Counted",
+        "private": "Only you see this. We'll ask once, in 20 minutes, how it went.",
+        "howDidItGo": "How did it go?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Tiredness",
+        "boredom": "Boredom",
+        "social": "Social",
+        "hunger": "Hunger",
+        "other": "Something else"
+      },
+      "outcome": {
+        "resisted": "I got past it",
+        "ate_off_plan": "I ate something off plan",
+        "ongoing": "I still have it"
+      },
+      "week": {
+        "title": "This week",
+        "range": "{from} – {to}",
+        "previous": "Previous week",
+        "next": "Next week",
+        "item": "Item",
+        "line": "Sleep on your goal {nights} of {days} nights · water on your goal {water} of {days} days",
+        "dot": {
+          "full": "On your goal",
+          "half": "Partly",
+          "empty": "Nothing logged",
+          "warm": "Craving logged"
+        }
+      },
+      "consent": {
+        "title": "Your water, sleep, meals and cravings",
+        "body": "What you log here is health data. It stays yours and private: your coach sees an entry only if you share it, and you can export or delete everything at any time.",
+        "items": "What do you want to see?",
+        "later": "You can change this any time from «Customise».",
+        "agree": "Agree and start"
+      },
+      "settings": {
+        "items": "Items and order",
+        "hiddenKeeps": "An item you turn off disappears from the card, the week and New entry. Its data stays until you delete it.",
+        "moveUp": "Move {item} up",
+        "moveDown": "Move {item} down",
+        "water": "Water",
+        "glass": "Your glass",
+        "ml": "{ml} ml",
+        "goalGlasses": "Daily goal (glasses)",
+        "reminder": "Afternoon reminder",
+        "reminderHint": "Once, after 15:00, if you're under half your goal",
+        "goalYours": "The goals are yours. A coach can suggest one but never sets it.",
+        "sleep": "Sleep",
+        "sleepGoal": "Sleep goal (hours)",
+        "data": "Your data",
+        "section": {
+          "wellness": "Water, sleep and meals",
+          "cravings": "Cravings"
+        },
+        "export": "Export (JSON)",
+        "erase": "Delete all",
+        "eraseConfirm": "Yes, delete for good",
+        "eraseWarning": "This removes every entry of this section for good, with meal photos.",
+        "erased": "Deleted."
+      },
+      "feed": {
+        "water": "{count, plural, one {# glass} other {# glasses}}",
+        "meals": "{count, plural, one {# meal} other {# meals}}",
+        "craving": "Craving · {intensity}/10",
+        "empty": "Wellness"
+      },
+      "error": {
+        "health_data_consent_required": "Agree to keep health data first.",
+        "occurred_in_future": "That time is in the future.",
+        "occurred_too_long_ago": "You can fill in or correct up to 7 days back.",
+        "invalid_wellness_value": "Check the values and try again.",
+        "invalid_media": "The photo isn't ready. Pick it again."
+      }
+    }
   },
   "Community": {
     "all": "All",

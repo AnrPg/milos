@@ -4333,7 +4333,13 @@
     "apiErrorAttendanceAlreadyRecorded": "A tua presença já foi registada.",
     "apiErrorAttendanceRequiresApprovedBooking": "Só uma reserva aprovada permite fazer check-in.",
     "coachProgrammeTitle": "O meu programa",
-    "coachProgrammeHint": "Muda um dia, recusa um treino ou pede um ao teu coach."
+    "coachProgrammeHint": "Muda um dia, recusa um treino ou pede um ao teu coach.",
+    "stfPortionsTitle": "Porções diárias com a mão",
+    "stfPortionsHint": "O que o membro vê no Bem-estar em vez de números. Metades são aceites.",
+    "stfPortionsFromGrams": "Preencher a partir dos gramas",
+    "stfInvalidPortions": "As porções vão de 0 a 20, em metades.",
+    "stfMealSlots": "Refeições do dia",
+    "stfMealSlotsHint": "As refeições em que o membro regista. Deixa vazio para pequeno-almoço, almoço, jantar e lanche."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -4857,7 +4863,9 @@
         "review": "Avaliação",
         "note": "Nota",
         "check_in": "Como me sinto",
-        "body": "Corpo"
+        "body": "Corpo",
+        "wellness": "Bem-estar",
+        "craving": "Desejo"
       },
       "loadMore": "Entradas anteriores",
       "loadingMore": "A carregar…",
@@ -4954,7 +4962,9 @@
       "formReview": "Vídeo de técnica",
       "review": "Avaliação",
       "checkIn": "Como me sinto",
-      "note": "Nota ou pensamento"
+      "note": "Nota ou pensamento",
+      "wellness": "Água · Sono · Refeição",
+      "craving": "Desejo"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -4963,7 +4973,9 @@
       "formReview": "Peça feedback ao seu treinador",
       "review": "Avalie uma aula ou um treino",
       "checkIn": "Algumas perguntas rápidas",
-      "note": "Técnica, objetivo, humor"
+      "note": "Técnica, objetivo, humor",
+      "wellness": "Um copo, a noite passada, uma refeição",
+      "craving": "Regista ou pede apoio"
     },
     "homeTitle": "Início",
     "wodToday": "O WOD de hoje no box",
@@ -5075,7 +5087,220 @@
     "checkedIn": "Check-in feito ✓",
     "followClassTimer": "Cronómetro da aula em direto",
     "classCheckIn": "Fazer check-in",
-    "programmeManage": "Mudar o dia ou recusar"
+    "programmeManage": "Mudar o dia ou recusar",
+    "wellness": {
+      "eyebrow": "Bem-estar",
+      "today": "Hoje",
+      "yesterday": "Ontem",
+      "loading": "A carregar…",
+      "customize": "Personalizar",
+      "previousDay": "Dia anterior",
+      "nextDay": "Dia seguinte",
+      "close": "Fechar",
+      "save": "Guardar",
+      "saving": "A guardar…",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "undo": "Desfazer",
+      "open": "Abrir",
+      "onlyMe": "Só tu vês isto. Podes partilhar registos individuais mais tarde.",
+      "whoSees": "Quem vê:",
+      "less": "Menos {what}",
+      "more": "Mais {what}",
+      "item": {
+        "water": "Água",
+        "sleep": "Sono",
+        "meals": "Refeições",
+        "plan": "Plano do coach",
+        "mood": "Humor",
+        "cravings": "Desejo de comer"
+      },
+      "water": {
+        "add": "+1 copo",
+        "glasses": "{filled} de {goal} copos",
+        "added": "Copo adicionado ({ml} ml)",
+        "dropsLabel": "Copos de hoje",
+        "remove": "Remover este copo"
+      },
+      "sleep": {
+        "title": "Sono",
+        "night": "Noite",
+        "nap": "Sesta",
+        "bed": "Deitei-me",
+        "wake": "Acordei",
+        "napMinutes": "Minutos",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Qualidade (de 1 a 5)",
+        "qualityValue": "Qualidade {quality}/5",
+        "napValue": "Sesta {minutes} min",
+        "empty": "Sem registo",
+        "tap": "Toca para registar a noite",
+        "fromDevice": "de {source}",
+        "corrected": "de {source}, corrigido por ti"
+      },
+      "source": {
+        "manual": "ti",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Refeição",
+        "slot": "Que refeição",
+        "logged": "Registada",
+        "addSnack": "+ Lanche",
+        "fitLabel": {
+          "plan": "E o plano?",
+          "own": "Como querias?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Dentro do plano",
+            "off_plan": "Fora do plano"
+          },
+          "own": {
+            "in_plan": "Como queria",
+            "off_plan": "De outra forma"
+          }
+        },
+        "photo": "Foto (opcional)",
+        "photoAdd": "Adicionar foto",
+        "photoChange": "Mudar foto",
+        "photoRemove": "Remover",
+        "photoUploading": "A enviar…",
+        "photoFailed": "A foto não foi enviada. Tenta de novo ou guarda sem ela.",
+        "photoPrivate": "Privada, como as fotos do corpo. Nunca vai para uma publicação sem te perguntar.",
+        "note": "Uma linha sobre isto (opcional)",
+        "portions": "Porções com a mão (opcional)",
+        "portionsHint": "Palma, mão em concha, punho, polegar. Metades contam. Sem pesar, sem calorias.",
+        "hungerLabel": "Fome e saciedade (opcional)",
+        "hunger": "Quanta fome antes (1 a 5)",
+        "fullness": "Quão saciado depois (1 a 5)"
+      },
+      "slot": {
+        "breakfast": "Pequeno-almoço",
+        "morning_snack": "Lanche da manhã",
+        "lunch": "Almoço",
+        "afternoon_snack": "Lanche da tarde",
+        "dinner": "Jantar",
+        "evening_snack": "Ceia",
+        "snack": "Lanche",
+        "pre_workout": "Antes do treino",
+        "post_workout": "Depois do treino"
+      },
+      "portion": {
+        "protein": "Proteína (palma)",
+        "carbs": "Hidratos (mão em concha)",
+        "veg": "Legumes (punho)",
+        "fat": "Gorduras (polegar)"
+      },
+      "plan": {
+        "title": "Nutrição · {title}",
+        "showNumbers": "Mostrar números",
+        "hideNumbers": "Esconder números",
+        "of": "{logged} de {target}",
+        "noPortions": "O plano do teu coach ainda não tem porções diárias."
+      },
+      "mood": {
+        "mood": "Humor {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Como te sentes?",
+        "open": "Responder a «Como me sinto»"
+      },
+      "craving": {
+        "title": "Desejo de comer",
+        "tileTitle": "Regista-o ou pede apoio",
+        "tileHint": "No momento; como acabou pode vir depois",
+        "count": "{count, plural, one {# hoje} other {# hoje}}",
+        "edit": "Editar",
+        "support": "Preciso de apoio",
+        "supportNoBuddy": "Quando escolheres um buddy, ele recebe uma mensagem curta. Nunca os detalhes.",
+        "intensity": "Que intensidade?",
+        "trigger": "O que o provocou?",
+        "outcome": "O que aconteceu?",
+        "note": "O que me apetecia (opcional)",
+        "notePlaceholder": "p. ex. algo doce depois do jantar",
+        "tryNow": "Experimenta agora",
+        "tryWater": "Um copo de água",
+        "tryWalk": "Uma caminhada de 10 minutos",
+        "tryWait": "Espera 10 minutos e respira devagar",
+        "waterCounted": "Contado",
+        "private": "Só tu vês isto. Perguntamos uma vez, daqui a 20 minutos, como correu.",
+        "howDidItGo": "Como correu?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Cansaço",
+        "boredom": "Tédio",
+        "social": "Social",
+        "hunger": "Fome",
+        "other": "Outra coisa"
+      },
+      "outcome": {
+        "resisted": "Ultrapassei-o",
+        "ate_off_plan": "Comi algo fora do plano",
+        "ongoing": "Ainda o tenho"
+      },
+      "week": {
+        "title": "Esta semana",
+        "range": "{from} – {to}",
+        "previous": "Semana anterior",
+        "next": "Semana seguinte",
+        "item": "Item",
+        "line": "Sono no teu objetivo {nights} de {days} noites · água no teu objetivo {water} de {days} dias",
+        "dot": {
+          "full": "No teu objetivo",
+          "half": "Em parte",
+          "empty": "Nada registado",
+          "warm": "Desejo registado"
+        }
+      },
+      "consent": {
+        "title": "A tua água, sono, refeições e desejos",
+        "body": "O que registas aqui são dados de saúde. Continuam teus e privados: o teu coach só vê um registo se o partilhares, e podes exportar ou eliminar tudo quando quiseres.",
+        "items": "O que queres ver?",
+        "later": "Podes mudar isto quando quiseres em «Personalizar».",
+        "agree": "Aceito e começo"
+      },
+      "settings": {
+        "items": "Itens e ordem",
+        "hiddenKeeps": "Um item que desligas desaparece do cartão, da semana e de Novo registo. Os dados ficam até os eliminares.",
+        "moveUp": "Subir {item}",
+        "moveDown": "Descer {item}",
+        "water": "Água",
+        "glass": "O teu copo",
+        "ml": "{ml} ml",
+        "goalGlasses": "Objetivo diário (copos)",
+        "reminder": "Lembrete à tarde",
+        "reminderHint": "Uma vez, depois das 15:00, se estiveres abaixo de metade do objetivo",
+        "goalYours": "Os objetivos são teus. Um coach pode sugerir um, mas nunca o define.",
+        "sleep": "Sono",
+        "sleepGoal": "Objetivo de sono (horas)",
+        "data": "Os teus dados",
+        "section": {
+          "wellness": "Água, sono e refeições",
+          "cravings": "Desejos"
+        },
+        "export": "Exportar (JSON)",
+        "erase": "Eliminar tudo",
+        "eraseConfirm": "Sim, eliminar de vez",
+        "eraseWarning": "Isto elimina de vez cada registo desta secção, com as fotos das refeições.",
+        "erased": "Eliminado."
+      },
+      "feed": {
+        "water": "{count, plural, one {# copo} other {# copos}}",
+        "meals": "{count, plural, one {# refeição} other {# refeições}}",
+        "craving": "Desejo · {intensity}/10",
+        "empty": "Bem-estar"
+      },
+      "error": {
+        "health_data_consent_required": "Aceita primeiro que guardemos dados de saúde.",
+        "occurred_in_future": "Essa hora está no futuro.",
+        "occurred_too_long_ago": "Podes completar ou corrigir até 7 dias atrás.",
+        "invalid_wellness_value": "Verifica os valores e tenta de novo.",
+        "invalid_media": "A foto não está pronta. Escolhe-a de novo."
+      }
+    }
   },
   "Community": {
     "all": "Tudo",

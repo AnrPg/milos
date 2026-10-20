@@ -4333,7 +4333,13 @@
     "apiErrorAttendanceAlreadyRecorded": "הנוכחות שלך כבר נרשמה.",
     "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת.",
     "coachProgrammeTitle": "התוכנית שלי",
-    "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן."
+    "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן.",
+    "stfPortionsTitle": "מנות יומיות לפי יד",
+    "stfPortionsHint": "מה שהמתאמן רואה בעמוד הרווחה במקום מספרים. אפשר גם חצאים.",
+    "stfPortionsFromGrams": "מילוי מהגרמים",
+    "stfInvalidPortions": "המנות הן מ־0 עד 20, בחצאים.",
+    "stfMealSlots": "ארוחות היום",
+    "stfMealSlotsHint": "הארוחות שאליהן המתאמן רושם. השאר/י ריק לבוקר, צהריים, ערב ונשנוש."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4857,7 +4863,9 @@
         "review": "דירוג",
         "note": "הערה",
         "check_in": "איך אני מרגיש",
-        "body": "גוף"
+        "body": "גוף",
+        "wellness": "רווחה",
+        "craving": "חשק לאכול"
       },
       "loadMore": "רשומות קודמות",
       "loadingMore": "טוען…",
@@ -4954,7 +4962,9 @@
       "formReview": "סרטון טכניקה",
       "review": "ביקורת",
       "checkIn": "איך אני מרגיש",
-      "note": "הערה או מחשבה"
+      "note": "הערה או מחשבה",
+      "wellness": "מים · שינה · ארוחה",
+      "craving": "חשק לאכול"
     },
     "entryKindHint": {
       "workout": "תוצאה, RPE, הערות",
@@ -4963,7 +4973,9 @@
       "formReview": "בקשו משוב מהמאמן",
       "review": "דרגו שיעור או אימון",
       "checkIn": "כמה שאלות קצרות",
-      "note": "טכניקה, מטרה, מצב רוח"
+      "note": "טכניקה, מטרה, מצב רוח",
+      "wellness": "כוס, הלילה שעבר, ארוחה",
+      "craving": "רשום/י אותו או בקש/י תמיכה"
     },
     "homeTitle": "בית",
     "wodToday": "האימון היומי במכון",
@@ -5075,7 +5087,220 @@
     "checkedIn": "בוצע צ'ק-אין ✓",
     "followClassTimer": "טיימר השיעור בשידור חי",
     "classCheckIn": "צ'ק-אין",
-    "programmeManage": "שינוי יום או דחייה"
+    "programmeManage": "שינוי יום או דחייה",
+    "wellness": {
+      "eyebrow": "רווחה",
+      "today": "היום",
+      "yesterday": "אתמול",
+      "loading": "טוען…",
+      "customize": "התאמה אישית",
+      "previousDay": "היום הקודם",
+      "nextDay": "היום הבא",
+      "close": "סגירה",
+      "save": "שמירה",
+      "saving": "שומר…",
+      "delete": "מחיקה",
+      "cancel": "ביטול",
+      "undo": "ביטול פעולה",
+      "open": "פתיחה",
+      "onlyMe": "רק את/ה רואה את זה. אפשר לשתף רשומות בודדות בהמשך.",
+      "whoSees": "מי רואה:",
+      "less": "פחות: {what}",
+      "more": "יותר: {what}",
+      "item": {
+        "water": "מים",
+        "sleep": "שינה",
+        "meals": "ארוחות",
+        "plan": "התוכנית של המאמן",
+        "mood": "מצב רוח",
+        "cravings": "חשק לאכול"
+      },
+      "water": {
+        "add": "+1 כוס",
+        "glasses": "{filled} מתוך {goal} כוסות",
+        "added": "נוספה כוס ({ml} מ״ל)",
+        "dropsLabel": "הכוסות של היום",
+        "remove": "הסרת הכוס הזו"
+      },
+      "sleep": {
+        "title": "שינה",
+        "night": "לילה",
+        "nap": "תנומה",
+        "bed": "הלכתי לישון",
+        "wake": "התעוררתי",
+        "napMinutes": "דקות",
+        "duration": "{hours} ש׳ {minutes} ד׳",
+        "quality": "איכות (1 עד 5)",
+        "qualityValue": "איכות {quality}/5",
+        "napValue": "תנומה {minutes} ד׳",
+        "empty": "לא נרשם",
+        "tap": "הקש/י כדי לרשום את הלילה",
+        "fromDevice": "מ־{source}",
+        "corrected": "מ־{source}, תוקן על ידך"
+      },
+      "source": {
+        "manual": "אותך",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "ארוחה",
+        "slot": "איזו ארוחה",
+        "logged": "נרשמה",
+        "addSnack": "+ נשנוש",
+        "fitLabel": {
+          "plan": "ומה עם התוכנית?",
+          "own": "כמו שרצית?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "בתוך התוכנית",
+            "off_plan": "מחוץ לתוכנית"
+          },
+          "own": {
+            "in_plan": "כמו שרציתי",
+            "off_plan": "אחרת"
+          }
+        },
+        "photo": "תמונה (רשות)",
+        "photoAdd": "הוספת תמונה",
+        "photoChange": "החלפת תמונה",
+        "photoRemove": "הסרה",
+        "photoUploading": "מעלה…",
+        "photoFailed": "התמונה לא עלתה. נסה/י שוב או שמור/י בלעדיה.",
+        "photoPrivate": "פרטית, כמו תמונות גוף. היא אף פעם לא עולה לפוסט בלי לשאול אותך.",
+        "note": "שורה עליה (רשות)",
+        "portions": "מנות לפי יד (רשות)",
+        "portionsHint": "כף יד, חופן, אגרוף, אגודל. אפשר גם חצאים. בלי שקילה, בלי קלוריות.",
+        "hungerLabel": "רעב ושובע (רשות)",
+        "hunger": "כמה הייתי רעב/ה לפני (1 עד 5)",
+        "fullness": "כמה שבע/ה אחרי (1 עד 5)"
+      },
+      "slot": {
+        "breakfast": "ארוחת בוקר",
+        "morning_snack": "נשנוש בוקר",
+        "lunch": "ארוחת צהריים",
+        "afternoon_snack": "נשנוש אחר הצהריים",
+        "dinner": "ארוחת ערב",
+        "evening_snack": "נשנוש לילה",
+        "snack": "נשנוש",
+        "pre_workout": "לפני האימון",
+        "post_workout": "אחרי האימון"
+      },
+      "portion": {
+        "protein": "חלבון (כף יד)",
+        "carbs": "פחמימות (חופן)",
+        "veg": "ירקות (אגרוף)",
+        "fat": "שומנים (אגודל)"
+      },
+      "plan": {
+        "title": "תזונה · {title}",
+        "showNumbers": "הצגת מספרים",
+        "hideNumbers": "הסתרת מספרים",
+        "of": "{logged} מתוך {target}",
+        "noPortions": "בתוכנית של המאמן שלך עוד אין מנות יומיות."
+      },
+      "mood": {
+        "mood": "מצב רוח {value}/4",
+        "stress": "מתח {value}/4",
+        "empty": "איך את/ה מרגיש/ה?",
+        "open": "ענה/י על «איך אני מרגיש/ה»"
+      },
+      "craving": {
+        "title": "חשק לאכול",
+        "tileTitle": "רשום/י אותו או בקש/י תמיכה",
+        "tileHint": "ברגע עצמו; איך זה נגמר אפשר להוסיף אחר כך",
+        "count": "{count, plural, one {# היום} other {# היום}}",
+        "edit": "עריכה",
+        "support": "אני צריך/ה תמיכה",
+        "supportNoBuddy": "כשתבחר/י באדי, הוא יקבל הודעה קצרה. אף פעם לא את הפרטים.",
+        "intensity": "כמה חזק?",
+        "trigger": "מה עורר אותו?",
+        "outcome": "מה קרה?",
+        "note": "מה רציתי (רשות)",
+        "notePlaceholder": "למשל משהו מתוק אחרי ארוחת הערב",
+        "tryNow": "נסה/י עכשיו",
+        "tryWater": "כוס מים",
+        "tryWalk": "הליכה של 10 דקות",
+        "tryWait": "חכה/י 10 דקות ונשום/נשמי לאט",
+        "waterCounted": "נספר",
+        "private": "רק את/ה רואה את זה. נשאל פעם אחת, בעוד 20 דקות, איך זה הלך.",
+        "howDidItGo": "איך זה הלך?"
+      },
+      "trigger": {
+        "stress": "מתח",
+        "fatigue": "עייפות",
+        "boredom": "שעמום",
+        "social": "חברתי",
+        "hunger": "רעב",
+        "other": "משהו אחר"
+      },
+      "outcome": {
+        "resisted": "התגברתי",
+        "ate_off_plan": "אכלתי משהו מחוץ לתוכנית",
+        "ongoing": "הוא עדיין כאן"
+      },
+      "week": {
+        "title": "השבוע",
+        "range": "{from} – {to}",
+        "previous": "השבוע הקודם",
+        "next": "השבוע הבא",
+        "item": "פריט",
+        "line": "שינה ביעד שלך {nights} מתוך {days} לילות · מים ביעד שלך {water} מתוך {days} ימים",
+        "dot": {
+          "full": "ביעד שלך",
+          "half": "חלקית",
+          "empty": "לא נרשם דבר",
+          "warm": "נרשם חשק"
+        }
+      },
+      "consent": {
+        "title": "המים, השינה, הארוחות והחשקים שלך",
+        "body": "מה שנרשם כאן הוא מידע בריאותי. הוא נשאר שלך ופרטי: המאמן רואה רשומה רק אם שיתפת אותה, ואפשר לייצא או למחוק הכול בכל עת.",
+        "items": "מה תרצה/י לראות?",
+        "later": "אפשר לשנות את זה בכל עת מ«התאמה אישית».",
+        "agree": "מסכים/ה, מתחילים"
+      },
+      "settings": {
+        "items": "פריטים וסדר",
+        "hiddenKeeps": "פריט שכיבית נעלם מהכרטיס, מהשבוע ומרשומה חדשה. המידע שלו נשמר עד שתמחק/י אותו.",
+        "moveUp": "הזזת {item} למעלה",
+        "moveDown": "הזזת {item} למטה",
+        "water": "מים",
+        "glass": "הכוס שלך",
+        "ml": "{ml} מ״ל",
+        "goalGlasses": "יעד יומי (כוסות)",
+        "reminder": "תזכורת אחר הצהריים",
+        "reminderHint": "פעם אחת, אחרי 15:00, אם את/ה מתחת לחצי מהיעד",
+        "goalYours": "היעדים שלך. מאמן יכול להציע, אבל אף פעם לא לקבוע.",
+        "sleep": "שינה",
+        "sleepGoal": "יעד שינה (שעות)",
+        "data": "המידע שלך",
+        "section": {
+          "wellness": "מים, שינה וארוחות",
+          "cravings": "חשקים"
+        },
+        "export": "ייצוא (JSON)",
+        "erase": "מחיקת הכול",
+        "eraseConfirm": "כן, למחוק לצמיתות",
+        "eraseWarning": "זה מוחק לצמיתות כל רשומה בחלק הזה, יחד עם תמונות הארוחות.",
+        "erased": "נמחק."
+      },
+      "feed": {
+        "water": "{count, plural, one {כוס אחת} other {# כוסות}}",
+        "meals": "{count, plural, one {ארוחה אחת} other {# ארוחות}}",
+        "craving": "חשק · {intensity}/10",
+        "empty": "רווחה"
+      },
+      "error": {
+        "health_data_consent_required": "קודם צריך להסכים לשמירת מידע בריאותי.",
+        "occurred_in_future": "השעה הזו בעתיד.",
+        "occurred_too_long_ago": "אפשר להשלים או לתקן עד 7 ימים אחורה.",
+        "invalid_wellness_value": "בדוק/י את הערכים ונסה/י שוב.",
+        "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
+      }
+    }
   },
   "Community": {
     "all": "הכול",

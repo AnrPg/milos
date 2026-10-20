@@ -11429,6 +11429,7 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "meal_photo",
                   "post_photo",
                   "post_video"
                 ],
@@ -11599,6 +11600,7 @@
                   "enum": [
                     "body_photo",
                     "box_photo",
+                    "meal_photo",
                     "post_photo",
                     "post_video"
                   ],
@@ -11883,6 +11885,7 @@
                     "enum": [
                       "body_photo",
                       "box_photo",
+                      "meal_photo",
                       "post_photo",
                       "post_video"
                     ],
@@ -12053,6 +12056,7 @@
                       "enum": [
                         "body_photo",
                         "box_photo",
+                        "meal_photo",
                         "post_photo",
                         "post_video"
                       ],
@@ -28790,7 +28794,9 @@
               "review",
               "note",
               "check_in",
-              "body"
+              "body",
+              "wellness",
+              "craving"
             ],
             "type": "string"
           },
@@ -29082,7 +29088,9 @@
               "review",
               "note",
               "check_in",
-              "body"
+              "body",
+              "wellness",
+              "craving"
             ],
             "type": "string"
           },
@@ -29156,6 +29164,7 @@
             "enum": [
               "body_photo",
               "box_photo",
+              "meal_photo",
               "post_photo",
               "post_video"
             ],
@@ -29289,6 +29298,7 @@
                 "enum": [
                   "body_photo",
                   "box_photo",
+                  "meal_photo",
                   "post_photo",
                   "post_video"
                 ],
@@ -30409,6 +30419,7 @@
             "type": "integer"
           },
           "daily_calories": {
+            "description": "Staff only; never sent to the member",
             "nullable": true,
             "type": "integer"
           },
@@ -30419,6 +30430,87 @@
           "id": {
             "format": "uuid",
             "type": "string"
+          },
+          "meal_slots": {
+            "items": {
+              "enum": [
+                "breakfast",
+                "morning_snack",
+                "lunch",
+                "afternoon_snack",
+                "dinner",
+                "evening_snack",
+                "snack",
+                "pre_workout",
+                "post_workout"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "portion_targets": {
+            "additionalProperties": false,
+            "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+            "nullable": true,
+            "properties": {
+              "carbs": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "fat": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "protein": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "veg": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              }
+            },
+            "type": "object"
+          },
+          "portions": {
+            "additionalProperties": false,
+            "description": "Effective daily portions (member view)",
+            "nullable": true,
+            "properties": {
+              "carbs": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "fat": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "protein": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              },
+              "veg": {
+                "maximum": 20,
+                "minimum": 0,
+                "multipleOf": 0.5,
+                "type": "number"
+              }
+            },
+            "type": "object"
           },
           "protein_grams": {
             "nullable": true,
@@ -40029,7 +40121,7 @@
           },
           "value": {
             "additionalProperties": true,
-            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
             "type": "object"
           }
         },
@@ -40061,7 +40153,7 @@
           },
           "value": {
             "additionalProperties": true,
-            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
             "type": "object"
           }
         },
@@ -40136,7 +40228,7 @@
               },
               "value": {
                 "additionalProperties": true,
-                "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                 "type": "object"
               }
             },
@@ -40175,8 +40267,273 @@
         "title": "WellnessEraseResponse",
         "type": "object"
       },
+      "WellnessExport": {
+        "properties": {
+          "exported_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "photos": {
+            "additionalProperties": {
+              "properties": {
+                "feed_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "full_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "placeholder": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "thumb_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "object"
+          },
+          "sections": {
+            "properties": {
+              "cravings": {
+                "properties": {
+                  "cravings": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "follow_up_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "intensity": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome": {
+                          "enum": [
+                            "ongoing",
+                            "resisted",
+                            "ate_off_plan"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "support_requested_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "triggers": {
+                          "items": {
+                            "enum": [
+                              "stress",
+                              "fatigue",
+                              "boredom",
+                              "social",
+                              "hunger",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "intensity",
+                        "triggers",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "wellness": {
+                "properties": {
+                  "entries": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "corrected": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "water",
+                            "sleep",
+                            "meal"
+                          ],
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "manual",
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "value": {
+                          "additionalProperties": true,
+                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "value",
+                        "source",
+                        "corrected",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "preferences": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "exported_at",
+          "sections",
+          "photos"
+        ],
+        "title": "WellnessExport",
+        "type": "object"
+      },
       "WellnessOverview": {
         "properties": {
+          "consented": {
+            "description": "Whether the health-data consent is active (needed to log anything)",
+            "type": "boolean"
+          },
           "cravings": {
             "items": {
               "additionalProperties": false,
@@ -40310,6 +40667,13 @@
                     "count": {
                       "type": "integer"
                     },
+                    "portions": {
+                      "additionalProperties": {
+                        "type": "number"
+                      },
+                      "description": "Hand portions logged that day",
+                      "type": "object"
+                    },
                     "status": {
                       "enum": [
                         "none",
@@ -40321,6 +40685,7 @@
                   },
                   "required": [
                     "count",
+                    "portions",
                     "status"
                   ],
                   "type": "object"
@@ -40500,7 +40865,7 @@
                 },
                 "value": {
                   "additionalProperties": true,
-                  "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                  "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                   "type": "object"
                 }
               },
@@ -40523,6 +40888,148 @@
             "format": "date",
             "type": "string"
           },
+          "photo_capabilities": {
+            "properties": {
+              "content_types": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "max_bytes": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "content_types",
+              "max_bytes"
+            ],
+            "type": "object"
+          },
+          "photos": {
+            "additionalProperties": {
+              "properties": {
+                "feed_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "full_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "placeholder": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "thumb_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "status"
+              ],
+              "type": "object"
+            },
+            "description": "Meal photos by media id, with short-lived signed URLs",
+            "type": "object"
+          },
+          "plans": {
+            "description": "Coaches' plans as the member sees them (no calories); empty when hidden",
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "meal_slots": {
+                  "description": "Meal slots the member logs against; empty means the default ones",
+                  "items": {
+                    "enum": [
+                      "breakfast",
+                      "morning_snack",
+                      "lunch",
+                      "afternoon_snack",
+                      "dinner",
+                      "evening_snack",
+                      "snack",
+                      "pre_workout",
+                      "post_workout"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "portions": {
+                  "additionalProperties": false,
+                  "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                  "nullable": true,
+                  "properties": {
+                    "carbs": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "multipleOf": 0.5,
+                      "type": "number"
+                    },
+                    "fat": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "multipleOf": 0.5,
+                      "type": "number"
+                    },
+                    "protein": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "multipleOf": 0.5,
+                      "type": "number"
+                    },
+                    "veg": {
+                      "maximum": 20,
+                      "minimum": 0,
+                      "multipleOf": 0.5,
+                      "type": "number"
+                    }
+                  },
+                  "type": "object"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "organization_id",
+                "title",
+                "meal_slots"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "preferences": {
             "additionalProperties": false,
             "properties": {
@@ -40544,6 +41051,20 @@
                 },
                 "type": "array"
               },
+              "item_order": {
+                "description": "Tile order; every item appears once (unplaced ones follow in default order)",
+                "items": {
+                  "enum": [
+                    "water",
+                    "sleep",
+                    "meals",
+                    "plan",
+                    "mood"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "sleep_goal_minutes": {
                 "maximum": 720,
                 "minimum": 240,
@@ -40553,13 +41074,19 @@
                 "maximum": 8000,
                 "minimum": 250,
                 "type": "integer"
+              },
+              "water_reminder": {
+                "description": "Opt-in afternoon reminder while the day is under half the goal",
+                "type": "boolean"
               }
             },
             "required": [
               "water_goal_ml",
               "glass_ml",
               "sleep_goal_minutes",
-              "hidden_items"
+              "hidden_items",
+              "item_order",
+              "water_reminder"
             ],
             "type": "object"
           },
@@ -40606,13 +41133,18 @@
           "days",
           "week",
           "entries",
-          "cravings"
+          "cravings",
+          "photos",
+          "photo_capabilities",
+          "plans",
+          "consented"
         ],
         "title": "WellnessOverview",
         "type": "object"
       },
       "WellnessPreferencesRequest": {
         "additionalProperties": false,
+        "description": "Any subset of the fields",
         "properties": {
           "glass_ml": {
             "maximum": 2000,
@@ -40620,6 +41152,20 @@
             "type": "integer"
           },
           "hidden_items": {
+            "items": {
+              "enum": [
+                "water",
+                "sleep",
+                "meals",
+                "plan",
+                "mood"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "item_order": {
+            "description": "Tile order; every item appears once (unplaced ones follow in default order)",
             "items": {
               "enum": [
                 "water",
@@ -40641,6 +41187,10 @@
             "maximum": 8000,
             "minimum": 250,
             "type": "integer"
+          },
+          "water_reminder": {
+            "description": "Opt-in afternoon reminder while the day is under half the goal",
+            "type": "boolean"
           }
         },
         "title": "WellnessPreferencesRequest",
@@ -40669,6 +41219,20 @@
                 },
                 "type": "array"
               },
+              "item_order": {
+                "description": "Tile order; every item appears once (unplaced ones follow in default order)",
+                "items": {
+                  "enum": [
+                    "water",
+                    "sleep",
+                    "meals",
+                    "plan",
+                    "mood"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
               "sleep_goal_minutes": {
                 "maximum": 720,
                 "minimum": 240,
@@ -40678,13 +41242,19 @@
                 "maximum": 8000,
                 "minimum": 250,
                 "type": "integer"
+              },
+              "water_reminder": {
+                "description": "Opt-in afternoon reminder while the day is under half the goal",
+                "type": "boolean"
               }
             },
             "required": [
               "water_goal_ml",
               "glass_ml",
               "sleep_goal_minutes",
-              "hidden_items"
+              "hidden_items",
+              "item_order",
+              "water_reminder"
             ],
             "type": "object"
           }
@@ -65454,7 +66024,10 @@
                 "review",
                 "note",
                 "check_in",
-                "body"
+                "body",
+                "wellness",
+                "craving",
+                "wellness_entry"
               ],
               "type": "string"
             }
@@ -65539,7 +66112,9 @@
                         "review",
                         "note",
                         "check_in",
-                        "body"
+                        "body",
+                        "wellness",
+                        "craving"
                       ],
                       "type": "string"
                     },
@@ -66110,6 +66685,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "meal_photo",
                             "post_photo",
                             "post_video"
                           ],
@@ -66267,6 +66843,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "meal_photo",
                             "post_photo",
                             "post_video"
                           ],
@@ -66470,6 +67047,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "meal_photo",
                             "post_photo",
                             "post_video"
                           ],
@@ -69489,6 +70067,10 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "consented": {
+                      "description": "Whether the health-data consent is active (needed to log anything)",
+                      "type": "boolean"
+                    },
                     "cravings": {
                       "items": {
                         "additionalProperties": false,
@@ -69622,6 +70204,13 @@
                               "count": {
                                 "type": "integer"
                               },
+                              "portions": {
+                                "additionalProperties": {
+                                  "type": "number"
+                                },
+                                "description": "Hand portions logged that day",
+                                "type": "object"
+                              },
                               "status": {
                                 "enum": [
                                   "none",
@@ -69633,6 +70222,7 @@
                             },
                             "required": [
                               "count",
+                              "portions",
                               "status"
                             ],
                             "type": "object"
@@ -69812,7 +70402,7 @@
                           },
                           "value": {
                             "additionalProperties": true,
-                            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                             "type": "object"
                           }
                         },
@@ -69835,6 +70425,148 @@
                       "format": "date",
                       "type": "string"
                     },
+                    "photo_capabilities": {
+                      "properties": {
+                        "content_types": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "max_bytes": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "content_types",
+                        "max_bytes"
+                      ],
+                      "type": "object"
+                    },
+                    "photos": {
+                      "additionalProperties": {
+                        "properties": {
+                          "feed_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "full_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "placeholder": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "thumb_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "description": "Meal photos by media id, with short-lived signed URLs",
+                      "type": "object"
+                    },
+                    "plans": {
+                      "description": "Coaches' plans as the member sees them (no calories); empty when hidden",
+                      "items": {
+                        "properties": {
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "meal_slots": {
+                            "description": "Meal slots the member logs against; empty means the default ones",
+                            "items": {
+                              "enum": [
+                                "breakfast",
+                                "morning_snack",
+                                "lunch",
+                                "afternoon_snack",
+                                "dinner",
+                                "evening_snack",
+                                "snack",
+                                "pre_workout",
+                                "post_workout"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "portions": {
+                            "additionalProperties": false,
+                            "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                            "nullable": true,
+                            "properties": {
+                              "carbs": {
+                                "maximum": 20,
+                                "minimum": 0,
+                                "multipleOf": 0.5,
+                                "type": "number"
+                              },
+                              "fat": {
+                                "maximum": 20,
+                                "minimum": 0,
+                                "multipleOf": 0.5,
+                                "type": "number"
+                              },
+                              "protein": {
+                                "maximum": 20,
+                                "minimum": 0,
+                                "multipleOf": 0.5,
+                                "type": "number"
+                              },
+                              "veg": {
+                                "maximum": 20,
+                                "minimum": 0,
+                                "multipleOf": 0.5,
+                                "type": "number"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "organization_id",
+                          "title",
+                          "meal_slots"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "preferences": {
                       "additionalProperties": false,
                       "properties": {
@@ -69856,6 +70588,20 @@
                           },
                           "type": "array"
                         },
+                        "item_order": {
+                          "description": "Tile order; every item appears once (unplaced ones follow in default order)",
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "sleep_goal_minutes": {
                           "maximum": 720,
                           "minimum": 240,
@@ -69865,13 +70611,19 @@
                           "maximum": 8000,
                           "minimum": 250,
                           "type": "integer"
+                        },
+                        "water_reminder": {
+                          "description": "Opt-in afternoon reminder while the day is under half the goal",
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "water_goal_ml",
                         "glass_ml",
                         "sleep_goal_minutes",
-                        "hidden_items"
+                        "hidden_items",
+                        "item_order",
+                        "water_reminder"
                       ],
                       "type": "object"
                     },
@@ -69918,7 +70670,11 @@
                     "days",
                     "week",
                     "entries",
-                    "cravings"
+                    "cravings",
+                    "photos",
+                    "photo_capabilities",
+                    "plans",
+                    "consented"
                   ],
                   "title": "WellnessOverview",
                   "type": "object"
@@ -70401,7 +71157,7 @@
                   },
                   "value": {
                     "additionalProperties": true,
-                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                     "type": "object"
                   }
                 },
@@ -70484,7 +71240,7 @@
                         },
                         "value": {
                           "additionalProperties": true,
-                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                           "type": "object"
                         }
                       },
@@ -70584,7 +71340,7 @@
                   },
                   "value": {
                     "additionalProperties": true,
-                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                     "type": "object"
                   }
                 },
@@ -70663,7 +71419,7 @@
                         },
                         "value": {
                           "additionalProperties": true,
-                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
                           "type": "object"
                         }
                       },
@@ -70703,6 +71459,389 @@
         ]
       }
     },
+    "/api/me/wellness/export": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.export",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sections",
+            "required": true,
+            "schema": {
+              "example": "wellness,cravings",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exported_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "photos": {
+                      "additionalProperties": {
+                        "properties": {
+                          "feed_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "full_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "height": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "placeholder": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "thumb_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "width": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "object"
+                    },
+                    "sections": {
+                      "properties": {
+                        "cravings": {
+                          "properties": {
+                            "cravings": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "follow_up_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "intensity": {
+                                    "maximum": 10,
+                                    "minimum": 1,
+                                    "type": "integer"
+                                  },
+                                  "journal_visibility": {
+                                    "enum": [
+                                      "private",
+                                      "coach_can_view",
+                                      "coach_reply_requested",
+                                      "posted"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "note": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "occurred_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "occurred_on": {
+                                    "format": "date",
+                                    "type": "string"
+                                  },
+                                  "occurred_tz": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "outcome": {
+                                    "enum": [
+                                      "ongoing",
+                                      "resisted",
+                                      "ate_off_plan"
+                                    ],
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "outcome_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "support_requested_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "triggers": {
+                                    "items": {
+                                      "enum": [
+                                        "stress",
+                                        "fatigue",
+                                        "boredom",
+                                        "social",
+                                        "hunger",
+                                        "other"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "type": "array"
+                                  },
+                                  "updated_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "occurred_at",
+                                  "occurred_tz",
+                                  "occurred_on",
+                                  "intensity",
+                                  "triggers",
+                                  "journal_visibility"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "wellness": {
+                          "properties": {
+                            "entries": {
+                              "items": {
+                                "additionalProperties": false,
+                                "properties": {
+                                  "corrected": {
+                                    "type": "boolean"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "inserted_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "journal_visibility": {
+                                    "enum": [
+                                      "private",
+                                      "coach_can_view",
+                                      "coach_reply_requested",
+                                      "posted"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "water",
+                                      "sleep",
+                                      "meal"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "occurred_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "occurred_on": {
+                                    "format": "date",
+                                    "type": "string"
+                                  },
+                                  "occurred_tz": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "source": {
+                                    "enum": [
+                                      "manual",
+                                      "garmin",
+                                      "apple_health",
+                                      "health_connect"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "updated_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "value": {
+                                    "additionalProperties": true,
+                                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\n(breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?\nin_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "kind",
+                                  "occurred_at",
+                                  "occurred_tz",
+                                  "occurred_on",
+                                  "value",
+                                  "source",
+                                  "corrected",
+                                  "journal_visibility"
+                                ],
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "preferences": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "exported_at",
+                    "sections",
+                    "photos"
+                  ],
+                  "title": "WellnessExport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Export"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your wellness and/or cravings as JSON, meal photos as signed links",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/meal-photos": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.upload_meal_photo",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "byte_size": {
+                    "maximum": 8388608,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "content_type": {
+                    "description": "Images are re-encoded in the browser (drops EXIF/GPS) before upload.",
+                    "enum": [
+                      "image/jpeg",
+                      "image/webp"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "content_type",
+                  "byte_size"
+                ],
+                "title": "MediaUploadRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_in": {
+                      "type": "integer"
+                    },
+                    "max_bytes": {
+                      "type": "integer"
+                    },
+                    "media_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "required_headers": {
+                      "additionalProperties": {
+                        "type": "string"
+                      },
+                      "type": "object"
+                    },
+                    "upload_url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "media_id",
+                    "upload_url",
+                    "required_headers",
+                    "expires_in",
+                    "max_bytes"
+                  ],
+                  "title": "MediaUpload",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Upload"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reserve an upload for a meal photo (needs your health-data consent)",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
     "/api/me/wellness/preferences": {
       "get": {
         "callbacks": {},
@@ -70735,6 +71874,20 @@
                           },
                           "type": "array"
                         },
+                        "item_order": {
+                          "description": "Tile order; every item appears once (unplaced ones follow in default order)",
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "sleep_goal_minutes": {
                           "maximum": 720,
                           "minimum": 240,
@@ -70744,13 +71897,19 @@
                           "maximum": 8000,
                           "minimum": 250,
                           "type": "integer"
+                        },
+                        "water_reminder": {
+                          "description": "Opt-in afternoon reminder while the day is under half the goal",
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "water_goal_ml",
                         "glass_ml",
                         "sleep_goal_minutes",
-                        "hidden_items"
+                        "hidden_items",
+                        "item_order",
+                        "water_reminder"
                       ],
                       "type": "object"
                     }
@@ -70785,6 +71944,7 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
+                "description": "Any subset of the fields",
                 "properties": {
                   "glass_ml": {
                     "maximum": 2000,
@@ -70792,6 +71952,20 @@
                     "type": "integer"
                   },
                   "hidden_items": {
+                    "items": {
+                      "enum": [
+                        "water",
+                        "sleep",
+                        "meals",
+                        "plan",
+                        "mood"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "item_order": {
+                    "description": "Tile order; every item appears once (unplaced ones follow in default order)",
                     "items": {
                       "enum": [
                         "water",
@@ -70813,6 +71987,10 @@
                     "maximum": 8000,
                     "minimum": 250,
                     "type": "integer"
+                  },
+                  "water_reminder": {
+                    "description": "Opt-in afternoon reminder while the day is under half the goal",
+                    "type": "boolean"
                   }
                 },
                 "title": "WellnessPreferencesRequest",
@@ -70849,6 +72027,20 @@
                           },
                           "type": "array"
                         },
+                        "item_order": {
+                          "description": "Tile order; every item appears once (unplaced ones follow in default order)",
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
                         "sleep_goal_minutes": {
                           "maximum": 720,
                           "minimum": 240,
@@ -70858,13 +72050,19 @@
                           "maximum": 8000,
                           "minimum": 250,
                           "type": "integer"
+                        },
+                        "water_reminder": {
+                          "description": "Opt-in afternoon reminder while the day is under half the goal",
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "water_goal_ml",
                         "glass_ml",
                         "sleep_goal_minutes",
-                        "hidden_items"
+                        "hidden_items",
+                        "item_order",
+                        "water_reminder"
                       ],
                       "type": "object"
                     }
@@ -97105,6 +98303,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "meal_photo",
                                 "post_photo",
                                 "post_video"
                               ],
@@ -97275,6 +98474,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "meal_photo",
                                   "post_photo",
                                   "post_video"
                                 ],
@@ -97723,6 +98923,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "meal_photo",
                                 "post_photo",
                                 "post_video"
                               ],
@@ -97893,6 +99094,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "meal_photo",
                                   "post_photo",
                                   "post_video"
                                 ],
@@ -98192,6 +99394,7 @@
                           "enum": [
                             "body_photo",
                             "box_photo",
+                            "meal_photo",
                             "post_photo",
                             "post_video"
                           ],
@@ -98440,6 +99643,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "meal_photo",
                                 "post_photo",
                                 "post_video"
                               ],
@@ -98610,6 +99814,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "meal_photo",
                                   "post_photo",
                                   "post_video"
                                 ],
@@ -99026,6 +100231,7 @@
                               "enum": [
                                 "body_photo",
                                 "box_photo",
+                                "meal_photo",
                                 "post_photo",
                                 "post_video"
                               ],
@@ -99196,6 +100402,7 @@
                                 "enum": [
                                   "body_photo",
                                   "box_photo",
+                                  "meal_photo",
                                   "post_photo",
                                   "post_video"
                                 ],
@@ -126387,6 +127594,7 @@
                           "type": "integer"
                         },
                         "daily_calories": {
+                          "description": "Staff only; never sent to the member",
                           "nullable": true,
                           "type": "integer"
                         },
@@ -126397,6 +127605,87 @@
                         "id": {
                           "format": "uuid",
                           "type": "string"
+                        },
+                        "meal_slots": {
+                          "items": {
+                            "enum": [
+                              "breakfast",
+                              "morning_snack",
+                              "lunch",
+                              "afternoon_snack",
+                              "dinner",
+                              "evening_snack",
+                              "snack",
+                              "pre_workout",
+                              "post_workout"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "portion_targets": {
+                          "additionalProperties": false,
+                          "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "portions": {
+                          "additionalProperties": false,
+                          "description": "Effective daily portions (member view)",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
                         },
                         "protein_grams": {
                           "nullable": true,
@@ -133072,6 +134361,7 @@
                           "type": "integer"
                         },
                         "daily_calories": {
+                          "description": "Staff only; never sent to the member",
                           "nullable": true,
                           "type": "integer"
                         },
@@ -133082,6 +134372,87 @@
                         "id": {
                           "format": "uuid",
                           "type": "string"
+                        },
+                        "meal_slots": {
+                          "items": {
+                            "enum": [
+                              "breakfast",
+                              "morning_snack",
+                              "lunch",
+                              "afternoon_snack",
+                              "dinner",
+                              "evening_snack",
+                              "snack",
+                              "pre_workout",
+                              "post_workout"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "portion_targets": {
+                          "additionalProperties": false,
+                          "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "portions": {
+                          "additionalProperties": false,
+                          "description": "Effective daily portions (member view)",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
                         },
                         "protein_grams": {
                           "nullable": true,
@@ -133172,6 +134543,56 @@
                     "nullable": true,
                     "type": "integer"
                   },
+                  "meal_slots": {
+                    "description": "Meal slots the member logs against; empty means the default ones",
+                    "items": {
+                      "enum": [
+                        "breakfast",
+                        "morning_snack",
+                        "lunch",
+                        "afternoon_snack",
+                        "dinner",
+                        "evening_snack",
+                        "snack",
+                        "pre_workout",
+                        "post_workout"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "portion_targets": {
+                    "additionalProperties": false,
+                    "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                    "nullable": true,
+                    "properties": {
+                      "carbs": {
+                        "maximum": 20,
+                        "minimum": 0,
+                        "multipleOf": 0.5,
+                        "type": "number"
+                      },
+                      "fat": {
+                        "maximum": 20,
+                        "minimum": 0,
+                        "multipleOf": 0.5,
+                        "type": "number"
+                      },
+                      "protein": {
+                        "maximum": 20,
+                        "minimum": 0,
+                        "multipleOf": 0.5,
+                        "type": "number"
+                      },
+                      "veg": {
+                        "maximum": 20,
+                        "minimum": 0,
+                        "multipleOf": 0.5,
+                        "type": "number"
+                      }
+                    },
+                    "type": "object"
+                  },
                   "protein_grams": {
                     "maximum": 1000,
                     "minimum": 0,
@@ -133211,6 +134632,7 @@
                           "type": "integer"
                         },
                         "daily_calories": {
+                          "description": "Staff only; never sent to the member",
                           "nullable": true,
                           "type": "integer"
                         },
@@ -133221,6 +134643,87 @@
                         "id": {
                           "format": "uuid",
                           "type": "string"
+                        },
+                        "meal_slots": {
+                          "items": {
+                            "enum": [
+                              "breakfast",
+                              "morning_snack",
+                              "lunch",
+                              "afternoon_snack",
+                              "dinner",
+                              "evening_snack",
+                              "snack",
+                              "pre_workout",
+                              "post_workout"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "portion_targets": {
+                          "additionalProperties": false,
+                          "description": "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "portions": {
+                          "additionalProperties": false,
+                          "description": "Effective daily portions (member view)",
+                          "nullable": true,
+                          "properties": {
+                            "carbs": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "fat": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "protein": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            },
+                            "veg": {
+                              "maximum": 20,
+                              "minimum": 0,
+                              "multipleOf": 0.5,
+                              "type": "number"
+                            }
+                          },
+                          "type": "object"
                         },
                         "protein_grams": {
                           "nullable": true,

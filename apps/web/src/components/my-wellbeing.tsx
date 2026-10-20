@@ -8,6 +8,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useMutation, useQuery } from "@tanstack/react-query";
 
 import {
@@ -24,6 +25,8 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
 import { CheckInPanel } from "@/components/member-app/wellbeing/CheckInPanel";
 import { InjuryTimeline, InjuryUpdateForm } from "@/components/member-app/wellbeing/InjuryTimeline";
+import { useWellness, wellnessWindow, WellnessPanel } from "@/components/member-app/wellness/WellnessPanel";
+import { localDate } from "@/components/member-app/wellness/wellness-model";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -33,6 +36,13 @@ export function MyWellbeing() {
   const [severity, setSeverity] = useState<ReportInjuryRequest["severity"]>("mild");
   const [limitations, setLimitations] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  // «Πώς πήγε;» and Νέα καταχώρηση › Λιγούρα arrive as ?craving=<id|new>.
+  const craving = useSearchParams().get("craving");
+  const today = localDate(new Date());
+  const range = wellnessWindow(today, 0);
+  const wellness = useWellness(range.from, range.to);
+  const todaySleep = wellness.data?.days.find((day) => day.date === today)?.sleep.status;
+  const sleepLogged = Boolean(todaySleep && todaySleep !== "none" && !wellness.data?.preferences.hidden_items.includes("sleep"));
 
   const injuriesQuery = useQuery({
     queryKey: ["my", "wellbeing", "injuries"],
@@ -78,8 +88,10 @@ export function MyWellbeing() {
       <div className="mx-auto max-w-4xl space-y-6">
         <PageHeader title={i18n("myWellbeing1916377")} />
 
+        <WellnessPanel key={craving ?? "panel"} initialCraving={craving} />
+
         <section id="check-in" className="scroll-mt-24">
-          <CheckInPanel />
+          <CheckInPanel skipQuestions={sleepLogged ? ["sleep"] : []} />
         </section>
 
         <form

@@ -4333,7 +4333,13 @@
     "apiErrorAttendanceAlreadyRecorded": "Deine Anwesenheit wurde bereits erfasst.",
     "apiErrorAttendanceRequiresApprovedBooking": "Einchecken geht nur mit einer bestätigten Buchung.",
     "coachProgrammeTitle": "Mein Programm",
-    "coachProgrammeHint": "Tag ändern, ein Workout ablehnen oder deinen Coach um eines bitten."
+    "coachProgrammeHint": "Tag ändern, ein Workout ablehnen oder deinen Coach um eines bitten.",
+    "stfPortionsTitle": "Tägliche Handportionen",
+    "stfPortionsHint": "Das sieht das Mitglied auf der Wohlbefinden-Seite statt Zahlen. Halbe sind möglich.",
+    "stfPortionsFromGrams": "Aus den Gramm übernehmen",
+    "stfInvalidPortions": "Portionen gehen von 0 bis 20, in Halben.",
+    "stfMealSlots": "Mahlzeiten am Tag",
+    "stfMealSlotsHint": "Die Mahlzeiten, zu denen das Mitglied einträgt. Leer lassen für Frühstück, Mittag, Abendessen und Snack."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4857,7 +4863,9 @@
         "review": "Bewertung",
         "note": "Notiz",
         "check_in": "Wie ich mich fühle",
-        "body": "Körper"
+        "body": "Körper",
+        "wellness": "Wohlbefinden",
+        "craving": "Heißhunger"
       },
       "loadMore": "Ältere Einträge",
       "loadingMore": "Wird geladen…",
@@ -4954,7 +4962,9 @@
       "formReview": "Technikvideo",
       "review": "Bewertung",
       "checkIn": "Wie ich mich fühle",
-      "note": "Notiz oder Gedanke"
+      "note": "Notiz oder Gedanke",
+      "wellness": "Wasser · Schlaf · Mahlzeit",
+      "craving": "Heißhunger"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
@@ -4963,7 +4973,9 @@
       "formReview": "Bitte deinen Coach um Feedback",
       "review": "Bewerte einen Kurs oder ein Training",
       "checkIn": "Ein paar kurze Fragen",
-      "note": "Technik, Ziel, Stimmung"
+      "note": "Technik, Ziel, Stimmung",
+      "wellness": "Ein Glas, die letzte Nacht, eine Mahlzeit",
+      "craving": "Notieren oder Unterstützung holen"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -5075,7 +5087,220 @@
     "checkedIn": "Eingecheckt ✓",
     "followClassTimer": "Live-Kurstimer",
     "classCheckIn": "Einchecken",
-    "programmeManage": "Tag ändern oder ablehnen"
+    "programmeManage": "Tag ändern oder ablehnen",
+    "wellness": {
+      "eyebrow": "Wohlbefinden",
+      "today": "Heute",
+      "yesterday": "Gestern",
+      "loading": "Wird geladen…",
+      "customize": "Anpassen",
+      "previousDay": "Vorheriger Tag",
+      "nextDay": "Nächster Tag",
+      "close": "Schließen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "delete": "Löschen",
+      "cancel": "Abbrechen",
+      "undo": "Rückgängig",
+      "open": "Öffnen",
+      "onlyMe": "Nur du siehst das. Einzelne Einträge kannst du später teilen.",
+      "whoSees": "Wer es sieht:",
+      "less": "Weniger {what}",
+      "more": "Mehr {what}",
+      "item": {
+        "water": "Wasser",
+        "sleep": "Schlaf",
+        "meals": "Mahlzeiten",
+        "plan": "Plan des Coachs",
+        "mood": "Stimmung",
+        "cravings": "Heißhunger"
+      },
+      "water": {
+        "add": "+1 Glas",
+        "glasses": "{filled} von {goal} Gläsern",
+        "added": "Ein Glas hinzugefügt ({ml} ml)",
+        "dropsLabel": "Gläser heute",
+        "remove": "Dieses Glas entfernen"
+      },
+      "sleep": {
+        "title": "Schlaf",
+        "night": "Nacht",
+        "nap": "Nickerchen",
+        "bed": "Ins Bett gegangen",
+        "wake": "Aufgewacht",
+        "napMinutes": "Minuten",
+        "duration": "{hours} Std. {minutes} Min.",
+        "quality": "Qualität (1 bis 5)",
+        "qualityValue": "Qualität {quality}/5",
+        "napValue": "Nickerchen {minutes} Min.",
+        "empty": "Nicht erfasst",
+        "tap": "Tippe, um die Nacht zu erfassen",
+        "fromDevice": "von {source}",
+        "corrected": "von {source}, von dir korrigiert"
+      },
+      "source": {
+        "manual": "dir",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Mahlzeit",
+        "slot": "Welche Mahlzeit",
+        "logged": "Erfasst",
+        "addSnack": "+ Snack",
+        "fitLabel": {
+          "plan": "Und der Plan?",
+          "own": "So wie gewollt?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Im Plan",
+            "off_plan": "Außerhalb des Plans"
+          },
+          "own": {
+            "in_plan": "So wie gewollt",
+            "off_plan": "Anders"
+          }
+        },
+        "photo": "Foto (optional)",
+        "photoAdd": "Foto hinzufügen",
+        "photoChange": "Foto ändern",
+        "photoRemove": "Entfernen",
+        "photoUploading": "Wird hochgeladen…",
+        "photoFailed": "Das Foto wurde nicht hochgeladen. Versuch es noch einmal oder speichere ohne.",
+        "photoPrivate": "Privat, wie Körperfotos. Es landet nie ohne deine Zustimmung in einem Beitrag.",
+        "note": "Eine Zeile dazu (optional)",
+        "portions": "Handportionen (optional)",
+        "portionsHint": "Handfläche, hohle Hand, Faust, Daumen. Halbe gehen auch. Kein Wiegen, keine Kalorien.",
+        "hungerLabel": "Hunger und Sättigung (optional)",
+        "hunger": "Wie hungrig vorher (1 bis 5)",
+        "fullness": "Wie satt danach (1 bis 5)"
+      },
+      "slot": {
+        "breakfast": "Frühstück",
+        "morning_snack": "Vormittagssnack",
+        "lunch": "Mittagessen",
+        "afternoon_snack": "Nachmittagssnack",
+        "dinner": "Abendessen",
+        "evening_snack": "Abendsnack",
+        "snack": "Snack",
+        "pre_workout": "Vor dem Training",
+        "post_workout": "Nach dem Training"
+      },
+      "portion": {
+        "protein": "Eiweiß (Handfläche)",
+        "carbs": "Kohlenhydrate (hohle Hand)",
+        "veg": "Gemüse (Faust)",
+        "fat": "Fette (Daumen)"
+      },
+      "plan": {
+        "title": "Ernährung · {title}",
+        "showNumbers": "Zahlen zeigen",
+        "hideNumbers": "Zahlen ausblenden",
+        "of": "{logged} von {target}",
+        "noPortions": "Der Plan deines Coachs hat noch keine Tagesportionen."
+      },
+      "mood": {
+        "mood": "Stimmung {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Wie fühlst du dich?",
+        "open": "«Wie ich mich fühle» beantworten"
+      },
+      "craving": {
+        "title": "Heißhunger",
+        "tileTitle": "Erfassen oder um Unterstützung bitten",
+        "tileHint": "Im Moment; wie es ausging, kann später kommen",
+        "count": "{count, plural, one {# heute} other {# heute}}",
+        "edit": "Bearbeiten",
+        "support": "Ich brauche Unterstützung",
+        "supportNoBuddy": "Sobald du einen Buddy festlegst, bekommt er eine kurze Nachricht. Nie die Details.",
+        "intensity": "Wie stark?",
+        "trigger": "Was hat ihn ausgelöst?",
+        "outcome": "Was ist passiert?",
+        "note": "Was ich wollte (optional)",
+        "notePlaceholder": "z. B. etwas Süßes nach dem Essen",
+        "tryNow": "Probier jetzt",
+        "tryWater": "Ein Glas Wasser",
+        "tryWalk": "Ein Spaziergang von 10 Minuten",
+        "tryWait": "Warte 10 Minuten und atme langsam",
+        "waterCounted": "Gezählt",
+        "private": "Nur du siehst das. Wir fragen einmal, in 20 Minuten, wie es lief.",
+        "howDidItGo": "Wie lief es?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Müdigkeit",
+        "boredom": "Langeweile",
+        "social": "Gesellschaft",
+        "hunger": "Hunger",
+        "other": "Etwas anderes"
+      },
+      "outcome": {
+        "resisted": "Ich bin drüber hinweggekommen",
+        "ate_off_plan": "Ich habe etwas außerhalb des Plans gegessen",
+        "ongoing": "Ich habe ihn noch"
+      },
+      "week": {
+        "title": "Diese Woche",
+        "range": "{from} – {to}",
+        "previous": "Vorherige Woche",
+        "next": "Nächste Woche",
+        "item": "Eintrag",
+        "line": "Schlaf im Ziel an {nights} von {days} Nächten · Wasser im Ziel an {water} von {days} Tagen",
+        "dot": {
+          "full": "Im Ziel",
+          "half": "Teilweise",
+          "empty": "Nichts erfasst",
+          "warm": "Heißhunger erfasst"
+        }
+      },
+      "consent": {
+        "title": "Dein Wasser, Schlaf, deine Mahlzeiten und dein Heißhunger",
+        "body": "Was du hier erfasst, sind Gesundheitsdaten. Sie bleiben deine und privat: Dein Coach sieht einen Eintrag nur, wenn du ihn teilst, und du kannst jederzeit alles exportieren oder löschen.",
+        "items": "Was möchtest du sehen?",
+        "later": "Du kannst das jederzeit unter «Anpassen» ändern.",
+        "agree": "Zustimmen und loslegen"
+      },
+      "settings": {
+        "items": "Einträge und Reihenfolge",
+        "hiddenKeeps": "Ein ausgeschalteter Eintrag verschwindet aus der Karte, der Woche und dem neuen Eintrag. Seine Daten bleiben, bis du sie löschst.",
+        "moveUp": "{item} nach oben",
+        "moveDown": "{item} nach unten",
+        "water": "Wasser",
+        "glass": "Dein Glas",
+        "ml": "{ml} ml",
+        "goalGlasses": "Tagesziel (Gläser)",
+        "reminder": "Erinnerung am Nachmittag",
+        "reminderHint": "Einmal, nach 15:00, wenn du unter der Hälfte deines Ziels bist",
+        "goalYours": "Die Ziele sind deine. Ein Coach kann eins vorschlagen, aber nie festlegen.",
+        "sleep": "Schlaf",
+        "sleepGoal": "Schlafziel (Stunden)",
+        "data": "Deine Daten",
+        "section": {
+          "wellness": "Wasser, Schlaf und Mahlzeiten",
+          "cravings": "Heißhunger"
+        },
+        "export": "Exportieren (JSON)",
+        "erase": "Alles löschen",
+        "eraseConfirm": "Ja, endgültig löschen",
+        "eraseWarning": "Das entfernt jeden Eintrag dieses Bereichs endgültig, mit den Fotos der Mahlzeiten.",
+        "erased": "Gelöscht."
+      },
+      "feed": {
+        "water": "{count, plural, one {# Glas} other {# Gläser}}",
+        "meals": "{count, plural, one {# Mahlzeit} other {# Mahlzeiten}}",
+        "craving": "Heißhunger · {intensity}/10",
+        "empty": "Wohlbefinden"
+      },
+      "error": {
+        "health_data_consent_required": "Stimme zuerst zu, dass Gesundheitsdaten gespeichert werden.",
+        "occurred_in_future": "Diese Zeit liegt in der Zukunft.",
+        "occurred_too_long_ago": "Du kannst bis zu 7 Tage zurück ergänzen oder korrigieren.",
+        "invalid_wellness_value": "Prüfe die Werte und versuch es noch einmal.",
+        "invalid_media": "Das Foto ist nicht bereit. Wähle es noch einmal."
+      }
+    }
   },
   "Community": {
     "all": "Alle",
