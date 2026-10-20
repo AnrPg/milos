@@ -164,6 +164,7 @@ function ChartCard({ settings, snapshots }: { settings: BodySettingsResponse; sn
           display={series.data.display}
           points={series.data.points}
           trend={series.data.trend}
+          shape={series.data.shape}
           unit={series.data.unit}
           label={label}
           rangeLabel={t(key("rangeLong", range))}

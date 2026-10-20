@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} разгледа измерванията ти · {date}",
-      "snapshot": "{coach} отвори измерване · {date}"
+      "snapshot": "{coach} отвори измерване · {date}",
+      "series": "{coach} разгледа графика на измерванията ти · {date}"
     },
     "fieldError": {
       "invalid": "Въведи число",

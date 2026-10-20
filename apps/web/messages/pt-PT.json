@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} viu as tuas medições · {date}",
-      "snapshot": "{coach} abriu uma medição · {date}"
+      "snapshot": "{coach} abriu uma medição · {date}",
+      "series": "{coach} viu um gráfico das tuas medições · {date}"
     },
     "fieldError": {
       "invalid": "Escreve um número",

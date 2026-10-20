@@ -3,8 +3,8 @@
 import { useId } from "react";
 import { useTranslations } from "next-intl";
 
-import type { BodySeries, BodyTrend } from "@/api/body";
-import { formatDelta, formatMetric, seriesPaths, seriesSummary, trendPath } from "@/lib/body";
+import type { BodySeries, BodyShape, BodyTrend } from "@/api/body";
+import { formatDelta, formatMetric, seriesPaths, seriesSummary, shapePath } from "@/lib/body";
 import { DeltaBadge, key } from "@/components/body/BodyBits";
 
 const WIDTH = 300;
@@ -12,13 +12,14 @@ const HEIGHT = 72;
 
 /**
  * One metric over a range. Numbers draw the readings and a smoothed line;
- * «Μόνο τάση» draws a schematic line from the trend word alone (no scale, no
- * values: the server never sends them); «Κρυφό» shows neither.
+ * «Μόνο τάση» draws the real smoothed line from the server's 0..1 `shape`
+ * (no scale, no values: the server never sends them); «Κρυφό» shows neither.
  */
 export function SeriesChart({
   display,
   points,
   trend,
+  shape,
   unit,
   label,
   rangeLabel,
@@ -28,6 +29,7 @@ export function SeriesChart({
   display: BodySeries["display"];
   points: BodySeries["points"];
   trend: BodyTrend | null | undefined;
+  shape?: BodyShape | null;
   unit: string;
   label: string;
   rangeLabel: string;
@@ -47,7 +49,7 @@ export function SeriesChart({
   }
 
   if (display === "trend") {
-    const path = trendPath(trend, WIDTH, HEIGHT);
+    const path = shapePath(shape, WIDTH, HEIGHT);
     const word = trend ? t(key("trend", trend)) : t("trendNotYet");
     return (
       <div data-testid="body-chart" data-display="trend" className="flex flex-col gap-2">
@@ -60,7 +62,7 @@ export function SeriesChart({
         {path ? (
           <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} width="100%" height={HEIGHT} role="img" aria-labelledby={titleId} preserveAspectRatio="none">
             <title id={titleId}>{t("chartTrendAria", { metric: label, trend: word })}</title>
-            <path d={path} fill="none" stroke="var(--primary)" strokeWidth="5" strokeLinecap="round" opacity="0.55" vectorEffect="non-scaling-stroke" />
+            <path d={path} data-testid="body-trend-line" fill="none" stroke="var(--primary)" strokeWidth="5" strokeLinecap="round" strokeLinejoin="round" opacity="0.55" vectorEffect="non-scaling-stroke" />
           </svg>
         ) : null}
         <p className="text-xs" style={{ color: "var(--dim)" }}>{t("chartTrendNote")}</p>

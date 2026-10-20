@@ -8,14 +8,13 @@ import {
   formFields,
   metricsPatch,
   parseMetricInput,
-  seriesFromSnapshots,
   seriesPaths,
   seriesSummary,
   sharedPoses,
   shouldAskWeightDisplay,
   snapshotChange,
   toDeltaRows,
-  trendPath,
+  shapePath,
   unitOf,
 } from "./body";
 
@@ -86,32 +85,29 @@ describe("unit formatting", () => {
 });
 
 describe("trend rendering", () => {
-  it("draws a schematic line from the word alone, falling for down and flat for steady", () => {
-    expect(trendPath(null, 200, 50)).toBe("");
-    const down = trendPath("down", 200, 50);
-    const [startY, endY] = [down.match(/^M0,([\d.]+)/)![1], down.match(/ 200(?:\.0)?,([\d.]+)$/)![1]].map(Number);
-    expect(startY).toBeLessThan(endY);
-    const steady = trendPath("steady", 200, 50);
-    expect(steady).toBe("M0,25.0C80.0,25.0 120.0,25.0 200.0,25.0");
-    const up = trendPath("up", 200, 50);
-    expect(Number(up.match(/^M0,([\d.]+)/)![1])).toBeGreaterThan(Number(up.match(/ 200(?:\.0)?,([\d.]+)$/)![1]));
+  const at = (day: number) => `2026-07-${String(day).padStart(2, "0")}T08:00:00Z`;
+
+  it("draws the server's 0..1 shape, spaced by time, top for 1 and bottom for 0", () => {
+    expect(shapePath(undefined, 200, 50)).toBe("");
+    expect(shapePath([], 200, 50)).toBe("");
+    const path = shapePath([{ at: at(1), y: 1 }, { at: at(4), y: 0.5 }, { at: at(11), y: 0 }], 200, 50);
+    expect(path).toBe("M0.0,6.0L60.0,25.0L200.0,44.0");
   });
 
-  it("carries no number when weight shows as a trend", () => {
-    expect(trendPath("slightly_down", 240, 60)).not.toMatch(/72/);
+  it("draws a flat series in the middle and one point as a short flat line", () => {
+    expect(shapePath([{ at: at(1), y: 0.5 }, { at: at(8), y: 0.5 }], 100, 50)).toBe("M0.0,25.0L100.0,25.0");
+    expect(shapePath([{ at: at(1), y: 0.5 }], 100, 50)).toBe("M0,25.0L100.0,25.0");
+  });
+
+  it("carries no number of the person's weight, only the shape", () => {
+    expect(shapePath([{ at: at(1), y: 1 }, { at: at(8), y: 0.2 }], 240, 60)).not.toMatch(/72/);
   });
 
   it("draws readings and a smoothed line from real points", () => {
-    const points = seriesFromSnapshots(
-      [
-        { taken_at: "2026-10-14T08:00:00Z", metrics: { weight: 72.4 } },
-        { taken_at: "2026-07-01T08:00:00Z", metrics: { weight: 74.5 } },
-        { taken_at: "2026-09-01T08:00:00Z", metrics: {} },
-      ],
-      "weight",
-    );
-    expect(points.map((point) => point.value)).toEqual([74.5, 72.4]);
-    expect(points[1].smoothed).toBeCloseTo(0.3 * 72.4 + 0.7 * 74.5, 3);
+    const points = [
+      { at: at(1), value: 74.5, smoothed: 74.5 },
+      { at: at(8), value: 72.4, smoothed: 73.87 },
+    ];
     const paths = seriesPaths(points, 100, 40);
     expect(paths.raw.startsWith("M0.0,")).toBe(true);
     expect(seriesSummary(points)).toEqual({ latest: 72.4, change: -2.1 });

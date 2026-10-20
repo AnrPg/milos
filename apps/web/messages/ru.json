@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} смотрел твои замеры · {date}",
-      "snapshot": "{coach} открыл замер · {date}"
+      "snapshot": "{coach} открыл замер · {date}",
+      "series": "{coach} смотрел график твоих замеров · {date}"
     },
     "fieldError": {
       "invalid": "Введи число",

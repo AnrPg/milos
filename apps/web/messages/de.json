@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} hat deine Messungen angesehen · {date}",
-      "snapshot": "{coach} hat eine Messung geöffnet · {date}"
+      "snapshot": "{coach} hat eine Messung geöffnet · {date}",
+      "series": "{coach} hat ein Diagramm deiner Messungen angesehen · {date}"
     },
     "fieldError": {
       "invalid": "Gib eine Zahl ein",

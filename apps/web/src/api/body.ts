@@ -19,6 +19,7 @@ export type BodyMetrics = BodySnapshot["metrics"];
 export type BodySeries = components["schemas"]["BodySeries"];
 export type BodyRange = BodySeries["range"];
 export type BodyTrend = NonNullable<BodySeries["trend"]>;
+export type BodyShape = NonNullable<BodySeries["shape"]>;
 export type BodyComparison = components["schemas"]["BodyComparison"];
 export type BodyDelta = BodyComparison["deltas"][number];
 export type BodySettingsResponse = components["schemas"]["BodySettingsResponse"];
@@ -138,6 +139,11 @@ export async function shareBodyBeforeAfter(token: string, body: BodyShareRequest
 /** A coach's read of a client's shared snapshots (every read is logged for the member). */
 export function fetchClientBodySnapshots(token: string, clientUserId: string, params: { cursor?: string | null; limit?: number } = {}) {
   return apiRequest<BodySnapshotPage>(`/staff/clients/${id(clientUserId)}/body${query(params)}`, { token });
+}
+
+/** A coach's read of one metric of a client, as the member's display allows (logged for the member). */
+export function fetchClientBodySeries(token: string, clientUserId: string, metric: BodyMetric, range: BodyRange) {
+  return apiRequest<BodySeries>(`/staff/clients/${id(clientUserId)}/body/series${query({ metric, range })}`, { token });
 }
 
 export async function fetchClientBodySnapshot(token: string, clientUserId: string, snapshotId: string) {

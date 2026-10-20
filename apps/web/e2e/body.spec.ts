@@ -281,12 +281,21 @@ test.describe("Ημερολόγιο › Σώμα", () => {
         snapshot("s1", "2026-07-01T08:00:00Z", { metrics: { waist: 85 }, withheld_metrics: ["weight"], weight_display: "trend" }),
       ],
       consents: [],
-      series: (metric, range) => ({ metric, range, display: "trend", unit: "kg", units: "metric", trend: "slightly_down", points: [] }),
+      series: (metric, range) => ({ metric, range, display: "trend", unit: "kg", units: "metric", trend: "slightly_down",
+        points: [],
+        shape: [
+          { at: "2026-08-01T08:00:00Z", y: 1 },
+          { at: "2026-08-15T08:00:00Z", y: 0.4 },
+          { at: "2026-08-29T08:00:00Z", y: 0 },
+        ],
+      }),
     });
     await page.goto("/journal/body");
     const chart = page.getByTestId("body-chart");
     await expect(chart).toHaveAttribute("data-display", "trend");
     await expect(page.getByTestId("body-trend-word")).toHaveText("Slightly down");
+    // The line is the server's real 0..1 shape, not a drawing from the word.
+    await expect(page.getByTestId("body-trend-line")).toHaveAttribute("d", "M0.0,6.0L150.0,42.0L300.0,66.0");
     await expect(chart).not.toContainText(/kg/);
     await expect(page.locator("main")).not.toContainText(/\d+(?:[.,]\d+)? kg/);
     // Circumferences still show as numbers.

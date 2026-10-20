@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} a consulté tes mesures · {date}",
-      "snapshot": "{coach} a ouvert une mesure · {date}"
+      "snapshot": "{coach} a ouvert une mesure · {date}",
+      "series": "{coach} a consulté un graphique de tes mesures · {date}"
     },
     "fieldError": {
       "invalid": "Saisis un nombre",

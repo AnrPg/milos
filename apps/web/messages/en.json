@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} looked at your measurements · {date}",
-      "snapshot": "{coach} opened a measurement · {date}"
+      "snapshot": "{coach} opened a measurement · {date}",
+      "series": "{coach} looked at a chart of your measurements · {date}"
     },
     "fieldError": {
       "invalid": "Type a number",

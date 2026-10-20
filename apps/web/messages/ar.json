@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "اطّلع {coach} على قياساتك · {date}",
-      "snapshot": "فتح {coach} قياسًا · {date}"
+      "snapshot": "فتح {coach} قياسًا · {date}",
+      "series": "اطّلع {coach} على رسم بياني لقياساتك · {date}"
     },
     "fieldError": {
       "invalid": "اكتب رقمًا",

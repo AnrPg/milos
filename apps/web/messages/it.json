@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} ha visto le tue misurazioni · {date}",
-      "snapshot": "{coach} ha aperto una misurazione · {date}"
+      "snapshot": "{coach} ha aperto una misurazione · {date}",
+      "series": "{coach} ha visto un grafico delle tue misurazioni · {date}"
     },
     "fieldError": {
       "invalid": "Scrivi un numero",

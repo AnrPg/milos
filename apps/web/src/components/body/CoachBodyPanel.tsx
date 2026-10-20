@@ -4,13 +4,13 @@ import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import { fetchClientBodySnapshots, type BodyMetric } from "@/api/body";
+import { fetchClientBodySeries, fetchClientBodySnapshots, type BodyMetric, type BodyRange } from "@/api/body";
 import { SeriesChart } from "@/components/body/BodyChart";
 import { BodyPhotoView, Chip, DeltaBadge, Eyebrow, dateFormat, key } from "@/components/body/BodyBits";
 import { CompareSlider } from "@/components/body/ComparePage";
 import { useBodyToken } from "@/components/body/use-body";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { METRICS, POSES, defaultComparePair, formatDelta, formatMetric, metricDeltas, seriesFromSnapshots, sharedPoses, snapshotChange, summaryMetrics, unitOf } from "@/lib/body";
+import { METRICS, POSES, RANGES, defaultComparePair, formatDelta, formatMetric, metricDeltas, sharedPoses, snapshotChange, summaryMetrics, unitOf } from "@/lib/body";
 
 /**
  * The coach's «Σώμα» tab of a client (ADR-158 §5, board 13 q7): only the
@@ -29,9 +29,20 @@ export function CoachBodyPanel({ userId, nickname }: { userId: string; nickname:
     staleTime: 5 * 60_000,
   });
   const list = useMemo(() => snapshots.data?.snapshots ?? [], [snapshots.data]);
-  const metrics = useMemo(() => METRICS.filter((metric) => list.some((snapshot) => typeof snapshot.metrics[metric] === "number")), [list]);
+  const metrics = useMemo(
+    () => METRICS.filter((metric) => list.some((snapshot) => typeof snapshot.metrics[metric] === "number" || snapshot.withheld_metrics.includes(metric))),
+    [list],
+  );
   const [picked, setPicked] = useState<BodyMetric | null>(null);
+  const [range, setRange] = useState<BodyRange>("3m");
   const metric = picked && metrics.includes(picked) ? picked : (metrics[0] ?? null);
+  // The server applies the member's display choice and logs the read.
+  const series = useQuery({
+    queryKey: ["staff", "clients", userId, "body", "series", metric, range],
+    enabled: Boolean(token && metric),
+    queryFn: () => fetchClientBodySeries(token!, userId, metric!, range),
+    staleTime: 5 * 60_000,
+  });
   const pair = defaultComparePair(list);
   const [from, setFrom] = useState<string | null>(null);
   const [to, setTo] = useState<string | null>(null);
@@ -72,18 +83,31 @@ export function CoachBodyPanel({ userId, nickname }: { userId: string; nickname:
         <section className="flex flex-col gap-3">
           {metric ? (
             <>
-              <SeriesChart
-                display="number"
-                points={seriesFromSnapshots(list, metric)}
-                trend={null}
-                unit={unitOf(metric, [], units)}
-                label={t(key("metric", metric))}
-                rangeLabel={t("rangeLong.all")}
-                locale={locale}
-              />
+              {series.isPending ? (
+                <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
+              ) : series.isError ? (
+                <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("coachLoadError")}</p>
+              ) : (
+                <SeriesChart
+                  display={series.data.display}
+                  points={series.data.points}
+                  trend={series.data.trend}
+                  shape={series.data.shape}
+                  unit={series.data.unit || unitOf(metric, [], units)}
+                  label={t(key("metric", metric))}
+                  rangeLabel={t(key("rangeLong", range))}
+                  locale={locale}
+                  hiddenNote={t("coachWeightChoice", { name: nickname })}
+                />
+              )}
               <div role="group" aria-label={t("metricsLabel")} className="flex flex-wrap gap-1.5">
                 {metrics.map((item) => (
                   <Chip key={item} selected={item === metric} onClick={() => setPicked(item)}>{t(key("metric", item))}</Chip>
+                ))}
+              </div>
+              <div role="group" aria-label={t("rangeLabel")} className="flex flex-wrap gap-1.5">
+                {RANGES.map((item) => (
+                  <Chip key={item} selected={item === range} onClick={() => setRange(item)}>{t(key("range", item))}</Chip>
                 ))}
               </div>
             </>

@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "Ο/Η {coach} είδε τις μετρήσεις σου · {date}",
-      "snapshot": "Ο/Η {coach} άνοιξε μια μέτρηση · {date}"
+      "snapshot": "Ο/Η {coach} άνοιξε μια μέτρηση · {date}",
+      "series": "Ο/Η {coach} είδε ένα γράφημα των μετρήσεών σου · {date}"
     },
     "fieldError": {
       "invalid": "Γράψε έναν αριθμό",

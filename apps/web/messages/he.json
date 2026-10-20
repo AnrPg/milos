@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} צפה במדידות שלך · {date}",
-      "snapshot": "{coach} פתח מדידה · {date}"
+      "snapshot": "{coach} פתח מדידה · {date}",
+      "series": "{coach} צפה בגרף של המדידות שלך · {date}"
     },
     "fieldError": {
       "invalid": "הקלד מספר",

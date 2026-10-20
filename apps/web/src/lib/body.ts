@@ -6,6 +6,7 @@ import type {
   BodyPhoto,
   BodyPose,
   BodySeries,
+  BodyShape,
   BodySnapshot,
   BodyTrend,
 } from "@/api/body";
@@ -232,23 +233,6 @@ export function toDeltaRows(deltas: BodyDelta[]): DeltaRow[] {
   );
 }
 
-/** Exponential smoothing as the server does it (α 0.3), oldest first. */
-export function smooth(values: number[], alpha = 0.3): number[] {
-  const out: number[] = [];
-  values.forEach((value, index) => out.push(index === 0 ? value : alpha * value + (1 - alpha) * out[index - 1]));
-  return out;
-}
-
-/** A metric's points from a list of snapshots (the coach view has no series endpoint). */
-export function seriesFromSnapshots(snapshots: Pick<BodySnapshot, "taken_at" | "metrics">[], metric: BodyMetric): BodySeries["points"] {
-  const points = snapshots
-    .filter((snapshot) => typeof snapshot.metrics[metric] === "number")
-    .map((snapshot) => ({ at: snapshot.taken_at, value: snapshot.metrics[metric] as number }))
-    .sort((a, b) => a.at.localeCompare(b.at));
-  const smoothed = smooth(points.map((point) => point.value));
-  return points.map((point, index) => ({ ...point, smoothed: Math.round(smoothed[index] * 1000) / 1000 }));
-}
-
 /** The chart paths of real values: a thin line of readings and a thick smoothed one. */
 export function seriesPaths(points: BodySeries["points"], width: number, height: number, pad = 4) {
   if (points.length === 0) return { raw: "", smoothed: "" };
@@ -263,22 +247,21 @@ export function seriesPaths(points: BodySeries["points"], width: number, height:
   return { raw: path((point) => point.value), smoothed: path((point) => point.smoothed) };
 }
 
-/** How far a schematic line falls or rises for each word, as a share of the height. */
-const TREND_RISE: Record<BodyTrend, number> = { steady: 0, slightly_down: -0.25, down: -0.6, slightly_up: 0.25, up: 0.6 };
-
 /**
- * A schematic, smooth line for «Μόνο τάση»: the server sends only the word,
- * so the line shows the direction and nothing else (no scale, no values).
+ * The line for «Μόνο τάση», from the server's `shape`: the real smoothed
+ * series normalized to 0..1 (no scale, no values). 1 is the top of the range.
+ * Points are spaced by time; a single point draws a short flat line.
  */
-export function trendPath(word: BodyTrend | null | undefined, width: number, height: number, pad = 6): string {
-  if (!word) return "";
-  const rise = TREND_RISE[word] ?? 0;
-  const mid = height / 2;
-  const amplitude = (height - pad * 2) / 2;
-  const startY = mid + rise * amplitude;
-  const endY = mid - rise * amplitude;
+export function shapePath(shape: BodyShape | null | undefined, width: number, height: number, pad = 6): string {
+  if (!shape || shape.length === 0) return "";
+  const times = shape.map((point) => Date.parse(point.at));
+  const first = times[0];
+  const span = times[times.length - 1] - first;
   const f = (value: number) => value.toFixed(1);
-  return `M0,${f(startY)}C${f(width * 0.4)},${f(startY)} ${f(width * 0.6)},${f(endY)} ${f(width)},${f(endY)}`;
+  const y = (value: number) => height - pad - Math.min(1, Math.max(0, value)) * (height - pad * 2);
+  if (shape.length === 1) return `M0,${f(y(shape[0].y))}L${f(width)},${f(y(shape[0].y))}`;
+  const x = (index: number) => (span > 0 ? ((times[index] - first) / span) * width : (index * width) / (shape.length - 1));
+  return shape.map((point, index) => `${index ? "L" : "M"}${f(x(index))},${f(y(point.y))}`).join("");
 }
 
 /** The first and last shown value of a series and the change between them. */

@@ -7032,7 +7032,8 @@
     },
     "accessLogEntry": {
       "list": "{coach} bekeek je metingen · {date}",
-      "snapshot": "{coach} opende een meting · {date}"
+      "snapshot": "{coach} opende een meting · {date}",
+      "series": "{coach} bekeek een grafiek van je metingen · {date}"
     },
     "fieldError": {
       "invalid": "Typ een getal",
