@@ -142,4 +142,21 @@ describe("notificationTargetUrl after the member-app move", () => {
       notificationTargetUrl({ type: "pr_shared", payload: { url: "/my-workouts/pantheon" } }, "athlete"),
     ).toBe("/journal/pantheon");
   });
+  it("opens the event page for event notifications and the trial sheet for the trial offer (ADR-153)", () => {
+    expect(
+      notificationTargetUrl({ type: "community_event_waitlist_promoted", payload: { event_id: "event-1" } }, "member"),
+    ).toBe("/events/event-1");
+    expect(notificationTargetUrl({ type: "community_event_message", payload: { event_id: "event-1" } }, "admin")).toBe(
+      "/events/event-1",
+    );
+    expect(
+      notificationTargetUrl(
+        {
+          type: "community_event_trial_offer",
+          payload: { event_id: "event-1", url: "/b/kypseli?trial=1&referral_event_id=event-1" },
+        },
+        "member",
+      ),
+    ).toBe("/b/kypseli?trial=1&referral_event_id=event-1");
+  });
 });
