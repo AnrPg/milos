@@ -42,6 +42,7 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
   alias MilosTraining.Workers.{
+    AroundAlertsJob,
     CoachingReplyOverdueJob,
     CorporateInvoicingJob,
     ExecutionAbandonmentSweepJob,
@@ -524,6 +525,73 @@ defmodule MilosTraining.Application.BackgroundUserScopeRLSTest do
 
       assert [%{payload: %{"sender_nickname" => ^held}}] =
                bypass_rls(fn -> Notifications.list_for_user(recipient.id) end)
+    end
+  end
+
+  describe "Γύρω μου saved-filter alerts (AroundAlertsJob)" do
+    test "the daily sweep reads each person's filter in their own session and notifies once" do
+      start_supervised!(
+        {Oban, Keyword.put(Application.fetch_env!(:milos_training, Oban), :testing, :manual)}
+      )
+
+      now = DateTime.utc_now()
+
+      {person, filter_id} =
+        bypass_rls(fn ->
+          person = user_fixture()
+          owner = user_fixture()
+          {:ok, gym} = Organizations.create_organization(%{name: "Around Gym"})
+          add!(gym, owner, :owner)
+          {:ok, club} = MilosTraining.Application.ClubScope.gym_club(tenant!(owner, gym))
+
+          [kypseli_id] =
+            Repo.all(
+              from n in "places_neighbourhoods",
+                where: n.slug == "athens-kypseli",
+                select: type(n.id, :binary_id)
+            )
+
+          Repo.insert!(%MilosTraining.Places.HomeArea{
+            user_id: person.id,
+            neighbourhood_id: kypseli_id,
+            position: 0
+          })
+
+          filter =
+            Repo.insert!(%MilosTraining.Identity.SavedFilter{
+              user_id: person.id,
+              surface: "around_me",
+              kind: "named",
+              name: "Κοντά",
+              params: %{"v" => 1, "kinds" => ["events"]},
+              alert_enabled: true,
+              alert_checked_at: DateTime.add(now, -3_600, :second),
+              last_used_at: now
+            })
+
+          Repo.insert!(%MilosTraining.Community.Event{
+            organization_id: gym.id,
+            club_id: club.id,
+            created_by_id: owner.id,
+            title: "Open WOD",
+            starts_at: DateTime.add(now, 2, :day),
+            ends_at: DateTime.add(now, 2 * 86_400 + 3_600, :second),
+            latitude: 38.002,
+            longitude: 23.739,
+            open_to_non_members: true
+          })
+
+          {person, filter.id}
+        end)
+
+      for _run <- 1..2 do
+        clear_session!()
+        assert :ok = AroundAlertsJob.perform(%Oban.Job{args: %{}})
+        Oban.drain_queue(queue: :notifications, with_safety: false)
+      end
+
+      assert [%{type: "around_new_matches", payload: %{"count" => 1, "filter_id" => ^filter_id}}] =
+               bypass_rls(fn -> Notifications.list_for_user(person.id) end)
     end
   end
 
