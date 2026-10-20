@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { hasCapability } from "@/components/client/entitlement";
 import { JOURNAL_FEED_KEY } from "@/api/journal";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { useBodySettings } from "@/components/body/use-body";
 import { NoteSheet } from "@/components/journal/NoteSheet";
 import { NewPRFormModal } from "@/components/pantheon/PRFormModal";
 import { useSession } from "@/components/session-provider";
@@ -17,19 +18,22 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 /**
  * The kinds of entry a member can write today (brief §7.7), grouped as the
  * feature map groups them: Προπόνηση · Ευεξία · Coach · Σημείωση. Each kind
- * opens the flow that owns it. Kinds that arrive in Phase 2 (Μέτρηση,
- * Νερό · Ύπνος · Γεύμα, Λιγούρα)
+ * opens the flow that owns it. Μέτρηση (Σώμα, ADR-158) is here unless Σώμα
+ * is switched off; kinds still to come (Νερό · Ύπνος · Γεύμα, Λιγούρα)
  * join their group then, so the sheet never shows a button that leads
  * nowhere, and a group with no kinds is not shown.
  */
-export type NewEntryKind = "workout" | "pr" | "checkIn" | "injury" | "formReview" | "review" | "note";
-export type NewEntryGroup = "training" | "wellbeing" | "coach" | "note";
+export type NewEntryKind = "workout" | "pr" | "measure" | "checkIn" | "injury" | "formReview" | "review" | "note";
+export type NewEntryGroup = "training" | "body" | "wellbeing" | "coach" | "note";
 
 export function newEntryGroups(options: {
   canRequestFormReview: boolean;
+  /** False when Σώμα is switched off in Ρυθμίσεις › Σώμα. */
+  body?: boolean;
 }): { group: NewEntryGroup; kinds: NewEntryKind[] }[] {
   const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
     { group: "training", kinds: ["workout", "pr"] },
+    { group: "body", kinds: options.body === false ? [] : ["measure"] },
     { group: "wellbeing", kinds: ["checkIn", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
     { group: "note", kinds: ["note"] },
@@ -38,6 +42,7 @@ export function newEntryGroups(options: {
 }
 
 const ROUTES: Partial<Record<NewEntryKind, string>> = {
+  measure: "/journal/body/new",
   checkIn: "/journal/wellbeing#check-in",
   injury: "/journal/wellbeing#report-injury",
   formReview: "/box/coach",
@@ -71,7 +76,11 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const { tokens } = useSession();
   const { entitlement } = useClientEntitlement();
   const [flow, setFlow] = useState<"menu" | "pr" | "note" | TrainingLogDialogState>("menu");
-  const groups = newEntryGroups({ canRequestFormReview: hasCapability(entitlement, "request_form_reviews") });
+  const bodySettings = useBodySettings();
+  const groups = newEntryGroups({
+    canRequestFormReview: hasCapability(entitlement, "request_form_reviews"),
+    body: bodySettings.data?.settings?.journal_sections?.body !== false,
+  });
 
   function choose(kind: NewEntryKind) {
     const route = ROUTES[kind];

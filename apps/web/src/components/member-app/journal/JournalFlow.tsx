@@ -29,6 +29,7 @@ import { NoteSheet } from "@/components/journal/NoteSheet";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
 import { executionHistoryEntry, journalFlow, withVisibility } from "@/components/member-app/journal/journal-flow";
 import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
+import { BodyFeedCard } from "@/components/body/BodyFeedCard";
 import { ReviewCard } from "@/components/my-reviews";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
@@ -181,6 +182,8 @@ export function JournalFlow() {
                         />
                       );
                     }
+                    case "body":
+                      return <BodyFeedCard key={key} item={item} locale={locale} badge={badge(item)} />;
                     default:
                       return (
                         <FeedCard key={key} item={item} locale={locale} badge={badge(item)} onEditNote={setEditingNote} />
@@ -245,7 +248,7 @@ function FeedCard({
   badge,
   onEditNote,
 }: {
-  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" }>;
+  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" | "body" }>;
   locale: string;
   badge: ReactNode;
   onEditNote: (item: Extract<TypedJournalItem, { kind: "note" }>) => void;
