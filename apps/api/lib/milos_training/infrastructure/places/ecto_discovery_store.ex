@@ -10,7 +10,7 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
 
   alias MilosTraining.Repo
 
-  @area "ST_GeogFromText($1), $2::float8, ST_MakeEnvelope($3, $4, $5, $6, 4326)::geography"
+  @area "ST_GeogFromText($1), $2::float8, ST_MakeEnvelope($3::float8, $4::float8, $5::float8, $6::float8, 4326)::geography"
 
   @impl true
   def search(_context, "events", area, plan, cursor, limit) do
@@ -18,7 +18,9 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
 
     """
     SELECT id, organization_id, latitude, longitude, distance_m, starts_at, total
-    FROM milos_around_events(#{@area}, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18)
+    FROM milos_around_events(#{@area}, $7::timestamptz, $8::timestamptz[], $9::timestamptz[],
+      $10::integer, $11::text[], $12::text[], $13::text[], $14::text[], $15::timestamptz, $16::timestamptz, $17::uuid,
+      $18::integer)
     """
     |> query(
       area_params(area) ++
@@ -53,7 +55,8 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
     """
     SELECT organization_id, location_id, latitude, longitude, distance_m, neighbourhood, city,
            takes_trials, snapshot, slug, title, logo_url, primary_color, rank, total
-    FROM milos_around_boxes(#{@area}, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    FROM milos_around_boxes(#{@area}, $7::boolean, $8::uuid[], $9::text[], $10::text[], $11::text[], $12::text[],
+      $13::timestamptz, $14::integer, $15::float8, $16::uuid, $17::integer)
     """
     |> query(
       area_params(area) ++
@@ -110,7 +113,8 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
   def search(_context, "clubs", area, plan, cursor, limit) do
     """
     SELECT id, organization_id, latitude, longitude, distance_m, total
-    FROM milos_around_clubs(#{@area}, $7, $8, $9, $10, $11, $12, $13, $14)
+    FROM milos_around_clubs(#{@area}, $7::text[], $8::text[], $9::text[], $10::text[], $11::timestamptz,
+      $12::float8, $13::uuid, $14::integer)
     """
     |> query(
       area_params(area) ++
@@ -140,7 +144,8 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
     """
     SELECT id, source, organization_id, author_id, latitude, longitude, distance_m,
            created_at, total
-    FROM milos_around_posts(#{@area}, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
+    FROM milos_around_posts(#{@area}, $7::timestamptz, $8::uuid, $9::text[], $10::text[], $11::text[], $12::text[],
+      $13::timestamptz, $14::timestamptz, $15::uuid, $16::integer)
     """
     |> query(
       area_params(area) ++
@@ -183,8 +188,10 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
     SELECT kind, radius_m, total
     FROM milos_around_counts(
       ST_GeogFromText($1), $2::float8[], $3::float8,
-      ST_MakeEnvelope($4, $5, $6, $7, 4326)::geography, $8, $9, $10, $11, $12, $13, $14,
-      $15, $16, $17, $18, $19, $20, $21)
+      ST_MakeEnvelope($4::float8, $5::float8, $6::float8, $7::float8, 4326)::geography,
+      $8::text[], $9::timestamptz, $10::timestamptz[], $11::timestamptz[], $12::integer,
+      $13::boolean, $14::uuid[], $15::timestamptz, $16::uuid, $17::text[], $18::text[], $19::text[], $20::text[],
+      $21::timestamptz)
     """
     |> query([
       multipoint(area.points),
@@ -222,8 +229,9 @@ defmodule MilosTraining.Infrastructure.Places.EctoDiscoveryStore do
 
     """
     SELECT kind, id, latitude, longitude, title, slug, distance_m
-    FROM milos_around_pins(#{@area}, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18,
-                           $19, $20, $21)
+    FROM milos_around_pins(#{@area}, $7::text[], $8::timestamptz, $9::timestamptz[],
+      $10::timestamptz[], $11::integer, $12::boolean, $13::uuid[], $14::timestamptz, $15::uuid,
+      $16::text[], $17::text[], $18::text[], $19::text[], $20::integer)
     """
     |> query(
       area_params(area) ++
