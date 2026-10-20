@@ -59,7 +59,14 @@ defmodule MilosTraining.Notifications.Notification do
     :community_group_archive_warning,
     :community_report_created,
     :community_club_join_requested,
-    :community_club_join_approved
+    :community_club_join_approved,
+    :community_event_waitlist_promoted,
+    :community_event_cancelled,
+    :community_event_changed,
+    :community_event_reminder,
+    :community_event_guest_joined,
+    :community_event_trial_offer,
+    :community_event_message
   ]
 
   schema "notifications" do

@@ -54,3 +54,9 @@ msgstr "Wacht op de box"
 
 msgid "Booked"
 msgstr "Geboekt"
+
+msgid "Event: %{title}"
+msgstr "Evenement: %{title}"
+
+msgid "You're going to this event."
+msgstr "Je gaat naar dit evenement."

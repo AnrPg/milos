@@ -354,3 +354,51 @@ msgstr "Нов сигнал"
 
 msgid "Someone reported something in the club."
 msgstr "Някой подаде сигнал за нещо в клуба."
+
+msgid "A place opened up"
+msgstr "Освободи се място"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "Идваш на «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Събитието е отменено"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) е отменено."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) е отменено: %{reason}"
+
+msgid "Event changed"
+msgstr "Събитието е променено"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» е преместено за %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "«%{event}» има ново място."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "«%{event}» има нов час и място: %{when}."
+
+msgid "Starting soon"
+msgstr "Започва скоро"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» започва след два часа (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Гостът ти идва"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} идва на «%{event}» с твоята гост покана."
+
+msgid "Try a class"
+msgstr "Пробвай тренировка"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "Хареса ли ти «%{event}»? %{box} те кани на пробна тренировка."
+
+msgid "Message about «%{event}»"
+msgstr "Съобщение за «%{event}»"

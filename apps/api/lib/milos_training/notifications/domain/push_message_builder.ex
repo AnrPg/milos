@@ -380,6 +380,89 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-153: club events.
+  def build("community_event_waitlist_promoted", payload, localize) do
+    %{
+      title: localize.("A place opened up", %{}),
+      body: localize.("You're going to «%{event}» (%{when}).", event_bindings(payload)),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_cancelled", payload, localize) do
+    body =
+      case payload["reason"] do
+        reason when is_binary(reason) and reason != "" ->
+          localize.(
+            "«%{event}» (%{when}) was cancelled: %{reason}",
+            Map.put(event_bindings(payload), :reason, reason)
+          )
+
+        _none ->
+          localize.("«%{event}» (%{when}) was cancelled.", event_bindings(payload))
+      end
+
+    %{title: localize.("Event cancelled", %{}), body: body, url: payload["url"] || "/"}
+  end
+
+  def build("community_event_changed", payload, localize) do
+    changes = String.split(payload["changes"] || "", ",", trim: true)
+
+    body =
+      cond do
+        "time" in changes and "place" in changes ->
+          localize.("«%{event}» has a new time and place: %{when}.", event_bindings(payload))
+
+        "place" in changes ->
+          localize.("«%{event}» has a new place.", event_bindings(payload))
+
+        true ->
+          localize.("«%{event}» moved to %{when}.", event_bindings(payload))
+      end
+
+    %{title: localize.("Event changed", %{}), body: body, url: payload["url"] || "/"}
+  end
+
+  def build("community_event_reminder", payload, localize) do
+    %{
+      title: localize.("Starting soon", %{}),
+      body: localize.("«%{event}» starts in two hours (%{when}).", event_bindings(payload)),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_guest_joined", payload, localize) do
+    %{
+      title: localize.("Your guest is coming", %{}),
+      body:
+        localize.(
+          "%{nickname} is coming to «%{event}» with your guest pass.",
+          Map.put(event_bindings(payload), :nickname, payload["person_nickname"])
+        ),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_trial_offer", payload, localize) do
+    %{
+      title: localize.("Try a class", %{}),
+      body:
+        localize.(
+          "Liked «%{event}»? %{box} invites you to a trial class.",
+          Map.put(event_bindings(payload), :box, payload["box_name"])
+        ),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_message", payload, localize) do
+    %{
+      title: localize.("Message about «%{event}»", event_bindings(payload)),
+      body: payload["message"] || "",
+      url: payload["url"] || "/"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),
@@ -658,6 +741,12 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       url: payload["url"] || "/"
     }
   end
+
+  defp event_bindings(payload),
+    do: %{
+      event: payload["event_title"],
+      when: payload["event_when"] || payload["event_starts_at"]
+    }
 
   defp admin_url(path, payload),
     do: AdminPath.admin_url(path, payload["organization_slug"])

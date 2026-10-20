@@ -24,6 +24,12 @@ defmodule MilosTraining.Notifications do
     community_report_created community_club_join_requested community_club_join_approved
   )
 
+  @event_types ~w(
+    community_event_waitlist_promoted community_event_cancelled community_event_changed
+    community_event_reminder community_event_guest_joined community_event_trial_offer
+    community_event_message
+  )
+
   def create_notification(params), do: create_and_broadcast_notification(params)
 
   # ADR-123: push dispatch result -> {outcome, reason_class} for analytics.
@@ -209,6 +215,16 @@ defmodule MilosTraining.Notifications do
         String.to_existing_atom(type),
         payload,
         community_payload(type, payload)
+      )
+
+  # ADR-153: club events. Each event names its one recipient; the use case
+  # fans out to the people going.
+  def process_event(type, payload) when type in @event_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        event_payload(type, payload)
       )
 
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
@@ -766,6 +782,26 @@ defmodule MilosTraining.Notifications do
       reason: field(payload, :reason),
       dedupe_key: "#{type}:#{dedupe}",
       url: url
+    }
+  end
+
+  defp event_payload(type, payload) do
+    event_id = field(payload, :event_id)
+
+    %{
+      organization_id: field(payload, :organization_id),
+      club_id: field(payload, :club_id),
+      event_id: event_id,
+      event_title: field(payload, :event_title),
+      event_starts_at: field(payload, :event_starts_at),
+      event_when: field(payload, :event_when),
+      changes: field(payload, :changes),
+      reason: field(payload, :reason),
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      message: field(payload, :message),
+      dedupe_key: "#{type}:#{event_id}:#{field(payload, :dedupe)}",
+      url: field(payload, :url) || "/events/#{event_id}"
     }
   end
 

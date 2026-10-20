@@ -354,3 +354,51 @@ msgstr "דיווח חדש"
 
 msgid "Someone reported something in the club."
 msgstr "מישהו דיווח על משהו במועדון."
+
+msgid "A place opened up"
+msgstr "התפנה מקום"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "אתה מגיע ל«%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "האירוע בוטל"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) בוטל."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) בוטל: %{reason}"
+
+msgid "Event changed"
+msgstr "האירוע השתנה"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» הועבר ל-%{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "ל«%{event}» יש מקום חדש."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "ל«%{event}» יש שעה ומקום חדשים: %{when}."
+
+msgid "Starting soon"
+msgstr "מתחיל בקרוב"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» מתחיל בעוד שעתיים (%{when})."
+
+msgid "Your guest is coming"
+msgstr "האורח שלך מגיע"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} מגיע ל«%{event}» עם כרטיס האורח שלך."
+
+msgid "Try a class"
+msgstr "נסה שיעור"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "אהבת את «%{event}»? %{box} מזמין אותך לשיעור ניסיון."
+
+msgid "Message about «%{event}»"
+msgstr "הודעה על «%{event}»"

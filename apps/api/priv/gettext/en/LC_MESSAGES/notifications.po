@@ -354,3 +354,51 @@ msgstr "New report"
 
 msgid "Someone reported something in the club."
 msgstr "Someone reported something in the club."
+
+msgid "A place opened up"
+msgstr "A place opened up"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "You're going to «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Event cancelled"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) was cancelled."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) was cancelled: %{reason}"
+
+msgid "Event changed"
+msgstr "Event changed"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» moved to %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "«%{event}» has a new place."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "«%{event}» has a new time and place: %{when}."
+
+msgid "Starting soon"
+msgstr "Starting soon"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» starts in two hours (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Your guest is coming"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} is coming to «%{event}» with your guest pass."
+
+msgid "Try a class"
+msgstr "Try a class"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "Liked «%{event}»? %{box} invites you to a trial class."
+
+msgid "Message about «%{event}»"
+msgstr "Message about «%{event}»"

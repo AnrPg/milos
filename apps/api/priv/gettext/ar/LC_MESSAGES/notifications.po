@@ -354,3 +354,51 @@ msgstr "بلاغ جديد"
 
 msgid "Someone reported something in the club."
 msgstr "أبلغ أحدهم عن شيء في النادي."
+
+msgid "A place opened up"
+msgstr "توفّر مكان"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "أنت ذاهب إلى «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "أُلغي الحدث"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "أُلغي «%{event}» (%{when})."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "أُلغي «%{event}» (%{when}): %{reason}"
+
+msgid "Event changed"
+msgstr "تغيّر الحدث"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "نُقل «%{event}» إلى %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "لـ«%{event}» مكان جديد."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "لـ«%{event}» وقت ومكان جديدان: %{when}."
+
+msgid "Starting soon"
+msgstr "يبدأ قريبًا"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "يبدأ «%{event}» بعد ساعتين (%{when})."
+
+msgid "Your guest is coming"
+msgstr "ضيفك قادم"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} قادم إلى «%{event}» بدعوة الضيف الخاصة بك."
+
+msgid "Try a class"
+msgstr "جرّب حصة"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "هل أعجبك «%{event}»؟ يدعوك %{box} إلى حصة تجريبية."
+
+msgid "Message about «%{event}»"
+msgstr "رسالة حول «%{event}»"

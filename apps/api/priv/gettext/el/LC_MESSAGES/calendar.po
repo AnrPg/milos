@@ -54,3 +54,9 @@ msgstr "Περιμένει απάντηση από το box"
 
 msgid "Booked"
 msgstr "Κλεισμένο"
+
+msgid "Event: %{title}"
+msgstr "Event: %{title}"
+
+msgid "You're going to this event."
+msgstr "Θα έρθεις σε αυτό το event."
