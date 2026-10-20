@@ -239,6 +239,10 @@ config :milos_training,
        MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore
 
 config :milos_training,
+       :wellness_store,
+       MilosTraining.Infrastructure.Wellness.EctoWellnessStore
+
+config :milos_training,
        :messaging_thread_store,
        MilosTraining.Infrastructure.Messaging.EctoThreadStore
 

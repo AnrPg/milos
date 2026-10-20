@@ -22670,6 +22670,169 @@
         "title": "CorporateSeat",
         "type": "object"
       },
+      "CravingRequest": {
+        "properties": {
+          "intensity": {
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "note": {
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          },
+          "occurred_at": {
+            "description": "Default: now",
+            "format": "date-time",
+            "type": "string"
+          },
+          "occurred_tz": {
+            "description": "IANA zone of the member, e.g. Europe/Athens",
+            "type": "string"
+          },
+          "organization_slug": {
+            "description": "Gym it was logged in (provenance)",
+            "type": "string"
+          },
+          "outcome": {
+            "enum": [
+              "ongoing",
+              "resisted",
+              "ate_off_plan"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "support_requested": {
+            "type": "boolean"
+          },
+          "triggers": {
+            "items": {
+              "enum": [
+                "stress",
+                "fatigue",
+                "boredom",
+                "social",
+                "hunger",
+                "other"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "CravingRequest",
+        "type": "object"
+      },
+      "CravingResponse": {
+        "properties": {
+          "craving": {
+            "additionalProperties": false,
+            "properties": {
+              "follow_up_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "intensity": {
+                "maximum": 10,
+                "minimum": 1,
+                "type": "integer"
+              },
+              "journal_visibility": {
+                "enum": [
+                  "private",
+                  "coach_can_view",
+                  "coach_reply_requested",
+                  "posted"
+                ],
+                "type": "string"
+              },
+              "note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "occurred_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "occurred_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "occurred_tz": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "outcome": {
+                "enum": [
+                  "ongoing",
+                  "resisted",
+                  "ate_off_plan"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "outcome_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "support_requested_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "triggers": {
+                "items": {
+                  "enum": [
+                    "stress",
+                    "fatigue",
+                    "boredom",
+                    "social",
+                    "hunger",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "occurred_at",
+              "occurred_tz",
+              "occurred_on",
+              "intensity",
+              "triggers",
+              "journal_visibility"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "craving"
+        ],
+        "title": "CravingResponse",
+        "type": "object"
+      },
       "ExecutionInteractionBatch": {
         "properties": {
           "events": {
@@ -37717,6 +37880,685 @@
           "pass"
         ],
         "title": "WalletPassResponse",
+        "type": "object"
+      },
+      "WellnessEntryChangeRequest": {
+        "properties": {
+          "occurred_at": {
+            "description": "Default: now",
+            "format": "date-time",
+            "type": "string"
+          },
+          "occurred_tz": {
+            "description": "IANA zone of the member, e.g. Europe/Athens",
+            "type": "string"
+          },
+          "value": {
+            "additionalProperties": true,
+            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+            "type": "object"
+          }
+        },
+        "title": "WellnessEntryChangeRequest",
+        "type": "object"
+      },
+      "WellnessEntryRequest": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "water",
+              "sleep",
+              "meal"
+            ],
+            "type": "string"
+          },
+          "occurred_at": {
+            "description": "Default: now",
+            "format": "date-time",
+            "type": "string"
+          },
+          "occurred_tz": {
+            "description": "IANA zone of the member, e.g. Europe/Athens",
+            "type": "string"
+          },
+          "organization_slug": {
+            "description": "Gym it was logged in (provenance)",
+            "type": "string"
+          },
+          "value": {
+            "additionalProperties": true,
+            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "value"
+        ],
+        "title": "WellnessEntryRequest",
+        "type": "object"
+      },
+      "WellnessEntryResponse": {
+        "properties": {
+          "entry": {
+            "additionalProperties": false,
+            "properties": {
+              "corrected": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "journal_visibility": {
+                "enum": [
+                  "private",
+                  "coach_can_view",
+                  "coach_reply_requested",
+                  "posted"
+                ],
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "water",
+                  "sleep",
+                  "meal"
+                ],
+                "type": "string"
+              },
+              "occurred_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "occurred_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "occurred_tz": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "source": {
+                "enum": [
+                  "manual",
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
+                ],
+                "type": "string"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "value": {
+                "additionalProperties": true,
+                "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                "type": "object"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "occurred_at",
+              "occurred_tz",
+              "occurred_on",
+              "value",
+              "source",
+              "corrected",
+              "journal_visibility"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "entry"
+        ],
+        "title": "WellnessEntryResponse",
+        "type": "object"
+      },
+      "WellnessEraseResponse": {
+        "properties": {
+          "erased": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "type": "object"
+          }
+        },
+        "required": [
+          "erased"
+        ],
+        "title": "WellnessEraseResponse",
+        "type": "object"
+      },
+      "WellnessOverview": {
+        "properties": {
+          "cravings": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "follow_up_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "intensity": {
+                  "maximum": 10,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "journal_visibility": {
+                  "enum": [
+                    "private",
+                    "coach_can_view",
+                    "coach_reply_requested",
+                    "posted"
+                  ],
+                  "type": "string"
+                },
+                "note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "occurred_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "occurred_tz": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "outcome": {
+                  "enum": [
+                    "ongoing",
+                    "resisted",
+                    "ate_off_plan"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "outcome_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "support_requested_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "triggers": {
+                  "items": {
+                    "enum": [
+                      "stress",
+                      "fatigue",
+                      "boredom",
+                      "social",
+                      "hunger",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "occurred_at",
+                "occurred_tz",
+                "occurred_on",
+                "intensity",
+                "triggers",
+                "journal_visibility"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "days": {
+            "items": {
+              "properties": {
+                "cravings": {
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "logged"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "date": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "meals": {
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "partial",
+                        "full"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "count",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "mood": {
+                  "description": "Latest Πώς νιώθω of the day (1-4 scale)",
+                  "nullable": true,
+                  "properties": {
+                    "check_in_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "energy": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "mood": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "recorded_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "stress": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "sleep": {
+                  "properties": {
+                    "entry_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "goal_minutes": {
+                      "type": "integer"
+                    },
+                    "minutes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "nap_minutes": {
+                      "type": "integer"
+                    },
+                    "quality": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "source": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "partial",
+                        "full"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "nap_minutes",
+                    "goal_minutes",
+                    "status"
+                  ],
+                  "type": "object"
+                },
+                "water": {
+                  "properties": {
+                    "count": {
+                      "type": "integer"
+                    },
+                    "glass_ml": {
+                      "type": "integer"
+                    },
+                    "goal_ml": {
+                      "type": "integer"
+                    },
+                    "ml": {
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "none",
+                        "partial",
+                        "full"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ml",
+                    "goal_ml",
+                    "glass_ml",
+                    "count",
+                    "status"
+                  ],
+                  "type": "object"
+                }
+              },
+              "required": [
+                "date",
+                "water",
+                "sleep",
+                "meals",
+                "cravings"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "entries": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "corrected": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "journal_visibility": {
+                  "enum": [
+                    "private",
+                    "coach_can_view",
+                    "coach_reply_requested",
+                    "posted"
+                  ],
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "water",
+                    "sleep",
+                    "meal"
+                  ],
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "occurred_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "occurred_tz": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "source": {
+                  "enum": [
+                    "manual",
+                    "garmin",
+                    "apple_health",
+                    "health_connect"
+                  ],
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "value": {
+                  "additionalProperties": true,
+                  "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "occurred_at",
+                "occurred_tz",
+                "occurred_on",
+                "value",
+                "source",
+                "corrected",
+                "journal_visibility"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "glass_ml": {
+                "maximum": 2000,
+                "minimum": 50,
+                "type": "integer"
+              },
+              "hidden_items": {
+                "items": {
+                  "enum": [
+                    "water",
+                    "sleep",
+                    "meals",
+                    "plan",
+                    "mood"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "sleep_goal_minutes": {
+                "maximum": 720,
+                "minimum": 240,
+                "type": "integer"
+              },
+              "water_goal_ml": {
+                "maximum": 8000,
+                "minimum": 250,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "water_goal_ml",
+              "glass_ml",
+              "sleep_goal_minutes",
+              "hidden_items"
+            ],
+            "type": "object"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          },
+          "week": {
+            "properties": {
+              "cravings": {
+                "type": "integer"
+              },
+              "meal_days_logged": {
+                "type": "integer"
+              },
+              "nights_logged": {
+                "type": "integer"
+              },
+              "nights_on_goal": {
+                "type": "integer"
+              },
+              "water_days_logged": {
+                "type": "integer"
+              },
+              "water_days_on_goal": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "nights_logged",
+              "nights_on_goal",
+              "water_days_logged",
+              "water_days_on_goal",
+              "meal_days_logged",
+              "cravings"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "preferences",
+          "days",
+          "week",
+          "entries",
+          "cravings"
+        ],
+        "title": "WellnessOverview",
+        "type": "object"
+      },
+      "WellnessPreferencesRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "glass_ml": {
+            "maximum": 2000,
+            "minimum": 50,
+            "type": "integer"
+          },
+          "hidden_items": {
+            "items": {
+              "enum": [
+                "water",
+                "sleep",
+                "meals",
+                "plan",
+                "mood"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "sleep_goal_minutes": {
+            "maximum": 720,
+            "minimum": 240,
+            "type": "integer"
+          },
+          "water_goal_ml": {
+            "maximum": 8000,
+            "minimum": 250,
+            "type": "integer"
+          }
+        },
+        "title": "WellnessPreferencesRequest",
+        "type": "object"
+      },
+      "WellnessPreferencesResponse": {
+        "properties": {
+          "preferences": {
+            "additionalProperties": false,
+            "properties": {
+              "glass_ml": {
+                "maximum": 2000,
+                "minimum": 50,
+                "type": "integer"
+              },
+              "hidden_items": {
+                "items": {
+                  "enum": [
+                    "water",
+                    "sleep",
+                    "meals",
+                    "plan",
+                    "mood"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "sleep_goal_minutes": {
+                "maximum": 720,
+                "minimum": 240,
+                "type": "integer"
+              },
+              "water_goal_ml": {
+                "maximum": 8000,
+                "minimum": 250,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "water_goal_ml",
+              "glass_ml",
+              "sleep_goal_minutes",
+              "hidden_items"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "preferences"
+        ],
+        "title": "WellnessPreferencesResponse",
         "type": "object"
       },
       "WodLeaderboardEntry": {
@@ -62561,6 +63403,1486 @@
         "summary": "Revoke one of my Wallet cards: it stops scanning at once",
         "tags": [
           "Connected devices"
+        ]
+      }
+    },
+    "/api/me/wellness": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.erase",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sections",
+            "required": true,
+            "schema": {
+              "example": "wellness,cravings",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "erased": {
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "erased"
+                  ],
+                  "title": "WellnessEraseResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rows erased per section"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete every entry of a section (wellness, cravings); irreversible",
+        "tags": [
+          "Wellness"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.show",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cravings": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "follow_up_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "intensity": {
+                            "maximum": 10,
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "journal_visibility": {
+                            "enum": [
+                              "private",
+                              "coach_can_view",
+                              "coach_reply_requested",
+                              "posted"
+                            ],
+                            "type": "string"
+                          },
+                          "note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "occurred_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "occurred_tz": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "outcome": {
+                            "enum": [
+                              "ongoing",
+                              "resisted",
+                              "ate_off_plan"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "outcome_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "support_requested_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "triggers": {
+                            "items": {
+                              "enum": [
+                                "stress",
+                                "fatigue",
+                                "boredom",
+                                "social",
+                                "hunger",
+                                "other"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "occurred_at",
+                          "occurred_tz",
+                          "occurred_on",
+                          "intensity",
+                          "triggers",
+                          "journal_visibility"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "days": {
+                      "items": {
+                        "properties": {
+                          "cravings": {
+                            "properties": {
+                              "count": {
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "none",
+                                  "logged"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "count",
+                              "status"
+                            ],
+                            "type": "object"
+                          },
+                          "date": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "meals": {
+                            "properties": {
+                              "count": {
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "none",
+                                  "partial",
+                                  "full"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "count",
+                              "status"
+                            ],
+                            "type": "object"
+                          },
+                          "mood": {
+                            "description": "Latest Πώς νιώθω of the day (1-4 scale)",
+                            "nullable": true,
+                            "properties": {
+                              "check_in_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "energy": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "mood": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "recorded_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "stress": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "sleep": {
+                            "properties": {
+                              "entry_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "goal_minutes": {
+                                "type": "integer"
+                              },
+                              "minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "nap_minutes": {
+                                "type": "integer"
+                              },
+                              "quality": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "source": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "none",
+                                  "partial",
+                                  "full"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "nap_minutes",
+                              "goal_minutes",
+                              "status"
+                            ],
+                            "type": "object"
+                          },
+                          "water": {
+                            "properties": {
+                              "count": {
+                                "type": "integer"
+                              },
+                              "glass_ml": {
+                                "type": "integer"
+                              },
+                              "goal_ml": {
+                                "type": "integer"
+                              },
+                              "ml": {
+                                "type": "integer"
+                              },
+                              "status": {
+                                "enum": [
+                                  "none",
+                                  "partial",
+                                  "full"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "ml",
+                              "goal_ml",
+                              "glass_ml",
+                              "count",
+                              "status"
+                            ],
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "date",
+                          "water",
+                          "sleep",
+                          "meals",
+                          "cravings"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "entries": {
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "corrected": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "journal_visibility": {
+                            "enum": [
+                              "private",
+                              "coach_can_view",
+                              "coach_reply_requested",
+                              "posted"
+                            ],
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meal"
+                            ],
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "occurred_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "occurred_tz": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "source": {
+                            "enum": [
+                              "manual",
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
+                            ],
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "value": {
+                            "additionalProperties": true,
+                            "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "occurred_at",
+                          "occurred_tz",
+                          "occurred_on",
+                          "value",
+                          "source",
+                          "corrected",
+                          "journal_visibility"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "preferences": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "glass_ml": {
+                          "maximum": 2000,
+                          "minimum": 50,
+                          "type": "integer"
+                        },
+                        "hidden_items": {
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "sleep_goal_minutes": {
+                          "maximum": 720,
+                          "minimum": 240,
+                          "type": "integer"
+                        },
+                        "water_goal_ml": {
+                          "maximum": 8000,
+                          "minimum": 250,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "water_goal_ml",
+                        "glass_ml",
+                        "sleep_goal_minutes",
+                        "hidden_items"
+                      ],
+                      "type": "object"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "week": {
+                      "properties": {
+                        "cravings": {
+                          "type": "integer"
+                        },
+                        "meal_days_logged": {
+                          "type": "integer"
+                        },
+                        "nights_logged": {
+                          "type": "integer"
+                        },
+                        "nights_on_goal": {
+                          "type": "integer"
+                        },
+                        "water_days_logged": {
+                          "type": "integer"
+                        },
+                        "water_days_on_goal": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "nights_logged",
+                        "nights_on_goal",
+                        "water_days_logged",
+                        "water_days_on_goal",
+                        "meal_days_logged",
+                        "cravings"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "from",
+                    "to",
+                    "preferences",
+                    "days",
+                    "week",
+                    "entries",
+                    "cravings"
+                  ],
+                  "title": "WellnessOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Days, entries and targets"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The member's wellness days (Σήμερα card, week strip) from..to, local dates",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/cravings": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.create_craving",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "intensity": {
+                    "maximum": 10,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "occurred_at": {
+                    "description": "Default: now",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "occurred_tz": {
+                    "description": "IANA zone of the member, e.g. Europe/Athens",
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "description": "Gym it was logged in (provenance)",
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "enum": [
+                      "ongoing",
+                      "resisted",
+                      "ate_off_plan"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "support_requested": {
+                    "type": "boolean"
+                  },
+                  "triggers": {
+                    "items": {
+                      "enum": [
+                        "stress",
+                        "fatigue",
+                        "boredom",
+                        "social",
+                        "hunger",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "title": "CravingRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "craving": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "follow_up_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "intensity": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome": {
+                          "enum": [
+                            "ongoing",
+                            "resisted",
+                            "ate_off_plan"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "support_requested_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "triggers": {
+                          "items": {
+                            "enum": [
+                              "stress",
+                              "fatigue",
+                              "boredom",
+                              "social",
+                              "hunger",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "intensity",
+                        "triggers",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "craving"
+                  ],
+                  "title": "CravingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Craving"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log a Λιγούρα",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/cravings/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.delete_craving",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove one of your Λιγούρες",
+        "tags": [
+          "Wellness"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.update_craving",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "intensity": {
+                    "maximum": 10,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "note": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "occurred_at": {
+                    "description": "Default: now",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "occurred_tz": {
+                    "description": "IANA zone of the member, e.g. Europe/Athens",
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "description": "Gym it was logged in (provenance)",
+                    "type": "string"
+                  },
+                  "outcome": {
+                    "enum": [
+                      "ongoing",
+                      "resisted",
+                      "ate_off_plan"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "support_requested": {
+                    "type": "boolean"
+                  },
+                  "triggers": {
+                    "items": {
+                      "enum": [
+                        "stress",
+                        "fatigue",
+                        "boredom",
+                        "social",
+                        "hunger",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "title": "CravingRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "craving": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "follow_up_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "intensity": {
+                          "maximum": 10,
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome": {
+                          "enum": [
+                            "ongoing",
+                            "resisted",
+                            "ate_off_plan"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "outcome_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "support_requested_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "triggers": {
+                          "items": {
+                            "enum": [
+                              "stress",
+                              "fatigue",
+                              "boredom",
+                              "social",
+                              "hunger",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "intensity",
+                        "triggers",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "craving"
+                  ],
+                  "title": "CravingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Craving"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update a Λιγούρα (e.g. how it went)",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/entries": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.create_entry",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "water",
+                      "sleep",
+                      "meal"
+                    ],
+                    "type": "string"
+                  },
+                  "occurred_at": {
+                    "description": "Default: now",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "occurred_tz": {
+                    "description": "IANA zone of the member, e.g. Europe/Athens",
+                    "type": "string"
+                  },
+                  "organization_slug": {
+                    "description": "Gym it was logged in (provenance)",
+                    "type": "string"
+                  },
+                  "value": {
+                    "additionalProperties": true,
+                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "kind",
+                  "value"
+                ],
+                "title": "WellnessEntryRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entry": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "corrected": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "water",
+                            "sleep",
+                            "meal"
+                          ],
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "manual",
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "value": {
+                          "additionalProperties": true,
+                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "value",
+                        "source",
+                        "corrected",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "entry"
+                  ],
+                  "title": "WellnessEntryResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Log water, sleep or a meal",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/entries/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.delete_entry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remove one of your wellness entries (undo a glass, a meal, a night)",
+        "tags": [
+          "Wellness"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.update_entry",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "occurred_at": {
+                    "description": "Default: now",
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "occurred_tz": {
+                    "description": "IANA zone of the member, e.g. Europe/Athens",
+                    "type": "string"
+                  },
+                  "value": {
+                    "additionalProperties": true,
+                    "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                    "type": "object"
+                  }
+                },
+                "title": "WellnessEntryChangeRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entry": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "corrected": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "journal_visibility": {
+                          "enum": [
+                            "private",
+                            "coach_can_view",
+                            "coach_reply_requested",
+                            "posted"
+                          ],
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "water",
+                            "sleep",
+                            "meal"
+                          ],
+                          "type": "string"
+                        },
+                        "occurred_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "occurred_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "occurred_tz": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "source": {
+                          "enum": [
+                            "manual",
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "value": {
+                          "additionalProperties": true,
+                          "description": "The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}\n(minutes or quality required; both ends give minutes). meal: {slot?\nbreakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,\nportions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.\n",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "occurred_at",
+                        "occurred_tz",
+                        "occurred_on",
+                        "value",
+                        "source",
+                        "corrected",
+                        "journal_visibility"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "entry"
+                  ],
+                  "title": "WellnessEntryResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Correct one of your wellness entries",
+        "tags": [
+          "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness/preferences": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.preferences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "glass_ml": {
+                          "maximum": 2000,
+                          "minimum": 50,
+                          "type": "integer"
+                        },
+                        "hidden_items": {
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "sleep_goal_minutes": {
+                          "maximum": 720,
+                          "minimum": 240,
+                          "type": "integer"
+                        },
+                        "water_goal_ml": {
+                          "maximum": 8000,
+                          "minimum": 250,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "water_goal_ml",
+                        "glass_ml",
+                        "sleep_goal_minutes",
+                        "hidden_items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "WellnessPreferencesResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your wellness targets and hidden items",
+        "tags": [
+          "Wellness"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessController.update_preferences",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "glass_ml": {
+                    "maximum": 2000,
+                    "minimum": 50,
+                    "type": "integer"
+                  },
+                  "hidden_items": {
+                    "items": {
+                      "enum": [
+                        "water",
+                        "sleep",
+                        "meals",
+                        "plan",
+                        "mood"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "sleep_goal_minutes": {
+                    "maximum": 720,
+                    "minimum": 240,
+                    "type": "integer"
+                  },
+                  "water_goal_ml": {
+                    "maximum": 8000,
+                    "minimum": 250,
+                    "type": "integer"
+                  }
+                },
+                "title": "WellnessPreferencesRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "preferences": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "glass_ml": {
+                          "maximum": 2000,
+                          "minimum": 50,
+                          "type": "integer"
+                        },
+                        "hidden_items": {
+                          "items": {
+                            "enum": [
+                              "water",
+                              "sleep",
+                              "meals",
+                              "plan",
+                              "mood"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "sleep_goal_minutes": {
+                          "maximum": 720,
+                          "minimum": 240,
+                          "type": "integer"
+                        },
+                        "water_goal_ml": {
+                          "maximum": 8000,
+                          "minimum": 250,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "water_goal_ml",
+                        "glass_ml",
+                        "sleep_goal_minutes",
+                        "hidden_items"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "preferences"
+                  ],
+                  "title": "WellnessPreferencesResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Preferences"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set your water goal, glass size, sleep goal or hidden items",
+        "tags": [
+          "Wellness"
         ]
       }
     },

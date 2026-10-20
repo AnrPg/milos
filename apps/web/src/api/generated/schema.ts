@@ -1733,6 +1733,112 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/wellness": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The member's wellness days (Σήμερα card, week strip) from..to, local dates */
+        get: operations["MilosTrainingWeb.WellnessController.show"];
+        put?: never;
+        post?: never;
+        /** Delete every entry of a section (wellness, cravings); irreversible */
+        delete: operations["MilosTrainingWeb.WellnessController.erase"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness/cravings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Log a Λιγούρα */
+        post: operations["MilosTrainingWeb.WellnessController.create_craving"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness/cravings/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove one of your Λιγούρες */
+        delete: operations["MilosTrainingWeb.WellnessController.delete_craving"];
+        options?: never;
+        head?: never;
+        /** Update a Λιγούρα (e.g. how it went) */
+        patch: operations["MilosTrainingWeb.WellnessController.update_craving"];
+        trace?: never;
+    };
+    "/api/me/wellness/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Log water, sleep or a meal */
+        post: operations["MilosTrainingWeb.WellnessController.create_entry"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness/entries/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove one of your wellness entries (undo a glass, a meal, a night) */
+        delete: operations["MilosTrainingWeb.WellnessController.delete_entry"];
+        options?: never;
+        head?: never;
+        /** Correct one of your wellness entries */
+        patch: operations["MilosTrainingWeb.WellnessController.update_entry"];
+        trace?: never;
+    };
+    "/api/me/wellness/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your wellness targets and hidden items */
+        get: operations["MilosTrainingWeb.WellnessController.preferences"];
+        /** Set your water goal, glass size, sleep goal or hidden items */
+        put: operations["MilosTrainingWeb.WellnessController.update_preferences"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships": {
         parameters: {
             query?: never;
@@ -14889,6 +14995,55 @@ export interface components {
         } & {
             [key: string]: unknown;
         };
+        /** CravingRequest */
+        CravingRequest: {
+            intensity?: number;
+            note?: string | null;
+            /**
+             * Format: date-time
+             * @description Default: now
+             */
+            occurred_at?: string;
+            /** @description IANA zone of the member, e.g. Europe/Athens */
+            occurred_tz?: string;
+            /** @description Gym it was logged in (provenance) */
+            organization_slug?: string;
+            /** @enum {string|null} */
+            outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+            support_requested?: boolean;
+            triggers?: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+        };
+        /** CravingResponse */
+        CravingResponse: {
+            craving: {
+                /** Format: date-time */
+                follow_up_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                intensity: number;
+                /** @enum {string} */
+                journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at: string;
+                /** Format: date */
+                occurred_on: string;
+                occurred_tz: string;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string|null} */
+                outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                /** Format: date-time */
+                outcome_at?: string | null;
+                /** Format: date-time */
+                support_requested_at?: string | null;
+                triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                /** Format: date-time */
+                updated_at?: string;
+            };
+        };
         /** ExecutionInteractionBatch */
         ExecutionInteractionBatch: {
             events: {
@@ -19548,6 +19703,227 @@ export interface components {
                 platform: "apple" | "google";
                 /** Format: date-time */
                 revoked_at?: string | null;
+            };
+        };
+        /** WellnessEntryChangeRequest */
+        WellnessEntryChangeRequest: {
+            /**
+             * Format: date-time
+             * @description Default: now
+             */
+            occurred_at?: string;
+            /** @description IANA zone of the member, e.g. Europe/Athens */
+            occurred_tz?: string;
+            /**
+             * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+             *     (minutes or quality required; both ends give minutes). meal: {slot?
+             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+             *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+             */
+            value?: {
+                [key: string]: unknown;
+            };
+        };
+        /** WellnessEntryRequest */
+        WellnessEntryRequest: {
+            /** @enum {string} */
+            kind: "water" | "sleep" | "meal";
+            /**
+             * Format: date-time
+             * @description Default: now
+             */
+            occurred_at?: string;
+            /** @description IANA zone of the member, e.g. Europe/Athens */
+            occurred_tz?: string;
+            /** @description Gym it was logged in (provenance) */
+            organization_slug?: string;
+            /**
+             * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+             *     (minutes or quality required; both ends give minutes). meal: {slot?
+             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+             *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+             */
+            value: {
+                [key: string]: unknown;
+            };
+        };
+        /** WellnessEntryResponse */
+        WellnessEntryResponse: {
+            entry: {
+                corrected: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @enum {string} */
+                journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                /** @enum {string} */
+                kind: "water" | "sleep" | "meal";
+                /** Format: date-time */
+                occurred_at: string;
+                /** Format: date */
+                occurred_on: string;
+                occurred_tz: string;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                source: "manual" | "garmin" | "apple_health" | "health_connect";
+                /** Format: date-time */
+                updated_at?: string;
+                /**
+                 * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                 *     (minutes or quality required; both ends give minutes). meal: {slot?
+                 *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                 *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                 */
+                value: {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        /** WellnessEraseResponse */
+        WellnessEraseResponse: {
+            erased: {
+                [key: string]: number;
+            };
+        };
+        /** WellnessOverview */
+        WellnessOverview: {
+            cravings: {
+                /** Format: date-time */
+                follow_up_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                intensity: number;
+                /** @enum {string} */
+                journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at: string;
+                /** Format: date */
+                occurred_on: string;
+                occurred_tz: string;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string|null} */
+                outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                /** Format: date-time */
+                outcome_at?: string | null;
+                /** Format: date-time */
+                support_requested_at?: string | null;
+                triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
+            days: {
+                cravings: {
+                    count: number;
+                    /** @enum {string} */
+                    status: "none" | "logged";
+                };
+                /** Format: date */
+                date: string;
+                meals: {
+                    count: number;
+                    /** @enum {string} */
+                    status: "none" | "partial" | "full";
+                };
+                /** @description Latest Πώς νιώθω of the day (1-4 scale) */
+                mood?: {
+                    /** Format: uuid */
+                    check_in_id?: string;
+                    energy?: number | null;
+                    mood?: number | null;
+                    /** Format: date-time */
+                    recorded_at?: string;
+                    stress?: number | null;
+                } | null;
+                sleep: {
+                    /** Format: uuid */
+                    entry_id?: string | null;
+                    goal_minutes: number;
+                    minutes?: number | null;
+                    nap_minutes: number;
+                    quality?: number | null;
+                    source?: string | null;
+                    /** @enum {string} */
+                    status: "none" | "partial" | "full";
+                };
+                water: {
+                    count: number;
+                    glass_ml: number;
+                    goal_ml: number;
+                    ml: number;
+                    /** @enum {string} */
+                    status: "none" | "partial" | "full";
+                };
+            }[];
+            entries: {
+                corrected: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @enum {string} */
+                journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                /** @enum {string} */
+                kind: "water" | "sleep" | "meal";
+                /** Format: date-time */
+                occurred_at: string;
+                /** Format: date */
+                occurred_on: string;
+                occurred_tz: string;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                source: "manual" | "garmin" | "apple_health" | "health_connect";
+                /** Format: date-time */
+                updated_at?: string;
+                /**
+                 * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                 *     (minutes or quality required; both ends give minutes). meal: {slot?
+                 *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                 *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                 */
+                value: {
+                    [key: string]: unknown;
+                };
+            }[];
+            /** Format: date */
+            from: string;
+            preferences: {
+                glass_ml: number;
+                hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                sleep_goal_minutes: number;
+                water_goal_ml: number;
+            };
+            /** Format: date */
+            to: string;
+            week: {
+                cravings: number;
+                meal_days_logged: number;
+                nights_logged: number;
+                nights_on_goal: number;
+                water_days_logged: number;
+                water_days_on_goal: number;
+            };
+        };
+        /** WellnessPreferencesRequest */
+        WellnessPreferencesRequest: {
+            glass_ml?: number;
+            hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+            sleep_goal_minutes?: number;
+            water_goal_ml?: number;
+        };
+        /** WellnessPreferencesResponse */
+        WellnessPreferencesResponse: {
+            preferences: {
+                glass_ml: number;
+                hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                sleep_goal_minutes: number;
+                water_goal_ml: number;
             };
         };
         /** WodLeaderboardEntry */
@@ -28825,6 +29201,571 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.show": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Days, entries and targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cravings: {
+                            /** Format: date-time */
+                            follow_up_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            intensity: number;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string|null} */
+                            outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                            /** Format: date-time */
+                            outcome_at?: string | null;
+                            /** Format: date-time */
+                            support_requested_at?: string | null;
+                            triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
+                        days: {
+                            cravings: {
+                                count: number;
+                                /** @enum {string} */
+                                status: "none" | "logged";
+                            };
+                            /** Format: date */
+                            date: string;
+                            meals: {
+                                count: number;
+                                /** @enum {string} */
+                                status: "none" | "partial" | "full";
+                            };
+                            /** @description Latest Πώς νιώθω of the day (1-4 scale) */
+                            mood?: {
+                                /** Format: uuid */
+                                check_in_id?: string;
+                                energy?: number | null;
+                                mood?: number | null;
+                                /** Format: date-time */
+                                recorded_at?: string;
+                                stress?: number | null;
+                            } | null;
+                            sleep: {
+                                /** Format: uuid */
+                                entry_id?: string | null;
+                                goal_minutes: number;
+                                minutes?: number | null;
+                                nap_minutes: number;
+                                quality?: number | null;
+                                source?: string | null;
+                                /** @enum {string} */
+                                status: "none" | "partial" | "full";
+                            };
+                            water: {
+                                count: number;
+                                glass_ml: number;
+                                goal_ml: number;
+                                ml: number;
+                                /** @enum {string} */
+                                status: "none" | "partial" | "full";
+                            };
+                        }[];
+                        entries: {
+                            corrected: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** @enum {string} */
+                            kind: "water" | "sleep" | "meal";
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            source: "manual" | "garmin" | "apple_health" | "health_connect";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /**
+                             * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                             *     (minutes or quality required; both ends give minutes). meal: {slot?
+                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                             */
+                            value: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** Format: date */
+                        from: string;
+                        preferences: {
+                            glass_ml: number;
+                            hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            sleep_goal_minutes: number;
+                            water_goal_ml: number;
+                        };
+                        /** Format: date */
+                        to: string;
+                        week: {
+                            cravings: number;
+                            meal_days_logged: number;
+                            nights_logged: number;
+                            nights_on_goal: number;
+                            water_days_logged: number;
+                            water_days_on_goal: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.erase": {
+        parameters: {
+            query: {
+                sections: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rows erased per section */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        erased: {
+                            [key: string]: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.create_craving": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    intensity?: number;
+                    note?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Default: now
+                     */
+                    occurred_at?: string;
+                    /** @description IANA zone of the member, e.g. Europe/Athens */
+                    occurred_tz?: string;
+                    /** @description Gym it was logged in (provenance) */
+                    organization_slug?: string;
+                    /** @enum {string|null} */
+                    outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                    support_requested?: boolean;
+                    triggers?: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Craving */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        craving: {
+                            /** Format: date-time */
+                            follow_up_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            intensity: number;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string|null} */
+                            outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                            /** Format: date-time */
+                            outcome_at?: string | null;
+                            /** Format: date-time */
+                            support_requested_at?: string | null;
+                            triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.delete_craving": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.update_craving": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    intensity?: number;
+                    note?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Default: now
+                     */
+                    occurred_at?: string;
+                    /** @description IANA zone of the member, e.g. Europe/Athens */
+                    occurred_tz?: string;
+                    /** @description Gym it was logged in (provenance) */
+                    organization_slug?: string;
+                    /** @enum {string|null} */
+                    outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                    support_requested?: boolean;
+                    triggers?: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Craving */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        craving: {
+                            /** Format: date-time */
+                            follow_up_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            intensity: number;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string|null} */
+                            outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                            /** Format: date-time */
+                            outcome_at?: string | null;
+                            /** Format: date-time */
+                            support_requested_at?: string | null;
+                            triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.create_entry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "water" | "sleep" | "meal";
+                    /**
+                     * Format: date-time
+                     * @description Default: now
+                     */
+                    occurred_at?: string;
+                    /** @description IANA zone of the member, e.g. Europe/Athens */
+                    occurred_tz?: string;
+                    /** @description Gym it was logged in (provenance) */
+                    organization_slug?: string;
+                    /**
+                     * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                     *     (minutes or quality required; both ends give minutes). meal: {slot?
+                     *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                     *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                     */
+                    value: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Entry */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entry: {
+                            corrected: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** @enum {string} */
+                            kind: "water" | "sleep" | "meal";
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            source: "manual" | "garmin" | "apple_health" | "health_connect";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /**
+                             * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                             *     (minutes or quality required; both ends give minutes). meal: {slot?
+                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                             */
+                            value: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.delete_entry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.update_entry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Format: date-time
+                     * @description Default: now
+                     */
+                    occurred_at?: string;
+                    /** @description IANA zone of the member, e.g. Europe/Athens */
+                    occurred_tz?: string;
+                    /**
+                     * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                     *     (minutes or quality required; both ends give minutes). meal: {slot?
+                     *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                     *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                     */
+                    value?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Entry */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entry: {
+                            corrected: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @enum {string} */
+                            journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                            /** @enum {string} */
+                            kind: "water" | "sleep" | "meal";
+                            /** Format: date-time */
+                            occurred_at: string;
+                            /** Format: date */
+                            occurred_on: string;
+                            occurred_tz: string;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            source: "manual" | "garmin" | "apple_health" | "health_connect";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /**
+                             * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                             *     (minutes or quality required; both ends give minutes). meal: {slot?
+                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                             */
+                            value: {
+                                [key: string]: unknown;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            glass_ml: number;
+                            hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            sleep_goal_minutes: number;
+                            water_goal_ml: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.update_preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    glass_ml?: number;
+                    hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                    sleep_goal_minutes?: number;
+                    water_goal_ml?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Preferences */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        preferences: {
+                            glass_ml: number;
+                            hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            sleep_goal_minutes: number;
+                            water_goal_ml: number;
+                        };
                     };
                 };
             };

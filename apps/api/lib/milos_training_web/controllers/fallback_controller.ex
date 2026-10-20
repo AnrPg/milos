@@ -1883,6 +1883,32 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-159 Ευεξία and Λιγούρα.
+  def call(conn, {:error, {:invalid_wellness_value, errors}}) when is_map(errors) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_wellness_value", error: "The entry is not valid", errors: errors})
+  end
+
+  @wellness_errors %{
+    unknown_wellness_kind: "Use water, sleep or meal",
+    wellness_organization_unavailable: "Entries can only name a gym you are an active member of",
+    unknown_time_zone: "The time zone is not known",
+    invalid_occurred_at: "occurred_at must be an ISO-8601 date-time",
+    occurred_in_future: "An entry cannot be in the future",
+    occurred_too_long_ago: "Entries can be added or moved at most 7 days back",
+    invalid_craving_trigger: "Use stress, fatigue, boredom, social, hunger or other",
+    invalid_date: "Dates must be ISO-8601 (YYYY-MM-DD), from before to",
+    date_window_too_long: "Ask for at most 92 days at a time",
+    unknown_wellness_section: "Use the sections wellness and cravings"
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@wellness_errors, reason) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: Atom.to_string(reason), error: Map.fetch!(@wellness_errors, reason)})
+  end
+
   def call(conn, {:error, :invalid_range}) do
     conn
     |> put_status(:unprocessable_entity)
