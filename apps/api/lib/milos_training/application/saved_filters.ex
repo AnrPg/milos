@@ -3,9 +3,16 @@ defmodule MilosTraining.Application.SavedFilters do
   ADR-151: a person's filter choices per list surface. The last-used filter
   is remembered automatically; named combinations are saved on request (at
   most 20 per surface; saving an existing name replaces it).
+
+  Γύρω μου (`around_me`, ADR-154) has a typed, versioned filter: its params
+  are parsed and stored in their canonical form, and a named Γύρω μου
+  filter can carry a daily alert.
   """
 
-  alias MilosTraining.Identity
+  alias MilosTraining.Application.AroundMe
+  alias MilosTraining.{Identity, Places}
+
+  @around "around_me"
 
   def get(context, surface) do
     with :ok <- Identity.validate_filter_surface(surface) do
@@ -24,6 +31,7 @@ defmodule MilosTraining.Application.SavedFilters do
   def remember(context, surface, params) do
     with :ok <- Identity.validate_filter_surface(surface),
          :ok <- Identity.validate_filter_params(params),
+         {:ok, params} <- normalize(surface, params),
          {:ok, _filter} <-
            Identity.put_last_used_filter(context, surface, params, DateTime.utc_now()) do
       get(context, surface)
@@ -33,6 +41,7 @@ defmodule MilosTraining.Application.SavedFilters do
   def save(context, surface, name, params) do
     with :ok <- Identity.validate_filter_surface(surface),
          :ok <- Identity.validate_filter_params(params),
+         {:ok, params} <- normalize(surface, params),
          {:ok, name} <- Identity.normalize_filter_name(name),
          :ok <- room_for(context, surface, name),
          {:ok, _filter} <-
@@ -47,6 +56,34 @@ defmodule MilosTraining.Application.SavedFilters do
       get(context, surface)
     end
   end
+
+  @doc """
+  Turns a named Γύρω μου filter's daily alert on or off. Turning it on
+  counts only what appears from now on.
+  """
+  def set_alert(context, surface, id, enabled, now \\ DateTime.utc_now())
+
+  def set_alert(context, @around, id, enabled, now) when is_boolean(enabled) do
+    with {:ok, _filter} <- Identity.set_filter_alert(context, id, enabled, now) do
+      get(context, @around)
+    end
+  end
+
+  def set_alert(_context, @around, _id, _enabled, _now),
+    do: {:error, [enabled: "must be true or false"]}
+
+  def set_alert(_context, surface, _id, _enabled, _now) do
+    with :ok <- Identity.validate_filter_surface(surface),
+         do: {:error, :filter_alerts_unsupported}
+  end
+
+  defp normalize(@around, params) do
+    with {:ok, filter} <- Places.parse_filter(params, AroundMe.vocabulary()) do
+      {:ok, Places.filter_params(filter)}
+    end
+  end
+
+  defp normalize(_surface, params), do: {:ok, params}
 
   # Replacing an existing name never needs room.
   defp room_for(context, surface, name) do

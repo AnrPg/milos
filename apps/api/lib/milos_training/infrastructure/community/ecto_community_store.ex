@@ -745,6 +745,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     Post
     |> where([p], p.organization_id in ^organization_ids and p.audience == "public")
     |> where([p], is_nil(p.deleted_at) and is_nil(p.hidden_at))
+    |> only_ids(Map.get(page, :ids))
     |> before(Map.get(page, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
     |> limit(^Map.get(page, :limit, 20))
@@ -776,6 +777,9 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
 
   defp maybe_author(query, nil), do: query
   defp maybe_author(query, author_id), do: where(query, [p], p.author_id == ^author_id)
+
+  defp only_ids(query, nil), do: query
+  defp only_ids(query, ids), do: where(query, [p], p.id in ^ids)
 
   defp before(query, nil), do: query
 

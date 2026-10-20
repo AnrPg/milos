@@ -24,4 +24,16 @@ defmodule MilosTraining.Identity.SavedFilterStore do
   def count_named(context, surface), do: run(context, :count_named, [surface])
   @impl true
   def delete_named(context, id), do: run(context, :delete_named, [id])
+
+  @impl true
+  def set_alert(context, id, enabled, now), do: run(context, :set_alert, [id, enabled, now])
+
+  # A SECURITY DEFINER lookup across people (ADR-131 §2): no session needed.
+  @impl true
+  def alert_candidates(day, limit), do: adapter().alert_candidates(day, limit)
+
+  @impl true
+  def claim_alert(context, id, day), do: run(context, :claim_alert, [id, day])
+  @impl true
+  def finish_alert(context, id, at), do: run(context, :finish_alert, [id, at])
 end

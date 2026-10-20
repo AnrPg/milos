@@ -402,3 +402,9 @@ msgstr "Vond je «%{event}» leuk? %{box} nodigt je uit voor een proefles."
 
 msgid "Message about «%{event}»"
 msgstr "Bericht over «%{event}»"
+
+msgid "New near you"
+msgstr "Nieuw in de buurt"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Nieuw voor «%{name}»: %{count}"

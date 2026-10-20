@@ -463,6 +463,18 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("around_new_matches", payload, localize) do
+    %{
+      title: localize.("New near you", %{}),
+      body:
+        localize.("New for «%{name}»: %{count}", %{
+          name: payload["filter_name"],
+          count: payload["count"]
+        }),
+      url: payload["url"] || "/around"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

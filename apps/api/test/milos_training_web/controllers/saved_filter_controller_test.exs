@@ -18,7 +18,7 @@ defmodule MilosTrainingWeb.SavedFilterControllerTest do
     put(conn, "/api/me/filters/around_me/last-used", %{params: %{radius_km: 3}})
     |> json_response(200)
 
-    assert %{"last_used" => %{"radius_km" => 5}} =
+    assert %{"last_used" => %{"radius_km" => 5.0, "v" => 1}} =
              conn
              |> put("/api/me/filters/around_me/last-used", %{params: %{radius_km: 5}})
              |> json_response(200)

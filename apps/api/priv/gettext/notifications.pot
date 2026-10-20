@@ -401,3 +401,9 @@ msgstr ""
 
 msgid "Message about «%{event}»"
 msgstr ""
+
+msgid "New near you"
+msgstr ""
+
+msgid "New for «%{name}»: %{count}"
+msgstr ""

@@ -402,3 +402,9 @@ msgstr "هل أعجبك «%{event}»؟ يدعوك %{box} إلى حصة تجري�
 
 msgid "Message about «%{event}»"
 msgstr "رسالة حول «%{event}»"
+
+msgid "New near you"
+msgstr "جديد بالقرب منك"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "جديد لـ «%{name}»: %{count}"

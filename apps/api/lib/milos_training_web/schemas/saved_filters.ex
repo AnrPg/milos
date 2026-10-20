@@ -10,7 +10,9 @@ defmodule MilosTrainingWeb.Schemas.SavedFilters do
     do: %Schema{
       type: :object,
       additionalProperties: true,
-      description: "The surface's filter values; the surface's query validates them."
+      description:
+        "The surface's filter values; the surface's query validates them. Γύρω μου " <>
+          "(`around_me`) stores them normalised as an AroundFilter."
     }
 
   def filters do
@@ -26,12 +28,16 @@ defmodule MilosTrainingWeb.Schemas.SavedFilters do
           items: %Schema{
             title: "SavedFilter",
             type: :object,
-            required: [:id, :name, :params, :last_used_at],
+            required: [:id, :name, :params, :last_used_at, :alert],
             properties: %{
               id: %Schema{type: :string, format: :uuid},
               name: %Schema{type: :string},
               params: params(),
-              last_used_at: %Schema{type: :string, format: :"date-time"}
+              last_used_at: %Schema{type: :string, format: :"date-time"},
+              alert: %Schema{
+                type: :boolean,
+                description: "Γύρω μου only: a daily notification when something new matches"
+              }
             }
           }
         }
@@ -54,6 +60,15 @@ defmodule MilosTrainingWeb.Schemas.SavedFilters do
       type: :object,
       required: [:name, :params],
       properties: %{name: %Schema{type: :string, minLength: 1, maxLength: 40}, params: params()}
+    }
+  end
+
+  def alert_request do
+    %Schema{
+      title: "SavedFilterAlertRequest",
+      type: :object,
+      required: [:enabled],
+      properties: %{enabled: %Schema{type: :boolean}}
     }
   end
 end

@@ -52,6 +52,28 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-154: Γύρω μου.
+  def call(conn, {:error, :origin_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "origin_required",
+      error: "Choose where to search from: your area, your position or a place"
+    })
+  end
+
+  def call(conn, {:error, :place_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "place_not_found", error: "No place matches that name"})
+  end
+
+  def call(conn, {:error, :filter_alerts_unsupported}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "filter_alerts_unsupported", error: "Only Γύρω μου filters have alerts"})
+  end
+
   def call(conn, {:error, :geocoder_unavailable}) do
     conn
     |> put_status(:service_unavailable)

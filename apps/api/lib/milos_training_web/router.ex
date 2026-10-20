@@ -98,6 +98,12 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
   end
 
+  # ADR-154: Γύρω μου searches run several indexed queries (and may geocode
+  # a typed place); a generous budget that still bounds scraping.
+  pipeline :around_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "around")
+  end
+
   pipeline :search_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
@@ -989,6 +995,7 @@ defmodule MilosTrainingWeb.Router do
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)
     delete("/me/filters/:surface/:id", SavedFilterController, :delete)
+    put("/me/filters/:surface/:id/alert", SavedFilterController, :alert)
     put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)
@@ -1026,6 +1033,7 @@ defmodule MilosTrainingWeb.Router do
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
     put("/me/social/member-visibility", FollowController, :member_visibility)
+    put("/me/social/around-visibility", FollowController, :around_visibility)
     post("/me/follows", FollowController, :create)
     get("/me/follows/:target_type/:target_id", FollowController, :show)
     delete("/me/follows/:target_type/:target_id", FollowController, :delete)
@@ -1053,6 +1061,24 @@ defmodule MilosTrainingWeb.Router do
     get("/me/trials/:id", TrialController, :show)
     post("/me/trials/:id/cancel", TrialController, :cancel)
     post("/me/trials/:id/follow-up", TrialController, :follow_up)
+  end
+
+  # ADR-154: Γύρω μου, «Η περιοχή μου» and the gazetteer; members only.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :around_rate_limited
+    ])
+
+    post("/around/search", AroundController, :search)
+    post("/around/search/:kind", AroundController, :kind)
+    post("/around/pins", AroundController, :pins)
+    get("/places/neighbourhoods", PlacesController, :neighbourhoods)
+    get("/me/around/area", PlacesController, :area)
+    put("/me/around/area", PlacesController, :update_area)
   end
 
   # ADR-144, board 6 Q6: talking to a box from its page.

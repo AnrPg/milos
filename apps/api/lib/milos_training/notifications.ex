@@ -227,6 +227,17 @@ defmodule MilosTraining.Notifications do
         event_payload(type, payload)
       )
 
+  # ADR-154: a saved Γύρω μου filter found something new (at most daily).
+  def process_event("around_new_matches", payload),
+    do:
+      enqueue_simple(:around_new_matches, payload, %{
+        filter_id: field(payload, :filter_id),
+        filter_name: field(payload, :filter_name),
+        count: field(payload, :count),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/around?filter=#{field(payload, :filter_id)}"
+      })
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)

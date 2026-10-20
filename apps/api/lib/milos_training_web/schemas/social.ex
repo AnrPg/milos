@@ -267,7 +267,8 @@ defmodule MilosTrainingWeb.Schemas.Social do
         following_count: %Schema{type: :integer},
         requests_count: %Schema{type: :integer},
         booking_sharing: booking_sharing(),
-        member_visibility: member_visibility()
+        member_visibility: member_visibility(),
+        around_visibility: MilosTrainingWeb.Schemas.Around.around_visibility()
       },
       required: [
         :posts_count,
@@ -275,7 +276,8 @@ defmodule MilosTrainingWeb.Schemas.Social do
         :following_count,
         :requests_count,
         :booking_sharing,
-        :member_visibility
+        :member_visibility,
+        :around_visibility
       ]
     }
   end

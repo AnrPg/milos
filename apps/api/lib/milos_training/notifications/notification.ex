@@ -66,7 +66,8 @@ defmodule MilosTraining.Notifications.Notification do
     :community_event_reminder,
     :community_event_guest_joined,
     :community_event_trial_offer,
-    :community_event_message
+    :community_event_message,
+    :around_new_matches
   ]
 
   schema "notifications" do

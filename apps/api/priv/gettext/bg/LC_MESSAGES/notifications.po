@@ -402,3 +402,9 @@ msgstr "Хареса ли ти «%{event}»? %{box} те кани на проб�
 
 msgid "Message about «%{event}»"
 msgstr "Съобщение за «%{event}»"
+
+msgid "New near you"
+msgstr "Ново близо до теб"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Ново за «%{name}»: %{count}"
