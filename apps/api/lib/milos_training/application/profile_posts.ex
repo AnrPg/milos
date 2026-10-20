@@ -4,22 +4,43 @@ defmodule MilosTraining.Application.ProfilePosts do
   optional journal attachment, kudos and comments. They belong to the
   author, so they run in the member's personal session; RLS lets active
   followers read followers posts and anyone read public ones.
+
+  ADR-157: up to ten photos or one video (`media_ids`). Deleting a post
+  deletes its uploads.
   """
 
-  alias MilosTraining.Application.{PostAttachment, PostPresenter, RealtimePublisher}
+  alias MilosTraining.Application.{PostAttachment, PostMedia, PostPresenter, RealtimePublisher}
   alias MilosTraining.Community
 
   def create(%{user_id: user_id} = context, params) do
+    audience = param(params, :audience)
+
     with {:ok, attachment} <- attachment(user_id, params),
+         {:ok, media} <- PostMedia.prepare(context, param(params, :media_ids)),
          attrs =
-           Map.merge(attachment, %{
+           attachment
+           |> Map.merge(PostMedia.initial(media))
+           |> Map.merge(%{
              body: param(params, :body),
              client_operation_id: param(params, :client_operation_id)
            }),
-         {:ok, post} <- Community.create_profile_post(context, param(params, :audience), attrs) do
+         {:ok, post} <- Community.create_profile_post(context, audience, attrs),
+         :ok <- attach_media(media, context, post),
+         {:ok, post} <- Community.fetch_profile_post(context, post.id) do
       _ = PostAttachment.mark_posted(user_id, post)
       announce(post, "post_created")
       {:ok, present(post, user_id)}
+    end
+  end
+
+  defp attach_media(media, context, post) do
+    case PostMedia.attach(media, context, PostMedia.ref("profile_post", post)) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        _ = Community.delete_profile_post(context, post, DateTime.utc_now())
+        {:error, reason}
     end
   end
 
@@ -27,6 +48,7 @@ defmodule MilosTraining.Application.ProfilePosts do
     with {:ok, post} <- Community.fetch_profile_post(context, post_id),
          :ok <- Community.delete_profile_post(context, post, now) do
       PostAttachment.restore(user_id, post)
+      :ok = PostMedia.release(post)
       announce(post, "post_deleted")
       :ok
     end

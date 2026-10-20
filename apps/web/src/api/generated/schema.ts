@@ -4,6 +4,60 @@
  */
 
 export interface paths {
+    "/api/around/pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Map pins inside a viewport («Ψάξε εδώ»), same filter, capped */
+        post: operations["MilosTrainingWeb.AroundController.pins"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/around/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Γύρω μου: each kind's nearest or soonest cards, totals and wider counts
+         * @description Events (soonest first), boxes with a published page (trial-takers first, then nearest), open clubs (nearest) and, when asked for, public posts (newest). Remembers the filter as your last-used Γύρω μου filter unless `remember` is false.
+         */
+        post: operations["MilosTrainingWeb.AroundController.search"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/around/search/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** One Γύρω μου kind, cursor-paged («Δες όλα») */
+        post: operations["MilosTrainingWeb.AroundController.kind"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/invitations/inspect": {
         parameters: {
             query?: never;
@@ -379,6 +433,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/check-in/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Scan the door: check in to a booking or open gym, or see what the box offers */
+        post: operations["MilosTrainingWeb.ScanCheckInController.scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/check-in/scan/{undo_token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Undo a scan's check-in within its minute */
+        delete: operations["MilosTrainingWeb.ScanCheckInController.undo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions": {
         parameters: {
             query?: never;
@@ -553,6 +641,24 @@ export interface paths {
         post?: never;
         /** Delete one of your comments */
         delete: operations["MilosTrainingWeb.JournalCommentController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/around/area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your «Η περιοχή μου» */
+        get: operations["MilosTrainingWeb.PlacesController.area"];
+        /** Set «Η περιοχή μου» (up to 5 neighbourhoods; the first is the main one) */
+        put: operations["MilosTrainingWeb.PlacesController.update_area"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -849,6 +955,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/connected-devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Wallet cards, calendar feed and health integrations */
+        get: operations["MilosTrainingWeb.WalletController.devices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/events": {
         parameters: {
             query?: never;
@@ -999,6 +1122,26 @@ export interface paths {
         post?: never;
         /** Delete a saved filter */
         delete: operations["MilosTrainingWeb.SavedFilterController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/filters/{surface}/{id}/alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Turn a saved Γύρω μου filter's daily alert on or off (ADR-154)
+         * @description At most one notification a day, only when something new matches. Turning it on counts only what appears from now on. Only the `around_me` surface has alerts.
+         */
+        put: operations["MilosTrainingWeb.SavedFilterController.alert"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1210,6 +1353,93 @@ export interface paths {
         patch: operations["MilosTrainingWeb.JournalController.update_note"];
         trace?: never;
     };
+    "/api/me/media/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the compose may offer: photo and video limits on this server */
+        get: operations["MilosTrainingWeb.MyMediaController.capabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve an upload for a post photo or video and get a presigned PUT for it */
+        post: operations["MilosTrainingWeb.MyMediaController.upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your uploads, while it processes and after */
+        get: operations["MilosTrainingWeb.MyMediaController.show"];
+        put?: never;
+        post?: never;
+        /** Remove an upload you took out of the compose (not one in a post) */
+        delete: operations["MilosTrainingWeb.MyMediaController.delete"];
+        options?: never;
+        head?: never;
+        /** Set or clear an upload's alternative text (its post follows) */
+        patch: operations["MilosTrainingWeb.MyMediaController.update"];
+        trace?: never;
+    };
+    "/api/me/media/{id}/alt-text-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest alternative text for a ready photo (shown to you only, never saved) */
+        post: operations["MilosTrainingWeb.MyMediaController.suggest_alt_text"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The upload finished: verify its type and size and start processing it */
+        post: operations["MilosTrainingWeb.MyMediaController.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/open-clubs/{id}": {
         parameters: {
             query?: never;
@@ -1282,6 +1512,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/post-attachments/{type}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview the card one of your journal entries or PRs makes in a post */
+        get: operations["MilosTrainingWeb.PostAttachmentController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/profile": {
         parameters: {
             query?: never;
@@ -1326,6 +1573,23 @@ export interface paths {
         /** Your counts for Εγώ: posts, followers, following, waiting requests */
         get: operations["MilosTrainingWeb.FollowController.summary"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social/around-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Show your public posts in Γύρω μου at your neighbourhood, or stop (ADR-154) */
+        put: operations["MilosTrainingWeb.FollowController.around_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1447,6 +1711,23 @@ export interface paths {
         /** After the trial: «Θέλω να γραφτώ» opens a chat with the box, «Όχι τώρα» hides the card */
         post: operations["MilosTrainingWeb.TrialController.follow_up"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wallet-passes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke one of my Wallet cards: it stops scanning at once */
+        delete: operations["MilosTrainingWeb.WalletController.revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1839,6 +2120,161 @@ export interface paths {
         head?: never;
         /** Update a seasonal challenge */
         patch: operations["MilosTrainingWeb.AdminChallengeController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The door display of a location: its code, the next codes, the next class */
+        get: operations["MilosTrainingWeb.AdminCheckInController.door"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The printed poster of a location: its static QR and whether it is on */
+        get: operations["MilosTrainingWeb.AdminCheckInController.poster"];
+        /** Turn the printed poster of a location on or off */
+        put: operations["MilosTrainingWeb.AdminCheckInController.update_poster"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Νέος κωδικός αφίσας»: every printed copy stops working */
+        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_poster"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Νέος κωδικός πόρτας»: every code shown so far stops working */
+        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_door"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a member in from the desk (booking in the window, else open gym) */
+        post: operations["MilosTrainingWeb.AdminCheckInController.check_in_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a member's static personal code; their Wallet cards stop scanning */
+        delete: operations["MilosTrainingWeb.AdminCheckInController.revoke_member_code"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/scan-member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Scan a member's personal QR or Wallet card at the desk */
+        post: operations["MilosTrainingWeb.AdminCheckInController.scan_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's check-in rules */
+        get: operations["MilosTrainingWeb.AdminCheckInController.settings"];
+        /** Change the box's check-in rules */
+        put: operations["MilosTrainingWeb.AdminCheckInController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/visitors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People who scanned the door and are not members («Επισκέπτης»), newest first */
+        get: operations["MilosTrainingWeb.AdminCheckInController.visitors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/check-ins": {
@@ -5378,6 +5814,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/check-in/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My personal check-in QR at this box (rotating every 30 s, or static per the box) */
+        get: operations["MilosTrainingWeb.MyCheckInController.code"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/check-in/code/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset my static personal code: the old one and its Wallet cards stop */
+        post: operations["MilosTrainingWeb.MyCheckInController.reset_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/corporate-enrollment": {
         parameters: {
             query?: never;
@@ -5841,6 +6311,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MyContentController.videos"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/wallet-passes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add my check-in card at this box to Apple or Google Wallet */
+        post: operations["MilosTrainingWeb.MyCheckInController.add_wallet_pass"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6667,6 +7154,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/places/neighbourhoods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Neighbourhoods and cities matching a name (case and accents ignored) */
+        get: operations["MilosTrainingWeb.PlacesController.neighbourhoods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organization-purges": {
         parameters: {
             query?: never;
@@ -7359,6 +7863,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/wallet/passes/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Apple Wallet .pkpass behind a short-lived download link */
+        get: operations["MilosTrainingWeb.WalletController.download"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/wellbeing/check-ins": {
         parameters: {
             query?: never;
@@ -7560,6 +8081,2588 @@ export interface components {
             spots_remaining?: number | null;
             /** Format: date-time */
             starts_at: string;
+        };
+        /** AroundAreaRequest */
+        AroundAreaRequest: {
+            neighbourhood_ids: string[];
+        };
+        /**
+         * AroundAreaResponse
+         * @description «Η περιοχή μου»; the first neighbourhood is the main one
+         */
+        AroundAreaResponse: {
+            neighbourhoods: {
+                city_slug: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "neighbourhood" | "city";
+                latitude: number;
+                longitude: number;
+                name: string;
+                name_en: string;
+                slug: string;
+            }[];
+        };
+        /** AroundBox */
+        AroundBox: {
+            amenities: string[];
+            audiences: string[];
+            city?: string | null;
+            cover_url?: string | null;
+            disciplines: string[];
+            languages: string[];
+            latitude: number;
+            logo_url?: string | null;
+            longitude: number;
+            name: string;
+            neighbourhood?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            slug: string;
+            takes_trials: boolean;
+        };
+        /** AroundBoxItem */
+        AroundBoxItem: {
+            /** AroundBox */
+            box: {
+                amenities: string[];
+                audiences: string[];
+                city?: string | null;
+                cover_url?: string | null;
+                disciplines: string[];
+                languages: string[];
+                latitude: number;
+                logo_url?: string | null;
+                longitude: number;
+                name: string;
+                neighbourhood?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                slug: string;
+                takes_trials: boolean;
+            };
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+        };
+        /** AroundBoxesSection */
+        AroundBoxesSection: {
+            items: {
+                /** AroundBox */
+                box: {
+                    amenities: string[];
+                    audiences: string[];
+                    city?: string | null;
+                    cover_url?: string | null;
+                    disciplines: string[];
+                    languages: string[];
+                    latitude: number;
+                    logo_url?: string | null;
+                    longitude: number;
+                    name: string;
+                    neighbourhood?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    slug: string;
+                    takes_trials: boolean;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            }[];
+            next_cursor: string | null;
+            /**
+             * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+             * @enum {string}
+             */
+            placement: "category" | "collapsed";
+            total: number;
+        } | null;
+        /** AroundClubItem */
+        AroundClubItem: {
+            /** CommunityOpenClub */
+            club: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
+            };
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+        };
+        /** AroundClubsSection */
+        AroundClubsSection: {
+            items: {
+                /** CommunityOpenClub */
+                club: {
+                    box?: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    channels?: {
+                        /** Format: uuid */
+                        id: string;
+                        kind: string;
+                        name?: string | null;
+                    }[];
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    join_policy: "open" | "approval";
+                    member_count: number;
+                    members?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string} */
+                    membership?: "none" | "requested" | "member";
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    request_count?: number;
+                    requests?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string|null} */
+                    role?: "member" | "staff" | null;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /** AroundEventItem */
+        AroundEventItem: {
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+            /** CommunityEvent */
+            event: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            };
+        };
+        /** AroundEventsSection */
+        AroundEventsSection: {
+            items: {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /** CommunityEvent */
+                event: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                };
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /**
+         * AroundFilter
+         * @description Every field is optional; the response echoes the normalised filter.
+         */
+        AroundFilter: {
+            amenities?: string[];
+            audiences?: string[];
+            cost?: ("free" | "trial")[];
+            /** Format: date */
+            date_from?: string | null;
+            /** Format: date */
+            date_to?: string | null;
+            disciplines?: string[];
+            /** @description Default events, boxes, clubs */
+            kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+            languages?: string[];
+            max_price_cents?: number | null;
+            /** @description Gazetteer places to search from, at most 5 */
+            neighbourhood_ids?: string[];
+            /** @description Default 3 */
+            radius_km?: number;
+            times?: ("morning" | "midday" | "evening")[];
+            /** @description Filter version; 1 today */
+            v?: number;
+            /** @enum {string|null} */
+            when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+        };
+        /** AroundKindRequest */
+        AroundKindRequest: {
+            cursor?: string | null;
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** @description Default 20 */
+            limit?: number;
+            /**
+             * AroundOriginRequest
+             * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+             */
+            origin?: {
+                /** @description point: the device position; rounded to 3 decimals */
+                latitude?: number;
+                longitude?: number;
+                /**
+                 * Format: uuid
+                 * @description place: a gazetteer place
+                 */
+                neighbourhood_id?: string;
+                /** @description place: a place name for the geocoder */
+                query?: string;
+                /** @enum {string} */
+                type: "area" | "point" | "place";
+            };
+        };
+        /** AroundKindResponse */
+        AroundKindResponse: {
+            items: ({
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /** CommunityEvent */
+                event: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                };
+            } | {
+                /** AroundBox */
+                box: {
+                    amenities: string[];
+                    audiences: string[];
+                    city?: string | null;
+                    cover_url?: string | null;
+                    disciplines: string[];
+                    languages: string[];
+                    latitude: number;
+                    logo_url?: string | null;
+                    longitude: number;
+                    name: string;
+                    neighbourhood?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    slug: string;
+                    takes_trials: boolean;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            } | {
+                /** CommunityOpenClub */
+                club: {
+                    box?: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    channels?: {
+                        /** Format: uuid */
+                        id: string;
+                        kind: string;
+                        name?: string | null;
+                    }[];
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    join_policy: "open" | "approval";
+                    member_count: number;
+                    members?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string} */
+                    membership?: "none" | "requested" | "member";
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    request_count?: number;
+                    requests?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string|null} */
+                    role?: "member" | "staff" | null;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            } | {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /**
+                 * CommunityPost
+                 * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                 */
+                post: {
+                    /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                    attachment?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    attachment_id?: string | null;
+                    /** @enum {string|null} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    /** @enum {string} */
+                    audience: "club_channel" | "followers" | "public";
+                    /** CommunityAuthor */
+                    author: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    body?: string | null;
+                    can_delete: boolean;
+                    can_moderate: boolean;
+                    can_pin: boolean;
+                    can_report?: boolean;
+                    channel: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    } | null;
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string;
+                        logo_url?: string | null;
+                        name: string;
+                        organization_slug?: string | null;
+                        primary_color?: string | null;
+                    } | null;
+                    comment_count: number;
+                    /**
+                     * CommunityPostEvent
+                     * @description The event as you see it now, when the post is an event card (attachment_type event)
+                     */
+                    event?: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    } | null;
+                    hidden: boolean;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    kudos_by_me: boolean;
+                    kudos_count: number;
+                    /** @description Up to ten photos or one video, in order (ADR-157) */
+                    media: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                     * @enum {string}
+                     */
+                    media_status: "ready" | "processing" | "failed";
+                    /** @enum {string} */
+                    origin: "club" | "profile";
+                    pinned: boolean;
+                };
+            })[];
+            /** @enum {string} */
+            kind: "events" | "boxes" | "clubs" | "posts";
+            next_cursor: string | null;
+            /** AroundOrigin */
+            origin: {
+                label: string | null;
+                latitude: number;
+                longitude: number;
+                neighbourhood_ids: string[];
+                /** @enum {string} */
+                type: "neighbourhoods" | "area" | "point" | "place" | "box";
+            };
+            /**
+             * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+             * @enum {string}
+             */
+            placement?: "category" | "collapsed";
+            total: number;
+        };
+        /**
+         * AroundNormalizedFilter
+         * @description Every field is optional; the response echoes the normalised filter.
+         */
+        AroundNormalizedFilter: {
+            amenities: string[];
+            audiences: string[];
+            cost: ("free" | "trial")[];
+            /** Format: date */
+            date_from: string | null;
+            /** Format: date */
+            date_to: string | null;
+            disciplines: string[];
+            /** @description Default events, boxes, clubs */
+            kinds: ("events" | "boxes" | "clubs" | "posts")[];
+            languages: string[];
+            max_price_cents: number | null;
+            /** @description Gazetteer places to search from, at most 5 */
+            neighbourhood_ids: string[];
+            /** @description Default 3 */
+            radius_km: number;
+            times: ("morning" | "midday" | "evening")[];
+            /** @description Filter version; 1 today */
+            v: number;
+            /** @enum {string|null} */
+            when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+        };
+        /** AroundOrigin */
+        AroundOrigin: {
+            label: string | null;
+            latitude: number;
+            longitude: number;
+            neighbourhood_ids: string[];
+            /** @enum {string} */
+            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+        };
+        /**
+         * AroundOriginRequest
+         * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+         */
+        AroundOriginRequest: {
+            /** @description point: the device position; rounded to 3 decimals */
+            latitude?: number;
+            longitude?: number;
+            /**
+             * Format: uuid
+             * @description place: a gazetteer place
+             */
+            neighbourhood_id?: string;
+            /** @description place: a place name for the geocoder */
+            query?: string;
+            /** @enum {string} */
+            type: "area" | "point" | "place";
+        };
+        /** AroundPin */
+        AroundPin: {
+            /**
+             * Format: uuid
+             * @description Event, club or post id; the gym's id for a box
+             */
+            id: string;
+            /** @enum {string} */
+            kind: "events" | "boxes" | "clubs" | "posts";
+            latitude: number;
+            longitude: number;
+            /** @description Boxes: the public page's slug */
+            slug: string | null;
+            title: string | null;
+        };
+        /** AroundPinsRequest */
+        AroundPinsRequest: {
+            /** AroundViewport */
+            bbox: {
+                east: number;
+                north: number;
+                south: number;
+                west: number;
+            };
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+        };
+        /** AroundPinsResponse */
+        AroundPinsResponse: {
+            pins: {
+                /**
+                 * Format: uuid
+                 * @description Event, club or post id; the gym's id for a box
+                 */
+                id: string;
+                /** @enum {string} */
+                kind: "events" | "boxes" | "clubs" | "posts";
+                latitude: number;
+                longitude: number;
+                /** @description Boxes: the public page's slug */
+                slug: string | null;
+                title: string | null;
+            }[];
+            /** @description More than the cap matched; zoom in */
+            truncated: boolean;
+        };
+        /** AroundPostItem */
+        AroundPostItem: {
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+            /**
+             * CommunityPost
+             * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+             */
+            post: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                can_report?: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                } | null;
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug?: string | null;
+                    primary_color?: string | null;
+                } | null;
+                comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
+                /** @enum {string} */
+                origin: "club" | "profile";
+                pinned: boolean;
+            };
+        };
+        /** AroundPostsSection */
+        AroundPostsSection: {
+            items: {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /**
+                 * CommunityPost
+                 * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                 */
+                post: {
+                    /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                    attachment?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    attachment_id?: string | null;
+                    /** @enum {string|null} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    /** @enum {string} */
+                    audience: "club_channel" | "followers" | "public";
+                    /** CommunityAuthor */
+                    author: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    body?: string | null;
+                    can_delete: boolean;
+                    can_moderate: boolean;
+                    can_pin: boolean;
+                    can_report?: boolean;
+                    channel: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    } | null;
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string;
+                        logo_url?: string | null;
+                        name: string;
+                        organization_slug?: string | null;
+                        primary_color?: string | null;
+                    } | null;
+                    comment_count: number;
+                    /**
+                     * CommunityPostEvent
+                     * @description The event as you see it now, when the post is an event card (attachment_type event)
+                     */
+                    event?: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    } | null;
+                    hidden: boolean;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    kudos_by_me: boolean;
+                    kudos_count: number;
+                    /** @description Up to ten photos or one video, in order (ADR-157) */
+                    media: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                     * @enum {string}
+                     */
+                    media_status: "ready" | "processing" | "failed";
+                    /** @enum {string} */
+                    origin: "club" | "profile";
+                    pinned: boolean;
+                };
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /** AroundSearchRequest */
+        AroundSearchRequest: {
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** @description Cards per section, default 5 */
+            limit?: number;
+            /**
+             * AroundOriginRequest
+             * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+             */
+            origin?: {
+                /** @description point: the device position; rounded to 3 decimals */
+                latitude?: number;
+                longitude?: number;
+                /**
+                 * Format: uuid
+                 * @description place: a gazetteer place
+                 */
+                neighbourhood_id?: string;
+                /** @description place: a place name for the geocoder */
+                query?: string;
+                /** @enum {string} */
+                type: "area" | "point" | "place";
+            };
+            /** @description Remember the filter as last used (default true) */
+            remember?: boolean;
+        };
+        /** AroundSearchResponse */
+        AroundSearchResponse: {
+            /** @description For «Φίλτρα (n)» */
+            active_filters: number;
+            /**
+             * AroundNormalizedFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter: {
+                amenities: string[];
+                audiences: string[];
+                cost: ("free" | "trial")[];
+                /** Format: date */
+                date_from: string | null;
+                /** Format: date */
+                date_to: string | null;
+                disciplines: string[];
+                /** @description Default events, boxes, clubs */
+                kinds: ("events" | "boxes" | "clubs" | "posts")[];
+                languages: string[];
+                max_price_cents: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids: string[];
+                /** @description Default 3 */
+                radius_km: number;
+                times: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v: number;
+                /** @enum {string|null} */
+                when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** AroundOrigin */
+            origin: {
+                label: string | null;
+                latitude: number;
+                longitude: number;
+                neighbourhood_ids: string[];
+                /** @enum {string} */
+                type: "neighbourhoods" | "area" | "point" | "place" | "box";
+            };
+            /**
+             * AroundSections
+             * @description A kind not asked for (or ruled out by cost) is null
+             */
+            sections: {
+                /** AroundBoxesSection */
+                boxes: {
+                    items: {
+                        /** AroundBox */
+                        box: {
+                            amenities: string[];
+                            audiences: string[];
+                            city?: string | null;
+                            cover_url?: string | null;
+                            disciplines: string[];
+                            languages: string[];
+                            latitude: number;
+                            logo_url?: string | null;
+                            longitude: number;
+                            name: string;
+                            neighbourhood?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug: string;
+                            takes_trials: boolean;
+                        };
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                    }[];
+                    next_cursor: string | null;
+                    /**
+                     * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                     * @enum {string}
+                     */
+                    placement: "category" | "collapsed";
+                    total: number;
+                } | null;
+                /** AroundClubsSection */
+                clubs: {
+                    items: {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+                /** AroundEventsSection */
+                events: {
+                    items: {
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+                /** AroundPostsSection */
+                posts: {
+                    items: {
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+            };
+            /** @description Only when the search found few: how many at wider radii */
+            wider: {
+                by_kind: {
+                    [key: string]: number;
+                };
+                radius_km: number;
+                total: number;
+            }[];
+        };
+        /**
+         * AroundSections
+         * @description A kind not asked for (or ruled out by cost) is null
+         */
+        AroundSections: {
+            /** AroundBoxesSection */
+            boxes: {
+                items: {
+                    /** AroundBox */
+                    box: {
+                        amenities: string[];
+                        audiences: string[];
+                        city?: string | null;
+                        cover_url?: string | null;
+                        disciplines: string[];
+                        languages: string[];
+                        latitude: number;
+                        logo_url?: string | null;
+                        longitude: number;
+                        name: string;
+                        neighbourhood?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        primary_color?: string | null;
+                        slug: string;
+                        takes_trials: boolean;
+                    };
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                }[];
+                next_cursor: string | null;
+                /**
+                 * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                 * @enum {string}
+                 */
+                placement: "category" | "collapsed";
+                total: number;
+            } | null;
+            /** AroundClubsSection */
+            clubs: {
+                items: {
+                    /** CommunityOpenClub */
+                    club: {
+                        box?: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        channels?: {
+                            /** Format: uuid */
+                            id: string;
+                            kind: string;
+                            name?: string | null;
+                        }[];
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        description?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        join_policy: "open" | "approval";
+                        member_count: number;
+                        members?: {
+                            /** CommunityAuthor */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** Format: date-time */
+                            since: string;
+                        }[];
+                        /** @enum {string} */
+                        membership?: "none" | "requested" | "member";
+                        name: string;
+                        /** Format: uuid */
+                        organization_id: string;
+                        request_count?: number;
+                        requests?: {
+                            /** CommunityAuthor */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** Format: date-time */
+                            since: string;
+                        }[];
+                        /** @enum {string|null} */
+                        role?: "member" | "staff" | null;
+                    };
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+            /** AroundEventsSection */
+            events: {
+                items: {
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                    /** CommunityEvent */
+                    event: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    };
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+            /** AroundPostsSection */
+            posts: {
+                items: {
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                    /**
+                     * CommunityPost
+                     * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                     */
+                    post: {
+                        /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                        attachment?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        attachment_id?: string | null;
+                        /** @enum {string|null} */
+                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                        /** @enum {string} */
+                        audience: "club_channel" | "followers" | "public";
+                        /** CommunityAuthor */
+                        author: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        body?: string | null;
+                        can_delete: boolean;
+                        can_moderate: boolean;
+                        can_pin: boolean;
+                        can_report?: boolean;
+                        channel: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        } | null;
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string;
+                            logo_url?: string | null;
+                            name: string;
+                            organization_slug?: string | null;
+                            primary_color?: string | null;
+                        } | null;
+                        comment_count: number;
+                        /**
+                         * CommunityPostEvent
+                         * @description The event as you see it now, when the post is an event card (attachment_type event)
+                         */
+                        event?: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        } | null;
+                        hidden: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date-time */
+                        inserted_at: string;
+                        kudos_by_me: boolean;
+                        kudos_count: number;
+                        /** @description Up to ten photos or one video, in order (ADR-157) */
+                        media: {
+                            alt_text?: string | null;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "image" | "video";
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                            thumb_url?: string | null;
+                            video_url?: string | null;
+                            width?: number | null;
+                        }[];
+                        /**
+                         * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                         * @enum {string}
+                         */
+                        media_status: "ready" | "processing" | "failed";
+                        /** @enum {string} */
+                        origin: "club" | "profile";
+                        pinned: boolean;
+                    };
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+        };
+        /** AroundViewport */
+        AroundViewport: {
+            east: number;
+            north: number;
+            south: number;
+            west: number;
+        };
+        /**
+         * AroundVisibility
+         * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+         */
+        AroundVisibility: {
+            /** @description Public posts show only once «Η περιοχή μου» is set */
+            has_area: boolean;
+            visible: boolean;
+        };
+        /** AroundVisibilityRequest */
+        AroundVisibilityRequest: {
+            visible: boolean;
+        };
+        /** AroundWiderCount */
+        AroundWiderCount: {
+            by_kind: {
+                [key: string]: number;
+            };
+            radius_km: number;
+            total: number;
         };
         /** AthleteInjuryWarnings */
         AthleteInjuryWarnings: {
@@ -7821,16 +10924,30 @@ export interface components {
             }[];
             /** Media */
             cover: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             } | null;
             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -7839,16 +10956,30 @@ export interface components {
             /** @description What the draft still needs before it can be published. */
             missing: ("about" | "disciplines")[];
             photos: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             }[];
             published: boolean;
@@ -7895,16 +11026,30 @@ export interface components {
                 }[];
                 /** Media */
                 cover: {
+                    alt_text?: string | null;
                     content_type: string;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
                     height: number | null;
                     /** Format: uuid */
                     id: string;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    kind?: "image" | "video";
+                    /** @description A tiny blurred WebP data URI to show while the image loads */
+                    placeholder?: string | null;
                     /** @enum {string} */
-                    status: "pending" | "ready";
-                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    rejection_reason?: string | null;
+                    /**
+                     * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                     * @enum {string}
+                     */
+                    status: "pending" | "processing" | "ready" | "rejected";
+                    thumb_url?: string | null;
+                    /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                     url: string | null;
+                    video_url?: string | null;
                     width: number | null;
                 } | null;
                 disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -7913,16 +11058,30 @@ export interface components {
                 /** @description What the draft still needs before it can be published. */
                 missing: ("about" | "disciplines")[];
                 photos: {
+                    alt_text?: string | null;
                     content_type: string;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
                     height: number | null;
                     /** Format: uuid */
                     id: string;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    kind?: "image" | "video";
+                    /** @description A tiny blurred WebP data URI to show while the image loads */
+                    placeholder?: string | null;
                     /** @enum {string} */
-                    status: "pending" | "ready";
-                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    rejection_reason?: string | null;
+                    /**
+                     * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                     * @enum {string}
+                     */
+                    status: "pending" | "processing" | "ready" | "rejected";
+                    thumb_url?: string | null;
+                    /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                     url: string | null;
+                    video_url?: string | null;
                     width: number | null;
                 }[];
                 published: boolean;
@@ -7979,6 +11138,557 @@ export interface components {
                 key: string;
             }[];
             services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
+        };
+        /** CheckInBooking */
+        CheckInBooking: {
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string|null} */
+            kind?: null | "member" | "guest" | "trial";
+            /** Format: uuid */
+            location_id?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            scheduled_class_id: string;
+            /** Format: date-time */
+            starts_at: string;
+        };
+        /** CheckInBox */
+        CheckInBox: {
+            logo_url?: string | null;
+            name: string;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            slug: string;
+        };
+        /** CheckInClass */
+        CheckInClass: {
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            name?: string | null;
+            spots_remaining?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** @description Visitor offer only */
+            trial_seats?: number | null;
+        };
+        /** CheckInDeskRequest */
+        CheckInDeskRequest: {
+            /** Format: uuid */
+            booking_id?: string;
+            /** Format: uuid */
+            location_id?: string;
+            /** @enum {string} */
+            method?: "member_qr" | "wallet" | "desk_search";
+            /** @description «Check-in παρ' όλα αυτά»: only when the owner allows desk overrides */
+            override?: boolean;
+        };
+        /** CheckInDeskResult */
+        CheckInDeskResult: {
+            /** @enum {string|null} */
+            already_checked_in?: null | "class" | "open_gym";
+            /** @description Bookings in the window */
+            bookings?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+            can_auto_check_in: boolean;
+            /** CheckInRecord */
+            checked_in?: {
+                /** Format: date-time */
+                at?: string | null;
+                booking?: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string|null} */
+                    kind?: null | "member" | "guest" | "trial";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    scheduled_class_id: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                } | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** @enum {string} */
+                kind: "class" | "open_gym";
+                /** @enum {string|null} */
+                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                override?: boolean;
+            } | null;
+            /** @enum {string} */
+            decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+            member: {
+                avatar_url?: string | null;
+                display_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** @enum {string} */
+            method?: "member_qr" | "wallet" | "desk_search";
+            /** Format: uuid */
+            organization_id?: string;
+            override_allowed: boolean;
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+            problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+            warnings?: "payment_due"[];
+        };
+        /** CheckInDeskScanRequest */
+        CheckInDeskScanRequest: {
+            /** @description Check in right away when nothing is wrong */
+            auto?: boolean;
+            /** @description Personal QR or Wallet barcode */
+            code: string;
+            /** Format: uuid */
+            location_id?: string;
+        };
+        /** CheckInDoorDisplay */
+        CheckInDoorDisplay: {
+            code: string;
+            /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+            codes: {
+                code: string;
+                deep_link: string;
+                /** Format: date-time */
+                shows_from: string;
+                /** Format: date-time */
+                valid_until: string;
+            }[];
+            /** @description What the QR encodes: /c/<location>/<code> */
+            deep_link: string;
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            next_class?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            } | null;
+            recent_check_ins?: {
+                /** Format: date-time */
+                at?: string;
+                first_name?: string | null;
+                /** @enum {string} */
+                kind?: "class" | "open_gym";
+            }[];
+            /** Format: date-time */
+            rotated_at?: string | null;
+            rotation_seconds: number;
+            seconds_until_rotation?: number;
+            /** Format: date-time */
+            server_time?: string;
+            /** @description Realtime topic with `checked_in` events (first names only) */
+            topic: string;
+        };
+        /** CheckInLocation */
+        CheckInLocation: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        /**
+         * CheckInMemberCode
+         * @description `rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.
+         */
+        CheckInMemberCode: {
+            code: string;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: date-time */
+            issued_at?: string | null;
+            /** @enum {string} */
+            mode: "rotating" | "static";
+            rotation_seconds?: number | null;
+            seconds_until_rotation?: number | null;
+            wallet_available: boolean;
+        };
+        /** CheckInMemberCodeRevoked */
+        CheckInMemberCodeRevoked: {
+            revoked_codes: number;
+            revoked_passes: number;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /**
+         * CheckInPackage
+         * @description What is left on the member's package; null when the box keeps no package for them
+         */
+        CheckInPackage: {
+            /** @description null = unlimited or not part of the package */
+            class_visits_left?: number | null;
+            /** Format: date */
+            expires_on?: string | null;
+            /** Format: date */
+            frozen_until?: string | null;
+            name?: string | null;
+            /** @description null = unlimited or not part of the package */
+            open_gym_visits_left?: number | null;
+            status?: string | null;
+            unlimited?: boolean;
+        } | null;
+        /**
+         * CheckInPoster
+         * @description The printed poster of a location: a static QR that only checks in bookings
+         */
+        CheckInPoster: {
+            code: string;
+            /** @description `/c/<location>/p/<code>`, what the QR holds */
+            deep_link: string;
+            enabled: boolean;
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            rotated_at?: string | null;
+        };
+        /** CheckInPosterRequest */
+        CheckInPosterRequest: {
+            enabled: boolean;
+        };
+        /** CheckInRecord */
+        CheckInRecord: {
+            /** Format: date-time */
+            at?: string | null;
+            booking?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            } | null;
+            /** Format: uuid */
+            id?: string | null;
+            /** @enum {string} */
+            kind: "class" | "open_gym";
+            /** @enum {string|null} */
+            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            override?: boolean;
+        } | null;
+        /** CheckInRules */
+        CheckInRules: {
+            desk_override?: boolean;
+            /** @enum {integer} */
+            door_rotation_seconds?: 15 | 30 | 60;
+            /**
+             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+             * @enum {string}
+             */
+            member_code_mode?: "rotating" | "static";
+            open_gym_requires_package?: boolean;
+            visitor_trial_offer?: boolean;
+            window_after_minutes?: number;
+            window_before_minutes?: number;
+        };
+        /** CheckInRulesResponse */
+        CheckInRulesResponse: {
+            /** CheckInRules */
+            settings: {
+                desk_override?: boolean;
+                /** @enum {integer} */
+                door_rotation_seconds?: 15 | 30 | 60;
+                /**
+                 * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                 * @enum {string}
+                 */
+                member_code_mode?: "rotating" | "static";
+                open_gym_requires_package?: boolean;
+                visitor_trial_offer?: boolean;
+                window_after_minutes?: number;
+                window_before_minutes?: number;
+            };
+        };
+        /**
+         * CheckInScanRequest
+         * @description `location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer
+         */
+        CheckInScanRequest: {
+            /** Format: uuid */
+            booking_id?: string;
+            code?: string;
+            /** Format: uuid */
+            location_id?: string;
+            /** @description The printed poster's static code: checks in a booking in its window only */
+            poster_code?: string;
+            scan_token?: string;
+        };
+        /** CheckInScanResult */
+        CheckInScanResult: {
+            /** CheckInBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                slug: string;
+            };
+            /** CheckInRecord */
+            check_in?: {
+                /** Format: date-time */
+                at?: string | null;
+                booking?: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string|null} */
+                    kind?: null | "member" | "guest" | "trial";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    scheduled_class_id: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                } | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** @enum {string} */
+                kind: "class" | "open_gym";
+                /** @enum {string|null} */
+                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                override?: boolean;
+            } | null;
+            choices?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+            /** @description «Κλείσε θέση» */
+            classes?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            }[];
+            /** @enum {string} */
+            follow?: "none" | "requested" | "active";
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** @enum {string} */
+            membership?: "none" | "former" | "member";
+            next_booking?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            } | null;
+            /** @enum {string} */
+            outcome: "checked_in" | "choose" | "already_checked_in" | "nothing" | "visitor" | "no_booking";
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+            /** @description Why open gym was refused (a finance error code) */
+            reason?: string | null;
+            /** @description Proof of this scan for 3 minutes, to post again with a booking_id */
+            scan_token?: string;
+            /**
+             * CheckInTrialOffer
+             * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+             */
+            trial?: {
+                /** @enum {string} */
+                approval?: "auto" | "manual";
+                /**
+                 * @description Why this person can't ask for a trial here; null when they can
+                 * @enum {string|null}
+                 */
+                blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                bring_note?: string | null;
+                classes: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    spots_remaining?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    /** @description Visitor offer only */
+                    trial_seats?: number | null;
+                }[];
+                enabled: boolean;
+                horizon_days?: number | null;
+                mine?: {
+                    [key: string]: unknown;
+                } | null;
+            } | null;
+            /** @description Undo within `undo_until` */
+            undo_token?: string;
+            /** Format: date-time */
+            undo_until?: string;
+        };
+        /**
+         * CheckInTrialOffer
+         * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+         */
+        CheckInTrialOffer: {
+            /** @enum {string} */
+            approval?: "auto" | "manual";
+            /**
+             * @description Why this person can't ask for a trial here; null when they can
+             * @enum {string|null}
+             */
+            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+            bring_note?: string | null;
+            classes: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            }[];
+            enabled: boolean;
+            horizon_days?: number | null;
+            mine?: {
+                [key: string]: unknown;
+            } | null;
+        } | null;
+        /** CheckInUndoResult */
+        CheckInUndoResult: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "open_gym";
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+        };
+        /** CheckInVisitors */
+        CheckInVisitors: {
+            visitors: {
+                avatar_url?: string | null;
+                display_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                location_name?: string | null;
+                nickname?: string | null;
+                /** Format: date-time */
+                scanned_at: string;
+                trial_offered?: boolean;
+                /** Format: uuid */
+                user_id: string;
+            }[];
         };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
@@ -9566,6 +13276,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -9745,6 +13478,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -10422,6 +14178,29 @@ export interface components {
             inserted_at: string;
             kudos_by_me: boolean;
             kudos_count: number;
+            /** @description Up to ten photos or one video, in order (ADR-157) */
+            media: {
+                alt_text?: string | null;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "image" | "video";
+                placeholder?: string | null;
+                /** @enum {string} */
+                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                thumb_url?: string | null;
+                video_url?: string | null;
+                width?: number | null;
+            }[];
+            /**
+             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+             * @enum {string}
+             */
+            media_status: "ready" | "processing" | "failed";
             /** @enum {string} */
             origin: "club" | "profile";
             pinned: boolean;
@@ -10441,6 +14220,8 @@ export interface components {
             /** Format: uuid */
             channel_id: string;
             client_operation_id?: string;
+            /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+            media_ids?: string[];
         };
         /**
          * CommunityPostEvent
@@ -10764,6 +14545,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -10822,6 +14626,28 @@ export interface components {
             preview?: {
                 body?: string | null;
                 hidden?: boolean;
+                media?: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description A post's: processing or failed while its media are not ready
+                 * @enum {string}
+                 */
+                media_status?: "ready" | "processing" | "failed";
                 name?: string | null;
             } | null;
             reasons: {
@@ -10853,6 +14679,28 @@ export interface components {
                 preview?: {
                     body?: string | null;
                     hidden?: boolean;
+                    media?: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description A post's: processing or failed while its media are not ready
+                     * @enum {string}
+                     */
+                    media_status?: "ready" | "processing" | "failed";
                     name?: string | null;
                 } | null;
                 reasons: {
@@ -11023,6 +14871,49 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
+            };
+        };
+        /** ConnectedDevices */
+        ConnectedDevices: {
+            calendar: {
+                download_url?: string;
+                help?: {
+                    [key: string]: string;
+                };
+                https_url: string;
+                webcal_url: string;
+            };
+            integrations: {
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "connected" | "disconnected" | "unavailable" | "native_only";
+            }[];
+            wallet: {
+                passes: {
+                    active: boolean;
+                    /** Format: date-time */
+                    added_at: string;
+                    box?: {
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id?: string;
+                        slug?: string | null;
+                    };
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    last_updated_at?: string;
+                    /** @enum {string} */
+                    platform: "apple" | "google";
+                    /** Format: date-time */
+                    revoked_at?: string | null;
+                }[];
+                /** @description Whether this server can issue cards per platform */
+                platforms: {
+                    apple?: boolean;
+                    google?: boolean;
+                };
             };
         };
         /** ContentVideo */
@@ -12425,32 +16316,74 @@ export interface components {
         };
         /** Media */
         Media: {
+            alt_text?: string | null;
             content_type: string;
+            duration_ms?: number | null;
+            feed_url?: string | null;
+            full_url?: string | null;
             height: number | null;
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "post_photo";
+            kind?: "image" | "video";
+            /** @description A tiny blurred WebP data URI to show while the image loads */
+            placeholder?: string | null;
             /** @enum {string} */
-            status: "pending" | "ready";
-            /** @description Stable for public media; presigned and short-lived for private media. */
+            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+            rejection_reason?: string | null;
+            /**
+             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+             * @enum {string}
+             */
+            status: "pending" | "processing" | "ready" | "rejected";
+            thumb_url?: string | null;
+            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
             url: string | null;
+            video_url?: string | null;
             width: number | null;
+        };
+        /** MediaAltTextRequest */
+        MediaAltTextRequest: {
+            alt_text: string | null;
+        };
+        /** MediaAltTextSuggestion */
+        MediaAltTextSuggestion: {
+            /** @description Shown to you only; nothing is saved until you save the alt text */
+            suggestion: string;
+        };
+        /** MediaAltTextSuggestionRequest */
+        MediaAltTextSuggestionRequest: {
+            /** @description Language of the suggestion; defaults to yours, then Greek */
+            locale?: string;
         };
         /** MediaResponse */
         MediaResponse: {
             /** Media */
             media: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             };
         };
@@ -12745,6 +16678,34 @@ export interface components {
             /** Format: uuid */
             workout_id: string;
         };
+        /** Neighbourhood */
+        Neighbourhood: {
+            city_slug: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "neighbourhood" | "city";
+            latitude: number;
+            longitude: number;
+            name: string;
+            name_en: string;
+            slug: string;
+        };
+        /** NeighbourhoodsResponse */
+        NeighbourhoodsResponse: {
+            neighbourhoods: {
+                city_slug: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "neighbourhood" | "city";
+                latitude: number;
+                longitude: number;
+                name: string;
+                name_en: string;
+                slug: string;
+            }[];
+        };
         /** NutritionPlan */
         NutritionPlan: {
             body: string;
@@ -13003,6 +16964,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -13028,6 +17012,60 @@ export interface components {
             id: string;
             nickname?: string | null;
         };
+        /** PostAttachmentPreview */
+        PostAttachmentPreview: {
+            attachment: {
+                [key: string]: unknown;
+            };
+            /** Format: uuid */
+            attachment_id: string;
+            attachment_type: string;
+        };
+        /**
+         * PostMedia
+         * @description Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px on the long side); for a video they are its poster and video_url is an H.264/AAC MP4. URLs are short-lived.
+         */
+        PostMedia: {
+            alt_text?: string | null;
+            duration_ms?: number | null;
+            feed_url?: string | null;
+            full_url?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "image" | "video";
+            placeholder?: string | null;
+            /** @enum {string} */
+            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+            thumb_url?: string | null;
+            video_url?: string | null;
+            width?: number | null;
+        };
+        /** PostMediaCapabilities */
+        PostMediaCapabilities: {
+            max_alt_text: number;
+            max_photo_bytes: number;
+            max_photos: number;
+            max_video_bytes: number;
+            max_video_seconds: number;
+            max_videos: number;
+            photo_content_types: string[];
+            /** @description Whether this server can take videos */
+            video: boolean;
+            video_content_types: string[];
+        };
+        /** PostMediaUploadRequest */
+        PostMediaUploadRequest: {
+            byte_size: number;
+            /**
+             * @description Photos and videos go as picked; the server strips their metadata (EXIF, GPS) and re-encodes them.
+             * @enum {string}
+             */
+            content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm";
+            /** @enum {string} */
+            purpose: "post_photo" | "post_video";
+        };
         /** ProfilePostCreateRequest */
         ProfilePostCreateRequest: {
             /** Format: uuid */
@@ -13038,6 +17076,8 @@ export interface components {
             audience: "followers" | "public";
             body?: string;
             client_operation_id?: string;
+            /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+            media_ids?: string[];
         };
         /** ProgressStats */
         ProgressStats: {
@@ -13353,6 +17393,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -14198,7 +18261,7 @@ export interface components {
         };
         /** RememberFilterRequest */
         RememberFilterRequest: {
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
@@ -14206,36 +18269,44 @@ export interface components {
         /** SaveFilterRequest */
         SaveFilterRequest: {
             name: string;
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
         };
         /** SavedFilter */
         SavedFilter: {
+            /** @description Γύρω μου only: a daily notification when something new matches */
+            alert: boolean;
             /** Format: uuid */
             id: string;
             /** Format: date-time */
             last_used_at: string;
             name: string;
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
         };
+        /** SavedFilterAlertRequest */
+        SavedFilterAlertRequest: {
+            enabled: boolean;
+        };
         /** SavedFilters */
         SavedFilters: {
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             last_used: {
                 [key: string]: unknown;
             } | null;
             saved: {
+                /** @description Γύρω μου only: a daily notification when something new matches */
+                alert: boolean;
                 /** Format: uuid */
                 id: string;
                 /** Format: date-time */
                 last_used_at: string;
                 name: string;
-                /** @description The surface's filter values; the surface's query validates them. */
+                /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                 params: {
                     [key: string]: unknown;
                 };
@@ -14253,6 +18324,15 @@ export interface components {
         };
         /** SocialSummary */
         SocialSummary: {
+            /**
+             * AroundVisibility
+             * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+             */
+            around_visibility: {
+                /** @description Public posts show only once «Η περιοχή μου» is set */
+                has_area: boolean;
+                visible: boolean;
+            };
             /**
              * BookingSharing
              * @description Whether followers see the classes you book, and whether the one-time offer was answered
@@ -16242,6 +20322,81 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WalletAddRequest */
+        WalletAddRequest: {
+            /** @enum {string} */
+            platform: "apple" | "google";
+        };
+        /** WalletAddResult */
+        WalletAddResult: {
+            /** @description Apple: open within 10 minutes to add the .pkpass */
+            download_url?: string | null;
+            /** WalletPass */
+            pass: {
+                active: boolean;
+                /** Format: date-time */
+                added_at: string;
+                box?: {
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id?: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_updated_at?: string;
+                /** @enum {string} */
+                platform: "apple" | "google";
+                /** Format: date-time */
+                revoked_at?: string | null;
+            };
+            /** @description Google: Save to Wallet */
+            save_url?: string | null;
+        };
+        /** WalletPass */
+        WalletPass: {
+            active: boolean;
+            /** Format: date-time */
+            added_at: string;
+            box?: {
+                name?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                slug?: string | null;
+            };
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            last_updated_at?: string;
+            /** @enum {string} */
+            platform: "apple" | "google";
+            /** Format: date-time */
+            revoked_at?: string | null;
+        };
+        /** WalletPassResponse */
+        WalletPassResponse: {
+            /** WalletPass */
+            pass: {
+                active: boolean;
+                /** Format: date-time */
+                added_at: string;
+                box?: {
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id?: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_updated_at?: string;
+                /** @enum {string} */
+                platform: "apple" | "google";
+                /** Format: date-time */
+                revoked_at?: string | null;
+            };
+        };
         /** WodLeaderboardEntry */
         WodLeaderboardEntry: {
             avatar_url?: string | null;
@@ -16496,6 +20651,1165 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "MilosTrainingWeb.AroundController.pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** AroundViewport */
+                    bbox: {
+                        east: number;
+                        north: number;
+                        south: number;
+                        west: number;
+                    };
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Pins */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        pins: {
+                            /**
+                             * Format: uuid
+                             * @description Event, club or post id; the gym's id for a box
+                             */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "events" | "boxes" | "clubs" | "posts";
+                            latitude: number;
+                            longitude: number;
+                            /** @description Boxes: the public page's slug */
+                            slug: string | null;
+                            title: string | null;
+                        }[];
+                        /** @description More than the cap matched; zoom in */
+                        truncated: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AroundController.search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                    /** @description Cards per section, default 5 */
+                    limit?: number;
+                    /**
+                     * AroundOriginRequest
+                     * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+                     */
+                    origin?: {
+                        /** @description point: the device position; rounded to 3 decimals */
+                        latitude?: number;
+                        longitude?: number;
+                        /**
+                         * Format: uuid
+                         * @description place: a gazetteer place
+                         */
+                        neighbourhood_id?: string;
+                        /** @description place: a place name for the geocoder */
+                        query?: string;
+                        /** @enum {string} */
+                        type: "area" | "point" | "place";
+                    };
+                    /** @description Remember the filter as last used (default true) */
+                    remember?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Sections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description For «Φίλτρα (n)» */
+                        active_filters: number;
+                        /**
+                         * AroundNormalizedFilter
+                         * @description Every field is optional; the response echoes the normalised filter.
+                         */
+                        filter: {
+                            amenities: string[];
+                            audiences: string[];
+                            cost: ("free" | "trial")[];
+                            /** Format: date */
+                            date_from: string | null;
+                            /** Format: date */
+                            date_to: string | null;
+                            disciplines: string[];
+                            /** @description Default events, boxes, clubs */
+                            kinds: ("events" | "boxes" | "clubs" | "posts")[];
+                            languages: string[];
+                            max_price_cents: number | null;
+                            /** @description Gazetteer places to search from, at most 5 */
+                            neighbourhood_ids: string[];
+                            /** @description Default 3 */
+                            radius_km: number;
+                            times: ("morning" | "midday" | "evening")[];
+                            /** @description Filter version; 1 today */
+                            v: number;
+                            /** @enum {string|null} */
+                            when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                        };
+                        /** AroundOrigin */
+                        origin: {
+                            label: string | null;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood_ids: string[];
+                            /** @enum {string} */
+                            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+                        };
+                        /**
+                         * AroundSections
+                         * @description A kind not asked for (or ruled out by cost) is null
+                         */
+                        sections: {
+                            /** AroundBoxesSection */
+                            boxes: {
+                                items: {
+                                    /** AroundBox */
+                                    box: {
+                                        amenities: string[];
+                                        audiences: string[];
+                                        city?: string | null;
+                                        cover_url?: string | null;
+                                        disciplines: string[];
+                                        languages: string[];
+                                        latitude: number;
+                                        logo_url?: string | null;
+                                        longitude: number;
+                                        name: string;
+                                        neighbourhood?: string | null;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        primary_color?: string | null;
+                                        slug: string;
+                                        takes_trials: boolean;
+                                    };
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                }[];
+                                next_cursor: string | null;
+                                /**
+                                 * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                                 * @enum {string}
+                                 */
+                                placement: "category" | "collapsed";
+                                total: number;
+                            } | null;
+                            /** AroundClubsSection */
+                            clubs: {
+                                items: {
+                                    /** CommunityOpenClub */
+                                    club: {
+                                        box?: {
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            slug?: string | null;
+                                        };
+                                        channels?: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind: string;
+                                            name?: string | null;
+                                        }[];
+                                        /** Format: uuid */
+                                        cover_media_id?: string | null;
+                                        cover_url?: string | null;
+                                        description?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** @enum {string} */
+                                        join_policy: "open" | "approval";
+                                        member_count: number;
+                                        members?: {
+                                            /** CommunityAuthor */
+                                            person: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** Format: date-time */
+                                            since: string;
+                                        }[];
+                                        /** @enum {string} */
+                                        membership?: "none" | "requested" | "member";
+                                        name: string;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        request_count?: number;
+                                        requests?: {
+                                            /** CommunityAuthor */
+                                            person: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** Format: date-time */
+                                            since: string;
+                                        }[];
+                                        /** @enum {string|null} */
+                                        role?: "member" | "staff" | null;
+                                    };
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                            /** AroundEventsSection */
+                            events: {
+                                items: {
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                    /** CommunityEvent */
+                                    event: {
+                                        /** CommunityEventBox */
+                                        box: {
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            slug?: string | null;
+                                        };
+                                        /** @description You run events at this box */
+                                        can_manage: boolean;
+                                        can_rsvp: boolean;
+                                        cancel_reason?: string | null;
+                                        cancelled: boolean;
+                                        /** Format: date-time */
+                                        cancelled_at?: string | null;
+                                        /** @description Null: no limit */
+                                        capacity?: number | null;
+                                        /**
+                                         * Format: uuid
+                                         * @description The member group this event belongs to; null for a club event
+                                         */
+                                        channel_id?: string | null;
+                                        /** CommunityEventClub */
+                                        club: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string | null;
+                                            name?: string | null;
+                                        };
+                                        /** Format: uuid */
+                                        club_id: string;
+                                        /** Format: uuid */
+                                        cover_media_id?: string | null;
+                                        cover_url?: string | null;
+                                        currency: string;
+                                        description?: string | null;
+                                        /** Format: date-time */
+                                        ends_at: string;
+                                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                        goers?: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        }[] | null;
+                                        going_count: number;
+                                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                        good_for_friends: boolean;
+                                        /**
+                                         * CommunityEventGroup
+                                         * @description The member group of a group event (free, for its members only)
+                                         */
+                                        group?: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            name?: string | null;
+                                        } | null;
+                                        guest_pass_allowed: boolean;
+                                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                                        guests_left?: number | null;
+                                        guests_per_member: number;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** @description Event page opened with an invitation link */
+                                        invitation?: {
+                                            /** CommunityAuthor */
+                                            inviter: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** @enum {string|null} */
+                                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                            usable: boolean;
+                                        } | null;
+                                        /**
+                                         * CommunityEventMine
+                                         * @description Where you stand; null if not on it
+                                         */
+                                        my?: {
+                                            /** Format: uuid */
+                                            invited_by_id?: string | null;
+                                            late_cancel: boolean;
+                                            paid: boolean;
+                                            /** @enum {string} */
+                                            source: "member" | "open" | "guest";
+                                            /** @enum {string} */
+                                            status: "going" | "waitlisted" | "cancelled";
+                                        } | null;
+                                        open_to_non_members: boolean;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        /** CommunityEventPlace */
+                                        place: {
+                                            address: string | null;
+                                            city?: string | null;
+                                            latitude: number | null;
+                                            /**
+                                             * Format: uuid
+                                             * @description One of the box's locations, or null
+                                             */
+                                            location_id: string | null;
+                                            longitude: number | null;
+                                            name: string | null;
+                                            neighbourhood?: string | null;
+                                        };
+                                        /**
+                                         * Format: uuid
+                                         * @description Its card in the club feed
+                                         */
+                                        post_id?: string | null;
+                                        /** @description 0: free; otherwise paid at the box */
+                                        price_cents: number;
+                                        /**
+                                         * Format: uuid
+                                         * @description Shared by every week of a weekly event
+                                         */
+                                        series_id?: string | null;
+                                        /** @description Null: no limit */
+                                        spots_left?: number | null;
+                                        /** Format: date-time */
+                                        starts_at: string;
+                                        title: string;
+                                        waitlist_count: number;
+                                    };
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                            /** AroundPostsSection */
+                            posts: {
+                                items: {
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                    /**
+                                     * CommunityPost
+                                     * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                                     */
+                                    post: {
+                                        /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                                        attachment?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** Format: uuid */
+                                        attachment_id?: string | null;
+                                        /** @enum {string|null} */
+                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                        /** @enum {string} */
+                                        audience: "club_channel" | "followers" | "public";
+                                        /** CommunityAuthor */
+                                        author: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        };
+                                        body?: string | null;
+                                        can_delete: boolean;
+                                        can_moderate: boolean;
+                                        can_pin: boolean;
+                                        can_report?: boolean;
+                                        channel: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string | null;
+                                            name?: string | null;
+                                        } | null;
+                                        club: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string;
+                                            logo_url?: string | null;
+                                            name: string;
+                                            organization_slug?: string | null;
+                                            primary_color?: string | null;
+                                        } | null;
+                                        comment_count: number;
+                                        /**
+                                         * CommunityPostEvent
+                                         * @description The event as you see it now, when the post is an event card (attachment_type event)
+                                         */
+                                        event?: {
+                                            /** CommunityEventBox */
+                                            box: {
+                                                logo_url?: string | null;
+                                                name?: string | null;
+                                                slug?: string | null;
+                                            };
+                                            /** @description You run events at this box */
+                                            can_manage: boolean;
+                                            can_rsvp: boolean;
+                                            cancel_reason?: string | null;
+                                            cancelled: boolean;
+                                            /** Format: date-time */
+                                            cancelled_at?: string | null;
+                                            /** @description Null: no limit */
+                                            capacity?: number | null;
+                                            /**
+                                             * Format: uuid
+                                             * @description The member group this event belongs to; null for a club event
+                                             */
+                                            channel_id?: string | null;
+                                            /** CommunityEventClub */
+                                            club: {
+                                                /** Format: uuid */
+                                                id: string;
+                                                kind?: string | null;
+                                                name?: string | null;
+                                            };
+                                            /** Format: uuid */
+                                            club_id: string;
+                                            /** Format: uuid */
+                                            cover_media_id?: string | null;
+                                            cover_url?: string | null;
+                                            currency: string;
+                                            description?: string | null;
+                                            /** Format: date-time */
+                                            ends_at: string;
+                                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                            goers?: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            }[] | null;
+                                            going_count: number;
+                                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                            good_for_friends: boolean;
+                                            /**
+                                             * CommunityEventGroup
+                                             * @description The member group of a group event (free, for its members only)
+                                             */
+                                            group?: {
+                                                /** Format: uuid */
+                                                id: string;
+                                                name?: string | null;
+                                            } | null;
+                                            guest_pass_allowed: boolean;
+                                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                                            guests_left?: number | null;
+                                            guests_per_member: number;
+                                            /** Format: uuid */
+                                            id: string;
+                                            /** @description Event page opened with an invitation link */
+                                            invitation?: {
+                                                /** CommunityAuthor */
+                                                inviter: {
+                                                    avatar_url?: string | null;
+                                                    /** Format: uuid */
+                                                    id: string;
+                                                    nickname?: string | null;
+                                                };
+                                                /** @enum {string|null} */
+                                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                                usable: boolean;
+                                            } | null;
+                                            /**
+                                             * CommunityEventMine
+                                             * @description Where you stand; null if not on it
+                                             */
+                                            my?: {
+                                                /** Format: uuid */
+                                                invited_by_id?: string | null;
+                                                late_cancel: boolean;
+                                                paid: boolean;
+                                                /** @enum {string} */
+                                                source: "member" | "open" | "guest";
+                                                /** @enum {string} */
+                                                status: "going" | "waitlisted" | "cancelled";
+                                            } | null;
+                                            open_to_non_members: boolean;
+                                            /** Format: uuid */
+                                            organization_id: string;
+                                            /** CommunityEventPlace */
+                                            place: {
+                                                address: string | null;
+                                                city?: string | null;
+                                                latitude: number | null;
+                                                /**
+                                                 * Format: uuid
+                                                 * @description One of the box's locations, or null
+                                                 */
+                                                location_id: string | null;
+                                                longitude: number | null;
+                                                name: string | null;
+                                                neighbourhood?: string | null;
+                                            };
+                                            /**
+                                             * Format: uuid
+                                             * @description Its card in the club feed
+                                             */
+                                            post_id?: string | null;
+                                            /** @description 0: free; otherwise paid at the box */
+                                            price_cents: number;
+                                            /**
+                                             * Format: uuid
+                                             * @description Shared by every week of a weekly event
+                                             */
+                                            series_id?: string | null;
+                                            /** @description Null: no limit */
+                                            spots_left?: number | null;
+                                            /** Format: date-time */
+                                            starts_at: string;
+                                            title: string;
+                                            waitlist_count: number;
+                                        } | null;
+                                        hidden: boolean;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** Format: date-time */
+                                        inserted_at: string;
+                                        kudos_by_me: boolean;
+                                        kudos_count: number;
+                                        /** @description Up to ten photos or one video, in order (ADR-157) */
+                                        media: {
+                                            alt_text?: string | null;
+                                            duration_ms?: number | null;
+                                            feed_url?: string | null;
+                                            full_url?: string | null;
+                                            height?: number | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "image" | "video";
+                                            placeholder?: string | null;
+                                            /** @enum {string} */
+                                            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                            thumb_url?: string | null;
+                                            video_url?: string | null;
+                                            width?: number | null;
+                                        }[];
+                                        /**
+                                         * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                                         * @enum {string}
+                                         */
+                                        media_status: "ready" | "processing" | "failed";
+                                        /** @enum {string} */
+                                        origin: "club" | "profile";
+                                        pinned: boolean;
+                                    };
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                        };
+                        /** @description Only when the search found few: how many at wider radii */
+                        wider: {
+                            by_kind: {
+                                [key: string]: number;
+                            };
+                            radius_km: number;
+                            total: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AroundController.kind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "events" | "boxes" | "clubs" | "posts";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cursor?: string | null;
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                    /** @description Default 20 */
+                    limit?: number;
+                    /**
+                     * AroundOriginRequest
+                     * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+                     */
+                    origin?: {
+                        /** @description point: the device position; rounded to 3 decimals */
+                        latitude?: number;
+                        longitude?: number;
+                        /**
+                         * Format: uuid
+                         * @description place: a gazetteer place
+                         */
+                        neighbourhood_id?: string;
+                        /** @description place: a place name for the geocoder */
+                        query?: string;
+                        /** @enum {string} */
+                        type: "area" | "point" | "place";
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: ({
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                            /** CommunityEvent */
+                            event: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            };
+                        } | {
+                            /** AroundBox */
+                            box: {
+                                amenities: string[];
+                                audiences: string[];
+                                city?: string | null;
+                                cover_url?: string | null;
+                                disciplines: string[];
+                                languages: string[];
+                                latitude: number;
+                                logo_url?: string | null;
+                                longitude: number;
+                                name: string;
+                                neighbourhood?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                slug: string;
+                                takes_trials: boolean;
+                            };
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                        } | {
+                            /** CommunityOpenClub */
+                            club: {
+                                box?: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                channels?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind: string;
+                                    name?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                description?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                join_policy: "open" | "approval";
+                                member_count: number;
+                                members?: {
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    since: string;
+                                }[];
+                                /** @enum {string} */
+                                membership?: "none" | "requested" | "member";
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                request_count?: number;
+                                requests?: {
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    since: string;
+                                }[];
+                                /** @enum {string|null} */
+                                role?: "member" | "staff" | null;
+                            };
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                        } | {
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                            /**
+                             * CommunityPost
+                             * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                             */
+                            post: {
+                                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                                attachment?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** Format: uuid */
+                                attachment_id?: string | null;
+                                /** @enum {string|null} */
+                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                /** @enum {string} */
+                                audience: "club_channel" | "followers" | "public";
+                                /** CommunityAuthor */
+                                author: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                body?: string | null;
+                                can_delete: boolean;
+                                can_moderate: boolean;
+                                can_pin: boolean;
+                                can_report?: boolean;
+                                channel: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                } | null;
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string;
+                                    logo_url?: string | null;
+                                    name: string;
+                                    organization_slug?: string | null;
+                                    primary_color?: string | null;
+                                } | null;
+                                comment_count: number;
+                                /**
+                                 * CommunityPostEvent
+                                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                                 */
+                                event?: {
+                                    /** CommunityEventBox */
+                                    box: {
+                                        logo_url?: string | null;
+                                        name?: string | null;
+                                        slug?: string | null;
+                                    };
+                                    /** @description You run events at this box */
+                                    can_manage: boolean;
+                                    can_rsvp: boolean;
+                                    cancel_reason?: string | null;
+                                    cancelled: boolean;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** @description Null: no limit */
+                                    capacity?: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description The member group this event belongs to; null for a club event
+                                     */
+                                    channel_id?: string | null;
+                                    /** CommunityEventClub */
+                                    club: {
+                                        /** Format: uuid */
+                                        id: string;
+                                        kind?: string | null;
+                                        name?: string | null;
+                                    };
+                                    /** Format: uuid */
+                                    club_id: string;
+                                    /** Format: uuid */
+                                    cover_media_id?: string | null;
+                                    cover_url?: string | null;
+                                    currency: string;
+                                    description?: string | null;
+                                    /** Format: date-time */
+                                    ends_at: string;
+                                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                    goers?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    }[] | null;
+                                    going_count: number;
+                                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                    good_for_friends: boolean;
+                                    /**
+                                     * CommunityEventGroup
+                                     * @description The member group of a group event (free, for its members only)
+                                     */
+                                    group?: {
+                                        /** Format: uuid */
+                                        id: string;
+                                        name?: string | null;
+                                    } | null;
+                                    guest_pass_allowed: boolean;
+                                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                                    guests_left?: number | null;
+                                    guests_per_member: number;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @description Event page opened with an invitation link */
+                                    invitation?: {
+                                        /** CommunityAuthor */
+                                        inviter: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        };
+                                        /** @enum {string|null} */
+                                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                        usable: boolean;
+                                    } | null;
+                                    /**
+                                     * CommunityEventMine
+                                     * @description Where you stand; null if not on it
+                                     */
+                                    my?: {
+                                        /** Format: uuid */
+                                        invited_by_id?: string | null;
+                                        late_cancel: boolean;
+                                        paid: boolean;
+                                        /** @enum {string} */
+                                        source: "member" | "open" | "guest";
+                                        /** @enum {string} */
+                                        status: "going" | "waitlisted" | "cancelled";
+                                    } | null;
+                                    open_to_non_members: boolean;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /** CommunityEventPlace */
+                                    place: {
+                                        address: string | null;
+                                        city?: string | null;
+                                        latitude: number | null;
+                                        /**
+                                         * Format: uuid
+                                         * @description One of the box's locations, or null
+                                         */
+                                        location_id: string | null;
+                                        longitude: number | null;
+                                        name: string | null;
+                                        neighbourhood?: string | null;
+                                    };
+                                    /**
+                                     * Format: uuid
+                                     * @description Its card in the club feed
+                                     */
+                                    post_id?: string | null;
+                                    /** @description 0: free; otherwise paid at the box */
+                                    price_cents: number;
+                                    /**
+                                     * Format: uuid
+                                     * @description Shared by every week of a weekly event
+                                     */
+                                    series_id?: string | null;
+                                    /** @description Null: no limit */
+                                    spots_left?: number | null;
+                                    /** Format: date-time */
+                                    starts_at: string;
+                                    title: string;
+                                    waitlist_count: number;
+                                } | null;
+                                hidden: boolean;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                kudos_by_me: boolean;
+                                kudos_count: number;
+                                /** @description Up to ten photos or one video, in order (ADR-157) */
+                                media: {
+                                    alt_text?: string | null;
+                                    duration_ms?: number | null;
+                                    feed_url?: string | null;
+                                    full_url?: string | null;
+                                    height?: number | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "image" | "video";
+                                    placeholder?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                    thumb_url?: string | null;
+                                    video_url?: string | null;
+                                    width?: number | null;
+                                }[];
+                                /**
+                                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                                 * @enum {string}
+                                 */
+                                media_status: "ready" | "processing" | "failed";
+                                /** @enum {string} */
+                                origin: "club" | "profile";
+                                pinned: boolean;
+                            };
+                        })[];
+                        /** @enum {string} */
+                        kind: "events" | "boxes" | "clubs" | "posts";
+                        next_cursor: string | null;
+                        /** AroundOrigin */
+                        origin: {
+                            label: string | null;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood_ids: string[];
+                            /** @enum {string} */
+                            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+                        };
+                        /**
+                         * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                         * @enum {string}
+                         */
+                        placement?: "category" | "collapsed";
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.inspect": {
         parameters: {
             query?: never;
@@ -17663,6 +22977,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -17966,6 +23303,263 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScanCheckInController.scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    booking_id?: string;
+                    code?: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                    /** @description The printed poster's static code: checks in a booking in its window only */
+                    poster_code?: string;
+                    scan_token?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description What the scan did */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInBox */
+                        box: {
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug: string;
+                        };
+                        /** CheckInRecord */
+                        check_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        choices?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        /** @description «Κλείσε θέση» */
+                        classes?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        }[];
+                        /** @enum {string} */
+                        follow?: "none" | "requested" | "active";
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** @enum {string} */
+                        membership?: "none" | "former" | "member";
+                        next_booking?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        } | null;
+                        /** @enum {string} */
+                        outcome: "checked_in" | "choose" | "already_checked_in" | "nothing" | "visitor" | "no_booking";
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        /** @description Why open gym was refused (a finance error code) */
+                        reason?: string | null;
+                        /** @description Proof of this scan for 3 minutes, to post again with a booking_id */
+                        scan_token?: string;
+                        /**
+                         * CheckInTrialOffer
+                         * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+                         */
+                        trial?: {
+                            /** @enum {string} */
+                            approval?: "auto" | "manual";
+                            /**
+                             * @description Why this person can't ask for a trial here; null when they can
+                             * @enum {string|null}
+                             */
+                            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                            bring_note?: string | null;
+                            classes: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                spots_remaining?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                /** @description Visitor offer only */
+                                trial_seats?: number | null;
+                            }[];
+                            enabled: boolean;
+                            horizon_days?: number | null;
+                            mine?: {
+                                [key: string]: unknown;
+                            } | null;
+                        } | null;
+                        /** @description Undo within `undo_until` */
+                        undo_token?: string;
+                        /** Format: date-time */
+                        undo_until?: string;
+                    };
+                };
+            };
+            /** @description The door code is wrong or expired, or the booking isn't in its window */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScanCheckInController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                undo_token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "class" | "open_gym";
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Nothing to undo */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description The minute has passed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -18584,6 +24178,78 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Area */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.update_area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    neighbourhood_ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Area */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
+                        }[];
+                    };
+                };
             };
         };
     };
@@ -19514,6 +25180,8 @@ export interface operations {
                     /** Format: uuid */
                     channel_id: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -19704,6 +25372,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -20031,6 +25722,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -20243,6 +25957,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -20455,6 +26192,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -20496,6 +26256,67 @@ export interface operations {
                         /** Format: uuid */
                         target_id: string;
                         target_type: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WalletController.devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connected devices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        calendar: {
+                            download_url?: string;
+                            help?: {
+                                [key: string]: string;
+                            };
+                            https_url: string;
+                            webcal_url: string;
+                        };
+                        integrations: {
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "connected" | "disconnected" | "unavailable" | "native_only";
+                        }[];
+                        wallet: {
+                            passes: {
+                                active: boolean;
+                                /** Format: date-time */
+                                added_at: string;
+                                box?: {
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id?: string;
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                last_updated_at?: string;
+                                /** @enum {string} */
+                                platform: "apple" | "google";
+                                /** Format: date-time */
+                                revoked_at?: string | null;
+                            }[];
+                            /** @description Whether this server can issue cards per platform */
+                            platforms: {
+                                apple?: boolean;
+                                google?: boolean;
+                            };
+                        };
                     };
                 };
             };
@@ -21532,6 +27353,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -21711,6 +27555,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -21738,17 +27605,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -21773,7 +27642,7 @@ export interface operations {
             content: {
                 "application/json": {
                     name: string;
-                    /** @description The surface's filter values; the surface's query validates them. */
+                    /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                     params: {
                         [key: string]: unknown;
                     };
@@ -21788,17 +27657,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -21822,7 +27693,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description The surface's filter values; the surface's query validates them. */
+                    /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                     params: {
                         [key: string]: unknown;
                     };
@@ -21837,17 +27708,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -21878,17 +27751,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SavedFilterController.alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -22400,6 +28324,292 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyMediaController.capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Capabilities */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        max_alt_text: number;
+                        max_photo_bytes: number;
+                        max_photos: number;
+                        max_video_bytes: number;
+                        max_video_seconds: number;
+                        max_videos: number;
+                        photo_content_types: string[];
+                        /** @description Whether this server can take videos */
+                        video: boolean;
+                        video_content_types: string[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Photos and videos go as picked; the server strips their metadata (EXIF, GPS) and re-encodes them.
+                     * @enum {string}
+                     */
+                    content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm";
+                    /** @enum {string} */
+                    purpose: "post_photo" | "post_video";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    alt_text: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.suggest_alt_text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description Language of the suggestion; defaults to yours, then Greek */
+                    locale?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Shown to you only; nothing is saved until you save the alt text */
+                        suggestion: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OpenClubController.show": {
         parameters: {
             query?: never;
@@ -22705,6 +28915,36 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PostAttachmentController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type: "training_log_entry" | "workout_execution" | "pr";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attachment: {
+                            [key: string]: unknown;
+                        };
+                        /** Format: uuid */
+                        attachment_id: string;
+                        attachment_type: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.update_profile": {
         parameters: {
             query?: never;
@@ -22807,6 +29047,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         /**
+                         * AroundVisibility
+                         * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+                         */
+                        around_visibility: {
+                            /** @description Public posts show only once «Η περιοχή μου» is set */
+                            has_area: boolean;
+                            visible: boolean;
+                        };
+                        /**
                          * BookingSharing
                          * @description Whether followers see the classes you book, and whether the one-time offer was answered
                          */
@@ -22825,6 +29074,36 @@ export interface operations {
                         };
                         posts_count: number;
                         requests_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.around_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    visible: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Public posts show only once «Η περιοχή μου» is set */
+                        has_area: boolean;
+                        visible: boolean;
                     };
                 };
             };
@@ -23384,6 +29663,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WalletController.revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** WalletPass */
+                        pass: {
+                            active: boolean;
+                            /** Format: date-time */
+                            added_at: string;
+                            box?: {
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id?: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_updated_at?: string;
+                            /** @enum {string} */
+                            platform: "apple" | "google";
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such card */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
         };
@@ -24661,6 +30994,731 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.door": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Door display */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+                        codes: {
+                            code: string;
+                            deep_link: string;
+                            /** Format: date-time */
+                            shows_from: string;
+                            /** Format: date-time */
+                            valid_until: string;
+                        }[];
+                        /** @description What the QR encodes: /c/<location>/<code> */
+                        deep_link: string;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        next_class?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        } | null;
+                        recent_check_ins?: {
+                            /** Format: date-time */
+                            at?: string;
+                            first_name?: string | null;
+                            /** @enum {string} */
+                            kind?: "class" | "open_gym";
+                        }[];
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                        rotation_seconds: number;
+                        seconds_until_rotation?: number;
+                        /** Format: date-time */
+                        server_time?: string;
+                        /** @description Realtime topic with `checked_in` events (first names only) */
+                        topic: string;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.update_poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.rotate_poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.rotate_door": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Door display */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+                        codes: {
+                            code: string;
+                            deep_link: string;
+                            /** Format: date-time */
+                            shows_from: string;
+                            /** Format: date-time */
+                            valid_until: string;
+                        }[];
+                        /** @description What the QR encodes: /c/<location>/<code> */
+                        deep_link: string;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        next_class?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        } | null;
+                        recent_check_ins?: {
+                            /** Format: date-time */
+                            at?: string;
+                            first_name?: string | null;
+                            /** @enum {string} */
+                            kind?: "class" | "open_gym";
+                        }[];
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                        rotation_seconds: number;
+                        seconds_until_rotation?: number;
+                        /** Format: date-time */
+                        server_time?: string;
+                        /** @description Realtime topic with `checked_in` events (first names only) */
+                        topic: string;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.check_in_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    booking_id?: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                    /** @enum {string} */
+                    method?: "member_qr" | "wallet" | "desk_search";
+                    /** @description «Check-in παρ' όλα αυτά»: only when the owner allows desk overrides */
+                    override?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Checked in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        already_checked_in?: null | "class" | "open_gym";
+                        /** @description Bookings in the window */
+                        bookings?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        can_auto_check_in: boolean;
+                        /** CheckInRecord */
+                        checked_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        /** @enum {string} */
+                        decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+                        member: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string} */
+                        method?: "member_qr" | "wallet" | "desk_search";
+                        /** Format: uuid */
+                        organization_id?: string;
+                        override_allowed: boolean;
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+                        warnings?: "payment_due"[];
+                    };
+                };
+            };
+            /** @description The owner doesn't allow desk overrides */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Problems with the package, or a booking to pick */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.revoke_member_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        revoked_codes: number;
+                        revoked_passes: number;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.scan_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Check in right away when nothing is wrong */
+                    auto?: boolean;
+                    /** @description Personal QR or Wallet barcode */
+                    code: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Who it is and what can happen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        already_checked_in?: null | "class" | "open_gym";
+                        /** @description Bookings in the window */
+                        bookings?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        can_auto_check_in: boolean;
+                        /** CheckInRecord */
+                        checked_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        /** @enum {string} */
+                        decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+                        member: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string} */
+                        method?: "member_qr" | "wallet" | "desk_search";
+                        /** Format: uuid */
+                        organization_id?: string;
+                        override_allowed: boolean;
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+                        warnings?: "payment_due"[];
+                    };
+                };
+            };
+            /** @description Unknown, expired or revoked code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInRules */
+                        settings: {
+                            desk_override?: boolean;
+                            /** @enum {integer} */
+                            door_rotation_seconds?: 15 | 30 | 60;
+                            /**
+                             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                             * @enum {string}
+                             */
+                            member_code_mode?: "rotating" | "static";
+                            open_gym_requires_package?: boolean;
+                            visitor_trial_offer?: boolean;
+                            window_after_minutes?: number;
+                            window_before_minutes?: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.update_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    desk_override?: boolean;
+                    /** @enum {integer} */
+                    door_rotation_seconds?: 15 | 30 | 60;
+                    /**
+                     * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                     * @enum {string}
+                     */
+                    member_code_mode?: "rotating" | "static";
+                    open_gym_requires_package?: boolean;
+                    visitor_trial_offer?: boolean;
+                    window_after_minutes?: number;
+                    window_before_minutes?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInRules */
+                        settings: {
+                            desk_override?: boolean;
+                            /** @enum {integer} */
+                            door_rotation_seconds?: 15 | 30 | 60;
+                            /**
+                             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                             * @enum {string}
+                             */
+                            member_code_mode?: "rotating" | "static";
+                            open_gym_requires_package?: boolean;
+                            visitor_trial_offer?: boolean;
+                            window_after_minutes?: number;
+                            window_before_minutes?: number;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid rules */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.visitors": {
+        parameters: {
+            query?: {
+                date?: string;
+                location_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Visitors */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        visitors: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            location_name?: string | null;
+                            nickname?: string | null;
+                            /** Format: date-time */
+                            scanned_at: string;
+                            trial_offered?: boolean;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
                     };
                 };
             };
@@ -28379,6 +35437,28 @@ export interface operations {
                             preview?: {
                                 body?: string | null;
                                 hidden?: boolean;
+                                media?: {
+                                    alt_text?: string | null;
+                                    duration_ms?: number | null;
+                                    feed_url?: string | null;
+                                    full_url?: string | null;
+                                    height?: number | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "image" | "video";
+                                    placeholder?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                    thumb_url?: string | null;
+                                    video_url?: string | null;
+                                    width?: number | null;
+                                }[];
+                                /**
+                                 * @description A post's: processing or failed while its media are not ready
+                                 * @enum {string}
+                                 */
+                                media_status?: "ready" | "processing" | "failed";
                                 name?: string | null;
                             } | null;
                             reasons: {
@@ -32722,16 +39802,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -32740,16 +39834,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -32822,16 +39930,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -32840,16 +39962,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -32944,16 +40080,30 @@ export interface operations {
                     "application/json": {
                         /** Media */
                         media: {
+                            alt_text?: string | null;
                             content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
                             height: number | null;
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo";
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
                             /** @enum {string} */
-                            status: "pending" | "ready";
-                            /** @description Stable for public media; presigned and short-lived for private media. */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                             url: string | null;
+                            video_url?: string | null;
                             width: number | null;
                         };
                     };
@@ -33005,16 +40155,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -33023,16 +40187,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -33154,16 +40332,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -33172,16 +40364,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -41732,6 +48938,8 @@ export interface operations {
                     /** Format: uuid */
                     channel_id: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -41922,6 +49130,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -42249,6 +49480,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -42461,6 +49715,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -42673,6 +49950,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -43261,6 +50561,79 @@ export interface operations {
                 };
             };
             /** @description No longer active */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyCheckInController.code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** Format: date-time */
+                        expires_at?: string | null;
+                        /** Format: date-time */
+                        issued_at?: string | null;
+                        /** @enum {string} */
+                        mode: "rotating" | "static";
+                        rotation_seconds?: number | null;
+                        seconds_until_rotation?: number | null;
+                        wallet_available: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyCheckInController.reset_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** Format: date-time */
+                        expires_at?: string | null;
+                        /** Format: date-time */
+                        issued_at?: string | null;
+                        /** @enum {string} */
+                        mode: "rotating" | "static";
+                        rotation_seconds?: number | null;
+                        seconds_until_rotation?: number | null;
+                        wallet_available: boolean;
+                    };
+                };
+            };
+            /** @description The box uses rotating codes (member_code_not_static) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -45118,6 +52491,80 @@ export interface operations {
             };
             /** @description Not included in the package */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyCheckInController.add_wallet_pass": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    platform: "apple" | "google";
+                };
+            };
+        };
+        responses: {
+            /** @description The card and how to add it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Apple: open within 10 minutes to add the .pkpass */
+                        download_url?: string | null;
+                        /** WalletPass */
+                        pass: {
+                            active: boolean;
+                            /** Format: date-time */
+                            added_at: string;
+                            box?: {
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id?: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_updated_at?: string;
+                            /** @enum {string} */
+                            platform: "apple" | "google";
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                        };
+                        /** @description Google: Save to Wallet */
+                        save_url?: string | null;
+                    };
+                };
+            };
+            /** @description The box uses rotating codes, so no Wallet (wallet_requires_static_code) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Wallet isn't configured on this server (wallet_not_configured) */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -49812,9 +57259,67 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.neighbourhoods": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
                         }[];
                     };
                 };
@@ -51210,6 +58715,8 @@ export interface operations {
                     audience: "followers" | "public";
                     body?: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -51400,6 +58907,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -51727,6 +59257,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -52300,6 +59853,39 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WalletController.download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.apple.pkpass": string;
+                };
+            };
+            /** @description Expired link or revoked card */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

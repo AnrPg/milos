@@ -438,3 +438,18 @@ msgstr "Препоръка за одобрение"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "%{nickname} се абонира по покана на %{referrer}."
+
+msgid "New near you"
+msgstr "Ново близо до теб"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Ново за «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Посетител на входа"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) - все още не е член."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) - все още не е член. Пробните тренировки са отворени."

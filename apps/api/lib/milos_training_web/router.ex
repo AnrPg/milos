@@ -51,6 +51,25 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-157: one upload per picked file, plus its completion.
+  pipeline :media_upload_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 300_000,
+      bucket: "media-uploads",
+      methods: ["POST", "PATCH", "DELETE"]
+    )
+  end
+
+  pipeline :ai_suggestion_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 20,
+      interval: 300_000,
+      bucket: "ai-suggestions",
+      methods: ["POST"]
+    )
+  end
+
   pipeline :messaging_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 60,
@@ -101,6 +120,24 @@ defmodule MilosTrainingWeb.Router do
   # ADR-141: address lookups go to a shared OpenStreetMap geocoder.
   pipeline :geocode_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
+  end
+
+  # ADR-154: Γύρω μου searches run several indexed queries (and may geocode
+  # a typed place); a generous budget that still bounds scraping.
+  pipeline :around_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "around")
+  end
+
+  # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
+  pipeline :check_in_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
+  end
+
+  # ADR-155: Wallet downloads and Apple's PassKit web service (no app session;
+  # many phones behind one address at a gym).
+  pipeline :wallet_public do
+    plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 300, interval: 60_000, bucket: "wallet")
   end
 
   pipeline :search_rate_limited do
@@ -202,6 +239,30 @@ defmodule MilosTrainingWeb.Router do
     get("/:code", ReferralController, :invite)
   end
 
+  # ADR-155: the .pkpass behind a signed, short-lived link (Safari opens it
+  # without the app's bearer header), and Apple's PassKit web service.
+  scope "/api/wallet", MilosTrainingWeb do
+    pipe_through([:wallet_public])
+
+    get("/passes/:token", WalletController, :download)
+
+    post(
+      "/apple/v1/devices/:device_id/registrations/:pass_type_id/:serial",
+      PassKitController,
+      :register
+    )
+
+    delete(
+      "/apple/v1/devices/:device_id/registrations/:pass_type_id/:serial",
+      PassKitController,
+      :unregister
+    )
+
+    get("/apple/v1/devices/:device_id/registrations/:pass_type_id", PassKitController, :serials)
+    get("/apple/v1/passes/:pass_type_id/:serial", PassKitController, :latest)
+    post("/apple/v1/log", PassKitController, :log)
+  end
+
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
   scope "/api" do
     pipe_through([:api, :slug_alias_rate_limited])
@@ -276,6 +337,10 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-155: Box › Check-in.
+    get("/check-in/code", MyCheckInController, :code)
+    post("/check-in/code/reset", MyCheckInController, :reset_code)
+    post("/wallet-passes", MyCheckInController, :add_wallet_pass)
     get("/entitlement", MyFinanceController, :entitlement)
     get("/videos", MyContentController, :videos)
     get("/form-reviews", CoachingExtrasController, :my_form_reviews)
@@ -598,6 +663,18 @@ defmodule MilosTrainingWeb.Router do
     post("/locations/:id/archive", AdminFacilityController, :archive_location)
     get("/check-ins", AdminFacilityController, :index_check_ins)
     post("/check-ins", AdminFacilityController, :create_check_in)
+    # ADR-155: QR check-in desk, door display and rules.
+    get("/check-in/door/:location_id", AdminCheckInController, :door)
+    post("/check-in/door/:location_id/rotate", AdminCheckInController, :rotate_door)
+    get("/check-in/door/:location_id/poster", AdminCheckInController, :poster)
+    put("/check-in/door/:location_id/poster", AdminCheckInController, :update_poster)
+    post("/check-in/door/:location_id/poster/rotate", AdminCheckInController, :rotate_poster)
+    delete("/check-in/members/:user_id/code", AdminCheckInController, :revoke_member_code)
+    post("/check-in/scan-member", AdminCheckInController, :scan_member)
+    post("/check-in/members/:user_id", AdminCheckInController, :check_in_member)
+    get("/check-in/visitors", AdminCheckInController, :visitors)
+    get("/check-in/settings", AdminCheckInController, :settings)
+    put("/check-in/settings", AdminCheckInController, :update_settings)
     post("/class-types", AdminClassTypeController, :create)
     patch("/class-types/:id", AdminClassTypeController, :update)
     delete("/class-types/:id", AdminClassTypeController, :delete)
@@ -1010,6 +1087,7 @@ defmodule MilosTrainingWeb.Router do
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)
     delete("/me/filters/:surface/:id", SavedFilterController, :delete)
+    put("/me/filters/:surface/:id/alert", SavedFilterController, :alert)
     put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)
@@ -1047,6 +1125,7 @@ defmodule MilosTrainingWeb.Router do
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
     put("/me/social/member-visibility", FollowController, :member_visibility)
+    put("/me/social/around-visibility", FollowController, :around_visibility)
     post("/me/follows", FollowController, :create)
     get("/me/follows/:target_type/:target_id", FollowController, :show)
     delete("/me/follows/:target_type/:target_id", FollowController, :delete)
@@ -1056,6 +1135,7 @@ defmodule MilosTrainingWeb.Router do
     get("/me/followers", FollowController, :followers)
     delete("/me/followers/:id", FollowController, :remove)
     get("/me/following", FollowController, :following)
+    get("/me/post-attachments/:type/:id", PostAttachmentController, :show)
     post("/profile-posts", ProfilePostController, :create)
     delete("/profile-posts/:id", ProfilePostController, :delete)
     put("/profile-posts/:id/kudos", ProfilePostController, :kudos)
@@ -1076,6 +1156,70 @@ defmodule MilosTrainingWeb.Router do
     get("/me/trials/:id", TrialController, :show)
     post("/me/trials/:id/cancel", TrialController, :cancel)
     post("/me/trials/:id/follow-up", TrialController, :follow_up)
+  end
+
+  # ADR-157: photos and videos for posts.
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :media_upload_rate_limited
+    ])
+
+    get("/capabilities", MyMediaController, :capabilities)
+    post("/uploads", MyMediaController, :upload)
+    get("/:id", MyMediaController, :show)
+    post("/:id/complete", MyMediaController, :complete)
+    patch("/:id", MyMediaController, :update)
+    delete("/:id", MyMediaController, :delete)
+  end
+
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :ai_suggestion_rate_limited
+    ])
+
+    post("/:id/alt-text-suggestion", MyMediaController, :suggest_alt_text)
+  end
+
+  # ADR-155: the door scan (any box: the door says which) and connected devices.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :check_in_rate_limited
+    ])
+
+    post("/check-in/scan", ScanCheckInController, :scan)
+    delete("/check-in/scan/:undo_token", ScanCheckInController, :undo)
+    get("/me/connected-devices", WalletController, :devices)
+    delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  # ADR-154: Γύρω μου, «Η περιοχή μου» and the gazetteer; members only.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :around_rate_limited
+    ])
+
+    post("/around/search", AroundController, :search)
+    post("/around/search/:kind", AroundController, :kind)
+    post("/around/pins", AroundController, :pins)
+    get("/places/neighbourhoods", PlacesController, :neighbourhoods)
+    get("/me/around/area", PlacesController, :area)
+    put("/me/around/area", PlacesController, :update_area)
   end
 
   # ADR-144, board 6 Q6: talking to a box from its page.

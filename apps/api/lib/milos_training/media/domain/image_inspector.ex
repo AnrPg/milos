@@ -1,6 +1,6 @@
 defmodule MilosTraining.Media.Domain.ImageInspector do
   @moduledoc """
-  Reads the leading bytes of an uploaded image (ADR-148): its real type and
+  Reads the leading bytes of an uploaded image (ADR-148, ADR-157): its real type and
   dimensions, and whether it still carries metadata.
 
   - JPEG: every segment before the first frame header must lie inside the
@@ -19,6 +19,32 @@ defmodule MilosTraining.Media.Domain.ImageInspector do
     do: webp(chunk, rest)
 
   def inspect_image(_head), do: {:error, :invalid_media_type}
+
+  @heic_brands ~w(heic heix hevc hevx heim heis)
+  @heif_brands ~w(mif1 msf1 heif)
+  @mp4_brands ["M4V " | ~w(isom iso2 iso4 iso5 iso6 mp41 mp42 avc1 dash 3gp4 3gp5 3gp6 MSNV)]
+
+  @doc """
+  The real type of an upload from its leading bytes (ADR-157), whatever the
+  browser declared: `{:ok, content_type}` or `{:error, :invalid_media_type}`.
+  Post uploads may still carry metadata; the server strips it.
+  """
+  def sniff(<<0xFF, 0xD8, 0xFF, _rest::binary>>), do: {:ok, "image/jpeg"}
+  def sniff(<<0x89, "PNG", 0x0D, 0x0A, 0x1A, 0x0A, _rest::binary>>), do: {:ok, "image/png"}
+  def sniff(<<"RIFF", _size::binary-size(4), "WEBP", _rest::binary>>), do: {:ok, "image/webp"}
+  def sniff(<<0x1A, 0x45, 0xDF, 0xA3, _rest::binary>>), do: {:ok, "video/webm"}
+
+  def sniff(<<_size::binary-size(4), "ftyp", brand::binary-size(4), _rest::binary>>) do
+    cond do
+      brand in @heic_brands -> {:ok, "image/heic"}
+      brand in @heif_brands -> {:ok, "image/heif"}
+      brand == "qt  " -> {:ok, "video/quicktime"}
+      brand in @mp4_brands -> {:ok, "video/mp4"}
+      true -> {:error, :invalid_media_type}
+    end
+  end
+
+  def sniff(_head), do: {:error, :invalid_media_type}
 
   # --- JPEG ---------------------------------------------------------------
 

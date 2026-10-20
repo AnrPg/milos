@@ -438,3 +438,18 @@ msgstr "הפניה לאישור"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "%{nickname} נרשם/ה למנוי בהזמנת %{referrer}."
+
+msgid "New near you"
+msgstr "חדש בסביבתך"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "חדש עבור «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "מבקר בדלת"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - עדיין לא חבר/ה."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - עדיין לא חבר/ה. אימוני ניסיון פתוחים."

@@ -18,6 +18,7 @@ import {
   type GeocodePlace,
   type OpeningHoursSpan,
 } from "@/api/facility";
+import { LocationCheckIn } from "@/components/check-in/LocationCheckIn";
 import { OpeningHoursEditor } from "@/components/admin/location/OpeningHoursEditor";
 import type { Pin } from "@/components/admin/location/LocationPinMap";
 import { useSession } from "@/components/session-provider";
@@ -342,6 +343,8 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
           </h2>
           <OpeningHoursEditor value={form.opening_hours} onChange={(opening_hours) => setForm({ ...form, opening_hours })} />
         </section>
+
+        <LocationCheckIn token={token} locationId={location.id} />
 
         <div
           className="fixed inset-x-0 bottom-0 z-[60] px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"

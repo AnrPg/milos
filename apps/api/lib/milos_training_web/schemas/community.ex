@@ -180,6 +180,17 @@ defmodule MilosTrainingWeb.Schemas.Community do
             description:
               "The event as you see it now, when the post is an event card (attachment_type event)"
         },
+        media: %Schema{
+          type: :array,
+          items: MilosTrainingWeb.Schemas.Media.post_media(),
+          description: "Up to ten photos or one video, in order (ADR-157)"
+        },
+        media_status: %Schema{
+          type: :string,
+          enum: MilosTraining.Community.post_media_statuses(),
+          description:
+            "ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed"
+        },
         pinned: %Schema{type: :boolean},
         hidden: %Schema{type: :boolean},
         kudos_count: %Schema{type: :integer},
@@ -198,6 +209,8 @@ defmodule MilosTrainingWeb.Schemas.Community do
         :club,
         :channel,
         :author,
+        :media,
+        :media_status,
         :pinned,
         :hidden,
         :kudos_count,
@@ -264,9 +277,21 @@ defmodule MilosTrainingWeb.Schemas.Community do
           enum: MilosTraining.Community.shareable_attachment_types()
         },
         attachment_id: @uuid,
+        media_ids: media_ids(),
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },
       required: [:channel_id]
+    }
+  end
+
+  @doc "ADR-157: the uploads a new post carries, in order."
+  def media_ids do
+    %Schema{
+      type: :array,
+      maxItems: MilosTraining.Community.max_post_images(),
+      items: @uuid,
+      description:
+        "Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing."
     }
   end
 

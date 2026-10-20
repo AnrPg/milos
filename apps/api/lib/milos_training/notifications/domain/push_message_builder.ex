@@ -519,6 +519,46 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("around_new_matches", payload, localize) do
+    %{
+      title: localize.("New near you", %{}),
+      body:
+        localize.("New for «%{name}»: %{count}", %{
+          name: payload["filter_name"],
+          count: payload["count"]
+        }),
+      url: payload["url"] || "/around"
+    }
+  end
+
+  # ADR-155 (board 10, Q3).
+  def build("check_in_visitor", payload, localize) do
+    bindings = %{
+      nickname: payload["person_nickname"],
+      box: payload["box_name"],
+      when: payload["scanned_when"] || payload["scanned_at"]
+    }
+
+    body =
+      if payload["trial_available"] in [true, "true"],
+        do:
+          localize.(
+            "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open.",
+            bindings
+          ),
+        else:
+          localize.(
+            "%{nickname} scanned the door at %{box} (%{when}) - not a member yet.",
+            bindings
+          )
+
+    %{
+      title: localize.("Visitor at the door", %{}),
+      body: body,
+      url: payload["url"] || "/admin/check-in"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

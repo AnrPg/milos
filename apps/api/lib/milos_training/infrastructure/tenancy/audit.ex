@@ -16,7 +16,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_document_counters finance_refund_receipts finance_reconciliation_records
     finance_accounting_exports
     finance_entitlement_usage_entries finance_settings finance_subscription_freezes
-    facility_locations facility_check_ins content_videos
+    facility_locations facility_check_ins facility_check_in_settings
+    facility_visitor_scans facility_member_codes wallet_passes content_videos
     coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
     appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
     finance_corporate_invoices
@@ -76,7 +77,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
-    media_account_objects saved_filters
+    media_account_objects saved_filters user_home_areas
   )
 
   def report do

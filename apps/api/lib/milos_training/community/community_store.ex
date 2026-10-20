@@ -172,6 +172,11 @@ defmodule MilosTraining.Community.CommunityStore do
 
   @impl true
   def moderate_post(context, id, attrs), do: tenant_call(context, :moderate_post, [id, attrs])
+
+  @impl true
+  def update_post_media(context, id, fun),
+    do: tenant_call(context, :update_post_media, [id, fun])
+
   @impl true
   def react(context, post, user_id, kind), do: tenant_call(context, :react, [post, user_id, kind])
 

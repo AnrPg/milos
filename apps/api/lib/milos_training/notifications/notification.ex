@@ -69,7 +69,9 @@ defmodule MilosTraining.Notifications.Notification do
     :community_event_message,
     :referral_progress,
     :referral_reward,
-    :referral_review
+    :referral_review,
+    :around_new_matches,
+    :check_in_visitor
   ]
 
   schema "notifications" do

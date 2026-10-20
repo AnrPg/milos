@@ -33,6 +33,7 @@ import { LocationSettings } from "@/components/admin/LocationSettings";
 import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
 import { TrialsLink } from "@/components/admin/trials/TrialsLink";
 import { CommunitySettingsLink } from "@/components/admin/community/CommunitySettings";
+import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -1383,6 +1384,9 @@ export function AdminSettingsHub() {
               </div>
               <div className="mt-3">
                 <CommunitySettingsLink />
+              </div>
+              <div className="mt-3">
+                <CheckInSettingsLink />
               </div>
             </CollapsibleSection>
 

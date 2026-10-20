@@ -438,3 +438,18 @@ msgstr "Recomendación por aprobar"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "%{nickname} se suscribió, invitado/a por %{referrer}."
+
+msgid "New near you"
+msgstr "Novedades cerca de ti"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Novedades para «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Visita en la puerta"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} escaneó la puerta de %{box} (%{when}) - aún no es miembro."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} escaneó la puerta de %{box} (%{when}) - aún no es miembro. Las clases de prueba están abiertas."

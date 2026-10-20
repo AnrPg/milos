@@ -21,6 +21,18 @@ describe("configuredMediaOrigins", () => {
     ).toBe("https://s3-milos.4kq.net");
   });
 
+  test("lets the app itself ask for the device position (Γύρω μου, location picker)", async () => {
+    const response = await proxy(new NextRequest("http://localhost/around"));
+    expect(response.headers.get("Permissions-Policy")).toContain("geolocation=(self)");
+  });
+
+  test("lets the app itself use the camera for the desk's QR scan, and nobody else", async () => {
+    const response = await proxy(new NextRequest("http://localhost/admin/check-in"));
+    const policy = response.headers.get("Permissions-Policy") ?? "";
+    expect(policy).toContain("camera=(self)");
+    expect(policy).toContain("microphone=()");
+  });
+
   test("rewrites tenant-prefixed RSC and prefetch requests too", () => {
     expect(config.matcher[0]).not.toHaveProperty("missing");
   });

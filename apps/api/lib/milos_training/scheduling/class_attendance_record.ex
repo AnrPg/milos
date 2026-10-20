@@ -15,6 +15,8 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
     field :marked_at, :utc_datetime_usec
     field :notes, :string
     field :params, :map, default: %{}
+    # ADR-155: how a check-in happened; nil for roster marks by staff.
+    field :check_in_method, :string
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -30,10 +32,15 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
       :marked_by_id,
       :marked_at,
       :notes,
-      :params
+      :params,
+      :check_in_method
     ])
     |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status, :marked_at])
     |> validate_inclusion(:status, ["attended", "missed", "cancelled", "late_cancel", "no_show"])
+    |> validate_inclusion(
+      :check_in_method,
+      ~w(door_qr door_poster member_qr wallet desk_search self)
+    )
     |> unique_constraint([:scheduled_class_id, :user_id])
     |> foreign_key_constraint(:scheduled_class_id)
     |> foreign_key_constraint(:booking_id)

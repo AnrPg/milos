@@ -1,7 +1,8 @@
 ARG API_DEV_BASE_IMAGE=elixir:1.18.4-otp-27-alpine
 FROM ${API_DEV_BASE_IMAGE}
 
-RUN apk add --no-cache build-base git inotify-tools
+RUN apk add --no-cache build-base git inotify-tools \
+    imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic ffmpeg
 
 WORKDIR /app
 

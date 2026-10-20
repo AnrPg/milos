@@ -1,12 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { createPost, FEED_KEY, type AttachmentType, type CommunityClub } from "@/api/community";
 import { createProfilePost, SUMMARY_KEY } from "@/api/social";
 import { fetchJournalPage, typedItem, type TypedJournalItem } from "@/api/journal";
+import { fetchPostAttachment, type ShareableAttachmentType } from "@/api/media";
 import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import {
@@ -18,6 +20,9 @@ import {
   sameTarget,
   type ComposeTarget,
 } from "@/components/community/community";
+import { Attachment } from "@/components/community/PostCard";
+import { ComposeMediaPicker } from "@/components/media/ComposeMediaPicker";
+import { useComposeMedia } from "@/components/media/useComposeMedia";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
@@ -82,15 +87,22 @@ function isPublic(target: ComposeTarget) {
   return target.kind === "profile" ? target.audience === "public" : target.public;
 }
 
-function ComposeSheet({
+/**
+ * Compose (vision §7.1, mockup `compose`): photos or a video first (ADR-157),
+ * then the text, a journal attachment and who sees it. `initialAttachment`
+ * prefills a just-logged PR («Μοιράσου το»); nothing posts before «Δημοσίευση».
+ */
+export function ComposeSheet({
   clubs,
   clubId,
   channelId,
+  initialAttachment,
   onClose,
 }: {
   clubs: CommunityClub[];
   clubId?: string | null;
   channelId?: string | null;
+  initialAttachment?: { type: ShareableAttachmentType; id: string } | null;
   onClose: () => void;
 }) {
   const t = useTranslations("Community");
@@ -98,16 +110,22 @@ function ComposeSheet({
   const locale = useUiLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
+  const tMedia = useTranslations("Media");
   const queryClient = useQueryClient();
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
+  const media = useComposeMedia();
+  const cancel = () => {
+    media.release(true);
+    onClose();
+  };
+  const trapRef = useModalFocusTrap<HTMLDivElement>(cancel);
   const groups = composeTargetGroups(clubs);
   const [target, setTarget] = useState<ComposeTarget>(() =>
-    initialComposeTarget(clubs, readStored<ComposeTarget>(LAST_TARGET_KEY), clubId, channelId),
+    initialComposeTarget(clubs, initialAttachment ? null : readStored<ComposeTarget>(LAST_TARGET_KEY), clubId, channelId),
   );
   const [picking, setPicking] = useState(false);
   const [publicNoteSeen, setPublicNoteSeen] = useState(() => readStored<boolean>(PUBLIC_NOTE_KEY) === true);
   const [body, setBody] = useState("");
-  const [attachment, setAttachment] = useState<{ type: AttachmentType; id: string } | null>(null);
+  const [attachment, setAttachment] = useState<{ type: AttachmentType; id: string } | null>(initialAttachment ?? null);
   const [operationId] = useState(newOperationId);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -117,6 +135,14 @@ function ComposeSheet({
     queryFn: () => fetchJournalPage(token!, { kinds: [...SHAREABLE_KINDS], limit: 10 }),
   });
   const attachable = useMemo(() => (entries.data?.items ?? []).map(typedItem), [entries.data]);
+  const preset = useQuery({
+    queryKey: ["community", "attachment-preview", initialAttachment?.type, initialAttachment?.id],
+    enabled: Boolean(token && initialAttachment),
+    queryFn: () => fetchPostAttachment(token!, initialAttachment!.type, initialAttachment!.id),
+    staleTime: 60_000,
+  });
+  const presetListed = Boolean(initialAttachment && attachable.some((item) => item.id === initialAttachment.id));
+  const presetChosen = Boolean(initialAttachment && attachment?.id === initialAttachment.id);
   const channelTarget =
     target.kind === "channel"
       ? groups.flatMap((group) => group.channels.map((channel) => ({ club: group.club, channel }))).find(
@@ -134,14 +160,18 @@ function ComposeSheet({
       : `${channelTarget.club.name} › #${channelName(channelTarget.channel, t)}`;
   }
 
+  const hasContent = Boolean(body.trim() || attachment || media.count > 0);
+  const canPublish = !busy && ready && hasContent && !media.blocked;
+
   async function publish() {
-    if (!token || !ready || busy || (!body.trim() && !attachment)) return;
+    if (!token || !canPublish) return;
     setBusy(true);
     setError(null);
     const content = {
       body: body.trim() || undefined,
       attachment_type: attachment?.type,
       attachment_id: attachment?.id,
+      media_ids: media.mediaIds.length ? media.mediaIds : undefined,
       client_operation_id: operationId,
     };
     try {
@@ -158,6 +188,7 @@ function ComposeSheet({
       writeStored(LAST_TARGET_KEY, target);
       if (isPublic(target)) writeStored(PUBLIC_NOTE_KEY, true);
       await queryClient.invalidateQueries({ queryKey: FEED_KEY });
+      media.release(false);
       onClose();
     } catch (caught) {
       setError(clientErrorMessage(caught, tUi));
@@ -165,11 +196,11 @@ function ComposeSheet({
     }
   }
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
       style={{ background: "rgba(0, 0, 0, 0.45)" }}
-      onClick={onClose}
+      onClick={cancel}
     >
       <div
         ref={trapRef}
@@ -181,6 +212,7 @@ function ComposeSheet({
         onClick={(event) => event.stopPropagation()}
       >
         <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("compose")}</h2>
+        <ComposeMediaPicker media={media} />
         <label className="sr-only" htmlFor="compose-body">{t("composePlaceholder")}</label>
         <textarea
           id="compose-body"
@@ -198,6 +230,14 @@ function ComposeSheet({
             {t("composeAttach")}
           </legend>
           <Choice name="attachment" checked={!attachment} onChange={() => setAttachment(null)} label={t("composeAttachNone")} />
+          {initialAttachment && !presetListed ? (
+            <Choice
+              name="attachment"
+              checked={presetChosen}
+              onChange={() => setAttachment(initialAttachment)}
+              label={presetLabel(preset.data?.attachment, t)}
+            />
+          ) : null}
           {entries.isSuccess && attachable.length === 0 ? (
             <p className="text-sm" style={{ color: "var(--dim)" }}>{t("composeAttachEmpty")}</p>
           ) : null}
@@ -216,6 +256,12 @@ function ComposeSheet({
             );
           })}
         </fieldset>
+
+        {presetChosen && preset.data ? (
+          <div data-testid="compose-attachment-preview">
+            <Attachment type={preset.data.attachment_type} snapshot={preset.data.attachment} />
+          </div>
+        ) : null}
 
         <button
           type="button"
@@ -249,11 +295,16 @@ function ComposeSheet({
           </p>
         ) : null}
 
+        {media.count > 0 && media.blocked && !busy ? (
+          <p role="status" className="text-xs" style={{ color: "var(--dim)" }}>
+            {media.busy ? tMedia("waitUploads") : tMedia("fixUploads")}
+          </p>
+        ) : null}
         {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
         <div className="flex gap-2">
           <button
             type="button"
-            onClick={onClose}
+            onClick={cancel}
             className="min-h-12 flex-1 rounded-2xl text-sm font-semibold"
             style={{ border: "1px solid var(--border)", color: "var(--text)" }}
           >
@@ -262,7 +313,7 @@ function ComposeSheet({
           <button
             type="button"
             onClick={() => void publish()}
-            disabled={busy || !ready || (!body.trim() && !attachment)}
+            disabled={!canPublish}
             className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
             style={{ background: "var(--primary)", color: "var(--bg)" }}
           >
@@ -281,8 +332,19 @@ function ComposeSheet({
           onClose={() => setPicking(false)}
         />
       ) : null}
-    </div>
+    </div>,
+    document.body,
   );
+}
+
+/** The prefilled attachment's line before (or without) its journal entry in the list. */
+function presetLabel(snapshot: Record<string, unknown> | undefined, t: (key: string) => string) {
+  const title = typeof snapshot?.title === "string" ? snapshot.title : null;
+  if (!title) return t("attachmentPr");
+  const score = Number(snapshot?.score);
+  return snapshot?.score != null && Number.isFinite(score) && typeof snapshot?.unit === "string"
+    ? [title, formatScore(score, snapshot.unit as Parameters<typeof formatScore>[1])].join(" · ")
+    : title;
 }
 
 /**

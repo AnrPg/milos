@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient, type QueryClient, type QueryKey } from "@tanstack/react-query";
 
 import { STAFF_EVENTS_KEY } from "@/api/admin-events";
+import { AROUND_KEY } from "@/api/around";
 import { FEED_KEY } from "@/api/community";
 import {
   CLUBS_EVENTS_KEY,
@@ -20,8 +21,8 @@ import { useSession } from "@/components/session-provider";
 
 import { optimisticRsvp } from "./events";
 
-/** Every cache that can hold an event: event pages and lists, the feeds and the box page's public posts. */
-const EVENT_CACHES: QueryKey[] = [EVENTS_KEY, FEED_KEY, ["social", "box-posts"]];
+/** Every cache that can hold an event: event pages and lists, the feeds, the box page's public posts and Γύρω μου. */
+const EVENT_CACHES: QueryKey[] = [EVENTS_KEY, FEED_KEY, ["social", "box-posts"], AROUND_KEY];
 
 type Patch = (event: CommunityEvent) => CommunityEvent;
 
@@ -43,7 +44,7 @@ export function patchEventIn(value: unknown, eventId: string, patch: Patch): unk
   }
   let changed = false;
   const next: Record<string, unknown> = { ...record };
-  for (const key of ["pages", "posts", "pinned", "event", "events"]) {
+  for (const key of ["pages", "posts", "pinned", "event", "events", "sections", "items", "post"]) {
     if (!(key in record)) continue;
     const patched = patchEventIn(record[key], eventId, patch);
     if (patched !== record[key]) {
@@ -66,6 +67,7 @@ export function invalidateEvents(queryClient: QueryClient) {
     queryClient.invalidateQueries({ queryKey: EVENTS_KEY }),
     queryClient.invalidateQueries({ queryKey: FEED_KEY }),
     queryClient.invalidateQueries({ queryKey: STAFF_EVENTS_KEY }),
+    queryClient.invalidateQueries({ queryKey: AROUND_KEY }),
   ]);
 }
 

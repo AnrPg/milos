@@ -436,4 +436,18 @@ msgid "Referral to approve"
 msgstr ""
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
+
+msgid "New near you"
+msgstr ""
+
+msgid "New for «%{name}»: %{count}"
+msgstr ""
+
+msgid "Visitor at the door"
+msgstr ""
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr ""
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr ""

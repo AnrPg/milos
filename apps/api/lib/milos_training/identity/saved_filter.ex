@@ -13,6 +13,10 @@ defmodule MilosTraining.Identity.SavedFilter do
     field :name, :string
     field :params, :map, default: %{}
     field :last_used_at, :utc_datetime_usec
+    # ADR-154: an opt-in daily alert of a named Γύρω μου filter.
+    field :alert_enabled, :boolean, default: false
+    field :alert_checked_on, :date
+    field :alert_checked_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end

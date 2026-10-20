@@ -354,7 +354,13 @@ defmodule MilosTrainingWeb.Schemas.CommunityGroups do
           properties: %{
             body: string(nullable: true),
             name: string(nullable: true),
-            hidden: %Schema{type: :boolean}
+            hidden: %Schema{type: :boolean},
+            media_status:
+              string(
+                enum: MilosTraining.Community.post_media_statuses(),
+                description: "A post's: processing or failed while its media are not ready"
+              ),
+            media: list(MilosTrainingWeb.Schemas.Media.post_media())
           }
         },
         report_count: %Schema{type: :integer},

@@ -42,15 +42,19 @@ config :milos_training, Oban,
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
        {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
        {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
+       {"37 3 * * *", MilosTraining.Workers.SweepOrphanMediaJob, args: %{"dangling" => true}},
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
-       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob}
+       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
+       {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob}
      ]}
   ],
   queues: [
     default: 10,
     notifications: 20,
     gamification: 5,
-    analytics: 3
+    analytics: 3,
+    # ADR-157: photo and video processing is CPU-bound.
+    media: 2
   ]
 
 config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
@@ -137,12 +141,17 @@ config :milos_training, :domain_event_handlers, %{
   ],
   attendance_recorded: [
     MilosTraining.Application.TrialReactions,
-    MilosTraining.Application.ReferralReactions
+    MilosTraining.Application.ReferralReactions,
+    MilosTraining.Application.WalletReactions
   ],
   # ADR-156: the invite funnel follows events, trials, joining and paying.
   event_attendance_recorded: [MilosTraining.Application.ReferralReactions],
   membership_payment_recorded: [MilosTraining.Application.ReferralReactions],
-  booking_cancelled: [MilosTraining.Application.TrialReactions],
+  booking_cancelled: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.WalletReactions
+  ],
+  booking_made: [MilosTraining.Application.WalletReactions],
   class_cancelled: [MilosTraining.Application.TrialReactions]
 }
 
@@ -151,6 +160,23 @@ config :milos_training,
        MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
 
 config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+# ADR-157: post photos and videos. ImageMagick and ffmpeg ship in the API
+# image; alt text suggestions use Gemini when configured.
+config :milos_training,
+       :image_processor,
+       MilosTraining.Infrastructure.Media.ImageMagickProcessor
+
+config :milos_training, :video_transcoder, MilosTraining.Infrastructure.Media.FfmpegTranscoder
+config :milos_training, :image_describer, MilosTraining.Infrastructure.Ai.GeminiImageDescriber
+
+# ADR-154: Γύρω μου.
+config :milos_training,
+       :discovery_store,
+       MilosTraining.Infrastructure.Places.EctoDiscoveryStore
+
+config :milos_training, :gazetteer_store, MilosTraining.Infrastructure.Places.EctoGazetteerStore
+config :milos_training, :home_area_store, MilosTraining.Infrastructure.Places.EctoHomeAreaStore
 
 config :milos_training,
        :public_profile_store,
@@ -243,6 +269,29 @@ config :milos_training,
        MilosTraining.Infrastructure.Security.PhoenixSignedToken
 
 config :milos_training, :public_base_url, "http://localhost:4000"
+
+# ADR-155: Wallet cards. Credentials come from runtime config (runtime.exs);
+# without them each platform reports wallet_not_configured.
+config :milos_training, :wallet_store, MilosTraining.Infrastructure.Wallet.EctoWalletStore
+
+config :milos_training, :wallet_pass_builders, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApplePassBuilder,
+  google: MilosTraining.Infrastructure.Wallet.GooglePassBuilder
+}
+
+config :milos_training, :wallet_pass_updaters, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApnsPassUpdater,
+  google: MilosTraining.Infrastructure.Wallet.GoogleWalletUpdater
+}
+
+config :milos_training,
+       :wallet_image_source,
+       MilosTraining.Infrastructure.Wallet.HttpImageSource
+
+# ADR-155: door codes, member codes and Wallet barcodes.
+config :milos_training,
+       :key_derivation,
+       MilosTraining.Infrastructure.Security.PhoenixKeyDerivation
 
 config :milos_training,
        :realtime_publisher,

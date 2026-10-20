@@ -83,6 +83,74 @@ defmodule MilosTraining.Infrastructure.Identity.EctoSavedFilterStore do
     end
   end
 
+  @impl true
+  def set_alert(%{user_id: user_id}, id, enabled, now) do
+    changes =
+      if enabled,
+        do: [alert_enabled: true, alert_checked_at: now, alert_checked_on: nil, updated_at: now],
+        else: [alert_enabled: false, updated_at: now]
+
+    with {:ok, id} <- Ecto.UUID.cast(id),
+         {1, [filter]} <-
+           SavedFilter
+           |> where([f], f.id == ^id and f.user_id == ^user_id and f.kind == "named")
+           |> select([f], f)
+           |> Repo.update_all(set: changes) do
+      {:ok, normalize(filter)}
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def alert_candidates(day, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT id, user_id FROM milos_around_alert_candidates($1, $2)", [day, limit])
+
+    Enum.map(rows, fn [id, user_id] ->
+      %{id: Ecto.UUID.load!(id), user_id: Ecto.UUID.load!(user_id)}
+    end)
+  end
+
+  # Taking the day first means a retried or concurrent sweep finds it taken.
+  @impl true
+  def claim_alert(%{user_id: user_id}, id, day) do
+    SavedFilter
+    |> where([f], f.id == ^id and f.user_id == ^user_id and f.alert_enabled)
+    |> where([f], is_nil(f.alert_checked_on) or f.alert_checked_on < ^day)
+    |> select([f], f)
+    |> Repo.update_all(set: [alert_checked_on: day])
+    |> case do
+      {1, [filter]} ->
+        {:ok,
+         %{
+           id: filter.id,
+           name: filter.name,
+           params: filter.params,
+           since: filter.alert_checked_at
+         }}
+
+      _taken ->
+        {:error, :taken}
+    end
+  end
+
+  @impl true
+  def finish_alert(%{user_id: user_id}, id, at) do
+    SavedFilter
+    |> where([f], f.id == ^id and f.user_id == ^user_id)
+    |> Repo.update_all(set: [alert_checked_at: at])
+
+    :ok
+  end
+
   defp normalize(%SavedFilter{} = f),
-    do: %{id: f.id, kind: f.kind, name: f.name, params: f.params, last_used_at: f.last_used_at}
+    do: %{
+      id: f.id,
+      kind: f.kind,
+      name: f.name,
+      params: f.params,
+      last_used_at: f.last_used_at,
+      alert: f.alert_enabled
+    }
 end

@@ -28,3 +28,6 @@ Uploads need a browser with canvas encoding (all supported ones have it).
 ## Implementation Notes
 Migration `20261018101000_media_and_public_profiles`; web helper
 `src/lib/box-photo-upload.ts`.
+
+ADR-157 (P2-M9): post photos and videos are the author's (account scope) and are
+processed on the server (metadata stripped, renditions); box photos keep this path.

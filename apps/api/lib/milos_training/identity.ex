@@ -44,6 +44,12 @@ defmodule MilosTraining.Identity do
   defdelegate count_named_filters(context, surface), to: SavedFilterStore, as: :count_named
   defdelegate delete_named_filter(context, id), to: SavedFilterStore, as: :delete_named
 
+  # ADR-154: daily alerts of named Γύρω μου filters.
+  defdelegate set_filter_alert(context, id, enabled, now), to: SavedFilterStore, as: :set_alert
+  defdelegate filter_alert_candidates(day, limit), to: SavedFilterStore, as: :alert_candidates
+  defdelegate claim_filter_alert(context, id, day), to: SavedFilterStore, as: :claim_alert
+  defdelegate finish_filter_alert(context, id, at), to: SavedFilterStore, as: :finish_alert
+
   @doc "Secret-free account records for a tenant export (ADR-117)."
   def export_accounts(user_ids) when is_list(user_ids) do
     user_ids

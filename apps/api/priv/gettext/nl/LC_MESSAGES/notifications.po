@@ -438,3 +438,18 @@ msgstr "Aanbreng om goed te keuren"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "%{nickname} heeft een abonnement genomen, uitgenodigd door %{referrer}."
+
+msgid "New near you"
+msgstr "Nieuw in de buurt"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Nieuw voor «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Bezoeker aan de deur"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} scande de deur bij %{box} (%{when}) - nog geen lid."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} scande de deur bij %{box} (%{when}) - nog geen lid. Proeflessen zijn open."

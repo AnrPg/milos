@@ -31,6 +31,8 @@ export async function proxy(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${mediaOrigins} ${mapOrigins}`,
+    // ADR-157: post videos play from the media origin; compose previews a picked file from a blob.
+    `media-src 'self' blob: ${mediaOrigins}`,
     "font-src 'self' data:",
     `connect-src 'self' ${mediaOrigins} ${mapOrigins} ws: wss:`,
     "worker-src 'self' blob:",
@@ -61,7 +63,7 @@ export async function proxy(request: NextRequest) {
 function applySecurityHeaders(response: NextResponse) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  response.headers.set("Permissions-Policy", "camera=(self), microphone=(), geolocation=(self)");
   return response;
 }
 

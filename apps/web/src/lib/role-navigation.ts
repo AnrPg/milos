@@ -125,7 +125,7 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
  */
 export function clientNavItems(): NavItem[] {
   return [
-    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs"], exact: true },
+    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs", "/around", "/around/events", "/around/boxes", "/around/clubs", "/around/posts"], exact: true },
     {
       id: "box",
       href: "/box",
@@ -155,7 +155,7 @@ export function clientExtraLinks(membership?: MembershipLike | null): NavItem[] 
 }
 
 /** Full-screen pages where the bottom bar would get in the way. */
-const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/];
+const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/, /^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
 
 export function showsBottomBar(pathname: string) {
   const path = relativePath(pathname);

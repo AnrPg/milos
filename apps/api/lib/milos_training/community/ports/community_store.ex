@@ -63,6 +63,12 @@ defmodule MilosTraining.Community.Ports.CommunityStore do
   @callback list_pinned_posts(context(), [id()], id()) :: [map()]
   @callback list_public_posts(context(), [id()], id() | nil, map()) :: [map()]
   @callback moderate_post(context(), id(), map()) :: {:ok, map()} | {:error, term()}
+  @doc """
+  ADR-157: locks the post, hands its media view to `fun` and applies the
+  `{:ok, attrs}` it returns (`:skip` changes nothing): `{:ok, before, after}`.
+  """
+  @callback update_post_media(context(), id(), (map() -> {:ok, map()} | :skip)) ::
+              {:ok, map(), map()} | {:error, term()}
   @callback react(context(), map(), id(), String.t()) :: :ok | {:error, term()}
   @callback unreact(context(), map(), id(), String.t()) :: :ok
   @callback list_comments(context(), id()) :: [map()]

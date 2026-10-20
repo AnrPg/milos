@@ -502,6 +502,56 @@ Apostolos picked option A on every question, with the extras below.
    one trial offer to non-members who came. Extras: per-event numbers; QR self check-in when M7
    lands.
 
+### Γύρω μου (2026-10-20, [board 9](https://claude.ai/artifact/M2zFUSokdeLnmsxsCr7q5W))
+
+Apostolos picked the recommended option on every question except the map (Q3: B), with the extras
+below.
+
+1. **Starting point (Q1):** «Η περιοχή μου» (up to five neighbourhoods, saved privately) with
+   «Χρήση τοποθεσίας τώρα» for one search, rounded to ~100 m and never stored. Extras: box members
+   start from their box's area; a one-off place search that leaves the saved area alone.
+2. **Results (Q2):** sections by kind (Events, Box κοντά σου, Ανοιχτά clubs, Αναρτήσεις when on),
+   each with «Δες όλα» and distances.
+3. **Map (Q3, B):** a compact map always above the list, pins linked to rows, «Ψάξε εδώ» after
+   panning, expandable to full screen.
+4. **Saved filters (Q4):** saved combinations as chips after «Φίλτρα (n)»; last filters follow the
+   account. Extra: «Ειδοποίησέ με», at most one notification a day for new matches.
+5. **Public posts (Q5):** off by default; boxes and open clubs at the box's location, people only
+   with «Φαίνομαι στο Γύρω μου», at neighbourhood level.
+6. **Thin results (Q6):** «Τίποτα έως 3 km» with counts at 10 and 25 km and «Καθάρισε φίλτρα».
+
+### QR check-in and Wallet (2026-10-20, [board 10](https://claude.ai/artifact/Juvy9kszaDKm1Mig5STT9h))
+
+Apostolos picked the recommended option on Q1–Q4 and Q6, with the extras and notes below.
+
+1. **Door QR (Q1):** «Οθόνη πόρτας» on a tablet or TV with a code that rotates every 30 s, the next
+   class and a welcome line. Extras: a sound and green flash per check-in; a printed poster per
+   location as a backup, which only checks in a booking you already have, in its window.
+2. **Member scan (Q2):** checked in at once, with what's left on the package and a 1-minute undo;
+   several bookings → pick one; none → open gym or «Κλείσε θέση».
+3. **Visitor scan (Q3):** «Θες δοκιμαστικό;» with trial classes and «Ακολούθησε». Note: staff also
+   get a notification to follow up and sell (once an hour per visitor).
+4. **Personal QR and desk (Q4):** a personal QR in Box › Check-in; the desk scans with its camera
+   and shows problems first. Extra: auto mode when everything is fine.
+5. **Wallet (Q5, his note):** an owner setting «Προσωπικός κωδικός: Αλλάζει / Σταθερός». Rotating
+   (default) has no Wallet; static gives a persistent, resettable code that can go into Apple or
+   Google Wallet.
+6. **Owner rules (Q6):** Ρυθμίσεις › Check-in: window, open gym, visitor offer, desk override,
+   door rotation, member code mode.
+
+### Photos and video in posts (2026-10-20, [board 12](https://claude.ai/artifact/FasZr8B6vU1ULkXBXXQQzx))
+
+Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with these notes.
+
+1. **Adding (Q1):** up to **10** photos per post (his note), uploading while you write, reorder,
+   crop, resized on the phone first.
+2. **Video (Q2):** one video per post, up to **2 minutes** (his note), converted on the server.
+3. **Feed (Q3):** swipe through with dots, tap for a full-screen viewer with zoom.
+4. **Descriptions (Q4):** optional per photo, with an AI suggestion used only on tap.
+5. **Safety (Q5, B):** no automatic checks; reports only. Note: the report control is a subtle,
+   almost hidden line-icon button.
+6. **PR (Q6):** «Μοιράσου το» after a PR opens compose with the PR card and the media picker first.
+
 ### Member referral (2026-10-20, [board 11](https://claude.ai/artifact/Mx77PrVYo8dfH2wT34Mbos))
 
 ANR picked the recommendation on every question except Q2, with the extras and notes below
@@ -553,5 +603,5 @@ ANR picked the recommendation on every question except Q2, with the extras and n
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
-- [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
+- [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

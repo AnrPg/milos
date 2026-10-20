@@ -38,7 +38,9 @@ config :milos_training, :gemini,
   thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low"),
   parser_thinking_level: System.get_env("GEMINI_PARSER_THINKING_LEVEL", "medium"),
   # Workout library icons (ADR-136) use their own small, cheap model.
-  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite")
+  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite"),
+  # ADR-157: alt text suggestions (vision).
+  vision_model: System.get_env("GEMINI_VISION_MODEL", "gemini-2.5-flash-lite")
 
 config :web_push_elixir,
   vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),
@@ -103,6 +105,29 @@ present_env = fn name ->
     nil -> nil
   end
 end
+
+# ADR-155: Wallet cards. Each platform works only with all of its values set;
+# otherwise adding a card answers wallet_not_configured and the rest of
+# check-in works. PEM values may be the PEM text or a path to a PEM file.
+config :milos_training, :wallet,
+  apple: [
+    pass_type_identifier: present_env.("WALLET_APPLE_PASS_TYPE_ID"),
+    team_identifier: present_env.("WALLET_APPLE_TEAM_ID"),
+    certificate: present_env.("WALLET_APPLE_CERTIFICATE"),
+    private_key: present_env.("WALLET_APPLE_PRIVATE_KEY"),
+    private_key_password: present_env.("WALLET_APPLE_PRIVATE_KEY_PASSWORD"),
+    wwdr_certificate: present_env.("WALLET_APPLE_WWDR_CERTIFICATE"),
+    apns_host: present_env.("WALLET_APPLE_APNS_HOST")
+  ],
+  google: [
+    issuer_id: present_env.("WALLET_GOOGLE_ISSUER_ID"),
+    service_account_email: present_env.("WALLET_GOOGLE_SERVICE_ACCOUNT_EMAIL"),
+    private_key: present_env.("WALLET_GOOGLE_PRIVATE_KEY"),
+    origins:
+      (present_env.("WALLET_GOOGLE_ORIGINS") || "")
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+  ]
 
 otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_base_endpoint = present_env.("OTEL_EXPORTER_OTLP_ENDPOINT")

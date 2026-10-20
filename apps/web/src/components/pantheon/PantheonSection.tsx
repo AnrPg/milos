@@ -11,6 +11,7 @@ import { useSession } from "@/components/session-provider";
 import { HomeDisclosure } from "@/components/home/HomeDisclosure";
 import { PantheonCard } from "./PantheonCard";
 import { PRFormModal } from "./PRFormModal";
+import { PRShareFlow } from "./PRShareFlow";
 import { PRShareModal } from "./PRShareModal";
 
 export function PantheonSection() {
@@ -83,10 +84,9 @@ export function PantheonSection() {
       </HomeDisclosure>
 
       {formPR !== null && (
-        <PRFormModal
-          pr={formPR === "new" ? null : formPR}
-          onClose={() => setFormPR(null)}
-        />
+        <PRShareFlow onClose={() => setFormPR(null)}>
+          {(onSaved) => <PRFormModal pr={formPR === "new" ? null : formPR} onClose={() => setFormPR(null)} onSaved={onSaved} />}
+        </PRShareFlow>
       )}
       {sharePR && <PRShareModal pr={sharePR} onClose={() => setSharePR(null)} />}
     </>

@@ -438,3 +438,18 @@ msgstr "Passaparola da approvare"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "%{nickname} si è abbonato/a, invitato/a da %{referrer}."
+
+msgid "New near you"
+msgstr "Novità vicino a te"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Novità per «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Visitatore alla porta"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} ha scansionato la porta di %{box} (%{when}) - non è ancora socio."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} ha scansionato la porta di %{box} (%{when}) - non è ancora socio. Le prove sono aperte."

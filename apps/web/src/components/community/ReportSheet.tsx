@@ -12,7 +12,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { ChoicePill, ErrorLine, Sheet, SheetButton } from "./Sheet";
 
 /**
- * ⋯ › Αναφορά (board 7 Q4): a reason, an optional note, send. The item then
+ * Αναφορά (board 7 Q4; the subtle flag of board 12): a reason, an optional note, send. The item then
  * disappears for the reporter («Ευχαριστούμε, θα το δει το staff») and staff
  * are told; nothing is hidden from anyone else until staff decide.
  */

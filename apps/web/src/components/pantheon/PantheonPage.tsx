@@ -16,6 +16,7 @@ import { buildPRListDocument } from "@/lib/document-export";
 import { PantheonCard } from "./PantheonCard";
 import { NewPRFormModal, PRFormModal } from "./PRFormModal";
 import { SharedPRsSection } from "./SharedPRsSection";
+import { PRShareFlow } from "./PRShareFlow";
 import { PRShareModal } from "./PRShareModal";
 
 export function PantheonPage() {
@@ -165,7 +166,9 @@ export function PantheonPage() {
       {formPR === "new" ? (
         <NewPRFormModal onClose={() => setFormPR(null)} />
       ) : formPR !== null ? (
-        <PRFormModal pr={formPR} onClose={() => setFormPR(null)} />
+        <PRShareFlow onClose={() => setFormPR(null)}>
+          {(onSaved) => <PRFormModal pr={formPR} onClose={() => setFormPR(null)} onSaved={onSaved} />}
+        </PRShareFlow>
       ) : null}
 
       {sharePR && (

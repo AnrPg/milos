@@ -438,3 +438,18 @@ msgstr "Σύσταση προς έγκριση"
 
 msgid "%{nickname} subscribed, invited by %{referrer}."
 msgstr "Ο/Η %{nickname} γράφτηκε, με πρόσκληση από %{referrer}."
+
+msgid "New near you"
+msgstr "Νέα γύρω σου"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Νέα για «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Επισκέπτης στην πόρτα"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος. Οι δοκιμαστικές είναι ανοιχτές."

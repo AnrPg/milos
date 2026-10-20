@@ -267,7 +267,8 @@ defmodule MilosTrainingWeb.Schemas.Social do
         following_count: %Schema{type: :integer},
         requests_count: %Schema{type: :integer},
         booking_sharing: booking_sharing(),
-        member_visibility: member_visibility()
+        member_visibility: member_visibility(),
+        around_visibility: MilosTrainingWeb.Schemas.Around.around_visibility()
       },
       required: [
         :posts_count,
@@ -275,7 +276,8 @@ defmodule MilosTrainingWeb.Schemas.Social do
         :following_count,
         :requests_count,
         :booking_sharing,
-        :member_visibility
+        :member_visibility,
+        :around_visibility
       ]
     }
   end
@@ -361,6 +363,7 @@ defmodule MilosTrainingWeb.Schemas.Social do
           enum: MilosTraining.Community.shareable_attachment_types()
         },
         attachment_id: @uuid,
+        media_ids: Community.media_ids(),
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },
       required: [:audience]

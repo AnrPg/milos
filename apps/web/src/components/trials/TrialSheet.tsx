@@ -13,6 +13,8 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { newOperationId, trialErrorKey } from "./trial-ui";
 
 type Slot = PublicBoxSchedule["slots"][number];
+/** What the sheet needs of a class picked before it opens (the box schedule, or a door scan's offer). */
+type PickedSlot = { id: string; name?: string | null; scheduled_at: string };
 
 const WINDOW_DAYS = 14;
 
@@ -29,21 +31,24 @@ export function TrialSheet({
   offer,
   initialSlot,
   referralEventId = null,
+  source,
   onClose,
 }: {
-  page: PublicBoxPage;
+  page: { box: Pick<PublicBoxPage["box"], "slug" | "name"> };
   token: string;
-  offer: TrialOffer;
-  initialSlot?: Slot | null;
+  offer: Pick<TrialOffer, "approval">;
+  initialSlot?: PickedSlot | null;
   /** The club event whose trial offer opened the sheet (ADR-153). */
   referralEventId?: string | null;
+  /** Where the ask came from when the caller knows better (the door scan: `qr_door`, ADR-155). */
+  source?: "qr_door";
   onClose: () => void;
 }) {
   const t = useTranslations("Trials");
   const locale = useLocale();
   const queryClient = useQueryClient();
   const dialog = useModalFocusTrap<HTMLElement>(onClose);
-  const [picked, setPicked] = useState<Slot | null>(initialSlot ?? null);
+  const [picked, setPicked] = useState<PickedSlot | null>(initialSlot ?? null);
   const [note, setNote] = useState("");
   const [phone, setPhone] = useState("");
   const [done, setDone] = useState<MyTrial | null>(null);
@@ -75,7 +80,7 @@ export function TrialSheet({
         scheduled_class_id: picked!.id,
         note: note.trim() || null,
         phone: phone.trim() || null,
-        source: referralEventId ? "event" : initialSlot ? "schedule" : "box_page",
+        source: referralEventId ? "event" : source ?? (initialSlot ? "schedule" : "box_page"),
         ...(referralEventId ? { referral_event_id: referralEventId } : {}),
         client_operation_id: operation.current,
       }),

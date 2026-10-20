@@ -2,6 +2,7 @@
 
 import { useTranslations } from "next-intl";
 
+import { AroundVisibilitySetting } from "@/components/around/AroundSettings";
 import { LeaderboardSetting } from "@/components/member-app/me/LeaderboardSetting";
 import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
@@ -22,6 +23,7 @@ export function SharingPage() {
   const tPrSharing = useTranslations("PrSharing");
   const tSocial = useTranslations("Social");
   const tClubs = useTranslations("Clubs");
+  const tAround = useTranslations("Around");
   const i18n = useUiTranslations();
   const { currentUser } = useSession();
   const selfService = showsTenantSelfServiceSurfaces(currentUser);
@@ -38,6 +40,9 @@ export function SharingPage() {
         </CollapsibleSection>
         <CollapsibleSection id="members-list" title={tClubs("visibilityTitle")} description={tClubs("visibilityHint")} defaultOpen>
           <MemberVisibilitySetting />
+        </CollapsibleSection>
+        <CollapsibleSection id="around-visibility" title={tAround("visibilityTitle")} description={tAround("visibilityHint")} defaultOpen>
+          <AroundVisibilitySetting />
         </CollapsibleSection>
         {selfService ? (
           <>

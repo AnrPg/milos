@@ -145,6 +145,16 @@ defmodule MilosTraining.Application.OpenClubs do
     end
   end
 
+  @doc "Open clubs from any box as the person's cards (Γύρω μου, ADR-154)."
+  def present_cards(_context, []), do: []
+
+  def present_cards(context, clubs) do
+    case ClubScope.call(context) do
+      {:ok, scope} -> present_clubs(context, clubs, scope)
+      _error -> []
+    end
+  end
+
   @doc "A box's open clubs for its public page (board 7 Q6), read in the gym's own scope."
   def for_box(%{organization_id: organization_id} = context) do
     clubs = Community.list_open_clubs(context, %{organization_ids: [organization_id], limit: 50})

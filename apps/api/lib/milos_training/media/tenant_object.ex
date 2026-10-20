@@ -1,5 +1,5 @@
 defmodule MilosTraining.Media.TenantObject do
-  @moduledoc "An image a gym owns: box photos, post photos (ADR-148)."
+  @moduledoc "An image a gym owns: box photos (ADR-148)."
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -20,6 +20,14 @@ defmodule MilosTraining.Media.TenantObject do
     field :height, :integer
     field :status, :string, default: "pending"
     field :attached_at, :utc_datetime_usec
+    field :variants, :map, default: %{}
+    field :placeholder, :string
+    field :alt_text, :string
+    field :duration_ms, :integer
+    field :rejection_reason, :string
+    field :attached_type, :string
+    field :attached_id, :binary_id
+    field :attached_organization_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end

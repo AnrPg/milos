@@ -216,6 +216,8 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   def list_profile_posts(_context, filter) do
     ProfilePost
     |> where([p], p.user_id in ^filter.author_ids and is_nil(p.deleted_at))
+    |> media_shown_to(filter.viewer_id)
+    |> only_ids(Map.get(filter, :ids))
     |> before(Map.get(filter, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
     |> limit(^filter.limit)
@@ -223,10 +225,62 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
     |> Repo.all()
   end
 
+  # ADR-157: a post whose media are not ready shows to its author only.
+  defp media_shown_to(query, viewer_id) when is_binary(viewer_id),
+    do: where(query, [p], p.media_status == "ready" or p.user_id == ^viewer_id)
+
+  defp media_shown_to(query, _viewer_id), do: where(query, [p], p.media_status == "ready")
+
+  @impl true
+  def update_profile_post_media(_context, id, fun) when is_function(fun, 1) do
+    Repo.transaction(fn ->
+      ProfilePost
+      |> where([p], p.id == ^id and is_nil(p.deleted_at))
+      |> lock("FOR UPDATE")
+      |> Repo.one()
+      |> case do
+        nil ->
+          Repo.rollback(:not_found)
+
+        post ->
+          before = profile_media_view(post)
+
+          case fun.(before) do
+            {:ok, attrs} ->
+              case post |> ProfilePost.media_changeset(attrs) |> Repo.update() do
+                {:ok, updated} -> {before, profile_media_view(updated)}
+                {:error, changeset} -> Repo.rollback(changeset)
+              end
+
+            :skip ->
+              {before, before}
+          end
+      end
+    end)
+    |> case do
+      {:ok, {before, later}} -> {:ok, before, later}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp profile_media_view(%ProfilePost{} = post) do
+    %{
+      id: post.id,
+      organization_id: nil,
+      club_id: nil,
+      channel_id: nil,
+      author_id: post.user_id,
+      audience: post.audience,
+      media: post.media || [],
+      media_status: post.media_status
+    }
+  end
+
   @impl true
   def count_profile_posts(_context, author_id) do
     ProfilePost
     |> where([p], p.user_id == ^author_id and is_nil(p.deleted_at))
+    |> where([p], p.media_status == "ready")
     |> Repo.aggregate(:count)
   end
 
@@ -327,6 +381,9 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   defp among(query, _field, nil), do: query
   defp among(query, field, ids), do: where(query, [f], field(f, ^field) in ^ids)
 
+  defp only_ids(query, nil), do: query
+  defp only_ids(query, ids), do: where(query, [p], p.id in ^ids)
+
   defp before(query, nil), do: query
 
   defp before(query, {%DateTime{} = at, id}),
@@ -341,6 +398,8 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
       attachment_type: p.attachment_type,
       attachment_id: p.attachment_id,
       attachment: p.attachment,
+      media: p.media,
+      media_status: p.media_status,
       inserted_at: p.inserted_at,
       kudos_count:
         fragment(
