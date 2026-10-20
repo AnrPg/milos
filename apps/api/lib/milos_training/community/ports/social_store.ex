@@ -31,6 +31,7 @@ defmodule MilosTraining.Community.Ports.SocialStore do
   @callback booking_sharer_ids(context()) :: [id()]
   @callback follower_counts(String.t(), [id()]) :: %{id() => non_neg_integer()}
   @callback following_count(id()) :: non_neg_integer()
+  @callback hidden_member_ids([id()]) :: [id()]
 
   # Profile posts.
   @callback create_profile_post(context(), map()) :: {:ok, map()} | {:error, term()}

@@ -609,6 +609,194 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/clubs/{id}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A club's members (not you), coaches first */
+        get: operations["MilosTrainingWeb.OpenClubController.members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/comments/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your comment (or one you moderate) */
+        delete: operations["MilosTrainingWeb.ClubPostController.delete_comment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/comments/{id}/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Hide or show a comment you moderate */
+        put: operations["MilosTrainingWeb.ClubPostController.hide_comment"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/discover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Βρες»: open clubs to join and your gyms' groups you are not in */
+        get: operations["MilosTrainingWeb.OpenClubController.discover"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Post in a channel of a club you reach */
+        post: operations["MilosTrainingWeb.ClubPostController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete your post (staff and group admins: any post they moderate) */
+        delete: operations["MilosTrainingWeb.ClubPostController.delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts/{id}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A post's comments, oldest first */
+        get: operations["MilosTrainingWeb.ClubPostController.comments"];
+        put?: never;
+        /** Comment on a post */
+        post: operations["MilosTrainingWeb.ClubPostController.comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts/{id}/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Hide or show a post you moderate */
+        put: operations["MilosTrainingWeb.ClubPostController.hide"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts/{id}/kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give or take back kudos */
+        put: operations["MilosTrainingWeb.ClubPostController.kudos"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/posts/{id}/pinned": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Pin or unpin a post you moderate */
+        put: operations["MilosTrainingWeb.ClubPostController.pin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Report a post, a comment or a group; it disappears for you and staff look at it */
+        post: operations["MilosTrainingWeb.OpenClubController.report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/feed": {
         parameters: {
             query?: never;
@@ -884,6 +1072,58 @@ export interface paths {
         patch: operations["MilosTrainingWeb.JournalController.update_note"];
         trace?: never;
     };
+    "/api/me/open-clubs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An open club: what it is, how many are in it and where you stand */
+        get: operations["MilosTrainingWeb.OpenClubController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/open-clubs/{id}/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join an open club (or ask, when it asks for approval) */
+        post: operations["MilosTrainingWeb.OpenClubController.join"];
+        /** Leave an open club */
+        delete: operations["MilosTrainingWeb.OpenClubController.leave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/open-clubs/{id}/notify-level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** How much you hear from an open club */
+        put: operations["MilosTrainingWeb.OpenClubController.set_notify_level"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/places": {
         parameters: {
             query?: never;
@@ -965,6 +1205,23 @@ export interface paths {
         get?: never;
         /** Show followers the classes you book, or stop (board 5 Q6) */
         put: operations["MilosTrainingWeb.FollowController.booking_sharing"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social/member-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1) */
+        put: operations["MilosTrainingWeb.FollowController.member_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1498,6 +1755,195 @@ export interface paths {
         head?: never;
         /** Rename or reorder an active class type */
         patch: operations["MilosTrainingWeb.AdminClassTypeController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's open clubs */
+        get: operations["MilosTrainingWeb.AdminCommunityController.clubs"];
+        put?: never;
+        /** Start an open club */
+        post: operations["MilosTrainingWeb.AdminCommunityController.create_club"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/clubs/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An open club with its members and requests */
+        get: operations["MilosTrainingWeb.AdminCommunityController.club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit an open club */
+        patch: operations["MilosTrainingWeb.AdminCommunityController.update_club"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/clubs/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive an open club */
+        post: operations["MilosTrainingWeb.AdminCommunityController.archive_club"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/clubs/{id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove someone from an open club */
+        delete: operations["MilosTrainingWeb.AdminCommunityController.remove_club_member"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/clubs/{id}/requests/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Let someone into an open club, or turn them down */
+        put: operations["MilosTrainingWeb.AdminCommunityController.answer_club_request"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Proposed, live and archived groups, and the gym's group rule */
+        get: operations["MilosTrainingWeb.AdminCommunityController.groups"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/groups/{id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Approve or decline a proposed group */
+        put: operations["MilosTrainingWeb.AdminCommunityController.decide_group"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/groups/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bring an archived group back */
+        post: operations["MilosTrainingWeb.AdminCommunityController.reopen_group"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Open reports, one row per reported item */
+        get: operations["MilosTrainingWeb.AdminCommunityController.reports"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/reports/actions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Act on a reported item; every open report on it closes */
+        post: operations["MilosTrainingWeb.AdminCommunityController.act_on_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Whether members may start groups, and whether staff approve them first */
+        put: operations["MilosTrainingWeb.AdminCommunityController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/accounting-exports": {
@@ -4117,6 +4563,162 @@ export interface paths {
         post?: never;
         /** Delete your comment (staff: any comment in their club) */
         delete: operations["MilosTrainingWeb.CommunityPostController.delete_comment"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/comments/{id}/hidden": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Staff and group admins: hide or show a comment */
+        put: operations["MilosTrainingWeb.CommunityPostController.hide_comment"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The club's live groups and whether you can start one */
+        get: operations["MilosTrainingWeb.CommunityGroupController.index"];
+        put?: never;
+        /** Start a group (it waits for staff when the gym asks for approval) */
+        post: operations["MilosTrainingWeb.CommunityGroupController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A group with its members (and requests, for its admins) */
+        get: operations["MilosTrainingWeb.CommunityGroupController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Admins: rename a group, describe it, or change how people join */
+        patch: operations["MilosTrainingWeb.CommunityGroupController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/admins/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Admins: make a member an admin, or not */
+        put: operations["MilosTrainingWeb.CommunityGroupController.set_admin"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Admins: archive the group */
+        post: operations["MilosTrainingWeb.CommunityGroupController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Admins: remove someone from the group */
+        delete: operations["MilosTrainingWeb.CommunityGroupController.remove_member"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Join a group, or ask to when its admins let people in */
+        post: operations["MilosTrainingWeb.CommunityGroupController.join"];
+        /** Leave a group (the last admin hands over first; the last member archives it) */
+        delete: operations["MilosTrainingWeb.CommunityGroupController.leave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Bring back an archived group you started */
+        post: operations["MilosTrainingWeb.CommunityGroupController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/groups/{id}/requests/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Admins: let someone in, or turn the request down */
+        put: operations["MilosTrainingWeb.CommunityGroupController.answer_request"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -7050,6 +7652,20 @@ export interface components {
             /** Format: date-time */
             started_at?: string;
         };
+        /** CommunityAdminRequest */
+        CommunityAdminRequest: {
+            admin: boolean;
+        };
+        /** CommunityApproveRequest */
+        CommunityApproveRequest: {
+            approve: boolean;
+        };
+        /** CommunityArchivedResponse */
+        CommunityArchivedResponse: {
+            archived: boolean;
+            /** Format: uuid */
+            club_id: string;
+        };
         /** CommunityAuthor */
         CommunityAuthor: {
             avatar_url?: string | null;
@@ -7059,22 +7675,38 @@ export interface components {
         };
         /** CommunityChannel */
         CommunityChannel: {
+            /** @description You are an admin of this member group */
+            admin?: boolean;
             /** @description You may join or leave it yourself */
             can_leave: boolean;
+            can_moderate?: boolean;
+            can_pin?: boolean;
             can_post: boolean;
             context_type?: string | null;
             /** Format: uuid */
+            created_by_id?: string | null;
+            description?: string | null;
+            /** Format: uuid */
             id: string;
+            /** @enum {string|null} */
+            join_policy?: "open" | "request" | null;
             /** @description Its posts reach your feed */
             joined: boolean;
             /** @enum {string} */
-            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
             /** @enum {string} */
             membership: "everyone" | "opt_in" | "invite";
             /** @description Null for built-in channels */
             name?: string | null;
             /** @description You are a member of this channel */
             participant?: boolean;
+            /** @description You asked to join this member group */
+            requested?: boolean;
+            /**
+             * @description A member group waits for staff while pending
+             * @enum {string}
+             */
+            status?: "pending" | "active" | "declined";
             /** @description Offered to you (you often book its class) and not joined yet */
             suggested?: boolean;
             /** @enum {string} */
@@ -7089,29 +7721,47 @@ export interface components {
         /** CommunityClub */
         CommunityClub: {
             channels: {
+                /** @description You are an admin of this member group */
+                admin?: boolean;
                 /** @description You may join or leave it yourself */
                 can_leave: boolean;
+                can_moderate?: boolean;
+                can_pin?: boolean;
                 can_post: boolean;
                 context_type?: string | null;
                 /** Format: uuid */
+                created_by_id?: string | null;
+                description?: string | null;
+                /** Format: uuid */
                 id: string;
+                /** @enum {string|null} */
+                join_policy?: "open" | "request" | null;
                 /** @description Its posts reach your feed */
                 joined: boolean;
                 /** @enum {string} */
-                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
                 /** @enum {string} */
                 membership: "everyone" | "opt_in" | "invite";
                 /** @description Null for built-in channels */
                 name?: string | null;
                 /** @description You are a member of this channel */
                 participant?: boolean;
+                /** @description You asked to join this member group */
+                requested?: boolean;
+                /**
+                 * @description A member group waits for staff while pending
+                 * @enum {string}
+                 */
+                status?: "pending" | "active" | "declined";
                 /** @description Offered to you (you often book its class) and not joined yet */
                 suggested?: boolean;
                 /** @enum {string} */
                 write_policy: "staff" | "members" | "participants" | "system_and_members";
             }[];
+            description?: string | null;
             /** Format: uuid */
             id: string;
+            join_policy?: string;
             /** @enum {string} */
             kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
             logo_url?: string | null;
@@ -7120,38 +7770,70 @@ export interface components {
             notify_level: "all" | "announcements" | "none";
             /** Format: uuid */
             organization_id: string;
-            organization_slug: string;
+            organization_name?: string | null;
+            /** @description Null for an open club of a gym you can't see */
+            organization_slug: string | null;
             primary_color?: string | null;
             /** @enum {string} */
             role: "member" | "staff";
+        };
+        /** CommunityClubMemberRow */
+        CommunityClubMemberRow: {
+            /** CommunityAuthor */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** Format: date-time */
+            since: string;
         };
         /** CommunityClubsResponse */
         CommunityClubsResponse: {
             clubs: {
                 channels: {
+                    /** @description You are an admin of this member group */
+                    admin?: boolean;
                     /** @description You may join or leave it yourself */
                     can_leave: boolean;
+                    can_moderate?: boolean;
+                    can_pin?: boolean;
                     can_post: boolean;
                     context_type?: string | null;
                     /** Format: uuid */
+                    created_by_id?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
                     id: string;
+                    /** @enum {string|null} */
+                    join_policy?: "open" | "request" | null;
                     /** @description Its posts reach your feed */
                     joined: boolean;
                     /** @enum {string} */
-                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
                     /** @enum {string} */
                     membership: "everyone" | "opt_in" | "invite";
                     /** @description Null for built-in channels */
                     name?: string | null;
                     /** @description You are a member of this channel */
                     participant?: boolean;
+                    /** @description You asked to join this member group */
+                    requested?: boolean;
+                    /**
+                     * @description A member group waits for staff while pending
+                     * @enum {string}
+                     */
+                    status?: "pending" | "active" | "declined";
                     /** @description Offered to you (you often book its class) and not joined yet */
                     suggested?: boolean;
                     /** @enum {string} */
                     write_policy: "staff" | "members" | "participants" | "system_and_members";
                 }[];
+                description?: string | null;
                 /** Format: uuid */
                 id: string;
+                join_policy?: string;
                 /** @enum {string} */
                 kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
                 logo_url?: string | null;
@@ -7160,7 +7842,9 @@ export interface components {
                 notify_level: "all" | "announcements" | "none";
                 /** Format: uuid */
                 organization_id: string;
-                organization_slug: string;
+                organization_name?: string | null;
+                /** @description Null for an open club of a gym you can't see */
+                organization_slug: string | null;
                 primary_color?: string | null;
                 /** @enum {string} */
                 role: "member" | "staff";
@@ -7177,6 +7861,9 @@ export interface components {
             };
             body: string;
             can_delete: boolean;
+            can_moderate?: boolean;
+            can_report?: boolean;
+            hidden?: boolean;
             /** Format: uuid */
             id: string;
             /** Format: date-time */
@@ -7201,6 +7888,9 @@ export interface components {
                 };
                 body: string;
                 can_delete: boolean;
+                can_moderate?: boolean;
+                can_report?: boolean;
+                hidden?: boolean;
                 /** Format: uuid */
                 id: string;
                 /** Format: date-time */
@@ -7221,12 +7911,119 @@ export interface components {
                 };
                 body: string;
                 can_delete: boolean;
+                can_moderate?: boolean;
+                can_report?: boolean;
+                hidden?: boolean;
                 /** Format: uuid */
                 id: string;
                 /** Format: date-time */
                 inserted_at: string;
                 /** Format: uuid */
                 post_id: string;
+            }[];
+        };
+        /** CommunityDiscoverResponse */
+        CommunityDiscoverResponse: {
+            clubs: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
+            }[];
+            groups: {
+                admin: boolean;
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                can_report: boolean;
+                /** @description The gym club it belongs to (in «Βρες») */
+                club?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string;
+                    organization_slug?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                created_by_me: boolean;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string} */
+                    role: "member" | "admin";
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "requested";
+                }[];
+                /** @enum {string} */
+                membership: "none" | "requested" | "member";
+                name: string;
+                /** @description Waiting requests, for those who answer them */
+                request_count: number;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
             }[];
         };
         /** CommunityFeedPage */
@@ -7254,6 +8051,7 @@ export interface components {
                 can_delete: boolean;
                 can_moderate: boolean;
                 can_pin: boolean;
+                can_report?: boolean;
                 channel: {
                     /** Format: uuid */
                     id: string;
@@ -7263,9 +8061,10 @@ export interface components {
                 club: {
                     /** Format: uuid */
                     id: string;
+                    kind?: string;
                     logo_url?: string | null;
                     name: string;
-                    organization_slug: string;
+                    organization_slug?: string | null;
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
@@ -7302,6 +8101,7 @@ export interface components {
                 can_delete: boolean;
                 can_moderate: boolean;
                 can_pin: boolean;
+                can_report?: boolean;
                 channel: {
                     /** Format: uuid */
                     id: string;
@@ -7311,9 +8111,10 @@ export interface components {
                 club: {
                     /** Format: uuid */
                     id: string;
+                    kind?: string;
                     logo_url?: string | null;
                     name: string;
-                    organization_slug: string;
+                    organization_slug?: string | null;
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
@@ -7329,6 +8130,305 @@ export interface components {
                 pinned: boolean;
             }[];
         };
+        /** CommunityGroup */
+        CommunityGroup: {
+            admin: boolean;
+            /** Format: date-time */
+            archive_warned_at?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            can_manage: boolean;
+            can_report: boolean;
+            /** @description The gym club it belongs to (in «Βρες») */
+            club?: {
+                /** Format: uuid */
+                id?: string;
+                name?: string;
+                organization_slug?: string | null;
+            };
+            /** Format: uuid */
+            club_id: string;
+            created_by_me: boolean;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            join_policy: "open" | "request";
+            /** Format: date-time */
+            last_post_at?: string | null;
+            member_count: number;
+            members?: {
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** @enum {string} */
+                role: "member" | "admin";
+                /** Format: date-time */
+                since: string;
+                /** @enum {string} */
+                status: "member" | "requested";
+            }[];
+            /** @enum {string} */
+            membership: "none" | "requested" | "member";
+            name: string;
+            /** @description Waiting requests, for those who answer them */
+            request_count: number;
+            /** @enum {string} */
+            status: "pending" | "active" | "declined";
+        };
+        /** CommunityGroupDecisionRequest */
+        CommunityGroupDecisionRequest: {
+            /** @enum {string} */
+            decision: "approve" | "decline";
+        };
+        /** CommunityGroupLifecycle */
+        CommunityGroupLifecycle: {
+            archive_after_days: number;
+            warn_after_days: number;
+        };
+        /** CommunityGroupMember */
+        CommunityGroupMember: {
+            /** CommunityAuthor */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** @enum {string} */
+            role: "member" | "admin";
+            /** Format: date-time */
+            since: string;
+            /** @enum {string} */
+            status: "member" | "requested";
+        };
+        /** CommunityGroupOutcome */
+        CommunityGroupOutcome: {
+            /** Format: uuid */
+            group_id: string;
+            /** @enum {string} */
+            outcome: "left" | "archived";
+        };
+        /** CommunityGroupRequest */
+        CommunityGroupRequest: {
+            description?: string | null;
+            /** @enum {string} */
+            join_policy?: "open" | "request";
+            name: string;
+        };
+        /** CommunityGroupResponse */
+        CommunityGroupResponse: {
+            /** CommunityGroup */
+            group: {
+                admin: boolean;
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                can_report: boolean;
+                /** @description The gym club it belongs to (in «Βρες») */
+                club?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string;
+                    organization_slug?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                created_by_me: boolean;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string} */
+                    role: "member" | "admin";
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "requested";
+                }[];
+                /** @enum {string} */
+                membership: "none" | "requested" | "member";
+                name: string;
+                /** @description Waiting requests, for those who answer them */
+                request_count: number;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            };
+        };
+        /** CommunityGroupSettings */
+        CommunityGroupSettings: {
+            can_propose: boolean;
+            /** CommunityGroupLifecycle */
+            lifecycle: {
+                archive_after_days: number;
+                warn_after_days: number;
+            };
+            /** @enum {string} */
+            member_groups: "none" | "approval" | "free";
+            needs_approval: boolean;
+        };
+        /** CommunityGroupUpdateRequest */
+        CommunityGroupUpdateRequest: {
+            description?: string | null;
+            /** @enum {string} */
+            join_policy?: "open" | "request";
+            name?: string;
+        };
+        /** CommunityGroupsResponse */
+        CommunityGroupsResponse: {
+            /** @description Archived groups you started, to bring back */
+            archived: {
+                admin: boolean;
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                can_report: boolean;
+                /** @description The gym club it belongs to (in «Βρες») */
+                club?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string;
+                    organization_slug?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                created_by_me: boolean;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string} */
+                    role: "member" | "admin";
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "requested";
+                }[];
+                /** @enum {string} */
+                membership: "none" | "requested" | "member";
+                name: string;
+                /** @description Waiting requests, for those who answer them */
+                request_count: number;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            }[];
+            groups: {
+                admin: boolean;
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                can_report: boolean;
+                /** @description The gym club it belongs to (in «Βρες») */
+                club?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string;
+                    organization_slug?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                created_by_me: boolean;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string} */
+                    role: "member" | "admin";
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "requested";
+                }[];
+                /** @enum {string} */
+                membership: "none" | "requested" | "member";
+                name: string;
+                /** @description Waiting requests, for those who answer them */
+                request_count: number;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            }[];
+            /** CommunityGroupSettings */
+            settings: {
+                can_propose: boolean;
+                /** CommunityGroupLifecycle */
+                lifecycle: {
+                    archive_after_days: number;
+                    warn_after_days: number;
+                };
+                /** @enum {string} */
+                member_groups: "none" | "approval" | "free";
+                needs_approval: boolean;
+            };
+        };
+        /** CommunityMember */
+        CommunityMember: {
+            avatar_url?: string | null;
+            coach: boolean;
+            following: boolean;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** CommunityMembersResponse */
+        CommunityMembersResponse: {
+            /** Format: uuid */
+            club_id: string;
+            count: number;
+            members: {
+                avatar_url?: string | null;
+                coach: boolean;
+                following: boolean;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+        };
         /** CommunityNotifyLevelRequest */
         CommunityNotifyLevelRequest: {
             /** @enum {string} */
@@ -7340,6 +8440,188 @@ export interface components {
             club_id: string;
             /** @enum {string} */
             notify_level: "all" | "announcements" | "none";
+        };
+        /** CommunityOpenClub */
+        CommunityOpenClub: {
+            box?: {
+                logo_url?: string | null;
+                name?: string | null;
+                slug?: string | null;
+            };
+            channels?: {
+                /** Format: uuid */
+                id: string;
+                kind: string;
+                name?: string | null;
+            }[];
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            cover_url?: string | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            join_policy: "open" | "approval";
+            member_count: number;
+            members?: {
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                since: string;
+            }[];
+            /** @enum {string} */
+            membership?: "none" | "requested" | "member";
+            name: string;
+            /** Format: uuid */
+            organization_id: string;
+            request_count?: number;
+            requests?: {
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                since: string;
+            }[];
+            /** @enum {string|null} */
+            role?: "member" | "staff" | null;
+        };
+        /** CommunityOpenClubRequest */
+        CommunityOpenClubRequest: {
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            description?: string | null;
+            /** @enum {string} */
+            join_policy?: "open" | "approval";
+            name: string;
+        };
+        /** CommunityOpenClubResponse */
+        CommunityOpenClubResponse: {
+            /** CommunityOpenClub */
+            club: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
+            };
+        };
+        /** CommunityOpenClubUpdateRequest */
+        CommunityOpenClubUpdateRequest: {
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            description?: string | null;
+            /** @enum {string} */
+            join_policy?: "open" | "approval";
+            name?: string;
+        };
+        /** CommunityOpenClubsResponse */
+        CommunityOpenClubsResponse: {
+            clubs: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
+            }[];
         };
         /**
          * CommunityPost
@@ -7367,6 +8649,7 @@ export interface components {
             can_delete: boolean;
             can_moderate: boolean;
             can_pin: boolean;
+            can_report?: boolean;
             channel: {
                 /** Format: uuid */
                 id: string;
@@ -7376,9 +8659,10 @@ export interface components {
             club: {
                 /** Format: uuid */
                 id: string;
+                kind?: string;
                 logo_url?: string | null;
                 name: string;
-                organization_slug: string;
+                organization_slug?: string | null;
                 primary_color?: string | null;
             } | null;
             comment_count: number;
@@ -7449,6 +8733,7 @@ export interface components {
                 can_delete: boolean;
                 can_moderate: boolean;
                 can_pin: boolean;
+                can_report?: boolean;
                 channel: {
                     /** Format: uuid */
                     id: string;
@@ -7458,9 +8743,10 @@ export interface components {
                 club: {
                     /** Format: uuid */
                     id: string;
+                    kind?: string;
                     logo_url?: string | null;
                     name: string;
-                    organization_slug: string;
+                    organization_slug?: string | null;
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
@@ -7474,6 +8760,262 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+            };
+        };
+        /** CommunityReportActionRequest */
+        CommunityReportActionRequest: {
+            /** @enum {string} */
+            action: "archive" | "delete" | "dismiss" | "hide";
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "post" | "comment" | "channel";
+        };
+        /** CommunityReportActionResponse */
+        CommunityReportActionResponse: {
+            action: string;
+            resolved: number;
+            /** Format: uuid */
+            target_id: string;
+            target_type: string;
+        };
+        /** CommunityReportRequest */
+        CommunityReportRequest: {
+            note?: string | null;
+            /** @enum {string} */
+            reason: "spam" | "harassment" | "inappropriate" | "other";
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "post" | "comment" | "channel";
+        };
+        /** CommunityReportResponse */
+        CommunityReportResponse: {
+            reported: boolean;
+            /** Format: uuid */
+            target_id: string;
+            target_type: string;
+        };
+        /** CommunityReportRow */
+        CommunityReportRow: {
+            author?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            /** Format: uuid */
+            channel_id?: string | null;
+            /** Format: date-time */
+            first_reported_at?: string;
+            /** Format: date-time */
+            last_reported_at: string;
+            notes: string[];
+            /** @description What was reported, null when it is already gone */
+            preview?: {
+                body?: string | null;
+                hidden?: boolean;
+                name?: string | null;
+            } | null;
+            reasons: {
+                [key: string]: number;
+            };
+            report_count: number;
+            /** Format: uuid */
+            target_id: string;
+            /** @enum {string} */
+            target_type: "post" | "comment" | "channel";
+        };
+        /** CommunityReportsResponse */
+        CommunityReportsResponse: {
+            reports: {
+                author?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** Format: uuid */
+                channel_id?: string | null;
+                /** Format: date-time */
+                first_reported_at?: string;
+                /** Format: date-time */
+                last_reported_at: string;
+                notes: string[];
+                /** @description What was reported, null when it is already gone */
+                preview?: {
+                    body?: string | null;
+                    hidden?: boolean;
+                    name?: string | null;
+                } | null;
+                reasons: {
+                    [key: string]: number;
+                };
+                report_count: number;
+                /** Format: uuid */
+                target_id: string;
+                /** @enum {string} */
+                target_type: "post" | "comment" | "channel";
+            }[];
+        };
+        /** CommunitySettingsRequest */
+        CommunitySettingsRequest: {
+            /** @enum {string} */
+            member_groups: "none" | "approval" | "free";
+        };
+        /** CommunitySettingsResponse */
+        CommunitySettingsResponse: {
+            /** CommunityGroupLifecycle */
+            lifecycle: {
+                archive_after_days: number;
+                warn_after_days: number;
+            };
+            /** @enum {string} */
+            member_groups: "none" | "approval" | "free";
+        };
+        /** CommunityStaffGroup */
+        CommunityStaffGroup: {
+            /** Format: date-time */
+            archive_warned_at?: string | null;
+            /** Format: date-time */
+            archived_at?: string | null;
+            created_by?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            /** @enum {string} */
+            join_policy: "open" | "request";
+            /** Format: date-time */
+            last_post_at?: string | null;
+            member_count: number;
+            name: string;
+            /** @enum {string} */
+            status: "pending" | "active" | "declined";
+        };
+        /** CommunityStaffGroupResponse */
+        CommunityStaffGroupResponse: {
+            /** CommunityStaffGroup */
+            group: {
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                created_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                name: string;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            };
+        };
+        /** CommunityStaffGroupsResponse */
+        CommunityStaffGroupsResponse: {
+            archived: {
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                created_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                name: string;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            }[];
+            live: {
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                created_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                name: string;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            }[];
+            pending: {
+                /** Format: date-time */
+                archive_warned_at?: string | null;
+                /** Format: date-time */
+                archived_at?: string | null;
+                created_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                /** @enum {string} */
+                join_policy: "open" | "request";
+                /** Format: date-time */
+                last_post_at?: string | null;
+                member_count: number;
+                name: string;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined";
+            }[];
+            /** CommunityGroupSettings */
+            settings: {
+                can_propose: boolean;
+                /** CommunityGroupLifecycle */
+                lifecycle: {
+                    archive_after_days: number;
+                    warn_after_days: number;
+                };
+                /** @enum {string} */
+                member_groups: "none" | "approval" | "free";
+                needs_approval: boolean;
             };
         };
         /** ContentVideo */
@@ -8925,6 +10467,13 @@ export interface components {
              */
             content_type: "image/jpeg" | "image/webp";
         };
+        /**
+         * MemberVisibility
+         * @description Whether you keep out of your clubs' «Μέλη» lists
+         */
+        MemberVisibility: {
+            hidden: boolean;
+        };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
             /** @enum {string} */
@@ -9288,6 +10837,7 @@ export interface components {
                 can_delete: boolean;
                 can_moderate: boolean;
                 can_pin: boolean;
+                can_report?: boolean;
                 channel: {
                     /** Format: uuid */
                     id: string;
@@ -9297,9 +10847,10 @@ export interface components {
                 club: {
                     /** Format: uuid */
                     id: string;
+                    kind?: string;
                     logo_url?: string | null;
                     name: string;
-                    organization_slug: string;
+                    organization_slug?: string | null;
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
@@ -9507,6 +11058,7 @@ export interface components {
                 can_delete: boolean;
                 can_moderate: boolean;
                 can_pin: boolean;
+                can_report?: boolean;
                 channel: {
                     /** Format: uuid */
                     id: string;
@@ -9516,9 +11068,10 @@ export interface components {
                 club: {
                     /** Format: uuid */
                     id: string;
+                    kind?: string;
                     logo_url?: string | null;
                     name: string;
-                    organization_slug: string;
+                    organization_slug?: string | null;
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
@@ -9595,6 +11148,59 @@ export interface components {
                 opening_hours?: {
                     [key: string]: unknown;
                 }[] | null;
+            }[];
+            /** @description The box's open clubs (ADR-143, board 7 Q6) */
+            open_clubs: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
             }[];
             /**
              * PublicBoxProfile
@@ -9767,6 +11373,13 @@ export interface components {
             };
             followers_count: number;
             following_count: number;
+            /**
+             * MemberVisibility
+             * @description Whether you keep out of your clubs' «Μέλη» lists
+             */
+            member_visibility: {
+                hidden: boolean;
+            };
             posts_count: number;
             requests_count: number;
         };
@@ -11591,6 +13204,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -11600,9 +13214,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -12673,29 +14288,47 @@ export interface operations {
                     "application/json": {
                         clubs: {
                             channels: {
+                                /** @description You are an admin of this member group */
+                                admin?: boolean;
                                 /** @description You may join or leave it yourself */
                                 can_leave: boolean;
+                                can_moderate?: boolean;
+                                can_pin?: boolean;
                                 can_post: boolean;
                                 context_type?: string | null;
                                 /** Format: uuid */
+                                created_by_id?: string | null;
+                                description?: string | null;
+                                /** Format: uuid */
                                 id: string;
+                                /** @enum {string|null} */
+                                join_policy?: "open" | "request" | null;
                                 /** @description Its posts reach your feed */
                                 joined: boolean;
                                 /** @enum {string} */
-                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom";
+                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
                                 /** @enum {string} */
                                 membership: "everyone" | "opt_in" | "invite";
                                 /** @description Null for built-in channels */
                                 name?: string | null;
                                 /** @description You are a member of this channel */
                                 participant?: boolean;
+                                /** @description You asked to join this member group */
+                                requested?: boolean;
+                                /**
+                                 * @description A member group waits for staff while pending
+                                 * @enum {string}
+                                 */
+                                status?: "pending" | "active" | "declined";
                                 /** @description Offered to you (you often book its class) and not joined yet */
                                 suggested?: boolean;
                                 /** @enum {string} */
                                 write_policy: "staff" | "members" | "participants" | "system_and_members";
                             }[];
+                            description?: string | null;
                             /** Format: uuid */
                             id: string;
+                            join_policy?: string;
                             /** @enum {string} */
                             kind: "gym" | "open" | "member_group" | "pt_squad" | "season";
                             logo_url?: string | null;
@@ -12704,11 +14337,717 @@ export interface operations {
                             notify_level: "all" | "announcements" | "none";
                             /** Format: uuid */
                             organization_id: string;
-                            organization_slug: string;
+                            organization_name?: string | null;
+                            /** @description Null for an open club of a gym you can't see */
+                            organization_slug: string | null;
                             primary_color?: string | null;
                             /** @enum {string} */
                             role: "member" | "staff";
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.members": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Members */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        club_id: string;
+                        count: number;
+                        members: {
+                            avatar_url?: string | null;
+                            coach: boolean;
+                            following: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.delete_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.hide_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.discover": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Found */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clubs: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        }[];
+                        groups: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    attachment_id?: string;
+                    /** @enum {string} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr";
+                    /**
+                     * @description public (staff only) also shows the post on the box page and to its followers
+                     * @enum {string}
+                     */
+                    audience?: "club_channel" | "public";
+                    body?: string;
+                    /** Format: uuid */
+                    channel_id: string;
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comments */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        comments: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Comment */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityComment */
+                        comment: {
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body: string;
+                            can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** Format: uuid */
+                            post_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.hide": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.kudos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    kudos: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClubPostController.pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    pinned: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                    /** @enum {string} */
+                    reason: "spam" | "harassment" | "inappropriate" | "other";
+                    /** Format: uuid */
+                    target_id: string;
+                    /** @enum {string} */
+                    target_type: "post" | "comment" | "channel";
+                };
+            };
+        };
+        responses: {
+            /** @description Reported */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reported: boolean;
+                        /** Format: uuid */
+                        target_id: string;
+                        target_type: string;
                     };
                 };
             };
@@ -12760,6 +15099,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -12769,9 +15109,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -12808,6 +15149,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -12817,9 +15159,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -13519,6 +15862,268 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.OpenClubController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.OpenClubController.set_notify_level": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    notify_level: "all" | "announcements" | "none";
+                };
+            };
+        };
+        responses: {
+            /** @description Level */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        club_id: string;
+                        /** @enum {string} */
+                        notify_level: "all" | "announcements" | "none";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyPlacesController.index": {
         parameters: {
             query?: {
@@ -13673,6 +16278,13 @@ export interface operations {
                         };
                         followers_count: number;
                         following_count: number;
+                        /**
+                         * MemberVisibility
+                         * @description Whether you keep out of your clubs' «Μέλη» lists
+                         */
+                        member_visibility: {
+                            hidden: boolean;
+                        };
                         posts_count: number;
                         requests_count: number;
                     };
@@ -13704,6 +16316,34 @@ export interface operations {
                     "application/json": {
                         enabled: boolean;
                         offered: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.member_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        hidden: boolean;
                     };
                 };
             };
@@ -15802,6 +18442,848 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.clubs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Clubs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        clubs: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.create_club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    description?: string | null;
+                    /** @enum {string} */
+                    join_policy?: "open" | "approval";
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Club */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.update_club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    description?: string | null;
+                    /** @enum {string} */
+                    join_policy?: "open" | "approval";
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.archive_club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archived */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        archived: boolean;
+                        /** Format: uuid */
+                        club_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.remove_club_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.answer_club_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    approve: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Club */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.groups": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Groups */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        archived: {
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            created_by?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            name: string;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                        live: {
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            created_by?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            name: string;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                        pending: {
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            created_by?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            name: string;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                        /** CommunityGroupSettings */
+                        settings: {
+                            can_propose: boolean;
+                            /** CommunityGroupLifecycle */
+                            lifecycle: {
+                                archive_after_days: number;
+                                warn_after_days: number;
+                            };
+                            /** @enum {string} */
+                            member_groups: "none" | "approval" | "free";
+                            needs_approval: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.decide_group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    decision: "approve" | "decline";
+                };
+            };
+        };
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityStaffGroup */
+                        group: {
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            created_by?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            name: string;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.reopen_group": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityStaffGroup */
+                        group: {
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            created_by?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            name: string;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        reports: {
+                            author?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            /** Format: date-time */
+                            first_reported_at?: string;
+                            /** Format: date-time */
+                            last_reported_at: string;
+                            notes: string[];
+                            /** @description What was reported, null when it is already gone */
+                            preview?: {
+                                body?: string | null;
+                                hidden?: boolean;
+                                name?: string | null;
+                            } | null;
+                            reasons: {
+                                [key: string]: number;
+                            };
+                            report_count: number;
+                            /** Format: uuid */
+                            target_id: string;
+                            /** @enum {string} */
+                            target_type: "post" | "comment" | "channel";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.act_on_report": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "archive" | "delete" | "dismiss" | "hide";
+                    /** Format: uuid */
+                    target_id: string;
+                    /** @enum {string} */
+                    target_type: "post" | "comment" | "channel";
+                };
+            };
+        };
+        responses: {
+            /** @description Done */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        action: string;
+                        resolved: number;
+                        /** Format: uuid */
+                        target_id: string;
+                        target_type: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityController.update_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    member_groups: "none" | "approval" | "free";
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroupLifecycle */
+                        lifecycle: {
+                            archive_after_days: number;
+                            warn_after_days: number;
+                        };
+                        /** @enum {string} */
+                        member_groups: "none" | "approval" | "free";
                     };
                 };
             };
@@ -27373,6 +30855,835 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityPostController.hide_comment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    hidden: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Groups */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Archived groups you started, to bring back */
+                        archived: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                        groups: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        }[];
+                        /** CommunityGroupSettings */
+                        settings: {
+                            can_propose: boolean;
+                            /** CommunityGroupLifecycle */
+                            lifecycle: {
+                                archive_after_days: number;
+                                warn_after_days: number;
+                            };
+                            /** @enum {string} */
+                            member_groups: "none" | "approval" | "free";
+                            needs_approval: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    description?: string | null;
+                    /** @enum {string} */
+                    join_policy?: "open" | "request";
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Group */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    description?: string | null;
+                    /** @enum {string} */
+                    join_policy?: "open" | "request";
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.set_admin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    admin: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        group_id: string;
+                        /** @enum {string} */
+                        outcome: "left" | "archived";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.remove_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        group_id: string;
+                        /** @enum {string} */
+                        outcome: "left" | "archived";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityGroupController.answer_request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    approve: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Group */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityGroup */
+                        group: {
+                            admin: boolean;
+                            /** Format: date-time */
+                            archive_warned_at?: string | null;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            can_report: boolean;
+                            /** @description The gym club it belongs to (in «Βρες») */
+                            club?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string;
+                                organization_slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            created_by_me: boolean;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "request";
+                            /** Format: date-time */
+                            last_post_at?: string | null;
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string} */
+                                role: "member" | "admin";
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "requested";
+                            }[];
+                            /** @enum {string} */
+                            membership: "none" | "requested" | "member";
+                            name: string;
+                            /** @description Waiting requests, for those who answer them */
+                            request_count: number;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined";
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CommunityPostController.create": {
         parameters: {
             query?: never;
@@ -27433,6 +31744,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -27442,9 +31754,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -27514,6 +31827,9 @@ export interface operations {
                             };
                             body: string;
                             can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -27561,6 +31877,9 @@ export interface operations {
                             };
                             body: string;
                             can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -27623,6 +31942,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -27632,9 +31952,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -27704,6 +32025,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -27713,9 +32035,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -27785,6 +32108,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -27794,9 +32118,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -34645,6 +38970,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -34654,9 +38980,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -36102,6 +40429,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -36111,9 +40439,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -36183,6 +40512,9 @@ export interface operations {
                             };
                             body: string;
                             can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -36230,6 +40562,9 @@ export interface operations {
                             };
                             body: string;
                             can_delete: boolean;
+                            can_moderate?: boolean;
+                            can_report?: boolean;
+                            hidden?: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
@@ -36292,6 +40627,7 @@ export interface operations {
                             can_delete: boolean;
                             can_moderate: boolean;
                             can_pin: boolean;
+                            can_report?: boolean;
                             channel: {
                                 /** Format: uuid */
                                 id: string;
@@ -36301,9 +40637,10 @@ export interface operations {
                             club: {
                                 /** Format: uuid */
                                 id: string;
+                                kind?: string;
                                 logo_url?: string | null;
                                 name: string;
-                                organization_slug: string;
+                                organization_slug?: string | null;
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
@@ -36647,6 +40984,59 @@ export interface operations {
                             opening_hours?: {
                                 [key: string]: unknown;
                             }[] | null;
+                        }[];
+                        /** @description The box's open clubs (ADR-143, board 7 Q6) */
+                        open_clubs: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
                         }[];
                         /**
                          * PublicBoxProfile

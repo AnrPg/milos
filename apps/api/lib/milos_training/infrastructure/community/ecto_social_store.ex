@@ -145,6 +145,18 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
     Map.new(ids, &{&1, Map.get(counts, &1, 0)})
   end
 
+  # Who keeps out of «Μέλη» (ADR-143): only the ids, through a SECURITY
+  # DEFINER function, since each person's settings are theirs alone.
+  @impl true
+  def hidden_member_ids([]), do: []
+
+  def hidden_member_ids(ids) do
+    %{rows: rows} =
+      Repo.query!("SELECT milos_hidden_member_ids($1)", [Enum.map(ids, &Ecto.UUID.dump!/1)])
+
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
   @impl true
   def following_count(user_id) do
     %{rows: [[count]]} =

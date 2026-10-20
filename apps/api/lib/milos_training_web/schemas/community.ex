@@ -19,9 +19,21 @@ defmodule MilosTrainingWeb.Schemas.Community do
         id: @uuid,
         kind: %Schema{
           type: :string,
-          enum: ~w(announcements wod challenges class_slot season custom)
+          enum: ~w(announcements wod challenges class_slot season custom member_group general)
         },
         name: %Schema{type: :string, nullable: true, description: "Null for built-in channels"},
+        description: %Schema{type: :string, nullable: true},
+        status: %Schema{
+          type: :string,
+          enum: ~w(pending active declined),
+          description: "A member group waits for staff while pending"
+        },
+        join_policy: %Schema{type: :string, enum: ~w(open request), nullable: true},
+        created_by_id: %Schema{type: :string, format: :uuid, nullable: true},
+        admin: %Schema{type: :boolean, description: "You are an admin of this member group"},
+        requested: %Schema{type: :boolean, description: "You asked to join this member group"},
+        can_moderate: %Schema{type: :boolean},
+        can_pin: %Schema{type: :boolean},
         write_policy: %Schema{
           type: :string,
           enum: ~w(staff members participants system_and_members)
@@ -48,9 +60,16 @@ defmodule MilosTrainingWeb.Schemas.Community do
       properties: %{
         id: @uuid,
         organization_id: @uuid,
-        organization_slug: %Schema{type: :string},
+        organization_slug: %Schema{
+          type: :string,
+          nullable: true,
+          description: "Null for an open club of a gym you can't see"
+        },
+        organization_name: %Schema{type: :string, nullable: true},
         kind: %Schema{type: :string, enum: ~w(gym open member_group pt_squad season)},
         name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        join_policy: %Schema{type: :string},
         logo_url: %Schema{type: :string, nullable: true},
         primary_color: %Schema{type: :string, nullable: true},
         role: %Schema{type: :string, enum: ~w(member staff)},
@@ -125,12 +144,13 @@ defmodule MilosTrainingWeb.Schemas.Community do
           nullable: true,
           properties: %{
             id: @uuid,
+            kind: %Schema{type: :string},
             name: %Schema{type: :string},
-            organization_slug: %Schema{type: :string},
+            organization_slug: %Schema{type: :string, nullable: true},
             logo_url: %Schema{type: :string, nullable: true},
             primary_color: %Schema{type: :string, nullable: true}
           },
-          required: [:id, :name, :organization_slug]
+          required: [:id, :name]
         },
         channel: %Schema{
           type: :object,
@@ -161,6 +181,7 @@ defmodule MilosTrainingWeb.Schemas.Community do
         can_delete: %Schema{type: :boolean},
         can_moderate: %Schema{type: :boolean},
         can_pin: %Schema{type: :boolean},
+        can_report: %Schema{type: :boolean},
         inserted_at: @datetime
       },
       required: [
@@ -258,7 +279,10 @@ defmodule MilosTrainingWeb.Schemas.Community do
         author: author(),
         body: %Schema{type: :string},
         inserted_at: @datetime,
-        can_delete: %Schema{type: :boolean}
+        hidden: %Schema{type: :boolean},
+        can_delete: %Schema{type: :boolean},
+        can_moderate: %Schema{type: :boolean},
+        can_report: %Schema{type: :boolean}
       },
       required: [:id, :post_id, :author, :body, :inserted_at, :can_delete]
     }

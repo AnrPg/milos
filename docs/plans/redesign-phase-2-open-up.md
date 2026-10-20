@@ -458,6 +458,28 @@ Apostolos picked option A on every question, with the extras below.
    chat with the box, prefilled, showing the box's join offer) or «Όχι τώρα». Joining the box
    within 30 days marks the trial as converted.
 
+### Open clubs, member groups and moderation (2026-10-20, [board 7](https://claude.ai/artifact/NgQ6u6yUdFZTyJPMHXf8hG))
+
+Apostolos picked option A on every question, with the recommended extras below.
+
+1. **Μέλη (Q1):** a list with search, coaches first, linking to each profile. Extra: a person can
+   hide from it in Κοινοποίηση & ορατότητα. People you follow are not sorted first.
+2. **Starting a group (Q2):** «Πρότεινε ομάδα» opens a short sheet: name, one line, and «Όποιος
+   θέλει» or «Με αίτημα σε μένα». The creator approves requests, pins, hides, and can hand over.
+3. **Owner setting and staff page (Q3):** Ομάδες μελών (Όχι · Με έγκριση · Ελεύθερα) in Ρυθμίσεις
+   next to Δημόσια σελίδα and Δοκιμαστικά; staff page «Κοινότητα» with Ομάδες · Αναφορές · Ανοιχτά
+   clubs.
+4. **Reporting (Q4):** ⋯ › Αναφορά with Spam · Παρενόχληση · Ακατάλληλο περιεχόμενο · Άλλο and an
+   optional note. The item disappears for the reporter («Ευχαριστούμε, θα το δει το staff»); no
+   autohide; staff are notified.
+5. **Staff queue (Q5):** grouped per item, with Απόκρυψη · Διαγραφή · Δεν χρειάζεται τίποτα ·
+   Αρχειοθέτηση ομάδας.
+6. **Open clubs (Q6):** «Μπες» (or a request), a cover, #ανακοινώσεις and #γενικά, listed on the
+   box page's Σχετικά.
+7. **Finding (Q7):** «+ Βρες» at the end of the club bar opens a page with open clubs and groups.
+8. **Quiet groups (Q8):** a warning at 50 days without a post, archived at 60; whoever started it
+   can bring it back.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -479,5 +501,5 @@ Apostolos picked option A on every question, with the extras below.
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [ ] P2-M4 · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

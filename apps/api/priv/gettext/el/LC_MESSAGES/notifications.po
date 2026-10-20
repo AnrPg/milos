@@ -312,3 +312,45 @@ msgstr "Ακυρώθηκε το μάθημα του δοκιμαστικού"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "Το %{box} ακύρωσε το %{class} (%{when}). Διάλεξε άλλο μάθημα."
+
+msgid "New group to review"
+msgstr "Νέα ομάδα για έγκριση"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "Ο/Η %{nickname} θέλει να ξεκινήσει την «%{group}»."
+
+msgid "Your group is live"
+msgstr "Η ομάδα σου είναι ενεργή"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "Η «%{group}» άνοιξε. Κάλεσε κόσμο."
+
+msgid "Group not approved"
+msgstr "Η ομάδα δεν εγκρίθηκε"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "Το box δεν ενέκρινε την «%{group}»."
+
+msgid "Request to join"
+msgstr "Αίτημα συμμετοχής"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "Ο/Η %{nickname} ζητά να μπει στην «%{group}»."
+
+msgid "You're in"
+msgstr "Είσαι μέσα"
+
+msgid "You joined «%{group}»."
+msgstr "Μπήκες στην «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Η ομάδα σου είναι ήσυχη"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Κανείς δεν έχει γράψει στην «%{group}» εδώ και καιρό. Γράψε κάτι, αλλιώς θα αρχειοθετηθεί."
+
+msgid "New report"
+msgstr "Νέα αναφορά"
+
+msgid "Someone reported something in the club."
+msgstr "Κάποιος ανέφερε κάτι στο club."

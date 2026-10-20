@@ -10,7 +10,10 @@ defmodule MilosTraining.Community do
     ChannelMembership,
     ClassGroups,
     Follows,
+    Groups,
+    OpenClubs,
     Posts,
+    Reports,
     ProfilePosts,
     ProvisionGymClub,
     SetNotifyLevel
@@ -22,8 +25,11 @@ defmodule MilosTraining.Community do
   alias MilosTraining.Community.Domain.{
     AudiencePolicy,
     ChannelPolicy,
+    ClubPolicy,
     FeedCursor,
     FollowPolicy,
+    GroupPolicy,
+    ReportPolicy,
     TenantDataPolicy
   }
 
@@ -46,9 +52,76 @@ defmodule MilosTraining.Community do
   def class_group_suggestion, do: ChannelPolicy.class_group_suggestion()
   def notify_level_options, do: ClubMembership.notify_levels()
 
+  # Open clubs (ADR-143).
+  defdelegate create_open_club(context, role, attrs), to: OpenClubs, as: :create
+  defdelegate update_open_club(context, club, role, attrs), to: OpenClubs, as: :update
+  defdelegate archive_open_club(context, club, role, now), to: OpenClubs, as: :archive
+  defdelegate join_open_club(context, club), to: OpenClubs, as: :join
+  defdelegate leave_open_club(context, club), to: OpenClubs, as: :leave
+
+  defdelegate answer_club_request(context, club, role, user_id, approve?),
+    to: OpenClubs,
+    as: :answer_request
+
+  defdelegate remove_club_member(context, club, role, user_id), to: OpenClubs, as: :remove_member
+
+  defdelegate set_open_club_notify_level(context, club, level),
+    to: OpenClubs,
+    as: :set_notify_level
+
+  defdelegate club_memberships(context, club_id, status \\ nil), to: OpenClubs, as: :memberships
+  defdelegate open_club_memberships_of(context, user_id), to: OpenClubs, as: :memberships_of
+  defdelegate list_open_clubs(context, filter), to: OpenClubs, as: :list
+  defdelegate open_club_member_counts(context, ids), to: OpenClubs, as: :member_counts
+  defdelegate list_clubs_by_ids(context, ids), to: OpenClubs, as: :by_ids
+  defdelegate open_club_role(gym_role, membership_status), to: ClubPolicy, as: :role
+  def open_club_join_policies, do: ClubPolicy.join_policies()
+
+  # Member groups (ADR-143).
+  defdelegate community_settings(context), to: Groups, as: :settings
+  defdelegate put_community_settings(context, attrs), to: Groups, as: :put_settings
+  defdelegate propose_group(context, club, role, attrs), to: Groups, as: :propose
+  defdelegate list_groups(context, club_id, filter \\ %{}), to: Groups, as: :list
+  defdelegate group_members(context, group_id), to: Groups, as: :members
+  defdelegate decide_group(context, group, role, decision, now), to: Groups, as: :decide
+  defdelegate join_group(context, group, membership), to: Groups, as: :join
+  defdelegate leave_group(context, group, membership, now), to: Groups, as: :leave
+
+  defdelegate answer_group_request(context, group, actor, user_id, approve?),
+    to: Groups,
+    as: :answer_request
+
+  defdelegate set_group_admin(context, group, actor, user_id, admin?), to: Groups, as: :set_admin
+  defdelegate remove_group_member(context, group, actor, user_id), to: Groups, as: :remove_member
+  defdelegate update_group(context, group, actor, attrs), to: Groups, as: :update
+  defdelegate archive_group(context, group, actor, now), to: Groups, as: :archive
+  defdelegate reopen_group(context, group, role, now), to: Groups, as: :reopen
+  defdelegate quiet_groups(context, now), to: Groups
+  defdelegate mark_group_warned(context, group, now), to: Groups, as: :mark_warned
+  defdelegate group_member?(membership), to: Groups, as: :member?
+  defdelegate channel_memberships_of(context, user_id, channel_ids), to: CommunityStore
+  defdelegate group_quiet_step(group, now), to: GroupPolicy, as: :quiet_step
+  defdelegate group_live?(group), to: GroupPolicy, as: :live?
+  defdelegate can_manage_group?(membership_role, club_role), to: GroupPolicy, as: :can_manage?
+  def group_lifecycle, do: GroupPolicy.lifecycle()
+  def member_group_options, do: MilosTraining.Community.CommunitySettings.member_group_options()
+  def group_join_policies, do: MilosTraining.Community.Channel.join_policies()
+
+  # Reports (ADR-143).
+  defdelegate report(context, target, attrs), to: Reports
+  defdelegate list_reports(context, filter), to: Reports, as: :list
+  defdelegate resolve_reports(context, target_type, target_id, action), to: Reports, as: :resolve
+  defdelegate reported_ids(context, user_id, type), to: Reports
+  defdelegate report_action_applies?(action, target_type), to: ReportPolicy, as: :action_applies?
+  def report_reasons, do: ReportPolicy.reasons()
+  def report_actions, do: ReportPolicy.actions()
+
   # Posts (M7).
   defdelegate create_post(context, channel, role, joined?, attrs), to: Posts, as: :create
   defdelegate fetch_post(context, post_id), to: Posts, as: :fetch
+  defdelegate find_post(context, post_id), to: Posts, as: :find
+  defdelegate get_comment(context, comment_id), to: CommunityStore
+  defdelegate hide_comment(context, comment, role, hidden?, now), to: Posts
   defdelegate delete_post(context, post, role, now), to: Posts, as: :delete
   defdelegate hide_post(context, post, role, hidden?, now), to: Posts, as: :hide
   defdelegate pin_post(context, post, channel, role, pinned?, now), to: Posts, as: :pin
@@ -97,6 +170,7 @@ defmodule MilosTraining.Community do
   defdelegate social_settings(context, user_id), to: SocialStore, as: :get_social_settings
   defdelegate put_social_settings(context, user_id, attrs), to: SocialStore
   defdelegate booking_sharer_ids(context), to: SocialStore
+  defdelegate hidden_member_ids(ids), to: SocialStore
 
   # Profile posts (ADR-142).
   defdelegate create_profile_post(context, audience, attrs), to: ProfilePosts, as: :create
@@ -126,6 +200,7 @@ defmodule MilosTraining.Community do
   defdelegate can_pin?(channel, role), to: ChannelPolicy
   defdelegate can_delete_post?(post, user_id, role), to: ChannelPolicy
   defdelegate can_moderate?(role), to: ChannelPolicy
+  defdelegate channel_role(club_role, channel), to: ChannelPolicy
 
   # Feed paging.
   defdelegate encode_feed_cursor(post), to: FeedCursor, as: :encode

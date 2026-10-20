@@ -123,4 +123,7 @@ defmodule MilosTraining.Community.SocialStore do
 
   @impl true
   def following_count(user_id), do: adapter().following_count(user_id)
+
+  @impl true
+  def hidden_member_ids(ids), do: adapter().hidden_member_ids(ids)
 end

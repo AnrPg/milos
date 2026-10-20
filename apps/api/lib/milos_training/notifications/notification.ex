@@ -50,7 +50,16 @@ defmodule MilosTraining.Notifications.Notification do
     :trial_declined,
     :trial_reminder,
     :trial_follow_up,
-    :trial_class_cancelled
+    :trial_class_cancelled,
+    :community_group_proposed,
+    :community_group_approved,
+    :community_group_declined,
+    :community_group_join_requested,
+    :community_group_join_approved,
+    :community_group_archive_warning,
+    :community_report_created,
+    :community_club_join_requested,
+    :community_club_join_approved
   ]
 
   schema "notifications" do

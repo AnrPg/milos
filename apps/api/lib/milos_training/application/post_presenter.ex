@@ -35,6 +35,7 @@ defmodule MilosTraining.Application.PostPresenter do
         box ->
           club = %{
             id: post.club_id,
+            kind: "gym",
             name: box.name,
             organization_slug: box.slug,
             logo_url: box.logo_url,
@@ -52,7 +53,8 @@ defmodule MilosTraining.Application.PostPresenter do
               hidden: false,
               can_delete: false,
               can_moderate: false,
-              can_pin: false
+              can_pin: false,
+              can_report: false
             })
           ]
       end
@@ -74,7 +76,8 @@ defmodule MilosTraining.Application.PostPresenter do
         hidden: false,
         can_delete: post.author_id == viewer_id,
         can_moderate: false,
-        can_pin: false
+        can_pin: false,
+        can_report: false
       })
     end)
   end
@@ -95,8 +98,10 @@ defmodule MilosTraining.Application.PostPresenter do
     end)
   end
 
-  def comments(comments, club, viewer_id) do
+  @doc "Comments on a club post; `moderator?` is the viewer's standing in its channel."
+  def comments(comments, club, viewer_id, moderator? \\ nil) do
     authors = authors(Enum.map(comments, & &1.author_id))
+    moderator? = if is_nil(moderator?), do: Community.can_moderate?(club.role), else: moderator?
 
     Enum.map(comments, fn comment ->
       %{
@@ -105,7 +110,10 @@ defmodule MilosTraining.Application.PostPresenter do
         author: author(authors, comment.author_id),
         body: comment.body,
         inserted_at: comment.inserted_at,
-        can_delete: comment.author_id == viewer_id or Community.can_moderate?(club.role)
+        hidden: not is_nil(Map.get(comment, :hidden_at)),
+        can_delete: comment.author_id == viewer_id or moderator?,
+        can_moderate: moderator?,
+        can_report: comment.author_id != viewer_id
       }
     end)
   end
@@ -113,12 +121,16 @@ defmodule MilosTraining.Application.PostPresenter do
   defp present(post, club, authors, viewer_id) do
     channel = Enum.find(club.channels, &(&1.id == post.channel_id)) || %{kind: nil, name: nil}
 
+    role =
+      if is_map_key(channel, :id), do: Community.channel_role(club.role, channel), else: club.role
+
     post
     |> base(authors)
     |> Map.merge(%{
       origin: "club",
       club: %{
         id: club.id,
+        kind: club.kind,
         name: club.name,
         organization_slug: club.organization_slug,
         logo_url: club.logo_url,
@@ -127,9 +139,10 @@ defmodule MilosTraining.Application.PostPresenter do
       channel: %{id: post.channel_id, kind: channel.kind, name: channel.name},
       pinned: not is_nil(post.pinned_at),
       hidden: not is_nil(post.hidden_at),
-      can_delete: Community.can_delete_post?(post, viewer_id, club.role),
-      can_moderate: Community.can_moderate?(club.role),
-      can_pin: is_map_key(channel, :write_policy) and Community.can_pin?(channel, club.role)
+      can_delete: Community.can_delete_post?(post, viewer_id, role),
+      can_moderate: Community.can_moderate?(role),
+      can_pin: is_map_key(channel, :write_policy) and Community.can_pin?(channel, role),
+      can_report: post.author_id != viewer_id
     })
   end
 

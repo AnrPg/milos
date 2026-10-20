@@ -1,5 +1,5 @@
 defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
-  @moduledoc "Ecto adapter for the Community context (ADR-138)."
+  @moduledoc "Ecto adapter for the Community context (ADR-138, ADR-143)."
 
   @behaviour MilosTraining.Community.Ports.CommunityStore
 
@@ -10,9 +10,11 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     ChannelMembership,
     Club,
     ClubMembership,
+    CommunitySettings,
     Post,
     PostComment,
-    PostReaction
+    PostReaction,
+    Report
   }
 
   alias MilosTraining.Repo
@@ -243,6 +245,408 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     end
   end
 
+  # Open clubs (ADR-143) -----------------------------------------------------
+
+  @impl true
+  def create_club(%{organization_id: organization_id}, attrs, channels) do
+    Repo.transaction(fn ->
+      club =
+        attrs
+        |> Map.merge(%{organization_id: organization_id, kind: "open"})
+        |> Club.changeset()
+        |> Repo.insert()
+        |> case do
+          {:ok, club} -> club
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+
+      Enum.each(channels, fn spec ->
+        spec
+        |> Map.merge(%{organization_id: organization_id, club_id: club.id})
+        |> Channel.changeset()
+        |> Repo.insert!()
+      end)
+
+      club_with_channels(club)
+    end)
+  end
+
+  @impl true
+  def update_club(_context, id, attrs) do
+    with %Club{} = club <- Repo.get(Club, id) || {:error, :not_found},
+         {:ok, club} <- club |> Club.changeset(attrs) |> Repo.update() do
+      {:ok, club_with_channels(club)}
+    end
+  end
+
+  @impl true
+  def list_clubs_by_ids(_context, []), do: []
+
+  def list_clubs_by_ids(_context, ids) do
+    clubs = Club |> where([c], c.id in ^ids and is_nil(c.archived_at)) |> Repo.all()
+    channels = channels_by_club(Enum.map(clubs, & &1.id))
+    Enum.map(clubs, &normalize_club(&1, Map.get(channels, &1.id, [])))
+  end
+
+  # Live open clubs anyone signed in can find; `organization_ids` narrows to
+  # some gyms, `query` matches the name.
+  @impl true
+  def list_open_clubs(_context, filter) do
+    Club
+    |> where([c], c.kind == "open" and is_nil(c.archived_at))
+    |> then(fn query ->
+      case Map.get(filter, :organization_ids) do
+        nil -> query
+        ids -> where(query, [c], c.organization_id in ^ids)
+      end
+    end)
+    |> then(fn query ->
+      case Map.get(filter, :query) do
+        text when is_binary(text) and text != "" ->
+          where(query, [c], ilike(c.name, ^"%#{escape_like(text)}%"))
+
+        _none ->
+          query
+      end
+    end)
+    |> order_by([c], asc: c.name)
+    |> limit(^Map.get(filter, :limit, 50))
+    |> Repo.all()
+    |> Enum.map(&normalize_club(&1, []))
+  end
+
+  @impl true
+  def open_club_member_counts(_context, []), do: %{}
+
+  def open_club_member_counts(_context, ids) do
+    binary_ids = Enum.map(ids, &Ecto.UUID.dump!/1)
+
+    Repo
+    |> Ecto.Adapters.SQL.query!(
+      "SELECT club_id, member_count FROM milos_open_club_member_counts($1)",
+      [binary_ids]
+    )
+    |> Map.get(:rows)
+    |> Map.new(fn [club_id, count] -> {Ecto.UUID.cast!(club_id), count} end)
+  end
+
+  @impl true
+  def club_memberships_of(_context, user_id) do
+    ClubMembership
+    |> join(:inner, [m], c in Club, on: c.id == m.club_id)
+    |> where([m, c], m.user_id == ^user_id and c.kind == "open" and is_nil(c.archived_at))
+    |> select([m, c], %{
+      club_id: m.club_id,
+      organization_id: m.organization_id,
+      status: m.status,
+      notify_level: m.notify_level
+    })
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_club_memberships(_context, club_id, status) do
+    ClubMembership
+    |> where([m], m.club_id == ^club_id)
+    |> then(fn query -> if status, do: where(query, [m], m.status == ^status), else: query end)
+    |> order_by([m], asc: m.inserted_at)
+    |> select([m], %{user_id: m.user_id, status: m.status, inserted_at: m.inserted_at})
+    |> Repo.all()
+  end
+
+  @impl true
+  def get_club_membership(_context, club_id, user_id) do
+    ClubMembership
+    |> where([m], m.club_id == ^club_id and m.user_id == ^user_id)
+    |> select([m], %{user_id: m.user_id, status: m.status, notify_level: m.notify_level})
+    |> Repo.one()
+  end
+
+  @impl true
+  def put_club_membership(_context, club, user_id, attrs) do
+    now = DateTime.utc_now()
+    set = attrs |> Map.take([:status, :notify_level]) |> Map.put(:updated_at, now)
+
+    %{organization_id: club.organization_id, club_id: club.id, user_id: user_id}
+    |> Map.merge(attrs)
+    |> ClubMembership.changeset()
+    |> Repo.insert(
+      on_conflict: [set: Map.to_list(set)],
+      conflict_target: [:club_id, :user_id],
+      returning: true
+    )
+    |> case do
+      {:ok, membership} ->
+        {:ok, Map.take(membership, [:user_id, :status, :notify_level])}
+
+      error ->
+        error
+    end
+  end
+
+  @impl true
+  def delete_club_membership(_context, club_id, user_id) do
+    ClubMembership
+    |> where([m], m.club_id == ^club_id and m.user_id == ^user_id)
+    |> Repo.delete_all()
+
+    :ok
+  end
+
+  # Member groups (ADR-143) --------------------------------------------------
+
+  @impl true
+  def get_community_settings(_context) do
+    case Repo.one(CommunitySettings) do
+      nil -> CommunitySettings.defaults()
+      settings -> Map.take(settings, [:member_groups])
+    end
+  end
+
+  @impl true
+  def put_community_settings(%{organization_id: organization_id}, attrs) do
+    attrs
+    |> Map.put(:organization_id, organization_id)
+    |> CommunitySettings.changeset()
+    |> Repo.insert(
+      on_conflict: {:replace, [:member_groups, :updated_at]},
+      conflict_target: [:organization_id],
+      returning: true
+    )
+    |> case do
+      {:ok, settings} -> {:ok, Map.take(settings, [:member_groups])}
+      error -> error
+    end
+  end
+
+  @impl true
+  def create_group(_context, club, spec, creator_id, status) do
+    Repo.transaction(fn ->
+      now = DateTime.utc_now()
+
+      channel =
+        spec
+        |> Map.merge(%{
+          organization_id: club.organization_id,
+          club_id: club.id,
+          created_by_id: creator_id,
+          status: status
+        })
+        |> Channel.changeset()
+        |> Ecto.Changeset.put_change(:decided_at, if(status == "active", do: now))
+        |> Repo.insert()
+        |> case do
+          {:ok, channel} -> channel
+          {:error, changeset} -> Repo.rollback(changeset)
+        end
+
+      %{
+        organization_id: club.organization_id,
+        channel_id: channel.id,
+        user_id: creator_id,
+        source: "auto",
+        role: "admin"
+      }
+      |> ChannelMembership.changeset()
+      |> Repo.insert!()
+
+      normalize_channel(channel)
+    end)
+  end
+
+  @impl true
+  def list_groups(_context, club_id, filter) do
+    member_sources = ChannelMembership.member_sources()
+    statuses = Map.get(filter, :statuses, ["active"])
+
+    Channel
+    |> where([ch], ch.club_id == ^club_id and ch.kind == "member_group")
+    |> where([ch], ch.status in ^statuses)
+    |> then(fn query ->
+      if Map.get(filter, :archived, false),
+        do: where(query, [ch], not is_nil(ch.archived_at)),
+        else: where(query, [ch], is_nil(ch.archived_at))
+    end)
+    |> order_by([ch], desc: ch.last_post_at, asc: ch.name)
+    |> select([ch], %{
+      channel: ch,
+      member_count:
+        fragment(
+          "(SELECT count(*) FROM community_channel_memberships m WHERE m.channel_id = ? AND m.source = ANY(?))",
+          ch.id,
+          ^member_sources
+        ),
+      request_count:
+        fragment(
+          "(SELECT count(*) FROM community_channel_memberships m WHERE m.channel_id = ? AND m.source = 'requested')",
+          ch.id
+        )
+    })
+    |> Repo.all()
+    |> Enum.map(fn row ->
+      row.channel
+      |> normalize_channel()
+      |> Map.merge(%{member_count: row.member_count, request_count: row.request_count})
+    end)
+  end
+
+  @impl true
+  def update_group(_context, id, attrs) do
+    with %Channel{kind: "member_group"} = channel <-
+           Repo.get(Channel, id) || {:error, :not_found},
+         {:ok, channel} <- channel |> Channel.group_changeset(attrs) |> Repo.update() do
+      {:ok, normalize_channel(channel)}
+    else
+      %Channel{} -> {:error, :not_found}
+      error -> error
+    end
+  end
+
+  @impl true
+  def update_group_lifecycle(_context, id, attrs) do
+    with %Channel{kind: "member_group"} = channel <-
+           Repo.get(Channel, id) || {:error, :not_found},
+         {:ok, channel} <- channel |> Channel.lifecycle_changeset(attrs) |> Repo.update() do
+      {:ok, normalize_channel(channel)}
+    else
+      %Channel{} -> {:error, :not_found}
+      error -> error
+    end
+  end
+
+  @impl true
+  def channel_memberships_of(_context, _user_id, []), do: %{}
+
+  def channel_memberships_of(_context, user_id, channel_ids) do
+    ChannelMembership
+    |> where([m], m.user_id == ^user_id and m.channel_id in ^channel_ids)
+    |> select([m], {m.channel_id, %{source: m.source, role: m.role}})
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  @impl true
+  def list_channel_memberships(_context, channel_id) do
+    sources = ["requested" | ChannelMembership.member_sources()]
+
+    ChannelMembership
+    |> where([m], m.channel_id == ^channel_id and m.source in ^sources)
+    |> order_by([m], desc: m.role, asc: m.inserted_at)
+    |> select([m], %{user_id: m.user_id, source: m.source, role: m.role, since: m.inserted_at})
+    |> Repo.all()
+  end
+
+  @impl true
+  def put_channel_membership(_context, channel, user_id, attrs) do
+    source = Map.fetch!(attrs, :source)
+    role = Map.get(attrs, :role, "member")
+
+    %{
+      organization_id: channel.organization_id,
+      channel_id: channel.id,
+      user_id: user_id,
+      source: source,
+      role: role
+    }
+    |> ChannelMembership.changeset()
+    |> Repo.insert(
+      on_conflict: [set: [source: source, role: role, updated_at: DateTime.utc_now()]],
+      conflict_target: [:channel_id, :user_id]
+    )
+    |> case do
+      {:ok, _membership} -> :ok
+      error -> error
+    end
+  end
+
+  @impl true
+  def quiet_groups(_context, cutoff) do
+    Channel
+    |> where([ch], ch.kind == "member_group" and ch.status == "active" and is_nil(ch.archived_at))
+    |> where(
+      [ch],
+      fragment("coalesce(?, ?, ?)", ch.last_post_at, ch.decided_at, ch.inserted_at) < ^cutoff
+    )
+    |> Repo.all()
+    |> Enum.map(&normalize_channel/1)
+  end
+
+  # Reports (ADR-143) --------------------------------------------------------
+
+  @impl true
+  def create_report(_context, attrs) do
+    attrs
+    |> Report.changeset()
+    |> Repo.insert()
+    |> case do
+      {:ok, report} -> {:ok, normalize_report(report)}
+      error -> error
+    end
+  end
+
+  @impl true
+  def list_reports(_context, filter) do
+    Report
+    |> then(fn query ->
+      case Map.get(filter, :status) do
+        nil -> query
+        status -> where(query, [r], r.status == ^status)
+      end
+    end)
+    |> order_by([r], desc: r.inserted_at)
+    |> limit(^Map.get(filter, :limit, 500))
+    |> Repo.all()
+    |> Enum.map(&normalize_report/1)
+  end
+
+  @impl true
+  def resolve_reports(_context, target_type, target_id, attrs) do
+    now = DateTime.utc_now()
+
+    {count, _rows} =
+      Report
+      |> where(
+        [r],
+        r.target_type == ^target_type and r.target_id == ^target_id and r.status == "open"
+      )
+      |> Repo.update_all(
+        set: [
+          status: attrs.status,
+          resolution: attrs.resolution,
+          resolved_by_id: attrs.resolved_by_id,
+          resolved_at: now,
+          updated_at: now
+        ]
+      )
+
+    count
+  end
+
+  @impl true
+  def reported_ids(_context, reporter_id, target_type) do
+    Report
+    |> where([r], r.reporter_id == ^reporter_id and r.target_type == ^target_type)
+    |> select([r], r.target_id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def hide_comment(_context, id, attrs) do
+    PostComment
+    |> where([c], c.id == ^id and is_nil(c.deleted_at))
+    |> Repo.update_all(
+      set: [
+        hidden_at: attrs.hidden_at,
+        hidden_by_id: attrs.hidden_by_id,
+        updated_at: DateTime.utc_now()
+      ]
+    )
+    |> case do
+      {1, _} -> :ok
+      _none -> {:error, :not_found}
+    end
+  end
+
   # Posts --------------------------------------------------------------------
 
   @impl true
@@ -252,6 +656,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     |> Repo.insert()
     |> case do
       {:ok, post} ->
+        touch_channel(post)
         {:ok, get_post(context, post.id, post.author_id)}
 
       {:error, %Ecto.Changeset{errors: errors} = changeset} ->
@@ -259,6 +664,13 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
           do: replayed_post(context, attrs, changeset),
           else: {:error, changeset}
     end
+  end
+
+  # A post keeps its channel alive: the quiet-group sweep counts from here.
+  defp touch_channel(post) do
+    Channel
+    |> where([ch], ch.id == ^post.channel_id)
+    |> Repo.update_all(set: [last_post_at: post.inserted_at, archive_warned_at: nil])
   end
 
   # The outbox retried a post that already landed: answer with that post.
@@ -299,6 +711,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     Post
     |> where([p], p.channel_id in ^filter.channel_ids and is_nil(p.deleted_at))
     |> visible_to(viewer_id, Map.get(filter, :moderated_organization_ids, []))
+    |> not_reported_by(viewer_id)
     |> maybe_author(Map.get(filter, :author_id))
     |> before(Map.get(filter, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
@@ -345,6 +758,19 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
       [p],
       is_nil(p.hidden_at) or p.author_id == ^viewer_id or
         p.organization_id in ^moderated_organization_ids
+    )
+  end
+
+  # What someone reported disappears for them (board 7 Q4).
+  defp not_reported_by(query, viewer_id) do
+    where(
+      query,
+      [p],
+      fragment(
+        "NOT EXISTS (SELECT 1 FROM community_reports r WHERE r.target_type = 'post' AND r.target_id = ? AND r.reporter_id = ?)",
+        p.id,
+        type(^viewer_id, :binary_id)
+      )
     )
   end
 
@@ -479,7 +905,17 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
 
   defp normalize_club(club, channels) do
     club
-    |> Map.take([:id, :organization_id, :kind, :name, :join_policy, :archived_at])
+    |> Map.take([
+      :id,
+      :organization_id,
+      :kind,
+      :name,
+      :join_policy,
+      :description,
+      :cover_media_id,
+      :created_by_id,
+      :archived_at
+    ])
     |> Map.put(:channels, channels)
   end
 
@@ -495,10 +931,49 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
       :context_type,
       :context_id,
       :position,
-      :archived_at
+      :description,
+      :created_by_id,
+      :join_policy,
+      :status,
+      :decided_at,
+      :last_post_at,
+      :archive_warned_at,
+      :archived_at,
+      :inserted_at
     ])
   end
 
   defp normalize_comment(comment),
-    do: Map.take(comment, [:id, :organization_id, :post_id, :author_id, :body, :inserted_at])
+    do:
+      Map.take(comment, [
+        :id,
+        :organization_id,
+        :post_id,
+        :author_id,
+        :body,
+        :hidden_at,
+        :inserted_at
+      ])
+
+  defp normalize_report(report) do
+    Map.take(report, [
+      :id,
+      :organization_id,
+      :club_id,
+      :channel_id,
+      :target_type,
+      :target_id,
+      :target_author_id,
+      :reporter_id,
+      :reason,
+      :note,
+      :status,
+      :resolution,
+      :resolved_by_id,
+      :resolved_at,
+      :inserted_at
+    ])
+  end
+
+  defp escape_like(text), do: String.replace(text, ~r/[\\%_]/, &"\\#{&1}")
 end

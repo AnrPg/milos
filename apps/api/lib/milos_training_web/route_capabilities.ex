@@ -99,6 +99,21 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminTrialController, :decline} => [:run_classes, :manage_memberships],
     {W.AdminTrialController, :attendance} => [:run_classes],
 
+    # «Κοινότητα» (ADR-143)
+    {W.AdminCommunityController, :groups} => [:moderate_community],
+    {W.AdminCommunityController, :decide_group} => [:moderate_community],
+    {W.AdminCommunityController, :reopen_group} => [:moderate_community],
+    {W.AdminCommunityController, :update_settings} => [:manage_community],
+    {W.AdminCommunityController, :reports} => [:moderate_community],
+    {W.AdminCommunityController, :act_on_report} => [:moderate_community],
+    {W.AdminCommunityController, :clubs} => [:moderate_community],
+    {W.AdminCommunityController, :create_club} => [:manage_community],
+    {W.AdminCommunityController, :club} => [:moderate_community],
+    {W.AdminCommunityController, :update_club} => [:manage_community],
+    {W.AdminCommunityController, :archive_club} => [:manage_community],
+    {W.AdminCommunityController, :answer_club_request} => [:moderate_community],
+    {W.AdminCommunityController, :remove_club_member} => [:moderate_community],
+
     # Schedule
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
     {W.AdminScheduleController, :create_series} => [:manage_schedule],

@@ -312,3 +312,45 @@ msgstr "Тренировката е отменена"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "%{box} отмени %{class} (%{when}). Избери друга тренировка."
+
+msgid "New group to review"
+msgstr "Нова група за одобрение"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} иска да създаде «%{group}»."
+
+msgid "Your group is live"
+msgstr "Групата ти е активна"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» е отворена. Покани хора."
+
+msgid "Group not approved"
+msgstr "Групата не е одобрена"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "Боксът не одобри «%{group}»."
+
+msgid "Request to join"
+msgstr "Заявка за присъединяване"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} иска да се присъедини към «%{group}»."
+
+msgid "You're in"
+msgstr "Вътре си"
+
+msgid "You joined «%{group}»."
+msgstr "Присъедини се към «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Групата ти е тиха"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Никой не е писал в «%{group}» от известно време. Напиши нещо, иначе ще бъде архивирана."
+
+msgid "New report"
+msgstr "Нов сигнал"
+
+msgid "Someone reported something in the club."
+msgstr "Някой подаде сигнал за нещо в клуба."

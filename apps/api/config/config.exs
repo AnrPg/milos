@@ -41,7 +41,8 @@ config :milos_training, Oban,
        {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob},
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
        {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
-       {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob}
+       {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
+       {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob}
      ]}
   ],
   queues: [

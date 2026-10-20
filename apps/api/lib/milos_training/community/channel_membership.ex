@@ -3,13 +3,15 @@ defmodule MilosTraining.Community.ChannelMembership do
   A member and an opt-in or invite-only channel (ADR-138). `opt_in`,
   `invited` and `auto` rows are members; `suggested` is an offer (D7: a
   frequent booker of a class) and `dismissed` remembers that they left or
-  declined, so they are not offered it again.
+  declined, so they are not offered it again. In a member group (ADR-143)
+  `requested` waits for one of its admins, and `role` marks those admins.
   """
 
   use Ecto.Schema
   import Ecto.Changeset
 
-  @sources ~w(opt_in suggested invited auto dismissed)
+  @sources ~w(opt_in suggested invited auto dismissed requested)
+  @roles ~w(member admin)
   @member_sources ~w(opt_in invited auto)
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -20,6 +22,7 @@ defmodule MilosTraining.Community.ChannelMembership do
     field :channel_id, :binary_id
     field :user_id, :binary_id
     field :source, :string
+    field :role, :string, default: "member"
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -28,8 +31,9 @@ defmodule MilosTraining.Community.ChannelMembership do
 
   def changeset(membership \\ %__MODULE__{}, attrs) do
     membership
-    |> cast(attrs, [:organization_id, :channel_id, :user_id, :source])
+    |> cast(attrs, [:organization_id, :channel_id, :user_id, :source, :role])
     |> validate_required([:channel_id, :user_id, :source])
     |> validate_inclusion(:source, @sources)
+    |> validate_inclusion(:role, @roles)
   end
 end

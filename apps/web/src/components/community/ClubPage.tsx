@@ -1,33 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
-import { CLUBS_KEY, FEED_KEY, setChannelJoined, type CommunityChannel, type CommunityClub } from "@/api/community";
+import {
+  CLUBS_KEY,
+  FEED_KEY,
+  setChannelJoined,
+  setOpenClubJoined,
+  type CommunityChannel,
+  type CommunityClub,
+} from "@/api/community";
 import { clientErrorMessage } from "@/components/client/errors";
 import { channelName, channelSections } from "@/components/community/community";
 import { ClubBar } from "@/components/community/ClubBar";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
+import { GroupsCard } from "@/components/community/GroupsCard";
+import { MembersTab } from "@/components/community/MembersTab";
+import { OpenClubLanding } from "@/components/community/OpenClubLanding";
+import { MoreMenu } from "@/components/community/PostCard";
+import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { WodCard } from "@/components/community/WodCard";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
+type ClubTab = "feed" | "channels" | "events" | "members";
+const TABS: ClubTab[] = ["feed", "channels", "events", "members"];
+const TAB_KEYS: Record<ClubTab, string> = { feed: "tabFeed", channels: "tabChannels", events: "tabEvents", members: "tabMembers" };
+
 /**
- * A club's page (vision §7.1, mockup «club»): Ροή (pinned announcements, the
- * #wod-σήμερα card, then every channel's posts; or one channel's posts) and
- * Κανάλια (the box's channels, class groups with the ones offered to the
- * member first; opt-in ones can be joined or left). Events and Μέλη arrive
- * with Phase 2.
+ * A club's page (vision §7.1, mockup «club», board 7): Ροή (pinned
+ * announcements, the #wod-σήμερα card, then every channel's posts; or one
+ * channel's posts), Κανάλια (the box's channels, member groups, class groups
+ * with the ones offered to the member first), Events (M5) and Μέλη. An open
+ * club the member hasn't joined shows its landing with «Μπες».
  */
 export function ClubPage({ clubId, channelId = null }: { clubId: string; channelId?: string | null }) {
   const t = useTranslations("Community");
+  const tClubs = useTranslations("Clubs");
   const clubs = useMyClubs();
   useClubRealtime(clubs.data);
-  const [tab, setTab] = useState<"feed" | "channels">("feed");
+  const [tab, setTab] = useState<ClubTab>("feed");
   const [openChannelId, setOpenChannelId] = useState<string | null>(channelId);
   const club = clubs.data?.find((entry) => entry.id === clubId);
   const openChannel = club?.channels.find((channel) => channel.id === openChannelId) ?? null;
@@ -40,38 +58,64 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
   if (clubs.isPending) return <HubPage title={t("clubTitle")}><p style={{ color: "var(--dim)" }}>{t("loading")}</p></HubPage>;
   if (!club)
     return (
-      <HubPage title={t("clubTitle")}>
-        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("clubNotFound")}</p>
-      </HubPage>
+      <OpenClubLanding
+        clubId={clubId}
+        notFound={
+          <HubPage title={t("clubTitle")}>
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("clubNotFound")}</p>
+          </HubPage>
+        }
+      />
     );
 
   return (
-    <HubPage title={club.name} actions={<ComposeButton clubs={clubs.data ?? []} clubId={club.id} />}>
+    <HubPage
+      title={club.name}
+      actions={
+        <div className="flex items-center gap-1">
+          {club.kind === "open" && club.role !== "staff" ? <LeaveOpenClub club={club} /> : null}
+          <ComposeButton clubs={clubs.data ?? []} clubId={club.id} channelId={openChannel?.id} />
+        </div>
+      }
+    >
       <ClubBar clubs={clubs.data ?? []} activeClubId={club.id} />
       <p className="text-sm" style={{ color: "var(--dim)" }}>
+        {club.kind === "open" ? `${tClubs("openClub")} · ` : ""}
         {club.role === "staff" ? t("roleStaff") : t("roleMember")}
       </p>
-      <div role="tablist" aria-label={club.name} className="flex gap-2">
-        {(["feed", "channels"] as const).map((id) => (
+      {club.kind === "open" && club.description ? (
+        <p className="text-sm" style={{ color: "var(--text-soft)" }}>{club.description}</p>
+      ) : null}
+      <div role="tablist" aria-label={club.name} className="grid grid-cols-4 gap-2">
+        {TABS.map((id) => (
           <button
             key={id}
             type="button"
             role="tab"
             aria-selected={tab === id}
             onClick={() => setTab(id)}
-            className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
+            className="min-h-11 rounded-2xl px-1 text-sm font-semibold"
             style={{
               background: tab === id ? "var(--primary)" : "var(--panel)",
               color: tab === id ? "var(--bg)" : "var(--text)",
               border: "1px solid var(--border)",
             }}
           >
-            {id === "feed" ? t("tabFeed") : t("tabChannels")}
+            {tClubs(TAB_KEYS[id])}
           </button>
         ))}
       </div>
       {tab === "channels" ? (
-        <ChannelList club={club} onOpen={showChannel} />
+        <>
+          <ChannelList club={club} onOpen={showChannel} />
+          {club.kind === "gym" ? <GroupsCard club={club} /> : null}
+        </>
+      ) : tab === "events" ? (
+        <HubCard eyebrow={tClubs("tabEvents")}>
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{tClubs("eventsSoon")}</p>
+        </HubCard>
+      ) : tab === "members" ? (
+        <MembersTab club={club} />
       ) : openChannel ? (
         <>
           <div className="flex items-center gap-2">
@@ -98,11 +142,54 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
   );
 }
 
+/** ⋯ › Αποχώρηση from an open club, behind a confirmation. */
+function LeaveOpenClub({ club }: { club: CommunityClub }) {
+  const t = useTranslations("Clubs");
+  const tCommunity = useTranslations("Community");
+  const tUi = useUiTranslations();
+  const { tokens } = useSession();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const [confirming, setConfirming] = useState(false);
+  const leave = useMutation({
+    mutationFn: () => setOpenClubJoined(tokens!.access_token, club.id, false),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: CLUBS_KEY }),
+        queryClient.invalidateQueries({ queryKey: FEED_KEY }),
+      ]);
+      router.push("/clubs/find");
+    },
+  });
+  return (
+    <>
+      <MoreMenu label={tCommunity("more")} items={[{ label: t("clubLeave"), onSelect: () => setConfirming(true) }]} />
+      {confirming ? (
+        <Sheet
+          labelId="leave-club"
+          eyebrow={club.name}
+          title={t("clubLeaveTitle")}
+          onClose={() => setConfirming(false)}
+          footer={
+            <>
+              <SheetButton onClick={() => setConfirming(false)}>{t("cancel")}</SheetButton>
+              <SheetButton primary disabled={leave.isPending} onClick={() => leave.mutate()}>{t("clubLeave")}</SheetButton>
+            </>
+          }
+        >
+          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("clubLeaveBody")}</p>
+          <ErrorLine message={leave.error ? clientErrorMessage(leave.error, tUi) : null} />
+        </Sheet>
+      ) : null}
+    </>
+  );
+}
+
 function ChannelList({ club, onOpen }: { club: CommunityClub; onOpen: (id: string) => void }) {
   const t = useTranslations("Community");
   const { box, classes, other } = channelSections(club.channels);
   const sections = [
-    { key: "box", title: t("channelsOfBox"), channels: box },
+    { key: "box", title: club.kind === "open" ? t("channelsOfClub") : t("channelsOfBox"), channels: box },
     { key: "classes", title: t("channelsClassGroups"), channels: classes },
     { key: "other", title: t("channelsOther"), channels: other },
   ].filter((section) => section.channels.length > 0);
@@ -146,7 +233,7 @@ function ChannelRow({
   const [error, setError] = useState<string | null>(null);
 
   async function toggle() {
-    if (!tokens?.access_token) return;
+    if (!tokens?.access_token || !club.organization_slug) return;
     setBusy(true);
     setError(null);
     try {

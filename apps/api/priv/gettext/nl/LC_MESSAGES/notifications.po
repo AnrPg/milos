@@ -312,3 +312,45 @@ msgstr "Les van je proefles geannuleerd"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "%{box} heeft %{class} (%{when}) geannuleerd. Kies een andere les."
+
+msgid "New group to review"
+msgstr "Nieuwe groep om te beoordelen"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} wil «%{group}» starten."
+
+msgid "Your group is live"
+msgstr "Je groep is live"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» is open. Nodig mensen uit."
+
+msgid "Group not approved"
+msgstr "Groep niet goedgekeurd"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "De box heeft «%{group}» niet goedgekeurd."
+
+msgid "Request to join"
+msgstr "Verzoek om lid te worden"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} vraagt om lid te worden van «%{group}»."
+
+msgid "You're in"
+msgstr "Je bent erbij"
+
+msgid "You joined «%{group}»."
+msgstr "Je bent lid geworden van «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Je groep is stil"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Er is al een tijd niets gepost in «%{group}». Post iets, anders wordt hij gearchiveerd."
+
+msgid "New report"
+msgstr "Nieuwe melding"
+
+msgid "Someone reported something in the club."
+msgstr "Iemand heeft iets gemeld in de club."

@@ -312,3 +312,45 @@ msgstr "Занятие отменено"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "%{box} отменил %{class} (%{when}). Выберите другое занятие."
+
+msgid "New group to review"
+msgstr "Новая группа на проверку"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} хочет создать «%{group}»."
+
+msgid "Your group is live"
+msgstr "Ваша группа активна"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» открыта. Приглашайте людей."
+
+msgid "Group not approved"
+msgstr "Группа не одобрена"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "Бокс не одобрил «%{group}»."
+
+msgid "Request to join"
+msgstr "Запрос на вступление"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} просит вступить в «%{group}»."
+
+msgid "You're in"
+msgstr "Вы в группе"
+
+msgid "You joined «%{group}»."
+msgstr "Вы вступили в «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "В вашей группе тихо"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "В «%{group}» давно никто не писал. Напишите что-нибудь, иначе она будет архивирована."
+
+msgid "New report"
+msgstr "Новая жалоба"
+
+msgid "Someone reported something in the club."
+msgstr "Кто-то пожаловался на что-то в клубе."

@@ -6,13 +6,25 @@ import { useTranslations } from "next-intl";
 import type { CommunityClub } from "@/api/community";
 import { clubInitials } from "@/components/community/community";
 
-/** The club bar (vision §7.1): Όλα, then one bubble per club; a bubble opens the club page. */
-export function ClubBar({ clubs, activeClubId }: { clubs: CommunityClub[]; activeClubId?: string | null }) {
+/**
+ * The club bar (vision §7.1): Όλα, then one bubble per club (a bubble opens
+ * the club page), then «+ Βρες» for open clubs and groups (board 7 Q7).
+ */
+export function ClubBar({
+  clubs,
+  activeClubId,
+  findActive = false,
+}: {
+  clubs: CommunityClub[];
+  activeClubId?: string | null;
+  findActive?: boolean;
+}) {
   const t = useTranslations("Community");
+  const tClubs = useTranslations("Clubs");
   return (
     <nav aria-label={t("clubBar")} className="-mx-4 overflow-x-auto px-4">
       <ul className="flex gap-3">
-        <Bubble href="/" label={t("all")} initials={t("allShort")} active={!activeClubId} />
+        <Bubble href="/" label={t("all")} initials={t("allShort")} active={!activeClubId && !findActive} />
         {clubs.map((club) => (
           <Bubble
             key={club.id}
@@ -24,6 +36,7 @@ export function ClubBar({ clubs, activeClubId }: { clubs: CommunityClub[]; activ
             active={club.id === activeClubId}
           />
         ))}
+        <Bubble href="/clubs/find" label={tClubs("find")} initials="+" active={findActive} dashed />
       </ul>
     </nav>
   );
@@ -36,6 +49,7 @@ function Bubble({
   color,
   logo,
   active,
+  dashed,
 }: {
   href: string;
   label: string;
@@ -43,6 +57,7 @@ function Bubble({
   color?: string | null;
   logo?: string | null;
   active: boolean;
+  dashed?: boolean;
 }) {
   return (
     <li className="shrink-0">
@@ -52,7 +67,7 @@ function Bubble({
           style={{
             background: color ?? "var(--panel-raised)",
             color: color ? "#fff" : "var(--text)",
-            outline: active ? "2px solid var(--primary)" : "1px solid var(--border)",
+            outline: active ? "2px solid var(--primary)" : `1px ${dashed ? "dashed" : "solid"} var(--border)`,
             outlineOffset: 2,
           }}
         >

@@ -151,4 +151,16 @@ defmodule MilosTrainingWeb.FollowController do
            SocialProfile.set_booking_sharing(conn.assigns.user_context, conn.body_params.enabled),
          do: json(conn, setting)
   end
+
+  operation(:member_visibility,
+    summary: "Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1)",
+    request_body: S.body(S.member_visibility()),
+    responses: [ok: {"Setting", "application/json", S.member_visibility()}]
+  )
+
+  def member_visibility(conn, _params) do
+    with {:ok, setting} <-
+           SocialProfile.set_member_visibility(conn.assigns.user_context, conn.body_params.hidden),
+         do: json(conn, setting)
+  end
 end

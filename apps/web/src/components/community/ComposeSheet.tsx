@@ -28,7 +28,15 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
  * ⊕ button that opens compose (vision §7.1). Everyone can post: to a club
  * channel, or to their own profile for followers or everyone (ADR-142).
  */
-export function ComposeButton({ clubs, clubId }: { clubs: CommunityClub[]; clubId?: string | null }) {
+export function ComposeButton({
+  clubs,
+  clubId,
+  channelId,
+}: {
+  clubs: CommunityClub[];
+  clubId?: string | null;
+  channelId?: string | null;
+}) {
   const t = useTranslations("Community");
   const [open, setOpen] = useState(false);
   return (
@@ -44,7 +52,7 @@ export function ComposeButton({ clubs, clubId }: { clubs: CommunityClub[]; clubI
           <path d="M12 5v14M5 12h14" />
         </svg>
       </button>
-      {open ? <ComposeSheet clubs={clubs} clubId={clubId} onClose={() => setOpen(false)} /> : null}
+      {open ? <ComposeSheet clubs={clubs} clubId={clubId} channelId={channelId} onClose={() => setOpen(false)} /> : null}
     </>
   );
 }
@@ -74,7 +82,17 @@ function isPublic(target: ComposeTarget) {
   return target.kind === "profile" ? target.audience === "public" : target.public;
 }
 
-function ComposeSheet({ clubs, clubId, onClose }: { clubs: CommunityClub[]; clubId?: string | null; onClose: () => void }) {
+function ComposeSheet({
+  clubs,
+  clubId,
+  channelId,
+  onClose,
+}: {
+  clubs: CommunityClub[];
+  clubId?: string | null;
+  channelId?: string | null;
+  onClose: () => void;
+}) {
   const t = useTranslations("Community");
   const tUi = useUiTranslations();
   const locale = useUiLocale();
@@ -84,7 +102,7 @@ function ComposeSheet({ clubs, clubId, onClose }: { clubs: CommunityClub[]; club
   const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const groups = composeTargetGroups(clubs);
   const [target, setTarget] = useState<ComposeTarget>(() =>
-    initialComposeTarget(clubs, readStored<ComposeTarget>(LAST_TARGET_KEY), clubId),
+    initialComposeTarget(clubs, readStored<ComposeTarget>(LAST_TARGET_KEY), clubId, channelId),
   );
   const [picking, setPicking] = useState(false);
   const [publicNoteSeen, setPublicNoteSeen] = useState(() => readStored<boolean>(PUBLIC_NOTE_KEY) === true);
@@ -131,7 +149,7 @@ function ComposeSheet({ clubs, clubId, onClose }: { clubs: CommunityClub[]; club
         await createProfilePost(token, { audience: target.audience, ...content });
         await queryClient.invalidateQueries({ queryKey: SUMMARY_KEY });
       } else if (channelTarget) {
-        await createPost(token, channelTarget.club.organization_slug, {
+        await createPost(token, {
           channel_id: channelTarget.channel.id,
           audience: target.public ? "public" : "club_channel",
           ...content,

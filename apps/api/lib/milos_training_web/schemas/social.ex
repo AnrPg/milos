@@ -112,9 +112,14 @@ defmodule MilosTrainingWeb.Schemas.Social do
         profile: profile(),
         published_at: %Schema{type: :string, format: :"date-time", nullable: true},
         followers_count: %Schema{type: :integer},
-        locations: %Schema{type: :array, items: location()}
+        locations: %Schema{type: :array, items: location()},
+        open_clubs: %Schema{
+          type: :array,
+          description: "The box's open clubs (ADR-143, board 7 Q6)",
+          items: MilosTrainingWeb.Schemas.CommunityGroups.open_club()
+        }
       },
-      required: [:box, :profile, :followers_count, :locations]
+      required: [:box, :profile, :followers_count, :locations, :open_clubs]
     }
   end
 
@@ -261,14 +266,16 @@ defmodule MilosTrainingWeb.Schemas.Social do
         followers_count: %Schema{type: :integer},
         following_count: %Schema{type: :integer},
         requests_count: %Schema{type: :integer},
-        booking_sharing: booking_sharing()
+        booking_sharing: booking_sharing(),
+        member_visibility: member_visibility()
       },
       required: [
         :posts_count,
         :followers_count,
         :following_count,
         :requests_count,
-        :booking_sharing
+        :booking_sharing,
+        :member_visibility
       ]
     }
   end
@@ -281,6 +288,16 @@ defmodule MilosTrainingWeb.Schemas.Social do
         "Whether followers see the classes you book, and whether the one-time offer was answered",
       properties: %{enabled: %Schema{type: :boolean}, offered: %Schema{type: :boolean}},
       required: [:enabled, :offered]
+    }
+  end
+
+  def member_visibility do
+    %Schema{
+      title: "MemberVisibility",
+      type: :object,
+      description: "Whether you keep out of your clubs' «Μέλη» lists",
+      properties: %{hidden: %Schema{type: :boolean}},
+      required: [:hidden]
     }
   end
 
