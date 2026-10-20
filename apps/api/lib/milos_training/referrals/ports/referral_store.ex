@@ -20,7 +20,8 @@ defmodule MilosTraining.Referrals.Ports.ReferralStore do
   user_id, box}` (the box's slug, name, logo, colour and whether its page is
   published), or nil for a revoked code, a former member or a closed box.
   """
-  @callback resolve_code(String.t()) :: %{code_id: id(), organization_id: id(), user_id: id(), box: map()} | nil
+  @callback resolve_code(String.t()) ::
+              %{code_id: id(), organization_id: id(), user_id: id(), box: map()} | nil
 
   @callback get_attribution(context(), id()) :: ReferralAttribution.t() | nil
   @doc "The friend's invite at the box in scope."

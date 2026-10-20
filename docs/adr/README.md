@@ -154,3 +154,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-151 | Filters and saved filters | Accepted |
 | ADR-152 | AI usage metering per call, operation and gym | Accepted |
 | ADR-153 | Club events, attendees and guest passes | Accepted |
+| ADR-156 | Member referrals («Φέρε φίλο») | Accepted |

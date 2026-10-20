@@ -1033,6 +1033,57 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # Member referrals (ADR-156).
+  def call(conn, {:error, :referral_code_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "referral_code_unavailable",
+      error: "No invite code could be made; try again"
+    })
+  end
+
+  def call(conn, {:error, :referrer_not_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "referrer_not_member", error: "The new inviter must be a member of the box"})
+  end
+
+  def call(conn, {:error, :self_referral}), do: call(conn, {:error, :self_referral_not_allowed})
+
+  def call(conn, {:error, :referral_already_qualified}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "referral_already_qualified",
+      error: "The invite already counted and can no longer move to another member"
+    })
+  end
+
+  def call(conn, {:error, :referral_gift_already_applied}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "referral_gift_already_applied",
+      error: "The friend's gift was already applied"
+    })
+  end
+
+  def call(conn, {:error, :referral_no_friend_gift}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "referral_no_friend_gift", error: "The programme gives the friend nothing"})
+  end
+
+  def call(conn, {:error, :no_active_subscription}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "no_active_subscription",
+      error: "The member has no active package with an end date to extend"
+    })
+  end
+
   def call(conn, {:error, :recipient_membership_not_found}) do
     conn
     |> put_status(:unprocessable_entity)

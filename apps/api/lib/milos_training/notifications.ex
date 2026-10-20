@@ -817,19 +817,21 @@ defmodule MilosTraining.Notifications do
     }
   end
 
+  # ADR-156: the member's notices open «Φέρε φίλο» at that box; staff's
+  # open the Finance › Συστάσεις queue.
   defp referral_payload(type, payload) do
     attribution_id = field(payload, :attribution_id)
+    box = field(payload, :box) || %{}
+    box_slug = field(box, :box_slug)
+
+    mine =
+      if box_slug, do: "/me/referrals?box=#{URI.encode_www_form(box_slug)}", else: "/me/referrals"
 
     {dedupe, url} =
       case type do
-        "referral_progress" ->
-          {"#{attribution_id}:#{field(payload, :stage)}", "/me/referrals"}
-
-        "referral_reward" ->
-          {"#{attribution_id}:#{field(payload, :reward_status)}", "/me/referrals"}
-
-        "referral_review" ->
-          {attribution_id, "/admin/finance/referrals"}
+        "referral_progress" -> {"#{attribution_id}:#{field(payload, :stage)}", mine}
+        "referral_reward" -> {"#{attribution_id}:#{field(payload, :reward_status)}", mine}
+        "referral_review" -> {attribution_id, "/admin/finance?tab=referrals"}
       end
 
     %{
@@ -839,7 +841,8 @@ defmodule MilosTraining.Notifications do
       reward_status: field(payload, :reward_status),
       person_nickname: field(payload, :person_nickname),
       referrer_nickname: field(payload, :referrer_nickname),
-      box_name: field(payload, :box_name),
+      box_name: field(box, :box_name),
+      box_slug: box_slug,
       dedupe_key: "#{type}:#{dedupe}",
       url: field(payload, :url) || url
     }

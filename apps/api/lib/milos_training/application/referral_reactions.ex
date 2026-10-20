@@ -18,7 +18,10 @@ defmodule MilosTraining.Application.ReferralReactions do
 
   # Any class the friend came to before joining is their trial (a trial seat,
   # a guest pass or a drop-in).
-  def handle_event(:attendance_recorded, %{organization_id: org, user_id: user, status: status} = event)
+  def handle_event(
+        :attendance_recorded,
+        %{organization_id: org, user_id: user, status: status} = event
+      )
       when status in ["attended", :attended],
       do: step(org, user, :trial, event)
 

@@ -44,7 +44,10 @@ defmodule MilosTraining.Application.Referrals do
   def overview(%{organization_id: organization_id, user_id: user_id} = context, now \\ now()) do
     with {:ok, code} <- ensure_code(context) do
       program = Finance.active_referral_program(box(organization_id))
-      invites = Referrals.list_attributions(context, %{referrer_user_id: user_id, limit: @invites_limit})
+
+      invites =
+        Referrals.list_attributions(context, %{referrer_user_id: user_id, limit: @invites_limit})
+
       programs = programs_of(organization_id, invites, program)
 
       {:ok,
@@ -163,7 +166,9 @@ defmodule MilosTraining.Application.Referrals do
     with %{} = resolved <- Referrals.resolve_code(code_input) || {:error, :not_found} do
       box_context = box(resolved.organization_id)
       program = Finance.active_referral_program(box_context)
-      inviter = [resolved.user_id] |> CommunityPeople.by_ids() |> CommunityPeople.person(resolved.user_id)
+
+      inviter =
+        [resolved.user_id] |> CommunityPeople.by_ids() |> CommunityPeople.person(resolved.user_id)
 
       {:ok,
        %{
@@ -223,7 +228,8 @@ defmodule MilosTraining.Application.Referrals do
           facts = %{
             referrer_id: resolved.user_id,
             referred_id: user_id,
-            referred_standing: Organizations.membership_standing(resolved.organization_id, user_id),
+            referred_standing:
+              Organizations.membership_standing(resolved.organization_id, user_id),
             existing: existing,
             now: now
           }
@@ -254,7 +260,7 @@ defmodule MilosTraining.Application.Referrals do
       referrer_user_id: resolved.user_id,
       referred_user_id: context.user_id,
       code_id: resolved.code_id,
-      community_event_id: channel == "event" && opts[:event_id] || nil,
+      community_event_id: (channel == "event" && opts[:event_id]) || nil,
       channel: channel,
       referral_program_id: program && program.id,
       new_account: opts[:new_account] == true,
@@ -331,11 +337,15 @@ defmodule MilosTraining.Application.Referrals do
       else: :ok
   end
 
-  defp program_of(context, %{referral_program_id: nil}), do: Finance.active_referral_program(context)
-  defp program_of(context, %{referral_program_id: id}), do: Finance.get_referral_program(context, id)
+  defp program_of(context, %{referral_program_id: nil}),
+    do: Finance.active_referral_program(context)
+
+  defp program_of(context, %{referral_program_id: id}),
+    do: Finance.get_referral_program(context, id)
 
   defp qualify(context, attribution, program, at) do
-    with {:eligible, true} <- {:eligible, earns_rewards?(context.organization_id, attribution.referrer_user_id)},
+    with {:eligible, true} <-
+           {:eligible, earns_rewards?(context.organization_id, attribution.referrer_user_id)},
          {:cap, false} <- {:cap, cap_reached?(context, attribution, program, at)},
          {:membership, %{membership: membership}} <-
            {:membership, Finance.get_member_profile(context, attribution.referred_user_id)},
@@ -378,7 +388,10 @@ defmodule MilosTraining.Application.Referrals do
   end
 
   defp open_finance_referral(context, attribution, program, membership) do
-    roles = [attribution.referrer_user_id, attribution.referred_user_id] |> Identity.list_by_ids() |> Map.new(&{&1.id, &1.role})
+    roles =
+      [attribution.referrer_user_id, attribution.referred_user_id]
+      |> Identity.list_by_ids()
+      |> Map.new(&{&1.id, &1.role})
 
     Finance.open_attributed_referral(context, %{
       referral_program_id: program.id,
@@ -387,7 +400,8 @@ defmodule MilosTraining.Application.Referrals do
       membership_id: membership.id,
       referrer_role_snapshot: to_string(roles[attribution.referrer_user_id]),
       referred_role_snapshot: to_string(roles[attribution.referred_user_id]),
-      notes: "#{attribution.channel} · #{Date.to_iso8601(DateTime.to_date(attribution.attributed_at))}",
+      notes:
+        "#{attribution.channel} · #{Date.to_iso8601(DateTime.to_date(attribution.attributed_at))}",
       params: %{"attribution_id" => attribution.id, "channel" => attribution.channel}
     })
   end
@@ -431,8 +445,11 @@ defmodule MilosTraining.Application.Referrals do
   @doc "Approves the invite's referral and creates its reward (a credit lands at once)."
   def approve(%{organization_id: organization_id} = context, attribution_id, _actor_id) do
     with {:ok, attribution, event} <- reviewable(context, attribution_id),
-         program when not is_nil(program) <- program_of(context, attribution) || {:error, :not_found},
-         {:ok, reward} <- approve_referral(context, event, program) do
+         %{} = program <- program_of(context, attribution) || {:error, :not_found},
+         {:ok, reward} <-
+           Referrals.with_friend_lock(context, attribution.referred_user_id, fn ->
+             approve_referral(context, event, program)
+           end) do
       notify_reward(organization_id, attribution, reward)
       {:ok, show(context, attribution.id)}
     end
@@ -449,12 +466,20 @@ defmodule MilosTraining.Application.Referrals do
 
   @doc "«Δόθηκε»: a non-credit reward was handed over (the referral is applied)."
   def mark_given(%{organization_id: organization_id} = context, attribution_id, _actor_id) do
-    with %ReferralAttribution{finance_referral_event_id: event_id} = attribution when is_binary(event_id) <-
+    with %ReferralAttribution{finance_referral_event_id: event_id} = attribution
+         when is_binary(event_id) <-
            Referrals.get_attribution(context, attribution_id) || {:error, :not_found},
          %{reward: %{status: "approved"} = reward} <-
            Finance.referral_outcomes(context, [event_id])[event_id] ||
              {:error, :invalid_referral_status_transition},
-         {:ok, given} <- Finance.update_referral_reward_status(context, reward.id, "applied") do
+         true <-
+           (reward.reward_type != "credit" or
+              has_finance_record?(context, attribution.referrer_user_id)) ||
+             {:error, :recipient_membership_not_found},
+         {:ok, given} <-
+           Referrals.with_friend_lock(context, attribution.referred_user_id, fn ->
+             Finance.update_referral_reward_status(context, reward.id, "applied")
+           end) do
       notify_reward(organization_id, attribution, given)
       {:ok, show(context, attribution.id)}
     else
@@ -470,8 +495,11 @@ defmodule MilosTraining.Application.Referrals do
 
     with %ReferralAttribution{} = attribution <-
            Referrals.get_attribution(context, attribution_id) || {:error, :not_found},
-         true <- Organizations.membership_standing(organization_id, new_referrer) == :member || {:error, :referrer_not_member},
-         {:ok, _moved} <- Referrals.reassign(context, attribution, new_referrer, actor_id, params[:note], now()) do
+         true <-
+           Organizations.membership_standing(organization_id, new_referrer) == :member ||
+             {:error, :referrer_not_member},
+         {:ok, _moved} <-
+           Referrals.reassign(context, attribution, new_referrer, actor_id, params[:note], now()) do
       {:ok, show(context, attribution.id)}
     end
   end
@@ -484,9 +512,11 @@ defmodule MilosTraining.Application.Referrals do
   def apply_friend_gift(context, attribution_id, actor_id) do
     with %ReferralAttribution{friend_gift_applied_at: nil} = attribution <-
            Referrals.get_attribution(context, attribution_id) || {:error, :not_found},
-         %{} = program <- program_of(context, attribution) || {:error, :referral_program_required},
+         %{} = program <-
+           program_of(context, attribution) || {:error, :referral_program_required},
          %{membership: membership} <-
-           Finance.get_member_profile(context, attribution.referred_user_id) || {:error, :referral_membership_required},
+           Finance.get_member_profile(context, attribution.referred_user_id) ||
+             {:error, :referral_membership_required},
          :ok <- grant_gift(context, attribution, program, membership, actor_id),
          {:ok, _applied} <-
            Referrals.update_attribution(context, attribution, %{
@@ -503,13 +533,29 @@ defmodule MilosTraining.Application.Referrals do
   defp grant_gift(_context, _attribution, %{friend_reward_type: "none"}, _membership, _actor),
     do: {:error, :referral_no_friend_gift}
 
-  defp grant_gift(context, _attribution, %{friend_reward_type: "free_days"} = program, membership, _actor) do
+  defp grant_gift(
+         context,
+         _attribution,
+         %{friend_reward_type: "free_days"} = program,
+         membership,
+         _actor
+       ) do
     with {:ok, _extended} <-
-           Finance.extend_current_subscription(context, membership.id, program.friend_reward_value),
+           Finance.extend_current_subscription(
+             context,
+             membership.id,
+             program.friend_reward_value
+           ),
          do: :ok
   end
 
-  defp grant_gift(context, attribution, %{friend_reward_type: "credit"} = program, membership, actor) do
+  defp grant_gift(
+         context,
+         attribution,
+         %{friend_reward_type: "credit"} = program,
+         membership,
+         actor
+       ) do
     with {:ok, _entry} <-
            Finance.create_manual_credit(context, membership.id, %{
              amount_cents: program.friend_reward_value,
@@ -520,10 +566,12 @@ defmodule MilosTraining.Application.Referrals do
          do: :ok
   end
 
-  defp grant_gift(_context, _attribution, %{friend_reward_type: "custom"}, _membership, _actor), do: :ok
+  defp grant_gift(_context, _attribution, %{friend_reward_type: "custom"}, _membership, _actor),
+    do: :ok
 
   defp reviewable(context, attribution_id) do
-    with %ReferralAttribution{finance_referral_event_id: event_id} = attribution when is_binary(event_id) <-
+    with %ReferralAttribution{finance_referral_event_id: event_id} = attribution
+         when is_binary(event_id) <-
            Referrals.get_attribution(context, attribution_id) || {:error, :not_found},
          %{event: %{status: "pending"} = event} <-
            Finance.referral_outcomes(context, [event_id])[event_id] ||
@@ -539,14 +587,20 @@ defmodule MilosTraining.Application.Referrals do
   # Approve the referral, make its reward approved, and hand over a credit at
   # once (it lands in the member's credit ledger); other kinds wait for
   # «Δόθηκε».
+  #
+  # A credit needs the member's own Finance record to land in; without one it
+  # stays approved and «Δόθηκε» hands it over once they have one.
   defp approve_referral(context, event, program) do
     with {:ok, _approved} <- Finance.update_referral_status(context, event.id, "approved"),
          {:ok, reward} <- Finance.create_referral_reward(context, event.id, %{status: "approved"}) do
-      if program.reward_type == "credit",
+      if program.reward_type == "credit" and has_finance_record?(context, event.referrer_user_id),
         do: Finance.update_referral_reward_status(context, reward.id, "applied"),
         else: {:ok, reward}
     end
   end
+
+  defp has_finance_record?(context, user_id),
+    do: match?(%{membership: %{}}, Finance.get_member_profile(context, user_id))
 
   defp maybe_note(_context, attribution, note) when note in [nil, ""], do: {:ok, attribution}
 
@@ -604,7 +658,9 @@ defmodule MilosTraining.Application.Referrals do
 
       base = %{
         id: invite.id,
-        friend: CommunityPeople.person(people, invite.referred_user_id) |> Map.take([:id, :nickname, :avatar_url]),
+        friend:
+          CommunityPeople.person(people, invite.referred_user_id)
+          |> Map.take([:id, :nickname, :avatar_url]),
         stage: Referrals.stage(invite),
         stage_at: stage_at(invite),
         status: invite.status,
@@ -616,10 +672,14 @@ defmodule MilosTraining.Application.Referrals do
 
       if audience == :staff do
         Map.merge(base, %{
-          referrer: invite.referrer_user_id && CommunityPeople.person(people, invite.referrer_user_id) |> Map.take([:id, :nickname, :avatar_url]),
+          referrer:
+            invite.referrer_user_id &&
+              CommunityPeople.person(people, invite.referrer_user_id)
+              |> Map.take([:id, :nickname, :avatar_url]),
           previous_referrer:
             invite.previous_referrer_user_id &&
-              CommunityPeople.person(people, invite.previous_referrer_user_id) |> Map.take([:id, :nickname, :avatar_url]),
+              CommunityPeople.person(people, invite.previous_referrer_user_id)
+              |> Map.take([:id, :nickname, :avatar_url]),
           steps: %{
             event_at: invite.event_at,
             trial_at: invite.trial_at,
@@ -643,7 +703,9 @@ defmodule MilosTraining.Application.Referrals do
   end
 
   defp stage_at(invite),
-    do: invite.paid_at || invite.joined_at || invite.trial_at || invite.event_at || invite.attributed_at
+    do:
+      invite.paid_at || invite.joined_at || invite.trial_at || invite.event_at ||
+        invite.attributed_at
 
   # The reward as the member and staff read it: what it is and where it stands.
   defp present_reward(_invite, nil, _outcome), do: nil
@@ -706,7 +768,10 @@ defmodule MilosTraining.Application.Referrals do
   # ---------------------------------------------------------------- notices
 
   defp notify_progress(organization_id, attribution, stage) do
-    friend = [attribution.referred_user_id] |> CommunityPeople.by_ids() |> CommunityPeople.person(attribution.referred_user_id)
+    friend =
+      [attribution.referred_user_id]
+      |> CommunityPeople.by_ids()
+      |> CommunityPeople.person(attribution.referred_user_id)
 
     if attribution.referrer_user_id do
       Notifications.dispatch_event(:referral_progress, %{
@@ -715,7 +780,7 @@ defmodule MilosTraining.Application.Referrals do
         attribution_id: attribution.id,
         stage: stage,
         person_nickname: friend.nickname,
-        box_name: box_name(organization_id)
+        box: box_ref(organization_id)
       })
     end
 
@@ -729,7 +794,7 @@ defmodule MilosTraining.Application.Referrals do
         organization_id: organization_id,
         attribution_id: attribution.id,
         reward_status: if(reward.status == "applied", do: "given", else: reward.status),
-        box_name: box_name(organization_id)
+        box: box_ref(organization_id)
       })
     end
 
@@ -743,7 +808,9 @@ defmodule MilosTraining.Application.Referrals do
     organization_id
     |> Organizations.list_staff_user_ids()
     |> Enum.filter(fn staff_id ->
-      organization_id |> Organizations.member_roles(staff_id) |> Enum.any?(&(&1 in @reviewer_roles))
+      organization_id
+      |> Organizations.member_roles(staff_id)
+      |> Enum.any?(&(&1 in @reviewer_roles))
     end)
     |> Enum.each(fn staff_id ->
       Notifications.dispatch_event(:referral_review, %{
@@ -752,7 +819,7 @@ defmodule MilosTraining.Application.Referrals do
         attribution_id: attribution.id,
         person_nickname: CommunityPeople.person(people, attribution.referred_user_id).nickname,
         referrer_nickname: CommunityPeople.person(people, attribution.referrer_user_id).nickname,
-        box_name: box_name(organization_id)
+        box: box_ref(organization_id)
       })
     end)
   end
@@ -772,10 +839,11 @@ defmodule MilosTraining.Application.Referrals do
 
   defp box(organization_id), do: %{organization_id: organization_id}
 
-  defp box_name(organization_id) do
+  # The box as notices name it, and its slug so the link opens that box.
+  defp box_ref(organization_id) do
     case PublicBox.boxes([organization_id]) do
-      [%{name: name}] -> name
-      _ -> nil
+      [%{name: name, slug: slug}] -> %{box_name: name, box_slug: slug}
+      _ -> %{box_name: nil, box_slug: nil}
     end
   end
 

@@ -469,10 +469,17 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
 
     body =
       case payload["stage"] do
-        "event" -> localize.("%{nickname} came to the event you invited them to.", bindings)
-        "trial" -> localize.("%{nickname} came to a trial.", bindings)
-        "paid" -> localize.("%{nickname} subscribed. Your reward is waiting for approval.", bindings)
-        _signed_up -> localize.("%{nickname} signed up with your invite.", bindings)
+        "event" ->
+          localize.("%{nickname} came to the event you invited them to.", bindings)
+
+        "trial" ->
+          localize.("%{nickname} came to a trial.", bindings)
+
+        "paid" ->
+          localize.("%{nickname} subscribed. Your reward is waiting for approval.", bindings)
+
+        _signed_up ->
+          localize.("%{nickname} signed up with your invite.", bindings)
       end
 
     %{title: localize.("Your invite", %{}), body: body, url: payload["url"] || "/me/referrals"}
@@ -486,7 +493,11 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
         _approved -> localize.("Your referral reward was approved.", %{})
       end
 
-    %{title: localize.("Referral reward", %{}), body: body, url: payload["url"] || "/me/referrals"}
+    %{
+      title: localize.("Referral reward", %{}),
+      body: body,
+      url: payload["url"] || "/me/referrals"
+    }
   end
 
   def build("referral_review", payload, localize) do
@@ -497,7 +508,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
           nickname: payload["person_nickname"],
           referrer: payload["referrer_nickname"]
         }),
-      url: payload["url"] || "/admin/finance/referrals"
+      url: payload["url"] || "/admin/finance?tab=referrals"
     }
   end
 

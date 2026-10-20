@@ -168,6 +168,7 @@ defmodule MilosTraining.Finance.FinanceStore do
   @impl true
   def extend_current_subscription(membership_id, days),
     do: adapter().extend_current_subscription(membership_id, days)
+
   @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)
   @impl true

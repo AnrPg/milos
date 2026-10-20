@@ -20,7 +20,8 @@ defmodule MilosTraining.Infrastructure.Referrals.EctoReferralStore do
   def insert_code(_context, attrs), do: attrs |> ReferralCode.create_changeset() |> Repo.insert()
 
   @impl true
-  def revoke_code(_context, code, at), do: code |> ReferralCode.revoke_changeset(at) |> Repo.update()
+  def revoke_code(_context, code, at),
+    do: code |> ReferralCode.revoke_changeset(at) |> Repo.update()
 
   @impl true
   def resolve_code(code) when is_binary(code) do
