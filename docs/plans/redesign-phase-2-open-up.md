@@ -520,6 +520,25 @@ below.
    with «Φαίνομαι στο Γύρω μου», at neighbourhood level.
 6. **Thin results (Q6):** «Τίποτα έως 3 km» with counts at 10 and 25 km and «Καθάρισε φίλτρα».
 
+### QR check-in and Wallet (2026-10-20, [board 10](https://claude.ai/artifact/Juvy9kszaDKm1Mig5STT9h))
+
+Apostolos picked the recommended option on Q1–Q4 and Q6, with the extras and notes below.
+
+1. **Door QR (Q1):** «Οθόνη πόρτας» on a tablet or TV with a code that rotates every 30 s, the next
+   class and a welcome line. Extras: a sound and green flash per check-in; a printed poster per
+   location as a backup, which only checks in a booking you already have, in its window.
+2. **Member scan (Q2):** checked in at once, with what's left on the package and a 1-minute undo;
+   several bookings → pick one; none → open gym or «Κλείσε θέση».
+3. **Visitor scan (Q3):** «Θες δοκιμαστικό;» with trial classes and «Ακολούθησε». Note: staff also
+   get a notification to follow up and sell (once an hour per visitor).
+4. **Personal QR and desk (Q4):** a personal QR in Box › Check-in; the desk scans with its camera
+   and shows problems first. Extra: auto mode when everything is fine.
+5. **Wallet (Q5, his note):** an owner setting «Προσωπικός κωδικός: Αλλάζει / Σταθερός». Rotating
+   (default) has no Wallet; static gives a persistent, resettable code that can go into Apple or
+   Google Wallet.
+6. **Owner rules (Q6):** Ρυθμίσεις › Check-in: window, open gym, visitor offer, desk override,
+   door rotation, member code mode.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -541,5 +560,5 @@ below.
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
