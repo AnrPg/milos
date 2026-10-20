@@ -15,7 +15,8 @@ import { TrialButton } from "@/components/trials/TrialButton";
 import { mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 
 import { AboutTab, OpeningHours } from "./AboutTab";
-import { BoxPosts, EmptyTab } from "./BoxPosts";
+import { BoxEvents } from "./BoxEvents";
+import { BoxPosts } from "./BoxPosts";
 import { Icon } from "./Icon";
 import { LockedTab } from "./LockedTab";
 import { PhotoViewer } from "./PhotoViewer";
@@ -178,7 +179,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
             {tab === "about" ? <AboutTab page={page} onOpenPhoto={setViewer} /> : null}
             {tab !== "about" && status === "guest" ? <LockedTab slug={page.box.slug} tab={tab} /> : null}
             {tab === "schedule" && signedIn ? <VisitorSchedule page={page} token={tokens!.access_token} member={Boolean(club)} /> : null}
-            {tab === "events" && signedIn ? <EmptyTab text={t("eventsEmpty")} /> : null}
+            {tab === "events" && signedIn ? <BoxEvents slug={page.box.slug} token={tokens!.access_token} /> : null}
             {tab === "posts" && signedIn ? <BoxPosts slug={page.box.slug} token={tokens!.access_token} /> : null}
           </section>
         </main>

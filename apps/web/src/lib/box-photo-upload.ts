@@ -38,10 +38,10 @@ export async function reencodeImage(file: Blob): Promise<Blob> {
 }
 
 /** Re-encode, reserve, PUT to storage, then let the API verify it. */
-export async function uploadBoxPhoto(token: string, file: File): Promise<MediaItem> {
+export async function uploadBoxPhoto(token: string, file: File, organizationSlug?: string | null): Promise<MediaItem> {
   const body = await reencodeImage(file);
-  const upload = await requestPhotoUpload(token, body.type, body.size);
+  const upload = await requestPhotoUpload(token, body.type, body.size, organizationSlug);
   const response = await fetch(upload.upload_url, { method: "PUT", body, headers: upload.required_headers });
   if (!response.ok) throw new BoxPhotoUploadError("storageRejected");
-  return completePhoto(token, upload.media_id);
+  return completePhoto(token, upload.media_id, organizationSlug);
 }

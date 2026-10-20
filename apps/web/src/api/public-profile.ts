@@ -91,16 +91,20 @@ export async function getBoxVocabulary() {
 
 type PhotoUpload = { media_id: string; upload_url: string; required_headers: Record<string, string>; max_bytes: number };
 
-export async function requestPhotoUpload(token: string, contentType: string, byteSize: number) {
-  return apiRequest<PhotoUpload>(`${BASE}/photos`, {
+/** `organizationSlug` targets one box explicitly (an event cover from the member app); else the selected gym. */
+const photosBase = (organizationSlug?: string | null) =>
+  organizationSlug ? `/org/${encodeURIComponent(organizationSlug)}${BASE}` : BASE;
+
+export async function requestPhotoUpload(token: string, contentType: string, byteSize: number, organizationSlug?: string | null) {
+  return apiRequest<PhotoUpload>(`${photosBase(organizationSlug)}/photos`, {
     method: "POST",
     token,
     body: { content_type: contentType, byte_size: byteSize },
   });
 }
 
-export async function completePhoto(token: string, mediaId: string) {
-  return (await apiRequest<{ media: MediaItem }>(`${BASE}/photos/${mediaId}/complete`, { method: "POST", token }))
+export async function completePhoto(token: string, mediaId: string, organizationSlug?: string | null) {
+  return (await apiRequest<{ media: MediaItem }>(`${photosBase(organizationSlug)}/photos/${mediaId}/complete`, { method: "POST", token }))
     .media;
 }
 

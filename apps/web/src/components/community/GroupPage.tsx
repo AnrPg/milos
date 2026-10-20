@@ -26,6 +26,7 @@ import {
 } from "@/api/community";
 import { ApiError } from "@/api/client";
 import { clientErrorMessage } from "@/components/client/errors";
+import { ClubEventsTab } from "@/components/events/ClubEventsTab";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -41,7 +42,7 @@ import { ErrorLine, Sheet, SheetButton } from "./Sheet";
 import { useClubRealtime, useMyClubs } from "./use-community";
 
 /**
- * A member group (board 7 Q2): its posts for members, who is in it, and for
+ * A member group (board 7 Q2): its posts and events (ADR-153) for members, who is in it, and for
  * its admins the requests, admins, editing and archiving. The last admin hands
  * over before leaving; a quiet group is warned at 50 days and archived at 60,
  * and whoever started it can bring it back (Q8).
@@ -82,7 +83,7 @@ export function GroupPage({ clubId, groupId }: { clubId: string; groupId: string
 function GroupView({ club, clubs, group }: { club: CommunityClub; clubs: CommunityClub[]; group: CommunityGroup }) {
   const t = useTranslations("Clubs");
   const member = group.membership === "member";
-  const [tab, setTab] = useState<"feed" | "members">(member && group.status === "active" ? "feed" : "members");
+  const [tab, setTab] = useState<"feed" | "events" | "members">(member && group.status === "active" ? "feed" : "members");
   const requests = (group.members ?? []).filter((row) => row.status === "requested");
   const canPost = club.channels.some((channel) => channel.id === group.id && channel.can_post);
 
@@ -109,7 +110,7 @@ function GroupView({ club, clubs, group }: { club: CommunityClub; clubs: Communi
       </HubCard>
       {group.status === "active" ? (
         <div role="tablist" aria-label={group.name} className="flex gap-2">
-          {(["feed", "members"] as const).map((id) => (
+          {(["feed", "events", "members"] as const).map((id) => (
             <button
               key={id}
               type="button"
@@ -123,12 +124,20 @@ function GroupView({ club, clubs, group }: { club: CommunityClub; clubs: Communi
                 border: "1px solid var(--border)",
               }}
             >
-              {id === "feed" ? t("tabFeed") : requests.length > 0 ? t("tabMembersRequests", { count: requests.length }) : t("tabMembers")}
+              {id === "feed" ? t("tabFeed") : id === "events" ? t("tabEvents") : requests.length > 0 ? t("tabMembersRequests", { count: requests.length }) : t("tabMembers")}
             </button>
           ))}
         </div>
       ) : null}
-      {tab === "feed" && group.status === "active" ? (
+      {tab === "events" && group.status === "active" ? (
+        member || group.can_manage ? (
+          <ClubEventsTab club={club} group={group} />
+        ) : (
+          <HubCard>
+            <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("groupFeedMembersOnly")}</p>
+          </HubCard>
+        )
+      ) : tab === "feed" && group.status === "active" ? (
         member || group.can_manage ? (
           <FeedList filter={{ clubId: club.id, channelId: group.id }} />
         ) : (

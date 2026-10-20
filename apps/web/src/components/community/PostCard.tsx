@@ -22,6 +22,7 @@ import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import { channelName, clubInitials } from "@/components/community/community";
 import { ReportSheet } from "@/components/community/ReportSheet";
+import { EventPostCard, EventSnapshotCard } from "@/components/events/EventPostCard";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -108,7 +109,13 @@ export function PostCard({ post }: { post: CommunityPost }) {
       {post.body ? (
         <p className="whitespace-pre-wrap text-sm" style={{ color: "var(--text)" }}>{post.body}</p>
       ) : null}
-      {post.attachment_type && post.attachment ? (
+      {post.attachment_type === "event" ? (
+        post.event ? (
+          <EventPostCard event={post.event} />
+        ) : post.attachment ? (
+          <EventSnapshotCard snapshot={post.attachment} />
+        ) : null
+      ) : post.attachment_type && post.attachment ? (
         <Attachment type={post.attachment_type} snapshot={post.attachment} />
       ) : null}
 

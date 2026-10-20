@@ -8,6 +8,7 @@ import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { WodCard } from "@/components/community/WodCard";
+import { MyEventsCard } from "@/components/events/MyEventsCard";
 import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
 import { LeaderboardCard } from "@/components/member-app/home/LeaderboardCard";
@@ -20,7 +21,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Αρχική (brief §6.1, §7.1): what is happening at my gym. Fixed slots, each
- * with an empty state: greeting, the gym's WOD of the day, challenges,
+ * with an empty state: greeting, the gym's WOD of the day, «Τα events μου»
+ * (ADR-153), challenges,
  * leaderboard (trials at other boxes and their follow-up after the greeting,
  * board 6), then the feed of the member's clubs (ADR-138) under the club
  * bar, with ⊕ to post and ♡ for notifications and follow requests. The WOD slot is the selected gym club's #wod-σήμερα
@@ -58,6 +60,7 @@ export function HomeHub() {
           </p>
         </HubCard>
       )}
+      <MyEventsCard />
       <ChallengesCard challenges={gamification?.active_challenges ?? []} />
       {gamification ? <LeaderboardCard leaderboard={gamification.leaderboard} /> : null}
       <section aria-label={t("feedPosts")} className="flex flex-col gap-3">
