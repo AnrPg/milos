@@ -311,7 +311,16 @@ function Tile({
           <video src={item.previewUrl} muted playsInline preload="metadata" className="h-full w-full object-cover" aria-hidden="true" />
         ) : (
           // eslint-disable-next-line @next/next/no-img-element -- a local object URL
-          <img src={item.previewUrl} alt="" className="h-full w-full object-cover" draggable={false} />
+          <img
+            src={item.previewUrl}
+            alt=""
+            className="h-full w-full object-cover"
+            draggable={false}
+            // A photo the browser cannot show (HEIC) still uploads; hide the broken image.
+            onError={(event) => {
+              event.currentTarget.style.visibility = "hidden";
+            }}
+          />
         )}
         {item.kind === "video" ? (
           <span className="absolute bottom-1.5 start-1.5 rounded-full px-1.5 text-[10px] font-bold" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }} aria-hidden="true">

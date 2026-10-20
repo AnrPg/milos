@@ -19,6 +19,7 @@ import {
   DEFAULT_MEDIA_LIMITS,
   INITIAL_UPLOAD,
   admitFiles,
+  contentTypeOf,
   isBusy,
   isPermanent,
   isPublishable,
@@ -160,7 +161,7 @@ export function useComposeMedia() {
 
       try {
         let blob: Blob = start.file;
-        let contentType = start.file.type;
+        let contentType = contentTypeOf(start.file);
         if (start.kind === "photo") {
           const prepared = await preparePhoto(start.file, start.aspect);
           if (signal.aborted) throw new Aborted();
@@ -181,7 +182,6 @@ export function useComposeMedia() {
           if (duration !== null && duration > max.max_video_seconds * 1000 + 500) {
             return send(key, { type: "reject", error: "tooLong" });
           }
-          contentType = contentType || "video/mp4";
           if (!max.video_content_types.includes(contentType)) return send(key, { type: "reject", error: "unsupported" });
         }
 

@@ -226,13 +226,14 @@ test.describe("community", () => {
     expect(calls.proposals).toEqual([{ name: "Mobility club", description: "Stretch after class", join_policy: "request" }]);
   });
 
-  test("⋯ › Report sends a reason and the post disappears for the reporter", async ({ page }) => {
+  test("the subtle report flag sends a reason and the post disappears for the reporter", async ({ page }) => {
     const calls = await member(page);
     await page.goto("/clubs/club-1");
 
     await expect(page.getByText("Who's in for Saturday's partner WOD?")).toBeVisible();
-    await page.getByRole("button", { name: "More" }).click();
-    await page.getByRole("menuitem", { name: "Report" }).click();
+    // Board 12: reporting is a low-contrast flag on the card, no longer an entry under ⋯.
+    await expect(page.getByRole("button", { name: "More" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Report", exact: true }).click();
     const sheet = page.getByRole("dialog", { name: "Report this post" });
     await expect(sheet.getByRole("button", { name: "Send report" })).toBeDisabled();
     await sheet.getByRole("radio", { name: "Spam" }).click();
