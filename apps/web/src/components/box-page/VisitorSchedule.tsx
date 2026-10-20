@@ -9,6 +9,8 @@ import { CLASS_LEVELS } from "@/api/schedule";
 import { fetchBoxSchedule, type PublicBoxPage, type PublicBoxSchedule } from "@/api/social";
 import { WeekStrip, weekStart } from "@/components/member-app/box/schedule/WeekStrip";
 import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
+import { TrialSheet } from "@/components/trials/TrialSheet";
+import type { TrialOffer } from "@/api/trials";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 type Slot = PublicBoxSchedule["slots"][number];
@@ -18,17 +20,22 @@ const ALL = "";
  * Πρόγραμμα for visitors (plan §5a board 4 Q7): the members' week strip and
  * compact rows with a chip row for class type, level and audience, and a
  * class sheet without booking or package dimming. Members of the gym get a
- * link to their own Πρόγραμμα, where they book.
+ * link to their own Πρόγραμμα, where they book. Classes that take trial
+ * guests carry a «Δοκιμαστικό» tag and a chip filter, and their sheet opens
+ * the trial sheet with the class picked (board 6 Q2).
  */
 export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; token: string; member: boolean }) {
   const t = useTranslations("BoxPage");
   const tSchedule = useTranslations("BoxSchedule");
+  const tTrials = useTranslations("Trials");
   const locale = useLocale();
   const [selectedDate, setSelectedDate] = useState(() => formatLocalIsoDate(new Date()));
   const [type, setType] = useState(ALL);
   const [level, setLevel] = useState(ALL);
   const [audience, setAudience] = useState(ALL);
   const [open, setOpen] = useState<Slot | null>(null);
+  const [trialOnly, setTrialOnly] = useState(false);
+  const [trialSlot, setTrialSlot] = useState<Slot | null>(null);
   const monday = weekStart(selectedDate);
 
   const schedule = useQuery({
@@ -42,6 +49,9 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   });
 
   const slots = useMemo(() => schedule.data?.slots ?? [], [schedule.data]);
+  const offer = (schedule.data?.trial_offer ?? null) as TrialOffer | null;
+  const canAsk = Boolean(offer && !offer.blocked_reason && !offer.mine);
+  const takesTrials = (slot: Slot) => canAsk && (slot.trial_seats ?? 0) > 0;
   const types = useMemo(
     () => [...new Map(slots.filter((slot) => slot.class_type).map((slot) => [slot.class_type!.id, slot.class_type!.name])).entries()],
     [slots],
@@ -53,6 +63,7 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
     .filter((slot) => !type || slot.class_type?.id === type)
     .filter((slot) => !level || slot.class_type?.level === level)
     .filter((slot) => !audience || (slot.class_type?.audiences ?? []).includes(audience))
+    .filter((slot) => !trialOnly || takesTrials(slot))
     .sort((a, b) => a.scheduled_at.localeCompare(b.scheduled_at));
   const locationName = (id: string | null | undefined) =>
     page.locations.length > 1 ? (page.locations.find((location) => location.id === id)?.name ?? null) : null;
@@ -74,6 +85,21 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
           onChange={setAudience}
           options={audiences.map((value) => ({ value, label: audienceLabel(tSchedule, value) }))}
         />
+        {canAsk && slots.some(takesTrials) ? (
+          <button
+            type="button"
+            aria-pressed={trialOnly}
+            onClick={() => setTrialOnly((value) => !value)}
+            className="flex min-h-10 shrink-0 items-center rounded-full px-3.5 text-sm font-semibold"
+            style={
+              trialOnly
+                ? { background: "var(--text)", color: "var(--bg)" }
+                : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }
+            }
+          >
+            {tTrials("chipTrial")}
+          </button>
+        ) : null}
       </div>
 
       {schedule.isPending ? <p className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
@@ -93,7 +119,7 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
       <ul className="flex flex-col gap-2">
         {day.map((slot) => (
           <li key={slot.id}>
-            <Row slot={slot} locale={locale} location={locationName(slot.location_id)} onOpen={() => setOpen(slot)} />
+            <Row slot={slot} locale={locale} location={locationName(slot.location_id)} trial={takesTrials(slot)} onOpen={() => setOpen(slot)} />
           </li>
         ))}
       </ul>
@@ -102,8 +128,12 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
           slot={open}
           location={page.locations.find((location) => location.id === open.location_id)?.name ?? null}
           memberHref={member ? `/org/${page.box.slug}/box/schedule?open_slot=${open.id}` : null}
+          onTrial={takesTrials(open) && new Date(open.scheduled_at) > new Date() ? () => (setTrialSlot(open), setOpen(null)) : null}
           onClose={() => setOpen(null)}
         />
+      ) : null}
+      {trialSlot && offer ? (
+        <TrialSheet page={page} token={token} offer={offer} initialSlot={trialSlot} onClose={() => setTrialSlot(null)} />
       ) : null}
     </div>
   );
@@ -155,8 +185,21 @@ function Chip({
   );
 }
 
-function Row({ slot, locale, location, onOpen }: { slot: Slot; locale: string; location: string | null; onOpen: () => void }) {
+function Row({
+  slot,
+  locale,
+  location,
+  trial,
+  onOpen,
+}: {
+  slot: Slot;
+  locale: string;
+  location: string | null;
+  trial: boolean;
+  onOpen: () => void;
+}) {
   const t = useTranslations("BoxSchedule");
+  const tTrials = useTranslations("Trials");
   const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at));
   const detail = [slot.coach?.nickname, location].filter(Boolean).join(" · ");
   const past = new Date(slot.scheduled_at) < new Date();
@@ -174,7 +217,14 @@ function Row({ slot, locale, location, onOpen }: { slot: Slot; locale: string; l
         ) : null}
       </span>
       <span className="flex min-w-0 flex-col">
-        <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>{slot.name}</span>
+        <span className="flex min-w-0 items-center gap-2">
+          <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>{slot.name}</span>
+          {trial && !past ? (
+            <span className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-bold" style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}>
+              {tTrials("tag")}
+            </span>
+          ) : null}
+        </span>
         {detail ? <span className="truncate text-xs" style={{ color: "var(--dim)" }}>{detail}</span> : null}
       </span>
       <span className="text-xs font-bold" style={{ color: past ? "var(--dim)" : slot.spots_remaining === 0 ? "var(--dim)" : "var(--success)" }}>
@@ -188,14 +238,17 @@ function VisitorClassSheet({
   slot,
   location,
   memberHref,
+  onTrial,
   onClose,
 }: {
   slot: Slot;
   location: string | null;
   memberHref: string | null;
+  onTrial: (() => void) | null;
   onClose: () => void;
 }) {
   const t = useTranslations("BoxPage");
+  const tTrials = useTranslations("Trials");
   const tSchedule = useTranslations("BoxSchedule");
   const locale = useLocale();
   const dialog = useModalFocusTrap<HTMLElement>(onClose);
@@ -247,9 +300,11 @@ function VisitorClassSheet({
             <Link href={memberHref} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
               {t("bookAsMember")}
             </Link>
-          ) : (
-            <p className="text-center text-sm" style={{ color: "var(--dim)" }}>{t("trialSoonHint")}</p>
-          )}
+          ) : onTrial ? (
+            <button type="button" onClick={onTrial} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+              {tTrials("bookWithTrial")}
+            </button>
+          ) : null}
           <button type="button" onClick={onClose} className="min-h-11 rounded-2xl text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             {t("close")}
           </button>
