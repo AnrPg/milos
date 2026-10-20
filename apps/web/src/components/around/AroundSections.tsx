@@ -64,7 +64,6 @@ function RowShell({
       data-around-id={id}
       className="flex flex-col gap-1.5 rounded-2xl p-1 transition-shadow"
       style={{ boxShadow: selected ? "0 0 0 2px var(--primary)" : undefined, scrollMarginTop: "5rem" }}
-      onMouseEnter={mappable ? () => setSelectedId(id) : undefined}
     >
       {children}
       {distance !== null || mappable ? (

@@ -61,7 +61,7 @@ export async function proxy(request: NextRequest) {
 function applySecurityHeaders(response: NextResponse) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(self)");
   return response;
 }
 

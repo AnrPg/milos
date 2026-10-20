@@ -85,8 +85,17 @@ export default function AroundMap({
     }
     instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     // Only the person's own panning or zooming offers «Ψάξε εδώ».
+    let byPerson = false;
+    const started = (event: { originalEvent?: unknown }) => {
+      if (event.originalEvent) byPerson = true;
+    };
+    instance.on("dragstart", started);
+    instance.on("zoomstart", started);
+    instance.on("rotatestart", started);
     instance.on("moveend", (event) => {
-      if ((event as { originalEvent?: unknown }).originalEvent) callbacks.current.onMoved(viewportOf(instance));
+      if (!byPerson && !(event as { originalEvent?: unknown }).originalEvent) return;
+      byPerson = false;
+      callbacks.current.onMoved(viewportOf(instance));
     });
     instance.on("error", () => undefined);
     map.current = instance;
