@@ -74,7 +74,7 @@ end
 
 defmodule MilosTraining.FakeVideoTranscoder do
   @moduledoc """
-  Test stand-in for ffmpeg (ADR-157): a 12-second 1920×1080 video, or 90
+  Test stand-in for ffmpeg (ADR-157): a 12-second 1920×1080 video, or 150
   seconds when the upload contains `LONG`. `available?/0` follows
   `:fake_video_available` (default true).
   """
@@ -87,7 +87,7 @@ defmodule MilosTraining.FakeVideoTranscoder do
   @impl true
   def probe(path) do
     {:ok, body} = File.read(path)
-    duration = if String.contains?(body, "LONG"), do: 90_000, else: 12_000
+    duration = if String.contains?(body, "LONG"), do: 150_000, else: 12_000
     {:ok, %{duration_ms: duration, width: 1920, height: 1080, has_video: true}}
   end
 
