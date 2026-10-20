@@ -6776,6 +6776,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/body/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One metric of a client over a range, as the client's display allows (logged) */
+        get: operations["MilosTrainingWeb.ClientBodyController.series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/clients/{user_id}/body/snapshots/{id}": {
         parameters: {
             query?: never;
@@ -10823,7 +10840,7 @@ export interface components {
                 };
                 snapshot_ids: string[];
                 /** @enum {string} */
-                subject: "list" | "snapshot";
+                subject: "list" | "snapshot" | "series";
             }[];
         };
         /** BodyComparison */
@@ -11071,7 +11088,7 @@ export interface components {
         /** BodySeries */
         BodySeries: {
             /**
-             * @description number: points with values; trend: only the trend word; hidden: neither
+             * @description number: points with values; trend: the trend word and a shape (no values); hidden: neither
              * @enum {string}
              */
             display: "number" | "trend" | "hidden";
@@ -11085,6 +11102,12 @@ export interface components {
             }[];
             /** @enum {string} */
             range: "1m" | "1y" | "3m" | "all";
+            /** @description Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout). */
+            shape?: {
+                /** Format: date-time */
+                at: string;
+                y: number;
+            }[];
             /** @enum {string|null} */
             trend?: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
             unit: string;
@@ -24437,7 +24460,7 @@ export interface operations {
                             };
                             snapshot_ids: string[];
                             /** @enum {string} */
-                            subject: "list" | "snapshot";
+                            subject: "list" | "snapshot" | "series";
                         }[];
                     };
                 };
@@ -24828,7 +24851,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /**
-                         * @description number: points with values; trend: only the trend word; hidden: neither
+                         * @description number: points with values; trend: the trend word and a shape (no values); hidden: neither
                          * @enum {string}
                          */
                         display: "number" | "trend" | "hidden";
@@ -24842,6 +24865,12 @@ export interface operations {
                         }[];
                         /** @enum {string} */
                         range: "1m" | "1y" | "3m" | "all";
+                        /** @description Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout). */
+                        shape?: {
+                            /** Format: date-time */
+                            at: string;
+                            y: number;
+                        }[];
                         /** @enum {string|null} */
                         trend?: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
                         unit: string;
@@ -54131,6 +54160,58 @@ export interface operations {
                             /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
                             withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClientBodyController.series": {
+        parameters: {
+            query: {
+                metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                range?: "1m" | "1y" | "3m" | "all";
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Series */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description number: points with values; trend: the trend word and a shape (no values); hidden: neither
+                         * @enum {string}
+                         */
+                        display: "number" | "trend" | "hidden";
+                        /** @enum {string} */
+                        metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                        points: {
+                            /** Format: date-time */
+                            at: string;
+                            smoothed: number;
+                            value: number;
+                        }[];
+                        /** @enum {string} */
+                        range: "1m" | "1y" | "3m" | "all";
+                        /** @description Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout). */
+                        shape?: {
+                            /** Format: date-time */
+                            at: string;
+                            y: number;
+                        }[];
+                        /** @enum {string|null} */
+                        trend?: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
+                        unit: string;
+                        /** @enum {string} */
+                        units: "metric" | "imperial";
                     };
                 };
             };

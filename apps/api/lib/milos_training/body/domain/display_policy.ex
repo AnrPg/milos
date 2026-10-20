@@ -48,7 +48,8 @@ defmodule MilosTraining.Body.Domain.DisplayPolicy do
   A metric's series as it may be shown. `points` are
   `[%{at: DateTime, value: canonical}]`. Returns `%{display, points, trend}`:
   points with `value` and `smoothed` in units when numbers may show, no
-  points (only the trend word) under `trend`, and neither under `hidden`.
+  points under `trend` (the trend word and a `shape` normalized to 0..1, no
+  values), and none of it under `hidden`.
   """
   def series(key, points, %{weight_display: display, units: units}) do
     case mode(key, display) do
@@ -69,7 +70,12 @@ defmodule MilosTraining.Body.Domain.DisplayPolicy do
         }
 
       "trend" ->
-        %{display: "trend", trend: TrendPolicy.word(points), points: []}
+        %{
+          display: "trend",
+          trend: TrendPolicy.word(points),
+          points: [],
+          shape: TrendPolicy.shape(points)
+        }
 
       "hidden" ->
         %{display: "hidden", trend: nil, points: []}

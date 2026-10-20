@@ -8677,7 +8677,8 @@
                 "subject": {
                   "enum": [
                     "list",
-                    "snapshot"
+                    "snapshot",
+                    "series"
                   ],
                   "type": "string"
                 }
@@ -9477,7 +9478,7 @@
       "BodySeries": {
         "properties": {
           "display": {
-            "description": "number: points with values; trend: only the trend word; hidden: neither",
+            "description": "number: points with values; trend: the trend word and a shape (no values); hidden: neither",
             "enum": [
               "number",
               "trend",
@@ -9534,6 +9535,28 @@
               "all"
             ],
             "type": "string"
+          },
+          "shape": {
+            "description": "Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout).",
+            "items": {
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "y": {
+                  "maximum": 1,
+                  "minimum": 0,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "at",
+                "y"
+              ],
+              "type": "object"
+            },
+            "type": "array"
           },
           "trend": {
             "enum": [
@@ -50281,7 +50304,8 @@
                           "subject": {
                             "enum": [
                               "list",
-                              "snapshot"
+                              "snapshot",
+                              "series"
                             ],
                             "type": "string"
                           }
@@ -51360,7 +51384,7 @@
                 "schema": {
                   "properties": {
                     "display": {
-                      "description": "number: points with values; trend: only the trend word; hidden: neither",
+                      "description": "number: points with values; trend: the trend word and a shape (no values); hidden: neither",
                       "enum": [
                         "number",
                         "trend",
@@ -51417,6 +51441,28 @@
                         "all"
                       ],
                       "type": "string"
+                    },
+                    "shape": {
+                      "description": "Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout).",
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "y": {
+                            "maximum": 1,
+                            "minimum": 0,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "at",
+                          "y"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
                     },
                     "trend": {
                       "enum": [
@@ -130132,6 +130178,194 @@
           }
         ],
         "summary": "A client's shared body snapshots (reads are logged for the client)",
+        "tags": [
+          "Body"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/body/series": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ClientBodyController.series",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "metric",
+            "required": true,
+            "schema": {
+              "enum": [
+                "weight",
+                "body_fat",
+                "waist",
+                "hips",
+                "chest",
+                "arm",
+                "thigh",
+                "neck",
+                "calf",
+                "arm_left",
+                "arm_right",
+                "thigh_left",
+                "thigh_right"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "enum": [
+                "1m",
+                "1y",
+                "3m",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "display": {
+                      "description": "number: points with values; trend: the trend word and a shape (no values); hidden: neither",
+                      "enum": [
+                        "number",
+                        "trend",
+                        "hidden"
+                      ],
+                      "type": "string"
+                    },
+                    "metric": {
+                      "enum": [
+                        "weight",
+                        "body_fat",
+                        "waist",
+                        "hips",
+                        "chest",
+                        "arm",
+                        "thigh",
+                        "neck",
+                        "calf",
+                        "arm_left",
+                        "arm_right",
+                        "thigh_left",
+                        "thigh_right"
+                      ],
+                      "type": "string"
+                    },
+                    "points": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "smoothed": {
+                            "type": "number"
+                          },
+                          "value": {
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "at",
+                          "value",
+                          "smoothed"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "range": {
+                      "enum": [
+                        "1m",
+                        "1y",
+                        "3m",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "shape": {
+                      "description": "Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout).",
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "y": {
+                            "maximum": 1,
+                            "minimum": 0,
+                            "type": "number"
+                          }
+                        },
+                        "required": [
+                          "at",
+                          "y"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "trend": {
+                      "enum": [
+                        "steady",
+                        "slightly_down",
+                        "down",
+                        "slightly_up",
+                        "up"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "units": {
+                      "enum": [
+                        "metric",
+                        "imperial"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "range",
+                    "units",
+                    "unit",
+                    "display",
+                    "points"
+                  ],
+                  "title": "BodySeries",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Series"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One metric of a client over a range, as the client's display allows (logged)",
         "tags": [
           "Body"
         ]

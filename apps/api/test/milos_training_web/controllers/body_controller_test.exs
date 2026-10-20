@@ -182,10 +182,15 @@ defmodule MilosTrainingWeb.BodyControllerTest do
 
     refute Map.has_key?(shown, "weight")
 
-    assert %{"display" => "trend", "trend" => "down", "points" => []} =
+    assert %{"display" => "trend", "trend" => "down", "points" => [], "shape" => shape} =
              as.(member)
              |> get("/api/me/body/series?metric=weight&range=all")
              |> json_response(200)
+
+    # The trend line is real data with no scale: 0..1, oldest highest here.
+    assert length(shape) == 6
+    assert hd(shape)["y"] == 1.0 and List.last(shape)["y"] == 0.0
+    refute Jason.encode!(shape) =~ "75.0"
 
     assert %{"deltas" => deltas} =
              as.(member)
@@ -201,10 +206,13 @@ defmodule MilosTrainingWeb.BodyControllerTest do
     |> send_json(:put, "/api/me/body/settings", %{weight_display: "hidden"})
     |> json_response(200)
 
-    assert %{"display" => "hidden", "trend" => nil, "points" => []} =
-             as.(member)
-             |> get("/api/me/body/series?metric=weight&range=all")
-             |> json_response(200)
+    hidden =
+      as.(member)
+      |> get("/api/me/body/series?metric=weight&range=all")
+      |> json_response(200)
+
+    assert %{"display" => "hidden", "trend" => nil, "points" => []} = hidden
+    refute Map.has_key?(hidden, "shape")
 
     assert %{"deltas" => [%{"metric" => "waist"}]} =
              as.(member)
@@ -403,6 +411,63 @@ defmodule MilosTrainingWeb.BodyControllerTest do
     assert first["reader"]["id"] == coach.id
     assert first["organization"]["id"] == ctx.organization.id
     assert Enum.sort(ids) == Enum.sort([full["id"], numbers["id"]])
+  end
+
+  test "a coach reads a client's series from shared snapshots, as the client's display allows",
+       ctx do
+    %{as: as, member: member, coach: coach, staff: staff} = ctx
+    path = "#{staff}/clients/#{member.id}/body/series"
+
+    _private = create!(as, member, %{metrics: %{weight: 90.0}, taken_at: "2026-08-01T08:00:00Z"})
+
+    shared =
+      for {weight, day} <- [{75.0, "10"}, {74.0, "17"}, {73.0, "24"}] do
+        create!(as, member, %{
+          metrics: %{weight: weight},
+          visibility: "coach_numbers",
+          taken_at: "2026-08-#{day}T08:00:00Z"
+        })
+      end
+
+    assert %{"display" => "number", "metric" => "weight", "range" => "all", "points" => points} =
+             as.(coach) |> get("#{path}?metric=weight&range=all") |> json_response(200)
+
+    # Only the shared snapshots: the private 90 kg never reaches the coach.
+    assert Enum.map(points, & &1["value"]) == [75.0, 74.0, 73.0]
+
+    as.(member)
+    |> send_json(:put, "/api/me/body/settings", %{weight_display: "trend"})
+    |> json_response(200)
+
+    trend = as.(coach) |> get("#{path}?metric=weight&range=all") |> json_response(200)
+    assert %{"display" => "trend", "points" => [], "shape" => [_, _, _] = shape} = trend
+    assert Enum.map(shape, & &1["y"]) |> hd() == 1.0
+    refute Jason.encode!(trend) =~ "75.0"
+
+    as.(member)
+    |> send_json(:put, "/api/me/body/settings", %{weight_display: "hidden"})
+    |> json_response(200)
+
+    hidden = as.(coach) |> get("#{path}?metric=weight&range=all") |> json_response(200)
+    assert %{"display" => "hidden", "points" => []} = hidden
+    refute Map.has_key?(hidden, "shape")
+
+    # Unknown metrics are refused by the contract; access as for the other routes.
+    assert as.(coach) |> get("#{path}?metric=height") |> json_response(422)
+    assert as.(ctx.other_coach) |> get("#{path}?metric=weight") |> json_response(403)
+    assert as.(member) |> get("#{path}?metric=weight") |> json_response(403)
+
+    assert %{"entries" => entries} =
+             as.(member) |> get("/api/me/body/access-log") |> json_response(200)
+
+    assert [
+             %{"subject" => "series", "snapshot_ids" => []},
+             %{"subject" => "series", "snapshot_ids" => trend_ids},
+             %{"subject" => "series", "snapshot_ids" => number_ids, "photos_shown" => false}
+           ] = entries
+
+    assert Enum.sort(number_ids) == Enum.sort(Enum.map(shared, & &1["id"]))
+    assert Enum.sort(trend_ids) == Enum.sort(number_ids)
   end
 
   test "body snapshots appear only in the member's own journal", ctx do

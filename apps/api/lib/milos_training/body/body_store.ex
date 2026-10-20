@@ -39,8 +39,8 @@ defmodule MilosTraining.Body.BodyStore do
     do: scoped(context, :delete_empty_snapshots, [user_id])
 
   @impl true
-  def list_metric_points(context, user_id, key, since),
-    do: scoped(context, :list_metric_points, [user_id, key, since])
+  def list_metric_points(context, user_id, key, since, opts \\ []),
+    do: scoped(context, :list_metric_points, [user_id, key, since, opts])
 
   @impl true
   def latest_taken_at(context, user_id), do: scoped(context, :latest_taken_at, [user_id])

@@ -41,6 +41,31 @@ defmodule MilosTrainingWeb.ClientBodyController do
          do: json(conn, page)
   end
 
+  operation(:series,
+    summary: "One metric of a client over a range, as the client's display allows (logged)",
+    parameters: [
+      @user_id,
+      %Parameter{
+        name: :metric,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, enum: MilosTraining.Body.metric_keys()}
+      },
+      %Parameter{
+        name: :range,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, enum: MilosTraining.Body.ranges()}
+      }
+    ],
+    responses: [ok: {"Series", "application/json", S.series()}]
+  )
+
+  def series(conn, %{user_id: user_id} = params) do
+    with {:ok, series} <- ClientBody.series(conn.assigns.tenant_context, user_id, params),
+         do: json(conn, series)
+  end
+
   operation(:show,
     summary: "One shared snapshot of a client (the read is logged for the client)",
     parameters: [
