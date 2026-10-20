@@ -27,7 +27,7 @@ const id = (value: string) => encodeURIComponent(value);
 
 export async function fetchStaffEvents(token: string, scope: EventListScope) {
   const data = await apiRequest<{ events: StaffEventRow[] }>(`${BASE}?scope=${scope}`, { token });
-  return data.events;
+  return data.events ?? [];
 }
 
 export async function fetchStaffEvent(token: string, eventId: string) {

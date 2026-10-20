@@ -31,7 +31,7 @@ export async function fetchClubEvents(token: string, clubId: string, scope: Even
   const data = await apiRequest<{ events: CommunityEvent[] }>(`/me/community/clubs/${id(clubId)}/events?scope=${scope}`, {
     token,
   });
-  return data.events;
+  return data.events ?? [];
 }
 
 /** Creates an event (or a weekly run with `repeat_until`) in a club; `channel_id` makes it a member group's. */
@@ -45,17 +45,17 @@ export function createClubEvent(token: string, clubId: string, draft: EventDraft
 
 export async function fetchClubsEvents(token: string) {
   const data = await apiRequest<{ events: CommunityEvent[] }>("/me/community/events", { token });
-  return data.events;
+  return data.events ?? [];
 }
 
 export async function fetchMyEvents(token: string) {
   const data = await apiRequest<{ events: CommunityEvent[] }>("/me/events", { token });
-  return data.events;
+  return data.events ?? [];
 }
 
 export async function fetchBoxEvents(token: string, slug: string) {
   const data = await apiRequest<{ events: CommunityEvent[] }>(`/boxes/${id(slug)}/events`, { token });
-  return data.events;
+  return data.events ?? [];
 }
 
 /** The event page; with a guest pass token it also says who invited and whether a place is left. */
