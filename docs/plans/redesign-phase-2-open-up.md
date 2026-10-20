@@ -460,8 +460,7 @@ Apostolos picked option A on every question, with the extras below.
 
 ### Open clubs, member groups and moderation (2026-10-20, [board 7](https://claude.ai/artifact/NgQ6u6yUdFZTyJPMHXf8hG))
 
-Built on the recommended option of every question; Apostolos hasn't answered the board yet, so
-any change he picks lands as a follow-up.
+Apostolos picked option A on every question, with the recommended extras below.
 
 1. **Μέλη (Q1):** a list with search, coaches first, linking to each profile. Extra: a person can
    hide from it in Κοινοποίηση & ορατότητα. People you follow are not sorted first.
