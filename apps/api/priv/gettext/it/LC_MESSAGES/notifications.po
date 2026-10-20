@@ -486,3 +486,12 @@ msgstr "Un bicchiere d'acqua?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Il pomeriggio è un buon momento per recuperare con l'acqua."
+
+msgid "Buddy message"
+msgstr "Messaggio dal buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: benessere settimanale"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} notti all'obiettivo di sonno, %{water} giorni con acqua, %{meals} giorni con pasti registrati."

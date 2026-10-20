@@ -1914,7 +1914,10 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_share_phone: {:unprocessable_entity, "share_phone must be true or false"},
     phone_required: {:unprocessable_entity, "Add a phone number to share it"},
     summary_required: {:unprocessable_entity, "Turn on the weekly summary first"},
-    invalid_summary_sharing: {:unprocessable_entity, "Use true or false"}
+    invalid_summary_sharing: {:unprocessable_entity, "Use true or false"},
+    message_body_required: {:unprocessable_entity, "Write a message"},
+    message_too_long_body: {:unprocessable_entity, "A message is at most 2000 characters"},
+    buddy_link_read_only: {:conflict, "This buddy link has ended; the conversation is read-only"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@buddy_errors, reason) do

@@ -15,13 +15,13 @@ defmodule MilosTraining.Buddies.Reply do
     field :buddy_user_id, :binary_id
     field :kind, :string
     field :text, :string
-    field :thread_id, :binary_id
-    field :conversation_organization_id, :binary_id
+    field :link_id, :binary_id
+    field :message_id, :binary_id
 
     timestamps(type: :utc_datetime_usec, updated_at: false)
   end
 
-  @fields ~w(request_id user_id buddy_user_id kind text thread_id conversation_organization_id)a
+  @fields ~w(request_id user_id buddy_user_id kind text link_id message_id)a
 
   def changeset(attrs) do
     %__MODULE__{}

@@ -28,7 +28,14 @@ defmodule MilosTraining.Application.Buddies do
       )
 
     people = people(links, user_id)
-    presented = Enum.map(links, &present(&1, user_id, people, now))
+    unread = Buddies.unread_counts(context, user_id, Enum.map(links, & &1.id))
+
+    presented =
+      Enum.map(links, fn link ->
+        link
+        |> present(user_id, people, now)
+        |> Map.put(:unread_messages, Map.get(unread, link.id, 0))
+      end)
 
     {:ok,
      %{

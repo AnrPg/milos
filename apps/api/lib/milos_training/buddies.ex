@@ -21,10 +21,12 @@ defmodule MilosTraining.Buddies do
     Eligibility,
     InviteToken,
     LinkPolicy,
+    MessagePolicy,
     QuietHours,
     SettingsPolicy,
     SummarySharingPolicy,
     SupportPolicy,
+    TenantDataPolicy,
     WeeklySummary
   }
 
@@ -89,6 +91,17 @@ defmodule MilosTraining.Buddies do
   defdelegate can_reply?(request), to: SupportPolicy
   defdelegate phone_for(kind, phone), to: SupportPolicy
 
+  # The pair's conversation.
+  defdelegate message_body_max(), to: MessagePolicy, as: :body_max
+  defdelegate normalize_message_body(body), to: MessagePolicy, as: :normalize_body
+  defdelegate link_party?(link, user_id), to: MessagePolicy, as: :party?
+  defdelegate can_post_message?(link, now), to: MessagePolicy, as: :can_post?
+  defdelegate messages_read_only?(link, now), to: MessagePolicy, as: :read_only?
+  defdelegate reply_message_body(kind, quick_text, text), to: MessagePolicy, as: :reply_body
+  defdelegate message_page_limit(value), to: MessagePolicy, as: :page_limit
+  defdelegate decode_message_cursor(cursor), to: MessagePolicy, as: :decode_cursor
+  defdelegate message_page(rows, limit), to: MessagePolicy, as: :page
+
   # Weekly summaries.
   defdelegate summary_due?(tz, now), to: WeeklySummary, as: :due?
   defdelegate summary_week(tz, now), to: WeeklySummary, as: :week
@@ -99,6 +112,18 @@ defmodule MilosTraining.Buddies do
   defdelegate summary_toggles(grants), to: SummarySharingPolicy, as: :toggles
   defdelegate summary_changes(toggles, params), to: SummarySharingPolicy, as: :changes
   defdelegate coach_summary(week, toggles, week_line, cravings), to: SummarySharingPolicy
+
+  # Tenant data lifecycle (ADR-117): only the coach-read audit is a gym's.
+  def tenant_data_policy, do: TenantDataPolicy.policy()
+
+  def tenant_data_inventory(context),
+    do: MilosTraining.TenantData.TableStore.inventory(tenant_data_policy(), context)
+
+  def export_tenant_data(context, mode \\ :full),
+    do: MilosTraining.TenantData.TableStore.export(tenant_data_policy(), context, mode)
+
+  def purge_tenant_data(context),
+    do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
 
   # Store.
   defdelegate list_links(context, user_id, ended_since), to: BuddyStore
@@ -126,6 +151,14 @@ defmodule MilosTraining.Buddies do
   defdelegate mark_delivered(context, id, now), to: BuddyStore
   defdelegate mark_nudged(context, id, now), to: BuddyStore
   defdelegate insert_reply(context, attrs, now), to: BuddyStore
+  defdelegate list_messages(context, link_id, cursor, limit), to: BuddyStore
+  defdelegate insert_message(context, attrs), to: BuddyStore
+  defdelegate mark_messages_read(context, link_id, reader_id, now), to: BuddyStore
+  defdelegate unread_counts(context, reader_id, link_ids), to: BuddyStore
+  defdelegate record_wellness_access(context, attrs), to: BuddyStore
+  defdelegate list_wellness_access(context, user_id, limit), to: BuddyStore
+  defdelegate wellness_summary_members(limit), to: BuddyStore
+  defdelegate wellness_summary_coaches(member_id), to: BuddyStore
   defdelegate list_summary_grants(context, user_id), to: BuddyStore
   defdelegate grant_summary(context, user_id, scope, now), to: BuddyStore
   defdelegate withdraw_summary(context, user_id, scope, now), to: BuddyStore

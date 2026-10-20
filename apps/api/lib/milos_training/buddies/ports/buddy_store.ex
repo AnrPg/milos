@@ -60,6 +60,32 @@ defmodule MilosTraining.Buddies.Ports.BuddyStore do
   @callback insert_reply(context(), attrs :: map(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
 
+  # The pair's conversation (one thread per link).
+  @callback list_messages(
+              context(),
+              link_id :: binary(),
+              cursor :: map() | nil,
+              limit :: pos_integer()
+            ) :: [map()]
+  @callback insert_message(context(), attrs :: map()) :: {:ok, map()} | {:error, term()}
+  @callback mark_messages_read(
+              context(),
+              link_id :: binary(),
+              reader_id :: binary(),
+              DateTime.t()
+            ) ::
+              non_neg_integer()
+  @callback unread_counts(context(), reader_id :: binary(), link_ids :: [binary()]) :: map()
+
+  # The coach's wellness-summary reads and the Sunday push.
+  @callback record_wellness_access(context(), attrs :: map()) :: :ok
+  @callback list_wellness_access(context(), user_id :: binary(), limit :: pos_integer()) ::
+              [map()]
+  @callback wellness_summary_members(limit :: pos_integer()) ::
+              [%{user_id: binary(), tz: String.t()}]
+  @callback wellness_summary_coaches(member_id :: binary()) ::
+              [%{organization_id: binary(), coach_user_id: binary()}]
+
   # The coach's weekly summary grants.
   @callback list_summary_grants(context(), user_id :: binary()) :: [map()]
   @callback grant_summary(context(), user_id :: binary(), scope :: String.t(), DateTime.t()) ::

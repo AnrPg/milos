@@ -1184,6 +1184,9 @@ defmodule MilosTrainingWeb.Router do
     post("/me/buddies/:id/decline", MyBuddiesController, :decline)
     post("/me/buddies/:id/leave", MyBuddiesController, :leave)
     patch("/me/buddies/:id", MyBuddiesController, :update)
+    get("/me/buddies/:id/messages", BuddyMessagesController, :index)
+    post("/me/buddies/:id/messages", BuddyMessagesController, :create)
+    post("/me/buddies/:id/messages/read", BuddyMessagesController, :read)
     post("/me/buddy-invites/:token/claim", MyBuddiesController, :claim)
     get("/me/support-requests", SupportRequestController, :index)
     post("/me/support-requests", SupportRequestController, :create)
@@ -1191,6 +1194,13 @@ defmodule MilosTrainingWeb.Router do
     post("/me/support-requests/:id/undo", SupportRequestController, :undo)
     post("/me/support-requests/:id/replies", SupportRequestController, :reply)
     get("/me/wellness-summary-sharing", WellnessSummarySharingController, :show)
+
+    get(
+      "/me/wellness-summary-sharing/access-log",
+      WellnessSummarySharingController,
+      :access_log
+    )
+
     put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
   end
 

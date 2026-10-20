@@ -15,7 +15,7 @@ defmodule MilosTraining.Application.BuddiesRLSTest do
   import MilosTraining.TestFixtures
 
   alias MilosTraining.{Buddies, Organizations, Repo}
-  alias MilosTraining.Buddies.{Link, SupportRequest}
+  alias MilosTraining.Buddies.{Link, Message, SupportRequest, WellnessAccessEntry}
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
   setup do
@@ -36,7 +36,7 @@ defmodule MilosTraining.Application.BuddiesRLSTest do
           })
       end
 
-      %{member: member, buddy: buddy, stranger: stranger}
+      %{gym: gym, member: member, buddy: buddy, stranger: stranger}
     end)
   end
 
@@ -207,5 +207,78 @@ defmodule MilosTraining.Application.BuddiesRLSTest do
 
     assert %{status: "expired"} =
              Buddies.invite_preview(Buddies.invite_token_digest(expired), now())
+  end
+
+  test "the buddy conversation: only the pair reads it; written as oneself into an active link",
+       ctx do
+    link = active_link!(ctx)
+
+    attrs = %{
+      link_id: link.id,
+      user_id: link.user_id,
+      buddy_user_id: link.buddy_user_id,
+      author_id: ctx.buddy.id,
+      body: "Είμαι εδώ"
+    }
+
+    assert {:ok, message} = Buddies.insert_message(ctx(ctx.buddy), attrs)
+    assert [_] = visible(ctx.member, Message)
+    assert [_] = visible(ctx.buddy, Message)
+    assert visible(ctx.stranger, Message) == []
+
+    # Nobody writes as someone else, and a stranger not at all.
+    assert {:error, :buddy_link_read_only} = Buddies.insert_message(ctx(ctx.member), attrs)
+
+    assert {:error, :buddy_link_read_only} =
+             Buddies.insert_message(ctx(ctx.stranger), %{attrs | author_id: ctx.stranger.id})
+
+    # Only the recipient marks it read; the author cannot.
+    assert 0 = Buddies.mark_messages_read(ctx(ctx.buddy), link.id, ctx.member.id, now())
+    assert 1 = Buddies.mark_messages_read(ctx(ctx.member), link.id, ctx.member.id, now())
+
+    # A message never changes.
+    assert_raise Postgrex.Error, fn ->
+      RepoContext.run(ctx(ctx.member), fn ->
+        Repo.update_all(Ecto.Query.where(Message, id: ^message.id), set: [body: "edited"])
+      end)
+    end
+
+    # Ended: still readable, nobody writes.
+    {:ok, _} = Buddies.update_link(ctx(ctx.member), link, %{status: "ended", ended_at: now()})
+    assert [_] = visible(ctx.member, Message)
+
+    assert {:error, :buddy_link_read_only} =
+             Buddies.insert_message(ctx(ctx.member), %{attrs | author_id: ctx.member.id})
+  end
+
+  test "the wellness access log: written in the coach's gym session, read by the member", ctx do
+    coach_session = %{user_id: ctx.buddy.id, organization_id: ctx.gym.id}
+
+    :ok =
+      Buddies.record_wellness_access(coach_session, %{
+        organization_id: ctx.gym.id,
+        user_id: ctx.member.id,
+        reader_user_id: ctx.buddy.id,
+        week_start: ~D[2026-10-12],
+        shared: true,
+        cravings_shown: false
+      })
+
+    assert [%{reader_user_id: reader}] =
+             Buddies.list_wellness_access(ctx(ctx.member), ctx.member.id, 10)
+
+    assert reader == ctx.buddy.id
+    assert visible(ctx.stranger, WellnessAccessEntry) == []
+    assert visible(ctx.buddy, WellnessAccessEntry) == []
+
+    # Outside a gym session nothing can be written.
+    assert_raise Postgrex.Error, fn ->
+      Buddies.record_wellness_access(ctx(ctx.stranger), %{
+        organization_id: ctx.gym.id,
+        user_id: ctx.member.id,
+        reader_user_id: ctx.stranger.id,
+        week_start: ~D[2026-10-12]
+      })
+    end
   end
 end

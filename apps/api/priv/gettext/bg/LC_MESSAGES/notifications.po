@@ -486,3 +486,12 @@ msgstr "Чаша вода?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Следобедът е добър момент да наваксаш с водата."
+
+msgid "Buddy message"
+msgstr "Съобщение от бъди"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: седмично благосъстояние"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} нощи с цел за сън, %{water} дни с вода, %{meals} дни със записани хранения."

@@ -9,7 +9,17 @@ defmodule MilosTraining.Infrastructure.Buddies.EctoBuddyStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Buddies.{Delivery, Link, Reply, Settings, SummaryGrant, SupportRequest}
+  alias MilosTraining.Buddies.{
+    Delivery,
+    Link,
+    Message,
+    Reply,
+    Settings,
+    SummaryGrant,
+    SupportRequest,
+    WellnessAccessEntry
+  }
+
   alias MilosTraining.Repo
 
   @open ~w(pending active)
@@ -328,6 +338,117 @@ defmodule MilosTraining.Infrastructure.Buddies.EctoBuddyStore do
         {:error, _changeset} ->
           Repo.rollback(:invalid_reply)
       end
+    end)
+  end
+
+  # The pair's conversation.
+
+  @impl true
+  def list_messages(_context, link_id, cursor, limit) do
+    Message
+    |> where([m], m.link_id == ^link_id)
+    |> before_cursor(cursor)
+    |> order_by([m], desc: m.inserted_at, desc: m.id)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
+  defp before_cursor(query, nil), do: query
+
+  defp before_cursor(query, %{inserted_at: at, id: id}) do
+    where(query, [m], m.inserted_at < ^at or (m.inserted_at == ^at and m.id < ^id))
+  end
+
+  @impl true
+  def insert_message(_context, attrs) do
+    Repo.transaction(fn ->
+      case attrs |> Message.changeset() |> Repo.insert() do
+        {:ok, message} -> message
+        {:error, _changeset} -> Repo.rollback(:message_body_required)
+      end
+    end)
+  rescue
+    # Row security refuses a message into a link that is no longer active.
+    error in Postgrex.Error ->
+      if error.postgres && error.postgres.code == :insufficient_privilege,
+        do: {:error, :buddy_link_read_only},
+        else: reraise(error, __STACKTRACE__)
+  end
+
+  @impl true
+  def mark_messages_read(_context, link_id, reader_id, now) do
+    {count, _rows} =
+      Message
+      |> where([m], m.link_id == ^link_id and m.author_id != ^reader_id and is_nil(m.read_at))
+      |> Repo.update_all(set: [read_at: now])
+
+    count
+  end
+
+  @impl true
+  def unread_counts(_context, _reader_id, []), do: %{}
+
+  def unread_counts(_context, reader_id, link_ids) do
+    Message
+    |> where([m], m.link_id in ^link_ids and m.author_id != ^reader_id and is_nil(m.read_at))
+    |> group_by([m], m.link_id)
+    |> select([m], {m.link_id, count(m.id)})
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  # The coach's wellness-summary reads.
+
+  @impl true
+  def record_wellness_access(_context, attrs) do
+    now = DateTime.utc_now()
+
+    entry =
+      attrs
+      |> Map.take([
+        :organization_id,
+        :user_id,
+        :reader_user_id,
+        :week_start,
+        :shared,
+        :cravings_shown
+      ])
+      |> Map.merge(%{id: Ecto.UUID.generate(), read_at: now, inserted_at: now})
+
+    {1, _rows} = Repo.insert_all(WellnessAccessEntry, [entry])
+    :ok
+  end
+
+  @impl true
+  def list_wellness_access(_context, user_id, limit) do
+    WellnessAccessEntry
+    |> where([a], a.user_id == ^user_id)
+    |> order_by([a], desc: a.read_at, desc: a.id)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
+  @impl true
+  def wellness_summary_members(limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, tz FROM milos_wellness_summary_members($1)", [limit])
+
+    Enum.map(rows, fn [id, tz] -> %{user_id: Ecto.UUID.load!(id), tz: tz} end)
+  end
+
+  @impl true
+  def wellness_summary_coaches(member_id) do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT organization_id, coach_user_id FROM milos_wellness_summary_coaches($1)",
+        [Ecto.UUID.dump!(member_id)]
+      )
+
+    Enum.map(rows, fn [organization_id, coach_id] ->
+      %{
+        organization_id: Ecto.UUID.load!(organization_id),
+        coach_user_id: Ecto.UUID.load!(coach_id)
+      }
     end)
   end
 

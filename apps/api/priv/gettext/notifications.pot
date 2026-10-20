@@ -485,3 +485,12 @@ msgstr ""
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr ""
+
+msgid "Buddy message"
+msgstr ""
+
+msgid "%{nickname}: weekly wellness"
+msgstr ""
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr ""

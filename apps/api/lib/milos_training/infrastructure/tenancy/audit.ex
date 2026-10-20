@@ -26,6 +26,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     coaching_note_reads
     journal_coach_reads
     body_access_log
+    wellness_access_log
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
     community_post_comments community_reports community_settings
@@ -81,6 +82,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     media_account_objects saved_filters user_home_areas
     body_snapshots body_snapshot_photos user_health_consents body_settings
     buddy_links buddy_settings support_requests support_request_deliveries support_replies
+    buddy_messages
     wellness_summary_grants
   )
 

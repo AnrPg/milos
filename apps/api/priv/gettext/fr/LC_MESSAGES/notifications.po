@@ -486,3 +486,12 @@ msgstr "Un verre d'eau ?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "L'après-midi est un bon moment pour rattraper ton eau."
+
+msgid "Buddy message"
+msgstr "Message de ton buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname} : bien-être de la semaine"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} nuits à l'objectif de sommeil, %{water} jours d'eau, %{meals} jours avec repas notés."

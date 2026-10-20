@@ -51,7 +51,105 @@ defmodule MilosTrainingWeb.Schemas.Buddies do
         started_at: @nullable_datetime,
         ended_at: @nullable_datetime,
         ended_by_me: %Schema{type: :boolean},
+        unread_messages: %Schema{
+          type: :integer,
+          description: "Unread messages from the other person in this link's conversation"
+        },
         created_at: @datetime
+      }
+    }
+  end
+
+  def message do
+    %Schema{
+      title: "BuddyMessage",
+      type: :object,
+      required: [:id, :link_id, :body, :mine, :author, :created_at],
+      properties: %{
+        id: @uuid,
+        link_id: @uuid,
+        body: %Schema{type: :string, maxLength: Buddies.message_body_max()},
+        mine: %Schema{type: :boolean},
+        author: person(),
+        created_at: @datetime,
+        read_at: @nullable_datetime
+      }
+    }
+  end
+
+  def message_page do
+    %Schema{
+      title: "BuddyMessagePage",
+      type: :object,
+      description:
+        "A page of the link's conversation, newest first. `read_only` once the link ended: the thread stays readable, nobody can write.",
+      required: [:messages, :next_cursor, :read_only, :unread],
+      properties: %{
+        messages: %Schema{type: :array, items: message()},
+        next_cursor: %Schema{type: :string, nullable: true},
+        read_only: %Schema{type: :boolean},
+        unread: %Schema{type: :integer}
+      }
+    }
+  end
+
+  def message_request do
+    %Schema{
+      title: "BuddyMessageRequest",
+      type: :object,
+      required: [:body],
+      properties: %{
+        body: %Schema{type: :string, minLength: 1, maxLength: Buddies.message_body_max()}
+      }
+    }
+  end
+
+  def message_response do
+    %Schema{
+      title: "BuddyMessageResponse",
+      type: :object,
+      required: [:message],
+      properties: %{message: message()}
+    }
+  end
+
+  def messages_read_response do
+    %Schema{
+      title: "BuddyMessagesReadResponse",
+      type: :object,
+      required: [:read],
+      properties: %{read: %Schema{type: :integer}}
+    }
+  end
+
+  def wellness_access_log_response do
+    %Schema{
+      title: "WellnessAccessLog",
+      type: :object,
+      required: [:entries],
+      properties: %{
+        entries: %Schema{
+          type: :array,
+          items: %Schema{
+            type: :object,
+            required: [:id, :read_at, :week_start, :shared, :cravings_shown, :reader],
+            properties: %{
+              id: @uuid,
+              read_at: @datetime,
+              week_start: @date,
+              shared: %Schema{type: :boolean},
+              cravings_shown: %Schema{type: :boolean},
+              reader: %Schema{
+                type: :object,
+                properties: %{id: @uuid, nickname: %Schema{type: :string, nullable: true}}
+              },
+              organization: %Schema{
+                type: :object,
+                properties: %{id: @uuid, name: %Schema{type: :string, nullable: true}}
+              }
+            }
+          }
+        }
       }
     }
   end
@@ -223,8 +321,8 @@ defmodule MilosTrainingWeb.Schemas.Buddies do
         conversation: %Schema{
           type: :object,
           nullable: true,
-          description: "The pair's private conversation in Μηνύματα, when they share a gym",
-          properties: %{thread_id: @uuid, organization_id: @uuid}
+          description: "Where the reply was posted in the pair's buddy conversation",
+          properties: %{link_id: @uuid, message_id: @uuid}
         }
       }
     }

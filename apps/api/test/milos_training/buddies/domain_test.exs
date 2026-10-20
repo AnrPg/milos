@@ -7,6 +7,7 @@ defmodule MilosTraining.Buddies.DomainTest do
     Eligibility,
     InviteToken,
     LinkPolicy,
+    MessagePolicy,
     QuietHours,
     SettingsPolicy,
     SummarySharingPolicy,
@@ -382,6 +383,58 @@ defmodule MilosTraining.Buddies.DomainTest do
 
       flat = inspect(summary)
       for leak <- ["chips", "stress", "intensity", "resisted"], do: refute(flat =~ leak)
+    end
+  end
+
+  describe "buddy conversation" do
+    test "bodies are trimmed, 1..2000 characters" do
+      assert MessagePolicy.normalize_body("  γεια  ") == {:ok, "γεια"}
+      assert MessagePolicy.normalize_body("   ") == {:error, :message_body_required}
+      assert MessagePolicy.normalize_body(nil) == {:error, :message_body_required}
+      assert {:ok, _} = MessagePolicy.normalize_body(String.duplicate("α", 2000))
+
+      assert MessagePolicy.normalize_body(String.duplicate("α", 2001)) ==
+               {:error, :message_too_long_body}
+    end
+
+    test "only the two people; writing only while active" do
+      active = link(%{status: "active", started_at: @now, expires_at: nil})
+      assert MessagePolicy.party?(active, "me")
+      assert MessagePolicy.party?(active, "dimitra")
+      refute MessagePolicy.party?(active, "kostas")
+      refute MessagePolicy.party?(active, nil)
+
+      assert MessagePolicy.can_post?(active, @now) == :ok
+      refute MessagePolicy.read_only?(active, @now)
+
+      for status <- ~w(ended declined expired pending) do
+        closed = %{active | status: status}
+        assert MessagePolicy.can_post?(closed, @now) == {:error, :buddy_link_read_only}
+        assert MessagePolicy.read_only?(closed, @now)
+      end
+    end
+
+    test "a support reply posts the quick reply, then the buddy's words" do
+      assert MessagePolicy.reply_body("walk", "Shall we go for a walk?", nil) ==
+               "Shall we go for a walk?"
+
+      assert MessagePolicy.reply_body("call", "Call me", "Τώρα") == "Call me\n\nΤώρα"
+      assert MessagePolicy.reply_body("text", "I'm here", "Μόνο λόγια") == "Μόνο λόγια"
+    end
+
+    test "cursor paging round-trips and refuses garbage" do
+      row = %{inserted_at: @now, id: "6f1f2b38-8b7e-4f9b-9d9c-1d1c4c0a7a11"}
+      cursor = MessagePolicy.encode_cursor(row)
+      assert MessagePolicy.decode_cursor(cursor) == {:ok, row}
+      assert MessagePolicy.decode_cursor(nil) == {:ok, nil}
+      assert MessagePolicy.decode_cursor("nope") == {:error, :invalid_cursor}
+
+      assert MessagePolicy.page_limit(nil) == 30
+      assert MessagePolicy.page_limit("500") == 100
+      assert MessagePolicy.page_limit(0) == 1
+
+      assert {[^row], ^cursor} = MessagePolicy.page([row, %{row | id: "x"}], 1)
+      assert {[^row], nil} = MessagePolicy.page([row], 1)
     end
   end
 

@@ -11,9 +11,9 @@ defmodule MilosTraining.Application.SupportRequests do
     silently (inbox, no push), and the sender is told.
   - A few requests an hour at most.
   - A buddy answers with a quick reply (here, walk, call) or their own
-    words. The answer reaches the sender as a push and, when the two share
-    a gym, opens their private conversation in Μηνύματα so they can keep
-    talking. «Πάρε με τηλέφωνο» shows the buddy the sender's phone only if
+    words. The answer is posted into the pair's own buddy conversation
+    (account-scoped, whether or not they share a gym) and reaches the
+    sender as one push, so they can keep talking. «Πάρε με τηλέφωνο» shows the buddy the sender's phone only if
     the sender shares it with buddies.
   - If nobody answered after ten minutes, the sender gets the calm card
     (breathing, water, a walk, «Στείλε ξανά», help lines as information).
@@ -23,8 +23,9 @@ defmodule MilosTraining.Application.SupportRequests do
 
   require Logger
 
+  alias MilosTraining.Application.BuddyMessages
   alias MilosTraining.Application.Buddies, as: BuddyPages
-  alias MilosTraining.{Buddies, Identity, Localization, Messaging, Notifications, Organizations}
+  alias MilosTraining.{Buddies, Identity, Localization, Notifications}
 
   @list_limit 20
 
@@ -226,18 +227,21 @@ defmodule MilosTraining.Application.SupportRequests do
   # Replies.
 
   @doc """
-  A buddy answers: `kind` here|walk|call|text and optional `text`. Opens
-  (or reuses) the pair's conversation when they share a gym.
+  A buddy answers: `kind` here|walk|call|text and optional `text`. The
+  answer is posted into the pair's buddy conversation (the quick reply's
+  text, then the buddy's own words) and the sender is told once.
   """
   def reply(%{user_id: user_id} = context, id, params, now \\ DateTime.utc_now()) do
     with %{} = request <- Buddies.get_request(context, id) || {:error, :not_found},
          true <- request.user_id != user_id || {:error, :not_found},
          :ok <- Buddies.can_reply?(request),
          [_delivery | _] <- own_deliveries(context, request.id, user_id),
-         true <- still_buddies?(context, request.user_id, user_id, now) || {:error, :forbidden},
+         %{} = link <-
+           active_link(context, request.user_id, user_id, now) || {:error, :forbidden},
          {:ok, kind, text} <-
            Buddies.validate_reply(param(params, "kind"), param(params, "text")),
-         conversation = conversation(context, request.user_id, kind, text),
+         body = Buddies.reply_message_body(kind, quick_reply_text(context, kind), text),
+         {:ok, message} <- BuddyMessages.post_reply(context, link, body),
          {:ok, reply} <-
            Buddies.insert_reply(
              context,
@@ -247,8 +251,8 @@ defmodule MilosTraining.Application.SupportRequests do
                buddy_user_id: user_id,
                kind: kind,
                text: text,
-               thread_id: conversation && conversation.thread_id,
-               conversation_organization_id: conversation && conversation.organization_id
+               link_id: link.id,
+               message_id: message.id
              },
              now
            ) do
@@ -256,11 +260,11 @@ defmodule MilosTraining.Application.SupportRequests do
         user_id: request.user_id,
         request_id: request.id,
         reply_id: reply.id,
+        link_id: link.id,
         buddy_id: user_id,
         buddy_nickname: BuddyPages.nickname(Map.get(context, :account) || %{}),
         kind: kind,
         text: text,
-        thread_id: conversation && conversation.thread_id,
         dedupe_key: "support_reply:#{reply.id}"
       })
 
@@ -277,64 +281,18 @@ defmodule MilosTraining.Application.SupportRequests do
     end
   end
 
-  defp still_buddies?(context, requester_id, buddy_id, now) do
+  # The requester's active link to this buddy: the conversation the reply
+  # goes into.
+  defp active_link(context, requester_id, buddy_id, now) do
     context
     |> Buddies.open_links_between(requester_id, buddy_id)
-    |> Enum.any?(fn link ->
+    |> Enum.find(fn link ->
       link.user_id == requester_id and Buddies.effective_status(link, now) == "active"
     end)
   end
 
-  # The pair's private conversation lives in a gym they share (Messaging is
-  # tenant-scoped); with none in common the reply reaches the sender as a
-  # push and on the request page only (ADR-160 §2).
-  defp conversation(%{user_id: buddy_id} = context, requester_id, kind, text) do
-    account = Map.get(context, :account) || Identity.find_by_id(buddy_id)
-
-    with %{} <- account,
-         organization_id when is_binary(organization_id) <- shared_gym(buddy_id, requester_id),
-         {:ok, tenant} <- Organizations.resolve_tenant_context_by_id(account, organization_id),
-         {:ok, thread_id} <-
-           Messaging.with_tenant_context(tenant, fn ->
-             with {:ok, thread} <-
-                    Messaging.get_or_create_thread(%{
-                      context_type: :direct,
-                      actor_id: buddy_id,
-                      participant_id: requester_id
-                    }),
-                  {:ok, _message} <-
-                    Messaging.send_message(
-                      %{
-                        thread_id: thread.id,
-                        sender_id: buddy_id,
-                        body: text || quick_reply_text(account, kind),
-                        message_type: :chat
-                      },
-                      %{reservations: []}
-                    ) do
-               {:ok, thread.id}
-             end
-           end) do
-      %{thread_id: thread_id, organization_id: organization_id}
-    else
-      _none -> nil
-    end
-  rescue
-    error ->
-      Logger.warning("support reply conversation failed: #{Exception.message(error)}")
-      nil
-  end
-
-  defp shared_gym(a, b) do
-    mine = a |> Organizations.list_memberships() |> Enum.map(& &1.organization.id)
-
-    theirs =
-      b |> Organizations.list_memberships() |> Enum.map(& &1.organization.id) |> MapSet.new()
-
-    Enum.find(mine, &MapSet.member?(theirs, &1))
-  end
-
-  defp quick_reply_text(account, kind) do
+  defp quick_reply_text(%{user_id: user_id} = context, kind) do
+    account = Map.get(context, :account) || Identity.find_by_id(user_id) || %{}
     locale = Map.get(account, :preferred_locale) || "en"
     Localization.translate(locale, quick_reply_message(kind), %{})
   end
@@ -406,10 +364,7 @@ defmodule MilosTraining.Application.SupportRequests do
       person: BuddyPages.person(people[reply.buddy_user_id]),
       created_at: reply.inserted_at,
       conversation:
-        if(reply.thread_id,
-          do: %{thread_id: reply.thread_id, organization_id: reply.conversation_organization_id},
-          else: nil
-        )
+        if(reply.link_id, do: %{link_id: reply.link_id, message_id: reply.message_id}, else: nil)
     }
   end
 

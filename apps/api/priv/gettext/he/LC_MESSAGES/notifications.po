@@ -486,3 +486,12 @@ msgstr "כוס מים?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
+
+msgid "Buddy message"
+msgstr "הודעה מהבאדי"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: רווחה שבועית"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} לילות ביעד השינה, %{water} ימים עם מים, %{meals} ימים עם ארוחות מתועדות."

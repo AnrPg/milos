@@ -36,6 +36,16 @@ defmodule MilosTrainingWeb.WellnessSummarySharingController do
     responses: [ok: @response]
   )
 
+  operation(:access_log,
+    summary: "Which coaches read your weekly wellness summary, newest first",
+    responses: [ok: {"Access log", "application/json", S.wellness_access_log_response()}]
+  )
+
+  def access_log(conn, _params) do
+    with {:ok, entries} <- WellnessSummarySharing.access_log(conn.assigns.user_context),
+         do: json(conn, %{entries: entries})
+  end
+
   def update(conn, _params) do
     with {:ok, sharing} <-
            WellnessSummarySharing.update(conn.assigns.user_context, conn.body_params),

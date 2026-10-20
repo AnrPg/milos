@@ -486,3 +486,12 @@ msgstr "Ένα ποτήρι νερό;"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."
+
+msgid "Buddy message"
+msgstr "Μήνυμα από buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: εβδομαδιαία ευεξία"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} νύχτες στον στόχο ύπνου, %{water} μέρες με νερό, %{meals} μέρες με καταγραφή γευμάτων."

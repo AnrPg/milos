@@ -291,9 +291,39 @@ defmodule MilosTraining.Notifications do
         nickname: field(payload, :buddy_nickname),
         kind: field(payload, :kind),
         text: field(payload, :text),
-        thread_id: field(payload, :thread_id),
+        link_id: field(payload, :link_id),
         dedupe_key: field(payload, :dedupe_key),
         url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  # ADR-160 §2: a message in the pair's buddy conversation. The push names
+  # who wrote, never what.
+  def process_event("buddy_message", payload),
+    do:
+      enqueue_simple(:buddy_message, payload, %{
+        link_id: field(payload, :link_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies/#{field(payload, :link_id)}/messages"
+      })
+
+  # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
+  # it. Counts only; the craving moments stay on the client page.
+  def process_event("coach_wellness_summary", payload),
+    do:
+      enqueue_simple(:coach_wellness_summary, payload, %{
+        organization_id: field(payload, :organization_id),
+        client_user_id: field(payload, :client_user_id),
+        client_nickname: field(payload, :client_nickname),
+        week_start: field(payload, :week_start),
+        week_end: field(payload, :week_end),
+        sleep_nights: field(payload, :sleep_nights),
+        water_days: field(payload, :water_days),
+        meal_days: field(payload, :meal_days),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
       })
 
   def process_event("support_no_reply_nudge", payload),

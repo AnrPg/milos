@@ -13,8 +13,13 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
   import Ecto.Query
   import MilosTraining.TestFixtures
 
-  alias MilosTraining.Application.{BuddyWeeklySummaries, SupportRequests}
-  alias MilosTraining.Messaging.Message
+  alias MilosTraining.Application.{
+    BuddyWeeklySummaries,
+    CoachWellnessSummaries,
+    SupportRequests
+  }
+
+  alias MilosTraining.Messaging.Message, as: GymMessage
   alias MilosTraining.Notifications.Notification
   alias MilosTraining.{Coaching, Organizations, Repo}
 
@@ -258,12 +263,17 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
              })
              |> json_response(201)
 
-    assert %{"kind" => "walk", "conversation" => %{"thread_id" => thread_id}} = reply
+    assert %{"kind" => "walk", "conversation" => %{"link_id" => link_id}} = reply
 
-    assert [%{body: "Πάμε μια βόλτα στις 10;"}] =
-             Repo.all(from(m in Message, where: m.thread_id == ^thread_id))
+    # Posted into the pair's buddy conversation, not gym messaging; one
+    # notification for the reply, none for the message it posted.
+    assert %{"messages" => [%{"body" => body, "mine" => false}], "read_only" => false} =
+             as.(member) |> get("/api/me/buddies/#{link_id}/messages") |> json_response(200)
 
+    assert body == "Shall we go for a walk?\n\nΠάμε μια βόλτα στις 10;"
+    assert Repo.all(GymMessage) == []
     assert [%{payload: %{"kind" => "walk"}}] = notifications(member, :support_reply)
+    assert notifications(member, :buddy_message) == []
 
     assert %{
              "support_request" => %{
@@ -275,8 +285,8 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
 
     assert replied
 
-    # A quick reply without words reuses the same conversation.
-    assert %{"reply" => %{"conversation" => %{"thread_id" => ^thread_id}}} =
+    # A quick reply without words goes into the same conversation.
+    assert %{"reply" => %{"conversation" => %{"link_id" => ^link_id}}} =
              as.(dimitra)
              |> send_json(:post, "/api/me/support-requests/#{request["id"]}/replies", %{
                kind: "here"
@@ -483,5 +493,198 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
              |> json_response(200)
 
     assert %{"shared" => false} = as.(coach) |> get(path) |> json_response(200)
+  end
+
+  test "buddies always have a conversation: no shared gym, paging, read, read-only after", ctx do
+    %{as: as, member: member, stranger: outsider} = ctx
+
+    # The outsider shares no gym with the member: joined through an invite link.
+    %{"token" => token} =
+      as.(member) |> post("/api/me/buddies/invite-links") |> json_response(201)
+
+    %{"link" => %{"id" => link_id}} =
+      as.(outsider) |> post("/api/me/buddy-invites/#{token}/claim") |> json_response(200)
+
+    request = ask!(as, member)
+    :ok = SupportRequests.deliver(member.id, request["id"])
+
+    assert %{"reply" => %{"conversation" => %{"link_id" => ^link_id}}} =
+             as.(outsider)
+             |> send_json(:post, "/api/me/support-requests/#{request["id"]}/replies", %{
+               kind: "call",
+               text: "Είμαι εδώ"
+             })
+             |> json_response(201)
+
+    assert [_one] = notifications(member, :support_reply)
+    assert notifications(member, :buddy_message) == []
+
+    for n <- 1..3 do
+      expected = "μήνυμα #{n}"
+
+      assert %{"message" => %{"mine" => true, "body" => ^expected}} =
+               as.(member)
+               |> send_json(:post, "/api/me/buddies/#{link_id}/messages", %{body: " μήνυμα #{n} "})
+               |> json_response(201)
+    end
+
+    # One notification per message.
+    assert [_, _, _] = notifications(outsider, :buddy_message)
+
+    assert %{"unread_messages" => 3} =
+             as.(outsider)
+             |> get("/api/me/buddies")
+             |> json_response(200)
+             |> Map.fetch!("supporting")
+             |> hd()
+
+    assert %{"messages" => [m3, m2], "next_cursor" => cursor, "unread" => 3} =
+             as.(outsider)
+             |> get("/api/me/buddies/#{link_id}/messages?limit=2")
+             |> json_response(200)
+
+    assert {m3["body"], m2["body"]} == {"μήνυμα 3", "μήνυμα 2"}
+
+    assert %{"messages" => [m1, reply], "next_cursor" => nil} =
+             as.(outsider)
+             |> get("/api/me/buddies/#{link_id}/messages?limit=2&cursor=#{cursor}")
+             |> json_response(200)
+
+    assert m1["body"] == "μήνυμα 1"
+    assert %{"mine" => true, "body" => "Call me\n\nΕίμαι εδώ"} = reply
+
+    assert %{"code" => "invalid_cursor"} =
+             as.(outsider)
+             |> get("/api/me/buddies/#{link_id}/messages?cursor=nope")
+             |> json_response(400)
+
+    assert %{"read" => 3} =
+             as.(outsider)
+             |> post("/api/me/buddies/#{link_id}/messages/read")
+             |> json_response(200)
+
+    # The member reads the reply; again, nothing left.
+    for expected <- [1, 0] do
+      assert %{"read" => ^expected} =
+               as.(member)
+               |> post("/api/me/buddies/#{link_id}/messages/read")
+               |> json_response(200)
+    end
+
+    assert %{"errors" => [%{"source" => %{"pointer" => "/body"}}]} =
+             as.(member)
+             |> send_json(:post, "/api/me/buddies/#{link_id}/messages", %{
+               body: String.duplicate("α", 2001)
+             })
+             |> json_response(422)
+
+    # Nobody else reads or writes it.
+    assert as.(ctx.kostas) |> get("/api/me/buddies/#{link_id}/messages") |> json_response(404)
+
+    assert as.(ctx.kostas)
+           |> send_json(:post, "/api/me/buddies/#{link_id}/messages", %{body: "hi"})
+           |> json_response(404)
+
+    # Ended: readable, read-only.
+    as.(outsider) |> post("/api/me/buddies/#{link_id}/leave") |> json_response(200)
+
+    assert %{"read_only" => true, "messages" => [_, _, _, _]} =
+             as.(member) |> get("/api/me/buddies/#{link_id}/messages") |> json_response(200)
+
+    assert %{"code" => "buddy_link_read_only"} =
+             as.(member)
+             |> send_json(:post, "/api/me/buddies/#{link_id}/messages", %{body: "still there?"})
+             |> json_response(409)
+  end
+
+  test "every coach read of the wellness summary is in the member's access log", ctx do
+    %{as: as, member: member, coach: coach, gym: gym} = ctx
+    path = "/api/org/#{gym.slug}/staff/clients/#{member.id}/wellness-summary"
+
+    assert %{"entries" => []} =
+             as.(member)
+             |> get("/api/me/wellness-summary-sharing/access-log")
+             |> json_response(200)
+
+    assert %{"shared" => false} = as.(coach) |> get(path) |> json_response(200)
+
+    as.(member)
+    |> send_json(:put, "/api/me/wellness-summary-sharing", %{wellness: true, cravings: true})
+    |> json_response(200)
+
+    assert %{"shared" => true} =
+             as.(coach) |> get(path <> "?week=2026-10-14") |> json_response(200)
+
+    # A refused read leaves no row.
+    assert as.(ctx.dimitra) |> get(path) |> response(403)
+
+    assert %{"entries" => [latest, first]} =
+             as.(member)
+             |> get("/api/me/wellness-summary-sharing/access-log")
+             |> json_response(200)
+
+    assert %{
+             "shared" => true,
+             "cravings_shown" => true,
+             "week_start" => "2026-10-12",
+             "reader" => %{"id" => coach_id},
+             "organization" => %{"name" => "Buddy Box"}
+           } = latest
+
+    assert coach_id == coach.id
+    assert %{"shared" => false, "cravings_shown" => false} = first
+
+    # Others never see it.
+    assert %{"entries" => []} =
+             as.(coach)
+             |> get("/api/me/wellness-summary-sharing/access-log")
+             |> json_response(200)
+  end
+
+  test "the coach's Sunday push: counts only, only with the toggle, once a week", ctx do
+    %{as: as, member: member, coach: coach} = ctx
+    # A Sunday at 19:10 in Athens.
+    sunday = ~U[2026-10-18 16:10:00Z]
+
+    as.(member)
+    |> put("/api/me/body/consents/health_data")
+    |> json_response(200)
+
+    :ok = CoachWellnessSummaries.call(sunday)
+    assert notifications(coach, :coach_wellness_summary) == []
+
+    as.(member)
+    |> send_json(:put, "/api/me/wellness-summary-sharing", %{wellness: true, cravings: true})
+    |> json_response(200)
+
+    # Not Sunday evening yet: nothing.
+    :ok = CoachWellnessSummaries.call(~U[2026-10-17 16:10:00Z])
+    assert notifications(coach, :coach_wellness_summary) == []
+
+    :ok = CoachWellnessSummaries.call(sunday)
+    :ok = CoachWellnessSummaries.call(sunday)
+
+    assert [%{payload: payload, organization_id: organization_id}] =
+             notifications(coach, :coach_wellness_summary)
+
+    assert organization_id == ctx.gym.id
+
+    assert %{
+             "client_user_id" => client_id,
+             "week_start" => "2026-10-12",
+             "week_end" => "2026-10-18",
+             "sleep_nights" => _,
+             "water_days" => _,
+             "meal_days" => _,
+             "url" => url
+           } = payload
+
+    assert client_id == member.id
+    assert url == "/admin/users/#{member.id}"
+    refute Map.has_key?(payload, "cravings")
+    refute Map.has_key?(payload, "moments")
+
+    # Only coaches: buddies and other members hear nothing.
+    assert notifications(ctx.dimitra, :coach_wellness_summary) == []
   end
 end

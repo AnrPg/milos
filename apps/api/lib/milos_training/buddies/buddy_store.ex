@@ -103,6 +103,38 @@ defmodule MilosTraining.Buddies.BuddyStore do
   def insert_reply(context, attrs, now), do: scoped(context, :insert_reply, [attrs, now])
 
   @impl true
+  def list_messages(context, link_id, cursor, limit),
+    do: scoped(context, :list_messages, [link_id, cursor, limit])
+
+  @impl true
+  def insert_message(context, attrs), do: scoped(context, :insert_message, [attrs])
+
+  @impl true
+  def mark_messages_read(context, link_id, reader_id, now),
+    do: scoped(context, :mark_messages_read, [link_id, reader_id, now])
+
+  @impl true
+  def unread_counts(context, reader_id, link_ids),
+    do: scoped(context, :unread_counts, [reader_id, link_ids])
+
+  # Written in the coach's gym session (the log is gym-scoped); the member
+  # reads their own rows in theirs.
+  @impl true
+  def record_wellness_access(context, attrs),
+    do: scoped(context, :record_wellness_access, [attrs])
+
+  @impl true
+  def list_wellness_access(context, user_id, limit),
+    do: scoped(context, :list_wellness_access, [user_id, limit])
+
+  # Definer lookups across people: ids only, no session needed.
+  @impl true
+  def wellness_summary_members(limit), do: adapter().wellness_summary_members(limit)
+
+  @impl true
+  def wellness_summary_coaches(member_id), do: adapter().wellness_summary_coaches(member_id)
+
+  @impl true
   def list_summary_grants(context, user_id),
     do: scoped(context, :list_summary_grants, [user_id])
 

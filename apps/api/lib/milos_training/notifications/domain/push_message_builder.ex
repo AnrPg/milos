@@ -566,6 +566,35 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-160 §2: who wrote, never what (lock-screen safe).
+  def build("buddy_message", payload, localize) do
+    %{
+      title: localize.("Buddy message", %{}),
+      body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  # ADR-160 §4: counts only, never craving times.
+  def build("coach_wellness_summary", payload, localize) do
+    bindings = %{
+      nickname: payload["client_nickname"] || "",
+      sleep: payload["sleep_nights"] || 0,
+      water: payload["water_days"] || 0,
+      meals: payload["meal_days"] || 0
+    }
+
+    %{
+      title: localize.("%{nickname}: weekly wellness", bindings),
+      body:
+        localize.(
+          "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged.",
+          bindings
+        ),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
   # ADR-159: lock-screen safe, so neither push names a craving or a number.
   def build("craving_follow_up", payload, localize) do
     %{
