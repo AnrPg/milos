@@ -10,7 +10,9 @@ defmodule MilosTraining.Application.WalletPasses do
     * `download/1` - the `.pkpass` behind a download link.
     * `revoke/3` - Εγώ › Συνδεδεμένες συσκευές: the card stops scanning now,
       and the platform is told (the Apple pass turns void, the Google object
-      inactive).
+      inactive). Its barcode is the member's static code, so the code is
+      reset too: every card carrying it is voided and the app shows a new
+      code.
     * `touch/2` + `push/2` - a booking or check-in changed the member's next
       booking: the card is marked updated and each platform is told, in a
       background job.
@@ -29,7 +31,15 @@ defmodule MilosTraining.Application.WalletPasses do
 
   require Logger
 
-  alias MilosTraining.Application.{CheckInFacts, CheckInKeys, MemberCodes, PublicURL, SignedToken}
+  alias MilosTraining.Application.{
+    CheckInActions,
+    CheckInFacts,
+    CheckInKeys,
+    MemberCodes,
+    PublicURL,
+    SignedToken
+  }
+
   alias MilosTraining.{Facility, Identity, Organizations, Scheduling, Wallet}
   alias MilosTraining.Facility.Domain.MemberCodePolicy
   alias MilosTraining.Wallet.Domain.{PassContent, PassImage}
@@ -69,13 +79,17 @@ defmodule MilosTraining.Application.WalletPasses do
     end
   end
 
+  # The card's barcode is the member's static code, so a card stops
+  # scanning only when that code ends: revoking a card resets the code,
+  # which voids every card carrying it (a new code is issued lazily).
   def revoke(%{user_id: user_id}, pass_id, now \\ DateTime.utc_now()) do
     with %{} = pass <-
            %{user_id: user_id}
            |> Wallet.list_user_passes()
            |> Enum.find(&(&1.id == pass_id)) || {:error, :not_found},
-         context = %{organization_id: pass.organization_id},
-         {:ok, revoked} <- Wallet.revoke_pass(context, pass.id, now) do
+         context = %{organization_id: pass.organization_id, user_id: user_id},
+         {:ok, revoked} <- Wallet.revoke_pass(context, pass.id, now),
+         {:ok, _counts} <- MemberCodes.revoke(context, user_id, "reset", now) do
       WalletPushJob.schedule(pass.organization_id, pass.id)
       {:ok, present(Map.merge(pass, revoked))}
     end
@@ -283,7 +297,7 @@ defmodule MilosTraining.Application.WalletPasses do
      %PassContent{
        serial: pass.serial,
        box: box,
-       member: %{name: (person && (person.display_nickname || person.nickname)) || ""},
+       member: %{name: CheckInActions.display_name(person) || ""},
        barcode: if(code, do: MemberCodes.wallet_barcode(context, code), else: ""),
        next_booking: next_booking(context, pass.user_id, now),
        updated_at: pass.last_updated_at,
