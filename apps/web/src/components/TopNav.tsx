@@ -40,6 +40,8 @@ export { adminHref } from "@/lib/organization-slug";
 
 // The public box page draws its own header over the cover (ADR-142).
 const CANVAS_PATHS = ["/login", "/b"];
+// Screens that fill the whole display (ADR-155): the door kiosk and the printed poster.
+const CANVAS_PATTERNS = [/^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
 
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
@@ -177,7 +179,10 @@ export function TopNav() {
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
-  if (CANVAS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+  if (
+    CANVAS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    CANVAS_PATTERNS.some((pattern) => pattern.test(stripOrganizationPrefix(pathname)))
+  ) {
     return null;
   }
 
