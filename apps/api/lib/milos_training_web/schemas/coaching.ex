@@ -32,7 +32,7 @@ defmodule MilosTrainingWeb.Schemas.Coaching do
   @portions %Schema{
     type: :object,
     nullable: true,
-    description: "Daily hand portions (palm, fist, fist, thumb), halves allowed",
+    description: "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
     properties: %{
       protein: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5},
       carbs: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5},

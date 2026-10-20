@@ -1,9 +1,9 @@
 defmodule MilosTraining.Nutrition.Domain.PortionPolicy do
   @moduledoc """
   Hand portions of the coach's plan (ADR-159, board 14 Q5): a palm of
-  protein, a fist of carbs, a fist of vegetables and a thumb of fat, per
+  protein, a cupped hand of carbs, a fist of vegetables and a thumb of fat, per
   day, in halves. A coach may write them; otherwise they follow from the
-  plan's grams (about 25 g protein a palm, 25 g carbs a fist, 10 g fat a
+  plan's grams (about 25 g protein a palm, 25 g carbs a cupped hand, 10 g fat a
   thumb), so a plan written in grams still reads without a scale. Vegetables
   have no grams to start from and appear only when the coach sets them.
 

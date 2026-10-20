@@ -489,7 +489,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("How did it go?", %{}),
       body: localize.("A quick note on earlier helps you see what works for you.", %{}),
-      url: payload["url"] || "/journal/wellness"
+      url: payload["url"] || "/journal/wellbeing"
     }
   end
 
@@ -497,7 +497,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("A glass of water?", %{}),
       body: localize.("The afternoon is a good moment to catch up on water.", %{}),
-      url: payload["url"] || "/journal/wellness"
+      url: payload["url"] || "/journal/wellbeing"
     }
   end
 

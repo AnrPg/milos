@@ -2,7 +2,7 @@ defmodule MilosTraining.Wellness.Domain.Meal do
   @moduledoc """
   Γεύμα (ADR-159 §1, vision §7.7, §8.6): a meal, optionally in a slot, «εντός»
   or «εκτός πλάνου», with an optional photo and line of text. Optional hand
-  portions (palm, fist, cupped hand, thumb) let a coach's plan be followed
+  portions (palm of protein, cupped hand of carbs, fist of vegetables, thumb of fat) let a coach's plan be followed
   without weighing food. No calories, ever.
   """
 

@@ -1,6 +1,6 @@
 # ADR-159: Ευεξία and Λιγούρα (wellness entries and cravings)
 Date: 2026-10-20
-Status: Accepted (sections marked «board 14» are filled in from ANR's answers)
+Status: Accepted (board 14 answered: Q1 B, Q2 A, Q3 A, Q4 A, Q5 B, Q6 B, Q7 A, Q8 A, Q9 A, every extra ticked)
 
 ## Context
 Plan §5 P2-M11 and vision §7.7 add the «Σήμερα» card to Ημερολόγιο › Ευεξία:
@@ -57,7 +57,45 @@ already records mood and stress; the coach's plan is Nutrition (ADR-098).
    purge removes rows with that gym's provenance (ADR-117); «Διαγραφή όλων»
    per section (`wellness`, `cravings`) removes the member's rows for good.
 8. **API.** `/api/me/wellness` (days `from..to`, at most 92), `entries`,
-   `cravings`, `preferences`, and `DELETE /api/me/wellness?sections=`.
+   `cravings`, `preferences`, `meal-photos` (upload), `export?sections=`
+   and `DELETE /api/me/wellness?sections=`.
+9. **Consent (board 14).** Logging anything needs M10's `health_data`
+   consent (`health_data_consent_required`, 403); the page asks on the first
+   visit, together with which items to show. Coach reads also need it, in
+   row security (`milos_health_data_consented`), so withdrawing it hides
+   every widened entry at once while the member keeps their data.
+10. **Meal photos (Q4).** A `meal_photo` media purpose (account scope,
+    `media_private`, server-stripped renditions, ADR-157), attached to the
+    entry (`wellness_entry`), released with it, shown with signed URLs, and
+    never posted without a separate confirmation.
+11. **Tiles and order (Q1 B).** The page is a grid of tiles in the member's
+    order (`item_order`; items never placed follow in default order), with
+    per-item switches (`hidden_items`: water, sleep, meals, plan, mood) in
+    «Προσαρμογή» (Q9 A). A hidden item leaves the card, the week, Νέα
+    καταχώρηση and the coach summary; its data stays until deleted.
+12. **Nudges (Q2, Q6).** A craving left open hears «Πώς πήγε;» once, 20
+    minutes later. The opt-in water reminder (`water_reminder`) comes at
+    most once a local day between 15:00 and 21:00 while the day is under
+    half the goal. Definer lookups name who is due; each person is handled
+    in their own session; dedupe keys hold each nudge to one. Lock-screen
+    text never names a craving or a number. No streaks and no «you missed»
+    messages anywhere (Q7).
+13. **Ροή (Q8 A).** One «Ευεξία» item per local day (water, sleep, meals,
+    with the member's summary) and each Λιγούρα as its own item. The day
+    never moves; single entries do (`wellness_entry`, `craving` on the
+    journal ladder, including Ζητάω απάντηση). A coach sees only widened
+    entries, never targets or photos. The coach's weekly summary is M12's.
+14. **The coach's plan (Q5 B).** Daily hand portions (palm of protein,
+    cupped hand of carbs, fist of vegetables, thumb of fat; halves) on `nutrition_plans.portion_targets`, derived from grams
+    until the coach writes their own, plus optional `meal_slots` the meal
+    sheet offers. Meals take portions; the day sums them against the plan.
+    Calories never reach the member (`Nutrition.for_member/1`). The member
+    reads their plans across gyms in their personal session through
+    `milos_own_nutrition_plans()` (no calories, no text).
+15. **Λιγούρα support (Q6).** «Χρειάζομαι στήριξη» stamps the craving once
+    and calls the `SupportRequests` port with only the craving id; M12's
+    buddy adapter decides who hears. Craving details never go to a buddy.
+16. **Export (Q9).** Per section, JSON, with signed links to meal photos.
 
 ## Rationale
 One table with typed value modules keeps the read model one query, lets
@@ -74,11 +112,12 @@ what makes undo, devices and changed glass sizes trivially correct.
   latest Πώς νιώθω instead.
 
 ## Consequences
-- Meal photos need a `meal_photo` media purpose (account scope, client
-  re-encoded, like body photos); it lands after M10's media changes so the
-  two milestones don't fight over the same constraint.
-- Journal feed and visibility kinds for wellness and cravings, the coach
-  summary and per-item switches follow board 14.
+- Migrations that touch shared check constraints (media purposes, attached
+  types, notification types, message subjects) read the current definition
+  and add to it, so milestones can land in any order.
+- The coach's weekly summary, buddies and who receives a support request
+  belong to M12; until then the support port is a no-op.
+- Devices (M13) write the same rows through `upsert_device_entry`.
 
 ## Implementation Notes
 - `WellnessInput.usec/1` normalises every timestamp to microseconds, since

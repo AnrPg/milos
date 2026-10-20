@@ -3,7 +3,7 @@ defmodule MilosTraining.Repo.Migrations.NutritionPortions do
 
   @moduledoc """
   ADR-159 (board 14, Q4 and Q5): the coach's plan gains daily hand portions
-  (palm of protein, fist of carbs, fist of vegetables, thumb of fat; halves
+  (palm of protein, cupped hand of carbs, fist of vegetables, thumb of fat; halves
   allowed) and, optionally, the meal slots the member logs against. Grams
   stay as the coach wrote them; calories stay staff-only.
 

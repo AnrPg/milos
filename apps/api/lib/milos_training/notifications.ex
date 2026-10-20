@@ -254,7 +254,7 @@ defmodule MilosTraining.Notifications do
       enqueue_simple(:craving_follow_up, payload, %{
         craving_id: field(payload, :craving_id),
         dedupe_key: field(payload, :dedupe_key),
-        url: "/journal/wellness?craving=#{field(payload, :craving_id)}"
+        url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
       })
 
   # ADR-159 (board 14, Q2): the opt-in afternoon water reminder.
@@ -262,7 +262,7 @@ defmodule MilosTraining.Notifications do
     do:
       enqueue_simple(:water_reminder, payload, %{
         dedupe_key: field(payload, :dedupe_key),
-        url: "/journal/wellness"
+        url: "/journal/wellbeing"
       })
 
   # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
