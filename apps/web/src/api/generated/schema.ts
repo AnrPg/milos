@@ -2323,6 +2323,40 @@ export interface paths {
         patch: operations["MilosTrainingWeb.WellnessController.update_entry"];
         trace?: never;
     };
+    "/api/me/wellness/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your wellness and/or cravings as JSON, meal photos as signed links */
+        get: operations["MilosTrainingWeb.WellnessController.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness/meal-photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve an upload for a meal photo (needs your health-data consent) */
+        post: operations["MilosTrainingWeb.WellnessController.upload_meal_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/wellness/preferences": {
         parameters: {
             query?: never;
@@ -12051,7 +12085,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -12083,7 +12117,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -12153,7 +12187,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -12185,7 +12219,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -17678,7 +17712,7 @@ export interface components {
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
             /** Format: date-time */
             occurred_at: string;
             /**
@@ -17769,7 +17803,7 @@ export interface components {
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
             /** @description The message sent to the coach, for coach_reply_requested. */
             reply_request?: {
                 /** Format: uuid */
@@ -17793,7 +17827,7 @@ export interface components {
             /** @description A tiny blurred WebP data URI to show while the image loads */
             placeholder?: string | null;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
             rejection_reason?: string | null;
             /**
              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -17837,7 +17871,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -18174,10 +18208,26 @@ export interface components {
         NutritionPlan: {
             body: string;
             carbs_grams?: number | null;
+            /** @description Staff only; never sent to the member */
             daily_calories?: number | null;
             fat_grams?: number | null;
             /** Format: uuid */
             id: string;
+            meal_slots?: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+            /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+            portion_targets?: {
+                carbs?: number;
+                fat?: number;
+                protein?: number;
+                veg?: number;
+            } | null;
+            /** @description Effective daily portions (member view) */
+            portions?: {
+                carbs?: number;
+                fat?: number;
+                protein?: number;
+                veg?: number;
+            } | null;
             protein_grams?: number | null;
             title: string;
             /** Format: date-time */
@@ -21561,7 +21611,8 @@ export interface components {
             /**
              * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
              *     (minutes or quality required; both ends give minutes). meal: {slot?
-             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+             *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+             *     in_plan|off_plan, note?, media_id?,
              *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
              */
             value?: {
@@ -21584,7 +21635,8 @@ export interface components {
             /**
              * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
              *     (minutes or quality required; both ends give minutes). meal: {slot?
-             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+             *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+             *     in_plan|off_plan, note?, media_id?,
              *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
              */
             value: {
@@ -21617,7 +21669,8 @@ export interface components {
                 /**
                  * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                  *     (minutes or quality required; both ends give minutes). meal: {slot?
-                 *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                 *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                 *     in_plan|off_plan, note?, media_id?,
                  *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                  */
                 value: {
@@ -21631,8 +21684,97 @@ export interface components {
                 [key: string]: number;
             };
         };
+        /** WellnessExport */
+        WellnessExport: {
+            /** Format: date-time */
+            exported_at: string;
+            photos: {
+                [key: string]: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    status: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                };
+            };
+            sections: {
+                cravings?: {
+                    cravings?: {
+                        /** Format: date-time */
+                        follow_up_at?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
+                        intensity: number;
+                        /** @enum {string} */
+                        journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                        note?: string | null;
+                        /** Format: date-time */
+                        occurred_at: string;
+                        /** Format: date */
+                        occurred_on: string;
+                        occurred_tz: string;
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        /** @enum {string|null} */
+                        outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                        /** Format: date-time */
+                        outcome_at?: string | null;
+                        /** Format: date-time */
+                        support_requested_at?: string | null;
+                        triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                        /** Format: date-time */
+                        updated_at?: string;
+                    }[];
+                };
+                wellness?: {
+                    entries?: {
+                        corrected: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date-time */
+                        inserted_at?: string;
+                        /** @enum {string} */
+                        journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                        /** @enum {string} */
+                        kind: "water" | "sleep" | "meal";
+                        /** Format: date-time */
+                        occurred_at: string;
+                        /** Format: date */
+                        occurred_on: string;
+                        occurred_tz: string;
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        /** @enum {string} */
+                        source: "manual" | "garmin" | "apple_health" | "health_connect";
+                        /** Format: date-time */
+                        updated_at?: string;
+                        /**
+                         * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                         *     (minutes or quality required; both ends give minutes). meal: {slot?
+                         *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                         *     in_plan|off_plan, note?, media_id?,
+                         *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                         */
+                        value: {
+                            [key: string]: unknown;
+                        };
+                    }[];
+                    preferences?: {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
         /** WellnessOverview */
         WellnessOverview: {
+            /** @description Whether the health-data consent is active (needed to log anything) */
+            consented: boolean;
             cravings: {
                 /** Format: date-time */
                 follow_up_at?: string | null;
@@ -21671,6 +21813,10 @@ export interface components {
                 date: string;
                 meals: {
                     count: number;
+                    /** @description Hand portions logged that day */
+                    portions: {
+                        [key: string]: number;
+                    };
                     /** @enum {string} */
                     status: "none" | "partial" | "full";
                 };
@@ -21728,7 +21874,8 @@ export interface components {
                 /**
                  * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                  *     (minutes or quality required; both ends give minutes). meal: {slot?
-                 *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                 *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                 *     in_plan|off_plan, note?, media_id?,
                  *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                  */
                 value: {
@@ -21737,11 +21884,52 @@ export interface components {
             }[];
             /** Format: date */
             from: string;
+            photo_capabilities: {
+                content_types: string[];
+                max_bytes: number;
+            };
+            /** @description Meal photos by media id, with short-lived signed URLs */
+            photos: {
+                [key: string]: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    status: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                };
+            };
+            /** @description Coaches' plans as the member sees them (no calories); empty when hidden */
+            plans: {
+                /** Format: uuid */
+                id: string;
+                /** @description Meal slots the member logs against; empty means the default ones */
+                meal_slots: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                /** Format: uuid */
+                organization_id: string;
+                /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                portions?: {
+                    carbs?: number;
+                    fat?: number;
+                    protein?: number;
+                    veg?: number;
+                } | null;
+                title: string;
+                /** Format: date-time */
+                updated_at?: string;
+            }[];
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
                 water_goal_ml: number;
+                /** @description Opt-in afternoon reminder while the day is under half the goal */
+                water_reminder: boolean;
             };
             /** Format: date */
             to: string;
@@ -21754,20 +21942,31 @@ export interface components {
                 water_days_on_goal: number;
             };
         };
-        /** WellnessPreferencesRequest */
+        /**
+         * WellnessPreferencesRequest
+         * @description Any subset of the fields
+         */
         WellnessPreferencesRequest: {
             glass_ml?: number;
             hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+            /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+            item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
             sleep_goal_minutes?: number;
             water_goal_ml?: number;
+            /** @description Opt-in afternoon reminder while the day is under half the goal */
+            water_reminder?: boolean;
         };
         /** WellnessPreferencesResponse */
         WellnessPreferencesResponse: {
             preferences: {
                 glass_ml: number;
                 hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                 sleep_goal_minutes: number;
                 water_goal_ml: number;
+                /** @description Opt-in afternoon reminder while the day is under half the goal */
+                water_reminder: boolean;
             };
         };
         /** WellnessSummarySharing */
@@ -31518,7 +31717,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
+                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "wellness_entry";
                 id: string;
             };
             cookie?: never;
@@ -31552,7 +31751,7 @@ export interface operations {
                         /** @enum {string} */
                         journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
                         /** @enum {string} */
-                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
+                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
                         /** @description The message sent to the coach, for coach_reply_requested. */
                         reply_request?: {
                             /** Format: uuid */
@@ -31788,7 +31987,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -31867,7 +32066,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -31950,7 +32149,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -33591,6 +33790,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Whether the health-data consent is active (needed to log anything) */
+                        consented: boolean;
                         cravings: {
                             /** Format: date-time */
                             follow_up_at?: string | null;
@@ -33629,6 +33830,10 @@ export interface operations {
                             date: string;
                             meals: {
                                 count: number;
+                                /** @description Hand portions logged that day */
+                                portions: {
+                                    [key: string]: number;
+                                };
                                 /** @enum {string} */
                                 status: "none" | "partial" | "full";
                             };
@@ -33686,7 +33891,8 @@ export interface operations {
                             /**
                              * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                              *     (minutes or quality required; both ends give minutes). meal: {slot?
-                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                             *     in_plan|off_plan, note?, media_id?,
                              *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                              */
                             value: {
@@ -33695,11 +33901,52 @@ export interface operations {
                         }[];
                         /** Format: date */
                         from: string;
+                        photo_capabilities: {
+                            content_types: string[];
+                            max_bytes: number;
+                        };
+                        /** @description Meal photos by media id, with short-lived signed URLs */
+                        photos: {
+                            [key: string]: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                status: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            };
+                        };
+                        /** @description Coaches' plans as the member sees them (no calories); empty when hidden */
+                        plans: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Meal slots the member logs against; empty means the default ones */
+                            meal_slots: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                            portions?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
+                            title: string;
+                            /** Format: date-time */
+                            updated_at?: string;
+                        }[];
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                            item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
                             water_goal_ml: number;
+                            /** @description Opt-in afternoon reminder while the day is under half the goal */
+                            water_reminder: boolean;
                         };
                         /** Format: date */
                         to: string;
@@ -33997,7 +34244,8 @@ export interface operations {
                     /**
                      * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                      *     (minutes or quality required; both ends give minutes). meal: {slot?
-                     *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                     *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                     *     in_plan|off_plan, note?, media_id?,
                      *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                      */
                     value: {
@@ -34038,7 +34286,8 @@ export interface operations {
                             /**
                              * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                              *     (minutes or quality required; both ends give minutes). meal: {slot?
-                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                             *     in_plan|off_plan, note?, media_id?,
                              *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                              */
                             value: {
@@ -34092,7 +34341,8 @@ export interface operations {
                     /**
                      * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                      *     (minutes or quality required; both ends give minutes). meal: {slot?
-                     *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                     *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                     *     in_plan|off_plan, note?, media_id?,
                      *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                      */
                     value?: {
@@ -34133,13 +34383,161 @@ export interface operations {
                             /**
                              * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
                              *     (minutes or quality required; both ends give minutes). meal: {slot?
-                             *     breakfast|lunch|dinner|snack, plan_fit? in_plan|off_plan, note?, media_id?,
+                             *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                             *     in_plan|off_plan, note?, media_id?,
                              *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
                              */
                             value: {
                                 [key: string]: unknown;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.export": {
+        parameters: {
+            query: {
+                sections: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        exported_at: string;
+                        photos: {
+                            [key: string]: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                status: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            };
+                        };
+                        sections: {
+                            cravings?: {
+                                cravings?: {
+                                    /** Format: date-time */
+                                    follow_up_at?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    intensity: number;
+                                    /** @enum {string} */
+                                    journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                                    note?: string | null;
+                                    /** Format: date-time */
+                                    occurred_at: string;
+                                    /** Format: date */
+                                    occurred_on: string;
+                                    occurred_tz: string;
+                                    /** Format: uuid */
+                                    organization_id?: string | null;
+                                    /** @enum {string|null} */
+                                    outcome?: "ongoing" | "resisted" | "ate_off_plan" | null;
+                                    /** Format: date-time */
+                                    outcome_at?: string | null;
+                                    /** Format: date-time */
+                                    support_requested_at?: string | null;
+                                    triggers: ("stress" | "fatigue" | "boredom" | "social" | "hunger" | "other")[];
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                }[];
+                            };
+                            wellness?: {
+                                entries?: {
+                                    corrected: boolean;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date-time */
+                                    inserted_at?: string;
+                                    /** @enum {string} */
+                                    journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "posted";
+                                    /** @enum {string} */
+                                    kind: "water" | "sleep" | "meal";
+                                    /** Format: date-time */
+                                    occurred_at: string;
+                                    /** Format: date */
+                                    occurred_on: string;
+                                    occurred_tz: string;
+                                    /** Format: uuid */
+                                    organization_id?: string | null;
+                                    /** @enum {string} */
+                                    source: "manual" | "garmin" | "apple_health" | "health_connect";
+                                    /** Format: date-time */
+                                    updated_at?: string;
+                                    /**
+                                     * @description The kind's value. water: {ml}. sleep: {bed_at?, wake_at?, minutes?, quality? 1-5, nap}
+                                     *     (minutes or quality required; both ends give minutes). meal: {slot?
+                                     *     (breakfast, lunch, dinner, snack or a plan slot such as pre_workout), plan_fit?
+                                     *     in_plan|off_plan, note?, media_id?,
+                                     *     portions? {protein, carbs, veg, fat in halves}, hunger_before? 1-5, fullness_after? 1-5}.
+                                     */
+                                    value: {
+                                        [key: string]: unknown;
+                                    };
+                                }[];
+                                preferences?: {
+                                    [key: string]: unknown;
+                                };
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessController.upload_meal_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
                     };
                 };
             };
@@ -34164,8 +34562,12 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                            item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
                             water_goal_ml: number;
+                            /** @description Opt-in afternoon reminder while the day is under half the goal */
+                            water_reminder: boolean;
                         };
                     };
                 };
@@ -34184,8 +34586,12 @@ export interface operations {
                 "application/json": {
                     glass_ml?: number;
                     hidden_items?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                    /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                    item_order?: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                     sleep_goal_minutes?: number;
                     water_goal_ml?: number;
+                    /** @description Opt-in afternoon reminder while the day is under half the goal */
+                    water_reminder?: boolean;
                 };
             };
         };
@@ -34200,8 +34606,12 @@ export interface operations {
                         preferences: {
                             glass_ml: number;
                             hidden_items: ("water" | "sleep" | "meals" | "plan" | "mood")[];
+                            /** @description Tile order; every item appears once (unplaced ones follow in default order) */
+                            item_order: ("water" | "sleep" | "meals" | "plan" | "mood")[];
                             sleep_goal_minutes: number;
                             water_goal_ml: number;
+                            /** @description Opt-in afternoon reminder while the day is under half the goal */
+                            water_reminder: boolean;
                         };
                     };
                 };
@@ -44258,7 +44668,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44290,7 +44700,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44386,7 +44796,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44418,7 +44828,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44536,7 +44946,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44611,7 +45021,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44643,7 +45053,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44788,7 +45198,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -44820,7 +45230,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -54744,10 +55154,26 @@ export interface operations {
                         nutrition_plan: {
                             body: string;
                             carbs_grams?: number | null;
+                            /** @description Staff only; never sent to the member */
                             daily_calories?: number | null;
                             fat_grams?: number | null;
                             /** Format: uuid */
                             id: string;
+                            meal_slots?: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                            /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                            portion_targets?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
+                            /** @description Effective daily portions (member view) */
+                            portions?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
                             protein_grams?: number | null;
                             title: string;
                             /** Format: date-time */
@@ -57459,10 +57885,26 @@ export interface operations {
                         nutrition_plan: {
                             body: string;
                             carbs_grams?: number | null;
+                            /** @description Staff only; never sent to the member */
                             daily_calories?: number | null;
                             fat_grams?: number | null;
                             /** Format: uuid */
                             id: string;
+                            meal_slots?: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                            /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                            portion_targets?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
+                            /** @description Effective daily portions (member view) */
+                            portions?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
                             protein_grams?: number | null;
                             title: string;
                             /** Format: date-time */
@@ -57491,6 +57933,15 @@ export interface operations {
                     carbs_grams?: number | null;
                     daily_calories?: number | null;
                     fat_grams?: number | null;
+                    /** @description Meal slots the member logs against; empty means the default ones */
+                    meal_slots?: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                    /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                    portion_targets?: {
+                        carbs?: number;
+                        fat?: number;
+                        protein?: number;
+                        veg?: number;
+                    } | null;
                     protein_grams?: number | null;
                     title: string;
                 };
@@ -57508,10 +57959,26 @@ export interface operations {
                         nutrition_plan: {
                             body: string;
                             carbs_grams?: number | null;
+                            /** @description Staff only; never sent to the member */
                             daily_calories?: number | null;
                             fat_grams?: number | null;
                             /** Format: uuid */
                             id: string;
+                            meal_slots?: ("breakfast" | "morning_snack" | "lunch" | "afternoon_snack" | "dinner" | "evening_snack" | "snack" | "pre_workout" | "post_workout")[];
+                            /** @description Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed */
+                            portion_targets?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
+                            /** @description Effective daily portions (member view) */
+                            portions?: {
+                                carbs?: number;
+                                fat?: number;
+                                protein?: number;
+                                veg?: number;
+                            } | null;
                             protein_grams?: number | null;
                             title: string;
                             /** Format: date-time */

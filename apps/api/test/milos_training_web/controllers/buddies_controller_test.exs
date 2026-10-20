@@ -403,6 +403,10 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
     |> json_response(200)
 
     as.(member)
+    |> put("/api/me/body/consents/health_data")
+    |> json_response(200)
+
+    as.(member)
     |> send_json(:post, "/api/me/wellness/cravings", %{
       intensity: 8,
       triggers: ["stress"],
@@ -431,6 +435,10 @@ defmodule MilosTrainingWeb.BuddiesControllerTest do
 
     path =
       "/api/org/#{gym.slug}/staff/clients/#{member.id}/wellness-summary?week=#{Date.utc_today()}"
+
+    as.(member)
+    |> put("/api/me/body/consents/health_data")
+    |> json_response(200)
 
     as.(member)
     |> send_json(:post, "/api/me/wellness/cravings", %{
