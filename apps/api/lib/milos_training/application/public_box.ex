@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.PublicBox do
   every row of that gym, so each function projects only public fields.
   """
 
-  alias MilosTraining.Application.{MediaUrls, PostPresenter, Trials}
+  alias MilosTraining.Application.{MediaUrls, OpenClubs, PostPresenter, Trials}
   alias MilosTraining.{Community, Facility, Identity, Media, Organizations, Scheduling}
 
   @max_window_days 31
@@ -30,6 +30,7 @@ defmodule MilosTraining.Application.PublicBox do
            |> Map.put(:coaches, coaches(context, snapshot["coach_ids"] || [])),
          published_at: profile && profile.published_at,
          followers_count: box_followers(box.organization_id),
+         open_clubs: OpenClubs.for_box(context),
          locations:
            context
            |> Facility.list_locations()

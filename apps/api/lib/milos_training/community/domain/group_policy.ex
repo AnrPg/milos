@@ -11,7 +11,7 @@ defmodule MilosTraining.Community.Domain.GroupPolicy do
     admin hands over before leaving while others remain; the last member
     leaving archives it.
   - A group nobody posts in for 50 days is warned; at 60 it is
-    archived. Staff can reopen it.
+    archived. Its creator or staff can reopen it.
   """
 
   @warn_after_days 50
@@ -53,6 +53,10 @@ defmodule MilosTraining.Community.Domain.GroupPolicy do
   def can_manage?(_membership_role, "staff"), do: true
   def can_manage?("admin", _club_role), do: true
   def can_manage?(_membership_role, _club_role), do: false
+
+  @doc "Whoever started a group, or staff, bring it back after it was archived."
+  def can_reopen?(_group, "staff", _user_id), do: true
+  def can_reopen?(%{created_by_id: creator}, _role, user_id), do: creator == user_id
 
   @doc "Only staff decide on a proposed group."
   def can_decide?(%{status: "pending"}, "staff"), do: true

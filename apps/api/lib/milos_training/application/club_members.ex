@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.ClubMembers do
   @moduledoc """
   A club's «Μέλη» tab (ADR-143, board 7 Q1): everyone in the club except the
-  viewer, coaches first, then by name. A gym club's members are the gym's
+  viewer and those who chose to keep out of it, coaches first, then by name. A gym club's members are the gym's
   active members; an open club's are its active memberships. Each row says
   whether the viewer follows that person.
   """
@@ -14,6 +14,7 @@ defmodule MilosTraining.Application.ClubMembers do
   def list(%{user_id: user_id} = context, club_id, params \\ %{}) do
     with {:ok, club} <- ClubScope.club(context, club_id) do
       ids = member_ids(context, club) -- [user_id]
+      ids = ids -- Community.hidden_member_ids(ids)
       coaches = MapSet.new(Organizations.list_staff(club.organization_id), & &1.user_id)
       followed = MapSet.new(Community.followed_ids(context, user_id, "user"))
       people = CommunityPeople.by_ids(ids)

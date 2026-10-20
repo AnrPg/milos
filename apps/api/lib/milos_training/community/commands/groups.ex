@@ -128,16 +128,34 @@ defmodule MilosTraining.Community.Commands.Groups do
          do: CommunityStore.update_group_lifecycle(context, group.id, %{archived_at: now})
   end
 
-  @doc "Staff bring an archived group back; it counts as active from now."
-  def reopen(context, group, "staff", now) do
-    CommunityStore.update_group_lifecycle(context, group.id, %{
-      archived_at: nil,
-      archive_warned_at: nil,
-      last_post_at: now
-    })
+  @doc """
+  Its creator or staff bring an archived group back; it counts as active
+  from now. A group nobody runs any more gets whoever reopened it as admin.
+  """
+  def reopen(%{user_id: user_id} = context, group, club_role, now) do
+    if GroupPolicy.can_reopen?(group, club_role, user_id) do
+      with {:ok, reopened} <-
+             CommunityStore.update_group_lifecycle(context, group.id, %{
+               archived_at: nil,
+               archive_warned_at: nil,
+               last_post_at: now
+             }),
+           :ok <- ensure_admin(context, group, user_id),
+           do: {:ok, reopened}
+    else
+      {:error, :forbidden}
+    end
   end
 
-  def reopen(_context, _group, _role, _now), do: {:error, :forbidden}
+  defp ensure_admin(context, group, user_id) do
+    if context |> members(group.id) |> Enum.any?(&(member?(&1) and &1.role == "admin")),
+      do: :ok,
+      else:
+        CommunityStore.put_channel_membership(context, group, user_id, %{
+          source: "auto",
+          role: "admin"
+        })
+  end
 
   def quiet_groups(context, now),
     do: CommunityStore.quiet_groups(context, GroupPolicy.warn_cutoff(now))

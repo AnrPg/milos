@@ -162,6 +162,15 @@ defmodule MilosTrainingWeb.CommunityGroupsControllerTest do
                |> json_response(200)
 
       assert %Channel{archived_at: %DateTime{}} = Repo.get(Channel, group_id)
+
+      # The member who left last didn't start it; its creator (the coach) can reopen it.
+      assert as.(other) |> post("#{base}/groups/#{group_id}/reopen") |> json_response(403)
+
+      assert %{"archived" => [%{"id" => ^group_id}]} =
+               as.(coach) |> get("#{base}/groups") |> json_response(200)
+
+      assert %{"group" => %{"archived_at" => nil, "admin" => true, "membership" => "member"}} =
+               as.(coach) |> post("#{base}/groups/#{group_id}/reopen") |> json_response(200)
     end
 
     test "the owner's rule decides who may start groups", ctx do
@@ -224,7 +233,11 @@ defmodule MilosTrainingWeb.CommunityGroupsControllerTest do
       ArchiveQuietGroups.call(now)
       assert %Channel{archived_at: %DateTime{}} = Repo.get(Channel, group_id)
 
-      # Staff bring it back.
+      # Its creator sees it among their archived groups and can bring it back too.
+      assert %{"archived" => [%{"id" => ^group_id}]} =
+               as.(coach) |> get("#{base}/groups") |> json_response(200)
+
+      # Its creator sees it among their archived groups; staff bring it back.
       assert %{"archived" => [%{"id" => ^group_id}]} =
                as.(coach) |> get("#{ctx.staff}/groups") |> json_response(200)
 
@@ -357,11 +370,18 @@ defmodule MilosTrainingWeb.CommunityGroupsControllerTest do
                })
                |> json_response(201)
 
-      # Someone from outside the gym finds it.
+      # Members of the gym find it in «Βρες»; someone from outside opens it
+      # from the box page.
       assert %{"clubs" => [%{"id" => ^club_id, "membership" => "none", "member_count" => 0}]} =
-               as.(outsider)
+               as.(ctx.member)
                |> get("/api/me/community/discover?q=trail")
                |> json_response(200)
+
+      assert %{"clubs" => []} =
+               as.(outsider) |> get("/api/me/community/discover") |> json_response(200)
+
+      assert %{"club" => %{"name" => "Saturday trail runs", "membership" => "none"}} =
+               as.(outsider) |> get("/api/me/open-clubs/#{club_id}") |> json_response(200)
 
       assert %{"club" => %{"membership" => "requested"}} =
                as.(outsider)
@@ -436,5 +456,19 @@ defmodule MilosTrainingWeb.CommunityGroupsControllerTest do
     assert hd(members)["coach"]
 
     assert as.(ctx.outsider) |> get("/api/me/clubs/#{club["id"]}/members") |> json_response(404)
+
+    # Board 7 Q1: someone can keep out of «Μέλη».
+    assert %{"hidden" => true} =
+             as.(other)
+             |> send_json(:put, "/api/me/social/member-visibility", %{hidden: true})
+             |> json_response(200)
+
+    assert %{"member_visibility" => %{"hidden" => true}} =
+             as.(other) |> get("/api/me/social") |> json_response(200)
+
+    %{"members" => members} =
+      as.(member) |> get("/api/me/clubs/#{club["id"]}/members") |> json_response(200)
+
+    refute Enum.any?(members, &(&1["id"] == other.id))
   end
 end

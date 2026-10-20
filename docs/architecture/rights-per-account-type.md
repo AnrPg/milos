@@ -112,11 +112,16 @@ admin is logged and the coach is notified with who read which note and when
 | Cleaning log: review, set areas and tasks | ✔ | ✔ | — | 👁 | — | own entries | — |
 | Inventory: add and edit items, prices, shops; restock, use, recount; service, repair, retire; inventory report (`manage_inventory`) | ✔ | ✔ | — | ✔ | — | — | — |
 | Inventory: see machines and consumables without prices or shops; log notes, issues, outages; report running low (`report_inventory`) ³ | ✔ | ✔ | ✔ | ✔ | — | ✔ | — |
+| Community: answer group proposals, handle reports, let people into open clubs (`moderate_community`) ⁴ | ✔ | ✔ | ✔ | — | — | — | — |
+| Community: the group rule; create, edit and archive open clubs (`manage_community`) | ✔ | ✔ | — | — | — | — | — |
 
 ³ Reporters do not see purchase or unit prices, shops, links, service
 contacts or serial numbers, and cannot log repair calls, services, repairs
 or retirements. Inventory alerts and the daily digest go to everyone with
 `manage_inventory` (ADR-104).
+
+⁴ Staff of the club (owner, admin, coach) also hide, delete and pin posts
+in it; a member group's admins do the same inside their group (ADR-143).
 
 ## 4. Rules that are easy to get wrong
 

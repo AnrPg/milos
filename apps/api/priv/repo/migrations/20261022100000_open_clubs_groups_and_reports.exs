@@ -303,11 +303,34 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
     USING (club_id IN (SELECT milos_acting_user_club_ids()))
     """)
 
+    # Board 7 Q1: a member can keep themselves out of every club's «Μέλη».
+    alter table(:community_social_settings) do
+      add :hide_from_members, :boolean, null: false, default: false
+    end
+
+    execute("""
+    CREATE OR REPLACE FUNCTION milos_hidden_member_ids(user_ids uuid[])
+    RETURNS SETOF uuid
+    LANGUAGE sql
+    STABLE
+    SECURITY DEFINER
+    SET search_path = public, pg_temp
+    AS $$
+      SELECT s.user_id FROM public.community_social_settings s
+      WHERE s.user_id = ANY(user_ids) AND s.hide_from_members
+    $$
+    """)
+
     replace_notification_types(@before_types ++ @community_types)
   end
 
   def down do
     replace_notification_types(@before_types)
+    execute("DROP FUNCTION IF EXISTS milos_hidden_member_ids(uuid[])")
+
+    alter table(:community_social_settings) do
+      remove :hide_from_members
+    end
 
     execute(
       "DROP POLICY IF EXISTS community_club_memberships_open_read_policy ON community_club_memberships"

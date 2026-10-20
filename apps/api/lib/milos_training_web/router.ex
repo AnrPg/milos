@@ -331,6 +331,7 @@ defmodule MilosTrainingWeb.Router do
     put("/groups/:id/admins/:user_id", CommunityGroupController, :set_admin)
     delete("/groups/:id/members/:user_id", CommunityGroupController, :remove_member)
     post("/groups/:id/archive", CommunityGroupController, :archive)
+    post("/groups/:id/reopen", CommunityGroupController, :reopen)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
@@ -992,6 +993,7 @@ defmodule MilosTrainingWeb.Router do
     # ADR-142: follows, profile posts and people.
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
+    put("/me/social/member-visibility", FollowController, :member_visibility)
     post("/me/follows", FollowController, :create)
     get("/me/follows/:target_type/:target_id", FollowController, :show)
     delete("/me/follows/:target_type/:target_id", FollowController, :delete)

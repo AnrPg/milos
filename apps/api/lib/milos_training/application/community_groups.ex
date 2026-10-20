@@ -17,13 +17,20 @@ defmodule MilosTraining.Application.CommunityGroups do
       reported = MapSet.new(Community.reported_ids(context, user_id, "channel"))
       memberships = memberships(context, user_id, groups)
 
+      archived =
+        context
+        |> Community.list_groups(club.id, %{archived: true})
+        |> Enum.filter(&(&1.created_by_id == user_id))
+
       {:ok,
        %{
          settings: settings(context, club),
          groups:
            groups
            |> Enum.reject(&MapSet.member?(reported, &1.id))
-           |> Enum.map(&present(&1, club, Map.get(memberships, &1.id), user_id))
+           |> Enum.map(&present(&1, club, Map.get(memberships, &1.id), user_id)),
+         archived:
+           Enum.map(archived, &present(&1, club, %{source: "auto", role: "admin"}, user_id))
        }}
     end
   end
@@ -203,6 +210,15 @@ defmodule MilosTraining.Application.CommunityGroups do
     end
   end
 
+  @doc "Whoever started an archived group brings it back."
+  def reopen_mine(context, group_id, now \\ DateTime.utc_now()) do
+    with {:ok, club, group, _membership} <- load(context, group_id, archived: true),
+         {:ok, _reopened} <- Community.reopen_group(context, group, club.role, now) do
+      announce(club)
+      show(context, group.id)
+    end
+  end
+
   def reopen(context, group_id, now \\ DateTime.utc_now()) do
     with {:ok, club, group, _membership} <- load(context, group_id, archived: true),
          {:ok, reopened} <- Community.reopen_group(context, group, club.role, now) do
@@ -294,6 +310,7 @@ defmodule MilosTraining.Application.CommunityGroups do
       request_count: if(manager?, do: Map.get(group, :request_count, 0), else: 0),
       last_post_at: group.last_post_at,
       archive_warned_at: group.archive_warned_at,
+      archived_at: group.archived_at,
       membership:
         cond do
           member? -> "member"
@@ -322,6 +339,9 @@ defmodule MilosTraining.Application.CommunityGroups do
       archived_at: group.archived_at
     }
   end
+
+  @doc false
+  def presented(group, club, membership, user_id), do: present(group, club, membership, user_id)
 
   defp notify_staff(type, %{organization_id: organization_id}, payload) do
     organization_id

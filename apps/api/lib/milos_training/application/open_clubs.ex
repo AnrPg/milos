@@ -7,16 +7,40 @@ defmodule MilosTraining.Application.OpenClubs do
   answers run in the scope of the gym that runs the club.
   """
 
-  alias MilosTraining.Application.{ClubScope, CommunityGroups, CommunityPeople, RealtimePublisher}
-  alias MilosTraining.{Community, Notifications, Organizations}
+  alias MilosTraining.Application.{
+    ClubScope,
+    CommunityGroups,
+    CommunityPeople,
+    MediaUrls,
+    RealtimePublisher,
+    ReleaseMedia
+  }
+
+  alias MilosTraining.{Community, Media, Notifications, Organizations}
 
   # Member side (personal routes) --------------------------------------------
 
-  @doc "«Βρες»: open clubs to join and the groups of the member's gyms they are not in."
+  @doc """
+  «Βρες»: the groups of the member's gyms they are not in, then the open
+  clubs of boxes they belong to or follow (board 7 Q7; places nearby join in
+  M6).
+  """
   def discover(%{user_id: user_id} = context, params) do
     with {:ok, clubs} <- ClubScope.call(context) do
       query = params[:q]
-      open = Community.list_open_clubs(context, %{query: query, limit: 50})
+
+      organization_ids =
+        Enum.uniq(
+          Enum.map(clubs, & &1.organization_id) ++
+            Community.followed_ids(context, user_id, "organization")
+        )
+
+      open =
+        Community.list_open_clubs(context, %{
+          organization_ids: organization_ids,
+          query: query,
+          limit: 50
+        })
 
       {:ok,
        %{
@@ -82,12 +106,14 @@ defmodule MilosTraining.Application.OpenClubs do
 
       counts = Community.open_club_member_counts(context, Enum.map(clubs, & &1.id))
 
+      urls = covers(context, clubs)
+
       {:ok,
        Enum.map(clubs, fn club ->
          pending = Community.club_memberships(context, club.id, "pending")
 
          club
-         |> base()
+         |> base(urls)
          |> Map.merge(%{
            member_count: Map.get(counts, club.id, 0),
            request_count: length(pending)
@@ -97,19 +123,38 @@ defmodule MilosTraining.Application.OpenClubs do
   end
 
   def create(context, params) do
+    attrs = editable(params)
+
     with {:ok, gym_club} <- staff_club(context),
-         {:ok, club} <- Community.create_open_club(context, gym_club.role, editable(params)) do
-      {:ok, Map.merge(base(club), %{member_count: 0, request_count: 0})}
+         :ok <- cover_ready(context, attrs),
+         {:ok, club} <- Community.create_open_club(context, gym_club.role, attrs) do
+      settle_cover(context, nil, club.cover_media_id)
+      {:ok, Map.merge(base(club, covers(context, [club])), %{member_count: 0, request_count: 0})}
     end
   end
 
   def update(context, club_id, params) do
+    attrs = editable(params)
+
     with {:ok, gym_club} <- staff_club(context),
          {:ok, club} <- own_club(context, club_id),
-         {:ok, club} <- Community.update_open_club(context, club, gym_club.role, editable(params)) do
+         :ok <- cover_ready(context, attrs),
+         {:ok, updated} <- Community.update_open_club(context, club, gym_club.role, attrs) do
+      settle_cover(context, club.cover_media_id, updated.cover_media_id)
       announce(club)
       staff_show(context, club.id)
     end
+  end
+
+  @doc "A box's open clubs for its public page (board 7 Q6), read in the gym's own scope."
+  def for_box(%{organization_id: organization_id} = context) do
+    clubs = Community.list_open_clubs(context, %{organization_ids: [organization_id], limit: 50})
+    counts = Community.open_club_member_counts(context, Enum.map(clubs, & &1.id))
+    urls = covers(context, clubs)
+
+    Enum.map(clubs, fn club ->
+      club |> base(urls) |> Map.put(:member_count, Map.get(counts, club.id, 0))
+    end)
   end
 
   def archive(context, club_id, now \\ DateTime.utc_now()) do
@@ -139,7 +184,7 @@ defmodule MilosTraining.Application.OpenClubs do
 
       {:ok,
        club
-       |> base()
+       |> base(covers(context, [club]))
        |> Map.merge(%{
          member_count: length(members),
          request_count: length(requests),
@@ -211,21 +256,53 @@ defmodule MilosTraining.Application.OpenClubs do
     |> Map.new(&{&1, Map.get(params, &1)})
   end
 
-  defp base(club) do
+  defp base(club, cover_urls) do
     %{
       id: club.id,
       organization_id: club.organization_id,
       name: club.name,
       description: club.description,
       join_policy: club.join_policy,
-      cover_media_id: club.cover_media_id
+      cover_media_id: club.cover_media_id,
+      cover_url: club.cover_media_id && Map.get(cover_urls, club.cover_media_id)
     }
+  end
+
+  # Covers are the gym's public box photos (ADR-148), read in each gym's scope.
+  defp covers(_context, clubs) do
+    clubs
+    |> Enum.reject(&is_nil(&1.cover_media_id))
+    |> Enum.group_by(& &1.organization_id, & &1.cover_media_id)
+    |> Enum.flat_map(fn {organization_id, ids} ->
+      gym = %{organization_id: organization_id}
+      gym |> Media.list(:tenant, ids) |> then(&MediaUrls.present_all(gym, &1))
+    end)
+    |> Map.new(&{&1.id, &1.url})
+  end
+
+  defp cover_ready(context, %{cover_media_id: id}) when is_binary(id) do
+    case Media.fetch_ready(context, "box_photo", [id]) do
+      {:ok, _media} -> :ok
+      error -> error
+    end
+  end
+
+  defp cover_ready(_context, _attrs), do: :ok
+
+  # The new cover is in use; the one it replaced is released.
+  defp settle_cover(_context, same, same), do: :ok
+
+  defp settle_cover(context, before, now) do
+    if now, do: :ok = Media.set_attached(context, :tenant, [now], DateTime.utc_now())
+    if before, do: ReleaseMedia.call(context, :tenant, [before])
+    :ok
   end
 
   defp present_clubs(_context, [], _scope), do: []
 
   defp present_clubs(%{user_id: user_id} = context, clubs, scope) do
     counts = Community.open_club_member_counts(context, Enum.map(clubs, & &1.id))
+    urls = covers(context, clubs)
 
     statuses =
       context |> Community.open_club_memberships_of(user_id) |> Map.new(&{&1.club_id, &1.status})
@@ -249,7 +326,7 @@ defmodule MilosTraining.Application.OpenClubs do
       gym = Enum.find(scope, &(&1.organization_id == club.organization_id and &1.kind == "gym"))
 
       club
-      |> base()
+      |> base(urls)
       |> Map.merge(%{
         member_count: Map.get(counts, club.id, 0),
         membership:

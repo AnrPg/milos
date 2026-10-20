@@ -58,6 +58,7 @@ defmodule MilosTrainingWeb.Schemas.CommunityGroups do
         },
         last_post_at: @nullable_datetime,
         archive_warned_at: @nullable_datetime,
+        archived_at: @nullable_datetime,
         membership: string(enum: ~w(none requested member)),
         admin: %Schema{type: :boolean},
         created_by_me: %Schema{type: :boolean},
@@ -101,10 +102,15 @@ defmodule MilosTrainingWeb.Schemas.CommunityGroups do
   end
 
   def groups_response do
-    object("CommunityGroupsResponse", %{settings: group_settings(), groups: list(group())}, [
-      :settings,
-      :groups
-    ])
+    object(
+      "CommunityGroupsResponse",
+      %{
+        settings: group_settings(),
+        groups: list(group()),
+        archived: %{list(group()) | description: "Archived groups you started, to bring back"}
+      },
+      [:settings, :groups, :archived]
+    )
   end
 
   def group_response, do: object("CommunityGroupResponse", %{group: group()}, [:group])
@@ -222,6 +228,7 @@ defmodule MilosTrainingWeb.Schemas.CommunityGroups do
         description: string(nullable: true),
         join_policy: string(enum: MilosTraining.Community.open_club_join_policies()),
         cover_media_id: %Schema{type: :string, format: :uuid, nullable: true},
+        cover_url: string(nullable: true),
         member_count: %Schema{type: :integer},
         request_count: %Schema{type: :integer},
         membership: string(enum: ~w(none requested member)),

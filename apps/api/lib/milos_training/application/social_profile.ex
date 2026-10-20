@@ -21,8 +21,21 @@ defmodule MilosTraining.Application.SocialProfile do
            "active"
          ]),
        requests_count: Community.count_incoming_follows(context, "user", user_id, "requested"),
-       booking_sharing: booking_sharing(context, user_id)
+       booking_sharing: booking_sharing(context, user_id),
+       member_visibility: member_visibility(context, user_id)
      }}
+  end
+
+  @doc "Board 7 Q1: whether the member shows in their clubs' «Μέλη» (shown unless they hide)."
+  def member_visibility(context, user_id) do
+    settings = Community.social_settings(context, user_id)
+    %{hidden: (settings && settings.hide_from_members) || false}
+  end
+
+  def set_member_visibility(%{user_id: user_id} = context, hidden) when is_boolean(hidden) do
+    with {:ok, _settings} <-
+           Community.put_social_settings(context, user_id, %{hide_from_members: hidden}),
+         do: {:ok, member_visibility(context, user_id)}
   end
 
   @doc """

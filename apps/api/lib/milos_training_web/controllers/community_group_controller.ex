@@ -134,6 +134,15 @@ defmodule MilosTrainingWeb.CommunityGroupController do
          do: json(conn, outcome)
   end
 
+  operation(:reopen,
+    summary: "Bring back an archived group you started",
+    parameters: [@id],
+    responses: [ok: @group]
+  )
+
+  def reopen(conn, %{id: id}),
+    do: reply(conn, CommunityGroups.reopen_mine(conn.assigns.tenant_context, id))
+
   defp reply(conn, {:ok, group}), do: json(conn, %{group: group})
   defp reply(_conn, error), do: error
 end
