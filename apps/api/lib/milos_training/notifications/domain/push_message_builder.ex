@@ -484,6 +484,88 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-160: Buddy για στήριξη. Calm words; the message the member typed
+  # shows in the app, a craving's details never travel.
+  def build("buddy_invite", payload, localize) do
+    %{
+      title: localize.("A buddy invitation", %{}),
+      body:
+        localize.("%{nickname} asks you to be their support buddy.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("buddy_accepted", payload, localize) do
+    %{
+      title: localize.("You have a support buddy", %{}),
+      body:
+        localize.("%{nickname} accepted. They hear from you only when you ask.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_request", payload, localize) do
+    %{
+      title:
+        localize.("%{nickname} is having a hard moment", %{nickname: payload["nickname"] || ""}),
+      body: localize.("I'm here · Shall we go for a walk? · Call me", %{}),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_reply", payload, localize) do
+    bindings = %{nickname: payload["nickname"] || ""}
+
+    body =
+      case payload["kind"] do
+        "walk" -> localize.("%{nickname}: Shall we go for a walk?", bindings)
+        "call" -> localize.("%{nickname}: Call me", bindings)
+        "text" -> payload["text"] || localize.("%{nickname}: I'm here", bindings)
+        _here -> localize.("%{nickname}: I'm here", bindings)
+      end
+
+    %{
+      title: localize.("%{nickname} replied", bindings),
+      body: body,
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_no_reply_nudge", payload, localize) do
+    %{
+      title: localize.("No one has replied yet", %{}),
+      body:
+        localize.(
+          "Until then, something small: two minutes of breathing, a glass of water, a short walk.",
+          %{}
+        ),
+      url: payload["url"] || "/journal/wellness"
+    }
+  end
+
+  def build("buddy_weekly_summary", payload, localize) do
+    bindings = %{
+      nickname: payload["nickname"] || "",
+      moments: payload["hard_moments"] || 0,
+      overcome: payload["overcome"] || 0,
+      requests: payload["support_requests"] || 0
+    }
+
+    %{
+      title: localize.("%{nickname}'s week", bindings),
+      body:
+        localize.(
+          "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support.",
+          bindings
+        ),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
   # ADR-155 (board 10, Q3).
   def build("check_in_visitor", payload, localize) do
     bindings = %{

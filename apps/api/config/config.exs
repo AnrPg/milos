@@ -46,7 +46,8 @@ config :milos_training, Oban,
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
        {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
        {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
-       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob}
+       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
+       {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob}
      ]}
   ],
   queues: [
@@ -225,6 +226,14 @@ config :milos_training,
 config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
 config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
 config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
+config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
+
+config :milos_training,
+       :support_scheduler,
+       MilosTraining.Infrastructure.Buddies.ObanSupportScheduler
+
+# ADR-160: «Χρειάζομαι στήριξη» from Λιγούρα (the port M11 calls).
+config :milos_training, :support_requests, MilosTraining.Application.SupportRequests
 
 config :milos_training,
        :push_subscription_store,

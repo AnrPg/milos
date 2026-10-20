@@ -423,3 +423,54 @@ msgstr "Zeit für eine neue Messung"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Ein neuer Schnappschuss zeigt dir deinen Trend. Es dauert nur eine Minute."
+
+msgid "A buddy invitation"
+msgstr "Eine Buddy-Einladung"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} bittet dich, Support-Buddy zu sein."
+
+msgid "You have a support buddy"
+msgstr "Du hast einen Support-Buddy"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} hat angenommen. Sie hören nur von dir, wenn du fragst."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} hat gerade einen schweren Moment"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Ich bin da · Gehen wir spazieren? · Ruf mich an"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Gehen wir spazieren?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Ruf mich an"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Ich bin da"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} hat geantwortet"
+
+msgid "No one has replied yet"
+msgstr "Noch hat niemand geantwortet"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Bis dahin etwas Kleines: zwei Minuten atmen, ein Glas Wasser, ein kurzer Spaziergang."
+
+msgid "%{nickname}'s week"
+msgstr "Die Woche von %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} schwere Momente, %{overcome} überwunden, %{requests} Bitten um Unterstützung."
+
+msgid "I'm here"
+msgstr "Ich bin da"
+
+msgid "Shall we go for a walk?"
+msgstr "Gehen wir spazieren?"
+
+msgid "Call me"
+msgstr "Ruf mich an"

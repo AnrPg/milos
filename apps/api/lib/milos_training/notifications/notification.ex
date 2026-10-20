@@ -69,7 +69,13 @@ defmodule MilosTraining.Notifications.Notification do
     :community_event_message,
     :around_new_matches,
     :check_in_visitor,
-    :body_measure_reminder
+    :body_measure_reminder,
+    :buddy_invite,
+    :buddy_accepted,
+    :support_request,
+    :support_reply,
+    :support_no_reply_nudge,
+    :buddy_weekly_summary
   ]
 
   schema "notifications" do

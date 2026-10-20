@@ -247,6 +247,78 @@ defmodule MilosTraining.Notifications do
         url: "/journal/body/new"
       })
 
+  # ADR-160: Buddy για στήριξη. Leaving or declining sends nothing.
+  def process_event("buddy_invite", payload),
+    do:
+      enqueue_simple(:buddy_invite, payload, %{
+        link_id: field(payload, :link_id),
+        inviter_id: field(payload, :inviter_id),
+        nickname: field(payload, :inviter_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
+  def process_event("buddy_accepted", payload),
+    do:
+      enqueue_simple(:buddy_accepted, payload, %{
+        link_id: field(payload, :link_id),
+        buddy_id: field(payload, :buddy_id),
+        nickname: field(payload, :buddy_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
+  # Inside the buddy's quiet hours it lands in the inbox without a push.
+  def process_event("support_request", payload),
+    do:
+      enqueue_simple(:support_request, payload, %{
+        request_id: field(payload, :request_id),
+        sender_id: field(payload, :sender_id),
+        nickname: field(payload, :sender_nickname),
+        message: field(payload, :message),
+        quick_replies: field(payload, :quick_replies) || [],
+        silent: field(payload, :silent) == true,
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  def process_event("support_reply", payload),
+    do:
+      enqueue_simple(:support_reply, payload, %{
+        request_id: field(payload, :request_id),
+        reply_id: field(payload, :reply_id),
+        buddy_id: field(payload, :buddy_id),
+        nickname: field(payload, :buddy_nickname),
+        kind: field(payload, :kind),
+        text: field(payload, :text),
+        thread_id: field(payload, :thread_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  def process_event("support_no_reply_nudge", payload),
+    do:
+      enqueue_simple(:support_no_reply_nudge, payload, %{
+        request_id: field(payload, :request_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  # Counts only, never times, causes or foods.
+  def process_event("buddy_weekly_summary", payload),
+    do:
+      enqueue_simple(:buddy_weekly_summary, payload, %{
+        member_id: field(payload, :member_id),
+        nickname: field(payload, :member_nickname),
+        week_start: field(payload, :week_start),
+        week_end: field(payload, :week_end),
+        hard_moments: field(payload, :hard_moments),
+        overcome: field(payload, :overcome),
+        support_requests: field(payload, :support_requests),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
   # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
   # Staff who check people in hear about it, so the desk can follow up and
   # sell a walk-in or a trial; the caller keeps it to once an hour per

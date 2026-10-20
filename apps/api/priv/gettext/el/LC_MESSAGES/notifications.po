@@ -423,3 +423,54 @@ msgstr "Ώρα για νέα μέτρηση"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Ένα νέο στιγμιότυπο σε βοηθά να δεις την τάση σου. Παίρνει ένα λεπτό."
+
+msgid "A buddy invitation"
+msgstr "Πρόσκληση για buddy"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "Ο/Η %{nickname} σου ζητά να γίνεις buddy στήριξης."
+
+msgid "You have a support buddy"
+msgstr "Έχεις buddy στήριξης"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "Ο/Η %{nickname} αποδέχτηκε. Θα μαθαίνει μόνο όταν το ζητάς εσύ."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "Ο/Η %{nickname} περνάει μια δύσκολη στιγμή"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Είμαι εδώ · Πάμε βόλτα; · Πάρε με τηλέφωνο"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Πάμε βόλτα;"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Πάρε με τηλέφωνο"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Είμαι εδώ"
+
+msgid "%{nickname} replied"
+msgstr "Ο/Η %{nickname} απάντησε"
+
+msgid "No one has replied yet"
+msgstr "Δεν απάντησε κανείς ακόμα"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Μέχρι τότε, κάτι μικρό: δύο λεπτά αναπνοή, ένα ποτήρι νερό, μια μικρή βόλτα."
+
+msgid "%{nickname}'s week"
+msgstr "Η εβδομάδα του/της %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} δύσκολες στιγμές, οι %{overcome} ξεπεράστηκαν, %{requests} αιτήματα στήριξης."
+
+msgid "I'm here"
+msgstr "Είμαι εδώ"
+
+msgid "Shall we go for a walk?"
+msgstr "Πάμε βόλτα;"
+
+msgid "Call me"
+msgstr "Πάρε με τηλέφωνο"
