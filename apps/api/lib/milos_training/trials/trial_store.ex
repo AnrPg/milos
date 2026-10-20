@@ -55,5 +55,9 @@ defmodule MilosTraining.Trials.TrialStore do
   def stats(context, since), do: call(context, :stats, [since])
 
   @impl true
+  def referral_event_stats(context, event_ids),
+    do: call(context, :referral_event_stats, [event_ids])
+
+  @impl true
   def with_box_lock(context, fun), do: call(context, :with_box_lock, [fun])
 end

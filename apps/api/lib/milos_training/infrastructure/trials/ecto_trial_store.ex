@@ -104,6 +104,23 @@ defmodule MilosTraining.Infrastructure.Trials.EctoTrialStore do
     |> Map.new()
   end
 
+  @impl true
+  def referral_event_stats(_context, []), do: %{}
+
+  def referral_event_stats(%{organization_id: organization_id}, event_ids) do
+    TrialRequest
+    |> where(
+      [r],
+      r.organization_id == ^organization_id and r.referral_event_id in ^event_ids
+    )
+    |> group_by([r], [r.referral_event_id, r.status])
+    |> select([r], {r.referral_event_id, r.status, count(r.id)})
+    |> Repo.all()
+    |> Enum.reduce(%{}, fn {event_id, status, count}, acc ->
+      Map.update(acc, event_id, %{status => count}, &Map.put(&1, status, count))
+    end)
+  end
+
   # A transaction-scoped advisory lock per box: concurrent asks for the same
   # box queue here, so seat, weekly and per-person limits are never overrun.
   @impl true

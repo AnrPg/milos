@@ -48,6 +48,11 @@ defmodule MilosTraining.Trials.Ports.TrialStore do
   @doc "Counts per status for trials whose class started since `since`."
   @callback stats(context(), DateTime.t()) :: %{String.t() => non_neg_integer()}
 
+  @doc "Trial requests that came from club events' trial offers, per event and status (ADR-153)."
+  @callback referral_event_stats(context(), [id()]) :: %{
+              id() => %{String.t() => non_neg_integer()}
+            }
+
   @doc "Runs `fun` in one transaction holding the box's trial lock (limits stay exact)."
   @callback with_box_lock(context(), (-> result)) :: result when result: term()
 end

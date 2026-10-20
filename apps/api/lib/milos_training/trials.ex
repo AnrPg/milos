@@ -31,6 +31,7 @@ defmodule MilosTraining.Trials do
   defdelegate count_in_window(context, window, statuses), to: TrialStore
   defdelegate open_per_class(context, slot_ids), to: TrialStore
   defdelegate stats(context, since), to: TrialStore
+  defdelegate referral_event_stats(context, event_ids), to: TrialStore
   defdelegate with_box_lock(context, fun), to: TrialStore
 
   @doc """
