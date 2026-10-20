@@ -47,12 +47,28 @@ export async function createPost(token: string, slug: string, body: PostCreate) 
   return data.post;
 }
 
-export function deletePost(token: string, slug: string, id: string) {
-  return apiRequest<void>(`${base(slug)}/posts/${id}`, { method: "DELETE", token });
+/**
+ * Where a post's own actions live: a club post in its gym, a profile post
+ * (origin `profile`, ADR-142) on the author's account.
+ */
+function postPath(post: Pick<CommunityPost, "id" | "origin" | "club">) {
+  return post.origin === "profile" || !post.club
+    ? `/profile-posts/${post.id}`
+    : `${base(post.club.organization_slug)}/posts/${post.id}`;
 }
 
-async function putFlag(token: string, slug: string, id: string, flag: "hidden" | "pinned" | "kudos", value: boolean) {
-  const data = await apiRequest<{ post: CommunityPost }>(`${base(slug)}/posts/${id}/${flag}`, {
+function commentPath(post: Pick<CommunityPost, "origin" | "club">, id: string) {
+  return post.origin === "profile" || !post.club
+    ? `/profile-post-comments/${id}`
+    : `${base(post.club.organization_slug)}/comments/${id}`;
+}
+
+export function deletePost(token: string, post: CommunityPost) {
+  return apiRequest<void>(postPath(post), { method: "DELETE", token });
+}
+
+async function putFlag(token: string, post: CommunityPost, flag: "hidden" | "pinned" | "kudos", value: boolean) {
+  const data = await apiRequest<{ post: CommunityPost }>(`${postPath(post)}/${flag}`, {
     method: "PUT",
     token,
     body: { [flag]: value },
@@ -60,20 +76,19 @@ async function putFlag(token: string, slug: string, id: string, flag: "hidden" |
   return data.post;
 }
 
-export const setPostHidden = (token: string, slug: string, id: string, hidden: boolean) =>
-  putFlag(token, slug, id, "hidden", hidden);
-export const setPostPinned = (token: string, slug: string, id: string, pinned: boolean) =>
-  putFlag(token, slug, id, "pinned", pinned);
-export const setKudos = (token: string, slug: string, id: string, kudos: boolean) =>
-  putFlag(token, slug, id, "kudos", kudos);
+export const setPostHidden = (token: string, post: CommunityPost, hidden: boolean) =>
+  putFlag(token, post, "hidden", hidden);
+export const setPostPinned = (token: string, post: CommunityPost, pinned: boolean) =>
+  putFlag(token, post, "pinned", pinned);
+export const setKudos = (token: string, post: CommunityPost, kudos: boolean) => putFlag(token, post, "kudos", kudos);
 
-export async function fetchComments(token: string, slug: string, postId: string) {
-  const data = await apiRequest<{ comments: CommunityComment[] }>(`${base(slug)}/posts/${postId}/comments`, { token });
+export async function fetchComments(token: string, post: CommunityPost) {
+  const data = await apiRequest<{ comments: CommunityComment[] }>(`${postPath(post)}/comments`, { token });
   return data.comments;
 }
 
-export async function addComment(token: string, slug: string, postId: string, body: string) {
-  const data = await apiRequest<{ comment: CommunityComment }>(`${base(slug)}/posts/${postId}/comments`, {
+export async function addComment(token: string, post: CommunityPost, body: string) {
+  const data = await apiRequest<{ comment: CommunityComment }>(`${postPath(post)}/comments`, {
     method: "POST",
     token,
     body: { body },
@@ -81,8 +96,8 @@ export async function addComment(token: string, slug: string, postId: string, bo
   return data.comment;
 }
 
-export function deleteComment(token: string, slug: string, id: string) {
-  return apiRequest<void>(`${base(slug)}/comments/${id}`, { method: "DELETE", token });
+export function deleteComment(token: string, post: CommunityPost, id: string) {
+  return apiRequest<void>(commentPath(post, id), { method: "DELETE", token });
 }
 
 export function setNotifyLevel(token: string, slug: string, clubId: string, level: NotifyLevel) {

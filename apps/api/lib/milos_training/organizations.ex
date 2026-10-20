@@ -543,6 +543,13 @@ defmodule MilosTraining.Organizations do
   def pending_tag_suggestions,
     do: MilosTraining.Organizations.PublicProfileStore.pending_suggestions()
 
+  @doc "The published gym a slug or one of its aliases names, for visitors (ADR-142)."
+  def public_box_by_slug(slug),
+    do: MilosTraining.Organizations.PublicProfileStore.public_box_by_slug(slug)
+
+  @doc "Name, slug, logo and colour of the published gyms among `ids`."
+  def public_boxes(ids), do: MilosTraining.Organizations.PublicProfileStore.public_boxes(ids)
+
   def resolve_tag_suggestion(id, status),
     do: MilosTraining.Organizations.PublicProfileStore.resolve_suggestion(id, status)
 
@@ -573,6 +580,10 @@ defmodule MilosTraining.Organizations do
   defdelegate box_audiences(),
     to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
     as: :audiences
+
+  defdelegate default_box_languages(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :default_languages
 
   defdelegate box_profile_max_photos(),
     to: MilosTraining.Organizations.Domain.BoxProfilePolicy,

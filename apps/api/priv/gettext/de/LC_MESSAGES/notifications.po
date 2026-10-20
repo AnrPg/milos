@@ -252,3 +252,15 @@ msgstr "Ihr Zugang ist abgelaufen. Verlängern Sie Ihr Abo, um wieder Kurse zu b
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Ihre kommenden Buchungen wurden storniert: %{count}."
+
+msgid "Follow request"
+msgstr "Folgeanfrage"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} möchte dir folgen."
+
+msgid "Follow request accepted"
+msgstr "Folgeanfrage angenommen"
+
+msgid "You now follow %{nickname}."
+msgstr "Du folgst jetzt %{nickname}."

@@ -252,3 +252,15 @@ msgstr "Tu acceso ha terminado. Renueva tu suscripción para volver a reservar c
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Se cancelaron tus próximas reservas: %{count}."
+
+msgid "Follow request"
+msgstr "Solicitud de seguimiento"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} quiere seguirte."
+
+msgid "Follow request accepted"
+msgstr "Solicitud de seguimiento aceptada"
+
+msgid "You now follow %{nickname}."
+msgstr "Ahora sigues a %{nickname}."

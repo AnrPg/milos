@@ -19,6 +19,7 @@ defmodule MilosTraining.Organizations.PublicProfile do
     field :services, {:array, :string}, default: []
     field :cover_photo_id, :binary_id
     field :photo_ids, {:array, :binary_id}, default: []
+    field :coach_ids, {:array, :binary_id}, default: []
     # What visitors see: the draft as it was at the last «Δημοσίευση».
     field :published_snapshot, :map
     field :published_at, :utc_datetime_usec
@@ -39,6 +40,7 @@ defmodule MilosTraining.Organizations.PublicProfile do
       :services,
       :cover_photo_id,
       :photo_ids,
+      :coach_ids,
       :published_snapshot,
       :published_at
     ])
@@ -56,6 +58,7 @@ defmodule MilosTraining.Organizations.PublicProfile do
     |> validate_audiences_consistent()
     |> validate_languages()
     |> validate_length(:photo_ids, max: BoxProfilePolicy.max_photos())
+    |> update_change(:coach_ids, &Enum.uniq/1)
     |> optimistic_lock(:lock_version)
     |> unique_constraint(:organization_id)
   end

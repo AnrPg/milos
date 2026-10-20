@@ -252,3 +252,15 @@ msgstr "انتهى وصولك. جدّد اشتراكك لتحجز الحصص م�
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "أُلغيت حجوزاتك القادمة: %{count}."
+
+msgid "Follow request"
+msgstr "طلب متابعة"
+
+msgid "%{nickname} wants to follow you."
+msgstr "يريد %{nickname} متابعتك."
+
+msgid "Follow request accepted"
+msgstr "تم قبول طلب المتابعة"
+
+msgid "You now follow %{nickname}."
+msgstr "أنت تتابع %{nickname} الآن."

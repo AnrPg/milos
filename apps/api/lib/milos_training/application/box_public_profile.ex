@@ -4,13 +4,14 @@ defmodule MilosTraining.Application.BoxPublicProfile do
   box page): the draft with its photos resolved to URLs, whether it is
   published, whether the draft differs from what visitors see, and what is
   still missing before it can be published. A gym without a stored profile
-  reads as an empty, unpublished one.
+  reads as an empty, unpublished one
+  (with the default languages pre-picked).
   """
 
   alias MilosTraining.Application.MediaUrls
-  alias MilosTraining.{Media, Organizations}
+  alias MilosTraining.{Identity, Media, Organizations}
 
-  @snapshot_fields ~w(about disciplines audiences amenities services languages cover_photo_id photo_ids)a
+  @snapshot_fields ~w(about disciplines audiences amenities services languages cover_photo_id photo_ids coach_ids)a
 
   def get(context) do
     with :ok <- Organizations.authorize_capability(context, :manage_settings) do
@@ -49,28 +50,52 @@ defmodule MilosTraining.Application.BoxPublicProfile do
 
     published = not is_nil(profile.published_at)
 
+    candidates = coach_candidates(context.organization_id)
+    picked = Map.new(candidates, &{&1.id, &1})
+
     profile
-    |> Map.drop([:photo_ids, :cover_photo_id, :published_snapshot])
+    |> Map.drop([:photo_ids, :cover_photo_id, :published_snapshot, :coach_ids])
     |> Map.merge(%{
       cover: profile.cover_photo_id && by_id[profile.cover_photo_id],
       photos: profile.photo_ids |> Enum.map(&by_id[&1]) |> Enum.reject(&is_nil/1),
+      coaches:
+        profile |> Map.get(:coach_ids, []) |> Enum.map(&picked[&1]) |> Enum.reject(&is_nil/1),
+      coach_candidates: candidates,
       published: published,
-      unpublished_changes: published and snapshot(profile) != (profile.published_snapshot || %{}),
+      unpublished_changes: published and snapshot(profile) != published_view(profile),
       missing: Organizations.box_profile_missing(profile)
     })
   end
+
+  @doc """
+  The gym's staff the owner may show as coaches (board 4 Q4), as people:
+  someone who leaves the staff drops off the page without an edit.
+  """
+  def coach_candidates(organization_id) do
+    ids = organization_id |> Organizations.list_staff() |> Enum.map(& &1.user_id)
+
+    ids
+    |> Identity.list_by_ids()
+    |> Enum.map(&%{id: &1.id, nickname: &1.nickname, avatar_url: Map.get(&1, :avatar_url)})
+    |> Enum.sort_by(&(&1.nickname || ""))
+  end
+
+  # Snapshots published before a field existed read as its empty value.
+  defp published_view(profile),
+    do: Map.merge(%{"coach_ids" => []}, profile.published_snapshot || %{})
 
   defp empty(context) do
     %{
       organization_id: context.organization_id,
       about: nil,
       disciplines: [],
-      languages: [],
+      languages: Organizations.default_box_languages(),
       audiences: [],
       amenities: [],
       services: [],
       cover_photo_id: nil,
       photo_ids: [],
+      coach_ids: [],
       published_snapshot: nil,
       published_at: nil,
       lock_version: 0,

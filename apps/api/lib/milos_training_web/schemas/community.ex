@@ -114,10 +114,15 @@ defmodule MilosTrainingWeb.Schemas.Community do
     %Schema{
       title: "CommunityPost",
       type: :object,
+      description:
+        "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
       properties: %{
         id: @uuid,
+        origin: %Schema{type: :string, enum: ~w(club profile)},
+        audience: %Schema{type: :string, enum: ~w(club_channel followers public)},
         club: %Schema{
           type: :object,
+          nullable: true,
           properties: %{
             id: @uuid,
             name: %Schema{type: :string},
@@ -129,6 +134,7 @@ defmodule MilosTrainingWeb.Schemas.Community do
         },
         channel: %Schema{
           type: :object,
+          nullable: true,
           properties: %{
             id: @uuid,
             kind: %Schema{type: :string, nullable: true},
@@ -159,6 +165,8 @@ defmodule MilosTrainingWeb.Schemas.Community do
       },
       required: [
         :id,
+        :origin,
+        :audience,
         :club,
         :channel,
         :author,
@@ -216,6 +224,12 @@ defmodule MilosTrainingWeb.Schemas.Community do
       type: :object,
       properties: %{
         channel_id: @uuid,
+        audience: %Schema{
+          type: :string,
+          enum: ~w(club_channel public),
+          description:
+            "public (staff only) also shows the post on the box page and to its followers"
+        },
         body: %Schema{type: :string, maxLength: 5000},
         attachment_type: %Schema{type: :string, enum: attachment_types()},
         attachment_id: @uuid,

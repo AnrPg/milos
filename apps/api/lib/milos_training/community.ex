@@ -9,14 +9,23 @@ defmodule MilosTraining.Community do
   alias MilosTraining.Community.Commands.{
     ChannelMembership,
     ClassGroups,
+    Follows,
     Posts,
+    ProfilePosts,
     ProvisionGymClub,
     SetNotifyLevel
   }
 
   alias MilosTraining.Community.Queries.Feed
-  alias MilosTraining.Community.{ClubMembership, CommunityStore}
-  alias MilosTraining.Community.Domain.{ChannelPolicy, FeedCursor, TenantDataPolicy}
+  alias MilosTraining.Community.{ClubMembership, CommunityStore, SocialStore}
+
+  alias MilosTraining.Community.Domain.{
+    AudiencePolicy,
+    ChannelPolicy,
+    FeedCursor,
+    FollowPolicy,
+    TenantDataPolicy
+  }
 
   def with_context(context, fun) when is_function(fun, 0),
     do: CommunityStore.with_context(context, fun)
@@ -50,6 +59,64 @@ defmodule MilosTraining.Community do
   defdelegate feed_page(context, params), to: Feed, as: :page
   defdelegate pinned_posts(context, channel_ids, viewer_id), to: Feed, as: :pinned
   def attachment_types, do: MilosTraining.Community.Post.attachment_types()
+
+  defdelegate list_public_posts(context, organization_ids, viewer_id, page),
+    to: CommunityStore
+
+  # Follows (ADR-142).
+  defdelegate follow(context, type, target_id, target), to: Follows
+  defdelegate unfollow(context, type, target_id), to: Follows
+  defdelegate follow_status(context, type, target_id), to: Follows, as: :status
+  defdelegate accept_follow(context, follow_id, now), to: Follows, as: :accept
+  defdelegate remove_incoming_follow(context, follow_id), to: Follows, as: :remove_incoming
+
+  defdelegate list_incoming_follows(context, type, target_id, status, page),
+    to: SocialStore,
+    as: :list_incoming
+
+  defdelegate list_outgoing_follows(context, follower_id, types, statuses, page),
+    to: SocialStore,
+    as: :list_outgoing
+
+  defdelegate count_incoming_follows(context, type, target_id, status),
+    to: SocialStore,
+    as: :count_incoming
+
+  defdelegate count_outgoing_follows(context, follower_id, types, statuses),
+    to: SocialStore,
+    as: :count_outgoing
+
+  defdelegate followed_ids(context, follower_id, type), to: SocialStore, as: :active_target_ids
+  defdelegate follow_statuses(context, follower_id, type, ids), to: SocialStore
+  defdelegate get_follow(context, follower_id, type, target_id), to: SocialStore
+  defdelegate follower_counts(type, ids), to: SocialStore
+  defdelegate following_count(user_id), to: SocialStore
+  def follow_target_types, do: FollowPolicy.target_types()
+
+  # Social settings (ADR-142 decision 12).
+  defdelegate social_settings(context, user_id), to: SocialStore, as: :get_social_settings
+  defdelegate put_social_settings(context, user_id, attrs), to: SocialStore
+  defdelegate booking_sharer_ids(context), to: SocialStore
+
+  # Profile posts (ADR-142).
+  defdelegate create_profile_post(context, audience, attrs), to: ProfilePosts, as: :create
+  defdelegate fetch_profile_post(context, post_id), to: ProfilePosts, as: :fetch
+  defdelegate delete_profile_post(context, post, now), to: ProfilePosts, as: :delete
+  defdelegate set_profile_kudos(context, post, on?), to: ProfilePosts, as: :kudos
+  defdelegate add_profile_comment(context, post, body), to: ProfilePosts, as: :comment
+
+  defdelegate delete_profile_comment(context, comment_id, now),
+    to: ProfilePosts,
+    as: :delete_comment
+
+  defdelegate list_profile_comments(context, post_id), to: SocialStore
+  defdelegate list_profile_posts(context, filter), to: SocialStore
+  defdelegate count_profile_posts(context, author_id), to: SocialStore
+
+  # Audiences (ADR-142).
+  def audiences, do: AudiencePolicy.audiences()
+  defdelegate post_scope(params), to: AudiencePolicy, as: :scope
+  defdelegate club_audience_allowed?(audience, role), to: AudiencePolicy
 
   # Governance rules (vision §7.1).
   defdelegate club_role(context_or_roles), to: ChannelPolicy

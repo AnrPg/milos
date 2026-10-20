@@ -281,6 +281,9 @@ export function ClassSheet({
 
           <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             {coachName ? <Fact label={t("coach")}>{coachName}</Fact> : null}
+            {slot.friends_going && slot.friends_going.length > 0 ? (
+              <Fact label={t("friendsLabel")}>{slot.friends_going.map((friend) => friend.nickname ?? "?").join(", ")}</Fact>
+            ) : null}
             <Fact label={t("chipSpots")}>
               {slot.spots_remaining > 0 ? t("spotsLeft", { count: slot.spots_remaining }) : t("statusFull")}
             </Fact>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -15,6 +16,7 @@ import {
   setPostPinned,
   type CommunityPost,
 } from "@/api/community";
+import { SOCIAL_KEY } from "@/api/social";
 import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import { channelName, clubInitials } from "@/components/community/community";
@@ -40,7 +42,6 @@ export function PostCard({ post }: { post: CommunityPost }) {
   const [showComments, setShowComments] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const slug = post.club.organization_slug;
   const author = post.author.nickname ?? "?";
 
   async function run(action: () => Promise<unknown>) {
@@ -49,7 +50,10 @@ export function PostCard({ post }: { post: CommunityPost }) {
     setError(null);
     try {
       await action();
-      await queryClient.invalidateQueries({ queryKey: FEED_KEY });
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: FEED_KEY }),
+        queryClient.invalidateQueries({ queryKey: SOCIAL_KEY }),
+      ]);
     } catch (caught) {
       setError(clientErrorMessage(caught, tUi));
     } finally {
@@ -67,7 +71,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
       }}
     >
       <p className="text-xs font-semibold" style={{ color: "var(--dim)" }}>
-        {post.club.name} › #{channelName(post.channel, t)}
+        {origin(post, t)}
         {post.pinned ? ` · ${t("pinned")}` : ""}
       </p>
       <header className="flex items-center gap-3">
@@ -84,7 +88,9 @@ export function PostCard({ post }: { post: CommunityPost }) {
           </span>
         )}
         <div className="min-w-0">
-          <p className="truncate font-bold" style={{ color: "var(--text)" }}>{author}</p>
+          <Link href={`/people/${post.author.id}`} className="block truncate font-bold" style={{ color: "var(--text)" }}>
+            {author}
+          </Link>
           <p className="text-xs" style={{ color: "var(--dim)" }}>
             <time dateTime={post.inserted_at}>{formatDateTime(post.inserted_at, locale)}</time>
           </p>
@@ -106,7 +112,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
           type="button"
           aria-pressed={post.kudos_by_me}
           disabled={busy}
-          onClick={() => void run(() => setKudos(token!, slug, post.id, !post.kudos_by_me))}
+          onClick={() => void run(() => setKudos(token!, post, !post.kudos_by_me))}
           className="min-h-11 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
           style={{
             background: post.kudos_by_me ? "var(--primary)" : "var(--panel-raised)",
@@ -127,12 +133,12 @@ export function PostCard({ post }: { post: CommunityPost }) {
         </button>
         <span className="grow" />
         {post.can_pin ? (
-          <SmallAction disabled={busy} onClick={() => void run(() => setPostPinned(token!, slug, post.id, !post.pinned))}>
+          <SmallAction disabled={busy} onClick={() => void run(() => setPostPinned(token!, post, !post.pinned))}>
             {post.pinned ? t("unpin") : t("pin")}
           </SmallAction>
         ) : null}
         {post.can_moderate ? (
-          <SmallAction disabled={busy} onClick={() => void run(() => setPostHidden(token!, slug, post.id, !post.hidden))}>
+          <SmallAction disabled={busy} onClick={() => void run(() => setPostHidden(token!, post, !post.hidden))}>
             {post.hidden ? t("unhide") : t("hide")}
           </SmallAction>
         ) : null}
@@ -140,7 +146,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
           <SmallAction
             disabled={busy}
             onClick={() => {
-              if (window.confirm(t("deleteConfirm"))) void run(() => deletePost(token!, slug, post.id));
+              if (window.confirm(t("deleteConfirm"))) void run(() => deletePost(token!, post));
             }}
           >
             {t("delete")}
@@ -151,6 +157,14 @@ export function PostCard({ post }: { post: CommunityPost }) {
       {showComments ? <Comments post={post} /> : null}
     </article>
   );
+}
+
+/** `Club › #channel`, the box alone for its public post, or the audience of a profile post. */
+function origin(post: CommunityPost, t: ReturnType<typeof useTranslations>) {
+  if (post.origin === "profile" || !post.club) {
+    return post.audience === "public" ? t("audiencePublic") : t("audienceFollowers");
+  }
+  return post.channel ? `${post.club.name} › #${channelName(post.channel, t)}` : post.club.name;
 }
 
 function SmallAction({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: string }) {
@@ -209,9 +223,8 @@ function Comments({ post }: { post: CommunityPost }) {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const queryClient = useQueryClient();
-  const slug = post.club.organization_slug;
   const key = ["community", "comments", post.id] as const;
-  const comments = useQuery({ queryKey: key, enabled: Boolean(token), queryFn: () => fetchComments(token!, slug, post.id) });
+  const comments = useQuery({ queryKey: key, enabled: Boolean(token), queryFn: () => fetchComments(token!, post) });
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -228,7 +241,7 @@ function Comments({ post }: { post: CommunityPost }) {
     if (!token || !body) return;
     setError(null);
     try {
-      await addComment(token, slug, post.id, body);
+      await addComment(token, post, body);
       setDraft("");
       await refresh();
     } catch (caught) {
@@ -251,7 +264,7 @@ function Comments({ post }: { post: CommunityPost }) {
                 className="ml-2 text-xs underline"
                 style={{ color: "var(--dim)" }}
                 onClick={() =>
-                  void deleteComment(token!, slug, comment.id)
+                  void deleteComment(token!, post, comment.id)
                     .then(refresh)
                     .catch((caught) => setError(clientErrorMessage(caught, tUi)))
                 }

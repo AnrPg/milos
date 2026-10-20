@@ -1,8 +1,8 @@
 defmodule MilosTraining.Application.PostPresenter do
   @moduledoc """
-  Posts and comments as the member app shows them (ADR-138): every post
-  carries its origin (club › channel), its author, and what the viewer may
-  do with it.
+  Posts and comments as the member app shows them (ADR-138, ADR-142): every
+  post carries its origin (`club` › channel, or the author's `profile`), its
+  audience, its author, and what the viewer may do with it.
   """
 
   alias MilosTraining.{Community, Identity}
@@ -16,6 +16,82 @@ defmodule MilosTraining.Application.PostPresenter do
         nil -> []
         club -> [present(post, club, authors, viewer_id)]
       end
+    end)
+  end
+
+  @doc """
+  Public club posts of gyms the viewer may not belong to (box page,
+  followed boxes): `boxes` are `Organizations.public_boxes/1` rows.
+  """
+  def public_box_posts(posts, boxes) do
+    authors = authors(Enum.map(posts, & &1.author_id))
+    boxes_by_id = Map.new(boxes, &{&1.organization_id, &1})
+
+    Enum.flat_map(posts, fn post ->
+      case Map.get(boxes_by_id, post.organization_id) do
+        nil ->
+          []
+
+        box ->
+          club = %{
+            id: post.club_id,
+            name: box.name,
+            organization_slug: box.slug,
+            logo_url: box.logo_url,
+            primary_color: box.primary_color
+          }
+
+          [
+            post
+            |> base(authors)
+            |> Map.merge(%{
+              origin: "club",
+              club: club,
+              channel: nil,
+              pinned: false,
+              hidden: false,
+              can_delete: false,
+              can_moderate: false,
+              can_pin: false
+            })
+          ]
+      end
+    end)
+  end
+
+  @doc "Posts to followers or to everyone, by their authors (ADR-142)."
+  def profile_posts(posts, viewer_id) do
+    authors = authors(Enum.map(posts, & &1.author_id))
+
+    Enum.map(posts, fn post ->
+      post
+      |> base(authors)
+      |> Map.merge(%{
+        origin: "profile",
+        club: nil,
+        channel: nil,
+        pinned: false,
+        hidden: false,
+        can_delete: post.author_id == viewer_id,
+        can_moderate: false,
+        can_pin: false
+      })
+    end)
+  end
+
+  @doc "Comments on a profile post: their author or the post's author removes them."
+  def profile_comments(comments, post, viewer_id) do
+    authors = authors(Enum.map(comments, & &1.author_id))
+
+    Enum.map(comments, fn comment ->
+      %{
+        id: comment.id,
+        post_id: comment.post_id,
+        author: author(authors, comment.author_id),
+        body: comment.body,
+        inserted_at: comment.inserted_at,
+        can_delete: viewer_id in [comment.author_id, post.author_id]
+      }
     end)
   end
 
@@ -37,8 +113,10 @@ defmodule MilosTraining.Application.PostPresenter do
   defp present(post, club, authors, viewer_id) do
     channel = Enum.find(club.channels, &(&1.id == post.channel_id)) || %{kind: nil, name: nil}
 
-    %{
-      id: post.id,
+    post
+    |> base(authors)
+    |> Map.merge(%{
+      origin: "club",
       club: %{
         id: club.id,
         name: club.name,
@@ -47,19 +125,26 @@ defmodule MilosTraining.Application.PostPresenter do
         primary_color: club.primary_color
       },
       channel: %{id: post.channel_id, kind: channel.kind, name: channel.name},
+      pinned: not is_nil(post.pinned_at),
+      hidden: not is_nil(post.hidden_at),
+      can_delete: Community.can_delete_post?(post, viewer_id, club.role),
+      can_moderate: Community.can_moderate?(club.role),
+      can_pin: is_map_key(channel, :write_policy) and Community.can_pin?(channel, club.role)
+    })
+  end
+
+  defp base(post, authors) do
+    %{
+      id: post.id,
+      audience: Map.get(post, :audience, "club_channel"),
       author: author(authors, post.author_id),
       body: post.body,
       attachment_type: post.attachment_type,
       attachment_id: post.attachment_id,
       attachment: public_snapshot(post.attachment),
-      pinned: not is_nil(post.pinned_at),
-      hidden: not is_nil(post.hidden_at),
       kudos_count: post.kudos_count,
       comment_count: post.comment_count,
       kudos_by_me: post.kudos_by_me,
-      can_delete: Community.can_delete_post?(post, viewer_id, club.role),
-      can_moderate: Community.can_moderate?(club.role),
-      can_pin: is_map_key(channel, :write_policy) and Community.can_pin?(channel, club.role),
       inserted_at: post.inserted_at
     }
   end

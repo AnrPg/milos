@@ -6,9 +6,12 @@ defmodule MilosTraining.Community.Commands.Posts do
   """
 
   alias MilosTraining.Community.CommunityStore
-  alias MilosTraining.Community.Domain.ChannelPolicy
+  alias MilosTraining.Community.Domain.{AudiencePolicy, ChannelPolicy}
 
-  @doc "A post in `channel` by the context's user. `attachment` is an already built snapshot."
+  @doc """
+  A post in `channel` by the context's user. `attachment` is an already
+  built snapshot; `audience` is `club_channel` unless staff make it public.
+  """
   def create(
         %{organization_id: organization_id, user_id: user_id} = context,
         channel,
@@ -16,6 +19,8 @@ defmodule MilosTraining.Community.Commands.Posts do
         joined?,
         attrs
       ) do
+    audience = Map.get(attrs, :audience) || "club_channel"
+
     cond do
       channel.organization_id != organization_id ->
         {:error, :not_found}
@@ -23,13 +28,16 @@ defmodule MilosTraining.Community.Commands.Posts do
       not ChannelPolicy.can_post?(channel, role, joined?) ->
         {:error, :cannot_post_in_channel}
 
+      not AudiencePolicy.club_audience_allowed?(audience, role) ->
+        {:error, :invalid_audience}
+
       true ->
         CommunityStore.create_post(context, %{
           organization_id: organization_id,
           club_id: channel.club_id,
           channel_id: channel.id,
           author_id: user_id,
-          audience: "club_channel",
+          audience: audience,
           body: Map.get(attrs, :body),
           attachment_type: Map.get(attrs, :attachment_type),
           attachment_id: Map.get(attrs, :attachment_id),

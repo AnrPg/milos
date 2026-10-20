@@ -68,6 +68,46 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoPublicProfileStore do
     end
   end
 
+  @impl true
+  def public_box_by_slug(slug) when is_binary(slug) do
+    case Repo.query!("SELECT organization_id, slug FROM milos_public_box_by_slug($1)", [slug]) do
+      %{rows: [[id, canonical]]} -> %{organization_id: Ecto.UUID.load!(id), slug: canonical}
+      _none -> nil
+    end
+  end
+
+  def public_box_by_slug(_slug), do: nil
+
+  @impl true
+  def public_boxes([]), do: []
+
+  def public_boxes(organization_ids) do
+    ids = organization_ids |> Enum.flat_map(&dump_uuid/1) |> Enum.uniq()
+
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT organization_id, slug, name, logo_url, primary_color FROM milos_public_boxes($1)",
+        [ids]
+      )
+
+    Enum.map(rows, fn [id, slug, name, logo_url, color] ->
+      %{
+        organization_id: Ecto.UUID.load!(id),
+        slug: slug,
+        name: name,
+        logo_url: logo_url,
+        primary_color: color
+      }
+    end)
+  end
+
+  defp dump_uuid(id) do
+    case Ecto.UUID.dump(id) do
+      {:ok, binary} -> [binary]
+      :error -> []
+    end
+  end
+
   defp normalize(nil), do: nil
 
   defp normalize(%PublicProfile{} = profile) do
@@ -81,6 +121,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoPublicProfileStore do
       :services,
       :cover_photo_id,
       :photo_ids,
+      :coach_ids,
       :published_snapshot,
       :published_at,
       :lock_version,

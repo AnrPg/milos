@@ -24,6 +24,8 @@ export type ScheduleFilters = {
   durations: DurationBand[];
   focus: WorkoutFocus[];
   audiences: ClassAudience[];
+  /** «Φίλοι»: only classes someone you follow is going to (ADR-142 decision 12). */
+  friends: boolean;
 };
 
 export const DEFAULT_SCHEDULE_FILTERS: ScheduleFilters = {
@@ -38,6 +40,7 @@ export const DEFAULT_SCHEDULE_FILTERS: ScheduleFilters = {
   durations: [],
   focus: [],
   audiences: [],
+  friends: false,
 };
 
 /** The day the time range slider spans, in 30-minute steps. */
@@ -117,7 +120,8 @@ export function matchesScheduleFilters(slot: ScheduleSlot, filters: ScheduleFilt
     matchesBooked(slot, filters.booked) &&
     (filters.durations.length === 0 || filters.durations.includes(durationBand(slot.duration_minutes))) &&
     intersects(filters.focus, slot.workout?.focus) &&
-    intersects(filters.audiences, classType?.audiences)
+    intersects(filters.audiences, classType?.audiences) &&
+    (!filters.friends || (slot.friends_going?.length ?? 0) > 0)
   );
 }
 
@@ -140,6 +144,7 @@ export function activeFilterCount(filters: ScheduleFilters) {
     filters.durations.length > 0,
     filters.focus.length > 0,
     filters.audiences.length > 0,
+    filters.friends,
   ].filter(Boolean).length;
 }
 
@@ -186,6 +191,7 @@ export function parseScheduleFilters(
     durations: subset(raw.durations, ["short", "medium", "long"] as const),
     focus: subset(raw.focus, vocab.focus),
     audiences: subset(raw.audiences, vocab.audiences),
+    friends: raw.friends === true,
   };
 }
 
@@ -233,3 +239,7 @@ export function nextMatch(slots: ScheduleSlot[], after: Date) {
 export const PACKAGE_ONLY = "only";
 export const PACKAGE_ALL = "all";
 export type PackageChoice = typeof PACKAGE_ONLY | typeof PACKAGE_ALL;
+
+export const FRIENDS_ONLY = "friends";
+export const FRIENDS_ALL = "all";
+export type FriendsChoice = typeof FRIENDS_ONLY | typeof FRIENDS_ALL;

@@ -481,6 +481,35 @@
         "title": "AthleteInjuryWarningsRequest",
         "type": "object"
       },
+      "BookingSharing": {
+        "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "offered": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "offered"
+        ],
+        "title": "BookingSharing",
+        "type": "object"
+      },
+      "BookingSharingRequest": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "BookingSharingRequest",
+        "type": "object"
+      },
       "BoxPublicProfile": {
         "properties": {
           "about": {
@@ -530,6 +559,56 @@
                 "returning_from_injury"
               ],
               "type": "string"
+            },
+            "type": "array"
+          },
+          "coach_candidates": {
+            "description": "The gym's staff the owner may pick from.",
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "BoxPublicProfileCoach",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "coaches": {
+            "description": "The coaches the page shows, in the owner's order.",
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "BoxPublicProfileCoach",
+              "type": "object"
             },
             "type": "array"
           },
@@ -753,6 +832,8 @@
           "services",
           "cover",
           "photos",
+          "coaches",
+          "coach_candidates",
           "published",
           "published_at",
           "unpublished_changes",
@@ -760,6 +841,27 @@
           "lock_version"
         ],
         "title": "BoxPublicProfile",
+        "type": "object"
+      },
+      "BoxPublicProfileCoach": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "BoxPublicProfileCoach",
         "type": "object"
       },
       "BoxPublicProfilePublish": {
@@ -823,6 +925,56 @@
                     "returning_from_injury"
                   ],
                   "type": "string"
+                },
+                "type": "array"
+              },
+              "coach_candidates": {
+                "description": "The gym's staff the owner may pick from.",
+                "items": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "BoxPublicProfileCoach",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "coaches": {
+                "description": "The coaches the page shows, in the owner's order.",
+                "items": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "BoxPublicProfileCoach",
+                  "type": "object"
                 },
                 "type": "array"
               },
@@ -1046,6 +1198,8 @@
               "services",
               "cover",
               "photos",
+              "coaches",
+              "coach_candidates",
               "published",
               "published_at",
               "unpublished_changes",
@@ -1111,6 +1265,14 @@
                 "lgbtq_friendly",
                 "returning_from_injury"
               ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "coach_ids": {
+            "description": "Staff shown as coaches on the page, in display order.",
+            "items": {
+              "format": "uuid",
               "type": "string"
             },
             "type": "array"
@@ -2429,6 +2591,7 @@
           },
           "pinned": {
             "items": {
+              "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
               "properties": {
                 "attachment": {
                   "additionalProperties": true,
@@ -2448,6 +2611,14 @@
                     "pr"
                   ],
                   "nullable": true,
+                  "type": "string"
+                },
+                "audience": {
+                  "enum": [
+                    "club_channel",
+                    "followers",
+                    "public"
+                  ],
                   "type": "string"
                 },
                 "author": {
@@ -2485,6 +2656,7 @@
                   "type": "boolean"
                 },
                 "channel": {
+                  "nullable": true,
                   "properties": {
                     "id": {
                       "format": "uuid",
@@ -2505,6 +2677,7 @@
                   "type": "object"
                 },
                 "club": {
+                  "nullable": true,
                   "properties": {
                     "id": {
                       "format": "uuid",
@@ -2552,12 +2725,21 @@
                 "kudos_count": {
                   "type": "integer"
                 },
+                "origin": {
+                  "enum": [
+                    "club",
+                    "profile"
+                  ],
+                  "type": "string"
+                },
                 "pinned": {
                   "type": "boolean"
                 }
               },
               "required": [
                 "id",
+                "origin",
+                "audience",
                 "club",
                 "channel",
                 "author",
@@ -2578,6 +2760,7 @@
           },
           "posts": {
             "items": {
+              "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
               "properties": {
                 "attachment": {
                   "additionalProperties": true,
@@ -2597,6 +2780,14 @@
                     "pr"
                   ],
                   "nullable": true,
+                  "type": "string"
+                },
+                "audience": {
+                  "enum": [
+                    "club_channel",
+                    "followers",
+                    "public"
+                  ],
                   "type": "string"
                 },
                 "author": {
@@ -2634,6 +2825,7 @@
                   "type": "boolean"
                 },
                 "channel": {
+                  "nullable": true,
                   "properties": {
                     "id": {
                       "format": "uuid",
@@ -2654,6 +2846,7 @@
                   "type": "object"
                 },
                 "club": {
+                  "nullable": true,
                   "properties": {
                     "id": {
                       "format": "uuid",
@@ -2701,12 +2894,21 @@
                 "kudos_count": {
                   "type": "integer"
                 },
+                "origin": {
+                  "enum": [
+                    "club",
+                    "profile"
+                  ],
+                  "type": "string"
+                },
                 "pinned": {
                   "type": "boolean"
                 }
               },
               "required": [
                 "id",
+                "origin",
+                "audience",
                 "club",
                 "channel",
                 "author",
@@ -2773,6 +2975,7 @@
         "type": "object"
       },
       "CommunityPost": {
+        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
         "properties": {
           "attachment": {
             "additionalProperties": true,
@@ -2792,6 +2995,14 @@
               "pr"
             ],
             "nullable": true,
+            "type": "string"
+          },
+          "audience": {
+            "enum": [
+              "club_channel",
+              "followers",
+              "public"
+            ],
             "type": "string"
           },
           "author": {
@@ -2829,6 +3040,7 @@
             "type": "boolean"
           },
           "channel": {
+            "nullable": true,
             "properties": {
               "id": {
                 "format": "uuid",
@@ -2849,6 +3061,7 @@
             "type": "object"
           },
           "club": {
+            "nullable": true,
             "properties": {
               "id": {
                 "format": "uuid",
@@ -2896,12 +3109,21 @@
           "kudos_count": {
             "type": "integer"
           },
+          "origin": {
+            "enum": [
+              "club",
+              "profile"
+            ],
+            "type": "string"
+          },
           "pinned": {
             "type": "boolean"
           }
         },
         "required": [
           "id",
+          "origin",
+          "audience",
           "club",
           "channel",
           "author",
@@ -2929,6 +3151,14 @@
               "training_log_entry",
               "workout_execution",
               "pr"
+            ],
+            "type": "string"
+          },
+          "audience": {
+            "description": "public (staff only) also shows the post on the box page and to its followers",
+            "enum": [
+              "club_channel",
+              "public"
             ],
             "type": "string"
           },
@@ -2990,6 +3220,7 @@
       "CommunityPostResponse": {
         "properties": {
           "post": {
+            "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
             "properties": {
               "attachment": {
                 "additionalProperties": true,
@@ -3009,6 +3240,14 @@
                   "pr"
                 ],
                 "nullable": true,
+                "type": "string"
+              },
+              "audience": {
+                "enum": [
+                  "club_channel",
+                  "followers",
+                  "public"
+                ],
                 "type": "string"
               },
               "author": {
@@ -3046,6 +3285,7 @@
                 "type": "boolean"
               },
               "channel": {
+                "nullable": true,
                 "properties": {
                   "id": {
                     "format": "uuid",
@@ -3066,6 +3306,7 @@
                 "type": "object"
               },
               "club": {
+                "nullable": true,
                 "properties": {
                   "id": {
                     "format": "uuid",
@@ -3113,12 +3354,21 @@
               "kudos_count": {
                 "type": "integer"
               },
+              "origin": {
+                "enum": [
+                  "club",
+                  "profile"
+                ],
+                "type": "string"
+              },
               "pinned": {
                 "type": "boolean"
               }
             },
             "required": [
               "id",
+              "origin",
+              "audience",
               "club",
               "channel",
               "author",
@@ -5932,6 +6182,300 @@
         "title": "FinanceRefundReceiptResponse",
         "type": "object"
       },
+      "FollowEntry": {
+        "properties": {
+          "box": {
+            "allOf": [
+              {
+                "properties": {
+                  "logo_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "primary_color": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "slug": {
+                    "description": "Canonical slug; redirect when it differs",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "organization_id",
+                  "slug",
+                  "name"
+                ],
+                "title": "PublicBox",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "follow_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "allOf": [
+              {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "my_status": {
+                    "allOf": [
+                      {
+                        "enum": [
+                          "none",
+                          "requested",
+                          "active"
+                        ],
+                        "type": "string"
+                      }
+                    ],
+                    "description": "Whether you follow them"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "my_status"
+                ],
+                "title": "FollowPerson",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "since": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "follow_id",
+          "status",
+          "since"
+        ],
+        "title": "FollowEntry",
+        "type": "object"
+      },
+      "FollowPage": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "box": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slug": {
+                          "description": "Canonical slug; redirect when it differs",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "slug",
+                        "name"
+                      ],
+                      "title": "PublicBox",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "follow_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "my_status": {
+                          "allOf": [
+                            {
+                              "enum": [
+                                "none",
+                                "requested",
+                                "active"
+                              ],
+                              "type": "string"
+                            }
+                          ],
+                          "description": "Whether you follow them"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "my_status"
+                      ],
+                      "title": "FollowPerson",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "since": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "none",
+                    "requested",
+                    "active"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "follow_id",
+                "status",
+                "since"
+              ],
+              "title": "FollowEntry",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "title": "FollowPage",
+        "type": "object"
+      },
+      "FollowPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "my_status": {
+            "allOf": [
+              {
+                "enum": [
+                  "none",
+                  "requested",
+                  "active"
+                ],
+                "type": "string"
+              }
+            ],
+            "description": "Whether you follow them"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "my_status"
+        ],
+        "title": "FollowPerson",
+        "type": "object"
+      },
+      "FollowRequest": {
+        "properties": {
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "target_type": {
+            "enum": [
+              "user",
+              "organization",
+              "club"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_type",
+          "target_id"
+        ],
+        "title": "FollowRequest",
+        "type": "object"
+      },
+      "FollowStatusResponse": {
+        "properties": {
+          "status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "FollowStatusResponse",
+        "type": "object"
+      },
       "FormReview": {
         "properties": {
           "execution_id": {
@@ -8213,6 +8757,291 @@
         "title": "PRTimelineEntry",
         "type": "object"
       },
+      "PersonPostsResponse": {
+        "properties": {
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "posts": {
+            "items": {
+              "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+              "properties": {
+                "attachment": {
+                  "additionalProperties": true,
+                  "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "attachment_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "attachment_type": {
+                  "enum": [
+                    "training_log_entry",
+                    "workout_execution",
+                    "pr"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "audience": {
+                  "enum": [
+                    "club_channel",
+                    "followers",
+                    "public"
+                  ],
+                  "type": "string"
+                },
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "body": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_delete": {
+                  "type": "boolean"
+                },
+                "can_moderate": {
+                  "type": "boolean"
+                },
+                "can_pin": {
+                  "type": "boolean"
+                },
+                "channel": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "club": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organization_slug": {
+                      "type": "string"
+                    },
+                    "primary_color": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "organization_slug"
+                  ],
+                  "type": "object"
+                },
+                "comment_count": {
+                  "type": "integer"
+                },
+                "hidden": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "kudos_by_me": {
+                  "type": "boolean"
+                },
+                "kudos_count": {
+                  "type": "integer"
+                },
+                "origin": {
+                  "enum": [
+                    "club",
+                    "profile"
+                  ],
+                  "type": "string"
+                },
+                "pinned": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "audience",
+                "club",
+                "channel",
+                "author",
+                "pinned",
+                "hidden",
+                "kudos_count",
+                "comment_count",
+                "kudos_by_me",
+                "can_delete",
+                "can_moderate",
+                "can_pin",
+                "inserted_at"
+              ],
+              "title": "CommunityPost",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "posts"
+        ],
+        "title": "PersonPostsResponse",
+        "type": "object"
+      },
+      "PersonProfile": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "followers_count": {
+            "type": "integer"
+          },
+          "following_count": {
+            "type": "integer"
+          },
+          "follows_me": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "is_me": {
+            "type": "boolean"
+          },
+          "my_status": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "is_me",
+          "followers_count",
+          "following_count",
+          "my_status",
+          "follows_me"
+        ],
+        "title": "PersonProfile",
+        "type": "object"
+      },
+      "PersonRef": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "PersonRef",
+        "type": "object"
+      },
+      "ProfilePostCreateRequest": {
+        "properties": {
+          "attachment_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "attachment_type": {
+            "enum": [
+              "training_log_entry",
+              "workout_execution",
+              "pr"
+            ],
+            "type": "string"
+          },
+          "audience": {
+            "enum": [
+              "followers",
+              "public"
+            ],
+            "type": "string"
+          },
+          "body": {
+            "maxLength": 5000,
+            "type": "string"
+          },
+          "client_operation_id": {
+            "maxLength": 120,
+            "type": "string"
+          }
+        },
+        "required": [
+          "audience"
+        ],
+        "title": "ProfilePostCreateRequest",
+        "type": "object"
+      },
       "ProgressStats": {
         "properties": {
           "consistency": {
@@ -8410,6 +9239,989 @@
         "title": "ProgressStats",
         "type": "object"
       },
+      "PublicBox": {
+        "properties": {
+          "logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "slug": {
+            "description": "Canonical slug; redirect when it differs",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "slug",
+          "name"
+        ],
+        "title": "PublicBox",
+        "type": "object"
+      },
+      "PublicBoxClass": {
+        "properties": {
+          "capacity": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "class_type": {
+            "nullable": true,
+            "properties": {
+              "audiences": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "level": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "audiences"
+            ],
+            "type": "object"
+          },
+          "coach": {
+            "allOf": [
+              {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "PersonRef",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "spots_remaining": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "scheduled_at"
+        ],
+        "title": "PublicBoxClass",
+        "type": "object"
+      },
+      "PublicBoxCoach": {
+        "description": "A coach the owner shows, with what they teach in the coming weeks",
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "class_types": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "class_types"
+        ],
+        "title": "PublicBoxCoach",
+        "type": "object"
+      },
+      "PublicBoxLocation": {
+        "properties": {
+          "accessibility": {
+            "items": {
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "address": {
+            "nullable": true,
+            "type": "string"
+          },
+          "city": {
+            "nullable": true,
+            "type": "string"
+          },
+          "country_code": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "latitude": {
+            "nullable": true,
+            "type": "number"
+          },
+          "longitude": {
+            "nullable": true,
+            "type": "number"
+          },
+          "name": {
+            "type": "string"
+          },
+          "neighbourhood": {
+            "nullable": true,
+            "type": "string"
+          },
+          "opening_hours": {
+            "description": "Weekly spans: weekday (1 = Monday), opens, closes",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "PublicBoxLocation",
+        "type": "object"
+      },
+      "PublicBoxPhoto": {
+        "properties": {
+          "height": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "width": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ],
+        "title": "PublicBoxPhoto",
+        "type": "object"
+      },
+      "PublicBoxPostsResponse": {
+        "properties": {
+          "box": {
+            "properties": {
+              "logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "primary_color": {
+                "nullable": true,
+                "type": "string"
+              },
+              "slug": {
+                "description": "Canonical slug; redirect when it differs",
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "slug",
+              "name"
+            ],
+            "title": "PublicBox",
+            "type": "object"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "posts": {
+            "items": {
+              "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+              "properties": {
+                "attachment": {
+                  "additionalProperties": true,
+                  "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "attachment_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "attachment_type": {
+                  "enum": [
+                    "training_log_entry",
+                    "workout_execution",
+                    "pr"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "audience": {
+                  "enum": [
+                    "club_channel",
+                    "followers",
+                    "public"
+                  ],
+                  "type": "string"
+                },
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "body": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_delete": {
+                  "type": "boolean"
+                },
+                "can_moderate": {
+                  "type": "boolean"
+                },
+                "can_pin": {
+                  "type": "boolean"
+                },
+                "channel": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "club": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "logo_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "organization_slug": {
+                      "type": "string"
+                    },
+                    "primary_color": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "organization_slug"
+                  ],
+                  "type": "object"
+                },
+                "comment_count": {
+                  "type": "integer"
+                },
+                "hidden": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "kudos_by_me": {
+                  "type": "boolean"
+                },
+                "kudos_count": {
+                  "type": "integer"
+                },
+                "origin": {
+                  "enum": [
+                    "club",
+                    "profile"
+                  ],
+                  "type": "string"
+                },
+                "pinned": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "origin",
+                "audience",
+                "club",
+                "channel",
+                "author",
+                "pinned",
+                "hidden",
+                "kudos_count",
+                "comment_count",
+                "kudos_by_me",
+                "can_delete",
+                "can_moderate",
+                "can_pin",
+                "inserted_at"
+              ],
+              "title": "CommunityPost",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "box",
+          "posts"
+        ],
+        "title": "PublicBoxPostsResponse",
+        "type": "object"
+      },
+      "PublicBoxProfile": {
+        "description": "The published snapshot only; never the draft",
+        "properties": {
+          "about": {
+            "nullable": true,
+            "type": "string"
+          },
+          "amenities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "audiences": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "coaches": {
+            "items": {
+              "description": "A coach the owner shows, with what they teach in the coming weeks",
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "class_types": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "class_types"
+              ],
+              "title": "PublicBoxCoach",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "cover": {
+            "allOf": [
+              {
+                "properties": {
+                  "height": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "url": {
+                    "type": "string"
+                  },
+                  "width": {
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "url"
+                ],
+                "title": "PublicBoxPhoto",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "languages": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "photos": {
+            "items": {
+              "properties": {
+                "height": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "url": {
+                  "type": "string"
+                },
+                "width": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "url"
+              ],
+              "title": "PublicBoxPhoto",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "services": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "disciplines",
+          "audiences",
+          "amenities",
+          "services",
+          "languages",
+          "photos",
+          "coaches"
+        ],
+        "title": "PublicBoxProfile",
+        "type": "object"
+      },
+      "PublicBoxResponse": {
+        "properties": {
+          "box": {
+            "properties": {
+              "logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "primary_color": {
+                "nullable": true,
+                "type": "string"
+              },
+              "slug": {
+                "description": "Canonical slug; redirect when it differs",
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "slug",
+              "name"
+            ],
+            "title": "PublicBox",
+            "type": "object"
+          },
+          "followers_count": {
+            "type": "integer"
+          },
+          "locations": {
+            "items": {
+              "properties": {
+                "accessibility": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "nullable": true,
+                  "type": "array"
+                },
+                "address": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "city": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "country_code": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "latitude": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "longitude": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "neighbourhood": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "opening_hours": {
+                  "description": "Weekly spans: weekday (1 = Monday), opens, closes",
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "nullable": true,
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "name"
+              ],
+              "title": "PublicBoxLocation",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "profile": {
+            "description": "The published snapshot only; never the draft",
+            "properties": {
+              "about": {
+                "nullable": true,
+                "type": "string"
+              },
+              "amenities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "audiences": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "coaches": {
+                "items": {
+                  "description": "A coach the owner shows, with what they teach in the coming weeks",
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "class_types": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "class_types"
+                  ],
+                  "title": "PublicBoxCoach",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "cover": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "height": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "url": {
+                        "type": "string"
+                      },
+                      "width": {
+                        "nullable": true,
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "url"
+                    ],
+                    "title": "PublicBoxPhoto",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              },
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "languages": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "photos": {
+                "items": {
+                  "properties": {
+                    "height": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    },
+                    "width": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "url"
+                  ],
+                  "title": "PublicBoxPhoto",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "services": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "disciplines",
+              "audiences",
+              "amenities",
+              "services",
+              "languages",
+              "photos",
+              "coaches"
+            ],
+            "title": "PublicBoxProfile",
+            "type": "object"
+          },
+          "published_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "box",
+          "profile",
+          "followers_count",
+          "locations"
+        ],
+        "title": "PublicBoxResponse",
+        "type": "object"
+      },
+      "PublicBoxScheduleResponse": {
+        "properties": {
+          "box": {
+            "properties": {
+              "logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "primary_color": {
+                "nullable": true,
+                "type": "string"
+              },
+              "slug": {
+                "description": "Canonical slug; redirect when it differs",
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "slug",
+              "name"
+            ],
+            "title": "PublicBox",
+            "type": "object"
+          },
+          "end_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "slots": {
+            "items": {
+              "properties": {
+                "capacity": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "class_type": {
+                  "nullable": true,
+                  "properties": {
+                    "audiences": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "level": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "audiences"
+                  ],
+                  "type": "object"
+                },
+                "coach": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "PersonRef",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                },
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "spots_remaining": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "name",
+                "scheduled_at"
+              ],
+              "title": "PublicBoxClass",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "start_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "box",
+          "start_at",
+          "end_at",
+          "slots"
+        ],
+        "title": "PublicBoxScheduleResponse",
+        "type": "object"
+      },
       "RememberFilterRequest": {
         "properties": {
           "params": {
@@ -8551,6 +10363,48 @@
           "code",
           "error"
         ],
+        "type": "object"
+      },
+      "SocialSummary": {
+        "properties": {
+          "booking_sharing": {
+            "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "offered": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "enabled",
+              "offered"
+            ],
+            "title": "BookingSharing",
+            "type": "object"
+          },
+          "followers_count": {
+            "type": "integer"
+          },
+          "following_count": {
+            "type": "integer"
+          },
+          "posts_count": {
+            "type": "integer"
+          },
+          "requests_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "posts_count",
+          "followers_count",
+          "following_count",
+          "requests_count",
+          "booking_sharing"
+        ],
+        "title": "SocialSummary",
         "type": "object"
       },
       "StaffMember": {
@@ -11629,6 +13483,453 @@
         ]
       }
     },
+    "/api/boxes/{slug}/posts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PublicBoxController.posts",
+        "parameters": [
+          {
+            "description": "The gym's slug or one of its former slugs",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slug": {
+                          "description": "Canonical slug; redirect when it differs",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "slug",
+                        "name"
+                      ],
+                      "title": "PublicBox",
+                      "type": "object"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "posts": {
+                      "items": {
+                        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+                        "properties": {
+                          "attachment": {
+                            "additionalProperties": true,
+                            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "attachment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attachment_type": {
+                            "enum": [
+                              "training_log_entry",
+                              "workout_execution",
+                              "pr"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "audience": {
+                            "enum": [
+                              "club_channel",
+                              "followers",
+                              "public"
+                            ],
+                            "type": "string"
+                          },
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "can_moderate": {
+                            "type": "boolean"
+                          },
+                          "can_pin": {
+                            "type": "boolean"
+                          },
+                          "channel": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "club": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "logo_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "organization_slug": {
+                                "type": "string"
+                              },
+                              "primary_color": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "organization_slug"
+                            ],
+                            "type": "object"
+                          },
+                          "comment_count": {
+                            "type": "integer"
+                          },
+                          "hidden": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kudos_by_me": {
+                            "type": "boolean"
+                          },
+                          "kudos_count": {
+                            "type": "integer"
+                          },
+                          "origin": {
+                            "enum": [
+                              "club",
+                              "profile"
+                            ],
+                            "type": "string"
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "origin",
+                          "audience",
+                          "club",
+                          "channel",
+                          "author",
+                          "pinned",
+                          "hidden",
+                          "kudos_count",
+                          "comment_count",
+                          "kudos_by_me",
+                          "can_delete",
+                          "can_moderate",
+                          "can_pin",
+                          "inserted_at"
+                        ],
+                        "title": "CommunityPost",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "box",
+                    "posts"
+                  ],
+                  "title": "PublicBoxPostsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Posts"
+          }
+        },
+        "summary": "Posts a published box made public, newest first (signed in)",
+        "tags": [
+          "Public box page"
+        ]
+      }
+    },
+    "/api/boxes/{slug}/schedule": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PublicBoxController.schedule",
+        "parameters": [
+          {
+            "description": "The gym's slug or one of its former slugs",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "start_at",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "end_at",
+            "required": false,
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slug": {
+                          "description": "Canonical slug; redirect when it differs",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "slug",
+                        "name"
+                      ],
+                      "title": "PublicBox",
+                      "type": "object"
+                    },
+                    "end_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "slots": {
+                      "items": {
+                        "properties": {
+                          "capacity": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "class_type": {
+                            "nullable": true,
+                            "properties": {
+                              "audiences": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "level": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "audiences"
+                            ],
+                            "type": "object"
+                          },
+                          "coach": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "PersonRef",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "scheduled_at"
+                        ],
+                        "title": "PublicBoxClass",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "start_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "box",
+                    "start_at",
+                    "end_at",
+                    "slots"
+                  ],
+                  "title": "PublicBoxScheduleResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Classes"
+          }
+        },
+        "summary": "A published box's classes in a window (read-only; signed in)",
+        "tags": [
+          "Public box page"
+        ]
+      }
+    },
     "/api/calendar/export-links": {
       "get": {
         "callbacks": {},
@@ -13431,6 +15732,7 @@
                     },
                     "pinned": {
                       "items": {
+                        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                         "properties": {
                           "attachment": {
                             "additionalProperties": true,
@@ -13450,6 +15752,14 @@
                               "pr"
                             ],
                             "nullable": true,
+                            "type": "string"
+                          },
+                          "audience": {
+                            "enum": [
+                              "club_channel",
+                              "followers",
+                              "public"
+                            ],
                             "type": "string"
                           },
                           "author": {
@@ -13487,6 +15797,7 @@
                             "type": "boolean"
                           },
                           "channel": {
+                            "nullable": true,
                             "properties": {
                               "id": {
                                 "format": "uuid",
@@ -13507,6 +15818,7 @@
                             "type": "object"
                           },
                           "club": {
+                            "nullable": true,
                             "properties": {
                               "id": {
                                 "format": "uuid",
@@ -13554,12 +15866,21 @@
                           "kudos_count": {
                             "type": "integer"
                           },
+                          "origin": {
+                            "enum": [
+                              "club",
+                              "profile"
+                            ],
+                            "type": "string"
+                          },
                           "pinned": {
                             "type": "boolean"
                           }
                         },
                         "required": [
                           "id",
+                          "origin",
+                          "audience",
                           "club",
                           "channel",
                           "author",
@@ -13580,6 +15901,7 @@
                     },
                     "posts": {
                       "items": {
+                        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                         "properties": {
                           "attachment": {
                             "additionalProperties": true,
@@ -13599,6 +15921,14 @@
                               "pr"
                             ],
                             "nullable": true,
+                            "type": "string"
+                          },
+                          "audience": {
+                            "enum": [
+                              "club_channel",
+                              "followers",
+                              "public"
+                            ],
                             "type": "string"
                           },
                           "author": {
@@ -13636,6 +15966,7 @@
                             "type": "boolean"
                           },
                           "channel": {
+                            "nullable": true,
                             "properties": {
                               "id": {
                                 "format": "uuid",
@@ -13656,6 +15987,7 @@
                             "type": "object"
                           },
                           "club": {
+                            "nullable": true,
                             "properties": {
                               "id": {
                                 "format": "uuid",
@@ -13703,12 +16035,21 @@
                           "kudos_count": {
                             "type": "integer"
                           },
+                          "origin": {
+                            "enum": [
+                              "club",
+                              "profile"
+                            ],
+                            "type": "string"
+                          },
                           "pinned": {
                             "type": "boolean"
                           }
                         },
                         "required": [
                           "id",
+                          "origin",
+                          "audience",
                           "club",
                           "channel",
                           "author",
@@ -14223,6 +16564,807 @@
         "summary": "Delete a saved filter",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/me/follow-requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.requests",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "box": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "primary_color": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "description": "Canonical slug; redirect when it differs",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "organization_id",
+                                  "slug",
+                                  "name"
+                                ],
+                                "title": "PublicBox",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "follow_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "my_status": {
+                                    "allOf": [
+                                      {
+                                        "enum": [
+                                          "none",
+                                          "requested",
+                                          "active"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    ],
+                                    "description": "Whether you follow them"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "my_status"
+                                ],
+                                "title": "FollowPerson",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "since": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "follow_id",
+                          "status",
+                          "since"
+                        ],
+                        "title": "FollowEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "FollowPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People waiting for you to accept them",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/follow-requests/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline a follow request, or remove a follower",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/follow-requests/{id}/accept": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.accept",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept a follow request",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/followers": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.followers",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "box": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "primary_color": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "description": "Canonical slug; redirect when it differs",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "organization_id",
+                                  "slug",
+                                  "name"
+                                ],
+                                "title": "PublicBox",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "follow_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "my_status": {
+                                    "allOf": [
+                                      {
+                                        "enum": [
+                                          "none",
+                                          "requested",
+                                          "active"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    ],
+                                    "description": "Whether you follow them"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "my_status"
+                                ],
+                                "title": "FollowPerson",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "since": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "follow_id",
+                          "status",
+                          "since"
+                        ],
+                        "title": "FollowEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "FollowPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Followers"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People who follow you",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/followers/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.remove (2)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Done"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline a follow request, or remove a follower",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/following": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.following",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Keep only names containing this (case and accents ignored)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "maxLength": 80,
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "enum": [
+                "user",
+                "organization"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "box": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "logo_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "primary_color": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "description": "Canonical slug; redirect when it differs",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "organization_id",
+                                  "slug",
+                                  "name"
+                                ],
+                                "title": "PublicBox",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "follow_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "my_status": {
+                                    "allOf": [
+                                      {
+                                        "enum": [
+                                          "none",
+                                          "requested",
+                                          "active"
+                                        ],
+                                        "type": "string"
+                                      }
+                                    ],
+                                    "description": "Whether you follow them"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "my_status"
+                                ],
+                                "title": "FollowPerson",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          },
+                          "since": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "none",
+                              "requested",
+                              "active"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "follow_id",
+                          "status",
+                          "since"
+                        ],
+                        "title": "FollowEntry",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "FollowPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Following"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People (type user) or boxes (type organization) you follow",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/follows": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "target_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "target_type": {
+                    "enum": [
+                      "user",
+                      "organization",
+                      "club"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "target_type",
+                  "target_id"
+                ],
+                "title": "FollowRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "none",
+                        "requested",
+                        "active"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "title": "FollowStatusResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Follow a person (a request they accept) or a published box (at once)",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/follows/{target_type}/{target_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "target_type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "user",
+                "organization",
+                "club"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "target_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "none",
+                        "requested",
+                        "active"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "title": "FollowStatusResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Unfollow, or withdraw a request",
+        "tags": [
+          "Follows"
+        ]
+      },
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "target_type",
+            "required": true,
+            "schema": {
+              "enum": [
+                "user",
+                "organization",
+                "club"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "target_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "status": {
+                      "enum": [
+                        "none",
+                        "requested",
+                        "active"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "title": "FollowStatusResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Status"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Whether you follow a person or box",
+        "tags": [
+          "Follows"
         ]
       }
     },
@@ -15005,6 +18147,134 @@
         "summary": "Search visible users by nickname",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/me/social": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "booking_sharing": {
+                      "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+                      "properties": {
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "offered": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "offered"
+                      ],
+                      "title": "BookingSharing",
+                      "type": "object"
+                    },
+                    "followers_count": {
+                      "type": "integer"
+                    },
+                    "following_count": {
+                      "type": "integer"
+                    },
+                    "posts_count": {
+                      "type": "integer"
+                    },
+                    "requests_count": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "posts_count",
+                    "followers_count",
+                    "following_count",
+                    "requests_count",
+                    "booking_sharing"
+                  ],
+                  "title": "SocialSummary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Counts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your counts for Εγώ: posts, followers, following, waiting requests",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/me/social/booking-sharing": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.FollowController.booking_sharing",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ],
+                "title": "BookingSharingRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Whether followers see the classes you book, and whether the one-time offer was answered",
+                  "properties": {
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "offered": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "enabled",
+                    "offered"
+                  ],
+                  "title": "BookingSharing",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Setting"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show followers the classes you book, or stop (board 5 Q6)",
+        "tags": [
+          "Follows"
         ]
       }
     },
@@ -29345,6 +32615,56 @@
                           },
                           "type": "array"
                         },
+                        "coach_candidates": {
+                          "description": "The gym's staff the owner may pick from.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "description": "The coaches the page shows, in the owner's order.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "cover": {
                           "nullable": true,
                           "properties": {
@@ -29565,6 +32885,8 @@
                         "services",
                         "cover",
                         "photos",
+                        "coaches",
+                        "coach_candidates",
                         "published",
                         "published_at",
                         "unpublished_changes",
@@ -29652,6 +32974,14 @@
                         "lgbtq_friendly",
                         "returning_from_injury"
                       ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "coach_ids": {
+                    "description": "Staff shown as coaches on the page, in display order.",
+                    "items": {
+                      "format": "uuid",
                       "type": "string"
                     },
                     "type": "array"
@@ -29815,6 +33145,56 @@
                           },
                           "type": "array"
                         },
+                        "coach_candidates": {
+                          "description": "The gym's staff the owner may pick from.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "description": "The coaches the page shows, in the owner's order.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "cover": {
                           "nullable": true,
                           "properties": {
@@ -30035,6 +33415,8 @@
                         "services",
                         "cover",
                         "photos",
+                        "coaches",
+                        "coach_candidates",
                         "published",
                         "published_at",
                         "unpublished_changes",
@@ -30348,6 +33730,56 @@
                           },
                           "type": "array"
                         },
+                        "coach_candidates": {
+                          "description": "The gym's staff the owner may pick from.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "description": "The coaches the page shows, in the owner's order.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "cover": {
                           "nullable": true,
                           "properties": {
@@ -30568,6 +34000,8 @@
                         "services",
                         "cover",
                         "photos",
+                        "coaches",
+                        "coach_candidates",
                         "published",
                         "published_at",
                         "unpublished_changes",
@@ -30794,6 +34228,56 @@
                           },
                           "type": "array"
                         },
+                        "coach_candidates": {
+                          "description": "The gym's staff the owner may pick from.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "description": "The coaches the page shows, in the owner's order.",
+                          "items": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "BoxPublicProfileCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "cover": {
                           "nullable": true,
                           "properties": {
@@ -31014,6 +34498,8 @@
                         "services",
                         "cover",
                         "photos",
+                        "coaches",
+                        "coach_candidates",
                         "published",
                         "published_at",
                         "unpublished_changes",
@@ -48869,6 +52355,14 @@
                     ],
                     "type": "string"
                   },
+                  "audience": {
+                    "description": "public (staff only) also shows the post on the box page and to its followers",
+                    "enum": [
+                      "club_channel",
+                      "public"
+                    ],
+                    "type": "string"
+                  },
                   "body": {
                     "maxLength": 5000,
                     "type": "string"
@@ -48899,6 +52393,7 @@
                 "schema": {
                   "properties": {
                     "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                       "properties": {
                         "attachment": {
                           "additionalProperties": true,
@@ -48918,6 +52413,14 @@
                             "pr"
                           ],
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
                           "type": "string"
                         },
                         "author": {
@@ -48955,6 +52458,7 @@
                           "type": "boolean"
                         },
                         "channel": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -48975,6 +52479,7 @@
                           "type": "object"
                         },
                         "club": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49022,12 +52527,21 @@
                         "kudos_count": {
                           "type": "integer"
                         },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
                         "pinned": {
                           "type": "boolean"
                         }
                       },
                       "required": [
                         "id",
+                        "origin",
+                        "audience",
                         "club",
                         "channel",
                         "author",
@@ -49362,6 +52876,7 @@
                 "schema": {
                   "properties": {
                     "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                       "properties": {
                         "attachment": {
                           "additionalProperties": true,
@@ -49381,6 +52896,14 @@
                             "pr"
                           ],
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
                           "type": "string"
                         },
                         "author": {
@@ -49418,6 +52941,7 @@
                           "type": "boolean"
                         },
                         "channel": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49438,6 +52962,7 @@
                           "type": "object"
                         },
                         "club": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49485,12 +53010,21 @@
                         "kudos_count": {
                           "type": "integer"
                         },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
                         "pinned": {
                           "type": "boolean"
                         }
                       },
                       "required": [
                         "id",
+                        "origin",
+                        "audience",
                         "club",
                         "channel",
                         "author",
@@ -49571,6 +53105,7 @@
                 "schema": {
                   "properties": {
                     "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                       "properties": {
                         "attachment": {
                           "additionalProperties": true,
@@ -49590,6 +53125,14 @@
                             "pr"
                           ],
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
                           "type": "string"
                         },
                         "author": {
@@ -49627,6 +53170,7 @@
                           "type": "boolean"
                         },
                         "channel": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49647,6 +53191,7 @@
                           "type": "object"
                         },
                         "club": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49694,12 +53239,21 @@
                         "kudos_count": {
                           "type": "integer"
                         },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
                         "pinned": {
                           "type": "boolean"
                         }
                       },
                       "required": [
                         "id",
+                        "origin",
+                        "audience",
                         "club",
                         "channel",
                         "author",
@@ -49780,6 +53334,7 @@
                 "schema": {
                   "properties": {
                     "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
                       "properties": {
                         "attachment": {
                           "additionalProperties": true,
@@ -49799,6 +53354,14 @@
                             "pr"
                           ],
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
                           "type": "string"
                         },
                         "author": {
@@ -49836,6 +53399,7 @@
                           "type": "boolean"
                         },
                         "channel": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49856,6 +53420,7 @@
                           "type": "object"
                         },
                         "club": {
+                          "nullable": true,
                           "properties": {
                             "id": {
                               "format": "uuid",
@@ -49903,12 +53468,21 @@
                         "kudos_count": {
                           "type": "integer"
                         },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
                         "pinned": {
                           "type": "boolean"
                         }
                       },
                       "required": [
                         "id",
+                        "origin",
+                        "audience",
                         "club",
                         "channel",
                         "author",
@@ -56293,6 +59867,30 @@
                           "covered_by_package": {
                             "description": "Members only: whether the viewer's package includes this class, regardless of visits left.",
                             "type": "boolean"
+                          },
+                          "friends_going": {
+                            "description": "Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip).",
+                            "items": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
                           },
                           "workout": {
                             "additionalProperties": true,
@@ -68534,6 +72132,312 @@
         ]
       }
     },
+    "/api/people/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PeopleController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "followers_count": {
+                      "type": "integer"
+                    },
+                    "following_count": {
+                      "type": "integer"
+                    },
+                    "follows_me": {
+                      "type": "boolean"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "is_me": {
+                      "type": "boolean"
+                    },
+                    "my_status": {
+                      "enum": [
+                        "none",
+                        "requested",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "is_me",
+                    "followers_count",
+                    "following_count",
+                    "my_status",
+                    "follows_me"
+                  ],
+                  "title": "PersonProfile",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Person"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A person: name, avatar, counts and both follow relationships",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
+    "/api/people/{id}/posts": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PeopleController.posts",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "posts": {
+                      "items": {
+                        "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+                        "properties": {
+                          "attachment": {
+                            "additionalProperties": true,
+                            "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "attachment_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "attachment_type": {
+                            "enum": [
+                              "training_log_entry",
+                              "workout_execution",
+                              "pr"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "audience": {
+                            "enum": [
+                              "club_channel",
+                              "followers",
+                              "public"
+                            ],
+                            "type": "string"
+                          },
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "can_moderate": {
+                            "type": "boolean"
+                          },
+                          "can_pin": {
+                            "type": "boolean"
+                          },
+                          "channel": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "club": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "logo_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "organization_slug": {
+                                "type": "string"
+                              },
+                              "primary_color": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "name",
+                              "organization_slug"
+                            ],
+                            "type": "object"
+                          },
+                          "comment_count": {
+                            "type": "integer"
+                          },
+                          "hidden": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "kudos_by_me": {
+                            "type": "boolean"
+                          },
+                          "kudos_count": {
+                            "type": "integer"
+                          },
+                          "origin": {
+                            "enum": [
+                              "club",
+                              "profile"
+                            ],
+                            "type": "string"
+                          },
+                          "pinned": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "origin",
+                          "audience",
+                          "club",
+                          "channel",
+                          "author",
+                          "pinned",
+                          "hidden",
+                          "kudos_count",
+                          "comment_count",
+                          "kudos_by_me",
+                          "can_delete",
+                          "can_moderate",
+                          "can_pin",
+                          "inserted_at"
+                        ],
+                        "title": "CommunityPost",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "posts"
+                  ],
+                  "title": "PersonPostsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Posts"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A person's followers and public posts you may read",
+        "tags": [
+          "Follows"
+        ]
+      }
+    },
     "/api/platform/organization-purges": {
       "get": {
         "callbacks": {},
@@ -71648,6 +75552,770 @@
         ]
       }
     },
+    "/api/profile-post-comments/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.delete_comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete your comment, or any comment on your post",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/profile-posts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "attachment_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "attachment_type": {
+                    "enum": [
+                      "training_log_entry",
+                      "workout_execution",
+                      "pr"
+                    ],
+                    "type": "string"
+                  },
+                  "audience": {
+                    "enum": [
+                      "followers",
+                      "public"
+                    ],
+                    "type": "string"
+                  },
+                  "body": {
+                    "maxLength": 5000,
+                    "type": "string"
+                  },
+                  "client_operation_id": {
+                    "maxLength": 120,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audience"
+                ],
+                "title": "ProfilePostCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "origin",
+                        "audience",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Post to your followers or to everyone, optionally attaching a journal entry",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/profile-posts/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Delete your post",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/profile-posts/{id}/comments": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.comments",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comments": {
+                      "items": {
+                        "properties": {
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "body": {
+                            "type": "string"
+                          },
+                          "can_delete": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "post_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "post_id",
+                          "author",
+                          "body",
+                          "inserted_at",
+                          "can_delete"
+                        ],
+                        "title": "CommunityComment",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "comments"
+                  ],
+                  "title": "CommunityCommentsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comments"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A post's comments, oldest first",
+        "tags": [
+          "Community"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.comment",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "CommunityCommentRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "comment": {
+                      "properties": {
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "post_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "post_id",
+                        "author",
+                        "body",
+                        "inserted_at",
+                        "can_delete"
+                      ],
+                      "title": "CommunityComment",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "comment"
+                  ],
+                  "title": "CommunityCommentResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Comment"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Comment on a post",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/profile-posts/{id}/kudos": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ProfilePostController.kudos",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kudos": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "kudos"
+                ],
+                "title": "CommunityPostKudosRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "post": {
+                      "description": "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
+                      "properties": {
+                        "attachment": {
+                          "additionalProperties": true,
+                          "description": "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on",
+                          "nullable": true,
+                          "type": "object"
+                        },
+                        "attachment_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "attachment_type": {
+                          "enum": [
+                            "training_log_entry",
+                            "workout_execution",
+                            "pr"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "audience": {
+                          "enum": [
+                            "club_channel",
+                            "followers",
+                            "public"
+                          ],
+                          "type": "string"
+                        },
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "body": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_delete": {
+                          "type": "boolean"
+                        },
+                        "can_moderate": {
+                          "type": "boolean"
+                        },
+                        "can_pin": {
+                          "type": "boolean"
+                        },
+                        "channel": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "type": "object"
+                        },
+                        "club": {
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "logo_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "organization_slug": {
+                              "type": "string"
+                            },
+                            "primary_color": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "name",
+                            "organization_slug"
+                          ],
+                          "type": "object"
+                        },
+                        "comment_count": {
+                          "type": "integer"
+                        },
+                        "hidden": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "kudos_by_me": {
+                          "type": "boolean"
+                        },
+                        "kudos_count": {
+                          "type": "integer"
+                        },
+                        "origin": {
+                          "enum": [
+                            "club",
+                            "profile"
+                          ],
+                          "type": "string"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "origin",
+                        "audience",
+                        "club",
+                        "channel",
+                        "author",
+                        "pinned",
+                        "hidden",
+                        "kudos_count",
+                        "comment_count",
+                        "kudos_by_me",
+                        "can_delete",
+                        "can_moderate",
+                        "can_pin",
+                        "inserted_at"
+                      ],
+                      "title": "CommunityPost",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "post"
+                  ],
+                  "title": "CommunityPostResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Post"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Give or take back kudos",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
     "/api/prs": {
       "get": {
         "callbacks": {},
@@ -72136,6 +76804,297 @@
         "summary": "Get a shareable text for a PR",
         "tags": [
           "Pantheon"
+        ]
+      }
+    },
+    "/api/public/boxes/{slug}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PublicBoxController.show",
+        "parameters": [
+          {
+            "description": "The gym's slug or one of its former slugs",
+            "in": "path",
+            "name": "slug",
+            "required": true,
+            "schema": {
+              "maxLength": 120,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slug": {
+                          "description": "Canonical slug; redirect when it differs",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "slug",
+                        "name"
+                      ],
+                      "title": "PublicBox",
+                      "type": "object"
+                    },
+                    "followers_count": {
+                      "type": "integer"
+                    },
+                    "locations": {
+                      "items": {
+                        "properties": {
+                          "accessibility": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "nullable": true,
+                            "type": "array"
+                          },
+                          "address": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "city": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "country_code": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "latitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "longitude": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "neighbourhood": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "opening_hours": {
+                            "description": "Weekly spans: weekday (1 = Monday), opens, closes",
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "nullable": true,
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name"
+                        ],
+                        "title": "PublicBoxLocation",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "profile": {
+                      "description": "The published snapshot only; never the draft",
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "amenities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "audiences": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "description": "A coach the owner shows, with what they teach in the coming weeks",
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "class_types": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "class_types"
+                            ],
+                            "title": "PublicBoxCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "cover": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "height": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "type": "string"
+                                },
+                                "width": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "url"
+                              ],
+                              "title": "PublicBoxPhoto",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "languages": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "photos": {
+                          "items": {
+                            "properties": {
+                              "height": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "url": {
+                                "type": "string"
+                              },
+                              "width": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "url"
+                            ],
+                            "title": "PublicBoxPhoto",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "services": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "audiences",
+                        "amenities",
+                        "services",
+                        "languages",
+                        "photos",
+                        "coaches"
+                      ],
+                      "title": "PublicBoxProfile",
+                      "type": "object"
+                    },
+                    "published_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "box",
+                    "profile",
+                    "followers_count",
+                    "locations"
+                  ],
+                  "title": "PublicBoxResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Box"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No published box with this slug"
+          }
+        },
+        "summary": "A published box: who it is, its «Σχετικά» and its locations",
+        "tags": [
+          "Public box page"
         ]
       }
     },

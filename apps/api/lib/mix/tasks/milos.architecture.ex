@@ -85,6 +85,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     appointments/appointment_store
     nutrition/nutrition_store
     community/community_store
+    community/social_store
     media/media_store
     identity/saved_filter_store
     organizations/public_profile_store

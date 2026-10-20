@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
@@ -7,6 +8,7 @@ import { openOnboardingChecklist, openProductTour } from "@/components/onboardin
 import { OrganizationSelector } from "@/components/organization-selector";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
+import { useSocialSummary } from "@/components/social/use-social";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
 import { clientExtraLinks, hasStaffRole } from "@/lib/role-navigation";
@@ -15,12 +17,16 @@ import { setView } from "@/lib/view-mode";
 /**
  * Εγώ (brief §6.1, §7.11, mockup 24): who I am to others, then a fixed list of
  * everything secondary, so the app needs no "More" drawer (brief §4.8).
+ * Under the name, «ακόλουθοι · ακολουθείς» opens the connections screen
+ * (plan §5a Q12).
  * Rows for Phase 2 features (Φέρε φίλο, Buddy, Συνδεδεμένες συσκευές) join
  * the list when they exist.
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");
   const tNav = useTranslations("Navigation");
+  const tSocial = useTranslations("Social");
+  const summary = useSocialSummary();
   const router = useRouter();
   const { currentUser, signOut } = useSession();
   const { membership, memberships, selectedOrganizationSlug } = useSelectedMembershipRole();
@@ -53,6 +59,12 @@ export function MeHub() {
           <div className="min-w-0">
             <p className="truncate text-xl font-extrabold" style={{ color: "var(--text)" }}>{nickname}</p>
             <p className="truncate text-sm" style={{ color: "var(--dim)" }}>{clubs.join(" · ")}</p>
+            <Link href="/me/connections" className="mt-1 inline-flex min-h-11 items-center text-sm font-semibold" style={{ color: "var(--text)" }}>
+              {tSocial("countsLine", {
+                followers: summary.data?.followers_count ?? 0,
+                following: summary.data?.following_count ?? 0,
+              })}
+            </Link>
           </div>
         </div>
       </HubCard>

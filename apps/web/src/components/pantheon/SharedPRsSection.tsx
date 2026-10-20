@@ -65,7 +65,7 @@ export function SharedPRsSection() {
   );
 }
 
-function SharedPRCard({ pr }: { pr: SharedPR }) {
+export function SharedPRCard({ pr }: { pr: SharedPR }) {
   const t = useTranslations("PrSharing");
   const i18n = useUiTranslations();
   const uiLocale = useUiLocale();

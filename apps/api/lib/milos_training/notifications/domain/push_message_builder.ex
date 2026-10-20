@@ -171,6 +171,23 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("follow_requested", payload, localize) do
+    %{
+      title: localize.("Follow request", %{}),
+      body:
+        localize.("%{nickname} wants to follow you.", %{nickname: payload["follower_nickname"]}),
+      url: payload["url"] || "/me/follow-requests"
+    }
+  end
+
+  def build("follow_accepted", payload, localize) do
+    %{
+      title: localize.("Follow request accepted", %{}),
+      body: localize.("You now follow %{nickname}.", %{nickname: payload["person_nickname"]}),
+      url: payload["url"] || "/people/#{payload["person_id"]}"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

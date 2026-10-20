@@ -76,6 +76,10 @@ defmodule MilosTraining.Community.CommunityStore do
     do: tenant_call(context, :list_pinned_posts, [channel_ids, viewer_id])
 
   @impl true
+  def list_public_posts(context, organization_ids, viewer_id, page),
+    do: tenant_call(context, :list_public_posts, [organization_ids, viewer_id, page])
+
+  @impl true
   def moderate_post(context, id, attrs), do: tenant_call(context, :moderate_post, [id, attrs])
   @impl true
   def react(context, post, user_id, kind), do: tenant_call(context, :react, [post, user_id, kind])

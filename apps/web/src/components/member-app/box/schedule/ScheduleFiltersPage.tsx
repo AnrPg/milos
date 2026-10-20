@@ -14,11 +14,14 @@ import { ChoiceChips, FilterPage, FilterSection, RangeSlider } from "@/component
 import {
   DEFAULT_SCHEDULE_FILTERS,
   PACKAGE_ALL,
+  FRIENDS_ALL,
+  FRIENDS_ONLY,
   PACKAGE_ONLY,
   TIME_RANGE_BOUNDS,
   type BookedFilter,
   type DurationBand,
   type KindFilter,
+  type FriendsChoice,
   type PackageChoice,
   type ScheduleFilters,
   type SpotsFilter,
@@ -106,6 +109,19 @@ export function ScheduleFiltersPage({
           ]}
           selected={[filters.packageOnly ? PACKAGE_ONLY : PACKAGE_ALL]}
           onChange={([value]) => update({ packageOnly: value === PACKAGE_ONLY })}
+        />
+      </FilterSection>
+
+      <FilterSection label={t("chipFriends")}>
+        <ChoiceChips<FriendsChoice>
+          ariaLabel={t("chipFriends")}
+          multiple={false}
+          options={[
+            { value: FRIENDS_ONLY, label: t("friendsOnly") },
+            { value: FRIENDS_ALL, label: t("optionAll") },
+          ]}
+          selected={[filters.friends ? FRIENDS_ONLY : FRIENDS_ALL]}
+          onChange={([value]) => update({ friends: value === FRIENDS_ONLY })}
         />
       </FilterSection>
 

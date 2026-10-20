@@ -122,6 +122,20 @@ defmodule MilosTrainingWeb.ScheduleController do
                      description:
                        "Members only: until when withdrawing is free; null when no cutoff applies."
                    },
+                   friends_going: %Schema{
+                     type: :array,
+                     description:
+                       "Members only: people the viewer follows who share their bookings and hold a place in this class (the «Φίλοι» chip).",
+                     items: %Schema{
+                       type: :object,
+                       properties: %{
+                         id: %Schema{type: :string, format: :uuid},
+                         nickname: %Schema{type: :string, nullable: true},
+                         avatar_url: %Schema{type: :string, nullable: true}
+                       },
+                       required: [:id]
+                     }
+                   },
                    covered_by_package: %Schema{
                      type: :boolean,
                      description:

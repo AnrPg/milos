@@ -20,12 +20,18 @@ defmodule MilosTraining.Application.UpdateBoxPublicProfile do
          :ok <- fresh(params, current),
          {:ok, photo_ids} <- photo_ids(params, current),
          {:ok, cover_id} <- cover_id(params, current),
+         {:ok, coach_ids} <- coach_ids(context, params, current),
          {:ok, _photos} <-
            Media.fetch_ready(context, "box_photo", Enum.reject([cover_id | photo_ids], &is_nil/1)),
          attrs =
            params
            |> Map.take(@fields)
-           |> Map.merge(%{"photo_ids" => photo_ids, "cover_photo_id" => cover_id}),
+           |> default_languages(current)
+           |> Map.merge(%{
+             "photo_ids" => photo_ids,
+             "cover_photo_id" => cover_id,
+             "coach_ids" => coach_ids
+           }),
          {:ok, profile} <- Organizations.upsert_public_profile(context, attrs) do
       :ok = settle_media(context, current, profile)
       {:ok, BoxPublicProfile.present(context, profile)}
@@ -33,6 +39,12 @@ defmodule MilosTraining.Application.UpdateBoxPublicProfile do
   end
 
   def call(_context, _params), do: {:error, :invalid_public_profile}
+
+  # The first save stores the languages the editor showed pre-picked.
+  defp default_languages(attrs, nil),
+    do: Map.put_new(attrs, "languages", Organizations.default_box_languages())
+
+  defp default_languages(attrs, _current), do: attrs
 
   @doc """
   Marks what the profile uses as attached and releases what `before` used
@@ -53,6 +65,22 @@ defmodule MilosTraining.Application.UpdateBoxPublicProfile do
   defp photo_ids(%{"photo_ids" => ids}, _current), do: Organizations.normalize_box_photo_ids(ids)
   defp photo_ids(_params, nil), do: {:ok, []}
   defp photo_ids(_params, current), do: {:ok, current.photo_ids}
+
+  # Board 4 Q4: only the gym's own staff can be shown as coaches.
+  defp coach_ids(context, %{"coach_ids" => ids}, _current) when is_list(ids) do
+    staff = MapSet.new(BoxPublicProfile.coach_candidates(context.organization_id), & &1.id)
+    ids = Enum.uniq(ids)
+
+    if Enum.all?(ids, &MapSet.member?(staff, &1)),
+      do: {:ok, ids},
+      else: {:error, :invalid_public_profile}
+  end
+
+  defp coach_ids(_context, %{"coach_ids" => _invalid}, _current),
+    do: {:error, :invalid_public_profile}
+
+  defp coach_ids(_context, _params, nil), do: {:ok, []}
+  defp coach_ids(_context, _params, current), do: {:ok, Map.get(current, :coach_ids, [])}
 
   defp cover_id(%{"cover_photo_id" => nil}, _current), do: {:ok, nil}
 

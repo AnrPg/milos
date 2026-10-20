@@ -7,6 +7,7 @@ import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { useSession } from "@/components/session-provider";
+import { BookingSharingSetting } from "@/components/social/BookingSharing";
 import { showsTenantSelfServiceSurfaces } from "@/lib/account-surfaces";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -18,6 +19,7 @@ import { useUiTranslations } from "@/i18n/ui";
 export function SharingPage() {
   const t = useTranslations("MemberApp");
   const tPrSharing = useTranslations("PrSharing");
+  const tSocial = useTranslations("Social");
   const i18n = useUiTranslations();
   const { currentUser } = useSession();
   const selfService = showsTenantSelfServiceSurfaces(currentUser);
@@ -28,6 +30,9 @@ export function SharingPage() {
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("meSharing")}</h1>
         <CollapsibleSection id="pr-sharing" title={tPrSharing("settingsTitle")} description={tPrSharing("settingsDescription")} defaultOpen>
           <PRSharingSettings />
+        </CollapsibleSection>
+        <CollapsibleSection id="bookings" title={tSocial("bookingSharingSectionTitle")} description={tSocial("bookingSharingSectionHint")} defaultOpen>
+          <BookingSharingSetting />
         </CollapsibleSection>
         {selfService ? (
           <>

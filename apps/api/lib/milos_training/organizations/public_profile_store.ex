@@ -24,4 +24,11 @@ defmodule MilosTraining.Organizations.PublicProfileStore do
 
   @impl true
   def resolve_suggestion(id, status), do: adapter().resolve_suggestion(id, status)
+
+  # Visitors: narrow SQL functions that only answer for published gyms.
+  @impl true
+  def public_box_by_slug(slug), do: adapter().public_box_by_slug(slug)
+
+  @impl true
+  def public_boxes(organization_ids), do: adapter().public_boxes(organization_ids)
 end

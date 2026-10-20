@@ -1,6 +1,6 @@
-# ADR-142: The gym's public profile, drafts and canonical tags
-Date: 2026-10-19
-Status: Accepted (P2-M1 part; public read API and follows land in P2-M2)
+# ADR-142: The gym's public profile, public page, follows and audiences
+Date: 2026-10-19 (extended 2026-10-20 for P2-M2)
+Status: Accepted
 
 ## Context
 Before someone joins, they see the gym's «Σχετικά»: text, photos and what it
@@ -32,19 +32,71 @@ work, and visitors must be able to filter gyms by the same words everywhere
    cover slot plus a gallery of up to 12), Τι προσφέρει, Για ποιους, Παροχές;
    tag cards open a grouped picker with search (side panel on wide screens,
    bottom sheet on phones). Visitors see only the tags the owner picked.
+6. **Coaches (P2-M2, board 4 Q4).** The draft carries `coach_ids`, picked from
+   the gym's staff (`Organizations.list_staff`) and published with the rest.
+   The page shows a picked coach only while they are still on staff, with the
+   class types they teach over the next four weeks.
+
+### P2-M2: the public page, follows and audiences
+7. **Public read.** `GET /api/public/boxes/:slug` (no account, own rate-limit
+   bucket) returns the box, the published snapshot, open locations and the
+   follower count. A slug or any retired alias resolves only for an active gym
+   with a published page, through the SECURITY DEFINER functions
+   `milos_public_box_by_slug` and `milos_public_boxes`; the read then runs in
+   that gym's scope and projects only public fields.
+8. **Sign-in for the rest (board 4 D2).** The schedule (a window of up to 31
+   days, no bookings or member data) and the box's public posts are at
+   `/api/boxes/:slug/schedule` and `/api/boxes/:slug/posts`, signed-in only.
+   Logged-out visitors see «Σχετικά» and a sign-in prompt.
+9. **Follows.** `community_follows` is account-scoped (the follower owns the
+   row). A follow of a person starts `requested` and only that person can
+   make it `active` (RLS: insert as requested, target-only update); boxes and,
+   from P2-M4, open clubs are followed at once. Requests and acceptances are
+   notifications (`follow_requested`, `follow_accepted`). Counts are public
+   numbers through `milos_follow_counts` and `milos_following_count`.
+10. **Audiences.** A club post is `club_channel` or, for staff only, `public`:
+    it then also shows on the box page and to the box's followers (RLS read
+    policies on posts, reactions and comments). A member's own voice lives in
+    `community_profile_posts` with audience `followers` or `public`, so it
+    follows them across gyms; an active follow is what opens a followers post.
+11. **Feed.** `/api/me/feed` merges club posts, profile posts of the people the
+    member follows and their own, and public posts of followed boxes the
+    member does not belong to, ordered by `(inserted_at, id)` with one keyset
+    cursor. Every post carries `origin` (`club` or `profile`) and `audience`.
+12. **Bookings for followers (board 5 Q6, the «Φίλοι» chip).** Bookings stay
+    private by default (vision §4.5). A member turns sharing on for all their
+    followers in account-scoped `community_social_settings`, offered once after
+    they accept their first follower and changeable in Κοινοποίηση &
+    ορατότητα. The member schedule adds `friends_going` to each class: people
+    the viewer actively follows who share and hold a place (pending or
+    approved). Only the owner reads the settings row; `milos_booking_sharers()`
+    (SECURITY DEFINER, bound to `app.user_id`) tells a follower who among the
+    people they follow shares, and nothing more.
 
 ## Rationale
 A snapshot makes «Δημοσίευση» a real moment and lets owners work in several
 sittings. Canonical keys keep search, filters and translations consistent;
 free-text tags would fragment the same thing into many spellings.
 
+Account-scoped profile posts keep tenant tables free of rows with no
+organization (the tenancy audit counts them) and keep a member's voice theirs
+when they change gyms.
+
 ## Alternatives Considered
 - A `published` boolean on the live row (the earlier version): every keystroke
   was public.
 - Free-text tags with moderation: inconsistent filters and no translations.
+- Profile posts as `community_posts` rows with a NULL organization: breaks
+  tenant ownership and the audit.
+- A public schedule and posts (the first board 4 draft): changed by the owner
+  so the page invites sign-in.
 
 ## Consequences
 - Adding a tag is a code change plus 12 translations.
 - Migration `20261019100000` renames audiences `women`→`women_only`,
   `prenatal`→`prenatal_postnatal` and moves `kids` from disciplines to
   audiences, in profiles and class types.
+- Migration `20261020100000` adds the public lookups, follows, profile posts
+  and their policies, the public read policies on club posts and `coach_ids`.
+- Migration `20261020110000` adds `community_social_settings` and
+  `milos_booking_sharers()`.
