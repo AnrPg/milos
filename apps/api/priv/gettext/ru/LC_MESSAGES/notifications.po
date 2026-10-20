@@ -402,3 +402,36 @@ msgstr "Понравилось «%{event}»? %{box} приглашает вас 
 
 msgid "Message about «%{event}»"
 msgstr "Сообщение о «%{event}»"
+
+msgid "Your invite"
+msgstr "Твоё приглашение"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} зарегистрировался(-ась) по твоему приглашению."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} пришёл(-ла) на событие, куда ты пригласил(а)."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} пришёл(-ла) на пробную тренировку."
+
+msgid "%{nickname} subscribed. Your reward is waiting for approval."
+msgstr "%{nickname} оформил(а) абонемент. Твоя награда ждёт одобрения."
+
+msgid "Referral reward"
+msgstr "Награда за рекомендацию"
+
+msgid "Your referral reward was given."
+msgstr "Твоя награда за рекомендацию выдана."
+
+msgid "Your referral was not approved."
+msgstr "Твоя рекомендация не одобрена."
+
+msgid "Your referral reward was approved."
+msgstr "Твоя награда за рекомендацию одобрена."
+
+msgid "Referral to approve"
+msgstr "Рекомендация на одобрение"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} оформил(а) абонемент по приглашению %{referrer}."

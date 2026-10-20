@@ -1,5 +1,5 @@
 defmodule MilosTraining.Application.CreateFinanceReceipt do
-  alias MilosTraining.Application.RecordAnalyticsEvent
+  alias MilosTraining.Application.{RecordAnalyticsEvent, RecordFinancePayment}
   alias MilosTraining.Finance
 
   def call(user_id, admin_id, params) do
@@ -22,6 +22,7 @@ defmodule MilosTraining.Application.CreateFinanceReceipt do
         }
       })
 
+      RecordFinancePayment.announce_payment(membership, receipt.payment)
       {:ok, receipt}
     else
       nil -> {:error, :not_found}

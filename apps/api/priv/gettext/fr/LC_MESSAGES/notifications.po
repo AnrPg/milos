@@ -402,3 +402,36 @@ msgstr "«%{event}» t'a plu ? %{box} t'invite à un cours d'essai."
 
 msgid "Message about «%{event}»"
 msgstr "Message à propos de «%{event}»"
+
+msgid "Your invite"
+msgstr "Ton invitation"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} s’est inscrit·e avec ton invitation."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} est venu·e à l’événement auquel tu l’as invité·e."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} est venu·e à une séance d’essai."
+
+msgid "%{nickname} subscribed. Your reward is waiting for approval."
+msgstr "%{nickname} s’est abonné·e. Ta récompense attend la validation."
+
+msgid "Referral reward"
+msgstr "Récompense de parrainage"
+
+msgid "Your referral reward was given."
+msgstr "Ta récompense de parrainage a été remise."
+
+msgid "Your referral was not approved."
+msgstr "Ton parrainage n’a pas été validé."
+
+msgid "Your referral reward was approved."
+msgstr "Ta récompense de parrainage a été validée."
+
+msgid "Referral to approve"
+msgstr "Parrainage à valider"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} s’est abonné·e, invité·e par %{referrer}."

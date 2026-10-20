@@ -30,6 +30,8 @@ defmodule MilosTraining.Notifications do
     community_event_message
   )
 
+  @referral_types ~w(referral_progress referral_reward referral_review)
+
   def create_notification(params), do: create_and_broadcast_notification(params)
 
   # ADR-123: push dispatch result -> {outcome, reason_class} for analytics.
@@ -225,6 +227,16 @@ defmodule MilosTraining.Notifications do
         String.to_existing_atom(type),
         payload,
         event_payload(type, payload)
+      )
+
+  # ADR-156: invites. The inviter hears each friend's step and their reward;
+  # the box's owners and admins hear a referral waiting for approval.
+  def process_event(type, payload) when type in @referral_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        referral_payload(type, payload)
       )
 
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
@@ -802,6 +814,34 @@ defmodule MilosTraining.Notifications do
       message: field(payload, :message),
       dedupe_key: "#{type}:#{event_id}:#{field(payload, :dedupe)}",
       url: field(payload, :url) || "/events/#{event_id}"
+    }
+  end
+
+  defp referral_payload(type, payload) do
+    attribution_id = field(payload, :attribution_id)
+
+    {dedupe, url} =
+      case type do
+        "referral_progress" ->
+          {"#{attribution_id}:#{field(payload, :stage)}", "/me/referrals"}
+
+        "referral_reward" ->
+          {"#{attribution_id}:#{field(payload, :reward_status)}", "/me/referrals"}
+
+        "referral_review" ->
+          {attribution_id, "/admin/finance/referrals"}
+      end
+
+    %{
+      organization_id: field(payload, :organization_id),
+      attribution_id: attribution_id,
+      stage: field(payload, :stage),
+      reward_status: field(payload, :reward_status),
+      person_nickname: field(payload, :person_nickname),
+      referrer_nickname: field(payload, :referrer_nickname),
+      box_name: field(payload, :box_name),
+      dedupe_key: "#{type}:#{dedupe}",
+      url: field(payload, :url) || url
     }
   end
 

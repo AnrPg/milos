@@ -402,3 +402,36 @@ msgstr "Vond je «%{event}» leuk? %{box} nodigt je uit voor een proefles."
 
 msgid "Message about «%{event}»"
 msgstr "Bericht over «%{event}»"
+
+msgid "Your invite"
+msgstr "Je uitnodiging"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} heeft zich aangemeld met je uitnodiging."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} kwam naar het event waarvoor je uitnodigde."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} kwam naar een proefles."
+
+msgid "%{nickname} subscribed. Your reward is waiting for approval."
+msgstr "%{nickname} heeft een abonnement genomen. Je beloning wacht op goedkeuring."
+
+msgid "Referral reward"
+msgstr "Beloning voor aanbrengen"
+
+msgid "Your referral reward was given."
+msgstr "Je beloning voor het aanbrengen is gegeven."
+
+msgid "Your referral was not approved."
+msgstr "Je aanbreng is niet goedgekeurd."
+
+msgid "Your referral reward was approved."
+msgstr "Je beloning voor het aanbrengen is goedgekeurd."
+
+msgid "Referral to approve"
+msgstr "Aanbreng om goed te keuren"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} heeft een abonnement genomen, uitgenodigd door %{referrer}."

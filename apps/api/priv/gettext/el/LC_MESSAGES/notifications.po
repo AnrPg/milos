@@ -402,3 +402,36 @@ msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δ
 
 msgid "Message about «%{event}»"
 msgstr "Μήνυμα για το «%{event}»"
+
+msgid "Your invite"
+msgstr "Η πρόσκλησή σου"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "Ο/Η %{nickname} έκανε εγγραφή με την πρόσκλησή σου."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "Ο/Η %{nickname} ήρθε στο event που τον/την κάλεσες."
+
+msgid "%{nickname} came to a trial."
+msgstr "Ο/Η %{nickname} ήρθε σε δοκιμαστικό."
+
+msgid "%{nickname} subscribed. Your reward is waiting for approval."
+msgstr "Ο/Η %{nickname} γράφτηκε. Η ανταμοιβή σου περιμένει έγκριση."
+
+msgid "Referral reward"
+msgstr "Ανταμοιβή σύστασης"
+
+msgid "Your referral reward was given."
+msgstr "Η ανταμοιβή της σύστασής σου δόθηκε."
+
+msgid "Your referral was not approved."
+msgstr "Η σύστασή σου δεν εγκρίθηκε."
+
+msgid "Your referral reward was approved."
+msgstr "Η ανταμοιβή της σύστασής σου εγκρίθηκε."
+
+msgid "Referral to approve"
+msgstr "Σύσταση προς έγκριση"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "Ο/Η %{nickname} γράφτηκε, με πρόσκληση από %{referrer}."

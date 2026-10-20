@@ -105,6 +105,32 @@ defmodule MilosTraining.Application.PublicBox do
     end
   end
 
+  @doc """
+  A published box's card (ADR-156 invite page, link previews): cover photo,
+  disciplines and the neighbourhood of its first location. Nil when the box
+  never published.
+  """
+  def card(%{organization_id: _} = context) do
+    case Organizations.get_public_profile(context) do
+      %{published_at: %DateTime{}, published_snapshot: snapshot} when is_map(snapshot) ->
+        profile = present_profile(context, snapshot)
+
+        location =
+          context
+          |> Facility.list_locations()
+          |> Enum.find(&is_nil(Map.get(&1, :archived_at)))
+
+        %{
+          cover: profile.cover,
+          disciplines: profile.disciplines,
+          neighbourhood: location && Map.get(location, :neighbourhood)
+        }
+
+      _unpublished ->
+        nil
+    end
+  end
+
   @doc "The public face of published gyms by id (followed boxes, feed origins)."
   def boxes(organization_ids), do: Organizations.public_boxes(organization_ids)
 

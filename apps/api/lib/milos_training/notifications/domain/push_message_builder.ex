@@ -463,6 +463,44 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-156: invites.
+  def build("referral_progress", payload, localize) do
+    bindings = %{nickname: payload["person_nickname"]}
+
+    body =
+      case payload["stage"] do
+        "event" -> localize.("%{nickname} came to the event you invited them to.", bindings)
+        "trial" -> localize.("%{nickname} came to a trial.", bindings)
+        "paid" -> localize.("%{nickname} subscribed. Your reward is waiting for approval.", bindings)
+        _signed_up -> localize.("%{nickname} signed up with your invite.", bindings)
+      end
+
+    %{title: localize.("Your invite", %{}), body: body, url: payload["url"] || "/me/referrals"}
+  end
+
+  def build("referral_reward", payload, localize) do
+    body =
+      case payload["reward_status"] do
+        "given" -> localize.("Your referral reward was given.", %{})
+        "rejected" -> localize.("Your referral was not approved.", %{})
+        _approved -> localize.("Your referral reward was approved.", %{})
+      end
+
+    %{title: localize.("Referral reward", %{}), body: body, url: payload["url"] || "/me/referrals"}
+  end
+
+  def build("referral_review", payload, localize) do
+    %{
+      title: localize.("Referral to approve", %{}),
+      body:
+        localize.("%{nickname} subscribed, invited by %{referrer}.", %{
+          nickname: payload["person_nickname"],
+          referrer: payload["referrer_nickname"]
+        }),
+      url: payload["url"] || "/admin/finance/referrals"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

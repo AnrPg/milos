@@ -15,6 +15,10 @@ defmodule MilosTraining.DomainEvents do
     * `:attendance_recorded` - `%{organization_id, scheduled_class_id, user_id, booking_id, status, at}`
     * `:booking_cancelled` - `%{organization_id, booking_id, kind, by, at}`
     * `:class_cancelled` - `%{organization_id, scheduled_class_id, at}` (the class is gone)
+    * `:event_attendance_recorded` - `%{organization_id, community_event_id, user_id, at}`
+      (staff ticked «Ήρθε» at a club event, ADR-156)
+    * `:membership_payment_recorded` - `%{organization_id, user_id, membership_id, payment_id,
+      amount_cents, at}` (a package payment or receipt, not an event payment, ADR-156)
   """
 
   require Logger

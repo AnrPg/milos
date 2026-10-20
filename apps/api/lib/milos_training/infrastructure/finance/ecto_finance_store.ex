@@ -3077,10 +3077,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def create_referral_program(params) do
-    %ReferralProgram{}
-    |> ReferralProgram.changeset(params)
-    |> Repo.insert()
-    |> normalize_result(&normalize_referral_program/1)
+    changeset = ReferralProgram.changeset(%ReferralProgram{}, params)
+
+    # ADR-156: one active programme per box; activating one retires the other.
+    Repo.transaction(fn ->
+      retire_other_active_programs(changeset, nil)
+
+      case Repo.insert(changeset) do
+        {:ok, program} -> normalize_referral_program(program)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
   end
 
   @impl true
@@ -3090,12 +3097,54 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         {:error, :not_found}
 
       %ReferralProgram{} = program ->
-        program
-        |> ReferralProgram.changeset(params)
-        |> Repo.update()
-        |> normalize_result(&normalize_referral_program/1)
+        changeset = ReferralProgram.changeset(program, params)
+
+        Repo.transaction(fn ->
+          retire_other_active_programs(changeset, program.id)
+
+          case Repo.update(changeset) do
+            {:ok, program} -> normalize_referral_program(program)
+            {:error, reason} -> Repo.rollback(reason)
+          end
+        end)
     end
   end
+
+  @impl true
+  def get_active_referral_program do
+    ReferralProgram
+    |> tenant_scope()
+    |> where([program], program.active)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      program -> normalize_referral_program(program)
+    end
+  end
+
+  @impl true
+  def get_referral_program(id) do
+    case ReferralProgram |> tenant_scope() |> Repo.get(id) do
+      nil -> nil
+      program -> normalize_referral_program(program)
+    end
+  end
+
+  defp retire_other_active_programs(%Ecto.Changeset{valid?: true} = changeset, own_id) do
+    if Ecto.Changeset.get_field(changeset, :active) do
+      ReferralProgram
+      |> tenant_scope()
+      |> where([program], program.active)
+      |> then(fn query ->
+        if own_id, do: where(query, [program], program.id != ^own_id), else: query
+      end)
+      |> Repo.update_all(set: [active: false, updated_at: utc_now()])
+    end
+
+    :ok
+  end
+
+  defp retire_other_active_programs(_changeset, _own_id), do: :ok
 
   @impl true
   def list_referral_programs do
@@ -3163,7 +3212,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
                  event.status,
                  referral_reward_exists?(event.id)
                ),
-             {:ok, program} <- active_referral_program(event.referral_program_id) do
+             {:ok, program} <- event_referral_program(event.referral_program_id) do
           params =
             params
             |> string_key_map()
@@ -3179,6 +3228,118 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> normalize_result(&normalize_referral_reward/1)
         end
     end
+  end
+
+  @impl true
+  def open_attributed_referral(params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      with %ReferralProgram{} = program <-
+             ReferralProgram |> tenant_scope() |> Repo.get(params["referral_program_id"]),
+           %Membership{} = membership <- locked_membership(params["membership_id"]),
+           :ok <-
+             ReferralPolicy.validate_event(%{
+               referrer_user_id: params["referrer_user_id"],
+               referred_user_id: params["referred_user_id"],
+               membership_user_id: membership.user_id,
+               referrer_role: params["referrer_role_snapshot"],
+               referred_role: params["referred_role_snapshot"]
+             }),
+           {:ok, event} <-
+             %ReferralEvent{}
+             |> ReferralEvent.changeset(
+               Map.merge(params, %{
+                 "referral_program_id" => program.id,
+                 "status" => "pending",
+                 "signup_source_snapshot" => "referral"
+               })
+             )
+             |> Repo.insert(),
+           {:ok, _membership} <- stamp_referred_membership(membership, event.referrer_user_id) do
+        normalize_referral_event(event)
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  # The friend's Finance record says who brought them, once.
+  defp stamp_referred_membership(%Membership{referred_by_user_id: nil} = membership, referrer_id) do
+    membership
+    |> Membership.changeset(%{referred_by_user_id: referrer_id, signup_source: "referral"})
+    |> Repo.update()
+  end
+
+  defp stamp_referred_membership(membership, _referrer_id), do: {:ok, membership}
+
+  @impl true
+  def count_referral_events_since(referrer_user_id, since) do
+    ReferralEvent
+    |> tenant_scope()
+    |> where([event], event.referrer_user_id == ^referrer_user_id)
+    |> where([event], event.status != "rejected" and event.inserted_at >= ^since)
+    |> Repo.aggregate(:count)
+  end
+
+  @impl true
+  def referral_outcomes([]), do: %{}
+
+  def referral_outcomes(event_ids) do
+    rewards =
+      ReferralReward
+      |> tenant_scope()
+      |> where([reward], reward.referral_event_id in ^event_ids)
+      |> Repo.all()
+      |> Map.new(&{&1.referral_event_id, normalize_referral_reward(&1)})
+
+    ReferralEvent
+    |> tenant_scope()
+    |> where([event], event.id in ^event_ids)
+    |> Repo.all()
+    |> Map.new(fn event ->
+      {event.id,
+       %{
+         event: normalize_referral_event(event),
+         reward: Map.get(rewards, event.id)
+       }}
+    end)
+  end
+
+  @impl true
+  def extend_current_subscription(membership_id, days)
+      when is_integer(days) and days > 0 and days <= 365 do
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership(membership_id),
+           %MembershipPackageSubscription{} = subscription <-
+             current_subscription(membership.id),
+           {:ok, extended} <-
+             subscription
+             |> MembershipPackageSubscription.changeset(%{
+               "ends_on" => Date.add(subscription.ends_on, days)
+             })
+             |> Repo.update() do
+        refresh_entitlement_snapshot(membership.id)
+        %{subscription_id: extended.id, ends_on: extended.ends_on}
+      else
+        nil -> Repo.rollback(:no_active_subscription)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  def extend_current_subscription(_membership_id, _days), do: {:error, :invalid_days}
+
+  defp current_subscription(membership_id) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([s], s.membership_id == ^membership_id and s.status == "active")
+    |> where([s], not is_nil(s.ends_on))
+    |> order_by([s], desc: s.ends_on)
+    |> limit(1)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
   end
 
   @impl true
@@ -4702,6 +4863,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp validate_package_active(%MembershipPackage{active: true}), do: :ok
   defp validate_package_active(%MembershipPackage{}), do: {:error, :package_inactive}
 
+  # ADR-156: a reward follows the programme the referral was made under, even
+  # when the box has since switched to another one.
+  defp event_referral_program(nil), do: {:error, :referral_program_required}
+
+  defp event_referral_program(program_id) do
+    case ReferralProgram |> tenant_scope() |> Repo.get(program_id) do
+      nil -> {:error, :not_found}
+      %ReferralProgram{} = program -> {:ok, program}
+    end
+  end
+
   defp active_referral_program(nil), do: {:error, :referral_program_required}
   defp active_referral_program(""), do: {:error, :referral_program_required}
 
@@ -5205,6 +5377,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       active: program.active,
       reward_type: program.reward_type,
       reward_value: program.reward_value,
+      reward_note: program.reward_note,
+      friend_reward_type: program.friend_reward_type,
+      friend_reward_value: program.friend_reward_value,
+      friend_reward_note: program.friend_reward_note,
+      qualifying_stage: program.qualifying_stage,
+      attribution_days: program.attribution_days,
+      yearly_cap: program.yearly_cap,
+      approval: program.approval,
       params: program.params || %{},
       inserted_at: program.inserted_at,
       updated_at: program.updated_at
