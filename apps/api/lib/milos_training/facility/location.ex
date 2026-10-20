@@ -31,6 +31,12 @@ defmodule MilosTraining.Facility.Location do
     field :opening_hours, {:array, :map}, default: []
     field :accessibility, {:array, :string}, default: []
     field :archived_at, :utc_datetime_usec
+    # ADR-155: the door code seed; never cast from params, never presented.
+    field :door_secret, :binary, redact: true
+    field :door_secret_rotated_at, :utc_datetime_usec
+    field :poster_enabled, :boolean, default: false
+    field :poster_secret, :binary, redact: true
+    field :poster_secret_rotated_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -38,6 +44,8 @@ defmodule MilosTraining.Facility.Location do
   def create_changeset(location \\ %__MODULE__{}, params) do
     location
     |> cast(params, [:organization_id, :name, :address | @place_fields])
+    |> put_change(:door_secret, :crypto.strong_rand_bytes(32))
+    |> put_change(:poster_secret, :crypto.strong_rand_bytes(32))
     |> validate_required([:organization_id])
     |> validate_fields()
   end
@@ -49,6 +57,18 @@ defmodule MilosTraining.Facility.Location do
   end
 
   def archive_changeset(location, archived_at), do: change(location, archived_at: archived_at)
+
+  @doc "A new door seed: every door code shown so far stops working."
+  def rotate_door_changeset(location, secret, rotated_at) when byte_size(secret) >= 32,
+    do: change(location, door_secret: secret, door_secret_rotated_at: rotated_at)
+
+  @doc "A new poster seed: every printed poster stops working."
+  def rotate_poster_changeset(location, secret, rotated_at) when byte_size(secret) >= 32,
+    do: change(location, poster_secret: secret, poster_secret_rotated_at: rotated_at)
+
+  @doc "The owner turns the printed poster on or off for this location."
+  def poster_changeset(location, enabled) when is_boolean(enabled),
+    do: change(location, poster_enabled: enabled)
 
   defp validate_fields(changeset) do
     changeset

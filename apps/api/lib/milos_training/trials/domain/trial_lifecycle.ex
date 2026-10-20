@@ -61,6 +61,16 @@ defmodule MilosTraining.Trials.Domain.TrialLifecycle do
   defp stamp(:convert, now, _opts), do: %{converted_at: now}
 
   @doc """
+  Takes back an `attend` step whose check-in was undone (ADR-155): the trial
+  returns to the status it had before (`booked` or `no_show`). Only an
+  `attended` trial goes back, so a converted one keeps its conversion.
+  """
+  def undo_attend(%{status: "attended"}, previous) when previous in ["booked", "no_show"],
+    do: {:ok, %{status: previous, attended_at: nil}}
+
+  def undo_attend(_request, _previous), do: {:error, :invalid_trial_transition}
+
+  @doc """
   Whether a past trial uses up one of the person's trials at this box. A
   declined, cancelled or expired ask doesn't; a no-show does when the
   owner says so (plan open question 2).

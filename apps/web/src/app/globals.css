@@ -329,3 +329,25 @@ input[type="number"] {
   border-radius: 9999px;
   background: var(--text);
 }
+
+/* ADR-155: the door kiosk's green flash on each check-in. */
+@keyframes checkin-flash {
+  0% { opacity: 0.85; }
+  100% { opacity: 0; }
+}
+.checkin-flash {
+  background: var(--success, #22c55e);
+  opacity: 0;
+  animation: checkin-flash 1.4s ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .checkin-flash { animation: none; opacity: 0.25; }
+}
+
+/* ADR-155: the printed poster prints only itself, on one page. */
+@media print {
+  body > *:not(.checkin-print-root):not(:has(.checkin-print-root)) { display: none !important; }
+  .checkin-print-hide { display: none !important; }
+  .checkin-print-root { min-height: auto !important; background: #fff !important; color: #000 !important; }
+  @page { size: A4 portrait; margin: 14mm; }
+}

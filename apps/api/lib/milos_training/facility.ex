@@ -4,7 +4,7 @@ defmodule MilosTraining.Facility do
   that consume package visits go through `Application.CheckInOpenGym`.
   """
 
-  alias MilosTraining.Facility.Domain.{GeoDistance, MapLink, PlacePolicy}
+  alias MilosTraining.Facility.Domain.{CheckInRules, GeoDistance, MapLink, PlacePolicy}
   alias MilosTraining.Facility.FacilityStore
 
   @doc "Kilometres between two `{latitude, longitude}` points; nil when either is missing."
@@ -79,6 +79,89 @@ defmodule MilosTraining.Facility do
   def get_check_in(context, user_id, date), do: FacilityStore.get_check_in(context, user_id, date)
   def create_check_in(context, attrs), do: FacilityStore.create_check_in(context, attrs)
   def list_check_ins(context, filters \\ %{}), do: FacilityStore.list_check_ins(context, filters)
+
+  # ADR-155: QR check-in.
+  def get_check_in_by_id(context, id), do: FacilityStore.get_check_in_by_id(context, id)
+  def delete_check_in(context, id), do: FacilityStore.delete_check_in(context, id)
+
+  @doc "A location's door seed (bytes), or nil. Only key derivation may see it."
+  def get_door_secret(context, location_id),
+    do: FacilityStore.get_door_secret(context, location_id)
+
+  @doc "«Νέος κωδικός πόρτας»: a fresh seed; every code shown so far stops working."
+  def rotate_door_secret(context, location_id, now),
+    do: FacilityStore.rotate_door_secret(context, location_id, :crypto.strong_rand_bytes(32), now)
+
+  @doc "The printed poster of a location: `%{enabled, secret, rotated_at}` or nil."
+  def get_poster(context, location_id), do: FacilityStore.get_poster(context, location_id)
+
+  @doc "«Νέος κωδικός αφίσας»: a fresh poster seed; every printed copy stops working."
+  def rotate_poster_secret(context, location_id, now),
+    do:
+      FacilityStore.rotate_poster_secret(
+        context,
+        location_id,
+        :crypto.strong_rand_bytes(32),
+        now
+      )
+
+  def set_poster_enabled(context, location_id, enabled) when is_boolean(enabled),
+    do: FacilityStore.set_poster_enabled(context, location_id, enabled)
+
+  # Static member codes (board 10, Q5).
+  def get_active_member_code(context, user_id),
+    do: FacilityStore.get_active_member_code(context, user_id)
+
+  def get_member_code(context, id), do: FacilityStore.get_member_code(context, id)
+
+  def get_member_code_by_serial(context, serial),
+    do: FacilityStore.get_member_code_by_serial(context, serial)
+
+  @doc "A new code for a member; a concurrent issue wins and is returned instead."
+  def issue_member_code(%{organization_id: organization_id} = context, user_id) do
+    case FacilityStore.create_member_code(context, %{
+           organization_id: organization_id,
+           user_id: user_id,
+           serial: Ecto.UUID.generate()
+         }) do
+      {:ok, code} ->
+        {:ok, code}
+
+      {:error, _changeset} = error ->
+        case get_active_member_code(context, user_id) do
+          nil -> error
+          code -> {:ok, code}
+        end
+    end
+  end
+
+  @doc "Revokes active codes (`%{user_id: id}` or every code of the box); returns them."
+  def revoke_member_codes(context, filters, reason, now),
+    do: FacilityStore.revoke_member_codes(context, filters, reason, now)
+
+  @doc "The box's check-in rules with defaults filled in."
+  def check_in_rules(context),
+    do: context |> FacilityStore.get_check_in_settings() |> CheckInRules.effective()
+
+  @doc "Validates and saves a change to the box's check-in rules."
+  def update_check_in_rules(context, attrs) do
+    with {:ok, changes} <- CheckInRules.validate(attrs),
+         {:ok, _saved} <-
+           FacilityStore.put_check_in_settings(
+             context,
+             Map.merge(check_in_rules(context), changes)
+           ) do
+      {:ok, check_in_rules(context)}
+    end
+  end
+
+  def record_visitor_scan(context, attrs), do: FacilityStore.record_visitor_scan(context, attrs)
+
+  def list_visitor_scans(context, filters \\ %{}),
+    do: FacilityStore.list_visitor_scans(context, filters)
+
+  @doc "The box behind a door (name, branding, location name), or nil."
+  def door_location(location_id), do: FacilityStore.door_location(location_id)
 
   # Tenant data lifecycle (ADR-117).
   def tenant_data_policy, do: MilosTraining.Facility.Domain.TenantDataPolicy.policy()

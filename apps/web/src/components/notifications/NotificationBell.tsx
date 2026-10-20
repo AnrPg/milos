@@ -59,6 +59,16 @@ function NotificationCard({
   const tTrials = useTranslations("Trials");
   const tClubs = useTranslations("Clubs");
   const tAround = useTranslations("Around");
+  const tCheckIn = useTranslations("CheckIn");
+  // ADR-155: a visitor at the door names the person, the box and when, and whether trials are open.
+  function checkInText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "check_in_visitor") return null;
+    if (part === "title") return tCheckIn("notifVisitorTitle");
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const values = { name: text("person_nickname") || tCheckIn("visitorUnnamed"), box: text("box_name"), when: text("scanned_when") };
+    const trials = notification.payload.trial_available === true || notification.payload.trial_available === "true";
+    return tCheckIn(trials ? "notifVisitorBodyTrials" : "notifVisitorBody", values);
+  }
   // ADR-154: a saved Γύρω μου filter's daily alert names the filter and how many are new.
   function aroundText(notification: NotificationRecord, part: "title" | "body") {
     if (notification.type !== "around_new_matches") return null;
@@ -120,6 +130,8 @@ function NotificationCard({
   }
 
   function notificationBody(notification: NotificationRecord) {
+    const checkIn = checkInText(notification, "body");
+    if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "body");
     if (around !== null) return around;
     const trial = trialText(notification, "body");
@@ -364,6 +376,8 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const checkIn = checkInText(notification, "title");
+    if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "title");
     if (around !== null) return around;
     const trial = trialText(notification, "title");

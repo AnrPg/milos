@@ -27,6 +27,11 @@ function preferredUrl(notification: LinkableNotification) {
   ) {
     return `/events/${encodeURIComponent(eventId)}`;
   }
+  // ADR-155: a visitor at the door opens the desk on that visitor.
+  if (notification.type === "check_in_visitor") {
+    const scanId = notification.payload.scan_id;
+    return typeof scanId === "string" && scanId ? `/admin/check-in?visitor=${encodeURIComponent(scanId)}#visitors` : "/admin/check-in#visitors";
+  }
   // ADR-154: a saved Γύρω μου filter's alert opens Γύρω μου with that filter.
   const filterId = notification.payload.filter_id;
   if (notification.type === "around_new_matches") {

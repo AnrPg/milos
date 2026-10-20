@@ -145,6 +145,16 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def record_attendance(_params), do: missing_tenant()
 
   @impl true
+  def delete_attendance(context, id), do: tenant_call(context, :delete_attendance, [id])
+
+  @impl true
+  def get_attendance(context, id), do: tenant_call(context, :get_attendance, [id])
+
+  @impl true
+  def list_recent_class_check_ins(context, since, location_id),
+    do: tenant_call(context, :list_recent_class_check_ins, [since, location_id])
+
+  @impl true
   def list_user_attendance(context, user_id, slot_ids),
     do: tenant_call(context, :list_user_attendance, [user_id, slot_ids])
 

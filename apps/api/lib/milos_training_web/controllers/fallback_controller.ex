@@ -2068,7 +2068,31 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},
     payment_exceeds_balance: {:unprocessable_entity, "The payment is more than the balance due"},
     corporate_invoice_has_payments: {:conflict, "Reverse the payments before voiding"},
-    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"}
+    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"},
+    # ADR-155: QR check-in and Wallet.
+    invalid_door_code: {:unprocessable_entity, "This door code has expired; scan it again"},
+    invalid_scan_token: {:unprocessable_entity, "Scan the door again"},
+    booking_not_in_window: {:unprocessable_entity, "That booking isn't open for check-in now"},
+    undo_expired: {:conflict, "It's too late to undo this check-in"},
+    invalid_undo_token: {:unprocessable_entity, "Nothing to undo"},
+    invalid_member_code: {:unprocessable_entity, "This code isn't valid here or has expired"},
+    not_a_member: {:unprocessable_entity, "This person isn't a member of the box"},
+    invalid_pass: {:unprocessable_entity, "This Wallet card isn't valid here"},
+    pass_revoked: {:unprocessable_entity, "This Wallet card was revoked"},
+    override_not_allowed: {:forbidden, "The box doesn't allow checking in despite a problem"},
+    check_in_problems: {:conflict, "There is a problem with this member's package"},
+    choose_booking: {:conflict, "Choose which booking to check in to"},
+    invalid_check_in_method: {:unprocessable_entity, "Unknown check-in method"},
+    invalid_wallet_platform: {:unprocessable_entity, "Choose Apple or Google Wallet"},
+    wallet_not_configured: {:service_unavailable, "Wallet cards aren't available on this server"},
+    invalid_download_link: {:unprocessable_entity, "This download link has expired"},
+    wallet_pass_conflict: {:conflict, "The card is being created; try again"},
+    wallet_requires_static_code:
+      {:conflict, "This box uses rotating codes, so its check-in card can't go in a Wallet"},
+    member_code_not_static:
+      {:conflict, "This box uses rotating codes; there is nothing to reset"},
+    member_code_revoked: {:unprocessable_entity, "This code was revoked"},
+    invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

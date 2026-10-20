@@ -433,6 +433,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/check-in/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Scan the door: check in to a booking or open gym, or see what the box offers */
+        post: operations["MilosTrainingWeb.ScanCheckInController.scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/check-in/scan/{undo_token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Undo a scan's check-in within its minute */
+        delete: operations["MilosTrainingWeb.ScanCheckInController.undo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions": {
         parameters: {
             query?: never;
@@ -915,6 +949,23 @@ export interface paths {
         put?: never;
         /** Report a post, a comment or a group; it disappears for you and staff look at it */
         post: operations["MilosTrainingWeb.OpenClubController.report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/connected-devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My Wallet cards, calendar feed and health integrations */
+        get: operations["MilosTrainingWeb.WalletController.devices"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1561,6 +1612,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/wallet-passes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke one of my Wallet cards: it stops scanning at once */
+        delete: operations["MilosTrainingWeb.WalletController.revoke"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships": {
         parameters: {
             query?: never;
@@ -1948,6 +2016,161 @@ export interface paths {
         head?: never;
         /** Update a seasonal challenge */
         patch: operations["MilosTrainingWeb.AdminChallengeController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The door display of a location: its code, the next codes, the next class */
+        get: operations["MilosTrainingWeb.AdminCheckInController.door"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The printed poster of a location: its static QR and whether it is on */
+        get: operations["MilosTrainingWeb.AdminCheckInController.poster"];
+        /** Turn the printed poster of a location on or off */
+        put: operations["MilosTrainingWeb.AdminCheckInController.update_poster"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Νέος κωδικός αφίσας»: every printed copy stops working */
+        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_poster"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Νέος κωδικός πόρτας»: every code shown so far stops working */
+        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_door"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Check a member in from the desk (booking in the window, else open gym) */
+        post: operations["MilosTrainingWeb.AdminCheckInController.check_in_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a member's static personal code; their Wallet cards stop scanning */
+        delete: operations["MilosTrainingWeb.AdminCheckInController.revoke_member_code"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/scan-member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Scan a member's personal QR or Wallet card at the desk */
+        post: operations["MilosTrainingWeb.AdminCheckInController.scan_member"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's check-in rules */
+        get: operations["MilosTrainingWeb.AdminCheckInController.settings"];
+        /** Change the box's check-in rules */
+        put: operations["MilosTrainingWeb.AdminCheckInController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/visitors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People who scanned the door and are not members («Επισκέπτης»), newest first */
+        get: operations["MilosTrainingWeb.AdminCheckInController.visitors"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/check-ins": {
@@ -5385,6 +5608,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/check-in/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My personal check-in QR at this box (rotating every 30 s, or static per the box) */
+        get: operations["MilosTrainingWeb.MyCheckInController.code"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/check-in/code/reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reset my static personal code: the old one and its Wallet cards stop */
+        post: operations["MilosTrainingWeb.MyCheckInController.reset_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/corporate-enrollment": {
         parameters: {
             query?: never;
@@ -5814,6 +6071,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.MyContentController.videos"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/wallet-passes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add my check-in card at this box to Apple or Google Wallet */
+        post: operations["MilosTrainingWeb.MyCheckInController.add_wallet_pass"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7307,6 +7581,23 @@ export interface paths {
         };
         /** Fetch active public UI theme */
         get: operations["MilosTrainingWeb.ThemeController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/wallet/passes/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Apple Wallet .pkpass behind a short-lived download link */
+        get: operations["MilosTrainingWeb.WalletController.download"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10383,6 +10674,557 @@ export interface components {
             }[];
             services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
+        /** CheckInBooking */
+        CheckInBooking: {
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string|null} */
+            kind?: null | "member" | "guest" | "trial";
+            /** Format: uuid */
+            location_id?: string | null;
+            name?: string | null;
+            /** Format: uuid */
+            scheduled_class_id: string;
+            /** Format: date-time */
+            starts_at: string;
+        };
+        /** CheckInBox */
+        CheckInBox: {
+            logo_url?: string | null;
+            name: string;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            slug: string;
+        };
+        /** CheckInClass */
+        CheckInClass: {
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            name?: string | null;
+            spots_remaining?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** @description Visitor offer only */
+            trial_seats?: number | null;
+        };
+        /** CheckInDeskRequest */
+        CheckInDeskRequest: {
+            /** Format: uuid */
+            booking_id?: string;
+            /** Format: uuid */
+            location_id?: string;
+            /** @enum {string} */
+            method?: "member_qr" | "wallet" | "desk_search";
+            /** @description «Check-in παρ' όλα αυτά»: only when the owner allows desk overrides */
+            override?: boolean;
+        };
+        /** CheckInDeskResult */
+        CheckInDeskResult: {
+            /** @enum {string|null} */
+            already_checked_in?: null | "class" | "open_gym";
+            /** @description Bookings in the window */
+            bookings?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+            can_auto_check_in: boolean;
+            /** CheckInRecord */
+            checked_in?: {
+                /** Format: date-time */
+                at?: string | null;
+                booking?: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string|null} */
+                    kind?: null | "member" | "guest" | "trial";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    scheduled_class_id: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                } | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** @enum {string} */
+                kind: "class" | "open_gym";
+                /** @enum {string|null} */
+                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                override?: boolean;
+            } | null;
+            /** @enum {string} */
+            decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+            member: {
+                avatar_url?: string | null;
+                display_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** @enum {string} */
+            method?: "member_qr" | "wallet" | "desk_search";
+            /** Format: uuid */
+            organization_id?: string;
+            override_allowed: boolean;
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+            problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+            warnings?: "payment_due"[];
+        };
+        /** CheckInDeskScanRequest */
+        CheckInDeskScanRequest: {
+            /** @description Check in right away when nothing is wrong */
+            auto?: boolean;
+            /** @description Personal QR or Wallet barcode */
+            code: string;
+            /** Format: uuid */
+            location_id?: string;
+        };
+        /** CheckInDoorDisplay */
+        CheckInDoorDisplay: {
+            code: string;
+            /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+            codes: {
+                code: string;
+                deep_link: string;
+                /** Format: date-time */
+                shows_from: string;
+                /** Format: date-time */
+                valid_until: string;
+            }[];
+            /** @description What the QR encodes: /c/<location>/<code> */
+            deep_link: string;
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            next_class?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            } | null;
+            recent_check_ins?: {
+                /** Format: date-time */
+                at?: string;
+                first_name?: string | null;
+                /** @enum {string} */
+                kind?: "class" | "open_gym";
+            }[];
+            /** Format: date-time */
+            rotated_at?: string | null;
+            rotation_seconds: number;
+            seconds_until_rotation?: number;
+            /** Format: date-time */
+            server_time?: string;
+            /** @description Realtime topic with `checked_in` events (first names only) */
+            topic: string;
+        };
+        /** CheckInLocation */
+        CheckInLocation: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        /**
+         * CheckInMemberCode
+         * @description `rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.
+         */
+        CheckInMemberCode: {
+            code: string;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: date-time */
+            issued_at?: string | null;
+            /** @enum {string} */
+            mode: "rotating" | "static";
+            rotation_seconds?: number | null;
+            seconds_until_rotation?: number | null;
+            wallet_available: boolean;
+        };
+        /** CheckInMemberCodeRevoked */
+        CheckInMemberCodeRevoked: {
+            revoked_codes: number;
+            revoked_passes: number;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /**
+         * CheckInPackage
+         * @description What is left on the member's package; null when the box keeps no package for them
+         */
+        CheckInPackage: {
+            /** @description null = unlimited or not part of the package */
+            class_visits_left?: number | null;
+            /** Format: date */
+            expires_on?: string | null;
+            /** Format: date */
+            frozen_until?: string | null;
+            name?: string | null;
+            /** @description null = unlimited or not part of the package */
+            open_gym_visits_left?: number | null;
+            status?: string | null;
+            unlimited?: boolean;
+        } | null;
+        /**
+         * CheckInPoster
+         * @description The printed poster of a location: a static QR that only checks in bookings
+         */
+        CheckInPoster: {
+            code: string;
+            /** @description `/c/<location>/p/<code>`, what the QR holds */
+            deep_link: string;
+            enabled: boolean;
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            rotated_at?: string | null;
+        };
+        /** CheckInPosterRequest */
+        CheckInPosterRequest: {
+            enabled: boolean;
+        };
+        /** CheckInRecord */
+        CheckInRecord: {
+            /** Format: date-time */
+            at?: string | null;
+            booking?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            } | null;
+            /** Format: uuid */
+            id?: string | null;
+            /** @enum {string} */
+            kind: "class" | "open_gym";
+            /** @enum {string|null} */
+            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            override?: boolean;
+        } | null;
+        /** CheckInRules */
+        CheckInRules: {
+            desk_override?: boolean;
+            /** @enum {integer} */
+            door_rotation_seconds?: 15 | 30 | 60;
+            /**
+             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+             * @enum {string}
+             */
+            member_code_mode?: "rotating" | "static";
+            open_gym_requires_package?: boolean;
+            visitor_trial_offer?: boolean;
+            window_after_minutes?: number;
+            window_before_minutes?: number;
+        };
+        /** CheckInRulesResponse */
+        CheckInRulesResponse: {
+            /** CheckInRules */
+            settings: {
+                desk_override?: boolean;
+                /** @enum {integer} */
+                door_rotation_seconds?: 15 | 30 | 60;
+                /**
+                 * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                 * @enum {string}
+                 */
+                member_code_mode?: "rotating" | "static";
+                open_gym_requires_package?: boolean;
+                visitor_trial_offer?: boolean;
+                window_after_minutes?: number;
+                window_before_minutes?: number;
+            };
+        };
+        /**
+         * CheckInScanRequest
+         * @description `location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer
+         */
+        CheckInScanRequest: {
+            /** Format: uuid */
+            booking_id?: string;
+            code?: string;
+            /** Format: uuid */
+            location_id?: string;
+            /** @description The printed poster's static code: checks in a booking in its window only */
+            poster_code?: string;
+            scan_token?: string;
+        };
+        /** CheckInScanResult */
+        CheckInScanResult: {
+            /** CheckInBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                slug: string;
+            };
+            /** CheckInRecord */
+            check_in?: {
+                /** Format: date-time */
+                at?: string | null;
+                booking?: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string|null} */
+                    kind?: null | "member" | "guest" | "trial";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: uuid */
+                    scheduled_class_id: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                } | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** @enum {string} */
+                kind: "class" | "open_gym";
+                /** @enum {string|null} */
+                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                override?: boolean;
+            } | null;
+            choices?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            }[];
+            /** @description «Κλείσε θέση» */
+            classes?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            }[];
+            /** @enum {string} */
+            follow?: "none" | "requested" | "active";
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** @enum {string} */
+            membership?: "none" | "former" | "member";
+            next_booking?: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string|null} */
+                kind?: null | "member" | "guest" | "trial";
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: uuid */
+                scheduled_class_id: string;
+                /** Format: date-time */
+                starts_at: string;
+            } | null;
+            /** @enum {string} */
+            outcome: "checked_in" | "choose" | "already_checked_in" | "nothing" | "visitor" | "no_booking";
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+            /** @description Why open gym was refused (a finance error code) */
+            reason?: string | null;
+            /** @description Proof of this scan for 3 minutes, to post again with a booking_id */
+            scan_token?: string;
+            /**
+             * CheckInTrialOffer
+             * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+             */
+            trial?: {
+                /** @enum {string} */
+                approval?: "auto" | "manual";
+                /**
+                 * @description Why this person can't ask for a trial here; null when they can
+                 * @enum {string|null}
+                 */
+                blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                bring_note?: string | null;
+                classes: {
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    spots_remaining?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    /** @description Visitor offer only */
+                    trial_seats?: number | null;
+                }[];
+                enabled: boolean;
+                horizon_days?: number | null;
+                mine?: {
+                    [key: string]: unknown;
+                } | null;
+            } | null;
+            /** @description Undo within `undo_until` */
+            undo_token?: string;
+            /** Format: date-time */
+            undo_until?: string;
+        };
+        /**
+         * CheckInTrialOffer
+         * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+         */
+        CheckInTrialOffer: {
+            /** @enum {string} */
+            approval?: "auto" | "manual";
+            /**
+             * @description Why this person can't ask for a trial here; null when they can
+             * @enum {string|null}
+             */
+            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+            bring_note?: string | null;
+            classes: {
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                spots_remaining?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** @description Visitor offer only */
+                trial_seats?: number | null;
+            }[];
+            enabled: boolean;
+            horizon_days?: number | null;
+            mine?: {
+                [key: string]: unknown;
+            } | null;
+        } | null;
+        /** CheckInUndoResult */
+        CheckInUndoResult: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "class" | "open_gym";
+            /**
+             * CheckInPackage
+             * @description What is left on the member's package; null when the box keeps no package for them
+             */
+            package?: {
+                /** @description null = unlimited or not part of the package */
+                class_visits_left?: number | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                frozen_until?: string | null;
+                name?: string | null;
+                /** @description null = unlimited or not part of the package */
+                open_gym_visits_left?: number | null;
+                status?: string | null;
+                unlimited?: boolean;
+            } | null;
+        };
+        /** CheckInVisitors */
+        CheckInVisitors: {
+            visitors: {
+                avatar_url?: string | null;
+                display_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                location_name?: string | null;
+                nickname?: string | null;
+                /** Format: date-time */
+                scanned_at: string;
+                trial_offered?: boolean;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+        };
         /** ClassSlotInjuryWarnings */
         ClassSlotInjuryWarnings: {
             athletes: {
@@ -13404,6 +14246,49 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
+            };
+        };
+        /** ConnectedDevices */
+        ConnectedDevices: {
+            calendar: {
+                download_url?: string;
+                help?: {
+                    [key: string]: string;
+                };
+                https_url: string;
+                webcal_url: string;
+            };
+            integrations: {
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "connected" | "disconnected" | "unavailable" | "native_only";
+            }[];
+            wallet: {
+                passes: {
+                    active: boolean;
+                    /** Format: date-time */
+                    added_at: string;
+                    box?: {
+                        name?: string | null;
+                        /** Format: uuid */
+                        organization_id?: string;
+                        slug?: string | null;
+                    };
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    last_updated_at?: string;
+                    /** @enum {string} */
+                    platform: "apple" | "google";
+                    /** Format: date-time */
+                    revoked_at?: string | null;
+                }[];
+                /** @description Whether this server can issue cards per platform */
+                platforms: {
+                    apple?: boolean;
+                    google?: boolean;
+                };
             };
         };
         /** ContentVideo */
@@ -18033,6 +18918,81 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** WalletAddRequest */
+        WalletAddRequest: {
+            /** @enum {string} */
+            platform: "apple" | "google";
+        };
+        /** WalletAddResult */
+        WalletAddResult: {
+            /** @description Apple: open within 10 minutes to add the .pkpass */
+            download_url?: string | null;
+            /** WalletPass */
+            pass: {
+                active: boolean;
+                /** Format: date-time */
+                added_at: string;
+                box?: {
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id?: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_updated_at?: string;
+                /** @enum {string} */
+                platform: "apple" | "google";
+                /** Format: date-time */
+                revoked_at?: string | null;
+            };
+            /** @description Google: Save to Wallet */
+            save_url?: string | null;
+        };
+        /** WalletPass */
+        WalletPass: {
+            active: boolean;
+            /** Format: date-time */
+            added_at: string;
+            box?: {
+                name?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                slug?: string | null;
+            };
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            last_updated_at?: string;
+            /** @enum {string} */
+            platform: "apple" | "google";
+            /** Format: date-time */
+            revoked_at?: string | null;
+        };
+        /** WalletPassResponse */
+        WalletPassResponse: {
+            /** WalletPass */
+            pass: {
+                active: boolean;
+                /** Format: date-time */
+                added_at: string;
+                box?: {
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id?: string;
+                    slug?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_updated_at?: string;
+                /** @enum {string} */
+                platform: "apple" | "google";
+                /** Format: date-time */
+                revoked_at?: string | null;
+            };
+        };
         /** WodLeaderboardEntry */
         WodLeaderboardEntry: {
             avatar_url?: string | null;
@@ -20862,6 +21822,263 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.ScanCheckInController.scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    booking_id?: string;
+                    code?: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                    /** @description The printed poster's static code: checks in a booking in its window only */
+                    poster_code?: string;
+                    scan_token?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description What the scan did */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInBox */
+                        box: {
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug: string;
+                        };
+                        /** CheckInRecord */
+                        check_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        choices?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        /** @description «Κλείσε θέση» */
+                        classes?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        }[];
+                        /** @enum {string} */
+                        follow?: "none" | "requested" | "active";
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** @enum {string} */
+                        membership?: "none" | "former" | "member";
+                        next_booking?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        } | null;
+                        /** @enum {string} */
+                        outcome: "checked_in" | "choose" | "already_checked_in" | "nothing" | "visitor" | "no_booking";
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        /** @description Why open gym was refused (a finance error code) */
+                        reason?: string | null;
+                        /** @description Proof of this scan for 3 minutes, to post again with a booking_id */
+                        scan_token?: string;
+                        /**
+                         * CheckInTrialOffer
+                         * @description Trial classes today and tomorrow at this location; null when the box offers none at the door
+                         */
+                        trial?: {
+                            /** @enum {string} */
+                            approval?: "auto" | "manual";
+                            /**
+                             * @description Why this person can't ask for a trial here; null when they can
+                             * @enum {string|null}
+                             */
+                            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                            bring_note?: string | null;
+                            classes: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                spots_remaining?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                /** @description Visitor offer only */
+                                trial_seats?: number | null;
+                            }[];
+                            enabled: boolean;
+                            horizon_days?: number | null;
+                            mine?: {
+                                [key: string]: unknown;
+                            } | null;
+                        } | null;
+                        /** @description Undo within `undo_until` */
+                        undo_token?: string;
+                        /** Format: date-time */
+                        undo_until?: string;
+                    };
+                };
+            };
+            /** @description The door code is wrong or expired, or the booking isn't in its window */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScanCheckInController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                undo_token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "class" | "open_gym";
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                    };
+                };
+            };
+            /** @description Nothing to undo */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description The minute has passed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.index": {
         parameters: {
             query?: never;
@@ -23444,6 +24661,67 @@ export interface operations {
                         /** Format: uuid */
                         target_id: string;
                         target_type: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WalletController.devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connected devices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        calendar: {
+                            download_url?: string;
+                            help?: {
+                                [key: string]: string;
+                            };
+                            https_url: string;
+                            webcal_url: string;
+                        };
+                        integrations: {
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "connected" | "disconnected" | "unavailable" | "native_only";
+                        }[];
+                        wallet: {
+                            passes: {
+                                active: boolean;
+                                /** Format: date-time */
+                                added_at: string;
+                                box?: {
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id?: string;
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                last_updated_at?: string;
+                                /** @enum {string} */
+                                platform: "apple" | "google";
+                                /** Format: date-time */
+                                revoked_at?: string | null;
+                            }[];
+                            /** @description Whether this server can issue cards per platform */
+                            platforms: {
+                                apple?: boolean;
+                                google?: boolean;
+                            };
+                        };
                     };
                 };
             };
@@ -26416,6 +27694,60 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.WalletController.revoke": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** WalletPass */
+                        pass: {
+                            active: boolean;
+                            /** Format: date-time */
+                            added_at: string;
+                            box?: {
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id?: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_updated_at?: string;
+                            /** @enum {string} */
+                            platform: "apple" | "google";
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such card */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.memberships": {
         parameters: {
             query?: never;
@@ -27689,6 +29021,731 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.door": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Door display */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+                        codes: {
+                            code: string;
+                            deep_link: string;
+                            /** Format: date-time */
+                            shows_from: string;
+                            /** Format: date-time */
+                            valid_until: string;
+                        }[];
+                        /** @description What the QR encodes: /c/<location>/<code> */
+                        deep_link: string;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        next_class?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        } | null;
+                        recent_check_ins?: {
+                            /** Format: date-time */
+                            at?: string;
+                            first_name?: string | null;
+                            /** @enum {string} */
+                            kind?: "class" | "open_gym";
+                        }[];
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                        rotation_seconds: number;
+                        seconds_until_rotation?: number;
+                        /** Format: date-time */
+                        server_time?: string;
+                        /** @description Realtime topic with `checked_in` events (first names only) */
+                        topic: string;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.update_poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.rotate_poster": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Poster */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/p/<code>`, what the QR holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.rotate_door": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Door display */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description The current code and the next ones, to keep rotating offline (about 2 minutes) */
+                        codes: {
+                            code: string;
+                            deep_link: string;
+                            /** Format: date-time */
+                            shows_from: string;
+                            /** Format: date-time */
+                            valid_until: string;
+                        }[];
+                        /** @description What the QR encodes: /c/<location>/<code> */
+                        deep_link: string;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        next_class?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            spots_remaining?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** @description Visitor offer only */
+                            trial_seats?: number | null;
+                        } | null;
+                        recent_check_ins?: {
+                            /** Format: date-time */
+                            at?: string;
+                            first_name?: string | null;
+                            /** @enum {string} */
+                            kind?: "class" | "open_gym";
+                        }[];
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                        rotation_seconds: number;
+                        seconds_until_rotation?: number;
+                        /** Format: date-time */
+                        server_time?: string;
+                        /** @description Realtime topic with `checked_in` events (first names only) */
+                        topic: string;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.check_in_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    booking_id?: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                    /** @enum {string} */
+                    method?: "member_qr" | "wallet" | "desk_search";
+                    /** @description «Check-in παρ' όλα αυτά»: only when the owner allows desk overrides */
+                    override?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Checked in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        already_checked_in?: null | "class" | "open_gym";
+                        /** @description Bookings in the window */
+                        bookings?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        can_auto_check_in: boolean;
+                        /** CheckInRecord */
+                        checked_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        /** @enum {string} */
+                        decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+                        member: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string} */
+                        method?: "member_qr" | "wallet" | "desk_search";
+                        /** Format: uuid */
+                        organization_id?: string;
+                        override_allowed: boolean;
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+                        warnings?: "payment_due"[];
+                    };
+                };
+            };
+            /** @description The owner doesn't allow desk overrides */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Problems with the package, or a booking to pick */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.revoke_member_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        revoked_codes: number;
+                        revoked_passes: number;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.scan_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Check in right away when nothing is wrong */
+                    auto?: boolean;
+                    /** @description Personal QR or Wallet barcode */
+                    code: string;
+                    /** Format: uuid */
+                    location_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Who it is and what can happen */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        already_checked_in?: null | "class" | "open_gym";
+                        /** @description Bookings in the window */
+                        bookings?: {
+                            duration_minutes?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string|null} */
+                            kind?: null | "member" | "guest" | "trial";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            name?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id: string;
+                            /** Format: date-time */
+                            starts_at: string;
+                        }[];
+                        can_auto_check_in: boolean;
+                        /** CheckInRecord */
+                        checked_in?: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            booking?: {
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string|null} */
+                                kind?: null | "member" | "guest" | "trial";
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: uuid */
+                                scheduled_class_id: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            } | null;
+                            /** Format: uuid */
+                            id?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "open_gym";
+                            /** @enum {string|null} */
+                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            override?: boolean;
+                        } | null;
+                        /** @enum {string} */
+                        decision: "class" | "choose" | "already_checked_in" | "open_gym" | "nothing" | "booking_not_in_window";
+                        member: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string} */
+                        method?: "member_qr" | "wallet" | "desk_search";
+                        /** Format: uuid */
+                        organization_id?: string;
+                        override_allowed: boolean;
+                        /**
+                         * CheckInPackage
+                         * @description What is left on the member's package; null when the box keeps no package for them
+                         */
+                        package?: {
+                            /** @description null = unlimited or not part of the package */
+                            class_visits_left?: number | null;
+                            /** Format: date */
+                            expires_on?: string | null;
+                            /** Format: date */
+                            frozen_until?: string | null;
+                            name?: string | null;
+                            /** @description null = unlimited or not part of the package */
+                            open_gym_visits_left?: number | null;
+                            status?: string | null;
+                            unlimited?: boolean;
+                        } | null;
+                        problems: ("frozen" | "package_expired" | "unpaid" | "no_spots" | "nothing_to_check_in")[];
+                        warnings?: "payment_due"[];
+                    };
+                };
+            };
+            /** @description Unknown, expired or revoked code */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInRules */
+                        settings: {
+                            desk_override?: boolean;
+                            /** @enum {integer} */
+                            door_rotation_seconds?: 15 | 30 | 60;
+                            /**
+                             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                             * @enum {string}
+                             */
+                            member_code_mode?: "rotating" | "static";
+                            open_gym_requires_package?: boolean;
+                            visitor_trial_offer?: boolean;
+                            window_after_minutes?: number;
+                            window_before_minutes?: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.update_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    desk_override?: boolean;
+                    /** @enum {integer} */
+                    door_rotation_seconds?: 15 | 30 | 60;
+                    /**
+                     * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                     * @enum {string}
+                     */
+                    member_code_mode?: "rotating" | "static";
+                    open_gym_requires_package?: boolean;
+                    visitor_trial_offer?: boolean;
+                    window_after_minutes?: number;
+                    window_before_minutes?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Rules */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CheckInRules */
+                        settings: {
+                            desk_override?: boolean;
+                            /** @enum {integer} */
+                            door_rotation_seconds?: 15 | 30 | 60;
+                            /**
+                             * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
+                             * @enum {string}
+                             */
+                            member_code_mode?: "rotating" | "static";
+                            open_gym_requires_package?: boolean;
+                            visitor_trial_offer?: boolean;
+                            window_after_minutes?: number;
+                            window_before_minutes?: number;
+                        };
+                    };
+                };
+            };
+            /** @description Invalid rules */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.visitors": {
+        parameters: {
+            query?: {
+                date?: string;
+                location_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Visitors */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        visitors: {
+                            avatar_url?: string | null;
+                            display_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            location_name?: string | null;
+                            nickname?: string | null;
+                            /** Format: date-time */
+                            scanned_at: string;
+                            trial_offered?: boolean;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
                     };
                 };
             };
@@ -45434,6 +47491,79 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyCheckInController.code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** Format: date-time */
+                        expires_at?: string | null;
+                        /** Format: date-time */
+                        issued_at?: string | null;
+                        /** @enum {string} */
+                        mode: "rotating" | "static";
+                        rotation_seconds?: number | null;
+                        seconds_until_rotation?: number | null;
+                        wallet_available: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyCheckInController.reset_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The new code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** Format: date-time */
+                        expires_at?: string | null;
+                        /** Format: date-time */
+                        issued_at?: string | null;
+                        /** @enum {string} */
+                        mode: "rotating" | "static";
+                        rotation_seconds?: number | null;
+                        seconds_until_rotation?: number | null;
+                        wallet_available: boolean;
+                    };
+                };
+            };
+            /** @description The box uses rotating codes (member_code_not_static) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PaymentModelsController.enrollment_offer": {
         parameters: {
             query?: never;
@@ -47131,6 +49261,80 @@ export interface operations {
             };
             /** @description Not included in the package */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyCheckInController.add_wallet_pass": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    platform: "apple" | "google";
+                };
+            };
+        };
+        responses: {
+            /** @description The card and how to add it */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Apple: open within 10 minutes to add the .pkpass */
+                        download_url?: string | null;
+                        /** WalletPass */
+                        pass: {
+                            active: boolean;
+                            /** Format: date-time */
+                            added_at: string;
+                            box?: {
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id?: string;
+                                slug?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_updated_at?: string;
+                            /** @enum {string} */
+                            platform: "apple" | "google";
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                        };
+                        /** @description Google: Save to Wallet */
+                        save_url?: string | null;
+                    };
+                };
+            };
+            /** @description The box uses rotating codes, so no Wallet (wallet_requires_static_code) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Wallet isn't configured on this server (wallet_not_configured) */
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -54223,6 +56427,39 @@ export interface operations {
                     "application/json": {
                         /** @enum {string} */
                         theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WalletController.download": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pass */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/vnd.apple.pkpass": string;
+                };
+            };
+            /** @description Expired link or revoked card */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

@@ -238,6 +238,37 @@ defmodule MilosTraining.Notifications do
         url: "/around?filter=#{field(payload, :filter_id)}"
       })
 
+  # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
+  # Staff who check people in hear about it, so the desk can follow up and
+  # sell a walk-in or a trial; the caller keeps it to once an hour per
+  # person and box, and the dedupe key holds that per staff member too.
+  def process_event("check_in_visitor", payload) do
+    organization_id = field(payload, :organization_id)
+    visitor_id = field(payload, :visitor_id)
+
+    organization_id
+    |> Organizations.list_user_ids_with_capability(:check_in)
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(:check_in_visitor, %{user_id: staff_id}, %{
+             organization_id: organization_id,
+             scan_id: field(payload, :scan_id),
+             visitor_id: visitor_id,
+             person_nickname: field(payload, :person_nickname),
+             box_name: field(payload, :box_name),
+             location_name: field(payload, :location_name),
+             scanned_at: field(payload, :scanned_at),
+             scanned_when: field(payload, :scanned_when),
+             trial_available: field(payload, :trial_available) in [true, "true"],
+             dedupe_key:
+               "check_in_visitor:#{organization_id}:#{visitor_id}:#{field(payload, :hour)}:#{staff_id}",
+             url: field(payload, :url) || "/admin/check-in"
+           }) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)

@@ -131,8 +131,15 @@ config :milos_training, :domain_event_handlers, %{
     MilosTraining.Application.TrialReactions,
     MilosTraining.Application.EventReactions
   ],
-  attendance_recorded: [MilosTraining.Application.TrialReactions],
-  booking_cancelled: [MilosTraining.Application.TrialReactions],
+  attendance_recorded: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.WalletReactions
+  ],
+  booking_cancelled: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.WalletReactions
+  ],
+  booking_made: [MilosTraining.Application.WalletReactions],
   class_cancelled: [MilosTraining.Application.TrialReactions]
 }
 
@@ -241,6 +248,29 @@ config :milos_training,
        MilosTraining.Infrastructure.Security.PhoenixSignedToken
 
 config :milos_training, :public_base_url, "http://localhost:4000"
+
+# ADR-155: Wallet cards. Credentials come from runtime config (runtime.exs);
+# without them each platform reports wallet_not_configured.
+config :milos_training, :wallet_store, MilosTraining.Infrastructure.Wallet.EctoWalletStore
+
+config :milos_training, :wallet_pass_builders, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApplePassBuilder,
+  google: MilosTraining.Infrastructure.Wallet.GooglePassBuilder
+}
+
+config :milos_training, :wallet_pass_updaters, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApnsPassUpdater,
+  google: MilosTraining.Infrastructure.Wallet.GoogleWalletUpdater
+}
+
+config :milos_training,
+       :wallet_image_source,
+       MilosTraining.Infrastructure.Wallet.HttpImageSource
+
+# ADR-155: door codes, member codes and Wallet barcodes.
+config :milos_training,
+       :key_derivation,
+       MilosTraining.Infrastructure.Security.PhoenixKeyDerivation
 
 config :milos_training,
        :realtime_publisher,

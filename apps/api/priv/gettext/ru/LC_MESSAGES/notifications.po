@@ -408,3 +408,12 @@ msgstr "Новое рядом с вами"
 
 msgid "New for «%{name}»: %{count}"
 msgstr "Новое для «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Посетитель у входа"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} отсканировал(а) код на входе в %{box} (%{when}) - пока не участник."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} отсканировал(а) код на входе в %{box} (%{when}) - пока не участник. Пробные занятия открыты."

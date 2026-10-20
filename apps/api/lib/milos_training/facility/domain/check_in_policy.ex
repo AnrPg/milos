@@ -17,8 +17,14 @@ defmodule MilosTraining.Facility.Domain.CheckInPolicy do
     }
   end
 
-  @doc "Idempotency key that makes repeated check-ins on one day consume once."
-  def idempotency_key(user_id, %Date{} = date), do: "open-gym:#{user_id}:#{Date.to_iso8601(date)}"
+  @doc """
+  Idempotency key of one check-in's visit. The day's single check-in is held
+  by the `(user_id, checked_in_on)` unique index (a losing concurrent insert
+  releases its reservation); the key is per check-in so a check-in undone
+  within its minute (ADR-155) leaves the next one free to reserve again.
+  """
+  def idempotency_key(user_id, %Date{} = date, check_in_id),
+    do: "open-gym:#{user_id}:#{Date.to_iso8601(date)}:#{check_in_id}"
 
   @doc "Self check-in when the actor is the member, otherwise staff."
   def source(actor_id, user_id) when actor_id == user_id, do: "self"
