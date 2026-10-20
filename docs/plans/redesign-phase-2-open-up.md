@@ -518,9 +518,10 @@ ANR picked the recommendation on every question except Q2, with the extras and n
 3. **Inviting to an event (Q3 A):** the upcoming events a friend can come to (open, or with guest
    passes the member is going to), with the referral attached. Extras: «Κάλεσε φίλο» on every such
    event page, and staff tag events «Καλό για φίλους» so they come first.
-4. **Who gets the credit (Q4, ANR's note):** the member whose link the friend used to sign up or
-   open the box's page; the invite holds for **30 days** (the programme's default window), then
-   another link can take it. Extras: a yearly cap, staff and coaches share without earning, and
+4. **Who gets the credit (Q4, ANR's note):** order doesn't matter, only whose link was used: each
+   link is personal, and the member whose link the friend used to sign up or open the box's page
+   owns the invite. Using another member's link moves it while it hasn't counted; it holds for
+   **30 days** (the programme's default window). Extras: a yearly cap, staff and coaches share without earning, and
    self-invites are blocked. Staff can reassign with a note.
 5. **What the member sees (Q5 A):** the friend's first name, stage and reward state; notices on
    sign-up, trial or event, subscription, and reward.

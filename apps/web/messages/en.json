@@ -6373,7 +6373,7 @@
       "claiming": "Saving your invite…",
       "failed": "We couldn't save your invite right now. We'll try again next time you open Milos.",
       "alreadyMember": "You're already at {box}, so this invite doesn't apply.",
-      "alreadyInvited": "Another member invited you first. Their invite stands.",
+      "alreadyInvited": "Another member’s invite already counted for you.",
       "self": "This is your own invite link.",
       "claimed": "Done. Your invite to {box} is saved.",
       "openMine": "Open Bring a friend",

@@ -6373,7 +6373,7 @@
       "claiming": "Guardando tu invitación…",
       "failed": "No pudimos guardar tu invitación ahora. Lo intentaremos de nuevo la próxima vez que abras Milos.",
       "alreadyMember": "Ya estás en {box}, así que esta invitación no aplica.",
-      "alreadyInvited": "Otro miembro te invitó primero. Su invitación es la que vale.",
+      "alreadyInvited": "La invitación de otro miembro ya cuenta para ti.",
       "self": "Este es tu propio enlace de invitación.",
       "claimed": "Listo. Tu invitación a {box} está guardada.",
       "openMine": "Abrir Trae a un amigo",

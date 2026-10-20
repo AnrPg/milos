@@ -322,7 +322,7 @@ defmodule MilosTraining.Web.ReferralsControllerTest do
       assert ctx.conn |> get("/api/public/referrals/ZZZZZZZZ") |> json_response(404)
     end
 
-    test "first invite wins; members and self-invites are never counted", ctx do
+    test "the link used owns the invite; members and self-invites are never counted", ctx do
       program!(ctx)
       %{"code" => code} = overview(ctx, ctx.member)
       %{"code" => other_code} = overview(ctx, ctx.other_member)
@@ -332,9 +332,6 @@ defmodule MilosTraining.Web.ReferralsControllerTest do
 
       assert slug == ctx.slug
       assert %{"outcome" => "unchanged"} = claim(ctx, ctx.friend, code) |> json_response(200)
-
-      assert %{"outcome" => "already_invited"} =
-               claim(ctx, ctx.friend, other_code) |> json_response(200)
 
       assert %{"outcome" => "self"} = claim(ctx, ctx.member, code) |> json_response(200)
 
@@ -352,6 +349,22 @@ defmodule MilosTraining.Web.ReferralsControllerTest do
 
       assert %{"invites" => [%{"stage" => "signed_up", "reward" => %{"status" => "upcoming"}}]} =
                overview(ctx, ctx.member)
+
+      # The friend uses another member's personal link: the invite is theirs now.
+      assert %{"outcome" => "claimed"} = claim(ctx, ctx.friend, other_code) |> json_response(200)
+      moved = attribution(ctx, ctx.friend)
+      assert moved.referrer_user_id == ctx.other_member.id
+      assert moved.previous_referrer_user_id == ctx.member.id
+      assert overview(ctx, ctx.member)["invites"] == []
+      assert [_moved] = overview(ctx, ctx.other_member)["invites"]
+
+      # Once it counted, another link changes nothing.
+      first_payment!(ctx, ctx.friend)
+
+      assert %{"outcome" => "already_invited"} =
+               claim(ctx, ctx.friend, code) |> json_response(200)
+
+      assert attribution(ctx, ctx.friend).referrer_user_id == ctx.other_member.id
     end
 
     test "an invite that ran out leaves room for another member's", ctx do

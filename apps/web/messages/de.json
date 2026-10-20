@@ -6373,7 +6373,7 @@
       "claiming": "Einladung wird gespeichert…",
       "failed": "Die Einladung konnte gerade nicht gespeichert werden. Wir versuchen es beim nächsten Öffnen von Milos erneut.",
       "alreadyMember": "Du bist schon bei {box}, daher gilt diese Einladung nicht.",
-      "alreadyInvited": "Ein anderes Mitglied hat dich zuerst eingeladen. Diese Einladung gilt.",
+      "alreadyInvited": "Die Einladung eines anderen Mitglieds zählt für dich bereits.",
       "self": "Das ist dein eigener Einladungslink.",
       "claimed": "Fertig. Deine Einladung zu {box} ist gespeichert.",
       "openMine": "Freund mitbringen öffnen",

@@ -6373,7 +6373,7 @@
       "claiming": "Uitnodiging opslaan…",
       "failed": "Je uitnodiging kon nu niet worden opgeslagen. We proberen het opnieuw wanneer je Milos weer opent.",
       "alreadyMember": "Je bent al bij {box}, dus deze uitnodiging geldt niet.",
-      "alreadyInvited": "Een ander lid nodigde je eerst uit. Die uitnodiging geldt.",
+      "alreadyInvited": "De uitnodiging van een ander lid telt al voor jou.",
       "self": "Dit is je eigen uitnodigingslink.",
       "claimed": "Klaar. Je uitnodiging voor {box} is opgeslagen.",
       "openMine": "Open Neem een vriend mee",

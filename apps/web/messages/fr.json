@@ -6373,7 +6373,7 @@
       "claiming": "Enregistrement de ton invitation…",
       "failed": "Impossible d'enregistrer ton invitation pour le moment. Nous réessaierons la prochaine fois que tu ouvriras Milos.",
       "alreadyMember": "Tu es déjà à {box}, cette invitation ne s'applique donc pas.",
-      "alreadyInvited": "Un autre membre t'a invité en premier. C'est son invitation qui compte.",
+      "alreadyInvited": "L’invitation d’un autre membre compte déjà pour toi.",
       "self": "C'est ton propre lien d'invitation.",
       "claimed": "C'est fait. Ton invitation à {box} est enregistrée.",
       "openMine": "Ouvrir Amène un ami",

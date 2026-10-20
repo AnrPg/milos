@@ -2,10 +2,13 @@ defmodule MilosTraining.Referrals.Domain.Attribution do
   @moduledoc """
   The rules of an invite (ADR-156, board 11), free of storage:
 
-    * **Claiming** (Q4): the first member whose link a friend used owns the
-      invite for the programme's window; nobody can invite themselves, and
-      members or former members of the box are never counted. The same
-      member using their own link again changes nothing.
+    * **Claiming** (Q4, ANR): the invite belongs to the member whose link
+      the friend used, not to whoever sent one first. Each link is personal,
+      so using another member's link moves the invite to that member while
+      it hasn't counted yet; once it counted (or staff assigned it) it
+      stands. An invite holds for the programme's window. Nobody can invite
+      themselves, and members or former members of the box are never
+      counted. The same member's link used again changes nothing.
     * **Funnel**: `event → trial → joined → paid`, each stamped once while
       the invite is alive. A step after the window ends the invite
       (`expired`) instead of moving it.
@@ -38,11 +41,15 @@ defmodule MilosTraining.Referrals.Domain.Attribution do
   Whether a claim may record a new invite:
 
     * `:ok` - record it (or replace an invite that ran out);
+    * `{:switch, attribution}` - the friend used another member's link: the
+      invite moves to that member, starting over;
     * `{:existing, attribution}` - the same member's invite stands, unchanged;
     * `{:error, reason}` - `:self_referral`, `:already_member` or
-      `:already_invited` (someone else's invite stands).
+      `:already_invited` (someone else's invite already counted, or staff
+      gave it to them).
   """
-  @spec claim(claim_facts()) :: :ok | {:existing, map()} | {:error, atom()}
+  @spec claim(claim_facts()) ::
+          :ok | {:switch, map()} | {:existing, map()} | {:error, atom()}
   def claim(%{referrer_id: same, referred_id: same}), do: {:error, :self_referral}
 
   def claim(%{referred_standing: standing}) when standing in [:member, :former],
@@ -54,9 +61,14 @@ defmodule MilosTraining.Referrals.Domain.Attribution do
     cond do
       replaceable?(existing, now) -> :ok
       existing.referrer_user_id == referrer_id -> {:existing, existing}
+      switchable?(existing) -> {:switch, existing}
       true -> {:error, :already_invited}
     end
   end
+
+  # An open invite follows the link used; a counted or staff-assigned one stands.
+  defp switchable?(%{status: "open"} = existing), do: is_nil(Map.get(existing, :reassigned_at))
+  defp switchable?(_existing), do: false
 
   # An invite that ran out without counting leaves room for a new one.
   defp replaceable?(%{status: status}, _now) when status in ["expired", "void"], do: true

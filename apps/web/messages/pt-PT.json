@@ -6373,7 +6373,7 @@
       "claiming": "A guardar o teu convite…",
       "failed": "Não foi possível guardar o teu convite agora. Tentamos de novo da próxima vez que abrires o Milos.",
       "alreadyMember": "Já estás na {box}, por isso este convite não se aplica.",
-      "alreadyInvited": "Outro membro convidou-te primeiro. O convite dele é o que conta.",
+      "alreadyInvited": "O convite de outro membro já conta para ti.",
       "self": "Este é o teu próprio link de convite.",
       "claimed": "Pronto. O teu convite para a {box} está guardado.",
       "openMine": "Abrir Traz um amigo",

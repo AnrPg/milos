@@ -28,14 +28,14 @@ describe("a friend's kept invites", () => {
     expect(inviteChannel({ event: "not-an-id" })).toEqual({ channel: "link", event_id: null });
   });
 
-  it("keeps each code once, oldest first, and adds an event to it", () => {
+  it("keeps each code once, the link used last at the end, and adds an event to it", () => {
     rememberReferral({ code: "AB12CD34", channel: "link", event_id: null }, day(0));
     rememberReferral({ code: "ZZ99YY88", channel: "qr", event_id: null }, day(1));
     rememberReferral({ code: "ab12-cd34", channel: "event", event_id: EVENT }, day(2));
 
     const kept = readPendingReferrals(day(3));
-    expect(kept.map((entry) => entry.code)).toEqual(["AB12CD34", "ZZ99YY88"]);
-    expect(kept[0]).toMatchObject({ channel: "event", event_id: EVENT, saved_at: day(0).toISOString() });
+    expect(kept.map((entry) => entry.code)).toEqual(["ZZ99YY88", "AB12CD34"]);
+    expect(kept[1]).toMatchObject({ channel: "event", event_id: EVENT, saved_at: day(2).toISOString() });
   });
 
   it("forgets an invite after 30 days", () => {

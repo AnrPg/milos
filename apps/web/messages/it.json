@@ -6373,7 +6373,7 @@
       "claiming": "Salvataggio dell'invito…",
       "failed": "Non siamo riusciti a salvare l'invito ora. Riproveremo la prossima volta che apri Milos.",
       "alreadyMember": "Sei già da {box}, quindi questo invito non vale.",
-      "alreadyInvited": "Un altro membro ti ha invitato prima. Vale il suo invito.",
+      "alreadyInvited": "L’invito di un altro membro conta già per te.",
       "self": "Questo è il tuo link di invito.",
       "claimed": "Fatto. Il tuo invito a {box} è salvato.",
       "openMine": "Apri Porta un amico",

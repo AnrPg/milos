@@ -2,11 +2,12 @@ import type { ReferralChannel, ReferralClaim } from "@/api/referrals";
 
 /**
  * Invites a friend opened, kept on their device until they're signed in
- * (ADR-156, board 11 Q1: kept 30 days, then the member can send it again). Invite pages and event links
- * save them; once there is a session each is claimed once, oldest first, and
- * forgotten, so signing up later, from another page, still credits the
- * member who invited them. The server keeps the first invite per box (Q4),
- * so claiming them in the order they were opened keeps that rule.
+ * (ADR-156, board 11 Q1: kept 30 days, then the member can send it again).
+ * Invite pages and event links save them; once there is a session each is
+ * claimed once, in the order they were last used, and forgotten, so signing
+ * up later, from another page, still credits the member who invited them.
+ * The invite belongs to whoever's link the friend used (Q4), so the link
+ * used last is claimed last and owns it.
  */
 export const PENDING_REFERRAL_KEY = "milos:pending-referrals";
 export const PENDING_REFERRAL_DAYS = 30;
@@ -52,12 +53,14 @@ export function rememberReferral(
   const entries = readPendingReferrals(now);
   const index = entries.findIndex((entry) => codeKey(entry.code) === codeKey(invite.code));
   if (index >= 0) {
-    const current = entries[index];
-    entries[index] = {
+    // Used again: it moves to the end, as the link used last.
+    const [current] = entries.splice(index, 1);
+    entries.push({
       ...current,
       channel: invite.event_id ? invite.channel : current.channel,
       event_id: invite.event_id ?? current.event_id,
-    };
+      saved_at: now.toISOString(),
+    });
   } else {
     entries.push({ ...invite, new_account: false, saved_at: now.toISOString() });
   }

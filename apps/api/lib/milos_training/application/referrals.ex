@@ -220,8 +220,9 @@ defmodule MilosTraining.Application.Referrals do
   `new_account` when the account was just made from the invite page.
 
   Returns `{:ok, %{outcome: outcome, box: %{slug, name}}}` where `outcome`
-  is `:claimed`, `:unchanged` (the same member's invite already stands),
-  `:already_member`, `:already_invited` or `:self`; an unknown or revoked
+  is `:claimed` (also when the invite moved from another member's link),
+  `:unchanged` (the same member's invite already stands), `:already_member`,
+  `:already_invited` or `:self`; an unknown or revoked
   code is `{:error, :not_found}`. Telling the friend no more than that keeps
   other members' invites private.
   """
@@ -246,6 +247,7 @@ defmodule MilosTraining.Application.Referrals do
 
           case Referrals.claim_check(facts) do
             :ok -> record_claim(context, resolved, existing, opts, now)
+            {:switch, previous} -> record_claim(context, resolved, previous, opts, now)
             {:existing, _attribution} -> {:ok, :unchanged}
             {:error, reason} -> {:ok, reason}
           end
@@ -274,6 +276,7 @@ defmodule MilosTraining.Application.Referrals do
       channel: channel,
       referral_program_id: program && program.id,
       new_account: opts[:new_account] == true,
+      previous_referrer_user_id: existing && switched_from(existing, resolved.user_id),
       attributed_at: now,
       expires_at: Referrals.expires_at(now, program && program.attribution_days)
     }
@@ -289,6 +292,13 @@ defmodule MilosTraining.Application.Referrals do
       {:ok, attribution}
     end
   end
+
+  # The member whose open invite this link took over, for staff's history.
+  defp switched_from(%{status: "open", referrer_user_id: previous}, new_referrer)
+       when previous != new_referrer,
+       do: previous
+
+  defp switched_from(_existing, _new_referrer), do: nil
 
   defp claim_channel(opts) do
     case opts[:channel] do

@@ -64,12 +64,23 @@ defmodule MilosTraining.Referrals.ReferralDomainTest do
       assert {:error, :already_member} = Attribution.claim(facts(%{referred_standing: :former}))
     end
 
-    test "the first invite wins inside its window" do
+    test "the link the friend used owns the invite until it counts" do
       existing = open()
       assert {:existing, ^existing} = Attribution.claim(facts(%{existing: existing}))
 
-      assert {:error, :already_invited} =
+      assert {:switch, ^existing} =
                Attribution.claim(facts(%{referrer_id: "b", existing: existing}))
+
+      for counted <- [open(%{status: "qualified"}), open(%{status: "capped"})] do
+        assert {:error, :already_invited} =
+                 Attribution.claim(facts(%{referrer_id: "b", existing: counted}))
+      end
+
+      # Staff gave it to someone: it stands.
+      assigned = open(%{reassigned_at: @now})
+
+      assert {:error, :already_invited} =
+               Attribution.claim(facts(%{referrer_id: "b", existing: assigned}))
     end
 
     test "an invite that ran out leaves room for a new one" do

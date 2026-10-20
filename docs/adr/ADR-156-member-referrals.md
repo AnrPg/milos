@@ -41,13 +41,18 @@ give the funnel its steps.
 
    One programme is active per box, enforced by a partial unique index.
    Activating a programme retires the previous one.
-4. **First invite wins (board 11 Q4).** The first member whose link a friend
-   uses to sign up or open the box's page owns the invite for the window
-   (30 days by default, ANR's note), after which another link can take it. An expired or void invite leaves room
-   for a new one. Members and former members of the box are never counted, and
-   nobody can invite themselves. Staff can give an invite to another member
-   before it counts, with a note, and the previous inviter is kept. Claims for
-   the same friend and box are serialised with an advisory transaction lock.
+4. **The link used owns the invite (board 11 Q4, ANR).** Order doesn't
+   matter: each link is personal and names its sender, and the invite
+   belongs to the member whose link the friend used to sign up or open the
+   box's page. Using another member's link moves an open invite to them
+   (starting over, the previous inviter kept for staff); once it counted, or
+   staff assigned it, it stands. An invite holds for the window (30 days by
+   default); an expired or void one leaves room for a new one. Members and
+   former members of the box are never counted, and nobody can invite
+   themselves. Staff can give an invite to another member before it counts,
+   with a note. Claims for the same friend and box are serialised with an
+   advisory transaction lock, and the device claims its kept invites in the
+   order they were last used.
 5. **Stages come from domain events.** `ReferralReactions` listens to:
    - `event_attendance_recorded` (new, published by event check-in) for the
      event step;

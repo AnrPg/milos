@@ -8,7 +8,8 @@ let queue: Promise<unknown> = Promise.resolve();
 const settled: ClaimResults = new Map();
 
 /**
- * Claims the invites kept on this device, oldest first (ADR-156). Calls from
+ * Claims the invites kept on this device, in the order they were last used
+ * (ADR-156), so the link used last owns the invite. Calls from
  * the invite page, event links and the app-wide bridge run one after the
  * other, so an invite kept a moment ago is never skipped by a run already
  * under way; a settled answer forgets an invite, a network or server failure
