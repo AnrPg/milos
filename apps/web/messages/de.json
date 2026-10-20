@@ -6197,7 +6197,9 @@
     "err_not_going": "Diese Person hat keinen Platz.",
     "err_trial_offer_already_sent": "Das Probetraining-Angebot wurde bereits gesendet.",
     "err_nobody_to_offer": "Niemand, der da war, wartet auf ein Probetraining-Angebot.",
-    "err_trials_disabled": "Die Box nimmt gerade keine Probetrainings an."
+    "err_trials_disabled": "Die Box nimmt gerade keine Probetrainings an.",
+    "fieldGoodForFriends": "Gut für Freunde",
+    "goodForFriendsHint": "Steht oben, wenn Mitglieder Freunde zu einem Event einladen."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Keine anstehenden Events. Erstelle eines mit «+ Neues Event».",
@@ -6287,7 +6289,8 @@
       "title": "Zu einem Event einladen",
       "shareText": "Komm mit mir zu {title}",
       "free": "kostenlos",
-      "invite": "Einladen"
+      "invite": "Einladen",
+      "goodForFriends": "Gut für Freunde"
     },
     "list": {
       "title": "Deine Einladungen",
@@ -6430,7 +6433,8 @@
       "newReferrer": "Neues Mitglied",
       "reassignSave": "Speichern",
       "cancel": "Abbrechen",
-      "note": "Notiz (optional)"
+      "note": "Notiz (optional)",
+      "discountOnRenewal": "«Vergeben» zieht ihn von der nächsten Verlängerungsrechnung des Mitglieds ab."
     },
     "rules": {
       "rewardNote": "Was das Mitglied bekommt (in Worten)",
@@ -6452,6 +6456,10 @@
       "cap": "Belohnte Freunde pro Mitglied und Jahr",
       "capNone": "Kein Limit",
       "hint": "Pro Box ist ein Programm aktiv: Wenn du dieses aktivierst, wird das andere beendet. Einladungen behalten die Bedingungen, mit denen sie gemacht wurden."
+    },
+    "tabs": {
+      "invite": "Einladen",
+      "invites": "Deine Einladungen · {count}"
     }
   }
 }

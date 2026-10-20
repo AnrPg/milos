@@ -2,14 +2,14 @@ import type { ReferralChannel, ReferralClaim } from "@/api/referrals";
 
 /**
  * Invites a friend opened, kept on their device until they're signed in
- * (ADR-156, board 11 extra «θυμάται 60 μέρες»). Invite pages and event links
+ * (ADR-156, board 11 Q1: kept 30 days, then the member can send it again). Invite pages and event links
  * save them; once there is a session each is claimed once, oldest first, and
  * forgotten, so signing up later, from another page, still credits the
  * member who invited them. The server keeps the first invite per box (Q4),
  * so claiming them in the order they were opened keeps that rule.
  */
 export const PENDING_REFERRAL_KEY = "milos:pending-referrals";
-export const PENDING_REFERRAL_DAYS = 60;
+export const PENDING_REFERRAL_DAYS = 30;
 const MAX_PENDING = 5;
 
 export type PendingReferral = {

@@ -6197,7 +6197,9 @@
     "err_not_going": "Esta persona no tiene plaza.",
     "err_trial_offer_already_sent": "La oferta de clase de prueba ya se envió.",
     "err_nobody_to_offer": "Nadie de los que vinieron espera una oferta de prueba.",
-    "err_trials_disabled": "El box no acepta clases de prueba ahora mismo."
+    "err_trials_disabled": "El box no acepta clases de prueba ahora mismo.",
+    "fieldGoodForFriends": "Ideal para amigos",
+    "goodForFriendsHint": "Aparece primero cuando los miembros invitan a amigos a un evento."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No hay próximos eventos. Crea uno con «+ Nuevo evento».",
@@ -6287,7 +6289,8 @@
       "title": "Invitar a un evento",
       "shareText": "Ven conmigo a {title}",
       "free": "gratis",
-      "invite": "Invitar"
+      "invite": "Invitar",
+      "goodForFriends": "Ideal para amigos"
     },
     "list": {
       "title": "Tus invitaciones",
@@ -6430,7 +6433,8 @@
       "newReferrer": "Nuevo miembro",
       "reassignSave": "Guardar",
       "cancel": "Cancelar",
-      "note": "Nota (opcional)"
+      "note": "Nota (opcional)",
+      "discountOnRenewal": "«Entregada» lo descuenta de la próxima factura de renovación del miembro."
     },
     "rules": {
       "rewardNote": "Qué recibe el miembro (en palabras)",
@@ -6452,6 +6456,10 @@
       "cap": "Amigos recompensados por miembro al año",
       "capNone": "Sin límite",
       "hint": "Hay un programa activo por box: al activar este, el otro se retira. Las invitaciones conservan las condiciones con las que se hicieron."
+    },
+    "tabs": {
+      "invite": "Invitar",
+      "invites": "Tus invitaciones · {count}"
     }
   }
 }

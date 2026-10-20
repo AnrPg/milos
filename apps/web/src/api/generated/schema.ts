@@ -8518,6 +8518,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -8878,6 +8880,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -9032,6 +9036,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -9101,6 +9107,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -9229,6 +9237,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at?: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -9297,6 +9307,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -9467,6 +9479,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -9644,6 +9658,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -10319,6 +10335,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -10473,6 +10491,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -10657,6 +10677,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -12894,6 +12916,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -13242,6 +13266,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -13591,6 +13617,8 @@ export interface components {
             currency: string;
             /** Format: date-time */
             ends_at: string;
+            /** @description Staff tagged it «Καλό για φίλους»; these come first */
+            good_for_friends: boolean;
             /** Format: uuid */
             id: string;
             place_name?: string | null;
@@ -13809,6 +13837,8 @@ export interface components {
                 currency: string;
                 /** Format: date-time */
                 ends_at: string;
+                /** @description Staff tagged it «Καλό για φίλους»; these come first */
+                good_for_friends: boolean;
                 /** Format: uuid */
                 id: string;
                 place_name?: string | null;
@@ -14445,6 +14475,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -14751,6 +14783,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -14875,6 +14909,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -15100,6 +15136,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -15249,6 +15287,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -15390,6 +15430,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -17329,6 +17371,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -17532,6 +17576,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -18846,6 +18892,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -18957,6 +19005,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -19034,6 +19084,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -19354,6 +19406,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -19563,6 +19617,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -19888,6 +19944,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -20098,6 +20156,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -20308,6 +20368,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -20500,6 +20562,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -20650,6 +20714,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -20756,6 +20822,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at?: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -20833,6 +20901,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -20991,6 +21061,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -21176,6 +21248,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -21371,6 +21445,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -21548,6 +21624,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -25485,6 +25563,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -25612,6 +25692,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -25845,6 +25927,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -26173,6 +26257,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -26303,6 +26389,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at?: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -26536,6 +26624,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -26864,6 +26954,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -27198,6 +27290,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -27533,6 +27627,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -27871,6 +27967,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -41737,6 +41835,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -42062,6 +42162,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -42272,6 +42374,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -42482,6 +42586,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -43784,6 +43890,8 @@ export interface operations {
                             currency: string;
                             /** Format: date-time */
                             ends_at: string;
+                            /** @description Staff tagged it «Καλό για φίλους»; these come first */
+                            good_for_friends: boolean;
                             /** Format: uuid */
                             id: string;
                             place_name?: string | null;
@@ -49617,6 +49725,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -51203,6 +51313,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -51528,6 +51640,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)

@@ -3859,6 +3859,10 @@
           "going_count": {
             "type": "integer"
           },
+          "good_for_friends": {
+            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+            "type": "boolean"
+          },
           "group": {
             "description": "The member group of a group event (free, for its members only)",
             "nullable": true,
@@ -4077,6 +4081,7 @@
           "open_to_non_members",
           "guest_pass_allowed",
           "guests_per_member",
+          "good_for_friends",
           "cancelled",
           "club",
           "box",
@@ -4922,6 +4927,10 @@
               "going_count": {
                 "type": "integer"
               },
+              "good_for_friends": {
+                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                "type": "boolean"
+              },
               "group": {
                 "description": "The member group of a group event (free, for its members only)",
                 "nullable": true,
@@ -5140,6 +5149,7 @@
               "open_to_non_members",
               "guest_pass_allowed",
               "guests_per_member",
+              "good_for_friends",
               "cancelled",
               "club",
               "box",
@@ -5359,6 +5369,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "good_for_friends": {
+            "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+            "type": "boolean"
+          },
           "guest_pass_allowed": {
             "type": "boolean"
           },
@@ -5546,6 +5560,10 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "good_for_friends": {
+                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                "type": "boolean"
               },
               "group": {
                 "description": "The member group of a group event (free, for its members only)",
@@ -5765,6 +5783,7 @@
               "open_to_non_members",
               "guest_pass_allowed",
               "guests_per_member",
+              "good_for_friends",
               "cancelled",
               "club",
               "box",
@@ -5914,6 +5933,10 @@
           "ends_at": {
             "format": "date-time",
             "type": "string"
+          },
+          "good_for_friends": {
+            "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+            "type": "boolean"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -6101,6 +6124,10 @@
                 },
                 "going_count": {
                   "type": "integer"
+                },
+                "good_for_friends": {
+                  "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                  "type": "boolean"
                 },
                 "group": {
                   "description": "The member group of a group event (free, for its members only)",
@@ -6320,6 +6347,7 @@
                 "open_to_non_members",
                 "guest_pass_allowed",
                 "guests_per_member",
+                "good_for_friends",
                 "cancelled",
                 "club",
                 "box",
@@ -6596,6 +6624,10 @@
                     "going_count": {
                       "type": "integer"
                     },
+                    "good_for_friends": {
+                      "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                      "type": "boolean"
+                    },
                     "group": {
                       "description": "The member group of a group event (free, for its members only)",
                       "nullable": true,
@@ -6814,6 +6846,7 @@
                     "open_to_non_members",
                     "guest_pass_allowed",
                     "guests_per_member",
+                    "good_for_friends",
                     "cancelled",
                     "club",
                     "box",
@@ -7125,6 +7158,10 @@
                     "going_count": {
                       "type": "integer"
                     },
+                    "good_for_friends": {
+                      "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                      "type": "boolean"
+                    },
                     "group": {
                       "description": "The member group of a group event (free, for its members only)",
                       "nullable": true,
@@ -7343,6 +7380,7 @@
                     "open_to_non_members",
                     "guest_pass_allowed",
                     "guests_per_member",
+                    "good_for_friends",
                     "cancelled",
                     "club",
                     "box",
@@ -9321,6 +9359,10 @@
               "going_count": {
                 "type": "integer"
               },
+              "good_for_friends": {
+                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                "type": "boolean"
+              },
               "group": {
                 "description": "The member group of a group event (free, for its members only)",
                 "nullable": true,
@@ -9539,6 +9581,7 @@
               "open_to_non_members",
               "guest_pass_allowed",
               "guests_per_member",
+              "good_for_friends",
               "cancelled",
               "club",
               "box",
@@ -9763,6 +9806,10 @@
           "going_count": {
             "type": "integer"
           },
+          "good_for_friends": {
+            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+            "type": "boolean"
+          },
           "group": {
             "description": "The member group of a group event (free, for its members only)",
             "nullable": true,
@@ -9981,6 +10028,7 @@
           "open_to_non_members",
           "guest_pass_allowed",
           "guests_per_member",
+          "good_for_friends",
           "cancelled",
           "club",
           "box",
@@ -10279,6 +10327,10 @@
                   "going_count": {
                     "type": "integer"
                   },
+                  "good_for_friends": {
+                    "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                    "type": "boolean"
+                  },
                   "group": {
                     "description": "The member group of a group event (free, for its members only)",
                     "nullable": true,
@@ -10497,6 +10549,7 @@
                   "open_to_non_members",
                   "guest_pass_allowed",
                   "guests_per_member",
+                  "good_for_friends",
                   "cancelled",
                   "club",
                   "box",
@@ -17758,6 +17811,10 @@
                     "going_count": {
                       "type": "integer"
                     },
+                    "good_for_friends": {
+                      "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                      "type": "boolean"
+                    },
                     "group": {
                       "description": "The member group of a group event (free, for its members only)",
                       "nullable": true,
@@ -17976,6 +18033,7 @@
                     "open_to_non_members",
                     "guest_pass_allowed",
                     "guests_per_member",
+                    "good_for_friends",
                     "cancelled",
                     "club",
                     "box",
@@ -18869,6 +18927,10 @@
                     "going_count": {
                       "type": "integer"
                     },
+                    "good_for_friends": {
+                      "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                      "type": "boolean"
+                    },
                     "group": {
                       "description": "The member group of a group event (free, for its members only)",
                       "nullable": true,
@@ -19087,6 +19149,7 @@
                     "open_to_non_members",
                     "guest_pass_allowed",
                     "guests_per_member",
+                    "good_for_friends",
                     "cancelled",
                     "club",
                     "box",
@@ -20054,6 +20117,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "good_for_friends": {
+            "description": "Staff tagged it «Καλό για φίλους»; these come first",
+            "type": "boolean"
+          },
           "id": {
             "format": "uuid",
             "type": "string"
@@ -20080,7 +20147,8 @@
           "ends_at",
           "price_cents",
           "currency",
-          "access"
+          "access",
+          "good_for_friends"
         ],
         "title": "ReferralEvent",
         "type": "object"
@@ -20696,6 +20764,10 @@
                   "format": "date-time",
                   "type": "string"
                 },
+                "good_for_friends": {
+                  "description": "Staff tagged it «Καλό για φίλους»; these come first",
+                  "type": "boolean"
+                },
                 "id": {
                   "format": "uuid",
                   "type": "string"
@@ -20722,7 +20794,8 @@
                 "ends_at",
                 "price_cents",
                 "currency",
-                "access"
+                "access",
+                "good_for_friends"
               ],
               "title": "ReferralEvent",
               "type": "object"
@@ -22588,6 +22661,10 @@
           "going_count": {
             "type": "integer"
           },
+          "good_for_friends": {
+            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+            "type": "boolean"
+          },
           "group": {
             "description": "The member group of a group event (free, for its members only)",
             "nullable": true,
@@ -22877,6 +22954,7 @@
           "open_to_non_members",
           "guest_pass_allowed",
           "guests_per_member",
+          "good_for_friends",
           "cancelled",
           "club",
           "box",
@@ -23500,6 +23578,10 @@
               "going_count": {
                 "type": "integer"
               },
+              "good_for_friends": {
+                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                "type": "boolean"
+              },
               "group": {
                 "description": "The member group of a group event (free, for its members only)",
                 "nullable": true,
@@ -23789,6 +23871,7 @@
               "open_to_non_members",
               "guest_pass_allowed",
               "guests_per_member",
+              "good_for_friends",
               "cancelled",
               "club",
               "box",
@@ -23852,6 +23935,10 @@
           "ends_at": {
             "format": "date-time",
             "type": "string"
+          },
+          "good_for_friends": {
+            "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+            "type": "boolean"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -24527,6 +24614,10 @@
               "going_count": {
                 "type": "integer"
               },
+              "good_for_friends": {
+                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                "type": "boolean"
+              },
               "group": {
                 "description": "The member group of a group event (free, for its members only)",
                 "nullable": true,
@@ -24816,6 +24907,7 @@
               "open_to_non_members",
               "guest_pass_allowed",
               "guests_per_member",
+              "good_for_friends",
               "cancelled",
               "club",
               "box",
@@ -24958,6 +25050,10 @@
           },
           "going_count": {
             "type": "integer"
+          },
+          "good_for_friends": {
+            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+            "type": "boolean"
           },
           "group": {
             "description": "The member group of a group event (free, for its members only)",
@@ -25225,6 +25321,7 @@
           "open_to_non_members",
           "guest_pass_allowed",
           "guests_per_member",
+          "good_for_friends",
           "cancelled",
           "club",
           "box",
@@ -25361,6 +25458,10 @@
                 },
                 "going_count": {
                   "type": "integer"
+                },
+                "good_for_friends": {
+                  "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                  "type": "boolean"
                 },
                 "group": {
                   "description": "The member group of a group event (free, for its members only)",
@@ -25628,6 +25729,7 @@
                 "open_to_non_members",
                 "guest_pass_allowed",
                 "guests_per_member",
+                "good_for_friends",
                 "cancelled",
                 "club",
                 "box",
@@ -30881,6 +30983,10 @@
                           "going_count": {
                             "type": "integer"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                            "type": "boolean"
+                          },
                           "group": {
                             "description": "The member group of a group event (free, for its members only)",
                             "nullable": true,
@@ -31099,6 +31205,7 @@
                           "open_to_non_members",
                           "guest_pass_allowed",
                           "guests_per_member",
+                          "good_for_friends",
                           "cancelled",
                           "club",
                           "box",
@@ -31449,6 +31556,10 @@
                               "going_count": {
                                 "type": "integer"
                               },
+                              "good_for_friends": {
+                                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                                "type": "boolean"
+                              },
                               "group": {
                                 "description": "The member group of a group event (free, for its members only)",
                                 "nullable": true,
@@ -31667,6 +31778,7 @@
                               "open_to_non_members",
                               "guest_pass_allowed",
                               "guests_per_member",
+                              "good_for_friends",
                               "cancelled",
                               "club",
                               "box",
@@ -34523,6 +34635,10 @@
                           "going_count": {
                             "type": "integer"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                            "type": "boolean"
+                          },
                           "group": {
                             "description": "The member group of a group event (free, for its members only)",
                             "nullable": true,
@@ -34741,6 +34857,7 @@
                           "open_to_non_members",
                           "guest_pass_allowed",
                           "guests_per_member",
+                          "good_for_friends",
                           "cancelled",
                           "club",
                           "box",
@@ -34827,6 +34944,10 @@
                   "ends_at": {
                     "format": "date-time",
                     "type": "string"
+                  },
+                  "good_for_friends": {
+                    "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+                    "type": "boolean"
                   },
                   "guest_pass_allowed": {
                     "type": "boolean"
@@ -35023,6 +35144,10 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
                         },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
@@ -35242,6 +35367,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -35906,6 +36032,10 @@
                           "going_count": {
                             "type": "integer"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                            "type": "boolean"
+                          },
                           "group": {
                             "description": "The member group of a group event (free, for its members only)",
                             "nullable": true,
@@ -36124,6 +36254,7 @@
                           "open_to_non_members",
                           "guest_pass_allowed",
                           "guests_per_member",
+                          "good_for_friends",
                           "cancelled",
                           "club",
                           "box",
@@ -36468,6 +36599,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -36686,6 +36821,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -37329,6 +37465,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -37547,6 +37687,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -37918,6 +38059,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -38136,6 +38281,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -38507,6 +38653,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -38725,6 +38875,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -39031,6 +39182,10 @@
                           "going_count": {
                             "type": "integer"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                            "type": "boolean"
+                          },
                           "group": {
                             "description": "The member group of a group event (free, for its members only)",
                             "nullable": true,
@@ -39249,6 +39404,7 @@
                           "open_to_non_members",
                           "guest_pass_allowed",
                           "guests_per_member",
+                          "good_for_friends",
                           "cancelled",
                           "club",
                           "box",
@@ -39437,6 +39593,10 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
                         },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
@@ -39656,6 +39816,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -39735,6 +39896,10 @@
                   "ends_at": {
                     "format": "date-time",
                     "type": "string"
+                  },
+                  "good_for_friends": {
+                    "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+                    "type": "boolean"
                   },
                   "guest_pass_allowed": {
                     "type": "boolean"
@@ -39930,6 +40095,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -40148,6 +40317,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -40351,6 +40521,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -40569,6 +40743,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -40832,6 +41007,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -41050,6 +41229,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -41395,6 +41575,10 @@
                               "going_count": {
                                 "type": "integer"
                               },
+                              "good_for_friends": {
+                                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                                "type": "boolean"
+                              },
                               "group": {
                                 "description": "The member group of a group event (free, for its members only)",
                                 "nullable": true,
@@ -41613,6 +41797,7 @@
                               "open_to_non_members",
                               "guest_pass_allowed",
                               "guests_per_member",
+                              "good_for_friends",
                               "cancelled",
                               "club",
                               "box",
@@ -41924,6 +42109,10 @@
                               "going_count": {
                                 "type": "integer"
                               },
+                              "good_for_friends": {
+                                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                                "type": "boolean"
+                              },
                               "group": {
                                 "description": "The member group of a group event (free, for its members only)",
                                 "nullable": true,
@@ -42142,6 +42331,7 @@
                               "open_to_non_members",
                               "guest_pass_allowed",
                               "guests_per_member",
+                              "good_for_friends",
                               "cancelled",
                               "club",
                               "box",
@@ -51972,6 +52162,10 @@
                           "going_count": {
                             "type": "integer"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                            "type": "boolean"
+                          },
                           "group": {
                             "description": "The member group of a group event (free, for its members only)",
                             "nullable": true,
@@ -52238,6 +52432,7 @@
                           "open_to_non_members",
                           "guest_pass_allowed",
                           "guests_per_member",
+                          "good_for_friends",
                           "cancelled",
                           "club",
                           "box",
@@ -52319,6 +52514,10 @@
                   "ends_at": {
                     "format": "date-time",
                     "type": "string"
+                  },
+                  "good_for_friends": {
+                    "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+                    "type": "boolean"
                   },
                   "guest_pass_allowed": {
                     "type": "boolean"
@@ -53002,6 +53201,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -53291,6 +53494,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -53960,6 +54164,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -54249,6 +54457,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -54331,6 +54540,10 @@
                   "ends_at": {
                     "format": "date-time",
                     "type": "string"
+                  },
+                  "good_for_friends": {
+                    "description": "«Καλό για φίλους»; only when friends can come (open or guest passes)",
+                    "type": "boolean"
                   },
                   "guest_pass_allowed": {
                     "type": "boolean"
@@ -55011,6 +55224,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -55300,6 +55517,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -55974,6 +56192,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -56263,6 +56485,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -56956,6 +57179,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -57245,6 +57472,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -57944,6 +58172,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -58233,6 +58465,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -58924,6 +59157,10 @@
                         "going_count": {
                           "type": "integer"
                         },
+                        "good_for_friends": {
+                          "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                          "type": "boolean"
+                        },
                         "group": {
                           "description": "The member group of a group event (free, for its members only)",
                           "nullable": true,
@@ -59213,6 +59450,7 @@
                         "open_to_non_members",
                         "guest_pass_allowed",
                         "guests_per_member",
+                        "good_for_friends",
                         "cancelled",
                         "club",
                         "box",
@@ -96736,6 +96974,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -96954,6 +97196,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -97597,6 +97840,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -97815,6 +98062,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -98186,6 +98434,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -98404,6 +98656,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -98775,6 +99028,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -98993,6 +99250,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -101867,6 +102125,10 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "good_for_friends": {
+                            "description": "Staff tagged it «Καλό για φίλους»; these come first",
+                            "type": "boolean"
+                          },
                           "id": {
                             "format": "uuid",
                             "type": "string"
@@ -101893,7 +102155,8 @@
                           "ends_at",
                           "price_cents",
                           "currency",
-                          "access"
+                          "access",
+                          "good_for_friends"
                         ],
                         "title": "ReferralEvent",
                         "type": "object"
@@ -118438,6 +118701,10 @@
                               "going_count": {
                                 "type": "integer"
                               },
+                              "good_for_friends": {
+                                "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                                "type": "boolean"
+                              },
                               "group": {
                                 "description": "The member group of a group event (free, for its members only)",
                                 "nullable": true,
@@ -118656,6 +118923,7 @@
                               "open_to_non_members",
                               "guest_pass_allowed",
                               "guests_per_member",
+                              "good_for_friends",
                               "cancelled",
                               "club",
                               "box",
@@ -122195,6 +122463,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -122413,6 +122685,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
@@ -123056,6 +123329,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -123274,6 +123551,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",

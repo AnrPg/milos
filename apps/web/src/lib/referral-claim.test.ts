@@ -38,10 +38,10 @@ describe("a friend's kept invites", () => {
     expect(kept[0]).toMatchObject({ channel: "event", event_id: EVENT, saved_at: day(0).toISOString() });
   });
 
-  it("forgets an invite after 60 days", () => {
+  it("forgets an invite after 30 days", () => {
     rememberReferral({ code: "AB12CD34", channel: "link", event_id: null }, day(0));
-    expect(readPendingReferrals(day(60))).toHaveLength(1);
-    expect(readPendingReferrals(day(61))).toEqual([]);
+    expect(readPendingReferrals(day(30))).toHaveLength(1);
+    expect(readPendingReferrals(day(31))).toEqual([]);
     expect(window.localStorage.getItem(PENDING_REFERRAL_KEY)).toBeNull();
   });
 

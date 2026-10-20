@@ -23,7 +23,7 @@ type ClaimState =
 /**
  * `/r/<code>` (ADR-156, board 11 Q1 A): a personal invite. The box, the
  * member who invites, what the friend gets and what the member will see.
- * The invite is kept on the device (60 days) and credited as soon as the
+ * The invite is kept on the device (30 days) and credited as soon as the
  * friend is signed in, here or after signing up.
  */
 export function InvitePage({

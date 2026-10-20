@@ -26,12 +26,15 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { giftText, invitePill, inviteUrl, qualifyingText, rewardText, stageText, type Tone } from "./referrals";
 import { QrCode } from "./QrCode";
 
+type ReferralsTab = "invite" | "invites";
+
 /**
- * Εγώ › Φέρε φίλο (mockup 34, board 11 Q2 A): one page per box. The offer
- * (what the friend gets, what the member gets and when), the personal link
- * and its QR, an invite to an upcoming event, and how each invited friend is
- * doing (first name and step, board 11 Q5 A). Members of several boxes pick
- * the box on top; `?box=` opens one (notifications link there).
+ * Εγώ › Φέρε φίλο (mockup 34, board 11 Q2 B): one page per box, in two tabs.
+ * «Κάλεσε» holds the offer (what the friend gets, what the member gets and
+ * when), the personal link and its QR, and an invite to an upcoming event;
+ * «Οι προσκλήσεις σου» shows how each invited friend is doing (first name
+ * and step, board 11 Q5 A). Members of several boxes pick the box on top.
+ * `?box=` opens one box and `?tab=invites` the list (notifications link there).
  */
 export function ReferralsPage() {
   const t = useTranslations("Referrals");
@@ -45,6 +48,7 @@ export function ReferralsPage() {
     name: entry.settings?.brand_name?.trim() || entry.organization.name,
   }));
   const requested = searchParams.get("box");
+  const tab: ReferralsTab = searchParams.get("tab") === "invites" ? "invites" : "invite";
   const slug =
     boxes.find((box) => box.slug === requested)?.slug ??
     boxes.find((box) => box.slug === selectedOrganizationSlug)?.slug ??
@@ -57,9 +61,9 @@ export function ReferralsPage() {
     queryFn: () => fetchMyReferrals(token!, slug!),
   });
 
-  function pickBox(next: string) {
+  function setParam(key: "box" | "tab", value: string) {
     const params = new URLSearchParams(searchParams.toString());
-    params.set("box", next);
+    params.set(key, value);
     router.replace(`?${params.toString()}`, { scroll: false });
   }
 
@@ -68,7 +72,7 @@ export function ReferralsPage() {
       {boxes.length > 1 ? (
         <div role="radiogroup" aria-label={t("pickBox")} className="flex gap-2 overflow-x-auto">
           {boxes.map((box) => (
-            <ChoicePill key={box.slug} selected={box.slug === slug} onSelect={() => pickBox(box.slug)}>
+            <ChoicePill key={box.slug} selected={box.slug === slug} onSelect={() => setParam("box", box.slug)}>
               {box.name}
             </ChoicePill>
           ))}
@@ -86,13 +90,31 @@ export function ReferralsPage() {
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("loadFailed")}</p>
         </HubCard>
       ) : (
-        <Overview data={overview.data} slug={slug!} boxName={boxes.find((box) => box.slug === slug)?.name ?? ""} />
+        <Overview
+          data={overview.data}
+          slug={slug!}
+          boxName={boxes.find((box) => box.slug === slug)?.name ?? ""}
+          tab={tab}
+          onTab={(next) => setParam("tab", next)}
+        />
       )}
     </HubPage>
   );
 }
 
-function Overview({ data, slug, boxName }: { data: ReferralOverview; slug: string; boxName: string }) {
+function Overview({
+  data,
+  slug,
+  boxName,
+  tab,
+  onTab,
+}: {
+  data: ReferralOverview;
+  slug: string;
+  boxName: string;
+  tab: ReferralsTab;
+  onTab: (tab: ReferralsTab) => void;
+}) {
   const t = useTranslations("Referrals");
   const locale = useLocale();
   const [qrOpen, setQrOpen] = useState(false);
@@ -120,72 +142,104 @@ function Overview({ data, slug, boxName }: { data: ReferralOverview; slug: strin
     }
   }
 
+  const tabs: { value: ReferralsTab; label: string }[] = [
+    { value: "invite", label: t("tabs.invite") },
+    { value: "invites", label: t("tabs.invites", { count: data.invites.length }) },
+  ];
+
   return (
     <>
-      <HubCard highlighted eyebrow={program ? `${boxName} · ${program.name}` : boxName}>
-        {program ? (
-          <>
-            <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>
-              {gift ? t("offer.friend", { gift }) : t("offer.friendNothing")}
-            </h2>
-            {data.earns_rewards && reward ? (
-              <p className="mt-1 text-sm" style={{ color: "var(--text-soft)" }}>
-                {t("offer.you", { reward, when: qualifyingText(program, t) })}
-              </p>
-            ) : null}
-            {data.earns_rewards && program.yearly_cap ? (
-              <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{t("offer.cap", { count: program.yearly_cap })}</p>
-            ) : null}
-            {!data.earns_rewards ? (
-              <p className="mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("offer.staff")}</p>
-            ) : null}
-          </>
-        ) : (
-          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("offer.noProgram")}</p>
-        )}
-      </HubCard>
-
-      <div className="flex gap-2">
-        <SheetButton primary onClick={() => void share(link, "link", t("shareText", { box: boxName }))}>
-          {copied === "link" ? t("copied") : t("shareLink")}
-        </SheetButton>
-        <SheetButton onClick={() => setQrOpen(true)}>{t("showQr")}</SheetButton>
+      <div
+        role="tablist"
+        aria-label={t("title")}
+        className="grid grid-cols-2 gap-1 rounded-2xl p-1"
+        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+      >
+        {tabs.map((entry) => (
+          <button
+            key={entry.value}
+            type="button"
+            role="tab"
+            aria-selected={tab === entry.value}
+            onClick={() => onTab(entry.value)}
+            className="min-h-11 truncate rounded-xl px-3 text-sm font-semibold"
+            style={tab === entry.value ? { background: "var(--primary)", color: "var(--bg)" } : { color: "var(--text-soft)" }}
+          >
+            {entry.label}
+          </button>
+        ))}
       </div>
 
-      {data.events.length > 0 ? (
-        <HubCard eyebrow={t("events.title")}>
-          <ul className="flex flex-col gap-3">
-            {data.events.map((event) => (
-              <EventInviteRow
-                key={event.id}
-                event={event}
-                code={data.code}
-                copied={copied === event.id}
-                onShare={(url) => void share(url, event.id, t("events.shareText", { title: event.title }))}
-              />
-            ))}
-          </ul>
-        </HubCard>
-      ) : null}
+      {tab === "invite" ? (
+        <div role="tabpanel" className="flex flex-col gap-3">
+          <HubCard highlighted eyebrow={program ? `${boxName} · ${program.name}` : boxName}>
+            {program ? (
+              <>
+                <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>
+                  {gift ? t("offer.friend", { gift }) : t("offer.friendNothing")}
+                </h2>
+                {data.earns_rewards && reward ? (
+                  <p className="mt-1 text-sm" style={{ color: "var(--text-soft)" }}>
+                    {t("offer.you", { reward, when: qualifyingText(program, t) })}
+                  </p>
+                ) : null}
+                {data.earns_rewards && program.yearly_cap ? (
+                  <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{t("offer.cap", { count: program.yearly_cap })}</p>
+                ) : null}
+                {!data.earns_rewards ? (
+                  <p className="mt-1 text-sm" style={{ color: "var(--text-soft)" }}>{t("offer.staff")}</p>
+                ) : null}
+              </>
+            ) : (
+              <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("offer.noProgram")}</p>
+            )}
+          </HubCard>
 
-      <HubCard eyebrow={t("list.title")}>
-        {data.invites.length === 0 ? (
-          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("list.empty")}</p>
-        ) : (
-          <>
-            <p className="mb-2 text-xs" style={{ color: "var(--dim)" }}>
-              {t("list.totals", { invited: data.totals.invited, trials: data.totals.trials, paid: data.totals.paid })}
-            </p>
-            <ul className="flex flex-col">
-              {data.invites.map((invite) => (
-                <InviteRow key={invite.id} invite={invite} />
-              ))}
-            </ul>
-          </>
-        )}
-      </HubCard>
+          <div className="flex gap-2">
+            <SheetButton primary onClick={() => void share(link, "link", t("shareText", { box: boxName }))}>
+              {copied === "link" ? t("copied") : t("shareLink")}
+            </SheetButton>
+            <SheetButton onClick={() => setQrOpen(true)}>{t("showQr")}</SheetButton>
+          </div>
 
-      <NewLink slug={slug} />
+          {data.events.length > 0 ? (
+            <HubCard eyebrow={t("events.title")}>
+              <ul className="flex flex-col gap-3">
+                {data.events.map((event) => (
+                  <EventInviteRow
+                    key={event.id}
+                    event={event}
+                    code={data.code}
+                    copied={copied === event.id}
+                    onShare={(url) => void share(url, event.id, t("events.shareText", { title: event.title }))}
+                  />
+                ))}
+              </ul>
+            </HubCard>
+          ) : null}
+
+          <NewLink slug={slug} />
+        </div>
+      ) : (
+        <div role="tabpanel" className="flex flex-col gap-3">
+          <HubCard eyebrow={t("list.title")}>
+            {data.invites.length === 0 ? (
+              <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("list.empty")}</p>
+            ) : (
+              <>
+                <p className="mb-2 text-xs" style={{ color: "var(--dim)" }}>
+                  {t("list.totals", { invited: data.totals.invited, trials: data.totals.trials, paid: data.totals.paid })}
+                </p>
+                <ul className="flex flex-col">
+                  {data.invites.map((invite) => (
+                    <InviteRow key={invite.id} invite={invite} />
+                  ))}
+                </ul>
+              </>
+            )}
+          </HubCard>
+        </div>
+      )}
 
       {qrOpen ? <QrSheet code={data.code} boxName={boxName} onClose={() => setQrOpen(false)} /> : null}
     </>
@@ -226,6 +280,9 @@ function EventInviteRow({
     <li className="flex items-center gap-3">
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>{event.title}</p>
+        {event.good_for_friends ? (
+          <p className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>{t("events.goodForFriends")}</p>
+        ) : null}
         <p className="truncate text-xs" style={{ color: "var(--dim)" }}>
           {[formatWhen(event.starts_at, event.ends_at, locale), event.place_name, price ?? t("events.free")].filter(Boolean).join(" · ")}
         </p>

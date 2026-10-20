@@ -245,7 +245,12 @@ function InvitePanel({ invite, onClose }: { invite: StaffReferralInvite; onClose
           {reward ? (
             <>
               <dt style={{ color: "var(--dim)" }}>{t("staff.reward")}</dt>
-              <dd style={{ color: "var(--text-soft)" }}>{reward}</dd>
+              <dd style={{ color: "var(--text-soft)" }}>
+                {reward}
+                {invite.reward?.type === "discount" && status === "approved" ? (
+                  <span className="block text-xs" style={{ color: "var(--dim)" }}>{t("staff.discountOnRenewal")}</span>
+                ) : null}
+              </dd>
             </>
           ) : null}
           {gift ? (

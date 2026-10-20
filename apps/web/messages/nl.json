@@ -6197,7 +6197,9 @@
     "err_not_going": "Deze persoon heeft geen plek.",
     "err_trial_offer_already_sent": "Het proeflesaanbod is al verstuurd.",
     "err_nobody_to_offer": "Niemand die er was wacht op een proeflesaanbod.",
-    "err_trials_disabled": "De box neemt op dit moment geen proeflessen aan."
+    "err_trials_disabled": "De box neemt op dit moment geen proeflessen aan.",
+    "fieldGoodForFriends": "Leuk voor vrienden",
+    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",
@@ -6287,7 +6289,8 @@
       "title": "Uitnodigen voor een event",
       "shareText": "Ga met me mee naar {title}",
       "free": "gratis",
-      "invite": "Uitnodigen"
+      "invite": "Uitnodigen",
+      "goodForFriends": "Leuk voor vrienden"
     },
     "list": {
       "title": "Je uitnodigingen",
@@ -6430,7 +6433,8 @@
       "newReferrer": "Nieuw lid",
       "reassignSave": "Opslaan",
       "cancel": "Annuleren",
-      "note": "Notitie (optioneel)"
+      "note": "Notitie (optioneel)",
+      "discountOnRenewal": "«Gegeven» trekt het af van de volgende verlengingsfactuur van het lid."
     },
     "rules": {
       "rewardNote": "Wat het lid krijgt (in woorden)",
@@ -6452,6 +6456,10 @@
       "cap": "Beloonde vrienden per lid per jaar",
       "capNone": "Geen limiet",
       "hint": "Per box is één programma actief: als je dit activeert, stopt het andere. Uitnodigingen houden de voorwaarden waarmee ze zijn gemaakt."
+    },
+    "tabs": {
+      "invite": "Uitnodigen",
+      "invites": "Je uitnodigingen · {count}"
     }
   }
 }

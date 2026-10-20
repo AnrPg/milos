@@ -6197,7 +6197,9 @@
     "err_not_going": "Cette personne n'a pas de place.",
     "err_trial_offer_already_sent": "L'offre de séance d'essai a déjà été envoyée.",
     "err_nobody_to_offer": "Personne parmi ceux qui sont venus n'attend d'offre d'essai.",
-    "err_trials_disabled": "La box n'accepte pas de séances d'essai pour le moment."
+    "err_trials_disabled": "La box n'accepte pas de séances d'essai pour le moment.",
+    "fieldGoodForFriends": "Idéal pour les amis",
+    "goodForFriendsHint": "Apparaît en premier quand les membres invitent des amis à un événement."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Aucun événement à venir. Crée-en un avec «+ Nouvel événement».",
@@ -6287,7 +6289,8 @@
       "title": "Inviter à un événement",
       "shareText": "Viens avec moi à {title}",
       "free": "gratuit",
-      "invite": "Inviter"
+      "invite": "Inviter",
+      "goodForFriends": "Idéal pour les amis"
     },
     "list": {
       "title": "Tes invitations",
@@ -6430,7 +6433,8 @@
       "newReferrer": "Nouveau membre",
       "reassignSave": "Enregistrer",
       "cancel": "Annuler",
-      "note": "Note (facultatif)"
+      "note": "Note (facultatif)",
+      "discountOnRenewal": "«Remise» la déduit de la prochaine facture de renouvellement du membre."
     },
     "rules": {
       "rewardNote": "Ce que reçoit le membre (en mots)",
@@ -6452,6 +6456,10 @@
       "cap": "Amis récompensés par membre et par an",
       "capNone": "Sans limite",
       "hint": "Un seul programme est actif par box : activer celui-ci retire l'autre. Les invitations gardent les conditions avec lesquelles elles ont été faites."
+    },
+    "tabs": {
+      "invite": "Inviter",
+      "invites": "Tes invitations · {count}"
     }
   }
 }

@@ -6197,7 +6197,9 @@
     "err_not_going": "Esta pessoa não tem lugar.",
     "err_trial_offer_already_sent": "A oferta de aula experimental já foi enviada.",
     "err_nobody_to_offer": "Ninguém dos que vieram está à espera de uma oferta experimental.",
-    "err_trials_disabled": "A box não está a aceitar aulas experimentais neste momento."
+    "err_trials_disabled": "A box não está a aceitar aulas experimentais neste momento.",
+    "fieldGoodForFriends": "Bom para amigos",
+    "goodForFriendsHint": "Aparece primeiro quando os membros convidam amigos para um evento."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Não há próximos eventos. Cria um com «+ Novo evento».",
@@ -6287,7 +6289,8 @@
       "title": "Convidar para um evento",
       "shareText": "Vem comigo a {title}",
       "free": "grátis",
-      "invite": "Convidar"
+      "invite": "Convidar",
+      "goodForFriends": "Bom para amigos"
     },
     "list": {
       "title": "Os teus convites",
@@ -6430,7 +6433,8 @@
       "newReferrer": "Novo membro",
       "reassignSave": "Guardar",
       "cancel": "Cancelar",
-      "note": "Nota (opcional)"
+      "note": "Nota (opcional)",
+      "discountOnRenewal": "«Entregue» desconta-o da próxima fatura de renovação do membro."
     },
     "rules": {
       "rewardNote": "O que o membro recebe (por palavras)",
@@ -6452,6 +6456,10 @@
       "cap": "Amigos recompensados por membro por ano",
       "capNone": "Sem limite",
       "hint": "Há um programa ativo por box: ativar este retira o outro. Os convites mantêm as condições com que foram feitos."
+    },
+    "tabs": {
+      "invite": "Convidar",
+      "invites": "Os teus convites · {count}"
     }
   }
 }

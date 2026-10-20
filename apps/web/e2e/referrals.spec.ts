@@ -31,7 +31,7 @@ const publicInvite = {
     },
     inviter: { nickname: "Maria", avatar_url: null },
     gift: { type: "free_days", value: 7, note: null },
-    window_days: 60,
+    window_days: 30,
     trials_enabled: true,
   },
 };
@@ -115,7 +115,7 @@ function overview(invites: unknown[] = []) {
       reward: { type: "credit", value: 2000, note: null },
       gift: { type: "free_days", value: 7, note: null },
       qualifying_stage: "paid",
-      attribution_days: 60,
+      attribution_days: 30,
       yearly_cap: 5,
     },
     events: [
@@ -128,6 +128,18 @@ function overview(invites: unknown[] = []) {
         currency: "EUR",
         place_name: "Box Kypseli",
         access: "open",
+        good_for_friends: false,
+      },
+      {
+        id: "event-friends",
+        title: "Bring a friend WOD",
+        starts_at: inDays(9, 11),
+        ends_at: inDays(9, 12),
+        price_cents: 0,
+        currency: "EUR",
+        place_name: "Box Kypseli",
+        access: "open",
+        good_for_friends: true,
       },
     ],
     invites,
@@ -143,7 +155,7 @@ const invite = (id: string, nickname: string, stage: string, reward: Record<stri
   status: stage === "paid" ? "qualified" : "open",
   channel: "link",
   attributed_at: inDays(-10),
-  expires_at: inDays(50),
+  expires_at: inDays(20),
   reward,
 });
 
@@ -174,12 +186,10 @@ test.describe("referrals", () => {
     await expect(page.getByRole("heading", { name: "Your friend: 7 days free" })).toBeVisible();
     await expect(page.getByText("You: €20 credit, when they subscribe")).toBeVisible();
     await expect(page.getByText("Up to 5 friends a year")).toBeVisible();
+    await expect(page.getByRole("tab", { name: "Invite", exact: true })).toHaveAttribute("aria-selected", "true");
 
     const list = page.getByRole("listitem");
-    await expect(list.filter({ hasText: "Katerina" })).toContainText("You got €20 credit");
-    await expect(list.filter({ hasText: "Katerina" })).toContainText("Given");
-    await expect(list.filter({ hasText: "Giorgos" })).toContainText("Came to a trial");
-    await expect(list.filter({ hasText: "Sofia" })).toContainText("Signed up");
+    await expect(list.filter({ hasText: "Bring a friend WOD" })).toContainText("Good for friends");
 
     await page.getByRole("button", { name: "Share link" }).click();
     await expect(page.getByRole("button", { name: "Link copied" })).toBeVisible();
@@ -197,6 +207,14 @@ test.describe("referrals", () => {
     await page.getByRole("button", { name: "New link" }).click();
     await page.getByRole("button", { name: "Make a new link" }).click();
     await expect.poll(() => rotations).toBe(1);
+
+    await page.getByRole("tab", { name: "Your invites · 3" }).click();
+    await expect(page).toHaveURL(/tab=invites/);
+    await expect(list.filter({ hasText: "Katerina" })).toContainText("You got €20 credit");
+    await expect(list.filter({ hasText: "Katerina" })).toContainText("Given");
+    await expect(list.filter({ hasText: "Giorgos" })).toContainText("Came to a trial");
+    await expect(list.filter({ hasText: "Sofia" })).toContainText("Signed up");
+    await expect(page.getByRole("button", { name: "Share link" })).toHaveCount(0);
   });
 
   test("signed out, a friend sees who invites them and what they get, and the invite is kept", async ({ page }) => {

@@ -23,7 +23,7 @@ export const BLANK_RULES: ProgramRules = {
   friend_reward_note: "",
   reward_note: "",
   qualifying_stage: "paid",
-  attribution_days: "60",
+  attribution_days: "30",
   yearly_cap: "",
   approval: "manual",
 };
@@ -44,7 +44,7 @@ export function rulesFromProgram(program: FinanceRecord | null | undefined): Pro
     friend_reward_note: text("friend_reward_note", ""),
     reward_note: text("reward_note", ""),
     qualifying_stage: program.qualifying_stage === "trial" ? "trial" : "paid",
-    attribution_days: text("attribution_days", "60"),
+    attribution_days: text("attribution_days", "30"),
     yearly_cap: text("yearly_cap", ""),
     approval: program.approval === "auto" ? "auto" : "manual",
   };
@@ -64,7 +64,7 @@ export function programRulesBody(rules: ProgramRules) {
     friend_reward_note: rules.friend_reward_type === "custom" ? rules.friend_reward_note.trim() || null : null,
     reward_note: rules.reward_note.trim() || null,
     qualifying_stage: rules.qualifying_stage,
-    attribution_days: Math.trunc(Number(rules.attribution_days || 60)),
+    attribution_days: Math.trunc(Number(rules.attribution_days || 30)),
     yearly_cap: cap && cap > 0 ? cap : null,
     approval: rules.approval,
   };

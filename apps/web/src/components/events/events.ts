@@ -139,6 +139,7 @@ export type EventForm = {
   openToAll: boolean;
   guestPass: boolean;
   guestsPerMember: number;
+  goodForFriends: boolean;
   repeatWeekly: boolean;
   repeatUntil: string;
   coverMediaId: string | null;
@@ -211,6 +212,8 @@ export function eventRequest(form: EventForm, { group = false, editing = false }
     open_to_non_members: group ? false : form.openToAll,
     guest_pass_allowed: group ? false : form.guestPass,
     guests_per_member: group || !form.guestPass ? 0 : form.guestsPerMember,
+    // «Καλό για φίλους» (ADR-156) only where a friend can come.
+    good_for_friends: !group && (form.openToAll || form.guestPass) && form.goodForFriends,
     cover_media_id: form.coverMediaId,
   };
   if (!editing && form.repeatWeekly) body.repeat_until = form.repeatUntil;
@@ -236,6 +239,7 @@ export function formFromEvent(event: CommunityEvent): EventForm {
     openToAll: event.open_to_non_members,
     guestPass: event.guest_pass_allowed,
     guestsPerMember: Math.max(1, event.guests_per_member),
+    goodForFriends: event.good_for_friends,
     repeatWeekly: false,
     repeatUntil: "",
     coverMediaId: event.cover_media_id ?? null,

@@ -6197,7 +6197,9 @@
     "err_not_going": "This person doesn't hold a place.",
     "err_trial_offer_already_sent": "The trial offer was already sent.",
     "err_nobody_to_offer": "Nobody who came is waiting for a trial offer.",
-    "err_trials_disabled": "The box isn't taking trials right now."
+    "err_trials_disabled": "The box isn't taking trials right now.",
+    "fieldGoodForFriends": "Good for friends",
+    "goodForFriendsHint": "Comes first when members invite friends to an event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",
@@ -6287,7 +6289,8 @@
       "title": "Invite to an event",
       "shareText": "Come with me to {title}",
       "free": "free",
-      "invite": "Invite"
+      "invite": "Invite",
+      "goodForFriends": "Good for friends"
     },
     "list": {
       "title": "Your invites",
@@ -6430,7 +6433,8 @@
       "newReferrer": "New member",
       "reassignSave": "Save",
       "cancel": "Cancel",
-      "note": "Note (optional)"
+      "note": "Note (optional)",
+      "discountOnRenewal": "«Given» takes it off the member’s next renewal invoice."
     },
     "rules": {
       "rewardNote": "What the member gets (in words)",
@@ -6452,6 +6456,10 @@
       "cap": "Rewarded friends per member per year",
       "capNone": "No limit",
       "hint": "One programme is active per box: activating this one retires the other. Invites keep the terms they were made with."
+    },
+    "tabs": {
+      "invite": "Invite",
+      "invites": "Your invites · {count}"
     }
   }
 }

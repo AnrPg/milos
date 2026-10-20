@@ -66,8 +66,8 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
 function fallbackUrl(notification: LinkableNotification) {
   if (notification.type === "booking_waitlist_promoted") return "/box/schedule";
   if (notification.type === "package_expiring") return "/me/payments";
-  // ADR-156: the member's referral notices open «Φέρε φίλο», staff's the queue.
-  if (notification.type === "referral_progress" || notification.type === "referral_reward") return "/me/referrals";
+  // ADR-156: the member's referral notices open their invites, staff's the queue.
+  if (notification.type === "referral_progress" || notification.type === "referral_reward") return "/me/referrals?tab=invites";
   if (notification.type === "referral_review") return "/admin/finance?tab=referrals";
   return null;
 }
