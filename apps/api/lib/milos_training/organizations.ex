@@ -86,6 +86,36 @@ defmodule MilosTraining.Organizations do
     end)
   end
 
+  @doc """
+  ADR-155: how a box presents itself on a Wallet card - its name (the brand
+  name when set), slug, logo URL and primary colour. Nil for an unknown box.
+  """
+  def brand_summary(organization_id) when is_binary(organization_id) do
+    with %{} = organization <- get_by_id(organization_id) do
+      settings =
+        RepoContext.run(%{organization_id: organization_id}, fn ->
+          OrganizationStore.get_organization_settings(organization_id)
+        end) || %{}
+
+      brand_name =
+        case Map.get(settings, :brand_name) do
+          name when is_binary(name) ->
+            if String.trim(name) == "", do: nil, else: String.trim(name)
+
+          _none ->
+            nil
+        end
+
+      %{
+        organization_id: organization.id,
+        name: brand_name || organization.name,
+        slug: organization.slug,
+        logo_url: Map.get(settings, :brand_logo_url),
+        primary_color: Map.get(settings, :brand_primary_color)
+      }
+    end
+  end
+
   @doc "Whether the tenant context holds any of `roles` (ADR-099)."
   defdelegate any_role?(context, roles),
     to: MilosTraining.Organizations.Domain.TenantAuthorization
