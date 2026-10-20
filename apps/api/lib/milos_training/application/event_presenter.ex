@@ -122,6 +122,7 @@ defmodule MilosTraining.Application.EventPresenter do
         open_to_non_members: event.open_to_non_members,
         guest_pass_allowed: event.guest_pass_allowed,
         guests_per_member: event.guests_per_member,
+        good_for_friends: event.good_for_friends,
         cover_media_id: event.cover_media_id,
         cover_url: event.cover_media_id && Map.get(covers, event.cover_media_id),
         cancelled: not is_nil(event.cancelled_at),

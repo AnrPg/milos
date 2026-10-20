@@ -402,6 +402,41 @@ msgstr ""
 msgid "Message about «%{event}»"
 msgstr ""
 
+msgid "Your invite"
+msgstr ""
+
+msgid "%{nickname} signed up with your invite."
+msgstr ""
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr ""
+
+msgid "%{nickname} came to a trial."
+msgstr ""
+
+msgid "%{nickname} subscribed."
+msgstr ""
+
+msgid "%{nickname} joined the box."
+msgstr ""
+
+msgid "Referral reward"
+msgstr ""
+
+msgid "Your referral reward was given."
+msgstr ""
+
+msgid "Your referral was not approved."
+msgstr ""
+
+msgid "Your referral reward was approved."
+msgstr ""
+
+msgid "Referral to approve"
+msgstr ""
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+
 msgid "New near you"
 msgstr ""
 

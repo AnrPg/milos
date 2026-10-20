@@ -128,16 +128,25 @@ config :milos_training,
 config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
 config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
 
+config :milos_training,
+       :referral_store,
+       MilosTraining.Infrastructure.Referrals.EctoReferralStore
+
 # ADR-144: reactions to facts other contexts announce (MilosTraining.DomainEvents).
 config :milos_training, :domain_event_handlers, %{
   membership_activated: [
     MilosTraining.Application.TrialReactions,
-    MilosTraining.Application.EventReactions
+    MilosTraining.Application.EventReactions,
+    MilosTraining.Application.ReferralReactions
   ],
   attendance_recorded: [
     MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.ReferralReactions,
     MilosTraining.Application.WalletReactions
   ],
+  # ADR-156: the invite funnel follows events, trials, joining and paying.
+  event_attendance_recorded: [MilosTraining.Application.ReferralReactions],
+  membership_payment_recorded: [MilosTraining.Application.ReferralReactions],
   booking_cancelled: [
     MilosTraining.Application.TrialReactions,
     MilosTraining.Application.WalletReactions

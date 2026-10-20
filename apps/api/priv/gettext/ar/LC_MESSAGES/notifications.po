@@ -403,6 +403,42 @@ msgstr "هل أعجبك «%{event}»؟ يدعوك %{box} إلى حصة تجري�
 msgid "Message about «%{event}»"
 msgstr "رسالة حول «%{event}»"
 
+msgid "Your invite"
+msgstr "دعوتك"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "سجّل %{nickname} عبر دعوتك."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "حضر %{nickname} الفعالية التي دعوته إليها."
+
+msgid "%{nickname} came to a trial."
+msgstr "حضر %{nickname} حصة تجريبية."
+
+msgid "%{nickname} subscribed."
+msgstr "اشترك %{nickname}."
+
+msgid "%{nickname} joined the box."
+msgstr "انضم %{nickname} إلى النادي."
+
+msgid "Referral reward"
+msgstr "مكافأة الإحالة"
+
+msgid "Your referral reward was given."
+msgstr "تم منحك مكافأة الإحالة."
+
+msgid "Your referral was not approved."
+msgstr "لم تتم الموافقة على إحالتك."
+
+msgid "Your referral reward was approved."
+msgstr "تمت الموافقة على مكافأة إحالتك."
+
+msgid "Referral to approve"
+msgstr "إحالة بانتظار الموافقة"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "اشترك %{nickname} بدعوة من %{referrer}."
+
 msgid "New near you"
 msgstr "جديد بالقرب منك"
 

@@ -42,6 +42,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoEventStore do
     |> filter_to(filter[:to])
     |> filter_ended_before(filter[:ended_before])
     |> filter_open(filter[:open_only])
+    |> filter_good_for_friends(filter[:good_for_friends])
     |> filter_cancelled(filter[:include_cancelled])
     |> order_events(filter[:order] || :asc)
     |> limit(^min(filter[:limit] || 200, 500))
@@ -66,6 +67,8 @@ defmodule MilosTraining.Infrastructure.Community.EctoEventStore do
   defp filter_ended_before(query, at), do: where(query, [e], e.ends_at <= ^at)
   defp filter_open(query, true), do: where(query, [e], e.open_to_non_members)
   defp filter_open(query, _all), do: query
+  defp filter_good_for_friends(query, true), do: where(query, [e], e.good_for_friends)
+  defp filter_good_for_friends(query, _all), do: query
   defp filter_cancelled(query, true), do: query
   defp filter_cancelled(query, _live), do: where(query, [e], is_nil(e.cancelled_at))
 

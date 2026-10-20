@@ -552,6 +552,36 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with the
    almost hidden line-icon button.
 6. **PR (Q6):** «Μοιράσου το» after a PR opens compose with the PR card and the media picker first.
 
+### Member referral (2026-10-20, [board 11](https://claude.ai/artifact/Mx77PrVYo8dfH2wT34Mbos))
+
+ANR picked the recommendation on every question except Q2, with the extras and notes below
+(ADR-156).
+
+1. **Where the friend lands (Q1 A):** a personal invite page `/r/<code>` with who invites, the
+   friend's gift, «Κλείσε δοκιμαστικό», «Γίνε μέλος» and «Δες το box». Extras: a link preview with
+   the inviter's first name over the box cover, a consent line, and the invite kept on the phone
+   for **30 days** (ANR's note), after which the member can send it again.
+2. **Εγώ › Φέρε φίλο (Q2 B):** two tabs, «Κάλεσε» (offer, share, QR, events) and «Οι προσκλήσεις
+   σου · N» (friends, stages, rewards); notices open the second tab. Extras: «Φέρε φίλο» in
+   Box › Συνδρομή and in the Εγώ list, the phone's share sheet with a ready message, and the link
+   still shown when the box has no programme.
+3. **Inviting to an event (Q3 A):** the upcoming events a friend can come to (open, or with guest
+   passes the member is going to), with the referral attached. Extras: «Κάλεσε φίλο» on every such
+   event page, and staff tag events «Καλό για φίλους» so they come first.
+4. **Who gets the credit (Q4, ANR's note):** order doesn't matter, only whose link was used: each
+   link is personal, and the member whose link the friend used to sign up or open the box's page
+   owns the invite. Using another member's link moves it while it hasn't counted; it holds for
+   **30 days** (the programme's default window). Extras: a yearly cap, staff and coaches share without earning, and
+   self-invites are blocked. Staff can reassign with a note.
+5. **What the member sees (Q5 A):** the friend's first name, stage and reward state; notices on
+   sign-up, trial or event, subscription, and reward.
+6. **Reward and approval (Q6 A):** made on the first payment, approved with one tap in Finance ›
+   Συστάσεις; an approved credit lands in the member's credit. Extra: «Δόθηκε» on a discount
+   applies it to the next renewal.
+7. **The owner's programme (Q7 A):** two-sided (what the member gets, what the friend gets), when
+   it counts, the window, the cap, and a live preview. Extras: «Εφάρμοσε» for the friend's gift on
+   their first package, and members keep the programme their invite was made under.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -573,5 +603,5 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with the
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
 - [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

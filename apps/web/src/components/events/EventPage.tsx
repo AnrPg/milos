@@ -28,6 +28,7 @@ import { formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from 
 import { EventEditorSheet, ScopePicker, useEventLocations } from "./EventEditorSheet";
 import { DateBlock, Goers, RsvpButton, useEventError } from "./EventParts";
 import { invalidateEvents } from "./use-events";
+import { useEventReferral } from "@/components/referrals/use-referral-link";
 
 /**
  * The event page (board 8 Q2–Q4): cover, when, where with directions, the
@@ -36,10 +37,19 @@ import { invalidateEvents } from "./use-events";
  * who invited and takes the place as their guest. Whoever runs the event
  * edits or cancels it here; staff also open its attendee list.
  */
-export function EventPage({ eventId, invite }: { eventId: string; invite: string | null }) {
+export function EventPage({
+  eventId,
+  invite,
+  referral = null,
+}: {
+  eventId: string;
+  invite: string | null;
+  referral?: string | null;
+}) {
   const t = useTranslations("Events");
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
+  useEventReferral(referral, eventId, invite ? "guest_pass" : "event");
   const event = useQuery({
     queryKey: eventKey(eventId, invite),
     enabled: Boolean(token),

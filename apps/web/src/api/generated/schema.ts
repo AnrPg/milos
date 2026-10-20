@@ -3947,6 +3947,108 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/referrals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's invites, newest first; filter review keeps those waiting for approval */
+        get: operations["MilosTrainingWeb.AdminReferralController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/referrals/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve the referral: its reward is created, and a credit lands at once */
+        post: operations["MilosTrainingWeb.AdminReferralController.approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/referrals/{id}/friend-gift": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Apply the friend's gift on their first sale (free days, a credit or a described gift) */
+        post: operations["MilosTrainingWeb.AdminReferralController.friend_gift"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/referrals/{id}/given": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Δόθηκε»: an approved reward that isn't a credit was handed over */
+        post: operations["MilosTrainingWeb.AdminReferralController.given"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/referrals/{id}/referrer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give an invite that hasn't qualified yet to another member, with a note */
+        put: operations["MilosTrainingWeb.AdminReferralController.reassign"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/referrals/{id}/reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject the referral; no reward is made */
+        post: operations["MilosTrainingWeb.AdminReferralController.reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/reviews": {
         parameters: {
             query?: never;
@@ -5918,6 +6020,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/referrals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your «Φέρε φίλο» at the box: link, programme, events to invite to and your invites */
+        get: operations["MilosTrainingWeb.ReferralController.mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/referrals/code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A new invite link at the box; the old one stops working */
+        post: operations["MilosTrainingWeb.ReferralController.rotate_code"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/refund-receipts": {
         parameters: {
             query?: never;
@@ -7676,6 +7812,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/public/referrals/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What an invite link shows: the box, who invites and the friend's gift (no sign-in) */
+        get: operations["MilosTrainingWeb.ReferralController.invite"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/referrals/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Records that the signed-in person came through a member's invite (first invite wins) */
+        post: operations["MilosTrainingWeb.ReferralController.claim"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/theme": {
         parameters: {
             query?: never;
@@ -8180,6 +8350,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -8310,6 +8482,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -8521,6 +8695,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -8772,6 +8948,8 @@ export interface components {
                             nickname?: string | null;
                         }[] | null;
                         going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
                         /**
                          * CommunityEventGroup
                          * @description The member group of a group event (free, for its members only)
@@ -9125,6 +9303,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -9335,6 +9515,8 @@ export interface components {
                             nickname?: string | null;
                         }[] | null;
                         going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
                         /**
                          * CommunityEventGroup
                          * @description The member group of a group event (free, for its members only)
@@ -9694,6 +9876,8 @@ export interface components {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -9873,6 +10057,8 @@ export interface components {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -10150,6 +10336,8 @@ export interface components {
                             nickname?: string | null;
                         }[] | null;
                         going_count: number;
+                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                        good_for_friends: boolean;
                         /**
                          * CommunityEventGroup
                          * @description The member group of a group event (free, for its members only)
@@ -10329,6 +10517,8 @@ export interface components {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -12038,6 +12228,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -12398,6 +12590,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -12552,6 +12746,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -12621,6 +12817,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -12749,6 +12947,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at?: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -12817,6 +13017,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -12987,6 +13189,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -13187,6 +13391,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -13885,6 +14091,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -14064,6 +14272,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -14248,6 +14458,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -16665,6 +16877,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -17092,6 +17306,8 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                    good_for_friends: boolean;
                     /**
                      * CommunityEventGroup
                      * @description The member group of a group event (free, for its members only)
@@ -17424,6 +17640,625 @@ export interface components {
                 } | null;
             } | null;
         };
+        /** ReferralClaim */
+        ReferralClaim: {
+            /** @enum {string} */
+            channel?: "link" | "qr" | "event" | "guest_pass";
+            code: string;
+            /**
+             * Format: uuid
+             * @description The event the invite came with (channel event)
+             */
+            event_id?: string;
+            /** @description The account was just created from the invite page */
+            new_account?: boolean;
+        };
+        /** ReferralClaimResult */
+        ReferralClaimResult: {
+            box: {
+                name: string;
+                slug: string;
+            };
+            /** @enum {string} */
+            outcome: "claimed" | "unchanged" | "already_member" | "already_invited" | "self";
+        };
+        /** ReferralCodeResponse */
+        ReferralCodeResponse: {
+            code: string;
+            path: string;
+        };
+        /**
+         * ReferralEvent
+         * @description An upcoming event a friend can come to
+         */
+        ReferralEvent: {
+            /**
+             * @description open: anyone signed in; guest_pass: as the member's guest
+             * @enum {string}
+             */
+            access: "open" | "guest_pass";
+            currency: string;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description Staff tagged it «Καλό για φίλους»; these come first */
+            good_for_friends: boolean;
+            /** Format: uuid */
+            id: string;
+            place_name?: string | null;
+            price_cents: number;
+            /** Format: date-time */
+            starts_at: string;
+            title: string;
+        };
+        /**
+         * ReferralFriendGift
+         * @description What the friend gets; null when the programme gives the friend nothing
+         */
+        ReferralFriendGift: {
+            note?: string | null;
+            /** @enum {string} */
+            type: "free_days" | "credit" | "custom";
+            /** @description Days for free_days, cents for credit */
+            value: number;
+        } | null;
+        /**
+         * ReferralInvite
+         * @description A friend the member invited, as the member sees them
+         */
+        ReferralInvite: {
+            /** Format: date-time */
+            attributed_at: string;
+            /** @enum {string} */
+            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+            /** Format: date-time */
+            expires_at: string;
+            /** ReferralPerson */
+            friend: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** Format: uuid */
+            id: string;
+            /**
+             * ReferralReward
+             * @description The inviter's reward for this friend; null without a programme
+             */
+            reward?: {
+                /** Format: date-time */
+                applied_at?: string | null;
+                note?: string | null;
+                /** @enum {string} */
+                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                /** @enum {string} */
+                type: "credit" | "discount" | "free_period" | "manual";
+                value: number;
+            } | null;
+            /**
+             * @description The furthest step the friend reached
+             * @enum {string}
+             */
+            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+            /** Format: date-time */
+            stage_at: string;
+            /**
+             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+             * @enum {string}
+             */
+            status: "open" | "qualified" | "capped" | "expired" | "void";
+        };
+        /** ReferralInviteForStaff */
+        ReferralInviteForStaff: {
+            /** Format: date-time */
+            attributed_at: string;
+            /** @enum {string} */
+            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+            /** Format: uuid */
+            community_event_id?: string | null;
+            /** Format: date-time */
+            expires_at: string;
+            /** ReferralPerson */
+            friend: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /**
+             * ReferralFriendGift
+             * @description What the friend gets; null when the programme gives the friend nothing
+             */
+            friend_gift?: {
+                note?: string | null;
+                /** @enum {string} */
+                type: "free_days" | "credit" | "custom";
+                /** @description Days for free_days, cents for credit */
+                value: number;
+            } | null;
+            /** Format: date-time */
+            friend_gift_applied_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            new_account: boolean;
+            notes?: string | null;
+            /** ReferralPerson */
+            previous_referrer?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            program?: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            /** Format: date-time */
+            reassigned_at?: string | null;
+            /** Format: uuid */
+            referral_event_id?: string | null;
+            /** ReferralPerson */
+            referrer?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            /**
+             * ReferralReward
+             * @description The inviter's reward for this friend; null without a programme
+             */
+            reward?: {
+                /** Format: date-time */
+                applied_at?: string | null;
+                note?: string | null;
+                /** @enum {string} */
+                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                /** @enum {string} */
+                type: "credit" | "discount" | "free_period" | "manual";
+                value: number;
+            } | null;
+            /**
+             * @description The furthest step the friend reached
+             * @enum {string}
+             */
+            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+            /** Format: date-time */
+            stage_at: string;
+            /**
+             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+             * @enum {string}
+             */
+            status: "open" | "qualified" | "capped" | "expired" | "void";
+            steps: {
+                /** Format: date-time */
+                event_at?: string | null;
+                /** Format: date-time */
+                joined_at?: string | null;
+                /** Format: date-time */
+                paid_at?: string | null;
+                /** Format: date-time */
+                trial_at?: string | null;
+            };
+            void_reason?: string | null;
+        };
+        /** ReferralInvitePage */
+        ReferralInvitePage: {
+            invite: {
+                box: {
+                    cover?: {
+                        height?: number | null;
+                        /** Format: uuid */
+                        id?: string;
+                        url: string;
+                        width?: number | null;
+                    } | null;
+                    disciplines: string[];
+                    logo_url?: string | null;
+                    name: string;
+                    neighbourhood?: string | null;
+                    primary_color?: string | null;
+                    published: boolean;
+                    slug: string;
+                };
+                code: string;
+                /**
+                 * ReferralFriendGift
+                 * @description What the friend gets; null when the programme gives the friend nothing
+                 */
+                gift: {
+                    note?: string | null;
+                    /** @enum {string} */
+                    type: "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    value: number;
+                } | null;
+                inviter: {
+                    avatar_url?: string | null;
+                    nickname?: string | null;
+                };
+                trials_enabled: boolean;
+                window_days?: number | null;
+            };
+        };
+        /** ReferralNote */
+        ReferralNote: {
+            note?: string | null;
+        };
+        /** ReferralOverview */
+        ReferralOverview: {
+            code: string;
+            /** @description Members earn rewards; staff and coaches share the link without one */
+            earns_rewards: boolean;
+            events: {
+                /**
+                 * @description open: anyone signed in; guest_pass: as the member's guest
+                 * @enum {string}
+                 */
+                access: "open" | "guest_pass";
+                currency: string;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Staff tagged it «Καλό για φίλους»; these come first */
+                good_for_friends: boolean;
+                /** Format: uuid */
+                id: string;
+                place_name?: string | null;
+                price_cents: number;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+            }[];
+            invites: {
+                /** Format: date-time */
+                attributed_at: string;
+                /** @enum {string} */
+                channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                /** Format: date-time */
+                expires_at: string;
+                /** ReferralPerson */
+                friend: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: uuid */
+                id: string;
+                /**
+                 * ReferralReward
+                 * @description The inviter's reward for this friend; null without a programme
+                 */
+                reward?: {
+                    /** Format: date-time */
+                    applied_at?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                    /** @enum {string} */
+                    type: "credit" | "discount" | "free_period" | "manual";
+                    value: number;
+                } | null;
+                /**
+                 * @description The furthest step the friend reached
+                 * @enum {string}
+                 */
+                stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                /** Format: date-time */
+                stage_at: string;
+                /**
+                 * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                 * @enum {string}
+                 */
+                status: "open" | "qualified" | "capped" | "expired" | "void";
+            }[];
+            /** @description The member app path of the invite: /r/<code> */
+            path: string;
+            /**
+             * ReferralProgramTerms
+             * @description The box's active programme; null when it has none
+             */
+            program: {
+                attribution_days: number;
+                /**
+                 * ReferralFriendGift
+                 * @description What the friend gets; null when the programme gives the friend nothing
+                 */
+                gift?: {
+                    note?: string | null;
+                    /** @enum {string} */
+                    type: "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    value: number;
+                } | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                qualifying_stage: "trial" | "paid";
+                /** ReferralRewardTerms */
+                reward: {
+                    note?: string | null;
+                    /** @enum {string} */
+                    type: "credit" | "discount" | "free_period" | "manual";
+                    /** @description Cents for credit, percent for discount, days for free_period */
+                    value: number;
+                };
+                yearly_cap?: number | null;
+            } | null;
+            totals: {
+                invited: number;
+                paid: number;
+                trials: number;
+            };
+        };
+        /** ReferralPerson */
+        ReferralPerson: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        } | null;
+        /**
+         * ReferralProgramTerms
+         * @description The box's active programme; null when it has none
+         */
+        ReferralProgramTerms: {
+            attribution_days: number;
+            /**
+             * ReferralFriendGift
+             * @description What the friend gets; null when the programme gives the friend nothing
+             */
+            gift?: {
+                note?: string | null;
+                /** @enum {string} */
+                type: "free_days" | "credit" | "custom";
+                /** @description Days for free_days, cents for credit */
+                value: number;
+            } | null;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            qualifying_stage: "trial" | "paid";
+            /** ReferralRewardTerms */
+            reward: {
+                note?: string | null;
+                /** @enum {string} */
+                type: "credit" | "discount" | "free_period" | "manual";
+                /** @description Cents for credit, percent for discount, days for free_period */
+                value: number;
+            };
+            yearly_cap?: number | null;
+        } | null;
+        /** ReferralReassign */
+        ReferralReassign: {
+            note?: string | null;
+            /** Format: uuid */
+            referrer_user_id: string;
+        };
+        /**
+         * ReferralReward
+         * @description The inviter's reward for this friend; null without a programme
+         */
+        ReferralReward: {
+            /** Format: date-time */
+            applied_at?: string | null;
+            note?: string | null;
+            /** @enum {string} */
+            status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+            /** @enum {string} */
+            type: "credit" | "discount" | "free_period" | "manual";
+            value: number;
+        } | null;
+        /** ReferralRewardTerms */
+        ReferralRewardTerms: {
+            note?: string | null;
+            /** @enum {string} */
+            type: "credit" | "discount" | "free_period" | "manual";
+            /** @description Cents for credit, percent for discount, days for free_period */
+            value: number;
+        };
+        /** ReferralStaffInviteResponse */
+        ReferralStaffInviteResponse: {
+            /** ReferralInviteForStaff */
+            invite: {
+                /** Format: date-time */
+                attributed_at: string;
+                /** @enum {string} */
+                channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                /** Format: uuid */
+                community_event_id?: string | null;
+                /** Format: date-time */
+                expires_at: string;
+                /** ReferralPerson */
+                friend: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /**
+                 * ReferralFriendGift
+                 * @description What the friend gets; null when the programme gives the friend nothing
+                 */
+                friend_gift?: {
+                    note?: string | null;
+                    /** @enum {string} */
+                    type: "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    value: number;
+                } | null;
+                /** Format: date-time */
+                friend_gift_applied_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                new_account: boolean;
+                notes?: string | null;
+                /** ReferralPerson */
+                previous_referrer?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                program?: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: date-time */
+                reassigned_at?: string | null;
+                /** Format: uuid */
+                referral_event_id?: string | null;
+                /** ReferralPerson */
+                referrer?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /**
+                 * ReferralReward
+                 * @description The inviter's reward for this friend; null without a programme
+                 */
+                reward?: {
+                    /** Format: date-time */
+                    applied_at?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                    /** @enum {string} */
+                    type: "credit" | "discount" | "free_period" | "manual";
+                    value: number;
+                } | null;
+                /**
+                 * @description The furthest step the friend reached
+                 * @enum {string}
+                 */
+                stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                /** Format: date-time */
+                stage_at: string;
+                /**
+                 * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                 * @enum {string}
+                 */
+                status: "open" | "qualified" | "capped" | "expired" | "void";
+                steps: {
+                    /** Format: date-time */
+                    event_at?: string | null;
+                    /** Format: date-time */
+                    joined_at?: string | null;
+                    /** Format: date-time */
+                    paid_at?: string | null;
+                    /** Format: date-time */
+                    trial_at?: string | null;
+                };
+                void_reason?: string | null;
+            };
+        };
+        /** ReferralStaffList */
+        ReferralStaffList: {
+            invites: {
+                /** Format: date-time */
+                attributed_at: string;
+                /** @enum {string} */
+                channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                /** Format: uuid */
+                community_event_id?: string | null;
+                /** Format: date-time */
+                expires_at: string;
+                /** ReferralPerson */
+                friend: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /**
+                 * ReferralFriendGift
+                 * @description What the friend gets; null when the programme gives the friend nothing
+                 */
+                friend_gift?: {
+                    note?: string | null;
+                    /** @enum {string} */
+                    type: "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    value: number;
+                } | null;
+                /** Format: date-time */
+                friend_gift_applied_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                new_account: boolean;
+                notes?: string | null;
+                /** ReferralPerson */
+                previous_referrer?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                program?: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: date-time */
+                reassigned_at?: string | null;
+                /** Format: uuid */
+                referral_event_id?: string | null;
+                /** ReferralPerson */
+                referrer?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /**
+                 * ReferralReward
+                 * @description The inviter's reward for this friend; null without a programme
+                 */
+                reward?: {
+                    /** Format: date-time */
+                    applied_at?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                    /** @enum {string} */
+                    type: "credit" | "discount" | "free_period" | "manual";
+                    value: number;
+                } | null;
+                /**
+                 * @description The furthest step the friend reached
+                 * @enum {string}
+                 */
+                stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                /** Format: date-time */
+                stage_at: string;
+                /**
+                 * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                 * @enum {string}
+                 */
+                status: "open" | "qualified" | "capped" | "expired" | "void";
+                steps: {
+                    /** Format: date-time */
+                    event_at?: string | null;
+                    /** Format: date-time */
+                    joined_at?: string | null;
+                    /** Format: date-time */
+                    paid_at?: string | null;
+                    /** Format: date-time */
+                    trial_at?: string | null;
+                };
+                void_reason?: string | null;
+            }[];
+            /** @description Invites of the last 90 days per status */
+            stats: {
+                [key: string]: number;
+            };
+        };
         /** RememberFilterRequest */
         RememberFilterRequest: {
             /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
@@ -17720,6 +18555,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -18026,6 +18863,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -18150,6 +18989,8 @@ export interface components {
             description?: string | null;
             /** Format: date-time */
             ends_at: string;
+            /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+            good_for_friends?: boolean;
             guest_pass_allowed?: boolean;
             guests_per_member?: number;
             latitude?: number | null;
@@ -18375,6 +19216,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -18524,6 +19367,8 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+            good_for_friends: boolean;
             /**
              * CommunityEventGroup
              * @description The member group of a group event (free, for its members only)
@@ -18665,6 +19510,8 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                good_for_friends: boolean;
                 /**
                  * CommunityEventGroup
                  * @description The member group of a group event (free, for its members only)
@@ -20139,6 +20986,8 @@ export interface operations {
                                             nickname?: string | null;
                                         }[] | null;
                                         going_count: number;
+                                        /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                        good_for_friends: boolean;
                                         /**
                                          * CommunityEventGroup
                                          * @description The member group of a group event (free, for its members only)
@@ -20318,6 +21167,8 @@ export interface operations {
                                                 nickname?: string | null;
                                             }[] | null;
                                             going_count: number;
+                                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                            good_for_friends: boolean;
                                             /**
                                              * CommunityEventGroup
                                              * @description The member group of a group event (free, for its members only)
@@ -20568,6 +21419,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -20819,6 +21672,8 @@ export interface operations {
                                         nickname?: string | null;
                                     }[] | null;
                                     going_count: number;
+                                    /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                    good_for_friends: boolean;
                                     /**
                                      * CommunityEventGroup
                                      * @description The member group of a group event (free, for its members only)
@@ -21830,6 +22685,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -22033,6 +22890,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -23699,6 +24558,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -23810,6 +24671,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -23887,6 +24750,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -24207,6 +25072,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -24418,6 +25285,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -24766,6 +25635,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -24999,6 +25870,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -25232,6 +26105,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -25508,6 +26383,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -25658,6 +26535,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -25764,6 +26643,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at?: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -25841,6 +26722,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -25999,6 +26882,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -26184,6 +27069,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -26379,6 +27266,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -26579,6 +27468,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -31730,6 +32621,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -31857,6 +32750,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -32090,6 +32985,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -32418,6 +33315,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -32548,6 +33447,8 @@ export interface operations {
                     description?: string | null;
                     /** Format: date-time */
                     ends_at?: string;
+                    /** @description «Καλό για φίλους»; only when friends can come (open or guest passes) */
+                    good_for_friends?: boolean;
                     guest_pass_allowed?: boolean;
                     guests_per_member?: number;
                     latitude?: number | null;
@@ -32781,6 +33682,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -33109,6 +34012,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -33443,6 +34348,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -33778,6 +34685,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -34116,6 +35025,8 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                            good_for_friends: boolean;
                             /**
                              * CommunityEventGroup
                              * @description The member group of a group event (free, for its members only)
@@ -37673,14 +38584,26 @@ export interface operations {
             content: {
                 "application/json": {
                     active?: boolean;
+                    /** @enum {string} */
+                    approval?: "manual" | "auto";
+                    attribution_days?: number;
                     description?: string | null;
+                    friend_reward_note?: string | null;
+                    /** @enum {string} */
+                    friend_reward_type?: "none" | "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    friend_reward_value?: number;
                     name: string;
                     params?: {
                         [key: string]: unknown;
                     };
                     /** @enum {string} */
+                    qualifying_stage?: "trial" | "paid";
+                    reward_note?: string | null;
+                    /** @enum {string} */
                     reward_type: "credit" | "discount" | "free_period" | "manual";
                     reward_value: number;
+                    yearly_cap?: number | null;
                 };
             };
         };
@@ -37711,14 +38634,26 @@ export interface operations {
             content: {
                 "application/json": {
                     active?: boolean;
+                    /** @enum {string} */
+                    approval?: "manual" | "auto";
+                    attribution_days?: number;
                     description?: string | null;
+                    friend_reward_note?: string | null;
+                    /** @enum {string} */
+                    friend_reward_type?: "none" | "free_days" | "credit" | "custom";
+                    /** @description Days for free_days, cents for credit */
+                    friend_reward_value?: number;
                     name?: string;
                     params?: {
                         [key: string]: unknown;
                     };
                     /** @enum {string} */
+                    qualifying_stage?: "trial" | "paid";
+                    reward_note?: string | null;
+                    /** @enum {string} */
                     reward_type?: "credit" | "discount" | "free_period" | "manual";
                     reward_value?: number;
+                    yearly_cap?: number | null;
                 };
             };
         };
@@ -39465,6 +40400,821 @@ export interface operations {
                             updated_at?: string | null;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.index": {
+        parameters: {
+            query?: {
+                filter?: "review";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invites */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invites: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        }[];
+                        /** @description Invites of the last 90 days per status */
+                        stats: {
+                            [key: string]: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ReferralInviteForStaff */
+                        invite: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such invite */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The invite can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.friend_gift": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ReferralInviteForStaff */
+                        invite: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such invite */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The invite can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.given": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ReferralInviteForStaff */
+                        invite: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such invite */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The invite can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.reassign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                    /** Format: uuid */
+                    referrer_user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ReferralInviteForStaff */
+                        invite: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such invite */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The invite can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminReferralController.reject": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    note?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ReferralInviteForStaff */
+                        invite: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: uuid */
+                            community_event_id?: string | null;
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            friend_gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: date-time */
+                            friend_gift_applied_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            new_account: boolean;
+                            notes?: string | null;
+                            /** ReferralPerson */
+                            previous_referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            program?: {
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: date-time */
+                            reassigned_at?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** ReferralPerson */
+                            referrer?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                            steps: {
+                                /** Format: date-time */
+                                event_at?: string | null;
+                                /** Format: date-time */
+                                joined_at?: string | null;
+                                /** Format: date-time */
+                                paid_at?: string | null;
+                                /** Format: date-time */
+                                trial_at?: string | null;
+                            };
+                            void_reason?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description No such invite */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The invite can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -47293,6 +49043,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -47641,6 +49393,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -47874,6 +49628,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -48107,6 +49863,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -49472,6 +51230,154 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ReferralController.mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Overview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description Members earn rewards; staff and coaches share the link without one */
+                        earns_rewards: boolean;
+                        events: {
+                            /**
+                             * @description open: anyone signed in; guest_pass: as the member's guest
+                             * @enum {string}
+                             */
+                            access: "open" | "guest_pass";
+                            currency: string;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Staff tagged it «Καλό για φίλους»; these come first */
+                            good_for_friends: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            place_name?: string | null;
+                            price_cents: number;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                        }[];
+                        invites: {
+                            /** Format: date-time */
+                            attributed_at: string;
+                            /** @enum {string} */
+                            channel: "link" | "qr" | "event" | "guest_pass" | "staff";
+                            /** Format: date-time */
+                            expires_at: string;
+                            /** ReferralPerson */
+                            friend: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /**
+                             * ReferralReward
+                             * @description The inviter's reward for this friend; null without a programme
+                             */
+                            reward?: {
+                                /** Format: date-time */
+                                applied_at?: string | null;
+                                note?: string | null;
+                                /** @enum {string} */
+                                status: "upcoming" | "pending" | "approved" | "given" | "rejected" | "capped" | "none";
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                value: number;
+                            } | null;
+                            /**
+                             * @description The furthest step the friend reached
+                             * @enum {string}
+                             */
+                            stage: "signed_up" | "event" | "trial" | "joined" | "paid";
+                            /** Format: date-time */
+                            stage_at: string;
+                            /**
+                             * @description open: on its way; qualified: the programme's step was reached and the referral opened; capped: over the member's yearly cap; expired: the window ended; void: doesn't earn
+                             * @enum {string}
+                             */
+                            status: "open" | "qualified" | "capped" | "expired" | "void";
+                        }[];
+                        /** @description The member app path of the invite: /r/<code> */
+                        path: string;
+                        /**
+                         * ReferralProgramTerms
+                         * @description The box's active programme; null when it has none
+                         */
+                        program: {
+                            attribution_days: number;
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            gift?: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            qualifying_stage: "trial" | "paid";
+                            /** ReferralRewardTerms */
+                            reward: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "credit" | "discount" | "free_period" | "manual";
+                                /** @description Cents for credit, percent for discount, days for free_period */
+                                value: number;
+                            };
+                            yearly_cap?: number | null;
+                        } | null;
+                        totals: {
+                            invited: number;
+                            paid: number;
+                            trials: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ReferralController.rotate_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        path: string;
                     };
                 };
             };
@@ -55266,6 +57172,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -56912,6 +58820,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -57260,6 +59170,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)
@@ -57794,6 +59706,125 @@ export interface operations {
                 };
             };
             /** @description No published box with this slug */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ReferralController.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invite: {
+                            box: {
+                                cover?: {
+                                    height?: number | null;
+                                    /** Format: uuid */
+                                    id?: string;
+                                    url: string;
+                                    width?: number | null;
+                                } | null;
+                                disciplines: string[];
+                                logo_url?: string | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                                primary_color?: string | null;
+                                published: boolean;
+                                slug: string;
+                            };
+                            code: string;
+                            /**
+                             * ReferralFriendGift
+                             * @description What the friend gets; null when the programme gives the friend nothing
+                             */
+                            gift: {
+                                note?: string | null;
+                                /** @enum {string} */
+                                type: "free_days" | "credit" | "custom";
+                                /** @description Days for free_days, cents for credit */
+                                value: number;
+                            } | null;
+                            inviter: {
+                                avatar_url?: string | null;
+                                nickname?: string | null;
+                            };
+                            trials_enabled: boolean;
+                            window_days?: number | null;
+                        };
+                    };
+                };
+            };
+            /** @description No live invite with this code */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ReferralController.claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    channel?: "link" | "qr" | "event" | "guest_pass";
+                    code: string;
+                    /**
+                     * Format: uuid
+                     * @description The event the invite came with (channel event)
+                     */
+                    event_id?: string;
+                    /** @description The account was just created from the invite page */
+                    new_account?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Claim */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        box: {
+                            name: string;
+                            slug: string;
+                        };
+                        /** @enum {string} */
+                        outcome: "claimed" | "unchanged" | "already_member" | "already_invited" | "self";
+                    };
+                };
+            };
+            /** @description No live invite with this code */
             404: {
                 headers: {
                     [name: string]: unknown;

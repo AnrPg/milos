@@ -5074,7 +5074,10 @@
     "checkedIn": "تم تسجيل الحضور ✓",
     "followClassTimer": "مؤقت الحصة المباشر",
     "classCheckIn": "تسجيل الحضور",
-    "programmeManage": "تغيير اليوم أو الرفض"
+    "programmeManage": "تغيير اليوم أو الرفض",
+    "meReferrals": "أحضر صديقًا",
+    "meReferralsHint": "رابطك ورمز QR والدعوات",
+    "membershipReferral": "أحضر صديقًا"
   },
   "Community": {
     "all": "الكل",
@@ -5962,7 +5965,8 @@
     "notif_event_guest_joined_body": "{person} قادم إلى «{event}» بتصريح الضيف الخاص بك.",
     "notif_event_trial_offer_title": "جرّب حصة",
     "notif_event_trial_offer_body": "أعجبتك «{event}»؟ {box} يدعوك إلى حصة تجريبية.",
-    "notif_event_message_title": "رسالة حول «{event}»"
+    "notif_event_message_title": "رسالة حول «{event}»",
+    "findNearbyLater": "الأندية القريبة منك قادمة مع «حولي»."
   },
   "CommunityAdmin": {
     "title": "المجتمع",
@@ -6195,7 +6199,9 @@
     "err_nobody_to_offer": "لا أحد ممن حضروا ينتظر عرضًا تجريبيًا.",
     "err_trials_disabled": "البوكس لا يقبل حصصًا تجريبية حاليًا.",
     "eventsSegments": "أي فعاليات",
-    "nearMe": "بالقرب مني"
+    "nearMe": "بالقرب مني",
+    "fieldGoodForFriends": "مناسب للأصدقاء",
+    "goodForFriendsHint": "يظهر أولًا عندما يدعو الأعضاء أصدقاءهم إلى فعالية."
   },
   "EventsAdmin": {
     "emptyUpcoming": "لا فعاليات قادمة. أنشئ واحدة عبر «+ فعالية جديدة».",
@@ -6751,5 +6757,200 @@
     "prSavedBody": "هل تريد مشاركته مع البوكس الخاص بك؟ أضف صورة أو فيديو إن شئت.",
     "prShare": "شاركه",
     "prNotNow": "ليس الآن"
+  },
+  "Referrals": {
+    "title": "أحضر صديقًا",
+    "pickBox": "أي نادٍ",
+    "noBox": "انضم إلى نادٍ لتدعو أصدقاءك إليه.",
+    "loading": "جارٍ التحميل…",
+    "loadFailed": "تعذّر تحميل دعواتك. حاول مجددًا بعد قليل.",
+    "shareLink": "شارك الرابط",
+    "showQr": "اعرض رمز QR",
+    "copied": "تم نسخ الرابط",
+    "shareText": "تعال وتدرّب معي في {box}",
+    "offer": {
+      "friend": "لصديقك: {gift}",
+      "friendNothing": "ادعُ صديقًا ليتدرّب معك",
+      "you": "لك: {reward}، {when}",
+      "cap": "{count, plural, zero {حتى # صديق في السنة} one {حتى صديق واحد في السنة} two {حتى صديقين في السنة} few {حتى # أصدقاء في السنة} many {حتى # صديقًا في السنة} other {حتى # صديق في السنة}}",
+      "staff": "شارك الرابط مع من تشاء. المكافآت للأعضاء.",
+      "noProgram": "لا يوجد لدى ناديك برنامج إحالة حاليًا. رابطك يعمل كالمعتاد ويظهر أصدقاؤك هنا."
+    },
+    "events": {
+      "title": "ادعُ إلى فعالية",
+      "shareText": "تعال معي إلى {title}",
+      "free": "مجانًا",
+      "invite": "ادعُ",
+      "goodForFriends": "مناسب للأصدقاء"
+    },
+    "list": {
+      "title": "دعواتك",
+      "empty": "لا أحد بعد. شارك رابطك أو ادعُ صديقًا إلى فعالية: إنها أسهل بداية.",
+      "totals": "{invited} مدعوون · {trials} حصص تجريبية · {paid} اشتراكات",
+      "someone": "شخص ما",
+      "earned": "حصلت على {reward}"
+    },
+    "newLink": {
+      "action": "رابط جديد",
+      "confirm": "سيتوقف رابطك ورمز QR الحاليان عن العمل. الأصدقاء الذين دعوتهم يبقون لك.",
+      "yes": "أنشئ رابطًا جديدًا",
+      "no": "احتفظ بهذا"
+    },
+    "qr": {
+      "title": "رمز QR لدعوتك",
+      "close": "إغلاق",
+      "alt": "رمز QR لرابط دعوتك",
+      "hint": "يمسحه صديقك بكاميرا هاتفه."
+    },
+    "gift": {
+      "freeDays": "{days, plural, zero {# يوم مجانًا} one {يوم واحد مجانًا} two {يومان مجانًا} few {# أيام مجانًا} many {# يومًا مجانًا} other {# يوم مجانًا}}",
+      "credit": "رصيد {amount}"
+    },
+    "reward": {
+      "credit": "رصيد {amount}",
+      "discount": "خصم {percent}% على التجديد",
+      "freePeriod": "{days, plural, zero {# يوم مجانًا} one {يوم واحد مجانًا} two {يومان مجانًا} few {# أيام مجانًا} many {# يومًا مجانًا} other {# يوم مجانًا}}",
+      "manual": "هدية من النادي"
+    },
+    "when": {
+      "trial": "عندما يحضر حصة تجريبية",
+      "paid": "عندما يشترك"
+    },
+    "stage": {
+      "signed_up": "سجّل",
+      "event": "حضر فعالية",
+      "trial": "حضر حصة تجريبية",
+      "joined": "انضم إلى النادي",
+      "paid": "اشترك"
+    },
+    "status": {
+      "open": "قيد التقدّم",
+      "qualified": "محتسبة",
+      "capped": "فوق الحد السنوي",
+      "expired": "انتهت",
+      "void": "غير محتسبة"
+    },
+    "rewardStatus": {
+      "upcoming": "ليس بعد",
+      "pending": "بانتظار الموافقة",
+      "approved": "تمت الموافقة",
+      "given": "مُنحت",
+      "rejected": "لم تتم الموافقة",
+      "capped": "فوق الحد",
+      "none": "بلا مكافأة"
+    },
+    "channel": {
+      "link": "رابط",
+      "qr": "QR",
+      "event": "فعالية",
+      "guest_pass": "تصريح ضيف",
+      "staff": "الفريق"
+    },
+    "invite": {
+      "heading": "دعوة",
+      "title": "{name} يدعوك إلى {box}",
+      "titleNoName": "أنت مدعو إلى {box}",
+      "preview": "تدرّب مع صديق في {box} عبر Milos.",
+      "from": "{name} يدعوك للتدرّب في {box}",
+      "fromMember": "عضو يدعوك للتدرّب في {box}",
+      "toEvent": "…وإلى فعالية هناك.",
+      "gift": "لك: {gift}",
+      "giftWhen": "يمنحك إياه النادي مع باقتك الأولى.",
+      "signUp": "أنشئ حسابًا",
+      "signIn": "لدي حساب بالفعل",
+      "seeBox": "شاهد النادي",
+      "consent": "سيرى {name} اسمك الأول ومدى تقدّمك (التسجيل، الحصة التجريبية، الاشتراك). لا شيء آخر.",
+      "consentNoName": "سيرى العضو الذي دعاك اسمك الأول ومدى تقدّمك (التسجيل، الحصة التجريبية، الاشتراك). لا شيء آخر.",
+      "claiming": "جارٍ حفظ دعوتك…",
+      "failed": "تعذّر حفظ دعوتك الآن. سنحاول مجددًا عندما تفتح Milos في المرة القادمة.",
+      "alreadyMember": "أنت بالفعل في {box}، لذا لا تنطبق هذه الدعوة.",
+      "alreadyInvited": "دعوة عضو آخر احتُسبت لك بالفعل.",
+      "self": "هذا رابط دعوتك الخاص.",
+      "claimed": "تم. حُفظت دعوتك إلى {box}.",
+      "openMine": "افتح أحضر صديقًا",
+      "openEvent": "شاهد الفعالية",
+      "bookTrial": "احجز حصة تجريبية",
+      "gone": "هذه الدعوة لم تعد فعّالة",
+      "goneHint": "ربما تم استبدال الرابط. اطلب الرابط الجديد من صديقك.",
+      "home": "اذهب إلى Milos"
+    },
+    "notif": {
+      "progressTitle": "دعوتك",
+      "progress": {
+        "signed_up": "سجّل {person} عبر دعوتك.",
+        "event": "حضر {person} الفعالية التي دعوته إليها.",
+        "trial": "حضر {person} حصة تجريبية.",
+        "joined": "انضم {person} إلى النادي.",
+        "paid": "اشترك {person}."
+      },
+      "rewardTitle": "مكافأة الإحالة",
+      "reward": {
+        "approved": "تمت الموافقة على مكافأة إحالتك.",
+        "given": "مُنحت مكافأة إحالتك.",
+        "rejected": "لم تتم الموافقة على إحالتك."
+      },
+      "reviewTitle": "إحالة بانتظار الموافقة",
+      "reviewBody": "اشترك {person} بدعوة من {referrer}."
+    },
+    "staff": {
+      "title": "دعوات من الأعضاء",
+      "filter": "أي دعوات",
+      "filter_review": "للموافقة",
+      "filter_all": "الكل",
+      "stats": "آخر 90 يومًا: {open} قيد التقدّم · {qualified} محتسبة · {expired} منتهية",
+      "emptyReview": "لا شيء للموافقة.",
+      "empty": "لا دعوات بعد. يشارك الأعضاء روابطهم من أنا › أحضر صديقًا.",
+      "noReferrer": "عضو سابق",
+      "row": "{friend} ← {referrer}",
+      "panel": "دعوة",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "given": "مُنحت",
+      "applyGift": "طبّق هدية الصديق",
+      "reassign": "انقلها إلى عضو آخر",
+      "status": "الحالة",
+      "void_staff": "الفريق لا يحصل على مكافآت",
+      "void_other": "غير محتسبة",
+      "channel": "كيف",
+      "newAccount": "حساب جديد",
+      "window": "صالحة",
+      "until": "حتى {date}",
+      "program": "البرنامج",
+      "reward": "مكافأة العضو",
+      "gift": "هدية الصديق",
+      "giftApplied": "طُبّقت في {date}",
+      "previous": "سابقًا",
+      "notes": "ملاحظات",
+      "newReferrer": "عضو جديد",
+      "reassignSave": "حفظ",
+      "cancel": "إلغاء",
+      "note": "ملاحظة (اختياري)",
+      "discountOnRenewal": "«مُنحت» يخصمه من فاتورة التجديد التالية للعضو."
+    },
+    "rules": {
+      "rewardNote": "ما يحصل عليه العضو (بالكلمات)",
+      "friendGift": "هدية الصديق",
+      "gift_free_days": "أيام مجانية على الباقة الأولى",
+      "gift_credit": "رصيد",
+      "gift_custom": "شيء آخر",
+      "gift_none": "لا شيء",
+      "giftDays": "أيام",
+      "giftEuros": "المبلغ (€)",
+      "giftNote": "ما يحصل عليه الصديق",
+      "counts": "تُحتسب الدعوة",
+      "counts_paid": "عند الدفعة الأولى",
+      "counts_trial": "عند الحصة التجريبية الأولى",
+      "approval": "المكافآت",
+      "approval_manual": "يوافق عليها الفريق",
+      "approval_auto": "تُعتمد تلقائيًا",
+      "window": "مدة صلاحية الدعوة (أيام)",
+      "cap": "الأصدقاء المكافَؤون لكل عضو سنويًا",
+      "capNone": "بلا حد",
+      "hint": "برنامج واحد نشط لكل نادٍ: تفعيل هذا يوقف الآخر. تحتفظ الدعوات بالشروط التي أُنشئت بها."
+    },
+    "tabs": {
+      "invite": "ادعُ",
+      "invites": "دعواتك · {count}"
+    }
   }
 }
