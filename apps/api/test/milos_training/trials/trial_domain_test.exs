@@ -89,6 +89,20 @@ defmodule MilosTraining.Trials.TrialDomainTest do
   end
 
   describe "TrialLifecycle" do
+    test "an undone check-in takes back the attend step, never a conversion" do
+      assert {:ok, %{status: "booked", attended_at: nil}} =
+               TrialLifecycle.undo_attend(%{status: "attended"}, "booked")
+
+      assert {:ok, %{status: "no_show"}} =
+               TrialLifecycle.undo_attend(%{status: "attended"}, "no_show")
+
+      assert {:error, :invalid_trial_transition} =
+               TrialLifecycle.undo_attend(%{status: "converted"}, "booked")
+
+      assert {:error, :invalid_trial_transition} =
+               TrialLifecycle.undo_attend(%{status: "attended"}, "requested")
+    end
+
     test "allowed steps stamp the change; others are refused" do
       assert {:ok, %{status: "booked", decided_by_id: "staff"}} =
                TrialLifecycle.transition(%{status: "requested"}, :accept, @now, by: "staff")

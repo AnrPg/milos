@@ -255,6 +255,77 @@ defmodule MilosTrainingWeb.QrCheckInTest do
                |> json_response(422)
     end
 
+    test "undoing a trial seat's check-in takes the trial back to its previous status", ctx do
+      box = %{organization_id: ctx.organization.id}
+
+      trial_for = fn user, status ->
+        class = slot(ctx, 10)
+        booking = book(ctx, user, class)
+
+        {:ok, request} =
+          Trials.insert_request(box, %{
+            organization_id: ctx.organization.id,
+            user_id: user.id,
+            scheduled_class_id: class.id,
+            booking_id: booking.id,
+            status: "booked",
+            source: "qr_door",
+            class_starts_at: class.scheduled_at
+          })
+
+        request =
+          if status == "no_show" do
+            {:ok, missed} = Trials.transition(box, request, :no_show, DateTime.utc_now())
+            missed
+          else
+            request
+          end
+
+        request
+      end
+
+      undo = fn user, token ->
+        build_conn()
+        |> put_bearer_token(user)
+        |> delete("/api/check-in/scan/#{token}")
+        |> json_response(200)
+      end
+
+      # booked -> attended by the scan -> booked again by the undo.
+      user = member(ctx)
+      request = trial_for.(user, "booked")
+      assert %{"undo_token" => token} = scan_door(ctx, user) |> json_response(200)
+      assert %{status: "attended"} = Trials.get_request(box, request.id)
+      undo.(user, token)
+      assert %{status: "booked", attended_at: nil} = Trials.get_request(box, request.id)
+
+      # A trial marked «Δεν ήρθε» before the scan goes back to no_show.
+      other = member(ctx)
+      missed = trial_for.(other, "no_show")
+      assert %{"undo_token" => token} = scan_door(ctx, other) |> json_response(200)
+      assert %{status: "attended"} = Trials.get_request(box, missed.id)
+      undo.(other, token)
+      assert %{status: "no_show"} = Trials.get_request(box, missed.id)
+
+      # A trial converted in the meantime keeps its conversion.
+      third = member(ctx)
+      converting = trial_for.(third, "booked")
+      assert %{"undo_token" => token} = scan_door(ctx, third) |> json_response(200)
+
+      {:ok, _converted} =
+        Trials.transition(
+          box,
+          Trials.get_request(box, converting.id),
+          :convert,
+          DateTime.utc_now()
+        )
+
+      undo.(third, token)
+
+      assert %{status: "converted", converted_at: %DateTime{}} =
+               Trials.get_request(box, converting.id)
+    end
+
     test "the window follows the owner's rules", ctx do
       user = member(ctx)
       book(ctx, user, slot(ctx, 50))

@@ -244,8 +244,9 @@ add three things:
 - `SubmitBooking` now publishes `booking_made`, and the payload of
   `booking_cancelled` carries `user_id`.
 - New notification type: `check_in_visitor`.
-- Known limitation: undoing the check-in of a trial booking doesn't reverse
-  the trial's "attended" step.
+- Undoing the check-in of a trial booking takes the trial back from
+  attended to the status it had before the scan (`booked` or `no_show`,
+  carried in the undo token); a trial converted meanwhile stays converted.
 - The sound and green flash on a successful scan are web-only.
 
 ## Implementation Notes

@@ -44,6 +44,13 @@ defmodule MilosTraining.Trials do
     end
   end
 
+  @doc "Takes back a trial's attended step when its check-in was undone (ADR-155)."
+  def undo_attend(context, %TrialRequest{} = request, previous) do
+    with {:ok, changes} <- TrialLifecycle.undo_attend(request, previous) do
+      TrialStore.update_request(context, request, changes)
+    end
+  end
+
   @doc "Records «Θέλω να γραφτώ» or «Όχι τώρα» on a trial (board 6 Q6)."
   def follow_up(context, %TrialRequest{} = request, field, now)
       when field in [:join_interest_at, :follow_up_dismissed_at],

@@ -68,10 +68,11 @@ defmodule MilosTraining.Application.ScanCheckIn do
   @doc "Undoes a scan's check-in within its minute (`undo_token` from `checked_in`)."
   def undo(%{id: user_id}, token, now \\ DateTime.utc_now()) do
     case SignedToken.verify(@undo_salt, token, max_age: CheckInActions.undo_seconds() + 5) do
-      {:ok, %{"o" => organization_id, "k" => kind, "i" => id, "u" => ^user_id}} ->
+      {:ok, %{"o" => organization_id, "k" => kind, "i" => id, "u" => ^user_id} = payload} ->
         context = %{organization_id: organization_id, user_id: user_id}
 
-        with {:ok, undone} <- CheckInActions.undo(context, kind, id, user_id, now) do
+        with {:ok, undone} <-
+               CheckInActions.undo(context, kind, id, user_id, now, trial_was: payload["t"]) do
           {:ok, Map.put(undone, :package, CheckInActions.package_summary(context, user_id))}
         end
 
@@ -154,9 +155,12 @@ defmodule MilosTraining.Application.ScanCheckIn do
   # -- the decision
 
   defp carry_out({:check_in_class, booking}, context, user, door, _facts, now) do
+    # A trial seat's check-in marks the trial attended; the undo puts it back.
+    trial_was = CheckInActions.trial_status(context, booking.id)
+
     with {:ok, attendance} <-
            CheckInActions.check_in_class(context, booking, user.id, user.id, method(door), now) do
-      checked_in(context, user, door, class_check_in(attendance, booking), now)
+      checked_in(context, user, door, class_check_in(attendance, booking), now, trial_was)
     end
   end
 
@@ -174,7 +178,7 @@ defmodule MilosTraining.Application.ScanCheckIn do
         already(context, user, door, open_gym_check_in(check_in))
 
       {:ok, check_in} ->
-        checked_in(context, user, door, open_gym_check_in(check_in), now)
+        checked_in(context, user, door, open_gym_check_in(check_in), now, nil)
 
       # The package said no (no visits left, outside its hours…): the member
       # has nothing to check in to, with the reason.
@@ -231,14 +235,19 @@ defmodule MilosTraining.Application.ScanCheckIn do
 
   defp carry_out({:error, reason}, _context, _user, _door, _facts, _now), do: {:error, reason}
 
-  defp checked_in(context, user, door, check_in, now) do
+  defp checked_in(context, user, door, check_in, now, trial_was) do
+    payload = %{
+      "o" => context.organization_id,
+      "k" => check_in.kind,
+      "i" => check_in.id,
+      "u" => user.id
+    }
+
     undo_token =
-      SignedToken.sign(@undo_salt, %{
-        "o" => context.organization_id,
-        "k" => check_in.kind,
-        "i" => check_in.id,
-        "u" => user.id
-      })
+      SignedToken.sign(
+        @undo_salt,
+        if(trial_was, do: Map.put(payload, "t", trial_was), else: payload)
+      )
 
     {:ok,
      %{

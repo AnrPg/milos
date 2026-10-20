@@ -18,7 +18,19 @@ defmodule MilosTraining.Application.CheckInActions do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Facility, Finance, Identity, Notifications, Organizations, Scheduling}
+  alias MilosTraining.Application.Trials, as: TrialUseCases
+
+  alias MilosTraining.{
+    Facility,
+    Finance,
+    Identity,
+    Notifications,
+    Organizations,
+    Scheduling,
+    Trials
+  }
+
+  alias MilosTraining.Trials.TrialRequest
 
   @undo_seconds 60
 
@@ -69,13 +81,18 @@ defmodule MilosTraining.Application.CheckInActions do
   @doc """
   Reverses a scan's check-in within its minute: the attendance or open-gym
   record goes and the open-gym visit returns to the package (a class keeps
-  its booking, which holds the class visit).
+  its booking, which holds the class visit). A trial booking's trial goes
+  back from attended to `trial_was`, the status it had before the check-in
+  (`booked` when unknown).
   """
-  def undo(context, "class", id, user_id, now) do
+  def undo(context, kind, id, user_id, now, opts \\ [])
+
+  def undo(context, "class", id, user_id, now, opts) do
     with %{user_id: ^user_id, status: "attended"} = attendance <-
            Scheduling.get_attendance(context, id) || {:error, :not_found},
          :ok <- within_undo(attendance.marked_at, now),
          {:ok, _deleted} <- Scheduling.delete_attendance(context, id) do
+      undo_trial_attend(context, attendance.booking_id, Keyword.get(opts, :trial_was))
       broadcast(context, "check_in_undone", %{kind: "class", user_id: user_id, at: now})
       {:ok, %{kind: "class", id: id}}
     else
@@ -84,7 +101,7 @@ defmodule MilosTraining.Application.CheckInActions do
     end
   end
 
-  def undo(context, "open_gym", id, user_id, now) do
+  def undo(context, "open_gym", id, user_id, now, _opts) do
     with %{user_id: ^user_id} = check_in <-
            Facility.get_check_in_by_id(context, id) || {:error, :not_found},
          :ok <- within_undo(check_in.checked_in_at, now),
@@ -98,7 +115,32 @@ defmodule MilosTraining.Application.CheckInActions do
     end
   end
 
-  def undo(_context, _kind, _id, _user_id, _now), do: {:error, :not_found}
+  def undo(_context, _kind, _id, _user_id, _now, _opts), do: {:error, :not_found}
+
+  @doc "The status of the trial behind a booking, if the booking is a trial seat."
+  def trial_status(_context, nil), do: nil
+
+  def trial_status(%{organization_id: organization_id}, booking_id) do
+    case Trials.get_request_by_booking(%{organization_id: organization_id}, booking_id) do
+      %TrialRequest{status: status} -> status
+      nil -> nil
+    end
+  end
+
+  defp undo_trial_attend(_context, nil, _trial_was), do: :ok
+
+  defp undo_trial_attend(%{organization_id: organization_id}, booking_id, trial_was) do
+    box = %{organization_id: organization_id}
+    previous = if trial_was in ["booked", "no_show"], do: trial_was, else: "booked"
+
+    with %TrialRequest{status: "attended"} = request <-
+           Trials.get_request_by_booking(box, booking_id),
+         {:ok, updated} <- Trials.undo_attend(box, request, previous) do
+      TrialUseCases.track_status(box, updated)
+    end
+
+    :ok
+  end
 
   defp within_undo(%DateTime{} = at, now) do
     if DateTime.diff(now, at, :second) <= @undo_seconds,
