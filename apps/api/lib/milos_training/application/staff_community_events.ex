@@ -133,9 +133,20 @@ defmodule MilosTraining.Application.StaffCommunityEvents do
          {:ok, event} <- CommunityEvents.fetch_own(context, event_id),
          {:ok, _attendee} <-
            Community.check_in_attendee(context, event, user_id, on?, DateTime.utc_now()) do
+      if on?, do: announce_attendance(event, user_id)
       CommunityEvents.announce(event)
       show(context, event.id)
     end
+  end
+
+  # ADR-156: «Ήρθε» is a fact the invite funnel follows.
+  defp announce_attendance(event, user_id) do
+    MilosTraining.DomainEvents.publish(:event_attendance_recorded, %{
+      organization_id: event.organization_id,
+      community_event_id: event.id,
+      user_id: user_id,
+      at: DateTime.utc_now()
+    })
   end
 
   @doc """

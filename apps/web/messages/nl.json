@@ -5080,7 +5080,10 @@
     "checkedIn": "Ingecheckt ✓",
     "followClassTimer": "Live lestimer",
     "classCheckIn": "Inchecken",
-    "programmeManage": "Dag wijzigen of weigeren"
+    "programmeManage": "Dag wijzigen of weigeren",
+    "meReferrals": "Neem een vriend mee",
+    "meReferralsHint": "Je link, QR en uitnodigingen",
+    "membershipReferral": "Neem een vriend mee"
   },
   "Community": {
     "all": "Alles",
@@ -5968,7 +5971,8 @@
     "notif_event_guest_joined_body": "{person} komt naar «{event}» met je gastenpas.",
     "notif_event_trial_offer_title": "Probeer een les",
     "notif_event_trial_offer_body": "Vond je «{event}» leuk? {box} nodigt je uit voor een proefles.",
-    "notif_event_message_title": "Bericht over «{event}»"
+    "notif_event_message_title": "Bericht over «{event}»",
+    "findNearbyLater": "Clubs bij jou in de buurt komen met In de buurt."
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6201,7 +6205,9 @@
     "err_nobody_to_offer": "Niemand die er was wacht op een proeflesaanbod.",
     "err_trials_disabled": "De box neemt op dit moment geen proeflessen aan.",
     "eventsSegments": "Welke events",
-    "nearMe": "Dichtbij"
+    "nearMe": "Dichtbij",
+    "fieldGoodForFriends": "Leuk voor vrienden",
+    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",
@@ -7062,6 +7068,201 @@
       "share_needs_two_snapshots": "Kies twee verschillende metingen.",
       "share_photo_missing": "Beide metingen hebben een klare foto van die houding nodig.",
       "media_not_ready": "Een foto wordt nog verwerkt. Probeer het zo opnieuw."
+    }
+  },
+  "Referrals": {
+    "title": "Neem een vriend mee",
+    "pickBox": "Welke box",
+    "noBox": "Word lid van een box om er vrienden voor uit te nodigen.",
+    "loading": "Laden…",
+    "loadFailed": "Je uitnodigingen konden niet worden geladen. Probeer het zo opnieuw.",
+    "shareLink": "Link delen",
+    "showQr": "QR tonen",
+    "copied": "Link gekopieerd",
+    "shareText": "Kom met me trainen bij {box}",
+    "offer": {
+      "friend": "Je vriend: {gift}",
+      "friendNothing": "Nodig een vriend uit om samen te trainen",
+      "you": "Jij: {reward}, {when}",
+      "cap": "{count, plural, one {Tot # vriend per jaar} other {Tot # vrienden per jaar}}",
+      "staff": "Deel de link met wie je wilt. Beloningen zijn voor leden.",
+      "noProgram": "Je box heeft nu geen verwijsprogramma. Je link werkt nog steeds en je vrienden verschijnen hier."
+    },
+    "events": {
+      "title": "Uitnodigen voor een event",
+      "shareText": "Ga met me mee naar {title}",
+      "free": "gratis",
+      "invite": "Uitnodigen",
+      "goodForFriends": "Leuk voor vrienden"
+    },
+    "list": {
+      "title": "Je uitnodigingen",
+      "empty": "Nog niemand. Deel je link of nodig een vriend uit voor een event: de makkelijkste start.",
+      "totals": "{invited} uitgenodigd · {trials} proeflessen · {paid} abonnementen",
+      "someone": "Iemand",
+      "earned": "Je kreeg {reward}"
+    },
+    "newLink": {
+      "action": "Nieuwe link",
+      "confirm": "Je huidige link en QR werken dan niet meer. Vrienden die je al uitnodigde blijven van jou.",
+      "yes": "Nieuwe link maken",
+      "no": "Deze houden"
+    },
+    "qr": {
+      "title": "Je uitnodigings-QR",
+      "close": "Sluiten",
+      "alt": "QR-code van je uitnodigingslink",
+      "hint": "Je vriend scant hem met de camera van zijn telefoon."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# dag gratis} other {# dagen gratis}}",
+      "credit": "{amount} tegoed"
+    },
+    "reward": {
+      "credit": "{amount} tegoed",
+      "discount": "−{percent}% op je verlenging",
+      "freePeriod": "{days, plural, one {# dag gratis} other {# dagen gratis}}",
+      "manual": "een cadeau van de box"
+    },
+    "when": {
+      "trial": "als hij naar een proefles komt",
+      "paid": "als hij een abonnement neemt"
+    },
+    "stage": {
+      "signed_up": "Aangemeld",
+      "event": "Kwam naar een event",
+      "trial": "Kwam naar een proefles",
+      "joined": "Lid van de box",
+      "paid": "Abonnement genomen"
+    },
+    "status": {
+      "open": "Onderweg",
+      "qualified": "Telt",
+      "capped": "Boven de jaarlimiet",
+      "expired": "Verlopen",
+      "void": "Telt niet"
+    },
+    "rewardStatus": {
+      "upcoming": "Nog niet",
+      "pending": "Wacht op goedkeuring",
+      "approved": "Goedgekeurd",
+      "given": "Gegeven",
+      "rejected": "Niet goedgekeurd",
+      "capped": "Boven de limiet",
+      "none": "Geen beloning"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Event",
+      "guest_pass": "Gastenpas",
+      "staff": "Team"
+    },
+    "invite": {
+      "heading": "Uitnodiging",
+      "title": "{name} nodigt je uit bij {box}",
+      "titleNoName": "Je bent uitgenodigd bij {box}",
+      "preview": "Train met een vriend bij {box} op Milos.",
+      "from": "{name} nodigt je uit om te trainen bij {box}",
+      "fromMember": "Een lid nodigt je uit om te trainen bij {box}",
+      "toEvent": "…en voor een event daar.",
+      "gift": "Voor jou: {gift}",
+      "giftWhen": "De box geeft het je bij je eerste pakket.",
+      "signUp": "Account aanmaken",
+      "signIn": "Ik heb al een account",
+      "seeBox": "Bekijk de box",
+      "consent": "{name} ziet je voornaam en hoe ver je bent (aanmelding, proefles, abonnement). Verder niets.",
+      "consentNoName": "Het lid dat je uitnodigde ziet je voornaam en hoe ver je bent (aanmelding, proefles, abonnement). Verder niets.",
+      "claiming": "Uitnodiging opslaan…",
+      "failed": "Je uitnodiging kon nu niet worden opgeslagen. We proberen het opnieuw wanneer je Milos weer opent.",
+      "alreadyMember": "Je bent al bij {box}, dus deze uitnodiging geldt niet.",
+      "alreadyInvited": "De uitnodiging van een ander lid telt al voor jou.",
+      "self": "Dit is je eigen uitnodigingslink.",
+      "claimed": "Klaar. Je uitnodiging voor {box} is opgeslagen.",
+      "openMine": "Open Neem een vriend mee",
+      "openEvent": "Bekijk het event",
+      "bookTrial": "Proefles boeken",
+      "gone": "Deze uitnodiging is niet meer actief",
+      "goneHint": "Misschien is de link vervangen. Vraag je vriend om de nieuwe.",
+      "home": "Naar Milos"
+    },
+    "notif": {
+      "progressTitle": "Je uitnodiging",
+      "progress": {
+        "signed_up": "{person} meldde zich aan met je uitnodiging.",
+        "event": "{person} kwam naar het event waarvoor je uitnodigde.",
+        "trial": "{person} kwam naar een proefles.",
+        "joined": "{person} is lid geworden van de box.",
+        "paid": "{person} heeft een abonnement genomen."
+      },
+      "rewardTitle": "Verwijsbeloning",
+      "reward": {
+        "approved": "Je verwijsbeloning is goedgekeurd.",
+        "given": "Je verwijsbeloning is gegeven.",
+        "rejected": "Je verwijzing is niet goedgekeurd."
+      },
+      "reviewTitle": "Verwijzing om goed te keuren",
+      "reviewBody": "{person} nam een abonnement, uitgenodigd door {referrer}."
+    },
+    "staff": {
+      "title": "Uitnodigingen van leden",
+      "filter": "Welke uitnodigingen",
+      "filter_review": "Goed te keuren",
+      "filter_all": "Alle",
+      "stats": "Laatste 90 dagen: {open} onderweg · {qualified} tellen · {expired} verlopen",
+      "emptyReview": "Niets goed te keuren.",
+      "empty": "Nog geen uitnodigingen. Leden delen hun link via Ik › Neem een vriend mee.",
+      "noReferrer": "een voormalig lid",
+      "row": "{friend} ← {referrer}",
+      "panel": "Uitnodiging",
+      "approve": "Goedkeuren",
+      "reject": "Afwijzen",
+      "given": "Gegeven",
+      "applyGift": "Cadeau van de vriend toepassen",
+      "reassign": "Aan ander lid geven",
+      "status": "Status",
+      "void_staff": "het team krijgt geen beloningen",
+      "void_other": "telt niet",
+      "channel": "Hoe",
+      "newAccount": "nieuw account",
+      "window": "Geldig",
+      "until": "tot {date}",
+      "program": "Programma",
+      "reward": "Beloning van het lid",
+      "gift": "Cadeau van de vriend",
+      "giftApplied": "toegepast {date}",
+      "previous": "Eerder",
+      "notes": "Notities",
+      "newReferrer": "Nieuw lid",
+      "reassignSave": "Opslaan",
+      "cancel": "Annuleren",
+      "note": "Notitie (optioneel)",
+      "discountOnRenewal": "«Gegeven» trekt het af van de volgende verlengingsfactuur van het lid."
+    },
+    "rules": {
+      "rewardNote": "Wat het lid krijgt (in woorden)",
+      "friendGift": "Cadeau van de vriend",
+      "gift_free_days": "Gratis dagen op het eerste pakket",
+      "gift_credit": "Tegoed",
+      "gift_custom": "Iets anders",
+      "gift_none": "Niets",
+      "giftDays": "Dagen",
+      "giftEuros": "Bedrag (€)",
+      "giftNote": "Wat de vriend krijgt",
+      "counts": "De uitnodiging telt",
+      "counts_paid": "Bij de eerste betaling",
+      "counts_trial": "Bij de eerste proefles",
+      "approval": "Beloningen",
+      "approval_manual": "Goedgekeurd door het team",
+      "approval_auto": "Automatisch goedgekeurd",
+      "window": "Uitnodiging geldig (dagen)",
+      "cap": "Beloonde vrienden per lid per jaar",
+      "capNone": "Geen limiet",
+      "hint": "Per box is één programma actief: als je dit activeert, stopt het andere. Uitnodigingen houden de voorwaarden waarmee ze zijn gemaakt."
+    },
+    "tabs": {
+      "invite": "Uitnodigen",
+      "invites": "Je uitnodigingen · {count}"
     }
   }
 }

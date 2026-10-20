@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
   @ready_tenant_tables ~w(
     class_types scheduling_settings class_series scheduled_classes bookings
     scheduling_trial_policies scheduling_trial_requests
+    referral_codes referral_attributions
     class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
     exercise_variations assigned_workouts assigned_workout_athletes scale_levels

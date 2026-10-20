@@ -5080,7 +5080,10 @@
     "checkedIn": "Check-in hecho ✓",
     "followClassTimer": "Temporizador en directo",
     "classCheckIn": "Hacer check-in",
-    "programmeManage": "Cambiar el día o rechazar"
+    "programmeManage": "Cambiar el día o rechazar",
+    "meReferrals": "Trae a un amigo",
+    "meReferralsHint": "Tu enlace, QR e invitaciones",
+    "membershipReferral": "Trae a un amigo"
   },
   "Community": {
     "all": "Todo",
@@ -5968,7 +5971,8 @@
     "notif_event_guest_joined_body": "{person} viene a «{event}» con tu pase de invitado.",
     "notif_event_trial_offer_title": "Prueba una clase",
     "notif_event_trial_offer_body": "¿Te gustó «{event}»? {box} te invita a una clase de prueba.",
-    "notif_event_message_title": "Mensaje sobre «{event}»"
+    "notif_event_message_title": "Mensaje sobre «{event}»",
+    "findNearbyLater": "Los clubs cerca de ti llegarán con Cerca de mí."
   },
   "CommunityAdmin": {
     "title": "Comunidad",
@@ -6201,7 +6205,9 @@
     "err_nobody_to_offer": "Nadie de los que vinieron espera una oferta de prueba.",
     "err_trials_disabled": "El box no acepta clases de prueba ahora mismo.",
     "eventsSegments": "Qué eventos",
-    "nearMe": "Cerca de mí"
+    "nearMe": "Cerca de mí",
+    "fieldGoodForFriends": "Ideal para amigos",
+    "goodForFriendsHint": "Aparece primero cuando los miembros invitan a amigos a un evento."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No hay próximos eventos. Crea uno con «+ Nuevo evento».",
@@ -7062,6 +7068,201 @@
       "share_needs_two_snapshots": "Elige dos mediciones distintas.",
       "share_photo_missing": "Las dos mediciones necesitan una foto lista de esa postura.",
       "media_not_ready": "Una foto aún se está procesando. Inténtalo en un momento."
+    }
+  },
+  "Referrals": {
+    "title": "Trae a un amigo",
+    "pickBox": "Qué box",
+    "noBox": "Únete a un box para invitar a amigos allí.",
+    "loading": "Cargando…",
+    "loadFailed": "No se pudieron cargar tus invitaciones. Inténtalo de nuevo en un momento.",
+    "shareLink": "Compartir enlace",
+    "showQr": "Mostrar QR",
+    "copied": "Enlace copiado",
+    "shareText": "Ven a entrenar conmigo en {box}",
+    "offer": {
+      "friend": "Tu amigo: {gift}",
+      "friendNothing": "Invita a un amigo a entrenar contigo",
+      "you": "Tú: {reward}, {when}",
+      "cap": "{count, plural, one {Hasta # amigo al año} other {Hasta # amigos al año}}",
+      "staff": "Comparte el enlace con quien quieras. Las recompensas son para los miembros.",
+      "noProgram": "Tu box no tiene programa de recomendaciones ahora mismo. Tu enlace sigue funcionando y tus amigos aparecen aquí."
+    },
+    "events": {
+      "title": "Invitar a un evento",
+      "shareText": "Ven conmigo a {title}",
+      "free": "gratis",
+      "invite": "Invitar",
+      "goodForFriends": "Ideal para amigos"
+    },
+    "list": {
+      "title": "Tus invitaciones",
+      "empty": "Nadie todavía. Comparte tu enlace o invita a un amigo a un evento: es el comienzo más fácil.",
+      "totals": "{invited} invitados · {trials} pruebas · {paid} suscripciones",
+      "someone": "Alguien",
+      "earned": "Recibiste {reward}"
+    },
+    "newLink": {
+      "action": "Nuevo enlace",
+      "confirm": "Tu enlace y QR actuales dejarán de funcionar. Los amigos que ya invitaste siguen siendo tuyos.",
+      "yes": "Crear un enlace nuevo",
+      "no": "Mantener este"
+    },
+    "qr": {
+      "title": "Tu QR de invitación",
+      "close": "Cerrar",
+      "alt": "Código QR de tu enlace de invitación",
+      "hint": "Tu amigo lo escanea con la cámara del móvil."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# día gratis} other {# días gratis}}",
+      "credit": "{amount} de crédito"
+    },
+    "reward": {
+      "credit": "{amount} de crédito",
+      "discount": "−{percent}% en tu renovación",
+      "freePeriod": "{days, plural, one {# día gratis} other {# días gratis}}",
+      "manual": "un regalo del box"
+    },
+    "when": {
+      "trial": "cuando venga a una clase de prueba",
+      "paid": "cuando se suscriba"
+    },
+    "stage": {
+      "signed_up": "Se registró",
+      "event": "Vino a un evento",
+      "trial": "Vino a una prueba",
+      "joined": "Se unió al box",
+      "paid": "Se suscribió"
+    },
+    "status": {
+      "open": "En curso",
+      "qualified": "Cuenta",
+      "capped": "Por encima del límite anual",
+      "expired": "Caducada",
+      "void": "No cuenta"
+    },
+    "rewardStatus": {
+      "upcoming": "Todavía no",
+      "pending": "Pendiente de aprobación",
+      "approved": "Aprobada",
+      "given": "Entregada",
+      "rejected": "No aprobada",
+      "capped": "Por encima del límite",
+      "none": "Sin recompensa"
+    },
+    "channel": {
+      "link": "Enlace",
+      "qr": "QR",
+      "event": "Evento",
+      "guest_pass": "Pase de invitado",
+      "staff": "Equipo"
+    },
+    "invite": {
+      "heading": "Invitación",
+      "title": "{name} te invita a {box}",
+      "titleNoName": "Estás invitado a {box}",
+      "preview": "Entrena con un amigo en {box} en Milos.",
+      "from": "{name} te invita a entrenar en {box}",
+      "fromMember": "Un miembro te invita a entrenar en {box}",
+      "toEvent": "…y a un evento allí.",
+      "gift": "Para ti: {gift}",
+      "giftWhen": "Te lo da el box con tu primer paquete.",
+      "signUp": "Crear una cuenta",
+      "signIn": "Ya tengo una cuenta",
+      "seeBox": "Ver el box",
+      "consent": "{name} verá tu nombre y hasta dónde llegaste (registro, prueba, suscripción). Nada más.",
+      "consentNoName": "El miembro que te invitó verá tu nombre y hasta dónde llegaste (registro, prueba, suscripción). Nada más.",
+      "claiming": "Guardando tu invitación…",
+      "failed": "No pudimos guardar tu invitación ahora. Lo intentaremos de nuevo la próxima vez que abras Milos.",
+      "alreadyMember": "Ya estás en {box}, así que esta invitación no aplica.",
+      "alreadyInvited": "La invitación de otro miembro ya cuenta para ti.",
+      "self": "Este es tu propio enlace de invitación.",
+      "claimed": "Listo. Tu invitación a {box} está guardada.",
+      "openMine": "Abrir Trae a un amigo",
+      "openEvent": "Ver el evento",
+      "bookTrial": "Reservar una prueba",
+      "gone": "Esta invitación ya no está activa",
+      "goneHint": "Puede que el enlace se haya cambiado. Pide a tu amigo el nuevo.",
+      "home": "Ir a Milos"
+    },
+    "notif": {
+      "progressTitle": "Tu invitación",
+      "progress": {
+        "signed_up": "{person} se registró con tu invitación.",
+        "event": "{person} vino al evento al que lo invitaste.",
+        "trial": "{person} vino a una clase de prueba.",
+        "joined": "{person} se unió al box.",
+        "paid": "{person} se suscribió."
+      },
+      "rewardTitle": "Recompensa por recomendación",
+      "reward": {
+        "approved": "Tu recompensa por recomendación fue aprobada.",
+        "given": "Tu recompensa por recomendación fue entregada.",
+        "rejected": "Tu recomendación no fue aprobada."
+      },
+      "reviewTitle": "Recomendación por aprobar",
+      "reviewBody": "{person} se suscribió, invitado por {referrer}."
+    },
+    "staff": {
+      "title": "Invitaciones de miembros",
+      "filter": "Qué invitaciones",
+      "filter_review": "Por aprobar",
+      "filter_all": "Todas",
+      "stats": "Últimos 90 días: {open} en curso · {qualified} cuentan · {expired} caducadas",
+      "emptyReview": "Nada por aprobar.",
+      "empty": "Aún no hay invitaciones. Los miembros comparten su enlace desde Yo › Trae a un amigo.",
+      "noReferrer": "un antiguo miembro",
+      "row": "{friend} ← {referrer}",
+      "panel": "Invitación",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "given": "Entregada",
+      "applyGift": "Aplicar el regalo del amigo",
+      "reassign": "Dar a otro miembro",
+      "status": "Estado",
+      "void_staff": "el equipo no recibe recompensas",
+      "void_other": "no cuenta",
+      "channel": "Cómo",
+      "newAccount": "cuenta nueva",
+      "window": "Válida",
+      "until": "hasta el {date}",
+      "program": "Programa",
+      "reward": "Recompensa del miembro",
+      "gift": "Regalo del amigo",
+      "giftApplied": "aplicado el {date}",
+      "previous": "Antes",
+      "notes": "Notas",
+      "newReferrer": "Nuevo miembro",
+      "reassignSave": "Guardar",
+      "cancel": "Cancelar",
+      "note": "Nota (opcional)",
+      "discountOnRenewal": "«Entregada» lo descuenta de la próxima factura de renovación del miembro."
+    },
+    "rules": {
+      "rewardNote": "Qué recibe el miembro (en palabras)",
+      "friendGift": "Regalo del amigo",
+      "gift_free_days": "Días gratis en el primer paquete",
+      "gift_credit": "Crédito",
+      "gift_custom": "Otra cosa",
+      "gift_none": "Nada",
+      "giftDays": "Días",
+      "giftEuros": "Importe (€)",
+      "giftNote": "Qué recibe el amigo",
+      "counts": "La invitación cuenta",
+      "counts_paid": "Con el primer pago",
+      "counts_trial": "Con la primera prueba",
+      "approval": "Recompensas",
+      "approval_manual": "Las aprueba el equipo",
+      "approval_auto": "Se aprueban automáticamente",
+      "window": "La invitación vale (días)",
+      "cap": "Amigos recompensados por miembro al año",
+      "capNone": "Sin límite",
+      "hint": "Hay un programa activo por box: al activar este, el otro se retira. Las invitaciones conservan las condiciones con las que se hicieron."
+    },
+    "tabs": {
+      "invite": "Invitar",
+      "invites": "Tus invitaciones · {count}"
     }
   }
 }

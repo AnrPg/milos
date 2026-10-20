@@ -20,6 +20,7 @@ defmodule MilosTraining.Community.Ports.EventStore do
           optional(:to) => DateTime.t(),
           optional(:ended_before) => DateTime.t(),
           optional(:open_only) => boolean(),
+          optional(:good_for_friends) => boolean(),
           optional(:include_cancelled) => boolean(),
           optional(:order) => :asc | :desc,
           optional(:limit) => pos_integer()

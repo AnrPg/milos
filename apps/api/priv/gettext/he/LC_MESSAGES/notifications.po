@@ -403,6 +403,42 @@ msgstr "אהבת את «%{event}»? %{box} מזמין אותך לשיעור ני
 msgid "Message about «%{event}»"
 msgstr "הודעה על «%{event}»"
 
+msgid "Your invite"
+msgstr "ההזמנה שלך"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} נרשם/ה עם ההזמנה שלך."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} הגיע/ה לאירוע שהזמנת אליו."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} הגיע/ה לאימון ניסיון."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} נרשם/ה למנוי."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} הצטרף/ה לבוקס."
+
+msgid "Referral reward"
+msgstr "פרס הפניה"
+
+msgid "Your referral reward was given."
+msgstr "פרס ההפניה שלך ניתן."
+
+msgid "Your referral was not approved."
+msgstr "ההפניה שלך לא אושרה."
+
+msgid "Your referral reward was approved."
+msgstr "פרס ההפניה שלך אושר."
+
+msgid "Referral to approve"
+msgstr "הפניה לאישור"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} נרשם/ה למנוי בהזמנת %{referrer}."
+
 msgid "New near you"
 msgstr "חדש בסביבתך"
 

@@ -403,6 +403,42 @@ msgstr "Хареса ли ти «%{event}»? %{box} те кани на проб�
 msgid "Message about «%{event}»"
 msgstr "Съобщение за «%{event}»"
 
+msgid "Your invite"
+msgstr "Твоята покана"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} се регистрира с твоята покана."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} дойде на събитието, на което го покани."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} дойде на пробна тренировка."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} се абонира."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} се присъедини към залата."
+
+msgid "Referral reward"
+msgstr "Награда за препоръка"
+
+msgid "Your referral reward was given."
+msgstr "Наградата ти за препоръка е дадена."
+
+msgid "Your referral was not approved."
+msgstr "Препоръката ти не беше одобрена."
+
+msgid "Your referral reward was approved."
+msgstr "Наградата ти за препоръка е одобрена."
+
+msgid "Referral to approve"
+msgstr "Препоръка за одобрение"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} се абонира по покана на %{referrer}."
+
 msgid "New near you"
 msgstr "Ново близо до теб"
 

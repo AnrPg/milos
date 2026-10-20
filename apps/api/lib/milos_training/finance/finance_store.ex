@@ -154,6 +154,22 @@ defmodule MilosTraining.Finance.FinanceStore do
   @impl true
   def list_referral_programs, do: adapter().list_referral_programs()
   @impl true
+  def get_active_referral_program, do: adapter().get_active_referral_program()
+  @impl true
+  def get_referral_program(id), do: adapter().get_referral_program(id)
+  @impl true
+  def open_attributed_referral(params), do: adapter().open_attributed_referral(params)
+  @impl true
+  def count_referral_events_since(referrer_user_id, since),
+    do: adapter().count_referral_events_since(referrer_user_id, since)
+
+  @impl true
+  def referral_outcomes(event_ids), do: adapter().referral_outcomes(event_ids)
+  @impl true
+  def extend_current_subscription(membership_id, days),
+    do: adapter().extend_current_subscription(membership_id, days)
+
+  @impl true
   def create_referral_event(params), do: adapter().create_referral_event(params)
   @impl true
   def update_referral_status(id, status), do: adapter().update_referral_status(id, status)

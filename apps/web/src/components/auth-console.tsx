@@ -19,6 +19,7 @@ import {
 } from "@/api/auth";
 import { getAvatarUploadUrl, updateAvatar } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
+import { markReferralNewAccount } from "@/lib/referral-claim";
 
 type Mode = "register" | "login";
 type FieldErrors = Record<string, string[]>;
@@ -443,7 +444,14 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                           invitation_token: invitationToken.trim(),
                         });
                       } else {
-                        await signUp(registerForm);
+                        // ADR-156: an invite kept on this device brought a new account.
+                        markReferralNewAccount();
+                        try {
+                          await signUp(registerForm);
+                        } catch (caught) {
+                          markReferralNewAccount(false);
+                          throw caught;
+                        }
                       }
                     });
                   }}
