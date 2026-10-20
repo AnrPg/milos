@@ -312,3 +312,45 @@ msgstr "Cours de la séance d'essai annulé"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "%{box} a annulé %{class} (%{when}). Choisis un autre cours."
+
+msgid "New group to review"
+msgstr "Nouveau groupe à examiner"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} veut créer «%{group}»."
+
+msgid "Your group is live"
+msgstr "Ton groupe est en ligne"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» est ouvert. Invite du monde."
+
+msgid "Group not approved"
+msgstr "Groupe non approuvé"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "La box n'a pas approuvé «%{group}»."
+
+msgid "Request to join"
+msgstr "Demande d'adhésion"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} demande à rejoindre «%{group}»."
+
+msgid "You're in"
+msgstr "Tu es dedans"
+
+msgid "You joined «%{group}»."
+msgstr "Tu as rejoint «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Ton groupe est calme"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Personne n'a publié dans «%{group}» depuis un moment. Publie quelque chose ou il sera archivé."
+
+msgid "New report"
+msgstr "Nouveau signalement"
+
+msgid "Someone reported something in the club."
+msgstr "Quelqu'un a signalé quelque chose dans le club."

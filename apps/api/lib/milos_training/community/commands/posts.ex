@@ -47,6 +47,14 @@ defmodule MilosTraining.Community.Commands.Posts do
     end
   end
 
+  @doc "A post the context's session can read, from any club it reaches (ADR-143)."
+  def find(%{user_id: user_id} = context, post_id) do
+    case CommunityStore.get_post(context, post_id, user_id) do
+      %{} = post -> {:ok, post}
+      nil -> {:error, :not_found}
+    end
+  end
+
   def fetch(%{organization_id: organization_id, user_id: user_id} = context, post_id) do
     case CommunityStore.get_post(context, post_id, user_id) do
       %{organization_id: ^organization_id} = post -> {:ok, post}
@@ -92,6 +100,20 @@ defmodule MilosTraining.Community.Commands.Posts do
       author_id: user_id,
       body: body
     })
+  end
+
+  @doc "Staff (and a group's admins, acting as staff there) hide a comment (ADR-143)."
+  def hide_comment(%{user_id: user_id} = context, comment, role, hidden?, now) do
+    if ChannelPolicy.can_moderate?(role) do
+      attrs =
+        if hidden?,
+          do: %{hidden_at: now, hidden_by_id: user_id},
+          else: %{hidden_at: nil, hidden_by_id: nil}
+
+      CommunityStore.hide_comment(context, comment.id, attrs)
+    else
+      {:error, :forbidden}
+    end
   end
 
   def delete_comment(

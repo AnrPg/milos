@@ -18,6 +18,12 @@ defmodule MilosTraining.Notifications do
   alias MilosTraining.Notifications.PushSubscriptionStore
   alias MilosTraining.Notifications.Queries.ListNotifications
 
+  @community_types ~w(
+    community_group_proposed community_group_approved community_group_declined
+    community_group_join_requested community_group_join_approved community_group_archive_warning
+    community_report_created community_club_join_requested community_club_join_approved
+  )
+
   def create_notification(params), do: create_and_broadcast_notification(params)
 
   # ADR-123: push dispatch result -> {outcome, reason_class} for analytics.
@@ -194,6 +200,16 @@ defmodule MilosTraining.Notifications do
           payload,
           trial_payload(type, payload, "person", "/trials/#{field(payload, :trial_id)}")
         )
+
+  # ADR-143: member groups, open clubs and reports. Each event names its one
+  # recipient; the use case fans out to staff or a group's admins.
+  def process_event(type, payload) when type in @community_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        community_payload(type, payload)
+      )
 
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
@@ -704,6 +720,52 @@ defmodule MilosTraining.Notifications do
       decline_reason: field(payload, :decline_reason),
       dedupe_key: "#{type}:#{trial_id}:#{audience}",
       url: field(payload, :url) || default_url
+    }
+  end
+
+  defp community_payload(type, payload) do
+    club_id = field(payload, :club_id)
+    group_id = field(payload, :group_id)
+
+    {dedupe, url} =
+      case type do
+        "community_group_proposed" ->
+          {group_id, "/admin/community"}
+
+        "community_group_declined" ->
+          {group_id, "/clubs/#{club_id}"}
+
+        "community_group_join_requested" ->
+          {"#{group_id}:#{field(payload, :person_id)}", "/clubs/#{club_id}/groups/#{group_id}"}
+
+        "community_group_archive_warning" ->
+          {"#{group_id}:#{field(payload, :warned_on)}", "/clubs/#{club_id}/groups/#{group_id}"}
+
+        "community_report_created" ->
+          {"#{field(payload, :target_type)}:#{field(payload, :target_id)}",
+           "/admin/community?tab=reports"}
+
+        "community_club_join_requested" ->
+          {"#{club_id}:#{field(payload, :person_id)}", "/admin/community?tab=clubs"}
+
+        "community_club_join_approved" ->
+          {club_id, "/clubs/#{club_id}"}
+
+        _group_answer ->
+          {group_id, "/clubs/#{club_id}/groups/#{group_id}"}
+      end
+
+    %{
+      organization_id: field(payload, :organization_id),
+      club_id: club_id,
+      club_name: field(payload, :club_name),
+      group_id: group_id,
+      group_name: field(payload, :group_name),
+      person_nickname: field(payload, :person_nickname),
+      target_type: field(payload, :target_type),
+      reason: field(payload, :reason),
+      dedupe_key: "#{type}:#{dedupe}",
+      url: url
     }
   end
 

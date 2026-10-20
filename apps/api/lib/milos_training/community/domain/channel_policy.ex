@@ -70,6 +70,13 @@ defmodule MilosTraining.Community.Domain.ChannelPolicy do
   def can_post?(%{archived_at: archived_at}, _role, _joined?) when not is_nil(archived_at),
     do: false
 
+  # A proposed or declined group is read-only (ADR-143).
+  def can_post?(%{status: status}, _role, _joined?) when status in ["pending", "declined"],
+    do: false
+
+  # In a member group only its members write, staff included (ADR-143).
+  def can_post?(%{kind: "member_group"}, _role, joined?), do: joined? == true
+
   def can_post?(%{write_policy: "staff"}, role, _joined?), do: role == "staff"
   def can_post?(%{write_policy: "members"}, _role, _joined?), do: true
   def can_post?(%{write_policy: "system_and_members"}, _role, _joined?), do: true
@@ -85,8 +92,17 @@ defmodule MilosTraining.Community.Domain.ChannelPolicy do
 
   def can_moderate?(role), do: role == "staff"
 
-  @doc "Only staff pin, and only in channels staff write to."
+  @doc """
+  The role someone acts with inside one channel: a member group's admins
+  moderate their group the way staff moderate the club (ADR-143).
+  """
+  def channel_role("staff", _channel), do: "staff"
+  def channel_role(_role, %{kind: "member_group", admin: true}), do: "staff"
+  def channel_role(role, _channel), do: role
+
+  @doc "Staff pin in channels staff write to; group admins pin in their group."
   def can_pin?(%{write_policy: "staff"}, "staff"), do: true
+  def can_pin?(%{kind: "member_group"}, "staff"), do: true
   def can_pin?(_channel, _role), do: false
 
   defp to_role(role) when is_atom(role), do: role

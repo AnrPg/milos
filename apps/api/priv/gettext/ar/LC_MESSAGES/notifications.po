@@ -312,3 +312,45 @@ msgstr "أُلغيت حصة التجربة"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "ألغى %{box} حصة %{class} (%{when}). اختر حصة أخرى."
+
+msgid "New group to review"
+msgstr "مجموعة جديدة للمراجعة"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} يريد إنشاء «%{group}»."
+
+msgid "Your group is live"
+msgstr "مجموعتك نشطة"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» مفتوحة. ادعُ الناس."
+
+msgid "Group not approved"
+msgstr "لم تتم الموافقة على المجموعة"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "لم يوافق النادي على «%{group}»."
+
+msgid "Request to join"
+msgstr "طلب انضمام"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} يطلب الانضمام إلى «%{group}»."
+
+msgid "You're in"
+msgstr "أنت عضو الآن"
+
+msgid "You joined «%{group}»."
+msgstr "انضممت إلى «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "مجموعتك هادئة"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "لم ينشر أحد في «%{group}» منذ فترة. انشر شيئًا وإلا ستُؤرشف."
+
+msgid "New report"
+msgstr "بلاغ جديد"
+
+msgid "Someone reported something in the club."
+msgstr "أبلغ أحدهم عن شيء في النادي."

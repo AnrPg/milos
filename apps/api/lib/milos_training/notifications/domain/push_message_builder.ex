@@ -289,6 +289,97 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-143: member groups, open clubs and reports.
+  def build("community_group_proposed", payload, localize) do
+    %{
+      title: localize.("New group to review", %{}),
+      body:
+        localize.("%{nickname} wants to start «%{group}».", %{
+          nickname: payload["person_nickname"],
+          group: payload["group_name"]
+        }),
+      url: payload["url"] || "/admin/community"
+    }
+  end
+
+  def build("community_group_approved", payload, localize) do
+    %{
+      title: localize.("Your group is live", %{}),
+      body: localize.("«%{group}» is open. Invite people in.", %{group: payload["group_name"]}),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_group_declined", payload, localize) do
+    %{
+      title: localize.("Group not approved", %{}),
+      body: localize.("The box didn't approve «%{group}».", %{group: payload["group_name"]}),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_group_join_requested", payload, localize) do
+    %{
+      title: localize.("Request to join", %{}),
+      body:
+        localize.("%{nickname} asks to join «%{group}».", %{
+          nickname: payload["person_nickname"],
+          group: payload["group_name"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_group_join_approved", payload, localize) do
+    %{
+      title: localize.("You're in", %{}),
+      body: localize.("You joined «%{group}».", %{group: payload["group_name"]}),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_group_archive_warning", payload, localize) do
+    %{
+      title: localize.("Your group is quiet", %{}),
+      body:
+        localize.(
+          "Nobody has posted in «%{group}» for a while. Post something or it will be archived.",
+          %{
+            group: payload["group_name"]
+          }
+        ),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_report_created", payload, localize) do
+    %{
+      title: localize.("New report", %{}),
+      body: localize.("Someone reported something in the club.", %{}),
+      url: payload["url"] || "/admin/community?tab=reports"
+    }
+  end
+
+  def build("community_club_join_requested", payload, localize) do
+    %{
+      title: localize.("Request to join", %{}),
+      body:
+        localize.("%{nickname} asks to join «%{group}».", %{
+          nickname: payload["person_nickname"],
+          group: payload["club_name"]
+        }),
+      url: payload["url"] || "/admin/community?tab=clubs"
+    }
+  end
+
+  def build("community_club_join_approved", payload, localize) do
+    %{
+      title: localize.("You're in", %{}),
+      body: localize.("You joined «%{group}».", %{group: payload["club_name"]}),
+      url: payload["url"] || "/"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

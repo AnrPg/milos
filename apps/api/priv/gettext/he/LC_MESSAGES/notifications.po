@@ -312,3 +312,45 @@ msgstr "השיעור של אימון הניסיון בוטל"
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr "%{box} ביטל את %{class} (%{when}). בחר/י שיעור אחר."
+
+msgid "New group to review"
+msgstr "קבוצה חדשה לאישור"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} רוצה לפתוח את «%{group}»."
+
+msgid "Your group is live"
+msgstr "הקבוצה שלך פעילה"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» פתוחה. הזמינו אנשים."
+
+msgid "Group not approved"
+msgstr "הקבוצה לא אושרה"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "הבוקס לא אישר את «%{group}»."
+
+msgid "Request to join"
+msgstr "בקשת הצטרפות"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} מבקש להצטרף ל«%{group}»."
+
+msgid "You're in"
+msgstr "אתה בפנים"
+
+msgid "You joined «%{group}»."
+msgstr "הצטרפת ל«%{group}»."
+
+msgid "Your group is quiet"
+msgstr "הקבוצה שלך שקטה"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "אף אחד לא פרסם ב«%{group}» כבר זמן מה. פרסמו משהו או שהיא תועבר לארכיון."
+
+msgid "New report"
+msgstr "דיווח חדש"
+
+msgid "Someone reported something in the club."
+msgstr "מישהו דיווח על משהו במועדון."

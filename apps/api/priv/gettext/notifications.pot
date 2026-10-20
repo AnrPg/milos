@@ -311,3 +311,45 @@ msgstr ""
 
 msgid "%{box} cancelled %{class} (%{when}). Pick another class."
 msgstr ""
+
+msgid "New group to review"
+msgstr ""
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr ""
+
+msgid "Your group is live"
+msgstr ""
+
+msgid "«%{group}» is open. Invite people in."
+msgstr ""
+
+msgid "Group not approved"
+msgstr ""
+
+msgid "The box didn't approve «%{group}»."
+msgstr ""
+
+msgid "Request to join"
+msgstr ""
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr ""
+
+msgid "You're in"
+msgstr ""
+
+msgid "You joined «%{group}»."
+msgstr ""
+
+msgid "Your group is quiet"
+msgstr ""
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr ""
+
+msgid "New report"
+msgstr ""
+
+msgid "Someone reported something in the club."
+msgstr ""

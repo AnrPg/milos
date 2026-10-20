@@ -64,6 +64,97 @@ defmodule MilosTraining.Community.CommunityStore do
   def put_notify_level(context, club, user_id, level),
     do: tenant_call(context, :put_notify_level, [club, user_id, level])
 
+  # Open clubs.
+  @impl true
+  def create_club(context, attrs, channels),
+    do: tenant_call(context, :create_club, [attrs, channels])
+
+  @impl true
+  def update_club(context, id, attrs), do: tenant_call(context, :update_club, [id, attrs])
+  @impl true
+  def list_clubs_by_ids(context, ids), do: tenant_call(context, :list_clubs_by_ids, [ids])
+  @impl true
+  def list_open_clubs(context, filter), do: tenant_call(context, :list_open_clubs, [filter])
+
+  @impl true
+  def open_club_member_counts(context, ids),
+    do: tenant_call(context, :open_club_member_counts, [ids])
+
+  @impl true
+  def club_memberships_of(context, user_id),
+    do: tenant_call(context, :club_memberships_of, [user_id])
+
+  @impl true
+  def list_club_memberships(context, club_id, status),
+    do: tenant_call(context, :list_club_memberships, [club_id, status])
+
+  @impl true
+  def get_club_membership(context, club_id, user_id),
+    do: tenant_call(context, :get_club_membership, [club_id, user_id])
+
+  @impl true
+  def put_club_membership(context, club, user_id, attrs),
+    do: tenant_call(context, :put_club_membership, [club, user_id, attrs])
+
+  @impl true
+  def delete_club_membership(context, club_id, user_id),
+    do: tenant_call(context, :delete_club_membership, [club_id, user_id])
+
+  # Member groups.
+  @impl true
+  def get_community_settings(context), do: tenant_call(context, :get_community_settings, [])
+
+  @impl true
+  def put_community_settings(context, attrs),
+    do: tenant_call(context, :put_community_settings, [attrs])
+
+  @impl true
+  def create_group(context, club, spec, creator_id, status),
+    do: tenant_call(context, :create_group, [club, spec, creator_id, status])
+
+  @impl true
+  def list_groups(context, club_id, filter),
+    do: tenant_call(context, :list_groups, [club_id, filter])
+
+  @impl true
+  def update_group(context, id, attrs), do: tenant_call(context, :update_group, [id, attrs])
+
+  @impl true
+  def update_group_lifecycle(context, id, attrs),
+    do: tenant_call(context, :update_group_lifecycle, [id, attrs])
+
+  @impl true
+  def channel_memberships_of(context, user_id, channel_ids),
+    do: tenant_call(context, :channel_memberships_of, [user_id, channel_ids])
+
+  @impl true
+  def list_channel_memberships(context, channel_id),
+    do: tenant_call(context, :list_channel_memberships, [channel_id])
+
+  @impl true
+  def put_channel_membership(context, channel, user_id, attrs),
+    do: tenant_call(context, :put_channel_membership, [channel, user_id, attrs])
+
+  @impl true
+  def quiet_groups(context, cutoff), do: tenant_call(context, :quiet_groups, [cutoff])
+
+  # Reports.
+  @impl true
+  def create_report(context, attrs), do: tenant_call(context, :create_report, [attrs])
+  @impl true
+  def list_reports(context, filter), do: tenant_call(context, :list_reports, [filter])
+
+  @impl true
+  def resolve_reports(context, target_type, target_id, attrs),
+    do: tenant_call(context, :resolve_reports, [target_type, target_id, attrs])
+
+  @impl true
+  def reported_ids(context, reporter_id, target_type),
+    do: tenant_call(context, :reported_ids, [reporter_id, target_type])
+
+  @impl true
+  def hide_comment(context, id, attrs), do: tenant_call(context, :hide_comment, [id, attrs])
+
   @impl true
   def create_post(context, attrs), do: tenant_call(context, :create_post, [attrs])
   @impl true

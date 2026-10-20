@@ -149,4 +149,18 @@ defmodule MilosTrainingWeb.CommunityPostController do
       send_resp(conn, :no_content, "")
     end
   end
+
+  operation(:hide_comment,
+    summary: "Staff and group admins: hide or show a comment",
+    parameters: [@id],
+    request_body: S.body(S.flag_request(:hidden)),
+    responses: [no_content: {"Done", "application/json", %Schema{type: :object}}]
+  )
+
+  def hide_comment(conn, %{id: id}) do
+    with :ok <-
+           CommunityPosts.hide_comment(conn.assigns.tenant_context, id, conn.body_params.hidden) do
+      send_resp(conn, :no_content, "")
+    end
+  end
 end
