@@ -33,6 +33,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Trials,
     Wallet,
     Wellbeing,
+    Wellness,
     Workouts
   }
 
@@ -50,6 +51,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Body,
     Feedback,
     Wellbeing,
+    Wellness,
     Messaging,
     Gamification,
     Wallet,
