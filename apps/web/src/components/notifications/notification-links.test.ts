@@ -3,6 +3,13 @@ import { describe, expect, it } from "vitest";
 import { notificationTargetUrl } from "./notification-links";
 
 describe("notificationTargetUrl", () => {
+  it("opens the desk's visitors on the visitor who scanned the door", () => {
+    expect(
+      notificationTargetUrl({ type: "check_in_visitor", payload: { scan_id: "scan-1", url: "/admin/check-in?visitor=scan-1" } }, "admin"),
+    ).toBe("/admin/check-in?visitor=scan-1#visitors");
+    expect(notificationTargetUrl({ type: "check_in_visitor", payload: {} }, "admin")).toBe("/admin/check-in#visitors");
+  });
+
   it("opens Γύρω μου with the saved filter of an around alert", () => {
     expect(
       notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),
