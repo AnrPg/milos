@@ -24,6 +24,7 @@ defmodule MilosTraining.Community.Event do
     :open_to_non_members,
     :guest_pass_allowed,
     :guests_per_member,
+    :good_for_friends,
     :cover_media_id
   ]
 
@@ -50,6 +51,7 @@ defmodule MilosTraining.Community.Event do
     field :open_to_non_members, :boolean, default: false
     field :guest_pass_allowed, :boolean, default: false
     field :guests_per_member, :integer, default: 1
+    field :good_for_friends, :boolean, default: false
     field :cover_media_id, :binary_id
     field :series_id, :binary_id
     field :cancelled_at, :utc_datetime_usec
@@ -110,6 +112,8 @@ defmodule MilosTraining.Community.Event do
     |> validate_place()
     |> validate_times()
     |> validate_group()
+    |> validate_good_for_friends()
+    |> check_constraint(:good_for_friends, name: :community_events_good_for_friends_check)
     |> check_constraint(:starts_at, name: :community_events_time_check)
     |> check_constraint(:location_id, name: :community_events_place_check)
     |> check_constraint(:capacity, name: :community_events_limits_check)
@@ -154,6 +158,18 @@ defmodule MilosTraining.Community.Event do
         message: "group events are for the group"
       )
       |> validate_inclusion(:guest_pass_allowed, [false], message: "group events take no guests")
+    end
+  end
+
+  # «Καλό για φίλους» (ADR-156) only on an event a friend can come to.
+  defp validate_good_for_friends(changeset) do
+    friends_can_come? =
+      get_field(changeset, :open_to_non_members) or get_field(changeset, :guest_pass_allowed)
+
+    if get_field(changeset, :good_for_friends) and not friends_can_come? do
+      add_error(changeset, :good_for_friends, "friends can't come to this event")
+    else
+      changeset
     end
   end
 

@@ -403,6 +403,42 @@ msgstr "Hat dir «%{event}» gefallen? %{box} lädt dich zu einem Probetraining 
 msgid "Message about «%{event}»"
 msgstr "Nachricht zu «%{event}»"
 
+msgid "Your invite"
+msgstr "Deine Einladung"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} hat sich mit deiner Einladung angemeldet."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} war beim Event, zu dem du eingeladen hast."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} war beim Probetraining."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} hat ein Abo abgeschlossen."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} ist der Box beigetreten."
+
+msgid "Referral reward"
+msgstr "Empfehlungsprämie"
+
+msgid "Your referral reward was given."
+msgstr "Deine Empfehlungsprämie wurde gutgeschrieben."
+
+msgid "Your referral was not approved."
+msgstr "Deine Empfehlung wurde nicht bestätigt."
+
+msgid "Your referral reward was approved."
+msgstr "Deine Empfehlungsprämie wurde freigegeben."
+
+msgid "Referral to approve"
+msgstr "Empfehlung zur Freigabe"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} hat ein Abo abgeschlossen, eingeladen von %{referrer}."
+
 msgid "New near you"
 msgstr "Neu in deiner Nähe"
 

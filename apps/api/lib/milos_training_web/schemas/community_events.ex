@@ -86,6 +86,10 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
         open_to_non_members: boolean(),
         guest_pass_allowed: boolean(),
         guests_per_member: integer(),
+        good_for_friends: %Schema{
+          type: :boolean,
+          description: "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο"
+        },
         cover_media_id: @nullable_uuid,
         cover_url: string(nullable: true),
         cancelled: boolean(),
@@ -154,6 +158,7 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
         :open_to_non_members,
         :guest_pass_allowed,
         :guests_per_member,
+        :good_for_friends,
         :cancelled,
         :club,
         :box,
@@ -191,6 +196,10 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
       open_to_non_members: boolean(),
       guest_pass_allowed: boolean(),
       guests_per_member: integer(minimum: 1, maximum: 10),
+      good_for_friends: %Schema{
+        type: :boolean,
+        description: "«Καλό για φίλους»; only when friends can come (open or guest passes)"
+      },
       cover_media_id: %{@nullable_uuid | description: "A ready box photo upload"}
     }
   end

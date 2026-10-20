@@ -173,4 +173,12 @@ describe("notificationTargetUrl after the member-app move", () => {
       ),
     ).toBe("/b/kypseli?trial=1&referral_event_id=event-1");
   });
+
+  it("opens «Φέρε φίλο» at the box for the inviter and the queue for staff (ADR-156)", () => {
+    expect(
+      notificationTargetUrl({ type: "referral_progress", payload: { url: "/me/referrals?tab=invites&box=kypseli" } }, "member"),
+    ).toBe("/me/referrals?tab=invites&box=kypseli");
+    expect(notificationTargetUrl({ type: "referral_reward", payload: {} }, "member")).toBe("/me/referrals?tab=invites");
+    expect(notificationTargetUrl({ type: "referral_review", payload: {} }, "admin")).toBe("/admin/finance?tab=referrals");
+  });
 });

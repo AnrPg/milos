@@ -320,6 +320,28 @@ defmodule MilosTraining.Finance do
 
   defdelegate list_referral_programs(), to: ListReferralPrograms, as: :call
   def list_referral_programs(context), do: scoped(context, fn -> list_referral_programs() end)
+  # ADR-156: what the Referrals context needs from Finance, each in the box's scope.
+  def active_referral_program(context),
+    do: scoped(context, fn -> FinanceStore.get_active_referral_program() end)
+
+  def get_referral_program(context, id),
+    do: scoped(context, fn -> FinanceStore.get_referral_program(id) end)
+
+  def open_attributed_referral(context, params),
+    do: scoped(context, fn -> FinanceStore.open_attributed_referral(params) end)
+
+  def count_referral_events_since(context, referrer_user_id, since),
+    do:
+      scoped(context, fn ->
+        FinanceStore.count_referral_events_since(referrer_user_id, since)
+      end)
+
+  def referral_outcomes(context, event_ids),
+    do: scoped(context, fn -> FinanceStore.referral_outcomes(event_ids) end)
+
+  def extend_current_subscription(context, membership_id, days),
+    do: scoped(context, fn -> FinanceStore.extend_current_subscription(membership_id, days) end)
+
   defdelegate create_referral_event(params), to: CreateReferralEvent, as: :call
 
   def create_referral_event(context, params),

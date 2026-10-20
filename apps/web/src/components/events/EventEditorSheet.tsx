@@ -65,6 +65,7 @@ export function blankEventForm(locations: EventLocation[], now: Date = new Date(
     openToAll: false,
     guestPass: false,
     guestsPerMember: 1,
+    goodForFriends: false,
     repeatWeekly: false,
     repeatUntil: "",
     coverMediaId: null,
@@ -322,6 +323,15 @@ export function EventEditorSheet({
                 </Field>
               ) : null}
             </div>
+            {form.openToAll || form.guestPass ? (
+              <label className="flex min-h-11 items-center gap-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
+                <input type="checkbox" checked={form.goodForFriends} onChange={(event) => set("goodForFriends", event.target.checked)} className="h-5 w-5" />
+                <span>
+                  {t("fieldGoodForFriends")}
+                  <span className="block text-xs font-normal" style={{ color: "var(--dim)" }}>{t("goodForFriendsHint")}</span>
+                </span>
+              </label>
+            ) : null}
           </>
         )}
 

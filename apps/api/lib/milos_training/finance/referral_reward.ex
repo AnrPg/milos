@@ -14,6 +14,8 @@ defmodule MilosTraining.Finance.ReferralReward do
     field :reward_value, :integer, default: 0
     field :status, :string, default: "pending"
     field :applied_at, :utc_datetime_usec
+    # A given discount reward, once a renewal invoice has taken it (ADR-156).
+    field :renewal_invoice_id, :binary_id
     field :params, :map, default: %{}
 
     timestamps(type: :utc_datetime_usec)

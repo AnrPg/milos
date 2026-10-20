@@ -5088,6 +5088,7 @@
     "followClassTimer": "Live class timer",
     "classCheckIn": "Check in",
     "programmeManage": "Change the day or decline",
+<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Wellness",
       "today": "Today",
@@ -5301,6 +5302,11 @@
         "invalid_media": "The photo isn't ready. Pick it again."
       }
     }
+=======
+    "meReferrals": "Bring a friend",
+    "meReferralsHint": "Your link, QR and invites",
+    "membershipReferral": "Bring a friend"
+>>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "All",
@@ -6188,7 +6194,8 @@
     "notif_event_guest_joined_body": "{person} is coming to «{event}» with your guest pass.",
     "notif_event_trial_offer_title": "Try a class",
     "notif_event_trial_offer_body": "Liked «{event}»? {box} invites you to a trial class.",
-    "notif_event_message_title": "Message about «{event}»"
+    "notif_event_message_title": "Message about «{event}»",
+    "findNearbyLater": "Clubs near you are coming with Around me."
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6421,7 +6428,9 @@
     "err_nobody_to_offer": "Nobody who came is waiting for a trial offer.",
     "err_trials_disabled": "The box isn't taking trials right now.",
     "eventsSegments": "Which events",
-    "nearMe": "Near me"
+    "nearMe": "Near me",
+    "fieldGoodForFriends": "Good for friends",
+    "goodForFriendsHint": "Comes first when members invite friends to an event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",
@@ -6977,5 +6986,200 @@
     "prSavedBody": "Want to share it with your box? Add a photo or video if you like.",
     "prShare": "Share it",
     "prNotNow": "Not now"
+  },
+  "Referrals": {
+    "title": "Bring a friend",
+    "pickBox": "Which box",
+    "noBox": "Join a box to invite friends there.",
+    "loading": "Loading…",
+    "loadFailed": "Couldn't load your invites. Try again in a moment.",
+    "shareLink": "Share link",
+    "showQr": "Show QR",
+    "copied": "Link copied",
+    "shareText": "Come train with me at {box}",
+    "offer": {
+      "friend": "Your friend: {gift}",
+      "friendNothing": "Invite a friend to train with you",
+      "you": "You: {reward}, {when}",
+      "cap": "{count, plural, one {Up to # friend a year} other {Up to # friends a year}}",
+      "staff": "Share the link with anyone. Rewards are for members.",
+      "noProgram": "Your box has no referral programme right now. Your link still works and your friends still show up here."
+    },
+    "events": {
+      "title": "Invite to an event",
+      "shareText": "Come with me to {title}",
+      "free": "free",
+      "invite": "Invite",
+      "goodForFriends": "Good for friends"
+    },
+    "list": {
+      "title": "Your invites",
+      "empty": "Nobody yet. Share your link, or invite a friend to an event: it's the easiest start.",
+      "totals": "{invited} invited · {trials} trials · {paid} joined",
+      "someone": "Someone",
+      "earned": "You got {reward}"
+    },
+    "newLink": {
+      "action": "New link",
+      "confirm": "Your current link and QR will stop working. Friends you already invited stay yours.",
+      "yes": "Make a new link",
+      "no": "Keep this one"
+    },
+    "qr": {
+      "title": "Your invite QR",
+      "close": "Close",
+      "alt": "QR code of your invite link",
+      "hint": "Your friend scans it with their phone camera."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# day free} other {# days free}}",
+      "credit": "{amount} credit"
+    },
+    "reward": {
+      "credit": "{amount} credit",
+      "discount": "−{percent}% on your renewal",
+      "freePeriod": "{days, plural, one {# day free} other {# days free}}",
+      "manual": "a gift from the box"
+    },
+    "when": {
+      "trial": "when they come to a trial",
+      "paid": "when they subscribe"
+    },
+    "stage": {
+      "signed_up": "Signed up",
+      "event": "Came to an event",
+      "trial": "Came to a trial",
+      "joined": "Joined the box",
+      "paid": "Subscribed"
+    },
+    "status": {
+      "open": "On the way",
+      "qualified": "Counted",
+      "capped": "Over the yearly limit",
+      "expired": "Expired",
+      "void": "Doesn't count"
+    },
+    "rewardStatus": {
+      "upcoming": "Not yet",
+      "pending": "Awaiting approval",
+      "approved": "Approved",
+      "given": "Given",
+      "rejected": "Not approved",
+      "capped": "Over the limit",
+      "none": "No reward"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Event",
+      "guest_pass": "Guest pass",
+      "staff": "Staff"
+    },
+    "invite": {
+      "heading": "Invite",
+      "title": "{name} invites you to {box}",
+      "titleNoName": "You're invited to {box}",
+      "preview": "Train with a friend at {box} on Milos.",
+      "from": "{name} invites you to train at {box}",
+      "fromMember": "A member invites you to train at {box}",
+      "toEvent": "…and to an event there.",
+      "gift": "For you: {gift}",
+      "giftWhen": "Given by the box with your first package.",
+      "signUp": "Create an account",
+      "signIn": "I already have an account",
+      "seeBox": "See the box",
+      "consent": "{name} will see your first name and how far you got (sign-up, trial, subscription). Nothing else.",
+      "consentNoName": "The member who invited you will see your first name and how far you got (sign-up, trial, subscription). Nothing else.",
+      "claiming": "Saving your invite…",
+      "failed": "We couldn't save your invite right now. We'll try again next time you open Milos.",
+      "alreadyMember": "You're already at {box}, so this invite doesn't apply.",
+      "alreadyInvited": "Another member’s invite already counted for you.",
+      "self": "This is your own invite link.",
+      "claimed": "Done. Your invite to {box} is saved.",
+      "openMine": "Open Bring a friend",
+      "openEvent": "See the event",
+      "bookTrial": "Book a trial",
+      "gone": "This invite isn't active any more",
+      "goneHint": "The link may have been replaced. Ask your friend for a new one.",
+      "home": "Go to Milos"
+    },
+    "notif": {
+      "progressTitle": "Your invite",
+      "progress": {
+        "signed_up": "{person} signed up with your invite.",
+        "event": "{person} came to the event you invited them to.",
+        "trial": "{person} came to a trial.",
+        "joined": "{person} joined the box.",
+        "paid": "{person} subscribed."
+      },
+      "rewardTitle": "Referral reward",
+      "reward": {
+        "approved": "Your referral reward was approved.",
+        "given": "Your referral reward was given.",
+        "rejected": "Your referral was not approved."
+      },
+      "reviewTitle": "Referral to approve",
+      "reviewBody": "{person} subscribed, invited by {referrer}."
+    },
+    "staff": {
+      "title": "Invites from members",
+      "filter": "Which invites",
+      "filter_review": "To approve",
+      "filter_all": "All",
+      "stats": "Last 90 days: {open} on the way · {qualified} counted · {expired} expired",
+      "emptyReview": "Nothing to approve.",
+      "empty": "No invites yet. Members share their link from Me › Bring a friend.",
+      "noReferrer": "a former member",
+      "row": "{friend} ← {referrer}",
+      "panel": "Invite",
+      "approve": "Approve",
+      "reject": "Reject",
+      "given": "Given",
+      "applyGift": "Apply friend's gift",
+      "reassign": "Give to another member",
+      "status": "Status",
+      "void_staff": "staff don't earn rewards",
+      "void_other": "doesn't count",
+      "channel": "How",
+      "newAccount": "new account",
+      "window": "Holds",
+      "until": "until {date}",
+      "program": "Programme",
+      "reward": "Member's reward",
+      "gift": "Friend's gift",
+      "giftApplied": "applied {date}",
+      "previous": "Was",
+      "notes": "Notes",
+      "newReferrer": "New member",
+      "reassignSave": "Save",
+      "cancel": "Cancel",
+      "note": "Note (optional)",
+      "discountOnRenewal": "«Given» takes it off the member’s next renewal invoice."
+    },
+    "rules": {
+      "rewardNote": "What the member gets (in words)",
+      "friendGift": "Friend's gift",
+      "gift_free_days": "Free days on the first package",
+      "gift_credit": "Credit",
+      "gift_custom": "Something else",
+      "gift_none": "Nothing",
+      "giftDays": "Days",
+      "giftEuros": "Amount (€)",
+      "giftNote": "What the friend gets",
+      "counts": "The invite counts",
+      "counts_paid": "On the first payment",
+      "counts_trial": "On the first trial",
+      "approval": "Rewards",
+      "approval_manual": "Approved by staff",
+      "approval_auto": "Approved automatically",
+      "window": "Invite holds (days)",
+      "cap": "Rewarded friends per member per year",
+      "capNone": "No limit",
+      "hint": "One programme is active per box: activating this one retires the other. Invites keep the terms they were made with."
+    },
+    "tabs": {
+      "invite": "Invite",
+      "invites": "Your invites · {count}"
+    }
   }
 }
