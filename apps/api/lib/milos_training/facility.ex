@@ -4,7 +4,7 @@ defmodule MilosTraining.Facility do
   that consume package visits go through `Application.CheckInOpenGym`.
   """
 
-  alias MilosTraining.Facility.Domain.{GeoDistance, MapLink, PlacePolicy}
+  alias MilosTraining.Facility.Domain.{CheckInRules, GeoDistance, MapLink, PlacePolicy}
   alias MilosTraining.Facility.FacilityStore
 
   @doc "Kilometres between two `{latitude, longitude}` points; nil when either is missing."
@@ -79,6 +79,42 @@ defmodule MilosTraining.Facility do
   def get_check_in(context, user_id, date), do: FacilityStore.get_check_in(context, user_id, date)
   def create_check_in(context, attrs), do: FacilityStore.create_check_in(context, attrs)
   def list_check_ins(context, filters \\ %{}), do: FacilityStore.list_check_ins(context, filters)
+
+  # ADR-155: QR check-in.
+  def get_check_in_by_id(context, id), do: FacilityStore.get_check_in_by_id(context, id)
+  def delete_check_in(context, id), do: FacilityStore.delete_check_in(context, id)
+
+  @doc "A location's door seed (bytes), or nil. Only key derivation may see it."
+  def get_door_secret(context, location_id),
+    do: FacilityStore.get_door_secret(context, location_id)
+
+  @doc "«Νέος κωδικός πόρτας»: a fresh seed; every code shown so far stops working."
+  def rotate_door_secret(context, location_id, now),
+    do: FacilityStore.rotate_door_secret(context, location_id, :crypto.strong_rand_bytes(32), now)
+
+  @doc "The box's check-in rules with defaults filled in."
+  def check_in_rules(context),
+    do: context |> FacilityStore.get_check_in_settings() |> CheckInRules.effective()
+
+  @doc "Validates and saves a change to the box's check-in rules."
+  def update_check_in_rules(context, attrs) do
+    with {:ok, changes} <- CheckInRules.validate(attrs),
+         {:ok, _saved} <-
+           FacilityStore.put_check_in_settings(
+             context,
+             Map.merge(check_in_rules(context), changes)
+           ) do
+      {:ok, check_in_rules(context)}
+    end
+  end
+
+  def record_visitor_scan(context, attrs), do: FacilityStore.record_visitor_scan(context, attrs)
+
+  def list_visitor_scans(context, filters \\ %{}),
+    do: FacilityStore.list_visitor_scans(context, filters)
+
+  @doc "The box behind a door (name, branding, location name), or nil."
+  def door_location(location_id), do: FacilityStore.door_location(location_id)
 
   # Tenant data lifecycle (ADR-117).
   def tenant_data_policy, do: MilosTraining.Facility.Domain.TenantDataPolicy.policy()

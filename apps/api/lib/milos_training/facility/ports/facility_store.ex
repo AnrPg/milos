@@ -11,4 +11,17 @@ defmodule MilosTraining.Facility.Ports.FacilityStore do
   @callback get_check_in(context(), binary(), Date.t()) :: map() | nil
   @callback create_check_in(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_check_ins(context(), map()) :: [map()]
+
+  # ADR-155: door codes, scans and the owner's check-in rules.
+  @callback get_check_in_by_id(context(), binary()) :: map() | nil
+  @callback delete_check_in(context(), binary()) :: {:ok, map()} | {:error, term()}
+  @callback get_door_secret(context(), binary()) :: binary() | nil
+  @callback rotate_door_secret(context(), binary(), binary(), DateTime.t()) ::
+              {:ok, map()} | {:error, term()}
+  @callback get_check_in_settings(context()) :: map() | nil
+  @callback put_check_in_settings(context(), map()) :: {:ok, map()} | {:error, term()}
+  @callback record_visitor_scan(context(), map()) :: {:ok, map()} | {:error, term()}
+  @callback list_visitor_scans(context(), map()) :: [map()]
+  @doc "The box behind a door, before any tenant is known (a narrow definer lookup)."
+  @callback door_location(binary()) :: map() | nil
 end

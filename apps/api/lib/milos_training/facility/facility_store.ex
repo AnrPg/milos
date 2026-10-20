@@ -35,4 +35,37 @@ defmodule MilosTraining.Facility.FacilityStore do
 
   @impl true
   def list_check_ins(context, filters), do: tenant_call(context, :list_check_ins, [filters])
+
+  @impl true
+  def get_check_in_by_id(context, id), do: tenant_call(context, :get_check_in_by_id, [id])
+
+  @impl true
+  def delete_check_in(context, id), do: tenant_call(context, :delete_check_in, [id])
+
+  @impl true
+  def get_door_secret(context, location_id),
+    do: tenant_call(context, :get_door_secret, [location_id])
+
+  @impl true
+  def rotate_door_secret(context, location_id, secret, at),
+    do: tenant_call(context, :rotate_door_secret, [location_id, secret, at])
+
+  @impl true
+  def get_check_in_settings(context), do: tenant_call(context, :get_check_in_settings, [])
+
+  @impl true
+  def put_check_in_settings(context, changes),
+    do: tenant_call(context, :put_check_in_settings, [changes])
+
+  @impl true
+  def record_visitor_scan(context, attrs), do: tenant_call(context, :record_visitor_scan, [attrs])
+
+  @impl true
+  def list_visitor_scans(context, filters),
+    do: tenant_call(context, :list_visitor_scans, [filters])
+
+  # No tenant yet: the definer function answers only for active boxes and
+  # open locations, and returns what the door itself shows.
+  @impl true
+  def door_location(location_id), do: adapter().door_location(location_id)
 end

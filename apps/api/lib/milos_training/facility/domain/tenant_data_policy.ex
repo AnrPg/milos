@@ -13,11 +13,15 @@ defmodule MilosTraining.Facility.Domain.TenantDataPolicy do
             purge_order: 120,
             disposition: :purge,
             basis:
-              "Locations and check-ins are operational data with no retention obligation; purged after Scheduling and Appointments because classes and appointment slots reference locations.",
+              "Locations, check-ins, visitor scans and check-in rules are operational data with no retention obligation; purged after Scheduling and Appointments because classes and appointment slots reference locations.",
             tables: [
+              %{table: "facility_visitor_scans"},
               %{table: "facility_check_ins"},
+              %{table: "facility_check_in_settings"},
               %{table: "facility_locations"}
-            ]
+            ],
+            # ADR-155: the door seed is a secret, never exported.
+            excluded_columns: ["door_secret"]
           })
 
   def policy, do: @policy

@@ -1,5 +1,8 @@
 defmodule MilosTraining.Facility.CheckIn do
-  @moduledoc "An open-gym visit: one per member and day (ADR-097)."
+  @moduledoc """
+  An open-gym visit: one per member and day (ADR-097), with how it happened
+  (ADR-155): `door_qr`, `member_qr`, `wallet`, `desk_search` or `self`.
+  """
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -16,9 +19,15 @@ defmodule MilosTraining.Facility.CheckIn do
     field :source, :string
     field :recorded_by_id, :binary_id
     field :reservation_id, :binary_id
+    field :method, :string, default: "self"
 
     timestamps(type: :utc_datetime_usec)
   end
+
+  @methods ~w(door_qr member_qr wallet desk_search self)
+
+  @doc "How a check-in happened (ADR-155)."
+  def methods, do: @methods
 
   def changeset(check_in \\ %__MODULE__{}, params) do
     check_in
@@ -31,10 +40,12 @@ defmodule MilosTraining.Facility.CheckIn do
       :checked_in_at,
       :source,
       :recorded_by_id,
-      :reservation_id
+      :reservation_id,
+      :method
     ])
     |> validate_required([:organization_id, :user_id, :checked_in_on, :checked_in_at, :source])
     |> validate_inclusion(:source, ["self", "staff"])
+    |> validate_inclusion(:method, methods())
     |> foreign_key_constraint(:location_id)
     |> unique_constraint([:user_id, :checked_in_on], name: :facility_check_ins_daily_index)
   end
