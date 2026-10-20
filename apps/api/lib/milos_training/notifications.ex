@@ -817,15 +817,17 @@ defmodule MilosTraining.Notifications do
     }
   end
 
-  # ADR-156: the member's notices open «Φέρε φίλο» at that box; staff's
-  # open the Finance › Συστάσεις queue.
+  # ADR-156: the member's notices open «Φέρε φίλο» › «Οι προσκλήσεις σου»
+  # at that box (board 11 Q2 B); staff's open the Finance › Συστάσεις queue.
   defp referral_payload(type, payload) do
     attribution_id = field(payload, :attribution_id)
     box = field(payload, :box) || %{}
     box_slug = field(box, :box_slug)
 
     mine =
-      if box_slug, do: "/me/referrals?box=#{URI.encode_www_form(box_slug)}", else: "/me/referrals"
+      if box_slug,
+        do: "/me/referrals?tab=invites&box=#{URI.encode_www_form(box_slug)}",
+        else: "/me/referrals?tab=invites"
 
     {dedupe, url} =
       case type do

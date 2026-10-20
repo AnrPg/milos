@@ -195,9 +195,22 @@ defmodule MilosTrainingWeb.Schemas.Referrals do
           type: :string,
           enum: ~w(open guest_pass),
           description: "open: anyone signed in; guest_pass: as the member's guest"
+        },
+        good_for_friends: %Schema{
+          type: :boolean,
+          description: "Staff tagged it «Καλό για φίλους»; these come first"
         }
       },
-      required: [:id, :title, :starts_at, :ends_at, :price_cents, :currency, :access]
+      required: [
+        :id,
+        :title,
+        :starts_at,
+        :ends_at,
+        :price_cents,
+        :currency,
+        :access,
+        :good_for_friends
+      ]
     }
   end
 

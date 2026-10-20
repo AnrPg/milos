@@ -485,7 +485,11 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
           localize.("%{nickname} signed up with your invite.", bindings)
       end
 
-    %{title: localize.("Your invite", %{}), body: body, url: payload["url"] || "/me/referrals"}
+    %{
+      title: localize.("Your invite", %{}),
+      body: body,
+      url: payload["url"] || "/me/referrals?tab=invites"
+    }
   end
 
   def build("referral_reward", payload, localize) do
@@ -499,7 +503,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Referral reward", %{}),
       body: body,
-      url: payload["url"] || "/me/referrals"
+      url: payload["url"] || "/me/referrals?tab=invites"
     }
   end
 

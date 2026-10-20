@@ -18,7 +18,7 @@ defmodule MilosTraining.Referrals.Domain.Attribution do
   @statuses ~w(open qualified capped expired void)
   @steps [:event, :trial, :joined, :paid]
   @step_fields %{event: :event_at, trial: :trial_at, joined: :joined_at, paid: :paid_at}
-  @default_window_days 60
+  @default_window_days 30
 
   def channels, do: @channels
   def statuses, do: @statuses

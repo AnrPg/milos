@@ -18,7 +18,7 @@ defmodule MilosTraining.Finance.ReferralProgram do
     field :friend_reward_note, :string
     field :reward_note, :string
     field :qualifying_stage, :string, default: "paid"
-    field :attribution_days, :integer, default: 60
+    field :attribution_days, :integer, default: 30
     field :yearly_cap, :integer
     field :approval, :string, default: "manual"
 

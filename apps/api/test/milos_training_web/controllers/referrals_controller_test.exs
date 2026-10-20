@@ -219,6 +219,56 @@ defmodule MilosTraining.Web.ReferralsControllerTest do
       assert %{"earns_rewards" => false} = overview(ctx, ctx.coach)
     end
 
+    test "events staff tag «Καλό για φίλους» come first, open ones only", ctx do
+      club_id =
+        ctx.as.(ctx.member)
+        |> get("/api/me/clubs")
+        |> json_response(200)
+        |> Map.fetch!("clubs")
+        |> Enum.find(&(&1["kind"] == "gym"))
+        |> Map.fetch!("id")
+
+      staff_events = "#{ctx.admin}/community/events"
+
+      event = fn title, days, attrs ->
+        starts_at = DateTime.utc_now() |> DateTime.truncate(:second) |> DateTime.add(days, :day)
+
+        ctx.as.(ctx.coach)
+        |> send_json(
+          :post,
+          staff_events,
+          Map.merge(
+            %{
+              club_id: club_id,
+              title: title,
+              starts_at: DateTime.to_iso8601(starts_at),
+              ends_at: starts_at |> DateTime.add(1, :hour) |> DateTime.to_iso8601(),
+              place_name: "Box",
+              open_to_non_members: true
+            },
+            attrs
+          )
+        )
+      end
+
+      soon = event.("Open WOD", 2, %{}) |> json_response(201)
+      later = event.("Bring a friend WOD", 9, %{good_for_friends: true}) |> json_response(201)
+      assert later["event"]["good_for_friends"]
+      refute soon["event"]["good_for_friends"]
+
+      # A members-only event can't take the tag.
+      assert %{"errors" => %{"good_for_friends" => [_]}} =
+               event.("Members only", 3, %{open_to_non_members: false, good_for_friends: true})
+               |> json_response(422)
+
+      assert [
+               %{"title" => "Bring a friend WOD", "good_for_friends" => true},
+               %{"title" => "Open WOD", "good_for_friends" => false}
+             ] =
+               overview(ctx, ctx.member)["events"]
+               |> Enum.map(&Map.take(&1, ~w(title good_for_friends)))
+    end
+
     test "a new code retires the old link", ctx do
       %{"code" => old} = overview(ctx, ctx.member)
 
@@ -456,6 +506,53 @@ defmodule MilosTraining.Web.ReferralsControllerTest do
                  note: "Ήταν ήδη πελάτης"
                })
                |> json_response(200)
+    end
+
+    test "a given discount comes off the member's next renewal, once", ctx do
+      program!(ctx, %{reward_type: "discount", reward_value: 10})
+      %{"code" => code} = overview(ctx, ctx.member)
+      claim(ctx, ctx.friend, code) |> json_response(200)
+      first_payment!(ctx, ctx.friend)
+      %{id: id} = attribution(ctx, ctx.friend)
+
+      for action <- ~w(approve given) do
+        ctx.as.(ctx.owner)
+        |> send_json(:post, "#{ctx.admin}/referrals/#{id}/#{action}", %{})
+        |> json_response(200)
+      end
+
+      {:ok, package} =
+        Finance.create_package(ctx.owner_context, %{
+          name: "Μηνιαίο μέλους",
+          family: "unlimited",
+          billing_period: "monthly",
+          base_price_cents: 6_000
+        })
+
+      membership = finance_record!(ctx, ctx.member)
+
+      {:ok, subscription} =
+        Finance.assign_package(ctx.owner_context, membership.id, package.id, %{
+          ends_on: Date.add(Date.utc_today(), 30)
+        })
+
+      renew = fn start ->
+        Finance.generate_renewal_invoice(ctx.owner_context, membership.id, %{
+          membership_package_subscription_id: subscription.id,
+          service_period_start: start
+        })
+      end
+
+      assert {:ok, %{id: invoice_id, lines: [%{discount_cents: 600}]}} =
+               renew.(Date.add(Date.utc_today(), 31))
+
+      # Used once: the renewal after that is full price.
+      assert {:ok, %{lines: [%{discount_cents: 0}]}} = renew.(Date.add(Date.utc_today(), 62))
+
+      # Voiding the discounted renewal frees the reward for the next one.
+      assert {:ok, _void} = Finance.void_invoice(ctx.owner_context, invoice_id, %{})
+
+      assert {:ok, %{lines: [%{discount_cents: 600}]}} = renew.(Date.add(Date.utc_today(), 93))
     end
 
     test "automatic approval, the yearly cap and a programme that rewards the trial", ctx do

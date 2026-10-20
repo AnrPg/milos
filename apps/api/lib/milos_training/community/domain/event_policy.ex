@@ -25,7 +25,12 @@ defmodule MilosTraining.Community.Domain.EventPolicy do
   @conversion_days 30
   @scopes ~w(this following)
   @late_cancel_window_days 90
-  @group_terms %{price_cents: 0, open_to_non_members: false, guest_pass_allowed: false}
+  @group_terms %{
+    price_cents: 0,
+    open_to_non_members: false,
+    guest_pass_allowed: false,
+    good_for_friends: false
+  }
 
   def late_cancel_minutes, do: @late_cancel_minutes
   def reminder_minutes, do: @reminder_minutes

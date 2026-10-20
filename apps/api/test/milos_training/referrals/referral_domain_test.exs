@@ -87,9 +87,9 @@ defmodule MilosTraining.Referrals.ReferralDomainTest do
                )
     end
 
-    test "the window defaults to 60 days" do
-      assert Attribution.expires_at(@now, 30) == DateTime.add(@now, 30, :day)
-      assert Attribution.expires_at(@now, nil) == DateTime.add(@now, 60, :day)
+    test "the window defaults to 30 days" do
+      assert Attribution.expires_at(@now, 45) == DateTime.add(@now, 45, :day)
+      assert Attribution.expires_at(@now, nil) == DateTime.add(@now, 30, :day)
     end
   end
 

@@ -92,7 +92,7 @@ defmodule MilosTraining.Repo.Migrations.MemberReferrals do
       # When an invite counts: the friend's first trial or first payment.
       add :qualifying_stage, :string, null: false, default: "paid"
       # How long an invite holds (first invite wins inside it).
-      add :attribution_days, :integer, null: false, default: 60
+      add :attribution_days, :integer, null: false, default: 30
       # Rewarded friends per member per rolling year; nil means no cap.
       add :yearly_cap, :integer
       add :approval, :string, null: false, default: "manual"

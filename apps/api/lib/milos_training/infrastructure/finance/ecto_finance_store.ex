@@ -898,27 +898,29 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         if renewal_invoice_exists?(membership.id, subscription.id, period_start, period_end) do
           {:error, :duplicate_renewal_invoice}
         else
-          case create_invoice(membership.id, %{
-                 "invoice_type" => "renewal",
-                 "membership_package_subscription_id" => subscription.id,
-                 "issue_date" => params["issue_date"],
-                 "due_date" => params["due_date"] || period_start,
-                 "service_period_start" => period_start,
-                 "service_period_end" => period_end,
-                 "notes" => params["notes"],
-                 "lines" => [
-                   %{
-                     "membership_package_subscription_id" => subscription.id,
-                     "line_type" => "membership_package",
-                     "description" => "Renewal: #{subscription.package_code_snapshot}",
-                     "quantity" => 1,
-                     "unit_amount_cents" => subscription.price_cents_snapshot || 0,
-                     "discount_cents" => 0,
-                     "package_code_snapshot" => subscription.package_code_snapshot,
-                     "package_family_snapshot" => subscription.package_family_snapshot
-                   }
-                 ]
-               }) do
+          case renewal_with_referral_discounts(membership, subscription, fn discount_cents ->
+                 %{
+                   "invoice_type" => "renewal",
+                   "membership_package_subscription_id" => subscription.id,
+                   "issue_date" => params["issue_date"],
+                   "due_date" => params["due_date"] || period_start,
+                   "service_period_start" => period_start,
+                   "service_period_end" => period_end,
+                   "notes" => params["notes"],
+                   "lines" => [
+                     %{
+                       "membership_package_subscription_id" => subscription.id,
+                       "line_type" => "membership_package",
+                       "description" => "Renewal: #{subscription.package_code_snapshot}",
+                       "quantity" => 1,
+                       "unit_amount_cents" => subscription.price_cents_snapshot || 0,
+                       "discount_cents" => discount_cents,
+                       "package_code_snapshot" => subscription.package_code_snapshot,
+                       "package_family_snapshot" => subscription.package_family_snapshot
+                     }
+                   ]
+                 }
+               end) do
             {:error, %Ecto.Changeset{} = changeset} ->
               if constraint_error?(
                    changeset,
@@ -938,6 +940,50 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       nil -> {:error, :not_found}
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  # ADR-156 (board 11 Q6): the member's given discount rewards come off this
+  # renewal, each used once. The rewards are locked so two renewals can't
+  # both take the same one.
+  defp renewal_with_referral_discounts(%Membership{} = membership, subscription, invoice_params) do
+    Repo.transaction(fn ->
+      rewards =
+        ReferralReward
+        |> tenant_scope()
+        |> where(
+          [r],
+          r.recipient_user_id == ^membership.user_id and r.reward_type == "discount" and
+            r.status == "applied" and is_nil(r.renewal_invoice_id)
+        )
+        |> lock("FOR UPDATE")
+        |> Repo.all()
+
+      discount_cents =
+        ReferralRewardFulfillment.renewal_discount_cents(
+          rewards,
+          subscription.price_cents_snapshot || 0
+        )
+
+      with {:ok, invoice} <- create_invoice(membership.id, invoice_params.(discount_cents)) do
+        reward_ids = Enum.map(rewards, & &1.id)
+
+        ReferralReward
+        |> where([r], r.id in ^reward_ids)
+        |> Repo.update_all(set: [renewal_invoice_id: invoice.id, updated_at: DateTime.utc_now()])
+
+        invoice
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  # Voiding a renewal frees the discount rewards it took for the next one.
+  defp release_referral_discounts(invoice_id) do
+    ReferralReward
+    |> tenant_scope()
+    |> where([r], r.renewal_invoice_id == ^invoice_id)
+    |> Repo.update_all(set: [renewal_invoice_id: nil, updated_at: DateTime.utc_now()])
   end
 
   @impl true
@@ -998,6 +1044,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             |> Repo.update()
             |> case do
               {:ok, updated_invoice} ->
+                release_referral_discounts(updated_invoice.id)
                 refresh_entitlement_snapshot(updated_invoice.membership_id)
                 normalize_invoice_with_balance(updated_invoice)
 
@@ -3408,7 +3455,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:ok, {:credit_grant, amount_cents}} ->
         sync_referral_reward_credit(reward, amount_cents, amount_cents)
 
-      {:ok, :lifecycle_only} ->
+      {:ok, plan} when plan in [:lifecycle_only, :renewal_discount] ->
         reward
 
       {:error, reason} ->
@@ -3421,7 +3468,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:ok, {:credit_grant, amount_cents}} ->
         sync_referral_reward_credit(reward, amount_cents, 0)
 
-      {:ok, :lifecycle_only} ->
+      {:ok, plan} when plan in [:lifecycle_only, :renewal_discount] ->
         reward
 
       {:error, reason} ->

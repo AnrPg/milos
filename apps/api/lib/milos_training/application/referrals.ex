@@ -104,16 +104,18 @@ defmodule MilosTraining.Application.Referrals do
 
   # Board 11 Q3: open events anyone signed in can come to, and events with
   # guest passes the member is going to (their guests count as invites too).
+  # Events staff tagged «Καλό για φίλους» come first, then the soonest; the
+  # tagged ones are read on their own so a later one isn't cut by the limit.
   defp invitable_events(%{organization_id: organization_id, user_id: user_id}, now) do
     gym = %{organization_id: organization_id, user_id: user_id}
+    upcoming_open = %{organization_ids: [organization_id], open_only: true, from: now}
 
     open =
-      Community.list_events(gym, %{
-        organization_ids: [organization_id],
-        open_only: true,
-        from: now,
-        limit: @events_limit
-      })
+      Community.list_events(
+        gym,
+        Map.merge(upcoming_open, %{good_for_friends: true, limit: @events_limit})
+      ) ++
+        Community.list_events(gym, Map.put(upcoming_open, :limit, @events_limit))
 
     going_ids =
       %{user_id: user_id}
@@ -134,13 +136,7 @@ defmodule MilosTraining.Application.Referrals do
 
     (open ++ with_guests)
     |> Enum.uniq_by(& &1.id)
-    |> Enum.sort_by(&{&1.starts_at, &1.id}, fn {a, ida}, {b, idb} ->
-      case DateTime.compare(a, b) do
-        :lt -> true
-        :gt -> false
-        :eq -> ida <= idb
-      end
-    end)
+    |> Enum.sort(&invite_order?/2)
     |> Enum.take(@events_limit)
     |> Enum.map(fn event ->
       %{
@@ -151,9 +147,23 @@ defmodule MilosTraining.Application.Referrals do
         price_cents: event.price_cents,
         currency: event.currency,
         place_name: event.place_name,
-        access: if(event.open_to_non_members, do: "open", else: "guest_pass")
+        access: if(event.open_to_non_members, do: "open", else: "guest_pass"),
+        good_for_friends: event.good_for_friends
       }
     end)
+  end
+
+  defp invite_order?(a, b) do
+    cond do
+      a.good_for_friends != b.good_for_friends ->
+        a.good_for_friends
+
+      DateTime.compare(a.starts_at, b.starts_at) != :eq ->
+        DateTime.before?(a.starts_at, b.starts_at)
+
+      true ->
+        a.id <= b.id
+    end
   end
 
   # ---------------------------------------------------------------- friend
