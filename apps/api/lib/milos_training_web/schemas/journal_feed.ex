@@ -2,13 +2,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
   @moduledoc """
   OpenAPI schemas of the journal feed, ladder moves and Σημείωση notes
   (ADR-139). A feed item's `entry` is the entry as its own endpoint returns
-  it (execution, training-log entry, PR, injury, review, note or check-in),
-  chosen by `kind`.
+  it (execution, training-log entry, PR, injury, review, note, check-in or,
+  ADR-158, a body snapshot, only ever in your own feed), chosen by `kind`.
   """
 
   alias OpenApiSpex.Schema
 
-  @kinds ~w(execution training_log pr injury review note check_in)
+  @kinds ~w(execution training_log pr injury review note check_in body)
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
   @topics ~w(technique thought mood goal)
 
@@ -33,7 +33,7 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         properties: %{
           kind: %Schema{
             type: :string,
-            enum: ~w(execution training_log pr injury review note check_in)
+            enum: ~w(execution training_log pr injury review note check_in body)
           },
           id: %Schema{type: :string, format: :uuid},
           occurred_at: %Schema{type: :string, format: :"date-time"},
