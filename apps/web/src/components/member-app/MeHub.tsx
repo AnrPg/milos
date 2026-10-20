@@ -19,13 +19,14 @@ import { setView } from "@/lib/view-mode";
  * everything secondary, so the app needs no "More" drawer (brief §4.8).
  * Under the name, «ακόλουθοι · ακολουθείς» opens the connections screen
  * (plan §5a Q12).
- * Rows for Phase 2 features (Φέρε φίλο, Buddy, Συνδεδεμένες συσκευές) join
- * the list when they exist.
+ * Rows for Phase 2 features join the list when they exist (Συνδεδεμένες
+ * συσκευές: ADR-155; Φέρε φίλο and Buddy to come).
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");
   const tNav = useTranslations("Navigation");
   const tSocial = useTranslations("Social");
+  const tCheckIn = useTranslations("CheckIn");
   const summary = useSocialSummary();
   const router = useRouter();
   const { currentUser, signOut } = useSession();
@@ -74,6 +75,7 @@ export function MeHub() {
         <HubListRow href="/me/clubs" label={t("meClubs")} detail={t("meClubsHint")} />
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
         <HubListRow href="/me/sharing" label={t("meSharing")} detail={t("meSharingHint")} />
+        <HubListRow href="/me/devices" label={tCheckIn("devicesTitle")} detail={tCheckIn("devicesNavHint")} />
         <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />
         <HubListRow href="/me/activity/chats" label={t("meChats")} />
         <HubListRow href="/me/settings" label={t("meSettings")} detail={t("meSettingsHint")} />
