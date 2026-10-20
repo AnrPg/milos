@@ -422,3 +422,15 @@ msgstr ""
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr ""
+
+msgid "How did it go?"
+msgstr ""
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr ""
+
+msgid "A glass of water?"
+msgstr ""
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr ""

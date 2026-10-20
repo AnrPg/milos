@@ -96,13 +96,16 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
 
   # Runs in the platform session of the follow-up job.
   @impl true
-  def due_craving_follow_ups(%DateTime{} = now, limit) do
-    Craving
-    |> where([c], is_nil(c.deleted_at) and is_nil(c.followed_up_at))
-    |> where([c], not is_nil(c.follow_up_at) and c.follow_up_at <= ^now)
-    |> order_by([c], asc: c.follow_up_at)
-    |> limit(^limit)
-    |> Repo.all()
+  # Platform sweeps: definer lookups that answer ids only; each person is
+  # then handled in their own session.
+  def craving_follow_ups_due(%DateTime{} = now, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, craving_id FROM milos_craving_follow_ups_due($1, $2)", [
+        DateTime.to_naive(now),
+        limit
+      ])
+
+    Enum.map(rows, fn [user_id, id] -> {Ecto.UUID.load!(user_id), Ecto.UUID.load!(id)} end)
   end
 
   @impl true
@@ -111,6 +114,26 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
 
   @impl true
   def get_preferences(user_id), do: Repo.get_by(Preferences, user_id: user_id)
+
+  @impl true
+  def water_reminders_due(%DateTime{} = now, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, local_day FROM milos_water_reminders_due($1, $2)", [
+        DateTime.to_naive(now),
+        limit
+      ])
+
+    Enum.map(rows, fn [user_id, day] -> {Ecto.UUID.load!(user_id), day} end)
+  end
+
+  @impl true
+  def mark_water_reminded(user_id, %Date{} = day) do
+    Preferences
+    |> where([p], p.user_id == ^user_id)
+    |> Repo.update_all(set: [water_reminded_on: day, updated_at: DateTime.utc_now()])
+
+    :ok
+  end
 
   @impl true
   def put_preferences(user_id, attrs) do

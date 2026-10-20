@@ -35,7 +35,7 @@ defmodule MilosTraining.Wellness.WellnessStore do
   @impl true
   def list_cravings(user_id, from, to), do: adapter().list_cravings(user_id, from, to)
   @impl true
-  def due_craving_follow_ups(now, limit), do: adapter().due_craving_follow_ups(now, limit)
+  def craving_follow_ups_due(now, limit), do: adapter().craving_follow_ups_due(now, limit)
   @impl true
   def mark_followed_up(craving, at), do: adapter().mark_followed_up(craving, at)
 
@@ -43,6 +43,10 @@ defmodule MilosTraining.Wellness.WellnessStore do
   def get_preferences(user_id), do: adapter().get_preferences(user_id)
   @impl true
   def put_preferences(user_id, attrs), do: adapter().put_preferences(user_id, attrs)
+  @impl true
+  def water_reminders_due(now, limit), do: adapter().water_reminders_due(now, limit)
+  @impl true
+  def mark_water_reminded(user_id, day), do: adapter().mark_water_reminded(user_id, day)
 
   @impl true
   def erase(user_id, sections, now), do: adapter().erase(user_id, sections, now)

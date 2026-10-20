@@ -6,13 +6,14 @@ defmodule MilosTraining.Application.LogCraving do
   it is the buddy's business (M12).
   """
 
-  alias MilosTraining.Application.{BroadcastUserSync, WellnessInput}
+  alias MilosTraining.Application.{BroadcastUserSync, WellnessConsent, WellnessInput}
   alias MilosTraining.Wellness
 
   def call(%{user_id: user_id, account: account} = context, params, now \\ DateTime.utc_now()) do
     now = WellnessInput.usec(now)
 
-    with {:ok, occurrence} <- WellnessInput.occurrence(params, now),
+    with :ok <- WellnessConsent.require(context),
+         {:ok, occurrence} <- WellnessInput.occurrence(params, now),
          {:ok, organization_id} <- WellnessInput.provenance(account, params),
          {:ok, fields} <- fields(params, now),
          {:ok, craving} <-
@@ -27,6 +28,8 @@ defmodule MilosTraining.Application.LogCraving do
              })
              |> Wellness.insert_craving()
            end) do
+      :ok = request_support(context, craving, nil)
+
       BroadcastUserSync.for_user(user_id, ["my_wellbeing"],
         reason: "craving_logged",
         payload: %{craving_id: craving.id}
@@ -69,6 +72,22 @@ defmodule MilosTraining.Application.LogCraving do
   defp outcome_at(nil, _existing, _now), do: nil
   defp outcome_at(outcome, %{outcome: outcome, outcome_at: at}, _now) when not is_nil(at), do: at
   defp outcome_at(_outcome, _existing, now), do: now
+
+  @doc """
+  Passes a new support request on (M12's buddy). `previous` is the stamp the
+  craving had before this change, so a request goes out once.
+  """
+  def request_support(context, %{support_requested_at: %DateTime{} = at} = craving, nil) do
+    support_requests().request(context, %{
+      user_id: craving.user_id,
+      craving_id: craving.id,
+      at: at
+    })
+  end
+
+  def request_support(_context, _craving, _previous), do: :ok
+
+  defp support_requests, do: Application.fetch_env!(:milos_training, :support_requests)
 
   # Asking for support is a one-way stamp: once sent, it was sent.
   defp support(params, existing, now) do

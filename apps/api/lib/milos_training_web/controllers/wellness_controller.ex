@@ -11,6 +11,7 @@ defmodule MilosTrainingWeb.WellnessController do
     GetMyWellness,
     LogCraving,
     LogWellnessEntry,
+    MealPhotos,
     SetWellnessPreferences
   }
 
@@ -54,6 +55,17 @@ defmodule MilosTrainingWeb.WellnessController do
     with {:ok, payload} <- GetMyWellness.call(conn.assigns.user_context, params) do
       json(conn, WellnessJSON.overview(payload))
     end
+  end
+
+  operation(:upload_meal_photo,
+    summary: "Reserve an upload for a meal photo (needs your health-data consent)",
+    request_body: Schemas.body(MilosTrainingWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", MilosTrainingWeb.Schemas.Media.upload()}]
+  )
+
+  def upload_meal_photo(conn, _params) do
+    with {:ok, upload} <- MealPhotos.request_upload(conn.assigns.user_context, conn.body_params),
+         do: json(conn, upload)
   end
 
   operation(:create_entry,

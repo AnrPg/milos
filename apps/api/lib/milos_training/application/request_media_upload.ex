@@ -60,7 +60,7 @@ defmodule MilosTraining.Application.RequestMediaUpload do
       else: {:error, :video_unavailable}
   end
 
-  defp guard(context, purpose, now) when purpose in ["post_photo", "body_photo"] do
+  defp guard(context, purpose, now) when purpose in ["post_photo", "body_photo", "meal_photo"] do
     since = DateTime.add(now, -Media.orphan_after_seconds())
     context |> Media.usage(:account, since) |> Media.check_quota()
   end

@@ -24,11 +24,13 @@ defmodule MilosTraining.Wellness.Ports.WellnessStore do
   @callback set_craving_visibility(Craving.t(), String.t()) :: result(Craving.t())
   @callback delete_craving(Craving.t(), DateTime.t()) :: result(Craving.t())
   @callback list_cravings(id(), Date.t(), Date.t()) :: [Craving.t()]
-  @callback due_craving_follow_ups(DateTime.t(), pos_integer()) :: [Craving.t()]
+  @callback craving_follow_ups_due(DateTime.t(), pos_integer()) :: [{id(), id()}]
   @callback mark_followed_up(Craving.t(), DateTime.t()) :: result(Craving.t())
 
   @callback get_preferences(id()) :: Preferences.t() | nil
   @callback put_preferences(id(), map()) :: result(Preferences.t())
+  @callback water_reminders_due(DateTime.t(), pos_integer()) :: [{id(), Date.t()}]
+  @callback mark_water_reminded(id(), Date.t()) :: :ok
 
   @callback erase(id(), [String.t()], DateTime.t()) :: %{String.t() => non_neg_integer()}
   @callback transaction((-> term())) :: {:ok, term()} | {:error, term()}

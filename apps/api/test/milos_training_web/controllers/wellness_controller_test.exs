@@ -5,7 +5,20 @@ defmodule MilosTrainingWeb.WellnessControllerTest do
 
   setup %{conn: conn} do
     user = user_fixture(%{role: :member})
-    %{user: user, conn: put_bearer_token(conn, user)}
+    conn = put_bearer_token(conn, user)
+
+    assert %{"code" => "health_data_consent_required"} =
+             conn
+             |> post("/api/me/wellness/entries", %{kind: "water", value: %{ml: 250}})
+             |> json_response(403)
+
+    conn
+    |> recycle()
+    |> put_bearer_token(user)
+    |> put("/api/me/body/consents/health_data")
+    |> json_response(200)
+
+    %{user: user, conn: conn |> recycle() |> put_bearer_token(user)}
   end
 
   test "log water, a night, a meal and a craving, read the day, undo and settle", %{

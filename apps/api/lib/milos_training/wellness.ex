@@ -40,6 +40,7 @@ defmodule MilosTraining.Wellness do
   defdelegate meal_portions(), to: Meal, as: :portion_keys
   defdelegate meal_media_id(value), to: Meal, as: :media_id
   defdelegate preference_items(), to: PreferencesPolicy, as: :items
+  defdelegate ordered_items(item_order), to: PreferencesPolicy
   defdelegate summarize_days(dates, entries, cravings, moods, prefs), to: DaySummary, as: :build
   defdelegate week_line(days), to: DaySummary
 
@@ -59,7 +60,7 @@ defmodule MilosTraining.Wellness do
   defdelegate set_craving_visibility(craving, rung), to: WellnessStore
   defdelegate delete_craving(craving, now), to: WellnessStore
   defdelegate list_cravings(user_id, from, to), to: WellnessStore
-  defdelegate due_craving_follow_ups(now, limit), to: WellnessStore
+  defdelegate craving_follow_ups_due(now, limit), to: WellnessStore
   defdelegate mark_followed_up(craving, at), to: WellnessStore
 
   # Preferences: the stored row, or the defaults for someone who never set any.
@@ -69,6 +70,8 @@ defmodule MilosTraining.Wellness do
   end
 
   defdelegate put_preferences(user_id, attrs), to: WellnessStore
+  defdelegate water_reminders_due(now, limit), to: WellnessStore
+  defdelegate mark_water_reminded(user_id, day), to: WellnessStore
 
   @sections ~w(wellness cravings)
   def erasable_sections, do: @sections

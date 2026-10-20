@@ -100,9 +100,26 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
       hidden_items: %Schema{
         type: :array,
         items: %Schema{type: :string, enum: ["water", "sleep", "meals", "plan", "mood"]}
+      },
+      item_order: %Schema{
+        type: :array,
+        description:
+          "Tile order; every item appears once (unplaced ones follow in default order)",
+        items: %Schema{type: :string, enum: ["water", "sleep", "meals", "plan", "mood"]}
+      },
+      water_reminder: %Schema{
+        type: :boolean,
+        description: "Opt-in afternoon reminder while the day is under half the goal"
       }
     },
-    required: [:water_goal_ml, :glass_ml, :sleep_goal_minutes, :hidden_items],
+    required: [
+      :water_goal_ml,
+      :glass_ml,
+      :sleep_goal_minutes,
+      :hidden_items,
+      :item_order,
+      :water_reminder
+    ],
     additionalProperties: false
   }
 
@@ -183,6 +200,30 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
     ]
   }
 
+  @photo %Schema{
+    type: :object,
+    properties: %{
+      id: @uuid,
+      status: %Schema{type: :string},
+      width: %Schema{type: :integer, nullable: true},
+      height: %Schema{type: :integer, nullable: true},
+      placeholder: %Schema{type: :string, nullable: true},
+      thumb_url: %Schema{type: :string, nullable: true},
+      feed_url: %Schema{type: :string, nullable: true},
+      full_url: %Schema{type: :string, nullable: true}
+    },
+    required: [:id, :status]
+  }
+
+  @photo_capabilities %Schema{
+    type: :object,
+    properties: %{
+      content_types: %Schema{type: :array, items: %Schema{type: :string}},
+      max_bytes: %Schema{type: :integer}
+    },
+    required: [:content_types, :max_bytes]
+  }
+
   def overview do
     %Schema{
       title: "WellnessOverview",
@@ -194,9 +235,30 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
         days: %Schema{type: :array, items: @day},
         week: @week,
         entries: %Schema{type: :array, items: @entry},
-        cravings: %Schema{type: :array, items: @craving}
+        cravings: %Schema{type: :array, items: @craving},
+        photos: %Schema{
+          type: :object,
+          description: "Meal photos by media id, with short-lived signed URLs",
+          additionalProperties: @photo
+        },
+        photo_capabilities: @photo_capabilities,
+        consented: %Schema{
+          type: :boolean,
+          description: "Whether the health-data consent is active (needed to log anything)"
+        }
       },
-      required: [:from, :to, :preferences, :days, :week, :entries, :cravings]
+      required: [
+        :from,
+        :to,
+        :preferences,
+        :days,
+        :week,
+        :entries,
+        :cravings,
+        :photos,
+        :photo_capabilities,
+        :consented
+      ]
     }
   end
 
@@ -254,6 +316,7 @@ defmodule MilosTrainingWeb.Schemas.Wellness do
       title: "WellnessPreferencesRequest",
       type: :object,
       properties: @preferences.properties,
+      description: "Any subset of the fields",
       additionalProperties: false
     }
   end

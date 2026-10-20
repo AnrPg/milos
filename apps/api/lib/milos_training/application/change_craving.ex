@@ -4,25 +4,31 @@ defmodule MilosTraining.Application.ChangeCraving do
   removes it (ADR-159 §3). Settling the outcome cancels a pending follow-up.
   """
 
-  alias MilosTraining.Application.{BroadcastUserSync, LogCraving, WellnessInput}
+  alias MilosTraining.Application.{BroadcastUserSync, LogCraving, WellnessConsent, WellnessInput}
   alias MilosTraining.Wellness
 
   def update(%{user_id: user_id} = context, id, params, now \\ DateTime.utc_now()) do
     now = WellnessInput.usec(now)
 
-    Wellness.with_context(context, fn ->
-      with %{} = craving <- Wellness.get_craving(id, user_id) || {:error, :not_found},
-           {:ok, fields} <- LogCraving.fields(params, now, craving),
-           {:ok, occurrence} <- occurrence(craving, params, now) do
-        attrs =
-          fields
-          |> Map.merge(occurrence)
-          |> Map.put(:follow_up_at, follow_up(craving, fields.outcome, now))
+    with :ok <- WellnessConsent.require(context),
+         {:ok, changed, previous} <-
+           Wellness.with_context(context, fn -> change(id, user_id, params, now) end),
+         :ok <- LogCraving.request_support(context, changed, previous) do
+      broadcast({:ok, changed}, user_id, "craving_changed")
+    end
+  end
 
-        Wellness.change_craving(craving, attrs)
-      end
-    end)
-    |> broadcast(user_id, "craving_changed")
+  defp change(id, user_id, params, now) do
+    with %{} = craving <- Wellness.get_craving(id, user_id) || {:error, :not_found},
+         {:ok, fields} <- LogCraving.fields(params, now, craving),
+         {:ok, occurrence} <- occurrence(craving, params, now),
+         attrs =
+           fields
+           |> Map.merge(occurrence)
+           |> Map.put(:follow_up_at, follow_up(craving, fields.outcome, now)),
+         {:ok, changed} <- Wellness.change_craving(craving, attrs) do
+      {:ok, changed, craving.support_requested_at}
+    end
   end
 
   def delete(%{user_id: user_id} = context, id, now \\ DateTime.utc_now()) do

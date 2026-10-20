@@ -19,11 +19,16 @@ defmodule MilosTraining.Application.WellnessRLSTest do
     GetMyWellness,
     LogCraving,
     LogWellnessEntry,
-    SetWellnessPreferences
+    MyBody,
+    SetWellnessPreferences,
+    WellnessNudges
   }
 
   alias MilosTraining.Identity.UserContext
-  alias MilosTraining.{Organizations, Wellness}
+  alias MilosTraining.Notifications.Notification
+  alias MilosTraining.{Organizations, Repo, Wellness}
+
+  import Ecto.Query
 
   @now ~U[2026-10-20 10:00:00Z]
 
@@ -39,11 +44,91 @@ defmodule MilosTraining.Application.WellnessRLSTest do
         %{gym: gym, coach: coach, member: member, other: other}
       end)
 
+    member_ctx = UserContext.new(fixtures.member)
+    {:ok, _consents} = MyBody.grant(member_ctx, "health_data", ~U[2026-10-01 00:00:00.000000Z])
+
     Map.merge(fixtures, %{
-      member_ctx: UserContext.new(fixtures.member),
+      member_ctx: member_ctx,
       other_ctx: UserContext.new(fixtures.other),
       coach_ctx: tenant!(fixtures.coach, fixtures.gym)
     })
+  end
+
+  test "nothing is logged without the health-data consent; withdrawing it hides everything from coaches",
+       ctx do
+    assert {:error, :health_data_consent_required} =
+             LogWellnessEntry.call(
+               ctx.other_ctx,
+               %{"kind" => "water", "value" => %{"ml" => 250}},
+               @now
+             )
+
+    assert {:error, :health_data_consent_required} =
+             LogCraving.call(ctx.other_ctx, %{"intensity" => 4}, @now)
+
+    assert {:ok, %{consented: false}} =
+             GetMyWellness.call(ctx.other_ctx, %{"from" => "2026-10-20", "to" => "2026-10-20"})
+
+    {:ok, entry} =
+      LogWellnessEntry.call(
+        ctx.member_ctx,
+        %{
+          "kind" => "water",
+          "value" => %{"ml" => 250},
+          "organization_slug" => ctx.gym.slug
+        },
+        @now
+      )
+
+    Wellness.with_context(ctx.member_ctx, fn ->
+      {:ok, _shared} = Wellness.set_entry_visibility(entry, "coach_can_view")
+    end)
+
+    assert coach_sees(ctx) == [entry.id]
+
+    {:ok, _consents} =
+      MyBody.withdraw(ctx.member_ctx, "health_data", ~U[2026-10-20 10:00:00.000000Z])
+
+    assert coach_sees(ctx) == []
+
+    assert {:ok, %{consented: false, entries: [_kept]}} =
+             GetMyWellness.call(ctx.member_ctx, %{"from" => "2026-10-20", "to" => "2026-10-20"})
+  end
+
+  test "a craving left open hears «Πώς πήγε;» once; the water reminder is opt-in and afternoon only",
+       ctx do
+    {:ok, open} = LogCraving.call(ctx.member_ctx, %{"intensity" => 6}, @now)
+
+    {:ok, _settled} =
+      LogCraving.call(ctx.member_ctx, %{"intensity" => 3, "outcome" => "resisted"}, @now)
+
+    {:ok, _glass} =
+      LogWellnessEntry.call(
+        ctx.member_ctx,
+        %{"kind" => "water", "value" => %{"ml" => 250}, "occurred_tz" => "Europe/Athens"},
+        @now
+      )
+
+    # 16:00 in Athens: the follow-up is due; the water reminder is not on yet.
+    assert :ok = WellnessNudges.call(~U[2026-10-20 13:00:00Z])
+    assert notified(ctx.member, :craving_follow_up) == 1
+    assert notified(ctx.member, :water_reminder) == 0
+
+    assert Wellness.with_context(ctx.member_ctx, fn ->
+             Wellness.get_craving(open.id, ctx.member.id).followed_up_at
+           end)
+
+    {:ok, _prefs} = SetWellnessPreferences.call(ctx.member_ctx, %{"water_reminder" => true})
+
+    # 13:00 Athens is still the morning side of the reminder window.
+    assert :ok = WellnessNudges.call(~U[2026-10-20 10:00:00Z])
+    assert notified(ctx.member, :water_reminder) == 0
+
+    afternoon = ~U[2026-10-20 13:00:00Z]
+    assert :ok = WellnessNudges.call(afternoon)
+    assert :ok = WellnessNudges.call(DateTime.add(afternoon, 1, :hour))
+    assert notified(ctx.member, :water_reminder) == 1
+    assert notified(ctx.member, :craving_follow_up) == 1
   end
 
   test "entries land on the member's local day, privately; nobody else sees them", ctx do
@@ -272,6 +357,15 @@ defmodule MilosTraining.Application.WellnessRLSTest do
     Wellness.with_context(ctx.member_ctx, fn ->
       [entry] = Wellness.list_entries(ctx.member.id, ~D[2026-10-20], ~D[2026-10-20])
       entry.id
+    end)
+  end
+
+  defp notified(user, type) do
+    bypass_rls(fn ->
+      Repo.aggregate(
+        from(n in Notification, where: n.user_id == ^user.id and n.type == ^type),
+        :count
+      )
     end)
   end
 
