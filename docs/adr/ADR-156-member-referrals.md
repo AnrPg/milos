@@ -28,18 +28,22 @@ give the funnel its steps.
    before. Rewards follow the programme the invite was made under, even after
    that programme is retired. A credit reward is applied when it is approved,
    provided the member has a Finance record. Otherwise it stays approved, and
-   «Δόθηκε» applies it later.
+   «Δόθηκε» applies it later. A discount reward (a percentage), once given,
+   comes off the member's next renewal invoice: the reward keeps
+   `renewal_invoice_id`, so it is used once, and voiding that invoice frees it
+   for the next renewal (board 11 Q6 extra).
 3. **Programmes carry their own rules.** Each programme defines:
    - the friend's gift (none · free_days · credit · custom);
    - when an invite counts (`trial` or `paid`, default paid);
-   - the window (7 to 365 days, default 60) and an optional yearly cap per
+   - the window (7 to 365 days, default 30) and an optional yearly cap per
      member;
    - manual or automatic approval.
 
    One programme is active per box, enforced by a partial unique index.
    Activating a programme retires the previous one.
 4. **First invite wins (board 11 Q4).** The first member whose link a friend
-   uses owns the invite for the window. An expired or void invite leaves room
+   uses to sign up or open the box's page owns the invite for the window
+   (30 days by default, ANR's note), after which another link can take it. An expired or void invite leaves room
    for a new one. Members and former members of the box are never counted, and
    nobody can invite themselves. Staff can give an invite to another member
    before it counts, with a note, and the previous inviter is kept. Claims for
@@ -71,7 +75,11 @@ give the funnel its steps.
    and «Δώρο φίλου». The friend's gift is applied once: free days extend the
    current dated package, and a credit lands in the friend's credit ledger. The
    list needs `view_promotions` and the actions need `manage_promotions`.
-10. **Tenancy.** Both tables have tenant RLS policies (FORCE). Inviters and
+10. **Events for friends (board 11 Q3).** «Φέρε φίλο» lists the open events
+    and the guest-pass events the member is going to. Staff can tag an event
+    «Καλό για φίλους» (`community_events.good_for_friends`, only on events
+    friends can come to), and tagged events come first.
+11. **Tenancy.** Both tables have tenant RLS policies (FORCE). Inviters and
     friends read their own rows from their personal scope. The tenant data
     policy purges them at order 89, before Finance.
 
