@@ -29,14 +29,23 @@ defmodule MilosTraining.Application.SupportRequests do
   @list_limit 20
 
   # The port M11's Λιγούρα calls when «Χρειάζομαι στήριξη» is on. Only the
-  # craving's id crosses, as an opaque reference.
+  # craving's id crosses, as an opaque reference. The craving is saved
+  # whatever happens here: no buddy yet, or the hourly limit reached, is
+  # logged and answered with `:ok`.
   @impl true
   def request(context, %{user_id: user_id} = params) do
-    request_support(
-      %{user_id: user_id, account: Map.get(context, :account)},
-      %{source: :craving, source_ref: Map.get(params, :craving_id), message: nil},
-      Map.get(params, :at) || DateTime.utc_now()
-    )
+    case request_support(
+           %{user_id: user_id, account: Map.get(context, :account)},
+           %{source: :craving, source_ref: Map.get(params, :craving_id), message: nil},
+           Map.get(params, :at) || DateTime.utc_now()
+         ) do
+      {:ok, _request} ->
+        :ok
+
+      {:error, reason} ->
+        Logger.info("support request from a craving not sent: #{inspect(reason)}")
+        :ok
+    end
   end
 
   @doc """
@@ -239,7 +248,7 @@ defmodule MilosTraining.Application.SupportRequests do
                kind: kind,
                text: text,
                thread_id: conversation && conversation.thread_id,
-               organization_id: conversation && conversation.organization_id
+               conversation_organization_id: conversation && conversation.organization_id
              },
              now
            ) do
@@ -398,7 +407,7 @@ defmodule MilosTraining.Application.SupportRequests do
       created_at: reply.inserted_at,
       conversation:
         if(reply.thread_id,
-          do: %{thread_id: reply.thread_id, organization_id: reply.organization_id},
+          do: %{thread_id: reply.thread_id, organization_id: reply.conversation_organization_id},
           else: nil
         )
     }

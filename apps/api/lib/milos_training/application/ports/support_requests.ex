@@ -16,5 +16,5 @@ defmodule MilosTraining.Application.Ports.SupportRequests do
           optional(:at) => DateTime.t()
         }
 
-  @callback request(context(), request()) :: {:ok, map()} | {:error, term()}
+  @callback request(context(), request()) :: :ok | {:error, term()}
 end

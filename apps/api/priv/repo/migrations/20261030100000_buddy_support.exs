@@ -167,7 +167,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
       add :kind, :string, null: false
       add :text, :string, size: 2000
       add :thread_id, :binary_id
-      add :organization_id, :binary_id
+      add :conversation_organization_id, :binary_id
 
       timestamps(type: :utc_datetime_usec, updated_at: false)
     end

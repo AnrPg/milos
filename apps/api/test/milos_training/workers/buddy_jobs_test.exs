@@ -81,20 +81,32 @@ defmodule MilosTraining.Workers.BuddyJobsTest do
   test "M11's port: source craving, only an opaque reference, nothing about the craving", ctx do
     craving_id = Ecto.UUID.generate()
 
-    assert {:ok, request} =
+    assert :ok =
              SupportRequests.request(%{user_id: ctx.member.id}, %{
                user_id: ctx.member.id,
                craving_id: craving_id,
                at: DateTime.utc_now()
              })
 
-    assert %{source: "craving", message: nil} = request
+    assert {:ok, [%{source: "craving", message: nil} = request]} =
+             SupportRequests.list(ctx.member_ctx, %{})
+
     assert %{source_ref: ^craving_id} = BuddyContext.get_request(ctx.member_ctx, request.id)
 
     :ok = SupportRequests.deliver(ctx.member.id, request.id)
     assert [%{payload: payload}] = notifications(ctx.buddy, :support_request)
     refute inspect(payload) =~ craving_id
     refute Map.has_key?(payload, "source")
+
+    # Without a buddy (or over the hourly limit) the craving is still saved.
+    stranger = user_fixture()
+
+    assert :ok =
+             SupportRequests.request(%{}, %{
+               user_id: stranger.id,
+               craving_id: Ecto.UUID.generate(),
+               at: DateTime.utc_now()
+             })
   end
 
   test "the weekly summary job sends on Sunday 19:00 in the member's zone", ctx do
