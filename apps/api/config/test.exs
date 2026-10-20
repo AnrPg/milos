@@ -39,6 +39,12 @@ config :phoenix, :plug_init_mode, :runtime
 config :milos_training, :start_redix, false
 config :milos_training, :start_oban, false
 config :milos_training, :workout_icon_suggester, MilosTraining.FakeWorkoutIconSuggester
+
+# ADR-157: deterministic media adapters; tests tagged :imagemagick / :ffmpeg
+# drive the real ones when the tools are installed.
+config :milos_training, :image_processor, MilosTraining.FakeImageProcessor
+config :milos_training, :video_transcoder, MilosTraining.FakeVideoTranscoder
+config :milos_training, :image_describer, MilosTraining.FakeImageDescriber
 config :milos_training, :geocoder, MilosTraining.FakeGeocoder
 config :milos_training, :map_link_resolver, MilosTraining.FakeMapLinkResolver
 config :milos_training, :start_storage_reconciler, false

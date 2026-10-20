@@ -24,6 +24,10 @@ FROM alpine:3.22.5 AS runtime
 
 RUN apk add --no-cache libstdc++ openssl ncurses-libs
 
+# ADR-157: post photos (ImageMagick with JPEG, PNG, WebP and HEIC coders)
+# and short videos (ffmpeg with libx264 and AAC) are processed in the API.
+RUN apk add --no-cache imagemagick imagemagick-jpeg imagemagick-webp imagemagick-heic ffmpeg
+
 WORKDIR /app
 
 ENV HOME=/app

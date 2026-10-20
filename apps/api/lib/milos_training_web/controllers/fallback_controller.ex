@@ -2092,7 +2092,17 @@ defmodule MilosTrainingWeb.FallbackController do
     member_code_not_static:
       {:conflict, "This box uses rotating codes; there is nothing to reset"},
     member_code_revoked: {:unprocessable_entity, "This code was revoked"},
-    invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"}
+    invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"},
+    # ADR-157: photos and videos in posts.
+    too_many_media: {:unprocessable_entity, "A post carries up to ten photos or one video"},
+    mixed_media: {:unprocessable_entity, "A post carries photos or a video, not both"},
+    media_quota_exceeded:
+      {:unprocessable_entity, "You have too many uploads waiting; post or remove some first"},
+    video_unavailable: {:service_unavailable, "Videos aren't available on this server"},
+    media_in_post: {:conflict, "This upload is in a post; delete the post instead"},
+    media_not_ready: {:conflict, "The photo is still processing"},
+    invalid_alt_text: {:unprocessable_entity, "Alternative text is at most 500 characters"},
+    alt_text_unavailable: {:service_unavailable, "Suggestions aren't available right now"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

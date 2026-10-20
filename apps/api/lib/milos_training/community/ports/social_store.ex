@@ -38,6 +38,9 @@ defmodule MilosTraining.Community.Ports.SocialStore do
   @callback get_profile_post(context(), id(), id() | nil) :: map() | nil
   @callback list_profile_posts(context(), map()) :: [map()]
   @callback count_profile_posts(context(), id()) :: non_neg_integer()
+  @doc "ADR-157: as `CommunityStore.update_post_media/3`, for a profile post."
+  @callback update_profile_post_media(context(), id(), (map() -> {:ok, map()} | :skip)) ::
+              {:ok, map(), map()} | {:error, term()}
   @callback delete_profile_post(context(), id(), DateTime.t()) :: :ok | {:error, :not_found}
   @callback react_profile_post(context(), id(), id(), String.t()) :: :ok | {:error, term()}
   @callback unreact_profile_post(context(), id(), id(), String.t()) :: :ok

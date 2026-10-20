@@ -4,9 +4,19 @@ defmodule MilosTraining.Application.CommunityReports do
   group they can see, with a reason and an optional note; it disappears for
   them and the gym's staff hear about it. Staff see one queue grouped by item
   and act once per item: hide, delete, archive the group, or nothing needed.
+
+  ADR-157: a post's preview shows its photos and video poster (thumbnails),
+  so staff judge what people reported without opening it.
   """
 
-  alias MilosTraining.Application.{ClubScope, CommunityGroups, CommunityPeople, CommunityPosts}
+  alias MilosTraining.Application.{
+    ClubScope,
+    CommunityGroups,
+    CommunityPeople,
+    CommunityPosts,
+    MediaUrls
+  }
+
   alias MilosTraining.{Community, Notifications, Organizations}
 
   def report(context, params) do
@@ -138,7 +148,13 @@ defmodule MilosTraining.Application.CommunityReports do
   defp preview(context, "post", id) do
     case Community.find_post(context, id) do
       {:ok, post} ->
-        %{author_id: post.author_id, body: post.body, hidden: not is_nil(post.hidden_at)}
+        %{
+          author_id: post.author_id,
+          body: post.body,
+          hidden: not is_nil(post.hidden_at),
+          media_status: Map.get(post, :media_status) || "ready",
+          media: MediaUrls.present_post_media(post.author_id, Map.get(post, :media) || [])
+        }
 
       _gone ->
         nil

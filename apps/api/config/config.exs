@@ -42,6 +42,7 @@ config :milos_training, Oban,
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
        {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
        {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
+       {"37 3 * * *", MilosTraining.Workers.SweepOrphanMediaJob, args: %{"dangling" => true}},
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
        {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
        {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob}
@@ -51,7 +52,9 @@ config :milos_training, Oban,
     default: 10,
     notifications: 20,
     gamification: 5,
-    analytics: 3
+    analytics: 3,
+    # ADR-157: photo and video processing is CPU-bound.
+    media: 2
   ]
 
 config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
@@ -148,6 +151,15 @@ config :milos_training,
        MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
 
 config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+# ADR-157: post photos and videos. ImageMagick and ffmpeg ship in the API
+# image; alt text suggestions use Gemini when configured.
+config :milos_training,
+       :image_processor,
+       MilosTraining.Infrastructure.Media.ImageMagickProcessor
+
+config :milos_training, :video_transcoder, MilosTraining.Infrastructure.Media.FfmpegTranscoder
+config :milos_training, :image_describer, MilosTraining.Infrastructure.Ai.GeminiImageDescriber
 
 # ADR-154: Γύρω μου.
 config :milos_training,

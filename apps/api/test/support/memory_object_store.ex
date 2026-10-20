@@ -67,6 +67,14 @@ defmodule MilosTraining.TestSupport.MemoryObjectStore do
   end
 
   @impl true
+  def download_object(bucket, key, path) do
+    case get(bucket, key) do
+      {:ok, body} -> File.write(path, body)
+      :error -> {:error, :not_found}
+    end
+  end
+
+  @impl true
   def public_object_url(bucket, key), do: {:ok, "https://media.test/#{bucket}/#{key}"}
 
   @doc "Raw body of a stored object, for assertions."

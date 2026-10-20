@@ -1353,6 +1353,93 @@ export interface paths {
         patch: operations["MilosTrainingWeb.JournalController.update_note"];
         trace?: never;
     };
+    "/api/me/media/capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the compose may offer: photo and video limits on this server */
+        get: operations["MilosTrainingWeb.MyMediaController.capabilities"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve an upload for a post photo or video and get a presigned PUT for it */
+        post: operations["MilosTrainingWeb.MyMediaController.upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your uploads, while it processes and after */
+        get: operations["MilosTrainingWeb.MyMediaController.show"];
+        put?: never;
+        post?: never;
+        /** Remove an upload you took out of the compose (not one in a post) */
+        delete: operations["MilosTrainingWeb.MyMediaController.delete"];
+        options?: never;
+        head?: never;
+        /** Set or clear an upload's alternative text (its post follows) */
+        patch: operations["MilosTrainingWeb.MyMediaController.update"];
+        trace?: never;
+    };
+    "/api/me/media/{id}/alt-text-suggestion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest alternative text for a ready photo (shown to you only, never saved) */
+        post: operations["MilosTrainingWeb.MyMediaController.suggest_alt_text"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/media/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The upload finished: verify its type and size and start processing it */
+        post: operations["MilosTrainingWeb.MyMediaController.complete"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/open-clubs/{id}": {
         parameters: {
             query?: never;
@@ -1417,6 +1504,23 @@ export interface paths {
          * @description Distance is from lat/lng when given (the device position), otherwise from the user's home location.
          */
         get: operations["MilosTrainingWeb.MyPlacesController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/post-attachments/{type}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview the card one of your journal entries or PRs makes in a post */
+        get: operations["MilosTrainingWeb.PostAttachmentController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8753,6 +8857,29 @@ export interface components {
                     inserted_at: string;
                     kudos_by_me: boolean;
                     kudos_count: number;
+                    /** @description Up to ten photos or one video, in order (ADR-157) */
+                    media: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                     * @enum {string}
+                     */
+                    media_status: "ready" | "processing" | "failed";
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
@@ -9083,6 +9210,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -9270,6 +9420,29 @@ export interface components {
                     inserted_at: string;
                     kudos_by_me: boolean;
                     kudos_count: number;
+                    /** @description Up to ten photos or one video, in order (ADR-157) */
+                    media: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                     * @enum {string}
+                     */
+                    media_status: "ready" | "processing" | "failed";
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
@@ -9785,6 +9958,29 @@ export interface components {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -10218,6 +10414,29 @@ export interface components {
                         inserted_at: string;
                         kudos_by_me: boolean;
                         kudos_count: number;
+                        /** @description Up to ten photos or one video, in order (ADR-157) */
+                        media: {
+                            alt_text?: string | null;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "image" | "video";
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                            thumb_url?: string | null;
+                            video_url?: string | null;
+                            width?: number | null;
+                        }[];
+                        /**
+                         * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                         * @enum {string}
+                         */
+                        media_status: "ready" | "processing" | "failed";
                         /** @enum {string} */
                         origin: "club" | "profile";
                         pinned: boolean;
@@ -10515,16 +10734,30 @@ export interface components {
             }[];
             /** Media */
             cover: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             } | null;
             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -10533,16 +10766,30 @@ export interface components {
             /** @description What the draft still needs before it can be published. */
             missing: ("about" | "disciplines")[];
             photos: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             }[];
             published: boolean;
@@ -10589,16 +10836,30 @@ export interface components {
                 }[];
                 /** Media */
                 cover: {
+                    alt_text?: string | null;
                     content_type: string;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
                     height: number | null;
                     /** Format: uuid */
                     id: string;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    kind?: "image" | "video";
+                    /** @description A tiny blurred WebP data URI to show while the image loads */
+                    placeholder?: string | null;
                     /** @enum {string} */
-                    status: "pending" | "ready";
-                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    rejection_reason?: string | null;
+                    /**
+                     * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                     * @enum {string}
+                     */
+                    status: "pending" | "processing" | "ready" | "rejected";
+                    thumb_url?: string | null;
+                    /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                     url: string | null;
+                    video_url?: string | null;
                     width: number | null;
                 } | null;
                 disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -10607,16 +10868,30 @@ export interface components {
                 /** @description What the draft still needs before it can be published. */
                 missing: ("about" | "disciplines")[];
                 photos: {
+                    alt_text?: string | null;
                     content_type: string;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
                     height: number | null;
                     /** Format: uuid */
                     id: string;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "post_photo";
+                    kind?: "image" | "video";
+                    /** @description A tiny blurred WebP data URI to show while the image loads */
+                    placeholder?: string | null;
                     /** @enum {string} */
-                    status: "pending" | "ready";
-                    /** @description Stable for public media; presigned and short-lived for private media. */
+                    purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                    rejection_reason?: string | null;
+                    /**
+                     * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                     * @enum {string}
+                     */
+                    status: "pending" | "processing" | "ready" | "rejected";
+                    thumb_url?: string | null;
+                    /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                     url: string | null;
+                    video_url?: string | null;
                     width: number | null;
                 }[];
                 published: boolean;
@@ -12797,6 +13072,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -12974,6 +13272,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -13649,6 +13970,29 @@ export interface components {
             inserted_at: string;
             kudos_by_me: boolean;
             kudos_count: number;
+            /** @description Up to ten photos or one video, in order (ADR-157) */
+            media: {
+                alt_text?: string | null;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "image" | "video";
+                placeholder?: string | null;
+                /** @enum {string} */
+                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                thumb_url?: string | null;
+                video_url?: string | null;
+                width?: number | null;
+            }[];
+            /**
+             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+             * @enum {string}
+             */
+            media_status: "ready" | "processing" | "failed";
             /** @enum {string} */
             origin: "club" | "profile";
             pinned: boolean;
@@ -13668,6 +14012,8 @@ export interface components {
             /** Format: uuid */
             channel_id: string;
             client_operation_id?: string;
+            /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+            media_ids?: string[];
         };
         /**
          * CommunityPostEvent
@@ -13987,6 +14333,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -14045,6 +14414,28 @@ export interface components {
             preview?: {
                 body?: string | null;
                 hidden?: boolean;
+                media?: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description A post's: processing or failed while its media are not ready
+                 * @enum {string}
+                 */
+                media_status?: "ready" | "processing" | "failed";
                 name?: string | null;
             } | null;
             reasons: {
@@ -14076,6 +14467,28 @@ export interface components {
                 preview?: {
                     body?: string | null;
                     hidden?: boolean;
+                    media?: {
+                        alt_text?: string | null;
+                        duration_ms?: number | null;
+                        feed_url?: string | null;
+                        full_url?: string | null;
+                        height?: number | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "image" | "video";
+                        placeholder?: string | null;
+                        /** @enum {string} */
+                        status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                        thumb_url?: string | null;
+                        video_url?: string | null;
+                        width?: number | null;
+                    }[];
+                    /**
+                     * @description A post's: processing or failed while its media are not ready
+                     * @enum {string}
+                     */
+                    media_status?: "ready" | "processing" | "failed";
                     name?: string | null;
                 } | null;
                 reasons: {
@@ -15691,32 +16104,74 @@ export interface components {
         };
         /** Media */
         Media: {
+            alt_text?: string | null;
             content_type: string;
+            duration_ms?: number | null;
+            feed_url?: string | null;
+            full_url?: string | null;
             height: number | null;
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "post_photo";
+            kind?: "image" | "video";
+            /** @description A tiny blurred WebP data URI to show while the image loads */
+            placeholder?: string | null;
             /** @enum {string} */
-            status: "pending" | "ready";
-            /** @description Stable for public media; presigned and short-lived for private media. */
+            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+            rejection_reason?: string | null;
+            /**
+             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+             * @enum {string}
+             */
+            status: "pending" | "processing" | "ready" | "rejected";
+            thumb_url?: string | null;
+            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
             url: string | null;
+            video_url?: string | null;
             width: number | null;
+        };
+        /** MediaAltTextRequest */
+        MediaAltTextRequest: {
+            alt_text: string | null;
+        };
+        /** MediaAltTextSuggestion */
+        MediaAltTextSuggestion: {
+            /** @description Shown to you only; nothing is saved until you save the alt text */
+            suggestion: string;
+        };
+        /** MediaAltTextSuggestionRequest */
+        MediaAltTextSuggestionRequest: {
+            /** @description Language of the suggestion; defaults to yours, then Greek */
+            locale?: string;
         };
         /** MediaResponse */
         MediaResponse: {
             /** Media */
             media: {
+                alt_text?: string | null;
                 content_type: string;
+                duration_ms?: number | null;
+                feed_url?: string | null;
+                full_url?: string | null;
                 height: number | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "post_photo";
+                kind?: "image" | "video";
+                /** @description A tiny blurred WebP data URI to show while the image loads */
+                placeholder?: string | null;
                 /** @enum {string} */
-                status: "pending" | "ready";
-                /** @description Stable for public media; presigned and short-lived for private media. */
+                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                rejection_reason?: string | null;
+                /**
+                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                 * @enum {string}
+                 */
+                status: "pending" | "processing" | "ready" | "rejected";
+                thumb_url?: string | null;
+                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                 url: string | null;
+                video_url?: string | null;
                 width: number | null;
             };
         };
@@ -16295,6 +16750,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -16320,6 +16798,60 @@ export interface components {
             id: string;
             nickname?: string | null;
         };
+        /** PostAttachmentPreview */
+        PostAttachmentPreview: {
+            attachment: {
+                [key: string]: unknown;
+            };
+            /** Format: uuid */
+            attachment_id: string;
+            attachment_type: string;
+        };
+        /**
+         * PostMedia
+         * @description Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px on the long side); for a video they are its poster and video_url is an H.264/AAC MP4. URLs are short-lived.
+         */
+        PostMedia: {
+            alt_text?: string | null;
+            duration_ms?: number | null;
+            feed_url?: string | null;
+            full_url?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "image" | "video";
+            placeholder?: string | null;
+            /** @enum {string} */
+            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+            thumb_url?: string | null;
+            video_url?: string | null;
+            width?: number | null;
+        };
+        /** PostMediaCapabilities */
+        PostMediaCapabilities: {
+            max_alt_text: number;
+            max_photo_bytes: number;
+            max_photos: number;
+            max_video_bytes: number;
+            max_video_seconds: number;
+            max_videos: number;
+            photo_content_types: string[];
+            /** @description Whether this server can take videos */
+            video: boolean;
+            video_content_types: string[];
+        };
+        /** PostMediaUploadRequest */
+        PostMediaUploadRequest: {
+            byte_size: number;
+            /**
+             * @description Photos and videos go as picked; the server strips their metadata (EXIF, GPS) and re-encodes them.
+             * @enum {string}
+             */
+            content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm";
+            /** @enum {string} */
+            purpose: "post_photo" | "post_video";
+        };
         /** ProfilePostCreateRequest */
         ProfilePostCreateRequest: {
             /** Format: uuid */
@@ -16330,6 +16862,8 @@ export interface components {
             audience: "followers" | "public";
             body?: string;
             client_operation_id?: string;
+            /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+            media_ids?: string[];
         };
         /** ProgressStats */
         ProgressStats: {
@@ -16643,6 +17177,29 @@ export interface components {
                 inserted_at: string;
                 kudos_by_me: boolean;
                 kudos_count: number;
+                /** @description Up to ten photos or one video, in order (ADR-157) */
+                media: {
+                    alt_text?: string | null;
+                    duration_ms?: number | null;
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "image" | "video";
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                    thumb_url?: string | null;
+                    video_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                 * @enum {string}
+                 */
+                media_status: "ready" | "processing" | "failed";
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
@@ -19846,6 +20403,29 @@ export interface operations {
                                         inserted_at: string;
                                         kudos_by_me: boolean;
                                         kudos_count: number;
+                                        /** @description Up to ten photos or one video, in order (ADR-157) */
+                                        media: {
+                                            alt_text?: string | null;
+                                            duration_ms?: number | null;
+                                            feed_url?: string | null;
+                                            full_url?: string | null;
+                                            height?: number | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            /** @enum {string} */
+                                            kind: "image" | "video";
+                                            placeholder?: string | null;
+                                            /** @enum {string} */
+                                            status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                            thumb_url?: string | null;
+                                            video_url?: string | null;
+                                            width?: number | null;
+                                        }[];
+                                        /**
+                                         * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                                         * @enum {string}
+                                         */
+                                        media_status: "ready" | "processing" | "failed";
                                         /** @enum {string} */
                                         origin: "club" | "profile";
                                         pinned: boolean;
@@ -20324,6 +20904,29 @@ export interface operations {
                                 inserted_at: string;
                                 kudos_by_me: boolean;
                                 kudos_count: number;
+                                /** @description Up to ten photos or one video, in order (ADR-157) */
+                                media: {
+                                    alt_text?: string | null;
+                                    duration_ms?: number | null;
+                                    feed_url?: string | null;
+                                    full_url?: string | null;
+                                    height?: number | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "image" | "video";
+                                    placeholder?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                    thumb_url?: string | null;
+                                    video_url?: string | null;
+                                    width?: number | null;
+                                }[];
+                                /**
+                                 * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                                 * @enum {string}
+                                 */
+                                media_status: "ready" | "processing" | "failed";
                                 /** @enum {string} */
                                 origin: "club" | "profile";
                                 pinned: boolean;
@@ -21515,6 +22118,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -23687,6 +24313,8 @@ export interface operations {
                     /** Format: uuid */
                     channel_id: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -23875,6 +24503,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -24200,6 +24851,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -24410,6 +25084,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -24620,6 +25317,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -25744,6 +26464,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -25921,6 +26664,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -26667,6 +27433,292 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyMediaController.capabilities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Capabilities */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        max_alt_text: number;
+                        max_photo_bytes: number;
+                        max_photos: number;
+                        max_video_bytes: number;
+                        max_video_seconds: number;
+                        max_videos: number;
+                        photo_content_types: string[];
+                        /** @description Whether this server can take videos */
+                        video: boolean;
+                        video_content_types: string[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Photos and videos go as picked; the server strips their metadata (EXIF, GPS) and re-encodes them.
+                     * @enum {string}
+                     */
+                    content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp" | "video/mp4" | "video/quicktime" | "video/webm";
+                    /** @enum {string} */
+                    purpose: "post_photo" | "post_video";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    alt_text: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.suggest_alt_text": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": {
+                    /** @description Language of the suggestion; defaults to yours, then Greek */
+                    locale?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Shown to you only; nothing is saved until you save the alt text */
+                        suggestion: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyMediaController.complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OpenClubController.show": {
         parameters: {
             query?: never;
@@ -26967,6 +28019,36 @@ export interface operations {
                                 slug: string;
                             };
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PostAttachmentController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                type: "training_log_entry" | "workout_execution" | "pr";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attachment */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attachment: {
+                            [key: string]: unknown;
+                        };
+                        /** Format: uuid */
+                        attachment_id: string;
+                        attachment_type: string;
                     };
                 };
             };
@@ -33444,6 +34526,28 @@ export interface operations {
                             preview?: {
                                 body?: string | null;
                                 hidden?: boolean;
+                                media?: {
+                                    alt_text?: string | null;
+                                    duration_ms?: number | null;
+                                    feed_url?: string | null;
+                                    full_url?: string | null;
+                                    height?: number | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "image" | "video";
+                                    placeholder?: string | null;
+                                    /** @enum {string} */
+                                    status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                    thumb_url?: string | null;
+                                    video_url?: string | null;
+                                    width?: number | null;
+                                }[];
+                                /**
+                                 * @description A post's: processing or failed while its media are not ready
+                                 * @enum {string}
+                                 */
+                                media_status?: "ready" | "processing" | "failed";
                                 name?: string | null;
                             } | null;
                             reasons: {
@@ -37763,16 +38867,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -37781,16 +38899,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -37863,16 +38995,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -37881,16 +39027,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -37985,16 +39145,30 @@ export interface operations {
                     "application/json": {
                         /** Media */
                         media: {
+                            alt_text?: string | null;
                             content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
                             height: number | null;
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "post_photo";
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
                             /** @enum {string} */
-                            status: "pending" | "ready";
-                            /** @description Stable for public media; presigned and short-lived for private media. */
+                            purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                             url: string | null;
+                            video_url?: string | null;
                             width: number | null;
                         };
                     };
@@ -38046,16 +39220,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -38064,16 +39252,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -38195,16 +39397,30 @@ export interface operations {
                             }[];
                             /** Media */
                             cover: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             } | null;
                             disciplines: ("strength" | "powerlifting" | "olympic_lifting" | "bodybuilding" | "strongman" | "kettlebell" | "crossfit" | "functional_fitness" | "hyrox" | "hiit" | "bootcamp" | "circuit_training" | "calisthenics" | "gymnastics" | "running" | "indoor_cycling" | "cycling" | "rowing" | "endurance" | "ems_training" | "yoga" | "hot_yoga" | "pilates" | "pilates_reformer" | "barre" | "mobility" | "stretching" | "tai_chi_qigong" | "boxing" | "kickboxing" | "muay_thai" | "mma" | "bjj_grappling" | "wrestling" | "martial_arts" | "self_defense" | "dance" | "dance_fitness" | "pole_aerial" | "swimming" | "aqua_fitness" | "outdoor_training" | "climbing_bouldering" | "physio_rehab" | "sports_massage" | "recovery")[];
@@ -38213,16 +39429,30 @@ export interface operations {
                             /** @description What the draft still needs before it can be published. */
                             missing: ("about" | "disciplines")[];
                             photos: {
+                                alt_text?: string | null;
                                 content_type: string;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
                                 height: number | null;
                                 /** Format: uuid */
                                 id: string;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "post_photo";
+                                kind?: "image" | "video";
+                                /** @description A tiny blurred WebP data URI to show while the image loads */
+                                placeholder?: string | null;
                                 /** @enum {string} */
-                                status: "pending" | "ready";
-                                /** @description Stable for public media; presigned and short-lived for private media. */
+                                purpose: "body_photo" | "box_photo" | "post_photo" | "post_video";
+                                rejection_reason?: string | null;
+                                /**
+                                 * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                                 * @enum {string}
+                                 */
+                                status: "pending" | "processing" | "ready" | "rejected";
+                                thumb_url?: string | null;
+                                /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
                                 url: string | null;
+                                video_url?: string | null;
                                 width: number | null;
                             }[];
                             published: boolean;
@@ -45958,6 +47188,8 @@ export interface operations {
                     /** Format: uuid */
                     channel_id: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -46146,6 +47378,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -46471,6 +47726,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -46681,6 +47959,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -46891,6 +48192,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -54027,6 +55351,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -55460,6 +56807,8 @@ export interface operations {
                     audience: "followers" | "public";
                     body?: string;
                     client_operation_id?: string;
+                    /** @description Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing. */
+                    media_ids?: string[];
                 };
             };
         };
@@ -55648,6 +56997,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
@@ -55973,6 +57345,29 @@ export interface operations {
                             inserted_at: string;
                             kudos_by_me: boolean;
                             kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;

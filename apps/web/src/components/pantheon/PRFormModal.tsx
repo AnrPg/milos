@@ -33,6 +33,7 @@ import { useSession } from "@/components/session-provider";
 import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { removeComment, sortComments } from "@/lib/journal-comments";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { PRShareFlow } from "@/components/pantheon/PRShareFlow";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -125,10 +126,17 @@ function timeFieldsToSeconds(t: TimeFields): number {
   return h * 3600 + m * 60 + s + ms / 1000;
 }
 
-/** A new PR, offering the caller's gyms as its provenance (ADR-129). */
+/**
+ * A new PR, offering the caller's gyms as its provenance (ADR-129); once it
+ * is saved, «Μοιράσου το» offers to post it (ADR-157 §8).
+ */
 export function NewPRFormModal({ onClose }: { onClose: () => void }) {
   const { gyms, defaultGymSlug } = usePRGymOptions();
-  return <PRFormModal pr={null} gyms={gyms} defaultGymSlug={defaultGymSlug} onClose={onClose} />;
+  return (
+    <PRShareFlow onClose={onClose}>
+      {(onSaved) => <PRFormModal pr={null} gyms={gyms} defaultGymSlug={defaultGymSlug} onClose={onClose} onSaved={onSaved} />}
+    </PRShareFlow>
+  );
 }
 
 export function PRFormModal({
@@ -136,11 +144,14 @@ export function PRFormModal({
   gyms = [],
   defaultGymSlug = PERSONAL_PR_GYM,
   onClose,
+  onSaved,
 }: {
   pr?: PRRecord | null;
   gyms?: PRGymOption[];
   defaultGymSlug?: string;
   onClose: () => void;
+  /** A new or better PR was recorded (not a correction): the caller offers to share it. */
+  onSaved?: (pr: PRRecord) => void;
 }) {
   const i18n = useUiTranslations();
   const UNITS: { value: PRUnit; label: string }[] = [
@@ -208,11 +219,12 @@ export function PRFormModal({
         organization_slug: prGymSlugForSubmit(gymSlug),
       });
     },
-    onSuccess: () => {
+    onSuccess: (saved, mode) => {
       void queryClient.invalidateQueries({ queryKey: ["prs"] });
       if (pr) void queryClient.invalidateQueries({ queryKey: ["prs", pr.id, "history"] });
       void queryClient.invalidateQueries({ queryKey: ["landing"] });
-      onClose();
+      if (onSaved && mode !== "edit" && saved) onSaved(saved);
+      else onClose();
     },
     onError: (err) => {
       setError(err instanceof Error ? localizeError(err, i18n) : i18n("failedToSave3d4146c"));
@@ -236,7 +248,7 @@ export function PRFormModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain p-2 sm:p-4"
+      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto overscroll-contain p-2 sm:p-4"
       style={{ background: "rgba(0,0,0,0.5)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >

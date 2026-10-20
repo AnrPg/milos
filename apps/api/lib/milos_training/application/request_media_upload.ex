@@ -4,19 +4,26 @@ defmodule MilosTraining.Application.RequestMediaUpload do
   browser uploads straight to object storage, then calls
   `CompleteMediaUpload` with the returned `media_id`. Who may upload which
   purpose is decided by the caller's use case (`authorize` below).
+
+  ADR-157: anyone signed in uploads photos and videos for their posts, one
+  upload per file, as soon as it is picked. They are the person's own media
+  (their account scope), so the compose may still change its destination.
+  A quota guard caps open uploads and stored bytes per person, and a video
+  is refused up front when this server cannot transcode one.
   """
 
-  alias MilosTraining.Application.MediaStorage
+  alias MilosTraining.Application.{MediaStorage, MediaTools}
   alias MilosTraining.{Media, Organizations}
 
   @expires_in 900
 
-  def call(context, purpose, params) when is_map(params) do
+  def call(context, purpose, params, now \\ DateTime.utc_now()) when is_map(params) do
     content_type = params[:content_type] || params["content_type"]
     byte_size = params[:byte_size] || params["byte_size"]
     id = Ecto.UUID.generate()
 
     with :ok <- authorize(context, purpose),
+         :ok <- guard(context, purpose, now),
          {:ok, allocation} <- Media.allocate(purpose, content_type, byte_size, id),
          owner = MediaStorage.owner(context, allocation.scope),
          key = MediaStorage.object_key(owner, allocation.relative_key),
@@ -40,12 +47,29 @@ defmodule MilosTraining.Application.RequestMediaUpload do
     end
   end
 
+  defp guard(context, "post_video", now) do
+    if MediaTools.video_available?(),
+      do: guard(context, "post_photo", now),
+      else: {:error, :video_unavailable}
+  end
+
+  defp guard(context, "post_photo", now) do
+    since = DateTime.add(now, -Media.orphan_after_seconds())
+    context |> Media.usage(:account, since) |> Media.check_quota()
+  end
+
+  defp guard(_context, _purpose, _now), do: :ok
+
   # Box photos speak for the gym: staff who manage its settings.
   defp authorize(context, "box_photo") do
     if Organizations.can?(context, :manage_settings),
       do: :ok,
       else: {:error, :forbidden}
   end
+
+  defp authorize(%{user_id: user_id}, purpose)
+       when purpose in ["post_photo", "post_video"] and is_binary(user_id),
+       do: :ok
 
   defp authorize(_context, purpose) do
     if purpose in Media.purposes(),

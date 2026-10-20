@@ -11,12 +11,20 @@ const FOCUSABLE = [
   "[tabindex]:not([tabindex='-1'])",
 ].join(",");
 
+/**
+ * Open dialogs, innermost last: only the innermost one answers Escape and
+ * Tab, so closing a sheet opened from compose leaves compose open.
+ */
+const openDialogs: symbol[] = [];
+
 export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
   const dialogRef = useRef<T>(null);
   const close = useEffectEvent(onClose);
 
   useEffect(() => {
     const dialog = dialogRef.current;
+    const id = Symbol("dialog");
+    openDialogs.push(id);
     const previouslyFocused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -25,6 +33,7 @@ export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
     (focusable()[0] ?? dialog)?.focus();
 
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (openDialogs[openDialogs.length - 1] !== id) return;
       if (event.key === "Escape") {
         event.preventDefault();
         close();
@@ -53,6 +62,7 @@ export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
     document.addEventListener("keydown", handleKeyDown);
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
+      openDialogs.splice(openDialogs.indexOf(id), 1);
       document.body.style.overflow = previousOverflow;
       previouslyFocused?.focus();
     };

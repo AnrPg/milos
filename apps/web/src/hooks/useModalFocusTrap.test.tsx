@@ -51,4 +51,20 @@ describe("useModalFocusTrap", () => {
     expect(document.body.style.overflow).toBe("");
     expect(launcher).toHaveFocus();
   });
+
+  it("lets only the innermost of nested dialogs answer Escape", () => {
+    const outer = vi.fn();
+    const inner = vi.fn();
+    const outerView = render(<TestDialog onClose={outer} />);
+    const innerView = render(<TestDialog onClose={inner} />);
+
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(inner).toHaveBeenCalledTimes(1);
+    expect(outer).not.toHaveBeenCalled();
+
+    innerView.unmount();
+    fireEvent.keyDown(document, { key: "Escape" });
+    expect(outer).toHaveBeenCalledTimes(1);
+    outerView.unmount();
+  });
 });

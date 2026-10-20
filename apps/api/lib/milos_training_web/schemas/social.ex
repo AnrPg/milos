@@ -363,6 +363,7 @@ defmodule MilosTrainingWeb.Schemas.Social do
           enum: MilosTraining.Community.shareable_attachment_types()
         },
         attachment_id: @uuid,
+        media_ids: Community.media_ids(),
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },
       required: [:audience]

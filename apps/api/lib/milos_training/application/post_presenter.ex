@@ -2,9 +2,10 @@ defmodule MilosTraining.Application.PostPresenter do
   @moduledoc """
   Posts and comments as the member app shows them (ADR-138, ADR-142): every
   post carries its origin (`club` › channel, or the author's `profile`), its
-  audience, its author, and what the viewer may do with it.
+  audience, its author, its media (ADR-157), and what the viewer may do with it.
   """
 
+  alias MilosTraining.Application.MediaUrls
   alias MilosTraining.{Community, Identity}
 
   def posts(posts, clubs, viewer_id) do
@@ -155,6 +156,10 @@ defmodule MilosTraining.Application.PostPresenter do
       attachment_type: post.attachment_type,
       attachment_id: post.attachment_id,
       attachment: public_snapshot(post.attachment),
+      # ADR-157: photos or a video, in order; `media_status` other than
+      # `ready` only ever reaches the author (and moderators).
+      media: MediaUrls.present_post_media(post.author_id, Map.get(post, :media) || []),
+      media_status: Map.get(post, :media_status) || "ready",
       # The live event card, filled by EventCards where the feed is read (ADR-153).
       event: nil,
       kudos_count: post.kudos_count,

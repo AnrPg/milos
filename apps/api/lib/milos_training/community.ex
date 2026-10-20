@@ -32,6 +32,7 @@ defmodule MilosTraining.Community do
     FeedCursor,
     FollowPolicy,
     GroupPolicy,
+    PostMediaPolicy,
     ReportPolicy,
     TenantDataPolicy
   }
@@ -210,6 +211,20 @@ defmodule MilosTraining.Community do
 
   defdelegate list_public_posts(context, organization_ids, viewer_id, page),
     to: CommunityStore
+
+  # Photos and videos in posts (ADR-157).
+  defdelegate validate_post_media(kinds), to: PostMediaPolicy, as: :compose
+  defdelegate post_media_status(states), to: PostMediaPolicy, as: :status
+  defdelegate post_media_visible?(post, viewer_id), to: PostMediaPolicy, as: :visible?
+  def post_media_statuses, do: PostMediaPolicy.statuses()
+  def max_post_images, do: PostMediaPolicy.max_images()
+
+  @doc "Locked read-modify-write of a club (`community_post`) or profile post's media."
+  def update_post_media(context, "community_post", id, fun),
+    do: CommunityStore.update_post_media(context, id, fun)
+
+  def update_post_media(context, "profile_post", id, fun),
+    do: SocialStore.update_profile_post_media(context, id, fun)
 
   # Follows (ADR-142).
   defdelegate follow(context, type, target_id, target), to: Follows

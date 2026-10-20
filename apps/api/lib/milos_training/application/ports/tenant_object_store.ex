@@ -23,6 +23,9 @@ defmodule MilosTraining.Application.Ports.TenantObjectStore do
   @doc "Leading `bytes` of an object plus its total size, without downloading it all."
   @callback probe_object(bucket(), String.t(), pos_integer()) ::
               {:ok, probe()} | {:error, :not_found} | {:error, term()}
+  @doc "Streams a whole object to a local file (ADR-157 media processing)."
+  @callback download_object(bucket(), String.t(), Path.t()) ::
+              :ok | {:error, :not_found} | {:error, term()}
   @doc "Stable public URL of an object in a publicly readable bucket."
   @callback public_object_url(bucket(), String.t()) :: {:ok, String.t()} | {:error, term()}
 end

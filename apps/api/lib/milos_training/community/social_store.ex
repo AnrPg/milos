@@ -80,6 +80,10 @@ defmodule MilosTraining.Community.SocialStore do
     do: call(context, :count_profile_posts, [author_id])
 
   @impl true
+  def update_profile_post_media(context, id, fun),
+    do: call(context, :update_profile_post_media, [id, fun])
+
+  @impl true
   def delete_profile_post(context, id, now),
     do: call(context, :delete_profile_post, [id, now])
 

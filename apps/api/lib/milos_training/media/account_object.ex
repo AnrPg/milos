@@ -1,5 +1,8 @@
 defmodule MilosTraining.Media.AccountObject do
-  @moduledoc "An image a person owns: body photos (ADR-148). Deleted with the account."
+  @moduledoc """
+  Media a person owns (ADR-148, ADR-157): body photos, and the photos and
+  videos they post. Deleted with the account.
+  """
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -19,6 +22,14 @@ defmodule MilosTraining.Media.AccountObject do
     field :height, :integer
     field :status, :string, default: "pending"
     field :attached_at, :utc_datetime_usec
+    field :variants, :map, default: %{}
+    field :placeholder, :string
+    field :alt_text, :string
+    field :duration_ms, :integer
+    field :rejection_reason, :string
+    field :attached_type, :string
+    field :attached_id, :binary_id
+    field :attached_organization_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
