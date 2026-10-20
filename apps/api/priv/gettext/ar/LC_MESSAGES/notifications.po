@@ -415,8 +415,11 @@ msgstr "حضر %{nickname} الفعالية التي دعوته إليها."
 msgid "%{nickname} came to a trial."
 msgstr "حضر %{nickname} حصة تجريبية."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "اشترك %{nickname}. مكافأتك بانتظار الموافقة."
+msgid "%{nickname} subscribed."
+msgstr "اشترك %{nickname}."
+
+msgid "%{nickname} joined the box."
+msgstr "انضم %{nickname} إلى النادي."
 
 msgid "Referral reward"
 msgstr "مكافأة الإحالة"

@@ -415,8 +415,11 @@ msgstr "%{nickname} war beim Event, zu dem du eingeladen hast."
 msgid "%{nickname} came to a trial."
 msgstr "%{nickname} war beim Probetraining."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "%{nickname} hat ein Abo abgeschlossen. Deine Prämie wartet auf Freigabe."
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} hat ein Abo abgeschlossen."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} ist der Box beigetreten."
 
 msgid "Referral reward"
 msgstr "Empfehlungsprämie"

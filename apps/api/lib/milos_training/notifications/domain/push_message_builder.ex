@@ -475,8 +475,11 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
         "trial" ->
           localize.("%{nickname} came to a trial.", bindings)
 
+        "joined" ->
+          localize.("%{nickname} joined the box.", bindings)
+
         "paid" ->
-          localize.("%{nickname} subscribed. Your reward is waiting for approval.", bindings)
+          localize.("%{nickname} subscribed.", bindings)
 
         _signed_up ->
           localize.("%{nickname} signed up with your invite.", bindings)

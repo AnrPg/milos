@@ -414,7 +414,10 @@ msgstr ""
 msgid "%{nickname} came to a trial."
 msgstr ""
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
+msgid "%{nickname} subscribed."
+msgstr ""
+
+msgid "%{nickname} joined the box."
 msgstr ""
 
 msgid "Referral reward"

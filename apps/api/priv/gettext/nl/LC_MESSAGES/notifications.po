@@ -415,8 +415,11 @@ msgstr "%{nickname} kwam naar het event waarvoor je uitnodigde."
 msgid "%{nickname} came to a trial."
 msgstr "%{nickname} kwam naar een proefles."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "%{nickname} heeft een abonnement genomen. Je beloning wacht op goedkeuring."
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} heeft een abonnement genomen."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} is lid geworden van de box."
 
 msgid "Referral reward"
 msgstr "Beloning voor aanbrengen"

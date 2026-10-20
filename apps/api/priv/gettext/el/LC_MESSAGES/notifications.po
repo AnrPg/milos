@@ -415,8 +415,11 @@ msgstr "Ο/Η %{nickname} ήρθε στο event που τον/την κάλεσ�
 msgid "%{nickname} came to a trial."
 msgstr "Ο/Η %{nickname} ήρθε σε δοκιμαστικό."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "Ο/Η %{nickname} γράφτηκε. Η ανταμοιβή σου περιμένει έγκριση."
+msgid "%{nickname} subscribed."
+msgstr "Ο/Η %{nickname} γράφτηκε με συνδρομή."
+
+msgid "%{nickname} joined the box."
+msgstr "Ο/Η %{nickname} έγινε μέλος του box."
 
 msgid "Referral reward"
 msgstr "Ανταμοιβή σύστασης"

@@ -415,8 +415,11 @@ msgstr "%{nickname} came to the event you invited them to."
 msgid "%{nickname} came to a trial."
 msgstr "%{nickname} came to a trial."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "%{nickname} subscribed. Your reward is waiting for approval."
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} subscribed."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} joined the box."
 
 msgid "Referral reward"
 msgstr "Referral reward"

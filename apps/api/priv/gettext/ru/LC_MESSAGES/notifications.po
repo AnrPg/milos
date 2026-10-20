@@ -415,8 +415,11 @@ msgstr "%{nickname} пришёл(-ла) на событие, куда ты пр�
 msgid "%{nickname} came to a trial."
 msgstr "%{nickname} пришёл(-ла) на пробную тренировку."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "%{nickname} оформил(а) абонемент. Твоя награда ждёт одобрения."
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} оформил(а) абонемент."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} вступил(а) в зал."
 
 msgid "Referral reward"
 msgstr "Награда за рекомендацию"

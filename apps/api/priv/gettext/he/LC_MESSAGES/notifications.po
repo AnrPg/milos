@@ -415,8 +415,11 @@ msgstr "%{nickname} הגיע/ה לאירוע שהזמנת אליו."
 msgid "%{nickname} came to a trial."
 msgstr "%{nickname} הגיע/ה לאימון ניסיון."
 
-msgid "%{nickname} subscribed. Your reward is waiting for approval."
-msgstr "%{nickname} נרשם/ה למנוי. הפרס שלך ממתין לאישור."
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} נרשם/ה למנוי."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} הצטרף/ה לבוקס."
 
 msgid "Referral reward"
 msgstr "פרס הפניה"
