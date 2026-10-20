@@ -212,6 +212,8 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     execute("DELETE FROM notifications WHERE type IN (#{in_list(@notification_types)})")
     remove_notification_types(@notification_types)
 
+    execute("DROP POLICY IF EXISTS support_requests_buddy_read_policy ON support_requests")
+
     drop table(:wellness_summary_grants)
     drop table(:support_replies)
     drop table(:support_request_deliveries)
@@ -484,13 +486,15 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
       """)
     end
 
-    # A buddy reads a request delivered to them (the deliveries' own policy
-    # applies inside EXISTS).
+    # A buddy reads a request delivered to them, once the undo window closed
+    # and unless it was taken back (the deliveries' own policy applies
+    # inside EXISTS).
     execute("""
     CREATE POLICY support_requests_buddy_read_policy ON support_requests
     FOR SELECT
     USING (
-      EXISTS (
+      delivered_at IS NOT NULL AND undone_at IS NULL
+      AND EXISTS (
         SELECT 1 FROM support_request_deliveries d
         WHERE d.request_id = support_requests.id
           AND d.buddy_user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
