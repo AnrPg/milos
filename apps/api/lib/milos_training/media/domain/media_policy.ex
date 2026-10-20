@@ -4,10 +4,11 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
   person), which bucket it lives in, where its key goes, which types and
   sizes it accepts and how it becomes `ready`.
 
-  - `:inspect` purposes (box and body photos) are re-encoded in the browser,
+  - `:inspect` purposes (box photos) are re-encoded in the browser,
     which drops EXIF and GPS; only JPEG and simple WebP are accepted and
     `ImageInspector` checks the stored bytes before an object becomes `ready`.
-  - `:server` purposes (post photos and videos) accept what a phone produces.
+  - `:server` purposes (post photos and videos, body photos since ADR-158)
+    accept what a phone produces.
     The server decodes them, strips every metadata block, re-encodes them
     into fixed renditions and deletes the original: pending → processing →
     ready | rejected.
@@ -35,14 +36,17 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
       types: @client_image_types,
       max_bytes: 8 * @mb
     },
+    # ADR-158: body photos go through the post pipeline (server-stripped
+    # renditions) but never into a post; private bucket, signed URLs only.
     "body_photo" => %{
       scope: :account,
       bucket: :media_private,
       folder: "media/body",
       kind: "image",
-      processing: :inspect,
-      types: @client_image_types,
-      max_bytes: 8 * @mb
+      processing: :server,
+      post: false,
+      types: @post_image_types,
+      max_bytes: 25 * @mb
     },
     "post_photo" => %{
       scope: :account,
@@ -50,6 +54,7 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
       folder: "media/posts",
       kind: "image",
       processing: :server,
+      post: true,
       types: @post_image_types,
       max_bytes: 25 * @mb
     },
@@ -59,6 +64,7 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
       folder: "media/posts",
       kind: "video",
       processing: :server,
+      post: true,
       types: @video_types,
       max_bytes: 500 * @mb
     }
@@ -101,11 +107,11 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
   def purposes, do: Map.keys(@purposes) |> Enum.sort()
   def tenant_purposes, do: for({p, %{scope: :tenant}} <- @purposes, do: p) |> Enum.sort()
   def account_purposes, do: for({p, %{scope: :account}} <- @purposes, do: p) |> Enum.sort()
-  def post_purposes, do: for({p, %{processing: :server}} <- @purposes, do: p) |> Enum.sort()
+  def post_purposes, do: for({p, %{post: true}} <- @purposes, do: p) |> Enum.sort()
   def statuses, do: @statuses
   def rejections, do: @rejections
 
-  @doc "Types a browser-re-encoded image may have (box and body photos)."
+  @doc "Types a browser-re-encoded image may have (box photos)."
   def content_types, do: Map.keys(@client_image_types) |> Enum.sort()
 
   @doc "Types an upload of `purpose` may declare."
