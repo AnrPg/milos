@@ -10,10 +10,17 @@ defmodule MilosTraining.Application.JournalFeed do
   (`{:coach, organization_id}`, in the coach's tenant session), where each
   source applies the ladder: only entries on a rung that reaches the coach,
   plus every injury (vision §4.5) and every review. Body snapshots
-  (ADR-158) appear only in the member's own feed.
+  (ADR-158) appear only in the member's own feed; Ευεξία (ADR-159) is one
+  item per day plus each Λιγούρα.
   """
 
-  alias MilosTraining.Application.{BodySnapshots, JournalComments, ListWorkoutExecutions}
+  alias MilosTraining.Application.{
+    BodySnapshots,
+    JournalComments,
+    ListWorkoutExecutions,
+    WellnessFeed
+  }
+
   alias MilosTraining.{Execution, Feedback, Journal, Pantheon, Wellbeing}
 
   @default_limit 30
@@ -81,6 +88,12 @@ defmodule MilosTraining.Application.JournalFeed do
 
   defp rows("body", _user_id, _bound, _limit, _coach), do: []
 
+  defp rows("wellness", user_id, bound, limit, scope),
+    do: WellnessFeed.day_items(user_id, bound, limit, scope)
+
+  defp rows("craving", user_id, bound, limit, scope),
+    do: WellnessFeed.craving_items(user_id, bound, limit, scope)
+
   defp items(executions, "execution") do
     executions
     |> ListWorkoutExecutions.summarize()
@@ -122,6 +135,12 @@ defmodule MilosTraining.Application.JournalFeed do
 
   defp items(snapshots, "body"),
     do: Enum.map(snapshots, &Journal.feed_item("body", &1, &1.taken_at, tz: &1.taken_tz))
+
+  defp items(days, "wellness"),
+    do: Enum.map(days, &Journal.feed_item("wellness", &1, &1.at, on: &1.date))
+
+  defp items(cravings, "craving"),
+    do: Enum.map(cravings, &Journal.feed_item("craving", &1, &1.occurred_at, tz: &1.occurred_tz))
 
   defp midnight(%Date{} = date), do: DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
 

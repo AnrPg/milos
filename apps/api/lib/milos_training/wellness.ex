@@ -54,6 +54,8 @@ defmodule MilosTraining.Wellness do
   defdelegate list_entries(user_id, from, to), to: WellnessStore
 
   # Cravings.
+  defdelegate list_day_items(user_id, bound, limit, scope), to: WellnessStore
+  defdelegate list_craving_items(user_id, bound, limit, scope), to: WellnessStore
   defdelegate insert_craving(attrs), to: WellnessStore
   defdelegate get_craving(id, user_id), to: WellnessStore
   defdelegate change_craving(craving, attrs), to: WellnessStore

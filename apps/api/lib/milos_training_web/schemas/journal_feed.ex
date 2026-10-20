@@ -4,15 +4,21 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
   (ADR-139). A feed item's `entry` is the entry as its own endpoint returns
   it (execution, training-log entry, PR, injury, review, note, check-in or,
   ADR-158, a body snapshot, only ever in your own feed), chosen by `kind`.
+  ADR-159: `wellness` is a day (date, summary, entries, photos) and
+  `craving` one Λιγούρα; single wellness entries move as `wellness_entry`.
   """
 
   alias OpenApiSpex.Schema
 
-  @kinds ~w(execution training_log pr injury review note check_in body)
+  @kinds ~w(execution training_log pr injury review note check_in body wellness craving)
+  @movable_kinds @kinds ++ ~w(wellness_entry)
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
   @topics ~w(technique thought mood goal)
 
   def kinds, do: @kinds
+
+  @doc "Kinds whose entries move on the ladder: feed kinds plus single wellness entries."
+  def movable_kinds, do: @movable_kinds
 
   defmodule Item do
     @moduledoc false
@@ -33,7 +39,7 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         properties: %{
           kind: %Schema{
             type: :string,
-            enum: ~w(execution training_log pr injury review note check_in body)
+            enum: ~w(execution training_log pr injury review note check_in body wellness craving)
           },
           id: %Schema{type: :string, format: :uuid},
           occurred_at: %Schema{type: :string, format: :"date-time"},

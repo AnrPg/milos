@@ -18,6 +18,9 @@ defmodule MilosTraining.Wellness.Ports.WellnessStore do
   @callback delete_entry(Entry.t(), DateTime.t()) :: result(Entry.t())
   @callback list_entries(id(), Date.t(), Date.t()) :: [Entry.t()]
 
+  @callback list_day_items(id(), term(), pos_integer(), term()) :: [map()]
+  @callback list_craving_items(id(), term(), pos_integer(), term()) :: [Craving.t()]
+
   @callback insert_craving(map()) :: result(Craving.t())
   @callback get_craving(id(), id()) :: Craving.t() | nil
   @callback change_craving(Craving.t(), map()) :: result(Craving.t())

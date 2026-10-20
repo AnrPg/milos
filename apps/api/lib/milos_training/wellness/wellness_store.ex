@@ -23,6 +23,14 @@ defmodule MilosTraining.Wellness.WellnessStore do
   def list_entries(user_id, from, to), do: adapter().list_entries(user_id, from, to)
 
   @impl true
+  def list_day_items(user_id, bound, limit, scope),
+    do: adapter().list_day_items(user_id, bound, limit, scope)
+
+  @impl true
+  def list_craving_items(user_id, bound, limit, scope),
+    do: adapter().list_craving_items(user_id, bound, limit, scope)
+
+  @impl true
   def insert_craving(attrs), do: adapter().insert_craving(attrs)
   @impl true
   def get_craving(id, user_id), do: adapter().get_craving(id, user_id)

@@ -16,10 +16,13 @@ defmodule MilosTraining.Application.WellnessRLSTest do
     ChangeCraving,
     ChangeWellnessEntry,
     EraseMyWellness,
+    GetClientJournal,
+    GetJournalFeed,
     GetMyWellness,
     LogCraving,
     LogWellnessEntry,
     MyBody,
+    SetJournalVisibility,
     SetWellnessPreferences,
     WellnessNudges
   }
@@ -93,6 +96,75 @@ defmodule MilosTraining.Application.WellnessRLSTest do
 
     assert {:ok, %{consented: false, entries: [_kept]}} =
              GetMyWellness.call(ctx.member_ctx, %{"from" => "2026-10-20", "to" => "2026-10-20"})
+  end
+
+  test "Ροή holds one Ευεξία item per day and each Λιγούρα; single entries widen to the coach",
+       ctx do
+    log = fn params ->
+      {:ok, entry} =
+        LogWellnessEntry.call(
+          ctx.member_ctx,
+          Map.merge(
+            %{"occurred_tz" => "Europe/Athens", "organization_slug" => ctx.gym.slug},
+            params
+          ),
+          @now
+        )
+
+      entry
+    end
+
+    log.(%{"kind" => "water", "value" => %{"ml" => 250}})
+    log.(%{"kind" => "water", "value" => %{"ml" => 250}})
+    meal = log.(%{"kind" => "meal", "value" => %{"slot" => "lunch", "plan_fit" => "in_plan"}})
+
+    {:ok, craving} =
+      LogCraving.call(
+        ctx.member_ctx,
+        %{"intensity" => 5, "note" => "after work", "organization_slug" => ctx.gym.slug},
+        @now
+      )
+
+    assert {:ok, %{items: items}} =
+             GetJournalFeed.call(ctx.member_ctx, %{"kinds" => "wellness,craving"})
+
+    assert [%{kind: "wellness"} = day, %{kind: "craving", id: craving_id}] =
+             Enum.sort_by(items, & &1.kind, :desc)
+
+    assert craving_id == craving.id
+    assert day.occurred_on == ~D[2026-10-20]
+    assert day.choosable_visibilities == []
+    assert length(day.entry.entries) == 3
+    assert day.entry.summary.water.ml == 500
+    assert day.journal_visibility == "private"
+
+    coach_feed = fn ->
+      {:ok, %{items: items}} =
+        GetClientJournal.call(ctx.coach_ctx, ctx.member.id, %{"kinds" => "wellness,craving"})
+
+      items
+    end
+
+    assert coach_feed.() == []
+
+    assert {:ok, %{journal_visibility: "coach_can_view"}} =
+             SetJournalVisibility.call(ctx.member_ctx, "wellness_entry", meal.id, %{
+               "visibility" => "coach_can_view"
+             })
+
+    assert {:error, :visibility_not_allowed} =
+             SetJournalVisibility.call(ctx.member_ctx, "wellness", meal.id, %{
+               "visibility" => "coach_can_view"
+             })
+
+    assert [%{kind: "wellness", entry: %{entries: [shown], summary: nil}}] = coach_feed.()
+    assert shown.id == meal.id
+
+    {:ok, _settings} =
+      MyBody.update_settings(ctx.member_ctx, %{"journal_sections" => %{"wellness" => false}})
+
+    assert {:ok, %{items: [%{kind: "craving"}]}} =
+             GetJournalFeed.call(ctx.member_ctx, %{"kinds" => "wellness,craving"})
   end
 
   test "a craving left open hears «Πώς πήγε;» once; the water reminder is opt-in and afternoon only",

@@ -14,9 +14,11 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
     person is then handled in their own session): «Πώς πήγε;» once for a
     craving left ongoing, and the opt-in afternoon water reminder when the
     day is under half the goal (board 14, Q2 and Q6).
+  - Ζητάω απάντηση may name a wellness entry or a craving (board 14, Q8).
   """
 
   @notification_types ~w(craving_follow_up water_reminder)
+  @subject_kinds ~w(wellness_entry craving)
 
   use Ecto.Migration
 
@@ -64,9 +66,16 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
       "type",
       &Enum.uniq(&1 ++ @notification_types)
     )
+
+    rewrite_subjects(&Enum.uniq(&1 ++ @subject_kinds))
   end
 
   def down do
+    execute(
+      "UPDATE messaging_messages SET subject_kind = NULL, subject_id = NULL WHERE subject_kind IN (#{in_list(@subject_kinds)})"
+    )
+
+    rewrite_subjects(&(&1 -- @subject_kinds))
     execute("DELETE FROM notifications WHERE type IN (#{in_list(@notification_types)})")
 
     rewrite_check(
@@ -128,6 +137,19 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
     ALTER TABLE media_account_objects ADD CONSTRAINT media_account_objects_attached_check CHECK (
       (attached_type IS NULL AND attached_id IS NULL) OR
       (attached_type IN (#{in_list(types)}) AND attached_id IS NOT NULL)
+    )
+    """)
+  end
+
+  # Ζητάω απάντηση about a wellness entry or a craving names it.
+  defp rewrite_subjects(change) do
+    kinds = current_values("messaging_messages_subject_check") |> change.()
+    execute("ALTER TABLE messaging_messages DROP CONSTRAINT messaging_messages_subject_check")
+
+    execute("""
+    ALTER TABLE messaging_messages ADD CONSTRAINT messaging_messages_subject_check CHECK (
+      (subject_kind IS NULL AND subject_id IS NULL) OR
+      (subject_kind IN (#{in_list(kinds)}) AND subject_id IS NOT NULL)
     )
     """)
   end

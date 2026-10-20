@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Repo
   alias MilosTraining.Wellness.{Craving, Entry, Preferences}
 
@@ -56,6 +57,49 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
     |> where([e], e.user_id == ^user_id and is_nil(e.deleted_at))
     |> where([e], e.occurred_on >= ^from and e.occurred_on <= ^to)
     |> order_by([e], asc: e.occurred_at, asc: e.id)
+    |> Repo.all()
+  end
+
+  # Ροή (board 14, Q8): one item per local day, placed at that day's latest
+  # entry, holding the day's entries the reader may see.
+  @impl true
+  def list_day_items(user_id, bound, limit, scope) do
+    latest =
+      Entry
+      |> where([e], is_nil(e.deleted_at))
+      |> FeedScope.apply(user_id, scope)
+      |> distinct([e], e.occurred_on)
+      |> order_by([e], asc: e.occurred_on, desc: e.occurred_at, desc: e.id)
+      |> select([e], %{occurred_on: e.occurred_on, at: e.occurred_at, id: e.id})
+
+    days =
+      from(d in subquery(latest))
+      |> FeedBound.apply(:at, bound)
+      |> order_by([d], desc: d.at, desc: d.id)
+      |> limit(^limit)
+      |> Repo.all()
+
+    on = Enum.map(days, & &1.occurred_on)
+
+    entries =
+      Entry
+      |> where([e], is_nil(e.deleted_at) and e.occurred_on in ^on)
+      |> FeedScope.apply(user_id, scope)
+      |> order_by([e], asc: e.occurred_at, asc: e.id)
+      |> Repo.all()
+      |> Enum.group_by(& &1.occurred_on)
+
+    Enum.map(days, &Map.put(&1, :entries, Map.get(entries, &1.occurred_on, [])))
+  end
+
+  @impl true
+  def list_craving_items(user_id, bound, limit, scope) do
+    Craving
+    |> where([c], is_nil(c.deleted_at))
+    |> FeedScope.apply(user_id, scope)
+    |> FeedBound.apply(:occurred_at, bound)
+    |> order_by([c], desc: c.occurred_at, desc: c.id)
+    |> limit(^limit)
     |> Repo.all()
   end
 
