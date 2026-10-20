@@ -75,6 +75,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     coaching/coaching_store
     pantheon/pr_store
     journal/journal_store
+    body/body_store
     coaching/form_review_store
     coaching/relationship_store
     coaching/note_store
