@@ -4856,7 +4856,8 @@
         "injury": "Infortunio",
         "review": "Valutazione",
         "note": "Nota",
-        "check_in": "Come mi sento"
+        "check_in": "Come mi sento",
+        "body": "Corpo"
       },
       "loadMore": "Voci precedenti",
       "loadingMore": "Caricamento…",

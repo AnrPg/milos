@@ -698,6 +698,249 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/body/access-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which coaches looked at the snapshots you shared, and when */
+        get: operations["MilosTrainingWeb.MyBodyController.access_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Two snapshots side by side, with the change of each metric */
+        get: operations["MilosTrainingWeb.MyBodyController.compare"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your health consents */
+        get: operations["MilosTrainingWeb.MyBodyController.consents"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/consents/{scope}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Give a health consent */
+        put: operations["MilosTrainingWeb.MyBodyController.grant_consent"];
+        post?: never;
+        /** Withdraw a health consent (coaches stop seeing your photos at once) */
+        delete: operations["MilosTrainingWeb.MyBodyController.withdraw_consent"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Delete all your body photos (files included) */
+        delete: operations["MilosTrainingWeb.MyBodyController.delete_photos"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/photos/latest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your latest photo of each pose, for the camera's outline */
+        get: operations["MilosTrainingWeb.MyBodyController.latest_photos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/photos/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve an upload for a body photo (needs your body-photo consent) */
+        post: operations["MilosTrainingWeb.MyBodyController.upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One metric over time, smoothed, with a trend word (as your display allows) */
+        get: operations["MilosTrainingWeb.MyBodyController.series"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your body settings and the metric catalog in your units */
+        get: operations["MilosTrainingWeb.MyBodyController.settings"];
+        /** Change your body settings (units, weight display, sections, reminder) */
+        put: operations["MilosTrainingWeb.MyBodyController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Share a before/after of one pose as a post (explicit confirmation; photos copied) */
+        post: operations["MilosTrainingWeb.MyBodyController.share"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your body snapshots, newest first */
+        get: operations["MilosTrainingWeb.MyBodyController.index"];
+        put?: never;
+        /** Save a snapshot: metrics in your units and/or photos (private by default) */
+        post: operations["MilosTrainingWeb.MyBodyController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/snapshots/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your snapshots */
+        get: operations["MilosTrainingWeb.MyBodyController.show"];
+        put?: never;
+        post?: never;
+        /** Delete a snapshot and its photos */
+        delete: operations["MilosTrainingWeb.MyBodyController.delete"];
+        options?: never;
+        head?: never;
+        /** Edit a snapshot (metrics merge; null removes one) */
+        patch: operations["MilosTrainingWeb.MyBodyController.update"];
+        trace?: never;
+    };
+    "/api/me/body/snapshots/{id}/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add an uploaded photo to a snapshot */
+        post: operations["MilosTrainingWeb.MyBodyController.add_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/body/snapshots/{id}/photos/{photo_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a photo from a snapshot (the file is deleted) */
+        delete: operations["MilosTrainingWeb.MyBodyController.remove_photo"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/box-conversations": {
         parameters: {
             query?: never;
@@ -6516,6 +6759,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/body": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's shared body snapshots (reads are logged for the client) */
+        get: operations["MilosTrainingWeb.ClientBodyController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/body/snapshots/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One shared snapshot of a client (the read is logged for the client) */
+        get: operations["MilosTrainingWeb.ClientBodyController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/clients/{user_id}/coach-notes": {
         parameters: {
             query?: never;
@@ -10525,6 +10802,651 @@ export interface components {
             user_ids: string[];
             /** Format: uuid */
             workout_id: string;
+        };
+        /** BodyAccessLog */
+        BodyAccessLog: {
+            entries: {
+                /** Format: uuid */
+                id: string;
+                organization?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string | null;
+                };
+                photos_shown: boolean;
+                /** Format: date-time */
+                read_at: string;
+                reader: {
+                    /** Format: uuid */
+                    id?: string;
+                    nickname?: string | null;
+                };
+                snapshot_ids: string[];
+                /** @enum {string} */
+                subject: "list" | "snapshot";
+            }[];
+        };
+        /** BodyComparison */
+        BodyComparison: {
+            deltas: {
+                /** @description In `units`; null when weight shows as a trend */
+                delta?: number | null;
+                /** @enum {string|null} */
+                direction: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
+                /** @enum {string} */
+                metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+            }[];
+            /** BodySnapshot */
+            from: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                metrics: {
+                    arm?: number;
+                    arm_left?: number;
+                    arm_right?: number;
+                    body_fat?: number;
+                    calf?: number;
+                    chest?: number;
+                    hips?: number;
+                    neck?: number;
+                    thigh?: number;
+                    thigh_left?: number;
+                    thigh_right?: number;
+                    waist?: number;
+                    weight?: number;
+                };
+                /** @description Never shown to a coach */
+                notes?: string | null;
+                photo_count: number;
+                photos: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                    /** Format: uuid */
+                    snapshot_id?: string;
+                    /** @enum {string} */
+                    status: "processing" | "ready" | "failed";
+                    /**
+                     * Format: date-time
+                     * @description Set on the latest photo per pose (ghost outline)
+                     */
+                    taken_at?: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description manual, or garmin when a connected device sent it
+                 * @enum {string}
+                 */
+                source?: "manual" | "garmin";
+                /** Format: date-time */
+                taken_at: string;
+                taken_tz?: string;
+                /** @enum {string} */
+                units: "metric" | "imperial";
+                /** Format: date-time */
+                updated_at?: string;
+                /** @enum {string} */
+                visibility: "private" | "coach_numbers" | "coach_full";
+                /** @enum {string} */
+                weight_display: "number" | "trend" | "hidden";
+                /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+            };
+            /** BodySnapshot */
+            to: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                metrics: {
+                    arm?: number;
+                    arm_left?: number;
+                    arm_right?: number;
+                    body_fat?: number;
+                    calf?: number;
+                    chest?: number;
+                    hips?: number;
+                    neck?: number;
+                    thigh?: number;
+                    thigh_left?: number;
+                    thigh_right?: number;
+                    waist?: number;
+                    weight?: number;
+                };
+                /** @description Never shown to a coach */
+                notes?: string | null;
+                photo_count: number;
+                photos: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                    /** Format: uuid */
+                    snapshot_id?: string;
+                    /** @enum {string} */
+                    status: "processing" | "ready" | "failed";
+                    /**
+                     * Format: date-time
+                     * @description Set on the latest photo per pose (ghost outline)
+                     */
+                    taken_at?: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description manual, or garmin when a connected device sent it
+                 * @enum {string}
+                 */
+                source?: "manual" | "garmin";
+                /** Format: date-time */
+                taken_at: string;
+                taken_tz?: string;
+                /** @enum {string} */
+                units: "metric" | "imperial";
+                /** Format: date-time */
+                updated_at?: string;
+                /** @enum {string} */
+                visibility: "private" | "coach_numbers" | "coach_full";
+                /** @enum {string} */
+                weight_display: "number" | "trend" | "hidden";
+                /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+            };
+            /** @enum {string} */
+            units: "metric" | "imperial";
+        };
+        /**
+         * BodyPhoto
+         * @description A private body photo. Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px); URLs are presigned and short-lived, present once status is ready.
+         */
+        BodyPhoto: {
+            feed_url?: string | null;
+            full_url?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            placeholder?: string | null;
+            /** @enum {string} */
+            pose: "front" | "side" | "back" | "other";
+            /** Format: uuid */
+            snapshot_id?: string;
+            /** @enum {string} */
+            status: "processing" | "ready" | "failed";
+            /**
+             * Format: date-time
+             * @description Set on the latest photo per pose (ghost outline)
+             */
+            taken_at?: string;
+            thumb_url?: string | null;
+            width?: number | null;
+        };
+        /** BodyPhotoRequest */
+        BodyPhotoRequest: {
+            /** Format: uuid */
+            media_id: string;
+            /** @enum {string} */
+            pose: "front" | "side" | "back" | "other";
+        };
+        /** BodyPhotoResponse */
+        BodyPhotoResponse: {
+            /**
+             * BodyPhoto
+             * @description A private body photo. Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px); URLs are presigned and short-lived, present once status is ready.
+             */
+            photo: {
+                feed_url?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                placeholder?: string | null;
+                /** @enum {string} */
+                pose: "front" | "side" | "back" | "other";
+                /** Format: uuid */
+                snapshot_id?: string;
+                /** @enum {string} */
+                status: "processing" | "ready" | "failed";
+                /**
+                 * Format: date-time
+                 * @description Set on the latest photo per pose (ghost outline)
+                 */
+                taken_at?: string;
+                thumb_url?: string | null;
+                width?: number | null;
+            };
+        };
+        /** BodyPhotoUploadRequest */
+        BodyPhotoUploadRequest: {
+            byte_size: number;
+            /**
+             * @description As picked; the server strips metadata (EXIF, GPS) and re-encodes.
+             * @enum {string}
+             */
+            content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp";
+        };
+        /** BodyPhotos */
+        BodyPhotos: {
+            photos: {
+                feed_url?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                placeholder?: string | null;
+                /** @enum {string} */
+                pose: "front" | "side" | "back" | "other";
+                /** Format: uuid */
+                snapshot_id?: string;
+                /** @enum {string} */
+                status: "processing" | "ready" | "failed";
+                /**
+                 * Format: date-time
+                 * @description Set on the latest photo per pose (ghost outline)
+                 */
+                taken_at?: string;
+                thumb_url?: string | null;
+                width?: number | null;
+            }[];
+        };
+        /** BodyPhotosDeleted */
+        BodyPhotosDeleted: {
+            deleted_photos: number;
+            /** @description Snapshots that held only photos and so were left empty */
+            deleted_snapshots: number;
+        };
+        /** BodySeries */
+        BodySeries: {
+            /**
+             * @description number: points with values; trend: only the trend word; hidden: neither
+             * @enum {string}
+             */
+            display: "number" | "trend" | "hidden";
+            /** @enum {string} */
+            metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+            points: {
+                /** Format: date-time */
+                at: string;
+                smoothed: number;
+                value: number;
+            }[];
+            /** @enum {string} */
+            range: "1m" | "1y" | "3m" | "all";
+            /** @enum {string|null} */
+            trend?: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
+            unit: string;
+            /** @enum {string} */
+            units: "metric" | "imperial";
+        };
+        /**
+         * BodySettingsRequest
+         * @description Partial: only the fields given change
+         */
+        BodySettingsRequest: {
+            /** @description Photos show blurred until tapped */
+            blur_photos?: boolean;
+            /** @enum {string} */
+            compare_mode?: "slider" | "side_by_side";
+            /** @enum {string} */
+            default_visibility?: "private" | "coach_numbers" | "coach_full";
+            journal_sections?: {
+                body?: boolean;
+                cravings?: boolean;
+                wellness?: boolean;
+            };
+            /** @description null turns the reminder off */
+            measure_reminder_weeks?: number | null;
+            /** @enum {string} */
+            units?: "metric" | "imperial";
+            /** @enum {string} */
+            weight_display?: "number" | "trend" | "hidden";
+        };
+        /** BodySettingsResponse */
+        BodySettingsResponse: {
+            catalog: {
+                /** @enum {string} */
+                key: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                max: number;
+                min: number;
+                /** @description Follows weight_display (weight, body fat) */
+                sensitive: boolean;
+                unit: string;
+            }[];
+            max_reminder_weeks: number;
+            photos: {
+                content_types: string[];
+                max_bytes: number;
+                max_photos: number;
+                poses: string[];
+            };
+            ranges: string[];
+            settings: {
+                /** @description Photos show blurred until tapped */
+                blur_photos: boolean;
+                /** @enum {string} */
+                compare_mode: "slider" | "side_by_side";
+                /** @enum {string} */
+                default_visibility: "private" | "coach_numbers" | "coach_full";
+                journal_sections: {
+                    body?: boolean;
+                    cravings?: boolean;
+                    wellness?: boolean;
+                };
+                measure_reminder_weeks: number | null;
+                /** @enum {string} */
+                units: "metric" | "imperial";
+                /** @enum {string} */
+                weight_display: "number" | "trend" | "hidden";
+            };
+        };
+        /**
+         * BodyShareRequest
+         * @description A before/after of one pose as a post. Needs confirm: true (a separate confirmation) and the body-photo consent; the photos are copied, no numbers are added.
+         */
+        BodyShareRequest: {
+            /** @enum {string} */
+            audience: "followers" | "public" | "club_channel";
+            /**
+             * Format: uuid
+             * @description For club_channel
+             */
+            channel_id?: string;
+            client_operation_id?: string;
+            /** @description Must be true */
+            confirm: boolean;
+            /** Format: uuid */
+            from_snapshot_id: string;
+            /** @enum {string} */
+            pose: "front" | "side" | "back" | "other";
+            text?: string | null;
+            /** Format: uuid */
+            to_snapshot_id: string;
+        };
+        /** BodySnapshot */
+        BodySnapshot: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+            metrics: {
+                arm?: number;
+                arm_left?: number;
+                arm_right?: number;
+                body_fat?: number;
+                calf?: number;
+                chest?: number;
+                hips?: number;
+                neck?: number;
+                thigh?: number;
+                thigh_left?: number;
+                thigh_right?: number;
+                waist?: number;
+                weight?: number;
+            };
+            /** @description Never shown to a coach */
+            notes?: string | null;
+            photo_count: number;
+            photos: {
+                feed_url?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                placeholder?: string | null;
+                /** @enum {string} */
+                pose: "front" | "side" | "back" | "other";
+                /** Format: uuid */
+                snapshot_id?: string;
+                /** @enum {string} */
+                status: "processing" | "ready" | "failed";
+                /**
+                 * Format: date-time
+                 * @description Set on the latest photo per pose (ghost outline)
+                 */
+                taken_at?: string;
+                thumb_url?: string | null;
+                width?: number | null;
+            }[];
+            /**
+             * @description manual, or garmin when a connected device sent it
+             * @enum {string}
+             */
+            source?: "manual" | "garmin";
+            /** Format: date-time */
+            taken_at: string;
+            taken_tz?: string;
+            /** @enum {string} */
+            units: "metric" | "imperial";
+            /** Format: date-time */
+            updated_at?: string;
+            /** @enum {string} */
+            visibility: "private" | "coach_numbers" | "coach_full";
+            /** @enum {string} */
+            weight_display: "number" | "trend" | "hidden";
+            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+        };
+        /**
+         * BodySnapshotCreateRequest
+         * @description At least one metric or one photo.
+         */
+        BodySnapshotCreateRequest: {
+            /** @description Values in `units` */
+            metrics?: {
+                arm?: number;
+                arm_left?: number;
+                arm_right?: number;
+                body_fat?: number;
+                calf?: number;
+                chest?: number;
+                hips?: number;
+                neck?: number;
+                thigh?: number;
+                thigh_left?: number;
+                thigh_right?: number;
+                waist?: number;
+                weight?: number;
+            };
+            notes?: string | null;
+            photos?: {
+                /** Format: uuid */
+                media_id: string;
+                /** @enum {string} */
+                pose: "front" | "side" | "back" | "other";
+            }[];
+            /**
+             * Format: date-time
+             * @description Defaults to now
+             */
+            taken_at?: string;
+            taken_tz?: string;
+            /**
+             * @description Units of `metrics`; defaults to your setting
+             * @enum {string}
+             */
+            units?: "metric" | "imperial";
+            /**
+             * @description Defaults to the visibility you used last
+             * @enum {string}
+             */
+            visibility?: "private" | "coach_numbers" | "coach_full";
+        };
+        /** BodySnapshotPage */
+        BodySnapshotPage: {
+            next_cursor?: string | null;
+            snapshots: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                metrics: {
+                    arm?: number;
+                    arm_left?: number;
+                    arm_right?: number;
+                    body_fat?: number;
+                    calf?: number;
+                    chest?: number;
+                    hips?: number;
+                    neck?: number;
+                    thigh?: number;
+                    thigh_left?: number;
+                    thigh_right?: number;
+                    waist?: number;
+                    weight?: number;
+                };
+                /** @description Never shown to a coach */
+                notes?: string | null;
+                photo_count: number;
+                photos: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                    /** Format: uuid */
+                    snapshot_id?: string;
+                    /** @enum {string} */
+                    status: "processing" | "ready" | "failed";
+                    /**
+                     * Format: date-time
+                     * @description Set on the latest photo per pose (ghost outline)
+                     */
+                    taken_at?: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description manual, or garmin when a connected device sent it
+                 * @enum {string}
+                 */
+                source?: "manual" | "garmin";
+                /** Format: date-time */
+                taken_at: string;
+                taken_tz?: string;
+                /** @enum {string} */
+                units: "metric" | "imperial";
+                /** Format: date-time */
+                updated_at?: string;
+                /** @enum {string} */
+                visibility: "private" | "coach_numbers" | "coach_full";
+                /** @enum {string} */
+                weight_display: "number" | "trend" | "hidden";
+                /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+            }[];
+        };
+        /** BodySnapshotResponse */
+        BodySnapshotResponse: {
+            /** BodySnapshot */
+            snapshot: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                metrics: {
+                    arm?: number;
+                    arm_left?: number;
+                    arm_right?: number;
+                    body_fat?: number;
+                    calf?: number;
+                    chest?: number;
+                    hips?: number;
+                    neck?: number;
+                    thigh?: number;
+                    thigh_left?: number;
+                    thigh_right?: number;
+                    waist?: number;
+                    weight?: number;
+                };
+                /** @description Never shown to a coach */
+                notes?: string | null;
+                photo_count: number;
+                photos: {
+                    feed_url?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    placeholder?: string | null;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                    /** Format: uuid */
+                    snapshot_id?: string;
+                    /** @enum {string} */
+                    status: "processing" | "ready" | "failed";
+                    /**
+                     * Format: date-time
+                     * @description Set on the latest photo per pose (ghost outline)
+                     */
+                    taken_at?: string;
+                    thumb_url?: string | null;
+                    width?: number | null;
+                }[];
+                /**
+                 * @description manual, or garmin when a connected device sent it
+                 * @enum {string}
+                 */
+                source?: "manual" | "garmin";
+                /** Format: date-time */
+                taken_at: string;
+                taken_tz?: string;
+                /** @enum {string} */
+                units: "metric" | "imperial";
+                /** Format: date-time */
+                updated_at?: string;
+                /** @enum {string} */
+                visibility: "private" | "coach_numbers" | "coach_full";
+                /** @enum {string} */
+                weight_display: "number" | "trend" | "hidden";
+                /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+            };
+        };
+        /** BodySnapshotUpdateRequest */
+        BodySnapshotUpdateRequest: {
+            /** @description Merged: a value sets a metric (in `units`), null removes it */
+            metrics?: {
+                arm?: number | null;
+                arm_left?: number | null;
+                arm_right?: number | null;
+                body_fat?: number | null;
+                calf?: number | null;
+                chest?: number | null;
+                hips?: number | null;
+                neck?: number | null;
+                thigh?: number | null;
+                thigh_left?: number | null;
+                thigh_right?: number | null;
+                waist?: number | null;
+                weight?: number | null;
+            };
+            notes?: string | null;
+            /** Format: date-time */
+            taken_at?: string;
+            taken_tz?: string;
+            /** @enum {string} */
+            units?: "metric" | "imperial";
+            /** @enum {string} */
+            visibility?: "private" | "coach_numbers" | "coach_full";
         };
         /**
          * BookingSharing
@@ -15710,6 +16632,18 @@ export interface components {
             longitude: number;
             neighbourhood: string | null;
         };
+        /** HealthConsents */
+        HealthConsents: {
+            consents: {
+                active: boolean;
+                /** Format: date-time */
+                granted_at?: string | null;
+                /** @enum {string} */
+                scope: "body_photos" | "health_data";
+                /** Format: date-time */
+                withdrawn_at?: string | null;
+            }[];
+        };
         /** InventoryLowReport */
         InventoryLowReport: {
             /** Format: uuid */
@@ -16002,7 +16936,7 @@ export interface components {
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
             /** Format: date-time */
             occurred_at: string;
             /**
@@ -16093,7 +17027,7 @@ export interface components {
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
             /** @description The message sent to the coach, for coach_reply_requested. */
             reply_request?: {
                 /** Format: uuid */
@@ -23469,6 +24403,1362 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyBodyController.access_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access log */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            /** Format: uuid */
+                            id: string;
+                            organization?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string | null;
+                            };
+                            photos_shown: boolean;
+                            /** Format: date-time */
+                            read_at: string;
+                            reader: {
+                                /** Format: uuid */
+                                id?: string;
+                                nickname?: string | null;
+                            };
+                            snapshot_ids: string[];
+                            /** @enum {string} */
+                            subject: "list" | "snapshot";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.compare": {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Comparison */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deltas: {
+                            /** @description In `units`; null when weight shows as a trend */
+                            delta?: number | null;
+                            /** @enum {string|null} */
+                            direction: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
+                            /** @enum {string} */
+                            metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                        }[];
+                        /** BodySnapshot */
+                        from: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        };
+                        /** BodySnapshot */
+                        to: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        };
+                        /** @enum {string} */
+                        units: "metric" | "imperial";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.consents": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Consents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consents: {
+                            active: boolean;
+                            /** Format: date-time */
+                            granted_at?: string | null;
+                            /** @enum {string} */
+                            scope: "body_photos" | "health_data";
+                            /** Format: date-time */
+                            withdrawn_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.grant_consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scope: "body_photos" | "health_data";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Consents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consents: {
+                            active: boolean;
+                            /** Format: date-time */
+                            granted_at?: string | null;
+                            /** @enum {string} */
+                            scope: "body_photos" | "health_data";
+                            /** Format: date-time */
+                            withdrawn_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.withdraw_consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                scope: "body_photos" | "health_data";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Consents */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        consents: {
+                            active: boolean;
+                            /** Format: date-time */
+                            granted_at?: string | null;
+                            /** @enum {string} */
+                            scope: "body_photos" | "health_data";
+                            /** Format: date-time */
+                            withdrawn_at?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.delete_photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deleted_photos: number;
+                        /** @description Snapshots that held only photos and so were left empty */
+                        deleted_snapshots: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.latest_photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Photos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        photos: {
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            pose: "front" | "side" | "back" | "other";
+                            /** Format: uuid */
+                            snapshot_id?: string;
+                            /** @enum {string} */
+                            status: "processing" | "ready" | "failed";
+                            /**
+                             * Format: date-time
+                             * @description Set on the latest photo per pose (ghost outline)
+                             */
+                            taken_at?: string;
+                            thumb_url?: string | null;
+                            width?: number | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description As picked; the server strips metadata (EXIF, GPS) and re-encodes.
+                     * @enum {string}
+                     */
+                    content_type: "image/heic" | "image/heif" | "image/jpeg" | "image/png" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.series": {
+        parameters: {
+            query: {
+                metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                range?: "1m" | "1y" | "3m" | "all";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Series */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * @description number: points with values; trend: only the trend word; hidden: neither
+                         * @enum {string}
+                         */
+                        display: "number" | "trend" | "hidden";
+                        /** @enum {string} */
+                        metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                        points: {
+                            /** Format: date-time */
+                            at: string;
+                            smoothed: number;
+                            value: number;
+                        }[];
+                        /** @enum {string} */
+                        range: "1m" | "1y" | "3m" | "all";
+                        /** @enum {string|null} */
+                        trend?: "steady" | "slightly_down" | "down" | "slightly_up" | "up" | null;
+                        unit: string;
+                        /** @enum {string} */
+                        units: "metric" | "imperial";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        catalog: {
+                            /** @enum {string} */
+                            key: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                            max: number;
+                            min: number;
+                            /** @description Follows weight_display (weight, body fat) */
+                            sensitive: boolean;
+                            unit: string;
+                        }[];
+                        max_reminder_weeks: number;
+                        photos: {
+                            content_types: string[];
+                            max_bytes: number;
+                            max_photos: number;
+                            poses: string[];
+                        };
+                        ranges: string[];
+                        settings: {
+                            /** @description Photos show blurred until tapped */
+                            blur_photos: boolean;
+                            /** @enum {string} */
+                            compare_mode: "slider" | "side_by_side";
+                            /** @enum {string} */
+                            default_visibility: "private" | "coach_numbers" | "coach_full";
+                            journal_sections: {
+                                body?: boolean;
+                                cravings?: boolean;
+                                wellness?: boolean;
+                            };
+                            measure_reminder_weeks: number | null;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.update_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Photos show blurred until tapped */
+                    blur_photos?: boolean;
+                    /** @enum {string} */
+                    compare_mode?: "slider" | "side_by_side";
+                    /** @enum {string} */
+                    default_visibility?: "private" | "coach_numbers" | "coach_full";
+                    journal_sections?: {
+                        body?: boolean;
+                        cravings?: boolean;
+                        wellness?: boolean;
+                    };
+                    /** @description null turns the reminder off */
+                    measure_reminder_weeks?: number | null;
+                    /** @enum {string} */
+                    units?: "metric" | "imperial";
+                    /** @enum {string} */
+                    weight_display?: "number" | "trend" | "hidden";
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        catalog: {
+                            /** @enum {string} */
+                            key: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
+                            max: number;
+                            min: number;
+                            /** @description Follows weight_display (weight, body fat) */
+                            sensitive: boolean;
+                            unit: string;
+                        }[];
+                        max_reminder_weeks: number;
+                        photos: {
+                            content_types: string[];
+                            max_bytes: number;
+                            max_photos: number;
+                            poses: string[];
+                        };
+                        ranges: string[];
+                        settings: {
+                            /** @description Photos show blurred until tapped */
+                            blur_photos: boolean;
+                            /** @enum {string} */
+                            compare_mode: "slider" | "side_by_side";
+                            /** @enum {string} */
+                            default_visibility: "private" | "coach_numbers" | "coach_full";
+                            journal_sections: {
+                                body?: boolean;
+                                cravings?: boolean;
+                                wellness?: boolean;
+                            };
+                            measure_reminder_weeks: number | null;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    audience: "followers" | "public" | "club_channel";
+                    /**
+                     * Format: uuid
+                     * @description For club_channel
+                     */
+                    channel_id?: string;
+                    client_operation_id?: string;
+                    /** @description Must be true */
+                    confirm: boolean;
+                    /** Format: uuid */
+                    from_snapshot_id: string;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                    text?: string | null;
+                    /** Format: uuid */
+                    to_snapshot_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.index": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        snapshots: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Values in `units` */
+                    metrics?: {
+                        arm?: number;
+                        arm_left?: number;
+                        arm_right?: number;
+                        body_fat?: number;
+                        calf?: number;
+                        chest?: number;
+                        hips?: number;
+                        neck?: number;
+                        thigh?: number;
+                        thigh_left?: number;
+                        thigh_right?: number;
+                        waist?: number;
+                        weight?: number;
+                    };
+                    notes?: string | null;
+                    photos?: {
+                        /** Format: uuid */
+                        media_id: string;
+                        /** @enum {string} */
+                        pose: "front" | "side" | "back" | "other";
+                    }[];
+                    /**
+                     * Format: date-time
+                     * @description Defaults to now
+                     */
+                    taken_at?: string;
+                    taken_tz?: string;
+                    /**
+                     * @description Units of `metrics`; defaults to your setting
+                     * @enum {string}
+                     */
+                    units?: "metric" | "imperial";
+                    /**
+                     * @description Defaults to the visibility you used last
+                     * @enum {string}
+                     */
+                    visibility?: "private" | "coach_numbers" | "coach_full";
+                };
+            };
+        };
+        responses: {
+            /** @description Snapshot */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BodySnapshot */
+                        snapshot: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BodySnapshot */
+                        snapshot: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Merged: a value sets a metric (in `units`), null removes it */
+                    metrics?: {
+                        arm?: number | null;
+                        arm_left?: number | null;
+                        arm_right?: number | null;
+                        body_fat?: number | null;
+                        calf?: number | null;
+                        chest?: number | null;
+                        hips?: number | null;
+                        neck?: number | null;
+                        thigh?: number | null;
+                        thigh_left?: number | null;
+                        thigh_right?: number | null;
+                        waist?: number | null;
+                        weight?: number | null;
+                    };
+                    notes?: string | null;
+                    /** Format: date-time */
+                    taken_at?: string;
+                    taken_tz?: string;
+                    /** @enum {string} */
+                    units?: "metric" | "imperial";
+                    /** @enum {string} */
+                    visibility?: "private" | "coach_numbers" | "coach_full";
+                };
+            };
+        };
+        responses: {
+            /** @description Snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BodySnapshot */
+                        snapshot: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.add_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    media_id: string;
+                    /** @enum {string} */
+                    pose: "front" | "side" | "back" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Photo */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BodyPhoto
+                         * @description A private body photo. Renditions are WebP (thumb ~320, feed ~1080, full ~2048 px); URLs are presigned and short-lived, present once status is ready.
+                         */
+                        photo: {
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height?: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            pose: "front" | "side" | "back" | "other";
+                            /** Format: uuid */
+                            snapshot_id?: string;
+                            /** @enum {string} */
+                            status: "processing" | "ready" | "failed";
+                            /**
+                             * Format: date-time
+                             * @description Set on the latest photo per pose (ghost outline)
+                             */
+                            taken_at?: string;
+                            thumb_url?: string | null;
+                            width?: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBodyController.remove_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                photo_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Done */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.BoxConversationController.index": {
         parameters: {
             query?: never;
@@ -27269,7 +29559,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
                 id: string;
             };
             cookie?: never;
@@ -27303,7 +29593,7 @@ export interface operations {
                         /** @enum {string} */
                         journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
                         /** @enum {string} */
-                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in";
+                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body";
                         /** @description The message sent to the coach, for coach_reply_requested. */
                         reply_request?: {
                             /** Format: uuid */
@@ -51749,6 +54039,186 @@ export interface operations {
                             tasks_done: string[];
                             /** Format: uuid */
                             user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClientBodyController.index": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshots */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        next_cursor?: string | null;
+                        snapshots: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClientBodyController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BodySnapshot */
+                        snapshot: {
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** @description Values in `units`; weight and body fat only when weight shows as a number */
+                            metrics: {
+                                arm?: number;
+                                arm_left?: number;
+                                arm_right?: number;
+                                body_fat?: number;
+                                calf?: number;
+                                chest?: number;
+                                hips?: number;
+                                neck?: number;
+                                thigh?: number;
+                                thigh_left?: number;
+                                thigh_right?: number;
+                                waist?: number;
+                                weight?: number;
+                            };
+                            /** @description Never shown to a coach */
+                            notes?: string | null;
+                            photo_count: number;
+                            photos: {
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                pose: "front" | "side" | "back" | "other";
+                                /** Format: uuid */
+                                snapshot_id?: string;
+                                /** @enum {string} */
+                                status: "processing" | "ready" | "failed";
+                                /**
+                                 * Format: date-time
+                                 * @description Set on the latest photo per pose (ghost outline)
+                                 */
+                                taken_at?: string;
+                                thumb_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description manual, or garmin when a connected device sent it
+                             * @enum {string}
+                             */
+                            source?: "manual" | "garmin";
+                            /** Format: date-time */
+                            taken_at: string;
+                            taken_tz?: string;
+                            /** @enum {string} */
+                            units: "metric" | "imperial";
+                            /** Format: date-time */
+                            updated_at?: string;
+                            /** @enum {string} */
+                            visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @enum {string} */
+                            weight_display: "number" | "trend" | "hidden";
+                            /** @description Metrics recorded but not shown as numbers (weight shown as trend) */
+                            withheld_metrics: ("weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right")[];
                         };
                     };
                 };

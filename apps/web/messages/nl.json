@@ -4856,7 +4856,8 @@
         "injury": "Blessure",
         "review": "Beoordeling",
         "note": "Notitie",
-        "check_in": "Hoe ik me voel"
+        "check_in": "Hoe ik me voel",
+        "body": "Lichaam"
       },
       "loadMore": "Oudere invoer",
       "loadingMore": "Laden…",
