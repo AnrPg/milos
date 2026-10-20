@@ -158,3 +158,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-155 | QR check-in, the printed poster, static member codes and Wallet | Accepted |
 | ADR-157 | Photos and video in posts | Accepted |
 | ADR-158 | Body snapshots, private photos and coach access | Accepted |
+| ADR-160 | Buddy για στήριξη and the coach's weekly wellness summary | Accepted |

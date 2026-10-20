@@ -12523,6 +12523,913 @@
         "title": "BoxVocabulary",
         "type": "object"
       },
+      "BuddyCandidates": {
+        "properties": {
+          "candidates": {
+            "items": {
+              "properties": {
+                "link_status": {
+                  "enum": [
+                    "pending",
+                    "active"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "relation": {
+                  "enum": [
+                    "coach",
+                    "club",
+                    "follow"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "person",
+                "relation"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidates"
+        ],
+        "title": "BuddyCandidates",
+        "type": "object"
+      },
+      "BuddyInviteLinkResponse": {
+        "description": "Shown once: share `url` yourself. Only a digest of the token is kept.",
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "link": {
+            "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+            "properties": {
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "ended_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "ended_by_me": {
+                "type": "boolean"
+              },
+              "expires_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "person": {
+                "nullable": true,
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname"
+                ],
+                "title": "BuddyPerson",
+                "type": "object"
+              },
+              "receives_weekly_summary": {
+                "type": "boolean"
+              },
+              "role": {
+                "enum": [
+                  "requester",
+                  "buddy"
+                ],
+                "type": "string"
+              },
+              "started_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "active",
+                  "declined",
+                  "ended",
+                  "expired"
+                ],
+                "type": "string"
+              },
+              "via_link": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "role",
+              "status",
+              "person",
+              "via_link",
+              "receives_weekly_summary",
+              "ended_by_me"
+            ],
+            "title": "BuddyLink",
+            "type": "object"
+          },
+          "path": {
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "link",
+          "token",
+          "path",
+          "url",
+          "expires_at"
+        ],
+        "title": "BuddyInviteLinkResponse",
+        "type": "object"
+      },
+      "BuddyInvitePreview": {
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "inviter": {
+            "nullable": true,
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname"
+            ],
+            "title": "BuddyPerson",
+            "type": "object"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "expired",
+              "unavailable"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "inviter"
+        ],
+        "title": "BuddyInvitePreview",
+        "type": "object"
+      },
+      "BuddyInviteRequest": {
+        "properties": {
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "BuddyInviteRequest",
+        "type": "object"
+      },
+      "BuddyLink": {
+        "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "ended_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "ended_by_me": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "person": {
+            "nullable": true,
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname"
+            ],
+            "title": "BuddyPerson",
+            "type": "object"
+          },
+          "receives_weekly_summary": {
+            "type": "boolean"
+          },
+          "role": {
+            "enum": [
+              "requester",
+              "buddy"
+            ],
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "active",
+              "declined",
+              "ended",
+              "expired"
+            ],
+            "type": "string"
+          },
+          "via_link": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "status",
+          "person",
+          "via_link",
+          "receives_weekly_summary",
+          "ended_by_me"
+        ],
+        "title": "BuddyLink",
+        "type": "object"
+      },
+      "BuddyLinkResponse": {
+        "properties": {
+          "link": {
+            "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+            "properties": {
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "ended_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "ended_by_me": {
+                "type": "boolean"
+              },
+              "expires_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "person": {
+                "nullable": true,
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname"
+                ],
+                "title": "BuddyPerson",
+                "type": "object"
+              },
+              "receives_weekly_summary": {
+                "type": "boolean"
+              },
+              "role": {
+                "enum": [
+                  "requester",
+                  "buddy"
+                ],
+                "type": "string"
+              },
+              "started_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "active",
+                  "declined",
+                  "ended",
+                  "expired"
+                ],
+                "type": "string"
+              },
+              "via_link": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "role",
+              "status",
+              "person",
+              "via_link",
+              "receives_weekly_summary",
+              "ended_by_me"
+            ],
+            "title": "BuddyLink",
+            "type": "object"
+          }
+        },
+        "required": [
+          "link"
+        ],
+        "title": "BuddyLinkResponse",
+        "type": "object"
+      },
+      "BuddyLinkUpdateRequest": {
+        "properties": {
+          "receives_weekly_summary": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "receives_weekly_summary"
+        ],
+        "title": "BuddyLinkUpdateRequest",
+        "type": "object"
+      },
+      "BuddyOverview": {
+        "properties": {
+          "buddies": {
+            "items": {
+              "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+              "properties": {
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "ended_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ended_by_me": {
+                  "type": "boolean"
+                },
+                "expires_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "receives_weekly_summary": {
+                  "type": "boolean"
+                },
+                "role": {
+                  "enum": [
+                    "requester",
+                    "buddy"
+                  ],
+                  "type": "string"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "active",
+                    "declined",
+                    "ended",
+                    "expired"
+                  ],
+                  "type": "string"
+                },
+                "via_link": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "role",
+                "status",
+                "person",
+                "via_link",
+                "receives_weekly_summary",
+                "ended_by_me"
+              ],
+              "title": "BuddyLink",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "invitations": {
+            "items": {
+              "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+              "properties": {
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "ended_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ended_by_me": {
+                  "type": "boolean"
+                },
+                "expires_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "receives_weekly_summary": {
+                  "type": "boolean"
+                },
+                "role": {
+                  "enum": [
+                    "requester",
+                    "buddy"
+                  ],
+                  "type": "string"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "active",
+                    "declined",
+                    "ended",
+                    "expired"
+                  ],
+                  "type": "string"
+                },
+                "via_link": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "role",
+                "status",
+                "person",
+                "via_link",
+                "receives_weekly_summary",
+                "ended_by_me"
+              ],
+              "title": "BuddyLink",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "invite_days": {
+            "type": "integer"
+          },
+          "max_buddies": {
+            "type": "integer"
+          },
+          "settings": {
+            "properties": {
+              "phone": {
+                "nullable": true,
+                "type": "string"
+              },
+              "quiet_hours": {
+                "description": "Local times in `tz`; requests still arrive, silently",
+                "nullable": true,
+                "properties": {
+                  "from": {
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "type": "string"
+                  },
+                  "to": {
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "type": "object"
+              },
+              "share_phone": {
+                "type": "boolean"
+              },
+              "tz": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "quiet_hours",
+              "tz",
+              "share_phone",
+              "phone"
+            ],
+            "title": "BuddySettings",
+            "type": "object"
+          },
+          "supporting": {
+            "items": {
+              "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+              "properties": {
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "ended_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ended_by_me": {
+                  "type": "boolean"
+                },
+                "expires_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "receives_weekly_summary": {
+                  "type": "boolean"
+                },
+                "role": {
+                  "enum": [
+                    "requester",
+                    "buddy"
+                  ],
+                  "type": "string"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "active",
+                    "declined",
+                    "ended",
+                    "expired"
+                  ],
+                  "type": "string"
+                },
+                "via_link": {
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "id",
+                "role",
+                "status",
+                "person",
+                "via_link",
+                "receives_weekly_summary",
+                "ended_by_me"
+              ],
+              "title": "BuddyLink",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "buddies",
+          "supporting",
+          "invitations",
+          "max_buddies",
+          "invite_days",
+          "settings"
+        ],
+        "title": "BuddyOverview",
+        "type": "object"
+      },
+      "BuddyPerson": {
+        "nullable": true,
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname"
+        ],
+        "title": "BuddyPerson",
+        "type": "object"
+      },
+      "BuddySettings": {
+        "properties": {
+          "phone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "quiet_hours": {
+            "description": "Local times in `tz`; requests still arrive, silently",
+            "nullable": true,
+            "properties": {
+              "from": {
+                "pattern": "^\\d{2}:\\d{2}$",
+                "type": "string"
+              },
+              "to": {
+                "pattern": "^\\d{2}:\\d{2}$",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to"
+            ],
+            "type": "object"
+          },
+          "share_phone": {
+            "type": "boolean"
+          },
+          "tz": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "quiet_hours",
+          "tz",
+          "share_phone",
+          "phone"
+        ],
+        "title": "BuddySettings",
+        "type": "object"
+      },
+      "BuddySettingsRequest": {
+        "properties": {
+          "phone": {
+            "nullable": true,
+            "type": "string"
+          },
+          "quiet_hours": {
+            "nullable": true,
+            "properties": {
+              "from": {
+                "type": "string"
+              },
+              "to": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "share_phone": {
+            "type": "boolean"
+          },
+          "tz": {
+            "type": "string"
+          }
+        },
+        "title": "BuddySettingsRequest",
+        "type": "object"
+      },
+      "BuddySettingsResponse": {
+        "properties": {
+          "settings": {
+            "properties": {
+              "phone": {
+                "nullable": true,
+                "type": "string"
+              },
+              "quiet_hours": {
+                "description": "Local times in `tz`; requests still arrive, silently",
+                "nullable": true,
+                "properties": {
+                  "from": {
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "type": "string"
+                  },
+                  "to": {
+                    "pattern": "^\\d{2}:\\d{2}$",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "type": "object"
+              },
+              "share_phone": {
+                "type": "boolean"
+              },
+              "tz": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "quiet_hours",
+              "tz",
+              "share_phone",
+              "phone"
+            ],
+            "title": "BuddySettings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "settings"
+        ],
+        "title": "BuddySettingsResponse",
+        "type": "object"
+      },
       "CheckInBooking": {
         "properties": {
           "duration_minutes": {
@@ -14445,6 +15352,101 @@
           "tasks_done"
         ],
         "title": "CleaningEntry",
+        "type": "object"
+      },
+      "ClientWellnessSummary": {
+        "properties": {
+          "shared": {
+            "type": "boolean"
+          },
+          "summary": {
+            "nullable": true,
+            "properties": {
+              "allowed_since": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "cravings": {
+                "description": "Only when the member allowed cravings in the summary: count and times",
+                "nullable": true,
+                "properties": {
+                  "count": {
+                    "type": "integer"
+                  },
+                  "moments": {
+                    "items": {
+                      "properties": {
+                        "date": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "time": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "meals": {
+                "properties": {
+                  "days_logged": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "sleep": {
+                "properties": {
+                  "nights_logged": {
+                    "type": "integer"
+                  },
+                  "nights_on_goal": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "water": {
+                "properties": {
+                  "days_logged": {
+                    "type": "integer"
+                  },
+                  "days_on_goal": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "week_end": {
+                "format": "date",
+                "type": "string"
+              },
+              "week_start": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "week_start",
+              "week_end",
+              "sleep",
+              "water",
+              "meals",
+              "cravings"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "shared",
+          "summary"
+        ],
+        "title": "ClientWellnessSummary",
         "type": "object"
       },
       "CoachNote": {
@@ -37841,6 +38843,1037 @@
         "title": "SubscriptionFreeze",
         "type": "object"
       },
+      "SupportReply": {
+        "properties": {
+          "conversation": {
+            "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+            "nullable": true,
+            "properties": {
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "thread_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "here",
+              "walk",
+              "call",
+              "text"
+            ],
+            "type": "string"
+          },
+          "person": {
+            "nullable": true,
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname"
+            ],
+            "title": "BuddyPerson",
+            "type": "object"
+          },
+          "text": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "person",
+          "created_at"
+        ],
+        "title": "SupportReply",
+        "type": "object"
+      },
+      "SupportReplyRequest": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "here",
+              "walk",
+              "call",
+              "text"
+            ],
+            "type": "string"
+          },
+          "text": {
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "SupportReplyRequest",
+        "type": "object"
+      },
+      "SupportReplyResponse": {
+        "properties": {
+          "reply": {
+            "properties": {
+              "conversation": {
+                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                "nullable": true,
+                "properties": {
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "thread_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "here",
+                  "walk",
+                  "call",
+                  "text"
+                ],
+                "type": "string"
+              },
+              "person": {
+                "nullable": true,
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname"
+                ],
+                "title": "BuddyPerson",
+                "type": "object"
+              },
+              "text": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "person",
+              "created_at"
+            ],
+            "title": "SupportReply",
+            "type": "object"
+          },
+          "sender_phone": {
+            "description": "Only for `call`, and only when the sender shares their phone with buddies",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "reply",
+          "sender_phone"
+        ],
+        "title": "SupportReplyResponse",
+        "type": "object"
+      },
+      "SupportRequest": {
+        "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+        "properties": {
+          "can_undo": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "delivered_silently": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "message": {
+            "nullable": true,
+            "type": "string"
+          },
+          "nudge": {
+            "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+            "properties": {
+              "breathing_seconds": {
+                "type": "integer"
+              },
+              "can_resend": {
+                "type": "boolean"
+              },
+              "due": {
+                "type": "boolean"
+              },
+              "due_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "help_lines": {
+                "properties": {
+                  "informational": {
+                    "type": "boolean"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "sent_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "suggestions": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "quick_replies": {
+            "items": {
+              "enum": [
+                "here",
+                "walk",
+                "call"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "quiet_hours": {
+            "description": "Buddies who got it silently (their quiet hours)",
+            "items": {
+              "nullable": true,
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "nickname"
+              ],
+              "title": "BuddyPerson",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "recipients": {
+            "items": {
+              "properties": {
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "quiet_hours": {
+                  "type": "boolean"
+                },
+                "replied_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "replies": {
+            "items": {
+              "properties": {
+                "conversation": {
+                  "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                  "nullable": true,
+                  "properties": {
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "thread_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "here",
+                    "walk",
+                    "call",
+                    "text"
+                  ],
+                  "type": "string"
+                },
+                "person": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "text": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "person",
+                "created_at"
+              ],
+              "title": "SupportReply",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "role": {
+            "enum": [
+              "sender",
+              "buddy"
+            ],
+            "type": "string"
+          },
+          "sender": {
+            "nullable": true,
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname"
+            ],
+            "title": "BuddyPerson",
+            "type": "object"
+          },
+          "source": {
+            "enum": [
+              "craving",
+              "quick"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "sending",
+              "delivered",
+              "undone"
+            ],
+            "type": "string"
+          },
+          "undo_until": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "message",
+          "created_at",
+          "status"
+        ],
+        "title": "SupportRequest",
+        "type": "object"
+      },
+      "SupportRequestCreateRequest": {
+        "properties": {
+          "message": {
+            "maxLength": 280,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "SupportRequestCreateRequest",
+        "type": "object"
+      },
+      "SupportRequestList": {
+        "properties": {
+          "support_requests": {
+            "items": {
+              "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+              "properties": {
+                "can_undo": {
+                  "type": "boolean"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "delivered_silently": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "nudge": {
+                  "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                  "properties": {
+                    "breathing_seconds": {
+                      "type": "integer"
+                    },
+                    "can_resend": {
+                      "type": "boolean"
+                    },
+                    "due": {
+                      "type": "boolean"
+                    },
+                    "due_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "help_lines": {
+                      "properties": {
+                        "informational": {
+                          "type": "boolean"
+                        },
+                        "path": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "sent_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "suggestions": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "type": "object"
+                },
+                "quick_replies": {
+                  "items": {
+                    "enum": [
+                      "here",
+                      "walk",
+                      "call"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "quiet_hours": {
+                  "description": "Buddies who got it silently (their quiet hours)",
+                  "items": {
+                    "nullable": true,
+                    "properties": {
+                      "avatar_url": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "nickname": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "nickname"
+                    ],
+                    "title": "BuddyPerson",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "recipients": {
+                  "items": {
+                    "properties": {
+                      "person": {
+                        "nullable": true,
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nickname"
+                        ],
+                        "title": "BuddyPerson",
+                        "type": "object"
+                      },
+                      "quiet_hours": {
+                        "type": "boolean"
+                      },
+                      "replied_at": {
+                        "format": "date-time",
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "replies": {
+                  "items": {
+                    "properties": {
+                      "conversation": {
+                        "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                        "nullable": true,
+                        "properties": {
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "thread_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "created_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "here",
+                          "walk",
+                          "call",
+                          "text"
+                        ],
+                        "type": "string"
+                      },
+                      "person": {
+                        "nullable": true,
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "nickname"
+                        ],
+                        "title": "BuddyPerson",
+                        "type": "object"
+                      },
+                      "text": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "kind",
+                      "person",
+                      "created_at"
+                    ],
+                    "title": "SupportReply",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "role": {
+                  "enum": [
+                    "sender",
+                    "buddy"
+                  ],
+                  "type": "string"
+                },
+                "sender": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "source": {
+                  "enum": [
+                    "craving",
+                    "quick"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "sending",
+                    "delivered",
+                    "undone"
+                  ],
+                  "type": "string"
+                },
+                "undo_until": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "role",
+                "message",
+                "created_at",
+                "status"
+              ],
+              "title": "SupportRequest",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "support_requests"
+        ],
+        "title": "SupportRequestList",
+        "type": "object"
+      },
+      "SupportRequestResponse": {
+        "properties": {
+          "support_request": {
+            "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+            "properties": {
+              "can_undo": {
+                "type": "boolean"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "delivered_silently": {
+                "type": "boolean"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "message": {
+                "nullable": true,
+                "type": "string"
+              },
+              "nudge": {
+                "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                "properties": {
+                  "breathing_seconds": {
+                    "type": "integer"
+                  },
+                  "can_resend": {
+                    "type": "boolean"
+                  },
+                  "due": {
+                    "type": "boolean"
+                  },
+                  "due_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "help_lines": {
+                    "properties": {
+                      "informational": {
+                        "type": "boolean"
+                      },
+                      "path": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "sent_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "suggestions": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "quick_replies": {
+                "items": {
+                  "enum": [
+                    "here",
+                    "walk",
+                    "call"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "quiet_hours": {
+                "description": "Buddies who got it silently (their quiet hours)",
+                "items": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "recipients": {
+                "items": {
+                  "properties": {
+                    "person": {
+                      "nullable": true,
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname"
+                      ],
+                      "title": "BuddyPerson",
+                      "type": "object"
+                    },
+                    "quiet_hours": {
+                      "type": "boolean"
+                    },
+                    "replied_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "replies": {
+                "items": {
+                  "properties": {
+                    "conversation": {
+                      "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                      "nullable": true,
+                      "properties": {
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "thread_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "created_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "here",
+                        "walk",
+                        "call",
+                        "text"
+                      ],
+                      "type": "string"
+                    },
+                    "person": {
+                      "nullable": true,
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname"
+                      ],
+                      "title": "BuddyPerson",
+                      "type": "object"
+                    },
+                    "text": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "kind",
+                    "person",
+                    "created_at"
+                  ],
+                  "title": "SupportReply",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "role": {
+                "enum": [
+                  "sender",
+                  "buddy"
+                ],
+                "type": "string"
+              },
+              "sender": {
+                "nullable": true,
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname"
+                ],
+                "title": "BuddyPerson",
+                "type": "object"
+              },
+              "source": {
+                "enum": [
+                  "craving",
+                  "quick"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "sending",
+                  "delivered",
+                  "undone"
+                ],
+                "type": "string"
+              },
+              "undo_until": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "role",
+              "message",
+              "created_at",
+              "status"
+            ],
+            "title": "SupportRequest",
+            "type": "object"
+          }
+        },
+        "required": [
+          "support_request"
+        ],
+        "title": "SupportRequestResponse",
+        "type": "object"
+      },
       "TrainingHistoryPage": {
         "properties": {
           "entries": {
@@ -40693,6 +42726,83 @@
           "preferences"
         ],
         "title": "WellnessPreferencesResponse",
+        "type": "object"
+      },
+      "WellnessSummarySharing": {
+        "properties": {
+          "cravings": {
+            "description": "Λιγούρες στη σύνοψη",
+            "type": "boolean"
+          },
+          "cravings_since": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "wellness": {
+            "description": "Ευεξία · εβδομαδιαία σύνοψη",
+            "type": "boolean"
+          },
+          "wellness_since": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "wellness",
+          "cravings"
+        ],
+        "title": "WellnessSummarySharing",
+        "type": "object"
+      },
+      "WellnessSummarySharingRequest": {
+        "properties": {
+          "cravings": {
+            "type": "boolean"
+          },
+          "wellness": {
+            "type": "boolean"
+          }
+        },
+        "title": "WellnessSummarySharingRequest",
+        "type": "object"
+      },
+      "WellnessSummarySharingResponse": {
+        "properties": {
+          "sharing": {
+            "properties": {
+              "cravings": {
+                "description": "Λιγούρες στη σύνοψη",
+                "type": "boolean"
+              },
+              "cravings_since": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "wellness": {
+                "description": "Ευεξία · εβδομαδιαία σύνοψη",
+                "type": "boolean"
+              },
+              "wellness_since": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "wellness",
+              "cravings"
+            ],
+            "title": "WellnessSummarySharing",
+            "type": "object"
+          }
+        },
+        "required": [
+          "sharing"
+        ],
+        "title": "WellnessSummarySharingResponse",
         "type": "object"
       },
       "WodLeaderboardEntry": {
@@ -48658,6 +50768,82 @@
         ]
       }
     },
+    "/api/buddy-invites/{token}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.BuddyInviteController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "inviter": {
+                      "nullable": true,
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname"
+                      ],
+                      "title": "BuddyPerson",
+                      "type": "object"
+                    },
+                    "status": {
+                      "enum": [
+                        "pending",
+                        "expired",
+                        "unavailable"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status",
+                    "inviter"
+                  ],
+                  "title": "BuddyInvitePreview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Preview"
+          }
+        },
+        "security": [],
+        "summary": "Preview of a buddy invite link (public)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
     "/api/calendar/export-links": {
       "get": {
         "callbacks": {},
@@ -55056,6 +57242,1600 @@
         "summary": "The boxes you talk to without being a member, latest first",
         "tags": [
           "Box conversations"
+        ]
+      }
+    },
+    "/api/me/buddies": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "buddies": {
+                      "items": {
+                        "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                        "properties": {
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_by_me": {
+                            "type": "boolean"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "receives_weekly_summary": {
+                            "type": "boolean"
+                          },
+                          "role": {
+                            "enum": [
+                              "requester",
+                              "buddy"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "active",
+                              "declined",
+                              "ended",
+                              "expired"
+                            ],
+                            "type": "string"
+                          },
+                          "via_link": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "role",
+                          "status",
+                          "person",
+                          "via_link",
+                          "receives_weekly_summary",
+                          "ended_by_me"
+                        ],
+                        "title": "BuddyLink",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "invitations": {
+                      "items": {
+                        "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                        "properties": {
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_by_me": {
+                            "type": "boolean"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "receives_weekly_summary": {
+                            "type": "boolean"
+                          },
+                          "role": {
+                            "enum": [
+                              "requester",
+                              "buddy"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "active",
+                              "declined",
+                              "ended",
+                              "expired"
+                            ],
+                            "type": "string"
+                          },
+                          "via_link": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "role",
+                          "status",
+                          "person",
+                          "via_link",
+                          "receives_weekly_summary",
+                          "ended_by_me"
+                        ],
+                        "title": "BuddyLink",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "invite_days": {
+                      "type": "integer"
+                    },
+                    "max_buddies": {
+                      "type": "integer"
+                    },
+                    "settings": {
+                      "properties": {
+                        "phone": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quiet_hours": {
+                          "description": "Local times in `tz`; requests still arrive, silently",
+                          "nullable": true,
+                          "properties": {
+                            "from": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            },
+                            "to": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "from",
+                            "to"
+                          ],
+                          "type": "object"
+                        },
+                        "share_phone": {
+                          "type": "boolean"
+                        },
+                        "tz": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "quiet_hours",
+                        "tz",
+                        "share_phone",
+                        "phone"
+                      ],
+                      "title": "BuddySettings",
+                      "type": "object"
+                    },
+                    "supporting": {
+                      "items": {
+                        "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                        "properties": {
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_by_me": {
+                            "type": "boolean"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "person": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "receives_weekly_summary": {
+                            "type": "boolean"
+                          },
+                          "role": {
+                            "enum": [
+                              "requester",
+                              "buddy"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "active",
+                              "declined",
+                              "ended",
+                              "expired"
+                            ],
+                            "type": "string"
+                          },
+                          "via_link": {
+                            "type": "boolean"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "role",
+                          "status",
+                          "person",
+                          "via_link",
+                          "receives_weekly_summary",
+                          "ended_by_me"
+                        ],
+                        "title": "BuddyLink",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "buddies",
+                    "supporting",
+                    "invitations",
+                    "max_buddies",
+                    "invite_days",
+                    "settings"
+                  ],
+                  "title": "BuddyOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Overview"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your buddies, the people you support, invitations waiting for you, your settings",
+        "tags": [
+          "Buddies"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.invite",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "title": "BuddyInviteRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Invite someone you know here (they must accept; expires after 7 days)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/candidates": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.candidates",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "candidates": {
+                      "items": {
+                        "properties": {
+                          "link_status": {
+                            "enum": [
+                              "pending",
+                              "active"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "person": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "relation": {
+                            "enum": [
+                              "coach",
+                              "club",
+                              "follow"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "person",
+                          "relation"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "candidates"
+                  ],
+                  "title": "BuddyCandidates",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Candidates"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People you can invite: your coaches and follows; with q, people of a club in common",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/invite-links": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.create_invite_link",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Shown once: share `url` yourself. Only a digest of the token is kept.",
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    },
+                    "url": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "link",
+                    "token",
+                    "path",
+                    "url",
+                    "expires_at"
+                  ],
+                  "title": "BuddyInviteLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invite link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "An invite link for someone not on Milos yet (shown once; expires after 7 days)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "phone": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quiet_hours": {
+                          "description": "Local times in `tz`; requests still arrive, silently",
+                          "nullable": true,
+                          "properties": {
+                            "from": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            },
+                            "to": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "from",
+                            "to"
+                          ],
+                          "type": "object"
+                        },
+                        "share_phone": {
+                          "type": "boolean"
+                        },
+                        "tz": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "quiet_hours",
+                        "tz",
+                        "share_phone",
+                        "phone"
+                      ],
+                      "title": "BuddySettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "title": "BuddySettingsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your quiet hours and whether buddies may see your phone",
+        "tags": [
+          "Buddies"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.update_settings",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "phone": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "quiet_hours": {
+                    "nullable": true,
+                    "properties": {
+                      "from": {
+                        "type": "string"
+                      },
+                      "to": {
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "share_phone": {
+                    "type": "boolean"
+                  },
+                  "tz": {
+                    "type": "string"
+                  }
+                },
+                "title": "BuddySettingsRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "phone": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "quiet_hours": {
+                          "description": "Local times in `tz`; requests still arrive, silently",
+                          "nullable": true,
+                          "properties": {
+                            "from": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            },
+                            "to": {
+                              "pattern": "^\\d{2}:\\d{2}$",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "from",
+                            "to"
+                          ],
+                          "type": "object"
+                        },
+                        "share_phone": {
+                          "type": "boolean"
+                        },
+                        "tz": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "quiet_hours",
+                        "tz",
+                        "share_phone",
+                        "phone"
+                      ],
+                      "title": "BuddySettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "title": "BuddySettingsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change your quiet hours, zone or phone sharing (off by default)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "receives_weekly_summary": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "receives_weekly_summary"
+                ],
+                "title": "BuddyLinkUpdateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What your buddy receives: only what you send, or also the weekly counts summary",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}/accept": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.accept",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept an invitation to support someone",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}/decline": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.decline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline an invitation (the other person is not notified)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}/leave": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.leave",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop, from either side, at any time (no push; the other sees it on their page)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddy-invites/{token}/claim": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyBuddiesController.claim",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "link": {
+                      "description": "A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.",
+                      "properties": {
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "ended_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ended_by_me": {
+                          "type": "boolean"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "receives_weekly_summary": {
+                          "type": "boolean"
+                        },
+                        "role": {
+                          "enum": [
+                            "requester",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "started_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "active",
+                            "declined",
+                            "ended",
+                            "expired"
+                          ],
+                          "type": "string"
+                        },
+                        "via_link": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "status",
+                        "person",
+                        "via_link",
+                        "receives_weekly_summary",
+                        "ended_by_me"
+                      ],
+                      "title": "BuddyLink",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "link"
+                  ],
+                  "title": "BuddyLinkResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Buddy link"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Claim an invite link: you become that person's buddy",
+        "tags": [
+          "Buddies"
         ]
       }
     },
@@ -67965,6 +71745,1437 @@
         ]
       }
     },
+    "/api/me/support-requests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SupportRequestController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "role",
+            "required": false,
+            "schema": {
+              "enum": [
+                "sent",
+                "received"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "support_requests": {
+                      "items": {
+                        "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+                        "properties": {
+                          "can_undo": {
+                            "type": "boolean"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "delivered_silently": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nudge": {
+                            "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                            "properties": {
+                              "breathing_seconds": {
+                                "type": "integer"
+                              },
+                              "can_resend": {
+                                "type": "boolean"
+                              },
+                              "due": {
+                                "type": "boolean"
+                              },
+                              "due_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "help_lines": {
+                                "properties": {
+                                  "informational": {
+                                    "type": "boolean"
+                                  },
+                                  "path": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "sent_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "suggestions": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "quick_replies": {
+                            "items": {
+                              "enum": [
+                                "here",
+                                "walk",
+                                "call"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "quiet_hours": {
+                            "description": "Buddies who got it silently (their quiet hours)",
+                            "items": {
+                              "nullable": true,
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "nickname"
+                              ],
+                              "title": "BuddyPerson",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "recipients": {
+                            "items": {
+                              "properties": {
+                                "person": {
+                                  "nullable": true,
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "nickname"
+                                  ],
+                                  "title": "BuddyPerson",
+                                  "type": "object"
+                                },
+                                "quiet_hours": {
+                                  "type": "boolean"
+                                },
+                                "replied_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "replies": {
+                            "items": {
+                              "properties": {
+                                "conversation": {
+                                  "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                  "nullable": true,
+                                  "properties": {
+                                    "organization_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "thread_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "created_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "here",
+                                    "walk",
+                                    "call",
+                                    "text"
+                                  ],
+                                  "type": "string"
+                                },
+                                "person": {
+                                  "nullable": true,
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "nickname"
+                                  ],
+                                  "title": "BuddyPerson",
+                                  "type": "object"
+                                },
+                                "text": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "kind",
+                                "person",
+                                "created_at"
+                              ],
+                              "title": "SupportReply",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "role": {
+                            "enum": [
+                              "sender",
+                              "buddy"
+                            ],
+                            "type": "string"
+                          },
+                          "sender": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "source": {
+                            "enum": [
+                              "craving",
+                              "quick"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "sending",
+                              "delivered",
+                              "undone"
+                            ],
+                            "type": "string"
+                          },
+                          "undo_until": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "role",
+                          "message",
+                          "created_at",
+                          "status"
+                        ],
+                        "title": "SupportRequest",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "support_requests"
+                  ],
+                  "title": "SupportRequestList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Support requests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your recent support requests, or the ones you received",
+        "tags": [
+          "Buddies"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SupportRequestController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "message": {
+                    "maxLength": 280,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "SupportRequestCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "support_request": {
+                      "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+                      "properties": {
+                        "can_undo": {
+                          "type": "boolean"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "delivered_silently": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "nudge": {
+                          "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                          "properties": {
+                            "breathing_seconds": {
+                              "type": "integer"
+                            },
+                            "can_resend": {
+                              "type": "boolean"
+                            },
+                            "due": {
+                              "type": "boolean"
+                            },
+                            "due_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "help_lines": {
+                              "properties": {
+                                "informational": {
+                                  "type": "boolean"
+                                },
+                                "path": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "sent_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "suggestions": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "quick_replies": {
+                          "items": {
+                            "enum": [
+                              "here",
+                              "walk",
+                              "call"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "quiet_hours": {
+                          "description": "Buddies who got it silently (their quiet hours)",
+                          "items": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "recipients": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "quiet_hours": {
+                                "type": "boolean"
+                              },
+                              "replied_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "replies": {
+                          "items": {
+                            "properties": {
+                              "conversation": {
+                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "nullable": true,
+                                "properties": {
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "thread_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "created_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "here",
+                                  "walk",
+                                  "call",
+                                  "text"
+                                ],
+                                "type": "string"
+                              },
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "text": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "kind",
+                              "person",
+                              "created_at"
+                            ],
+                            "title": "SupportReply",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "role": {
+                          "enum": [
+                            "sender",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "sender": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "source": {
+                          "enum": [
+                            "craving",
+                            "quick"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "sending",
+                            "delivered",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "message",
+                        "created_at",
+                        "status"
+                      ],
+                      "title": "SupportRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "support_request"
+                  ],
+                  "title": "SupportRequestResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Support request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask your active buddies for support (optional message; nothing else is shared)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/support-requests/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SupportRequestController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "support_request": {
+                      "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+                      "properties": {
+                        "can_undo": {
+                          "type": "boolean"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "delivered_silently": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "nudge": {
+                          "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                          "properties": {
+                            "breathing_seconds": {
+                              "type": "integer"
+                            },
+                            "can_resend": {
+                              "type": "boolean"
+                            },
+                            "due": {
+                              "type": "boolean"
+                            },
+                            "due_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "help_lines": {
+                              "properties": {
+                                "informational": {
+                                  "type": "boolean"
+                                },
+                                "path": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "sent_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "suggestions": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "quick_replies": {
+                          "items": {
+                            "enum": [
+                              "here",
+                              "walk",
+                              "call"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "quiet_hours": {
+                          "description": "Buddies who got it silently (their quiet hours)",
+                          "items": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "recipients": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "quiet_hours": {
+                                "type": "boolean"
+                              },
+                              "replied_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "replies": {
+                          "items": {
+                            "properties": {
+                              "conversation": {
+                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "nullable": true,
+                                "properties": {
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "thread_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "created_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "here",
+                                  "walk",
+                                  "call",
+                                  "text"
+                                ],
+                                "type": "string"
+                              },
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "text": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "kind",
+                              "person",
+                              "created_at"
+                            ],
+                            "title": "SupportReply",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "role": {
+                          "enum": [
+                            "sender",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "sender": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "source": {
+                          "enum": [
+                            "craving",
+                            "quick"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "sending",
+                            "delivered",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "message",
+                        "created_at",
+                        "status"
+                      ],
+                      "title": "SupportRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "support_request"
+                  ],
+                  "title": "SupportRequestResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Support request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One support request: who received it, who replied, quiet hours, the no-reply card",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/support-requests/{id}/replies": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SupportRequestController.reply",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "kind": {
+                    "enum": [
+                      "here",
+                      "walk",
+                      "call",
+                      "text"
+                    ],
+                    "type": "string"
+                  },
+                  "text": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "kind"
+                ],
+                "title": "SupportReplyRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "reply": {
+                      "properties": {
+                        "conversation": {
+                          "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                          "nullable": true,
+                          "properties": {
+                            "organization_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "thread_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "here",
+                            "walk",
+                            "call",
+                            "text"
+                          ],
+                          "type": "string"
+                        },
+                        "person": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "text": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "person",
+                        "created_at"
+                      ],
+                      "title": "SupportReply",
+                      "type": "object"
+                    },
+                    "sender_phone": {
+                      "description": "Only for `call`, and only when the sender shares their phone with buddies",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "reply",
+                    "sender_phone"
+                  ],
+                  "title": "SupportReplyResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reply"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Answer as a buddy: here, walk, call (with the sender's phone if shared) or text",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/support-requests/{id}/undo": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SupportRequestController.undo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "support_request": {
+                      "description": "One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.",
+                      "properties": {
+                        "can_undo": {
+                          "type": "boolean"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "delivered_silently": {
+                          "type": "boolean"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "nudge": {
+                          "description": "The calm card after ten minutes without a reply; help lines are information, not advice",
+                          "properties": {
+                            "breathing_seconds": {
+                              "type": "integer"
+                            },
+                            "can_resend": {
+                              "type": "boolean"
+                            },
+                            "due": {
+                              "type": "boolean"
+                            },
+                            "due_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "help_lines": {
+                              "properties": {
+                                "informational": {
+                                  "type": "boolean"
+                                },
+                                "path": {
+                                  "type": "string"
+                                }
+                              },
+                              "type": "object"
+                            },
+                            "sent_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "suggestions": {
+                              "items": {
+                                "type": "string"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "quick_replies": {
+                          "items": {
+                            "enum": [
+                              "here",
+                              "walk",
+                              "call"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "quiet_hours": {
+                          "description": "Buddies who got it silently (their quiet hours)",
+                          "items": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "recipients": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "quiet_hours": {
+                                "type": "boolean"
+                              },
+                              "replied_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "replies": {
+                          "items": {
+                            "properties": {
+                              "conversation": {
+                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "nullable": true,
+                                "properties": {
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "thread_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "created_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "here",
+                                  "walk",
+                                  "call",
+                                  "text"
+                                ],
+                                "type": "string"
+                              },
+                              "person": {
+                                "nullable": true,
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id",
+                                  "nickname"
+                                ],
+                                "title": "BuddyPerson",
+                                "type": "object"
+                              },
+                              "text": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "kind",
+                              "person",
+                              "created_at"
+                            ],
+                            "title": "SupportReply",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "role": {
+                          "enum": [
+                            "sender",
+                            "buddy"
+                          ],
+                          "type": "string"
+                        },
+                        "sender": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "source": {
+                          "enum": [
+                            "craving",
+                            "quick"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "sending",
+                            "delivered",
+                            "undone"
+                          ],
+                          "type": "string"
+                        },
+                        "undo_until": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role",
+                        "message",
+                        "created_at",
+                        "status"
+                      ],
+                      "title": "SupportRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "support_request"
+                  ],
+                  "title": "SupportRequestResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Support request"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take a request back within 5 seconds (nobody is told)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
     "/api/me/tours/{audience}/complete": {
       "post": {
         "callbacks": {},
@@ -69936,6 +75147,147 @@
         "summary": "The member's wellness days (Σήμερα card, week strip) from..to, local dates",
         "tags": [
           "Wellness"
+        ]
+      }
+    },
+    "/api/me/wellness-summary-sharing": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessSummarySharingController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "sharing": {
+                      "properties": {
+                        "cravings": {
+                          "description": "Λιγούρες στη σύνοψη",
+                          "type": "boolean"
+                        },
+                        "cravings_since": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "wellness": {
+                          "description": "Ευεξία · εβδομαδιαία σύνοψη",
+                          "type": "boolean"
+                        },
+                        "wellness_since": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "wellness",
+                        "cravings"
+                      ],
+                      "title": "WellnessSummarySharing",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "sharing"
+                  ],
+                  "title": "WellnessSummarySharingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sharing"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Whether your coaches get a weekly wellness summary, and cravings in it",
+        "tags": [
+          "Buddies"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessSummarySharingController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "cravings": {
+                    "type": "boolean"
+                  },
+                  "wellness": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "WellnessSummarySharingRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "sharing": {
+                      "properties": {
+                        "cravings": {
+                          "description": "Λιγούρες στη σύνοψη",
+                          "type": "boolean"
+                        },
+                        "cravings_since": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "wellness": {
+                          "description": "Ευεξία · εβδομαδιαία σύνοψη",
+                          "type": "boolean"
+                        },
+                        "wellness_since": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "wellness",
+                        "cravings"
+                      ],
+                      "title": "WellnessSummarySharing",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "sharing"
+                  ],
+                  "title": "WellnessSummarySharingResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sharing"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn the coach's weekly wellness summary, or cravings in it, on or off",
+        "tags": [
+          "Buddies"
         ]
       }
     },
@@ -133277,6 +138629,146 @@
         "summary": "Write a client's nutrition plan; the client is notified",
         "tags": [
           "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/wellness-summary": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ClientWellnessSummaryController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Any date of the week; the last completed week when left out",
+            "in": "query",
+            "name": "week",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "shared": {
+                      "type": "boolean"
+                    },
+                    "summary": {
+                      "nullable": true,
+                      "properties": {
+                        "allowed_since": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "cravings": {
+                          "description": "Only when the member allowed cravings in the summary: count and times",
+                          "nullable": true,
+                          "properties": {
+                            "count": {
+                              "type": "integer"
+                            },
+                            "moments": {
+                              "items": {
+                                "properties": {
+                                  "date": {
+                                    "format": "date",
+                                    "type": "string"
+                                  },
+                                  "time": {
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "type": "array"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "meals": {
+                          "properties": {
+                            "days_logged": {
+                              "type": "integer"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "sleep": {
+                          "properties": {
+                            "nights_logged": {
+                              "type": "integer"
+                            },
+                            "nights_on_goal": {
+                              "type": "integer"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "water": {
+                          "properties": {
+                            "days_logged": {
+                              "type": "integer"
+                            },
+                            "days_on_goal": {
+                              "type": "integer"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "week_end": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "week_start": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "week_start",
+                        "week_end",
+                        "sleep",
+                        "water",
+                        "meals",
+                        "cravings"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "shared",
+                    "summary"
+                  ],
+                  "title": "ClientWellnessSummary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Summary"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's weekly wellness summary (only when the client allowed it)",
+        "tags": [
+          "Buddies"
         ]
       }
     },
