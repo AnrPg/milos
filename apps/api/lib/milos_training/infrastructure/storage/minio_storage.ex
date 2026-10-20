@@ -110,6 +110,18 @@ defmodule MilosTraining.Infrastructure.Storage.MinioStorage do
     end
   end
 
+  # ADR-157: post media are processed from a local copy of the upload.
+  @impl MilosTraining.Application.Ports.TenantObjectStore
+  def download_object(bucket, key, path) when is_binary(key) and is_binary(path) do
+    {storage_config, _url_config, bucket_name} = bucket_config(bucket)
+
+    case ExAws.S3.download_file(bucket_name, key, path) |> ExAws.request(storage_config) do
+      {:ok, _done} -> :ok
+      {:error, {:http_error, 404, _response}} -> {:error, :not_found}
+      {:error, reason} -> {:error, {:object_store_failed, reason}}
+    end
+  end
+
   @impl MilosTraining.Application.Ports.TenantObjectStore
   def public_object_url(bucket, key)
       when bucket in [:branding, :media_public] and is_binary(key) do

@@ -10,33 +10,57 @@ defmodule MilosTraining.Application.CommunityPosts do
   in the scope of the gym that runs the club; a member group's admins
   moderate inside their group. Every change is announced on the club's
   realtime topic.
+
+  ADR-157: a post may carry up to ten photos or one video (`media_ids`,
+  the author's uploads, in order), still processing when it is published.
+  Deleting a post deletes its uploads.
   """
 
-  alias MilosTraining.Application.{ClubScope, PostAttachment, PostPresenter, RealtimePublisher}
+  alias MilosTraining.Application.{
+    ClubScope,
+    PostAttachment,
+    PostMedia,
+    PostPresenter,
+    RealtimePublisher
+  }
+
   alias MilosTraining.Community
 
   def create(%{user_id: user_id} = context, params) do
+    audience = param(params, :audience)
+
     with {:ok, clubs} <- ClubScope.reachable(context),
          {:ok, club, channel} <- ClubScope.find_channel(clubs, param(params, :channel_id)),
          {:ok, attachment} <- attachment(user_id, params),
+         {:ok, media} <- PostMedia.prepare(context, param(params, :media_ids)),
          attrs =
-           Map.merge(attachment, %{
+           attachment
+           |> Map.merge(PostMedia.initial(media))
+           |> Map.merge(%{
              body: param(params, :body),
-             audience: param(params, :audience),
+             audience: audience,
              client_operation_id: param(params, :client_operation_id)
            }),
+         write = ClubScope.write_context(club, context),
          {:ok, post} <-
-           Community.create_post(
-             ClubScope.write_context(club, context),
-             channel,
-             club.role,
-             channel.participant,
-             attrs
-           ) do
+           Community.create_post(write, channel, club.role, channel.participant, attrs),
+         :ok <- attach_media(media, context, write, club, channel, post) do
       _ = PostAttachment.mark_posted(user_id, post)
-      [presented] = PostPresenter.posts([post], [club], user_id)
       announce(club, "post_created", post)
-      {:ok, presented}
+      reload(context, club, post.id)
+    end
+  end
+
+  # The uploads join the post; if another post took one meanwhile, this
+  # post goes again.
+  defp attach_media(media, context, write, club, channel, post) do
+    case PostMedia.attach(media, context, PostMedia.ref("community_post", post)) do
+      :ok ->
+        :ok
+
+      {:error, reason} ->
+        _ = Community.delete_post(write, post, role(club, channel), DateTime.utc_now())
+        {:error, reason}
     end
   end
 
@@ -45,6 +69,7 @@ defmodule MilosTraining.Application.CommunityPosts do
          {:ok, _deleted} <-
            Community.delete_post(write(club, context), post, role(club, channel), now) do
       PostAttachment.restore(post.author_id, post)
+      :ok = PostMedia.release(post)
       announce(club, "post_deleted", post)
       :ok
     end
@@ -157,10 +182,12 @@ defmodule MilosTraining.Application.CommunityPosts do
 
   defp can_comment(_channel), do: :ok
 
-  defp visible?(%{hidden_at: nil}, _club, _channel, _user_id), do: true
-
-  defp visible?(post, club, channel, user_id),
-    do: post.author_id == user_id or Community.can_moderate?(role(club, channel))
+  # Hidden posts, and posts whose media are not ready (ADR-157), show to
+  # their author and to those who moderate the channel.
+  defp visible?(post, club, channel, user_id) do
+    (is_nil(post.hidden_at) and Community.post_media_visible?(post, user_id)) or
+      post.author_id == user_id or Community.can_moderate?(role(club, channel))
+  end
 
   defp role(club, channel), do: Community.channel_role(club.role, channel)
   defp write(club, context), do: ClubScope.write_context(club, context)

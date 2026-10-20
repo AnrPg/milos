@@ -42,6 +42,8 @@ defmodule MilosTraining.Community.Commands.Posts do
           attachment_type: Map.get(attrs, :attachment_type),
           attachment_id: Map.get(attrs, :attachment_id),
           attachment: Map.get(attrs, :attachment),
+          media: Map.get(attrs, :media, []),
+          media_status: Map.get(attrs, :media_status, "ready"),
           client_operation_id: Map.get(attrs, :client_operation_id)
         })
     end

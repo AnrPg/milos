@@ -38,7 +38,9 @@ config :milos_training, :gemini,
   thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low"),
   parser_thinking_level: System.get_env("GEMINI_PARSER_THINKING_LEVEL", "medium"),
   # Workout library icons (ADR-136) use their own small, cheap model.
-  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite")
+  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite"),
+  # ADR-157: alt text suggestions (vision).
+  vision_model: System.get_env("GEMINI_VISION_MODEL", "gemini-2.5-flash-lite")
 
 config :web_push_elixir,
   vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),

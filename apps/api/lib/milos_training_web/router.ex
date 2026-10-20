@@ -51,6 +51,25 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-157: one upload per picked file, plus its completion.
+  pipeline :media_upload_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 300_000,
+      bucket: "media-uploads",
+      methods: ["POST", "PATCH", "DELETE"]
+    )
+  end
+
+  pipeline :ai_suggestion_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 20,
+      interval: 300_000,
+      bucket: "ai-suggestions",
+      methods: ["POST"]
+    )
+  end
+
   pipeline :messaging_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 60,
@@ -1095,6 +1114,7 @@ defmodule MilosTrainingWeb.Router do
     get("/me/followers", FollowController, :followers)
     delete("/me/followers/:id", FollowController, :remove)
     get("/me/following", FollowController, :following)
+    get("/me/post-attachments/:type/:id", PostAttachmentController, :show)
     post("/profile-posts", ProfilePostController, :create)
     delete("/profile-posts/:id", ProfilePostController, :delete)
     put("/profile-posts/:id/kudos", ProfilePostController, :kudos)
@@ -1113,6 +1133,36 @@ defmodule MilosTrainingWeb.Router do
     get("/me/trials/:id", TrialController, :show)
     post("/me/trials/:id/cancel", TrialController, :cancel)
     post("/me/trials/:id/follow-up", TrialController, :follow_up)
+  end
+
+  # ADR-157: photos and videos for posts.
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :media_upload_rate_limited
+    ])
+
+    get("/capabilities", MyMediaController, :capabilities)
+    post("/uploads", MyMediaController, :upload)
+    get("/:id", MyMediaController, :show)
+    post("/:id/complete", MyMediaController, :complete)
+    patch("/:id", MyMediaController, :update)
+    delete("/:id", MyMediaController, :delete)
+  end
+
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :ai_suggestion_rate_limited
+    ])
+
+    post("/:id/alt-text-suggestion", MyMediaController, :suggest_alt_text)
   end
 
   # ADR-155: the door scan (any box: the door says which) and connected devices.

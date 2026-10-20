@@ -4,7 +4,7 @@ defmodule MilosTraining.Community.Commands.ProfilePosts do
   (ADR-142). The author owns the post; RLS decides who reads it.
   """
 
-  alias MilosTraining.Community.Domain.AudiencePolicy
+  alias MilosTraining.Community.Domain.{AudiencePolicy, PostMediaPolicy}
   alias MilosTraining.Community.SocialStore
 
   def create(%{user_id: user_id} = context, audience, attrs) do
@@ -16,6 +16,8 @@ defmodule MilosTraining.Community.Commands.ProfilePosts do
         attachment_type: Map.get(attrs, :attachment_type),
         attachment_id: Map.get(attrs, :attachment_id),
         attachment: Map.get(attrs, :attachment),
+        media: Map.get(attrs, :media, []),
+        media_status: Map.get(attrs, :media_status, "ready"),
         client_operation_id: Map.get(attrs, :client_operation_id)
       })
     else
@@ -25,8 +27,11 @@ defmodule MilosTraining.Community.Commands.ProfilePosts do
 
   def fetch(%{user_id: user_id} = context, post_id) do
     case SocialStore.get_profile_post(context, post_id, user_id) do
-      nil -> {:error, :not_found}
-      post -> {:ok, post}
+      nil ->
+        {:error, :not_found}
+
+      post ->
+        if PostMediaPolicy.visible?(post, user_id), do: {:ok, post}, else: {:error, :not_found}
     end
   end
 

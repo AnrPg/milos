@@ -24,6 +24,16 @@ defmodule MilosTraining.Application.MediaStorage do
     with :ok <- owned(owner, key), do: impl().probe_object(bucket, key, bytes)
   end
 
+  @doc "Copies an object to a local file (ADR-157)."
+  def download(owner, bucket, key, path) do
+    with :ok <- owned(owner, key), do: impl().download_object(bucket, key, path)
+  end
+
+  @doc "Stores a generated rendition under the owner's prefix."
+  def put(owner, bucket, key, body, content_type) do
+    with :ok <- owned(owner, key), do: impl().put_object(bucket, key, body, content_type)
+  end
+
   @doc "A URL to show the object: stable for public media, short-lived otherwise."
   def read_url(owner, :media_public, key) do
     with :ok <- owned(owner, key), do: impl().public_object_url(:media_public, key)

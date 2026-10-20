@@ -711,6 +711,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     Post
     |> where([p], p.channel_id in ^filter.channel_ids and is_nil(p.deleted_at))
     |> visible_to(viewer_id, Map.get(filter, :moderated_organization_ids, []))
+    |> media_shown_to(viewer_id)
     |> not_reported_by(viewer_id)
     |> maybe_author(Map.get(filter, :author_id))
     |> before(Map.get(filter, :before))
@@ -730,6 +731,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
       p.channel_id in ^channel_ids and is_nil(p.deleted_at) and is_nil(p.hidden_at) and
         not is_nil(p.pinned_at)
     )
+    |> media_shown_to(viewer_id)
     |> order_by([p], desc: p.pinned_at)
     |> limit(10)
     |> with_counts(viewer_id)
@@ -745,6 +747,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     Post
     |> where([p], p.organization_id in ^organization_ids and p.audience == "public")
     |> where([p], is_nil(p.deleted_at) and is_nil(p.hidden_at))
+    |> media_shown_to(viewer_id)
     |> only_ids(Map.get(page, :ids))
     |> before(Map.get(page, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
@@ -761,6 +764,13 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
         p.organization_id in ^moderated_organization_ids
     )
   end
+
+  # ADR-157: a post whose media are not ready (processing, held, failed)
+  # shows to its author only.
+  defp media_shown_to(query, viewer_id) when is_binary(viewer_id),
+    do: where(query, [p], p.media_status == "ready" or p.author_id == ^viewer_id)
+
+  defp media_shown_to(query, _viewer_id), do: where(query, [p], p.media_status == "ready")
 
   # What someone reported disappears for them (board 7 Q4).
   defp not_reported_by(query, viewer_id) do
@@ -799,6 +809,8 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
       attachment_type: p.attachment_type,
       attachment_id: p.attachment_id,
       attachment: p.attachment,
+      media: p.media,
+      media_status: p.media_status,
       pinned_at: p.pinned_at,
       hidden_at: p.hidden_at,
       inserted_at: p.inserted_at,
@@ -819,6 +831,53 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
           type(^viewer_id, :binary_id)
         )
     })
+  end
+
+  # ADR-157: read-modify-write of a post's media under a row lock, so two
+  # refreshes (two uploads finishing at once) never interleave.
+  @impl true
+  def update_post_media(_context, id, fun) when is_function(fun, 1) do
+    Repo.transaction(fn ->
+      Post
+      |> where([p], p.id == ^id and is_nil(p.deleted_at))
+      |> lock("FOR UPDATE")
+      |> Repo.one()
+      |> case do
+        nil ->
+          Repo.rollback(:not_found)
+
+        post ->
+          before = post_media_view(post)
+
+          case fun.(before) do
+            {:ok, attrs} ->
+              case post |> Post.media_changeset(attrs) |> Repo.update() do
+                {:ok, updated} -> {before, post_media_view(updated)}
+                {:error, changeset} -> Repo.rollback(changeset)
+              end
+
+            :skip ->
+              {before, before}
+          end
+      end
+    end)
+    |> case do
+      {:ok, {before, later}} -> {:ok, before, later}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp post_media_view(%Post{} = post) do
+    %{
+      id: post.id,
+      organization_id: post.organization_id,
+      club_id: post.club_id,
+      channel_id: post.channel_id,
+      author_id: post.author_id,
+      audience: post.audience,
+      media: post.media || [],
+      media_status: post.media_status
+    }
   end
 
   @impl true

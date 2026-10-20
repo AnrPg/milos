@@ -34,4 +34,24 @@ defmodule MilosTraining.Media.Domain.ImageInspectorTest do
     assert {:error, :invalid_media_type} = ImageInspector.inspect_image(<<0x89, "PNG">>)
     assert {:error, :invalid_media_type} = ImageInspector.inspect_image("<svg/>")
   end
+
+  describe "sniff/1 (ADR-157)" do
+    test "names the real type of what a phone uploads" do
+      assert {:ok, "image/jpeg"} = ImageInspector.sniff(jpeg(10, 10, [exif_segment()]))
+      assert {:ok, "image/png"} = ImageInspector.sniff(<<0x89, "PNG", 0x0D, 0x0A, 0x1A, 0x0A, 0>>)
+      assert {:ok, "image/webp"} = ImageInspector.sniff(webp_extended())
+      assert {:ok, "image/heic"} = ImageInspector.sniff(<<0, 0, 0, 24, "ftypheic", 0, 0>>)
+      assert {:ok, "image/heif"} = ImageInspector.sniff(<<0, 0, 0, 24, "ftypmif1", 0, 0>>)
+      assert {:ok, "video/quicktime"} = ImageInspector.sniff(<<0, 0, 0, 20, "ftypqt  ", 0>>)
+      assert {:ok, "video/mp4"} = ImageInspector.sniff(<<0, 0, 0, 32, "ftypisom", 0>>)
+      assert {:ok, "video/mp4"} = ImageInspector.sniff(<<0, 0, 0, 32, "ftypM4V ", 0>>)
+      assert {:ok, "video/webm"} = ImageInspector.sniff(<<0x1A, 0x45, 0xDF, 0xA3, 0>>)
+    end
+
+    test "refuses anything else" do
+      assert {:error, :invalid_media_type} = ImageInspector.sniff("<svg xmlns=...>")
+      assert {:error, :invalid_media_type} = ImageInspector.sniff(<<0, 0, 0, 24, "ftypavif">>)
+      assert {:error, :invalid_media_type} = ImageInspector.sniff("GIF89a")
+    end
+  end
 end
