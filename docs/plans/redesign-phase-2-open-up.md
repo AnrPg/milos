@@ -502,6 +502,24 @@ Apostolos picked option A on every question, with the extras below.
    one trial offer to non-members who came. Extras: per-event numbers; QR self check-in when M7
    lands.
 
+### Γύρω μου (2026-10-20, [board 9](https://claude.ai/artifact/M2zFUSokdeLnmsxsCr7q5W))
+
+Apostolos picked the recommended option on every question except the map (Q3: B), with the extras
+below.
+
+1. **Starting point (Q1):** «Η περιοχή μου» (up to five neighbourhoods, saved privately) with
+   «Χρήση τοποθεσίας τώρα» for one search, rounded to ~100 m and never stored. Extras: box members
+   start from their box's area; a one-off place search that leaves the saved area alone.
+2. **Results (Q2):** sections by kind (Events, Box κοντά σου, Ανοιχτά clubs, Αναρτήσεις when on),
+   each with «Δες όλα» and distances.
+3. **Map (Q3, B):** a compact map always above the list, pins linked to rows, «Ψάξε εδώ» after
+   panning, expandable to full screen.
+4. **Saved filters (Q4):** saved combinations as chips after «Φίλτρα (n)»; last filters follow the
+   account. Extra: «Ειδοποίησέ με», at most one notification a day for new matches.
+5. **Public posts (Q5):** off by default; boxes and open clubs at the box's location, people only
+   with «Φαίνομαι στο Γύρω μου», at neighbourhood level.
+6. **Thin results (Q6):** «Τίποτα έως 3 km» with counts at 10 and 25 km and «Καθάρισε φίλτρα».
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -523,5 +541,5 @@ Apostolos picked option A on every question, with the extras below.
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [ ] P2-M7 · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
