@@ -27,7 +27,9 @@ export function CheckInSettings() {
   if (rules.isPending) return <p className="p-6 text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (rules.isError) return <p role="alert" className="p-6 text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(rules.error))}</p>;
   const initial = { ...DEFAULT_RULES, ...Object.fromEntries(Object.entries(rules.data).filter(([, value]) => value !== undefined && value !== null)) } as RulesDraft;
-  return <Form key={JSON.stringify(initial)} token={token} initial={initial} />;
+  // Not keyed on the saved rules: saving updates `initial` (what a mode switch is measured
+  // from) without throwing away the form and its «Αποθηκεύτηκε».
+  return <Form token={token} initial={initial} />;
 }
 
 function Form({ token, initial }: { token: string; initial: RulesDraft }) {
