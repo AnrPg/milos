@@ -84,9 +84,28 @@ Finance already exist and must not learn about events.
     and events they're on (`milos_acting_user_event_ids`), and their own
     attendee rows.
 
+13. **Member-group events.** An event may belong to a member group
+    (`community_events.channel_id`, a `member_group` channel of the same club).
+    The admin of an active group creates them from the club page
+    (`channel_id` in the create body), and edits and cancels them; staff with
+    `manage_events` manage them like any other, and running a group gives no
+    say over club events (`EventPolicy.manage_check/2`). They are always free,
+    never open to non-members and take no guest passes: `EventPolicy.group_terms/1`
+    overrides whatever was asked, the changeset validates it and a check
+    constraint holds it. Only the group's members see them, see who's going
+    and say they come (`belongs?`, `visible?`, `can_rsvp?`); their card goes in
+    the group. From a personal session, RLS shows a group event to the group's
+    members (`milos_acting_user_group_ids`) and the box's staff.
+14. **Late cancels for staff.** The staff attendee list marks «Ακύρωσε αργά»
+    (`late_cancel` with `cancelled_at`) and gives each person's late cancels at
+    the box over the last 90 days (`late_cancels_90d`); every event's numbers
+    count its late cancels.
+
 ## Consequences
 - The club page's Events tab and «Κοινότητα › Events» have an API; the web
   follows in the second half of P2-M5.
+- A group archived or no longer active keeps its events, but only staff can
+  change them.
 - A person's guest pass works only while they are going; withdrawing doesn't
   remove guests already in.
 - Payments of people without a Finance record don't appear in Finance reports;
