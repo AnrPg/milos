@@ -402,3 +402,9 @@ msgstr "Понравилось «%{event}»? %{box} приглашает вас 
 
 msgid "Message about «%{event}»"
 msgstr "Сообщение о «%{event}»"
+
+msgid "New near you"
+msgstr "Новое рядом с вами"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Новое для «%{name}»: %{count}"

@@ -216,6 +216,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   def list_profile_posts(_context, filter) do
     ProfilePost
     |> where([p], p.user_id in ^filter.author_ids and is_nil(p.deleted_at))
+    |> only_ids(Map.get(filter, :ids))
     |> before(Map.get(filter, :before))
     |> order_by([p], desc: p.inserted_at, desc: p.id)
     |> limit(^filter.limit)
@@ -326,6 +327,9 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
   # Only the follows whose other side is one of `ids` (a name search).
   defp among(query, _field, nil), do: query
   defp among(query, field, ids), do: where(query, [f], field(f, ^field) in ^ids)
+
+  defp only_ids(query, nil), do: query
+  defp only_ids(query, ids), do: where(query, [p], p.id in ^ids)
 
   defp before(query, nil), do: query
 

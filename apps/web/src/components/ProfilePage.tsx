@@ -16,6 +16,7 @@ import { signOutAllDevices } from "@/api/auth";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
+import { AroundAreaSetting } from "@/components/around/AroundSettings";
 import { isSupportedAvatarSource } from "@/components/profile/avatar-crop";
 import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
@@ -69,6 +70,7 @@ export function ProfilePage() {
   const i18n = useUiTranslations();
   const locale = useLocale();
   const tProfile = useTranslations("Profile");
+  const tAround = useTranslations("Around");
   const tMe = useTranslations("MemberApp");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
@@ -283,6 +285,10 @@ export function ProfilePage() {
 
         <CollapsibleSection id="theme" title={tProfile("themeTitle")} description={tProfile("themeDescription")}>
           <ThemeSetting />
+        </CollapsibleSection>
+
+        <CollapsibleSection id="around-area" title={tAround("areaTitle")} description={tAround("areaSettingHint")} defaultOpen>
+          <AroundAreaSetting />
         </CollapsibleSection>
 
         <OutboxSettingsCard />

@@ -16,3 +16,27 @@ export async function rememberFilters(token: string, surface: FilterSurface, par
     body: { params },
   });
 }
+
+export type SavedFilter = SavedFilters["saved"][number];
+
+/** Saves a named combination («ΣΚ κοντά»); the same name replaces it. */
+export async function saveNamedFilter(token: string, surface: FilterSurface, name: string, params: Record<string, unknown>) {
+  return apiRequest<SavedFilters>(`/me/filters/${surface}`, {
+    method: "POST",
+    token,
+    body: { name, params },
+  });
+}
+
+export async function deleteSavedFilter(token: string, surface: FilterSurface, id: string) {
+  return apiRequest<SavedFilters>(`/me/filters/${surface}/${encodeURIComponent(id)}`, { method: "DELETE", token });
+}
+
+/** Γύρω μου only (ADR-154): a daily notification when something new matches. */
+export async function setSavedFilterAlert(token: string, surface: FilterSurface, id: string, enabled: boolean) {
+  return apiRequest<SavedFilters>(`/me/filters/${surface}/${encodeURIComponent(id)}/alert`, {
+    method: "PUT",
+    token,
+    body: { enabled },
+  });
+}

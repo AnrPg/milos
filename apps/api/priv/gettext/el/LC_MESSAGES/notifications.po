@@ -402,3 +402,9 @@ msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δ
 
 msgid "Message about «%{event}»"
 msgstr "Μήνυμα για το «%{event}»"
+
+msgid "New near you"
+msgstr "Νέα γύρω σου"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Νέα για «%{name}»: %{count}"

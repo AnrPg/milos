@@ -7,7 +7,7 @@ defmodule MilosTraining.Application.SocialProfile do
   """
 
   alias MilosTraining.Application.PostPresenter
-  alias MilosTraining.{Community, Identity}
+  alias MilosTraining.{Community, Identity, Places}
 
   @page 20
 
@@ -22,7 +22,8 @@ defmodule MilosTraining.Application.SocialProfile do
          ]),
        requests_count: Community.count_incoming_follows(context, "user", user_id, "requested"),
        booking_sharing: booking_sharing(context, user_id),
-       member_visibility: member_visibility(context, user_id)
+       member_visibility: member_visibility(context, user_id),
+       around_visibility: around_visibility(context, user_id)
      }}
   end
 
@@ -36,6 +37,26 @@ defmodule MilosTraining.Application.SocialProfile do
     with {:ok, _settings} <-
            Community.put_social_settings(context, user_id, %{hide_from_members: hidden}),
          do: {:ok, member_visibility(context, user_id)}
+  end
+
+  @doc """
+  ADR-154: «Φαίνομαι στο Γύρω μου», off until the member turns it on. Their
+  public posts then show in Γύρω μου at the centroid of their main
+  neighbourhood, so it only works once «Η περιοχή μου» is set.
+  """
+  def around_visibility(context, user_id) do
+    settings = Community.social_settings(context, user_id)
+
+    %{
+      visible: (settings && settings.visible_around) || false,
+      has_area: Places.home_area(%{user_id: user_id}) != []
+    }
+  end
+
+  def set_around_visibility(%{user_id: user_id} = context, visible) when is_boolean(visible) do
+    with {:ok, _settings} <-
+           Community.put_social_settings(context, user_id, %{visible_around: visible}),
+         do: {:ok, around_visibility(context, user_id)}
   end
 
   @doc """

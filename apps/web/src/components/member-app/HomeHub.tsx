@@ -1,6 +1,11 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+
+import { ScopeToggle } from "@/components/around/ScopeToggle";
+import { useHomeScope } from "@/components/around/use-around";
 
 import { ClubBar } from "@/components/community/ClubBar";
 import { gymClubFor } from "@/components/community/community";
@@ -26,7 +31,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * leaderboard (trials at other boxes and their follow-up after the greeting,
  * board 6), then the feed of the member's clubs (ADR-138) under the club
  * bar, with ⊕ to post and ♡ for notifications and follow requests. The WOD slot is the selected gym club's #wod-σήμερα
- * card with its leaderboard (ADR-138 D6).
+ * card with its leaderboard (ADR-138 D6). «Τα clubs μου | Γύρω μου» switches
+ * to /around (ADR-154) and is remembered.
  */
 export function HomeHub() {
   const t = useTranslations("MemberApp");
@@ -37,6 +43,13 @@ export function HomeHub() {
   const clubs = useMyClubs();
   useClubRealtime(clubs.data);
   const gymClub = gymClubFor(clubs.data ?? [], membership?.organization.id);
+  const router = useRouter();
+  const scope = useHomeScope();
+  // «Remember the last choice» (vision §7.1): Αρχική opens in Γύρω μου when that was it.
+  const openAround = scope.settled && scope.scope === "around";
+  useEffect(() => {
+    if (openAround) router.replace("/around");
+  }, [openAround, router]);
 
   return (
     <HubPage
@@ -49,6 +62,7 @@ export function HomeHub() {
       }
     >
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
+      <ScopeToggle current="clubs" />
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
       <MyTrialsCard />
       {gymClub ? (

@@ -85,4 +85,37 @@ defmodule MilosTrainingWeb.SavedFilterController do
       json(conn, filters)
     end
   end
+
+  operation(:alert,
+    summary: "Turn a saved Γύρω μου filter's daily alert on or off (ADR-154)",
+    description:
+      "At most one notification a day, only when something new matches. Turning it on " <>
+        "counts only what appears from now on. Only the `around_me` surface has alerts.",
+    parameters: [
+      @surface,
+      %Parameter{
+        name: :id,
+        in: :path,
+        required: true,
+        schema: %OpenApiSpex.Schema{type: :string, format: :uuid}
+      }
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{"application/json" => %MediaType{schema: Schemas.alert_request()}}
+    },
+    responses: [ok: {"Filters", "application/json", Schemas.filters()}]
+  )
+
+  def alert(conn, %{"surface" => surface, "id" => id}) do
+    with {:ok, filters} <-
+           SavedFilters.set_alert(
+             conn.assigns.user_context,
+             surface,
+             id,
+             conn.body_params["enabled"]
+           ) do
+      json(conn, filters)
+    end
+  end
 end

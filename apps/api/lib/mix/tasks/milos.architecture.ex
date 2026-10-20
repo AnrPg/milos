@@ -92,6 +92,8 @@ defmodule Mix.Tasks.Milos.Architecture do
     identity/saved_filter_store
     organizations/public_profile_store
     ai_usage/ai_usage_store
+    places/discovery_store
+    places/home_area_store
   )
 
   defp tenant_scope_violations do

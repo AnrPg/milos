@@ -3,6 +3,13 @@ import { describe, expect, it } from "vitest";
 import { notificationTargetUrl } from "./notification-links";
 
 describe("notificationTargetUrl", () => {
+  it("opens Γύρω μου with the saved filter of an around alert", () => {
+    expect(
+      notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),
+    ).toBe("/around?filter=f-1");
+    expect(notificationTargetUrl({ type: "around_new_matches", payload: {} }, "member")).toBe("/around");
+  });
+
   it("normalizes legacy assignment links to the canonical admin route and query", () => {
     expect(
       notificationTargetUrl(

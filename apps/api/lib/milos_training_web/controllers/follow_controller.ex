@@ -163,4 +163,21 @@ defmodule MilosTrainingWeb.FollowController do
            SocialProfile.set_member_visibility(conn.assigns.user_context, conn.body_params.hidden),
          do: json(conn, setting)
   end
+
+  operation(:around_visibility,
+    summary: "Show your public posts in Γύρω μου at your neighbourhood, or stop (ADR-154)",
+    request_body: S.body(MilosTrainingWeb.Schemas.Around.around_visibility_request()),
+    responses: [
+      ok: {"Setting", "application/json", MilosTrainingWeb.Schemas.Around.around_visibility()}
+    ]
+  )
+
+  def around_visibility(conn, _params) do
+    with {:ok, setting} <-
+           SocialProfile.set_around_visibility(
+             conn.assigns.user_context,
+             conn.body_params.visible
+           ),
+         do: json(conn, setting)
+  end
 end

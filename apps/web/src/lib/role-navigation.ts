@@ -125,7 +125,7 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
  */
 export function clientNavItems(): NavItem[] {
   return [
-    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs"], exact: true },
+    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs", "/around", "/around/events", "/around/boxes", "/around/clubs", "/around/posts"], exact: true },
     {
       id: "box",
       href: "/box",

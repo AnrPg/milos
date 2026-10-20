@@ -43,7 +43,8 @@ config :milos_training, Oban,
        {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
        {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
-       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob}
+       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
+       {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob}
      ]}
   ],
   queues: [
@@ -140,6 +141,14 @@ config :milos_training,
        MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
 
 config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+# ADR-154: Γύρω μου.
+config :milos_training,
+       :discovery_store,
+       MilosTraining.Infrastructure.Places.EctoDiscoveryStore
+
+config :milos_training, :gazetteer_store, MilosTraining.Infrastructure.Places.EctoGazetteerStore
+config :milos_training, :home_area_store, MilosTraining.Infrastructure.Places.EctoHomeAreaStore
 
 config :milos_training,
        :public_profile_store,

@@ -49,6 +49,8 @@ type ApiRequestOptions = {
   body?: unknown;
   /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
   responseType?: "json" | "text";
+  /** Cancels the request (react-query passes one so stale searches stop). */
+  signal?: AbortSignal;
 };
 
 function organizationSlugFromPath() {
@@ -350,6 +352,7 @@ export async function apiRequest<T>(
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
+    signal: options.signal,
   });
 
   rememberCanonicalOrganizationSlug(response, organizationSlug);

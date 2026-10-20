@@ -501,6 +501,23 @@ defmodule MilosTraining.Application.CommunityEvents do
     end
   end
 
+  @doc """
+  Events from any box as the person's cards (Γύρω μου, ADR-154): only those
+  they may see, presented as everywhere else.
+  """
+  def present_cards(context, events, now \\ DateTime.utc_now())
+  def present_cards(_context, [], _now), do: []
+
+  def present_cards(context, events, now) do
+    case ClubScope.call(context) do
+      {:ok, clubs} ->
+        events |> visible_only(context, clubs) |> then(&present(context, &1, clubs, now: now))
+
+      _error ->
+        []
+    end
+  end
+
   @doc false
   def present(%{user_id: user_id}, events, clubs, opts \\ []) do
     EventPresenter.present(events, viewer(%{user_id: user_id}, clubs), opts)

@@ -5,6 +5,7 @@ import { useDeferredValue, useState } from "react";
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { AROUND_KEY } from "@/api/around";
 import {
   CLUBS_KEY,
   discoverKey,
@@ -15,6 +16,7 @@ import {
   type CommunityGroup,
   type OpenClub,
 } from "@/api/community";
+import { NearbyClubs } from "@/components/around/Nearby";
 import { clientErrorMessage } from "@/components/client/errors";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
@@ -29,8 +31,8 @@ import { useMyClubs } from "./use-community";
 
 /**
  * «+ Βρες» (board 7 Q7): open clubs of the boxes you belong to or follow, and
- * member groups of your gyms you're not in, with a search. Clubs near you
- * arrive with Γύρω μου (M6).
+ * member groups of your gyms you're not in, with a search, and «Κοντά μου»:
+ * open clubs near you from Γύρω μου (ADR-154).
  */
 export function FindPage() {
   const t = useTranslations("Clubs");
@@ -85,7 +87,7 @@ export function FindPage() {
               </ul>
             </HubCard>
           ) : null}
-          <p className="text-xs" style={{ color: "var(--dim)" }}>{t("findNearbyLater")}</p>
+          <NearbyClubs />
         </>
       )}
     </HubPage>
@@ -99,10 +101,12 @@ function useDiscoverRefresh() {
       queryClient.invalidateQueries({ queryKey: ["community", "discover"] }),
       queryClient.invalidateQueries({ queryKey: CLUBS_KEY }),
       queryClient.invalidateQueries({ queryKey: FEED_KEY }),
+      queryClient.invalidateQueries({ queryKey: AROUND_KEY }),
     ]);
 }
 
-function OpenClubRow({ club }: { club: OpenClub }) {
+/** An open club with «Μπες» (or «Αίτημα»); `detail` adds e.g. the distance (Γύρω μου). */
+export function OpenClubRow({ club, detail }: { club: OpenClub; detail?: string }) {
   const t = useTranslations("Clubs");
   const tUi = useUiTranslations();
   const { tokens } = useSession();
@@ -128,7 +132,7 @@ function OpenClubRow({ club }: { club: OpenClub }) {
         <Link href={`/clubs/${club.id}`} className="min-w-0 grow">
           <span className="block truncate font-bold" style={{ color: "var(--text)" }}>{club.name}</span>
           <span className="block truncate text-xs" style={{ color: "var(--dim)" }}>
-            {[club.box?.name, t("clubMembers", { count: club.member_count })].filter(Boolean).join(" · ")}
+            {[club.box?.name, t("clubMembers", { count: club.member_count }), detail].filter(Boolean).join(" · ")}
           </span>
         </Link>
         {club.membership === "member" || club.role === "staff" ? (
