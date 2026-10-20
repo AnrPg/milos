@@ -9836,6 +9836,1664 @@
         "title": "BoxVocabulary",
         "type": "object"
       },
+      "CheckInBooking": {
+        "properties": {
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              null,
+              "member",
+              "guest",
+              "trial"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_class_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "scheduled_class_id",
+          "starts_at"
+        ],
+        "title": "CheckInBooking",
+        "type": "object"
+      },
+      "CheckInBox": {
+        "properties": {
+          "logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "slug",
+          "name"
+        ],
+        "title": "CheckInBox",
+        "type": "object"
+      },
+      "CheckInClass": {
+        "properties": {
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "spots_remaining": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "starts_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "trial_seats": {
+            "description": "Visitor offer only",
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "starts_at"
+        ],
+        "title": "CheckInClass",
+        "type": "object"
+      },
+      "CheckInDeskRequest": {
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "member_qr",
+              "wallet",
+              "desk_search"
+            ],
+            "type": "string"
+          },
+          "override": {
+            "description": "«Check-in παρ' όλα αυτά»: only when the owner allows desk overrides",
+            "type": "boolean"
+          }
+        },
+        "title": "CheckInDeskRequest",
+        "type": "object"
+      },
+      "CheckInDeskResult": {
+        "properties": {
+          "already_checked_in": {
+            "enum": [
+              null,
+              "class",
+              "open_gym"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "bookings": {
+            "description": "Bookings in the window",
+            "items": {
+              "properties": {
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    null,
+                    "member",
+                    "guest",
+                    "trial"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scheduled_class_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "scheduled_class_id",
+                "starts_at"
+              ],
+              "title": "CheckInBooking",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "can_auto_check_in": {
+            "type": "boolean"
+          },
+          "checked_in": {
+            "nullable": true,
+            "properties": {
+              "at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "booking": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "duration_minutes": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          null,
+                          "member",
+                          "guest",
+                          "trial"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "location_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "scheduled_class_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "starts_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "scheduled_class_id",
+                      "starts_at"
+                    ],
+                    "title": "CheckInBooking",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              },
+              "id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "class",
+                  "open_gym"
+                ],
+                "type": "string"
+              },
+              "method": {
+                "enum": [
+                  "door_qr",
+                  "door_poster",
+                  "member_qr",
+                  "wallet",
+                  "desk_search",
+                  "self"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "override": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "title": "CheckInRecord",
+            "type": "object"
+          },
+          "decision": {
+            "enum": [
+              "class",
+              "choose",
+              "already_checked_in",
+              "open_gym",
+              "nothing",
+              "booking_not_in_window"
+            ],
+            "type": "string"
+          },
+          "member": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "display_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "type": "object"
+          },
+          "method": {
+            "enum": [
+              "member_qr",
+              "wallet",
+              "desk_search"
+            ],
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "override_allowed": {
+            "type": "boolean"
+          },
+          "package": {
+            "description": "What is left on the member's package; null when the box keeps no package for them",
+            "nullable": true,
+            "properties": {
+              "class_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "expires_on": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "frozen_until": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "open_gym_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "status": {
+                "nullable": true,
+                "type": "string"
+              },
+              "unlimited": {
+                "type": "boolean"
+              }
+            },
+            "title": "CheckInPackage",
+            "type": "object"
+          },
+          "problems": {
+            "items": {
+              "enum": [
+                "frozen",
+                "package_expired",
+                "unpaid",
+                "no_spots",
+                "nothing_to_check_in"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "warnings": {
+            "items": {
+              "enum": [
+                "payment_due"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "member",
+          "decision",
+          "problems",
+          "can_auto_check_in",
+          "override_allowed"
+        ],
+        "title": "CheckInDeskResult",
+        "type": "object"
+      },
+      "CheckInDeskScanRequest": {
+        "properties": {
+          "auto": {
+            "description": "Check in right away when nothing is wrong",
+            "type": "boolean"
+          },
+          "code": {
+            "description": "Personal QR or Wallet barcode",
+            "maxLength": 256,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code"
+        ],
+        "title": "CheckInDeskScanRequest",
+        "type": "object"
+      },
+      "CheckInDoorDisplay": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "codes": {
+            "description": "The current code and the next ones, to keep rotating offline (about 2 minutes)",
+            "items": {
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "deep_link": {
+                  "type": "string"
+                },
+                "shows_from": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "valid_until": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "code",
+                "deep_link",
+                "shows_from",
+                "valid_until"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "deep_link": {
+            "description": "What the QR encodes: /c/<location>/<code>",
+            "type": "string"
+          },
+          "location": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "title": "CheckInLocation",
+            "type": "object"
+          },
+          "next_class": {
+            "allOf": [
+              {
+                "properties": {
+                  "duration_minutes": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "spots_remaining": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "trial_seats": {
+                    "description": "Visitor offer only",
+                    "nullable": true,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "starts_at"
+                ],
+                "title": "CheckInClass",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "recent_check_ins": {
+            "items": {
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "first_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "class",
+                    "open_gym"
+                  ],
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "rotated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "rotation_seconds": {
+            "type": "integer"
+          },
+          "seconds_until_rotation": {
+            "type": "integer"
+          },
+          "server_time": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "topic": {
+            "description": "Realtime topic with `checked_in` events (first names only)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "location",
+          "code",
+          "deep_link",
+          "rotation_seconds",
+          "codes",
+          "topic"
+        ],
+        "title": "CheckInDoorDisplay",
+        "type": "object"
+      },
+      "CheckInLocation": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ],
+        "title": "CheckInLocation",
+        "type": "object"
+      },
+      "CheckInMemberCode": {
+        "description": "`rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "rotating",
+              "static"
+            ],
+            "type": "string"
+          },
+          "rotation_seconds": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "seconds_until_rotation": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "wallet_available": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "mode",
+          "code",
+          "wallet_available"
+        ],
+        "title": "CheckInMemberCode",
+        "type": "object"
+      },
+      "CheckInMemberCodeRevoked": {
+        "properties": {
+          "revoked_codes": {
+            "type": "integer"
+          },
+          "revoked_passes": {
+            "type": "integer"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "revoked_codes",
+          "revoked_passes"
+        ],
+        "title": "CheckInMemberCodeRevoked",
+        "type": "object"
+      },
+      "CheckInPackage": {
+        "description": "What is left on the member's package; null when the box keeps no package for them",
+        "nullable": true,
+        "properties": {
+          "class_visits_left": {
+            "description": "null = unlimited or not part of the package",
+            "nullable": true,
+            "type": "integer"
+          },
+          "expires_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "frozen_until": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "open_gym_visits_left": {
+            "description": "null = unlimited or not part of the package",
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "nullable": true,
+            "type": "string"
+          },
+          "unlimited": {
+            "type": "boolean"
+          }
+        },
+        "title": "CheckInPackage",
+        "type": "object"
+      },
+      "CheckInPoster": {
+        "description": "The printed poster of a location: a static QR that only checks in bookings",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "deep_link": {
+            "description": "`/c/<location>/p/<code>`, what the QR holds",
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "location": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "title": "CheckInLocation",
+            "type": "object"
+          },
+          "rotated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "location",
+          "enabled",
+          "code",
+          "deep_link"
+        ],
+        "title": "CheckInPoster",
+        "type": "object"
+      },
+      "CheckInPosterRequest": {
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled"
+        ],
+        "title": "CheckInPosterRequest",
+        "type": "object"
+      },
+      "CheckInRecord": {
+        "nullable": true,
+        "properties": {
+          "at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "booking": {
+            "allOf": [
+              {
+                "properties": {
+                  "duration_minutes": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      null,
+                      "member",
+                      "guest",
+                      "trial"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "scheduled_class_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "scheduled_class_id",
+                  "starts_at"
+                ],
+                "title": "CheckInBooking",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "class",
+              "open_gym"
+            ],
+            "type": "string"
+          },
+          "method": {
+            "enum": [
+              "door_qr",
+              "door_poster",
+              "member_qr",
+              "wallet",
+              "desk_search",
+              "self"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "override": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "kind"
+        ],
+        "title": "CheckInRecord",
+        "type": "object"
+      },
+      "CheckInRules": {
+        "properties": {
+          "desk_override": {
+            "type": "boolean"
+          },
+          "door_rotation_seconds": {
+            "enum": [
+              15,
+              30,
+              60
+            ],
+            "type": "integer"
+          },
+          "member_code_mode": {
+            "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
+            "enum": [
+              "rotating",
+              "static"
+            ],
+            "type": "string"
+          },
+          "open_gym_requires_package": {
+            "type": "boolean"
+          },
+          "visitor_trial_offer": {
+            "type": "boolean"
+          },
+          "window_after_minutes": {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "window_before_minutes": {
+            "maximum": 120,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "title": "CheckInRules",
+        "type": "object"
+      },
+      "CheckInRulesResponse": {
+        "properties": {
+          "settings": {
+            "properties": {
+              "desk_override": {
+                "type": "boolean"
+              },
+              "door_rotation_seconds": {
+                "enum": [
+                  15,
+                  30,
+                  60
+                ],
+                "type": "integer"
+              },
+              "member_code_mode": {
+                "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
+                "enum": [
+                  "rotating",
+                  "static"
+                ],
+                "type": "string"
+              },
+              "open_gym_requires_package": {
+                "type": "boolean"
+              },
+              "visitor_trial_offer": {
+                "type": "boolean"
+              },
+              "window_after_minutes": {
+                "maximum": 120,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "window_before_minutes": {
+                "maximum": 120,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "title": "CheckInRules",
+            "type": "object"
+          }
+        },
+        "required": [
+          "settings"
+        ],
+        "title": "CheckInRulesResponse",
+        "type": "object"
+      },
+      "CheckInScanRequest": {
+        "description": "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
+        "properties": {
+          "booking_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "code": {
+            "maxLength": 64,
+            "type": "string"
+          },
+          "location_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "poster_code": {
+            "description": "The printed poster's static code: checks in a booking in its window only",
+            "maxLength": 64,
+            "type": "string"
+          },
+          "scan_token": {
+            "maxLength": 1024,
+            "type": "string"
+          }
+        },
+        "title": "CheckInScanRequest",
+        "type": "object"
+      },
+      "CheckInScanResult": {
+        "properties": {
+          "box": {
+            "properties": {
+              "logo_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "primary_color": {
+                "nullable": true,
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "slug",
+              "name"
+            ],
+            "title": "CheckInBox",
+            "type": "object"
+          },
+          "check_in": {
+            "nullable": true,
+            "properties": {
+              "at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "booking": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "duration_minutes": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          null,
+                          "member",
+                          "guest",
+                          "trial"
+                        ],
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "location_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "scheduled_class_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "starts_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "scheduled_class_id",
+                      "starts_at"
+                    ],
+                    "title": "CheckInBooking",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              },
+              "id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "class",
+                  "open_gym"
+                ],
+                "type": "string"
+              },
+              "method": {
+                "enum": [
+                  "door_qr",
+                  "door_poster",
+                  "member_qr",
+                  "wallet",
+                  "desk_search",
+                  "self"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "override": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "title": "CheckInRecord",
+            "type": "object"
+          },
+          "choices": {
+            "items": {
+              "properties": {
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    null,
+                    "member",
+                    "guest",
+                    "trial"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scheduled_class_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "scheduled_class_id",
+                "starts_at"
+              ],
+              "title": "CheckInBooking",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "classes": {
+            "description": "«Κλείσε θέση»",
+            "items": {
+              "properties": {
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "spots_remaining": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trial_seats": {
+                  "description": "Visitor offer only",
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "starts_at"
+              ],
+              "title": "CheckInClass",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "follow": {
+            "enum": [
+              "none",
+              "requested",
+              "active"
+            ],
+            "type": "string"
+          },
+          "location": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "title": "CheckInLocation",
+            "type": "object"
+          },
+          "membership": {
+            "enum": [
+              "none",
+              "former",
+              "member"
+            ],
+            "type": "string"
+          },
+          "next_booking": {
+            "allOf": [
+              {
+                "properties": {
+                  "duration_minutes": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "kind": {
+                    "enum": [
+                      null,
+                      "member",
+                      "guest",
+                      "trial"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "scheduled_class_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "starts_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "scheduled_class_id",
+                  "starts_at"
+                ],
+                "title": "CheckInBooking",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "outcome": {
+            "enum": [
+              "checked_in",
+              "choose",
+              "already_checked_in",
+              "nothing",
+              "visitor",
+              "no_booking"
+            ],
+            "type": "string"
+          },
+          "package": {
+            "description": "What is left on the member's package; null when the box keeps no package for them",
+            "nullable": true,
+            "properties": {
+              "class_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "expires_on": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "frozen_until": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "open_gym_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "status": {
+                "nullable": true,
+                "type": "string"
+              },
+              "unlimited": {
+                "type": "boolean"
+              }
+            },
+            "title": "CheckInPackage",
+            "type": "object"
+          },
+          "reason": {
+            "description": "Why open gym was refused (a finance error code)",
+            "nullable": true,
+            "type": "string"
+          },
+          "scan_token": {
+            "description": "Proof of this scan for 3 minutes, to post again with a booking_id",
+            "type": "string"
+          },
+          "trial": {
+            "description": "Trial classes today and tomorrow at this location; null when the box offers none at the door",
+            "nullable": true,
+            "properties": {
+              "approval": {
+                "enum": [
+                  "auto",
+                  "manual"
+                ],
+                "type": "string"
+              },
+              "blocked_reason": {
+                "description": "Why this person can't ask for a trial here; null when they can",
+                "enum": [
+                  null,
+                  "already_member",
+                  "trial_for_first_timers_only",
+                  "trial_already_used"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "bring_note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "classes": {
+                "items": {
+                  "properties": {
+                    "duration_minutes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "location_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "spots_remaining": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "starts_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "trial_seats": {
+                      "description": "Visitor offer only",
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "starts_at"
+                  ],
+                  "title": "CheckInClass",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "horizon_days": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "mine": {
+                "additionalProperties": true,
+                "nullable": true,
+                "type": "object"
+              }
+            },
+            "required": [
+              "enabled",
+              "classes"
+            ],
+            "title": "CheckInTrialOffer",
+            "type": "object"
+          },
+          "undo_token": {
+            "description": "Undo within `undo_until`",
+            "type": "string"
+          },
+          "undo_until": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "outcome",
+          "box",
+          "location"
+        ],
+        "title": "CheckInScanResult",
+        "type": "object"
+      },
+      "CheckInTrialOffer": {
+        "description": "Trial classes today and tomorrow at this location; null when the box offers none at the door",
+        "nullable": true,
+        "properties": {
+          "approval": {
+            "enum": [
+              "auto",
+              "manual"
+            ],
+            "type": "string"
+          },
+          "blocked_reason": {
+            "description": "Why this person can't ask for a trial here; null when they can",
+            "enum": [
+              null,
+              "already_member",
+              "trial_for_first_timers_only",
+              "trial_already_used"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "bring_note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "classes": {
+            "items": {
+              "properties": {
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "spots_remaining": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "starts_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trial_seats": {
+                  "description": "Visitor offer only",
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "starts_at"
+              ],
+              "title": "CheckInClass",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "horizon_days": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "mine": {
+            "additionalProperties": true,
+            "nullable": true,
+            "type": "object"
+          }
+        },
+        "required": [
+          "enabled",
+          "classes"
+        ],
+        "title": "CheckInTrialOffer",
+        "type": "object"
+      },
+      "CheckInUndoResult": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "class",
+              "open_gym"
+            ],
+            "type": "string"
+          },
+          "package": {
+            "description": "What is left on the member's package; null when the box keeps no package for them",
+            "nullable": true,
+            "properties": {
+              "class_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "expires_on": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "frozen_until": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "open_gym_visits_left": {
+                "description": "null = unlimited or not part of the package",
+                "nullable": true,
+                "type": "integer"
+              },
+              "status": {
+                "nullable": true,
+                "type": "string"
+              },
+              "unlimited": {
+                "type": "boolean"
+              }
+            },
+            "title": "CheckInPackage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "kind",
+          "id"
+        ],
+        "title": "CheckInUndoResult",
+        "type": "object"
+      },
+      "CheckInVisitors": {
+        "properties": {
+          "visitors": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "display_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "location_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scanned_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "trial_offered": {
+                  "type": "boolean"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "user_id",
+                "scanned_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "visitors"
+        ],
+        "title": "CheckInVisitors",
+        "type": "object"
+      },
       "ClassSlotInjuryWarnings": {
         "additionalProperties": false,
         "properties": {
@@ -19169,6 +20827,150 @@
           "archived"
         ],
         "title": "CommunityStaffGroupsResponse",
+        "type": "object"
+      },
+      "ConnectedDevices": {
+        "properties": {
+          "calendar": {
+            "properties": {
+              "download_url": {
+                "type": "string"
+              },
+              "help": {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              "https_url": {
+                "type": "string"
+              },
+              "webcal_url": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "https_url",
+              "webcal_url"
+            ],
+            "type": "object"
+          },
+          "integrations": {
+            "items": {
+              "properties": {
+                "provider": {
+                  "enum": [
+                    "garmin",
+                    "apple_health",
+                    "health_connect"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "connected",
+                    "disconnected",
+                    "unavailable",
+                    "native_only"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "provider",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "wallet": {
+            "properties": {
+              "passes": {
+                "items": {
+                  "properties": {
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "added_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "box": {
+                      "properties": {
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "slug": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "last_updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "platform": {
+                      "enum": [
+                        "apple",
+                        "google"
+                      ],
+                      "type": "string"
+                    },
+                    "revoked_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "platform",
+                    "added_at",
+                    "active"
+                  ],
+                  "title": "WalletPass",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "platforms": {
+                "description": "Whether this server can issue cards per platform",
+                "properties": {
+                  "apple": {
+                    "type": "boolean"
+                  },
+                  "google": {
+                    "type": "boolean"
+                  }
+                },
+                "type": "object"
+              }
+            },
+            "required": [
+              "platforms",
+              "passes"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "wallet",
+          "calendar",
+          "integrations"
+        ],
+        "title": "ConnectedDevices",
         "type": "object"
       },
       "ContentVideo": {
@@ -34122,6 +35924,218 @@
         ],
         "type": "object"
       },
+      "WalletAddRequest": {
+        "properties": {
+          "platform": {
+            "enum": [
+              "apple",
+              "google"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform"
+        ],
+        "title": "WalletAddRequest",
+        "type": "object"
+      },
+      "WalletAddResult": {
+        "properties": {
+          "download_url": {
+            "description": "Apple: open within 10 minutes to add the .pkpass",
+            "nullable": true,
+            "type": "string"
+          },
+          "pass": {
+            "properties": {
+              "active": {
+                "type": "boolean"
+              },
+              "added_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "box": {
+                "properties": {
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "slug": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "last_updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "platform": {
+                "enum": [
+                  "apple",
+                  "google"
+                ],
+                "type": "string"
+              },
+              "revoked_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "platform",
+              "added_at",
+              "active"
+            ],
+            "title": "WalletPass",
+            "type": "object"
+          },
+          "save_url": {
+            "description": "Google: Save to Wallet",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "pass"
+        ],
+        "title": "WalletAddResult",
+        "type": "object"
+      },
+      "WalletPass": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "added_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "box": {
+            "properties": {
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "slug": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "platform": {
+            "enum": [
+              "apple",
+              "google"
+            ],
+            "type": "string"
+          },
+          "revoked_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "platform",
+          "added_at",
+          "active"
+        ],
+        "title": "WalletPass",
+        "type": "object"
+      },
+      "WalletPassResponse": {
+        "properties": {
+          "pass": {
+            "properties": {
+              "active": {
+                "type": "boolean"
+              },
+              "added_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "box": {
+                "properties": {
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "slug": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "type": "object"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "last_updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "platform": {
+                "enum": [
+                  "apple",
+                  "google"
+                ],
+                "type": "string"
+              },
+              "revoked_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "platform",
+              "added_at",
+              "active"
+            ],
+            "title": "WalletPass",
+            "type": "object"
+          }
+        },
+        "required": [
+          "pass"
+        ],
+        "title": "WalletPassResponse",
+        "type": "object"
+      },
       "WodLeaderboardEntry": {
         "properties": {
           "avatar_url": {
@@ -41941,6 +43955,659 @@
         ]
       }
     },
+    "/api/check-in/scan": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScanCheckInController.scan",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
+                "properties": {
+                  "booking_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "code": {
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "poster_code": {
+                    "description": "The printed poster's static code: checks in a booking in its window only",
+                    "maxLength": 64,
+                    "type": "string"
+                  },
+                  "scan_token": {
+                    "maxLength": 1024,
+                    "type": "string"
+                  }
+                },
+                "title": "CheckInScanRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "box": {
+                      "properties": {
+                        "logo_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "primary_color": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "slug",
+                        "name"
+                      ],
+                      "title": "CheckInBox",
+                      "type": "object"
+                    },
+                    "check_in": {
+                      "nullable": true,
+                      "properties": {
+                        "at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "booking": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    null,
+                                    "member",
+                                    "guest",
+                                    "trial"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "location_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scheduled_class_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "scheduled_class_id",
+                                "starts_at"
+                              ],
+                              "title": "CheckInBooking",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "open_gym"
+                          ],
+                          "type": "string"
+                        },
+                        "method": {
+                          "enum": [
+                            "door_qr",
+                            "door_poster",
+                            "member_qr",
+                            "wallet",
+                            "desk_search",
+                            "self"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "override": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "title": "CheckInRecord",
+                      "type": "object"
+                    },
+                    "choices": {
+                      "items": {
+                        "properties": {
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              null,
+                              "member",
+                              "guest",
+                              "trial"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_class_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "scheduled_class_id",
+                          "starts_at"
+                        ],
+                        "title": "CheckInBooking",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "classes": {
+                      "description": "«Κλείσε θέση»",
+                      "items": {
+                        "properties": {
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "spots_remaining": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "trial_seats": {
+                            "description": "Visitor offer only",
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "starts_at"
+                        ],
+                        "title": "CheckInClass",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "follow": {
+                      "enum": [
+                        "none",
+                        "requested",
+                        "active"
+                      ],
+                      "type": "string"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "membership": {
+                      "enum": [
+                        "none",
+                        "former",
+                        "member"
+                      ],
+                      "type": "string"
+                    },
+                    "next_booking": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "duration_minutes": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "kind": {
+                              "enum": [
+                                null,
+                                "member",
+                                "guest",
+                                "trial"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "location_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "scheduled_class_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "starts_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "scheduled_class_id",
+                            "starts_at"
+                          ],
+                          "title": "CheckInBooking",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "outcome": {
+                      "enum": [
+                        "checked_in",
+                        "choose",
+                        "already_checked_in",
+                        "nothing",
+                        "visitor",
+                        "no_booking"
+                      ],
+                      "type": "string"
+                    },
+                    "package": {
+                      "description": "What is left on the member's package; null when the box keeps no package for them",
+                      "nullable": true,
+                      "properties": {
+                        "class_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "expires_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "frozen_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "open_gym_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "CheckInPackage",
+                      "type": "object"
+                    },
+                    "reason": {
+                      "description": "Why open gym was refused (a finance error code)",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scan_token": {
+                      "description": "Proof of this scan for 3 minutes, to post again with a booking_id",
+                      "type": "string"
+                    },
+                    "trial": {
+                      "description": "Trial classes today and tomorrow at this location; null when the box offers none at the door",
+                      "nullable": true,
+                      "properties": {
+                        "approval": {
+                          "enum": [
+                            "auto",
+                            "manual"
+                          ],
+                          "type": "string"
+                        },
+                        "blocked_reason": {
+                          "description": "Why this person can't ask for a trial here; null when they can",
+                          "enum": [
+                            null,
+                            "already_member",
+                            "trial_for_first_timers_only",
+                            "trial_already_used"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "bring_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "classes": {
+                          "items": {
+                            "properties": {
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "location_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "spots_remaining": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "starts_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "trial_seats": {
+                                "description": "Visitor offer only",
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "starts_at"
+                            ],
+                            "title": "CheckInClass",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "horizon_days": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "mine": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "enabled",
+                        "classes"
+                      ],
+                      "title": "CheckInTrialOffer",
+                      "type": "object"
+                    },
+                    "undo_token": {
+                      "description": "Undo within `undo_until`",
+                      "type": "string"
+                    },
+                    "undo_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "outcome",
+                    "box",
+                    "location"
+                  ],
+                  "title": "CheckInScanResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "What the scan did"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The door code is wrong or expired, or the booking isn't in its window"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Scan the door: check in to a booking or open gym, or see what the box offers",
+        "tags": [
+          "Check-in"
+        ]
+      }
+    },
+    "/api/check-in/scan/{undo_token}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScanCheckInController.undo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "undo_token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "class",
+                        "open_gym"
+                      ],
+                      "type": "string"
+                    },
+                    "package": {
+                      "description": "What is left on the member's package; null when the box keeps no package for them",
+                      "nullable": true,
+                      "properties": {
+                        "class_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "expires_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "frozen_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "open_gym_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "CheckInPackage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id"
+                  ],
+                  "title": "CheckInUndoResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Undone"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Nothing to undo"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The minute has passed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Undo a scan's check-in within its minute",
+        "tags": [
+          "Check-in"
+        ]
+      }
+    },
     "/api/executions": {
       "get": {
         "callbacks": {},
@@ -48566,6 +51233,175 @@
         "summary": "Report a post, a comment or a group; it disappears for you and staff look at it",
         "tags": [
           "Community"
+        ]
+      }
+    },
+    "/api/me/connected-devices": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WalletController.devices",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "calendar": {
+                      "properties": {
+                        "download_url": {
+                          "type": "string"
+                        },
+                        "help": {
+                          "additionalProperties": {
+                            "type": "string"
+                          },
+                          "type": "object"
+                        },
+                        "https_url": {
+                          "type": "string"
+                        },
+                        "webcal_url": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "https_url",
+                        "webcal_url"
+                      ],
+                      "type": "object"
+                    },
+                    "integrations": {
+                      "items": {
+                        "properties": {
+                          "provider": {
+                            "enum": [
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "connected",
+                              "disconnected",
+                              "unavailable",
+                              "native_only"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "provider",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "wallet": {
+                      "properties": {
+                        "passes": {
+                          "items": {
+                            "properties": {
+                              "active": {
+                                "type": "boolean"
+                              },
+                              "added_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "box": {
+                                "properties": {
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "slug": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "type": "object"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "last_updated_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "platform": {
+                                "enum": [
+                                  "apple",
+                                  "google"
+                                ],
+                                "type": "string"
+                              },
+                              "revoked_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "platform",
+                              "added_at",
+                              "active"
+                            ],
+                            "title": "WalletPass",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "platforms": {
+                          "description": "Whether this server can issue cards per platform",
+                          "properties": {
+                            "apple": {
+                              "type": "boolean"
+                            },
+                            "google": {
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "platforms",
+                        "passes"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "wallet",
+                    "calendar",
+                    "integrations"
+                  ],
+                  "title": "ConnectedDevices",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Connected devices"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My Wallet cards, calendar feed and health integrations",
+        "tags": [
+          "Connected devices"
         ]
       }
     },
@@ -56489,6 +59325,117 @@
         ]
       }
     },
+    "/api/me/wallet-passes/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WalletController.revoke",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "pass": {
+                      "properties": {
+                        "active": {
+                          "type": "boolean"
+                        },
+                        "added_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "box": {
+                          "properties": {
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "slug": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "platform": {
+                          "enum": [
+                            "apple",
+                            "google"
+                          ],
+                          "type": "string"
+                        },
+                        "revoked_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "platform",
+                        "added_at",
+                        "active"
+                      ],
+                      "title": "WalletPass",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "pass"
+                  ],
+                  "title": "WalletPassResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The card"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such card"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke one of my Wallet cards: it stops scanning at once",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
     "/api/memberships": {
       "get": {
         "callbacks": {},
@@ -59382,6 +62329,1774 @@
         "summary": "Update a seasonal challenge",
         "tags": [
           "Admin Challenges"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.door",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "codes": {
+                      "description": "The current code and the next ones, to keep rotating offline (about 2 minutes)",
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "deep_link": {
+                            "type": "string"
+                          },
+                          "shows_from": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "valid_until": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "deep_link",
+                          "shows_from",
+                          "valid_until"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "deep_link": {
+                      "description": "What the QR encodes: /c/<location>/<code>",
+                      "type": "string"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "next_class": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "duration_minutes": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "location_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "spots_remaining": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "starts_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "trial_seats": {
+                              "description": "Visitor offer only",
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "starts_at"
+                          ],
+                          "title": "CheckInClass",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "recent_check_ins": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "open_gym"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "rotation_seconds": {
+                      "type": "integer"
+                    },
+                    "seconds_until_rotation": {
+                      "type": "integer"
+                    },
+                    "server_time": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "topic": {
+                      "description": "Realtime topic with `checked_in` events (first names only)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "code",
+                    "deep_link",
+                    "rotation_seconds",
+                    "codes",
+                    "topic"
+                  ],
+                  "title": "CheckInDoorDisplay",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Door display"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The door display of a location: its code, the next codes, the next class",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.poster",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The printed poster of a location: a static QR that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/p/<code>`, what the QR holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInPoster",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Poster"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The printed poster of a location: its static QR and whether it is on",
+        "tags": [
+          "Admin Check-in"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.update_poster",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ],
+                "title": "CheckInPosterRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The printed poster of a location: a static QR that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/p/<code>`, what the QR holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInPoster",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Poster"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn the printed poster of a location on or off",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster/rotate": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.rotate_poster",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The printed poster of a location: a static QR that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/p/<code>`, what the QR holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInPoster",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Poster"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Νέος κωδικός αφίσας»: every printed copy stops working",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/rotate": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.rotate_door",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "codes": {
+                      "description": "The current code and the next ones, to keep rotating offline (about 2 minutes)",
+                      "items": {
+                        "properties": {
+                          "code": {
+                            "type": "string"
+                          },
+                          "deep_link": {
+                            "type": "string"
+                          },
+                          "shows_from": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "valid_until": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "deep_link",
+                          "shows_from",
+                          "valid_until"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "deep_link": {
+                      "description": "What the QR encodes: /c/<location>/<code>",
+                      "type": "string"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "next_class": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "duration_minutes": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "location_id": {
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "spots_remaining": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "starts_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "trial_seats": {
+                              "description": "Visitor offer only",
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "starts_at"
+                          ],
+                          "title": "CheckInClass",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "recent_check_ins": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "first_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "open_gym"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "rotation_seconds": {
+                      "type": "integer"
+                    },
+                    "seconds_until_rotation": {
+                      "type": "integer"
+                    },
+                    "server_time": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "topic": {
+                      "description": "Realtime topic with `checked_in` events (first names only)",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "code",
+                    "deep_link",
+                    "rotation_seconds",
+                    "codes",
+                    "topic"
+                  ],
+                  "title": "CheckInDoorDisplay",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Door display"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Νέος κωδικός πόρτας»: every code shown so far stops working",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.check_in_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "booking_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "method": {
+                    "enum": [
+                      "member_qr",
+                      "wallet",
+                      "desk_search"
+                    ],
+                    "type": "string"
+                  },
+                  "override": {
+                    "description": "«Check-in παρ' όλα αυτά»: only when the owner allows desk overrides",
+                    "type": "boolean"
+                  }
+                },
+                "title": "CheckInDeskRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "already_checked_in": {
+                      "enum": [
+                        null,
+                        "class",
+                        "open_gym"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "bookings": {
+                      "description": "Bookings in the window",
+                      "items": {
+                        "properties": {
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              null,
+                              "member",
+                              "guest",
+                              "trial"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_class_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "scheduled_class_id",
+                          "starts_at"
+                        ],
+                        "title": "CheckInBooking",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "can_auto_check_in": {
+                      "type": "boolean"
+                    },
+                    "checked_in": {
+                      "nullable": true,
+                      "properties": {
+                        "at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "booking": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    null,
+                                    "member",
+                                    "guest",
+                                    "trial"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "location_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scheduled_class_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "scheduled_class_id",
+                                "starts_at"
+                              ],
+                              "title": "CheckInBooking",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "open_gym"
+                          ],
+                          "type": "string"
+                        },
+                        "method": {
+                          "enum": [
+                            "door_qr",
+                            "door_poster",
+                            "member_qr",
+                            "wallet",
+                            "desk_search",
+                            "self"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "override": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "title": "CheckInRecord",
+                      "type": "object"
+                    },
+                    "decision": {
+                      "enum": [
+                        "class",
+                        "choose",
+                        "already_checked_in",
+                        "open_gym",
+                        "nothing",
+                        "booking_not_in_window"
+                      ],
+                      "type": "string"
+                    },
+                    "member": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "display_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "method": {
+                      "enum": [
+                        "member_qr",
+                        "wallet",
+                        "desk_search"
+                      ],
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "override_allowed": {
+                      "type": "boolean"
+                    },
+                    "package": {
+                      "description": "What is left on the member's package; null when the box keeps no package for them",
+                      "nullable": true,
+                      "properties": {
+                        "class_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "expires_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "frozen_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "open_gym_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "CheckInPackage",
+                      "type": "object"
+                    },
+                    "problems": {
+                      "items": {
+                        "enum": [
+                          "frozen",
+                          "package_expired",
+                          "unpaid",
+                          "no_spots",
+                          "nothing_to_check_in"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "warnings": {
+                      "items": {
+                        "enum": [
+                          "payment_due"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "member",
+                    "decision",
+                    "problems",
+                    "can_auto_check_in",
+                    "override_allowed"
+                  ],
+                  "title": "CheckInDeskResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Checked in"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The owner doesn't allow desk overrides"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Problems with the package, or a booking to pick"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Check a member in from the desk (booking in the window, else open gym)",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/members/{user_id}/code": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.revoke_member_code",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "revoked_codes": {
+                      "type": "integer"
+                    },
+                    "revoked_passes": {
+                      "type": "integer"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "revoked_codes",
+                    "revoked_passes"
+                  ],
+                  "title": "CheckInMemberCodeRevoked",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Revoked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke a member's static personal code; their Wallet cards stop scanning",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/scan-member": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.scan_member",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "auto": {
+                    "description": "Check in right away when nothing is wrong",
+                    "type": "boolean"
+                  },
+                  "code": {
+                    "description": "Personal QR or Wallet barcode",
+                    "maxLength": 256,
+                    "type": "string"
+                  },
+                  "location_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code"
+                ],
+                "title": "CheckInDeskScanRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "already_checked_in": {
+                      "enum": [
+                        null,
+                        "class",
+                        "open_gym"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "bookings": {
+                      "description": "Bookings in the window",
+                      "items": {
+                        "properties": {
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              null,
+                              "member",
+                              "guest",
+                              "trial"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_class_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "starts_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "scheduled_class_id",
+                          "starts_at"
+                        ],
+                        "title": "CheckInBooking",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "can_auto_check_in": {
+                      "type": "boolean"
+                    },
+                    "checked_in": {
+                      "nullable": true,
+                      "properties": {
+                        "at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "booking": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    null,
+                                    "member",
+                                    "guest",
+                                    "trial"
+                                  ],
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "location_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scheduled_class_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "scheduled_class_id",
+                                "starts_at"
+                              ],
+                              "title": "CheckInBooking",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "open_gym"
+                          ],
+                          "type": "string"
+                        },
+                        "method": {
+                          "enum": [
+                            "door_qr",
+                            "door_poster",
+                            "member_qr",
+                            "wallet",
+                            "desk_search",
+                            "self"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "override": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "title": "CheckInRecord",
+                      "type": "object"
+                    },
+                    "decision": {
+                      "enum": [
+                        "class",
+                        "choose",
+                        "already_checked_in",
+                        "open_gym",
+                        "nothing",
+                        "booking_not_in_window"
+                      ],
+                      "type": "string"
+                    },
+                    "member": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "display_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "method": {
+                      "enum": [
+                        "member_qr",
+                        "wallet",
+                        "desk_search"
+                      ],
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "override_allowed": {
+                      "type": "boolean"
+                    },
+                    "package": {
+                      "description": "What is left on the member's package; null when the box keeps no package for them",
+                      "nullable": true,
+                      "properties": {
+                        "class_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "expires_on": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "frozen_until": {
+                          "format": "date",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "open_gym_visits_left": {
+                          "description": "null = unlimited or not part of the package",
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "unlimited": {
+                          "type": "boolean"
+                        }
+                      },
+                      "title": "CheckInPackage",
+                      "type": "object"
+                    },
+                    "problems": {
+                      "items": {
+                        "enum": [
+                          "frozen",
+                          "package_expired",
+                          "unpaid",
+                          "no_spots",
+                          "nothing_to_check_in"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "warnings": {
+                      "items": {
+                        "enum": [
+                          "payment_due"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "member",
+                    "decision",
+                    "problems",
+                    "can_auto_check_in",
+                    "override_allowed"
+                  ],
+                  "title": "CheckInDeskResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Who it is and what can happen"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown, expired or revoked code"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Scan a member's personal QR or Wallet card at the desk",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "desk_override": {
+                          "type": "boolean"
+                        },
+                        "door_rotation_seconds": {
+                          "enum": [
+                            15,
+                            30,
+                            60
+                          ],
+                          "type": "integer"
+                        },
+                        "member_code_mode": {
+                          "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
+                          "enum": [
+                            "rotating",
+                            "static"
+                          ],
+                          "type": "string"
+                        },
+                        "open_gym_requires_package": {
+                          "type": "boolean"
+                        },
+                        "visitor_trial_offer": {
+                          "type": "boolean"
+                        },
+                        "window_after_minutes": {
+                          "maximum": 120,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "window_before_minutes": {
+                          "maximum": 120,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "title": "CheckInRules",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "title": "CheckInRulesResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rules"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The box's check-in rules",
+        "tags": [
+          "Admin Check-in"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.update_settings",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "desk_override": {
+                    "type": "boolean"
+                  },
+                  "door_rotation_seconds": {
+                    "enum": [
+                      15,
+                      30,
+                      60
+                    ],
+                    "type": "integer"
+                  },
+                  "member_code_mode": {
+                    "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
+                    "enum": [
+                      "rotating",
+                      "static"
+                    ],
+                    "type": "string"
+                  },
+                  "open_gym_requires_package": {
+                    "type": "boolean"
+                  },
+                  "visitor_trial_offer": {
+                    "type": "boolean"
+                  },
+                  "window_after_minutes": {
+                    "maximum": 120,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "window_before_minutes": {
+                    "maximum": 120,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "title": "CheckInRules",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "settings": {
+                      "properties": {
+                        "desk_override": {
+                          "type": "boolean"
+                        },
+                        "door_rotation_seconds": {
+                          "enum": [
+                            15,
+                            30,
+                            60
+                          ],
+                          "type": "integer"
+                        },
+                        "member_code_mode": {
+                          "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
+                          "enum": [
+                            "rotating",
+                            "static"
+                          ],
+                          "type": "string"
+                        },
+                        "open_gym_requires_package": {
+                          "type": "boolean"
+                        },
+                        "visitor_trial_offer": {
+                          "type": "boolean"
+                        },
+                        "window_after_minutes": {
+                          "maximum": 120,
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "window_before_minutes": {
+                          "maximum": 120,
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "title": "CheckInRules",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "settings"
+                  ],
+                  "title": "CheckInRulesResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Rules"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid rules"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change the box's check-in rules",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/visitors": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.visitors",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "location_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "visitors": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "display_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "location_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scanned_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "trial_offered": {
+                            "type": "boolean"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "user_id",
+                          "scanned_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "visitors"
+                  ],
+                  "title": "CheckInVisitors",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Visitors"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People who scanned the door and are not members («Επισκέπτης»), newest first",
+        "tags": [
+          "Admin Check-in"
         ]
       }
     },
@@ -108261,6 +112976,153 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/check-in/code": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyCheckInController.code",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "`rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "issued_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "mode": {
+                      "enum": [
+                        "rotating",
+                        "static"
+                      ],
+                      "type": "string"
+                    },
+                    "rotation_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "seconds_until_rotation": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "wallet_available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "code",
+                    "wallet_available"
+                  ],
+                  "title": "CheckInMemberCode",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Code"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "My personal check-in QR at this box (rotating every 30 s, or static per the box)",
+        "tags": [
+          "Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/check-in/code/reset": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyCheckInController.reset_code",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "`rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "expires_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "issued_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "mode": {
+                      "enum": [
+                        "rotating",
+                        "static"
+                      ],
+                      "type": "string"
+                    },
+                    "rotation_seconds": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "seconds_until_rotation": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "wallet_available": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "mode",
+                    "code",
+                    "wallet_available"
+                  ],
+                  "title": "CheckInMemberCode",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The new code"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The box uses rotating codes (member_code_not_static)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reset my static personal code: the old one and its Wallet cards stop",
+        "tags": [
+          "Check-in"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/corporate-enrollment": {
       "get": {
         "callbacks": {},
@@ -112256,6 +117118,151 @@
         "summary": "On-demand videos included in my package",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/wallet-passes": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyCheckInController.add_wallet_pass",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "platform": {
+                    "enum": [
+                      "apple",
+                      "google"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "platform"
+                ],
+                "title": "WalletAddRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "download_url": {
+                      "description": "Apple: open within 10 minutes to add the .pkpass",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "pass": {
+                      "properties": {
+                        "active": {
+                          "type": "boolean"
+                        },
+                        "added_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "box": {
+                          "properties": {
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "organization_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "slug": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "platform": {
+                          "enum": [
+                            "apple",
+                            "google"
+                          ],
+                          "type": "string"
+                        },
+                        "revoked_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "platform",
+                        "added_at",
+                        "active"
+                      ],
+                      "title": "WalletPass",
+                      "type": "object"
+                    },
+                    "save_url": {
+                      "description": "Google: Save to Wallet",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "pass"
+                  ],
+                  "title": "WalletAddResult",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The card and how to add it"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The box uses rotating codes, so no Wallet (wallet_requires_static_code)"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Wallet isn't configured on this server (wallet_not_configured)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add my check-in card at this box to Apple or Google Wallet",
+        "tags": [
+          "Check-in"
         ]
       }
     },
@@ -131796,6 +136803,50 @@
         "summary": "Fetch active public UI theme",
         "tags": [
           "Theme"
+        ]
+      }
+    },
+    "/api/wallet/passes/{token}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WalletController.download",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/vnd.apple.pkpass": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Pass"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Expired link or revoked card"
+          }
+        },
+        "summary": "The Apple Wallet .pkpass behind a short-lived download link",
+        "tags": [
+          "Connected devices"
         ]
       }
     },
