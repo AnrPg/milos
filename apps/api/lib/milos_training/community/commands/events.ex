@@ -17,13 +17,22 @@ defmodule MilosTraining.Community.Commands.Events do
 
   @doc """
   A new event in `club`, or a weekly run of them when `repeat_until` (a date
-  in the box's zone) is given; every occurrence shares a `series_id`.
+  in the box's zone) is given; every occurrence shares a `series_id`. With
+  `channel_id` it is an event of that member group (checked by the caller).
   """
   def create(%{organization_id: organization_id, user_id: user_id} = context, club, attrs, opts) do
+    channel_id = Keyword.get(opts, :channel_id)
+
     attrs =
       attrs
       |> Map.take(Event.editable_fields())
-      |> Map.merge(%{organization_id: organization_id, club_id: club.id, created_by_id: user_id})
+      |> group_terms(channel_id)
+      |> Map.merge(%{
+        organization_id: organization_id,
+        club_id: club.id,
+        channel_id: channel_id,
+        created_by_id: user_id
+      })
 
     with :ok <- own_live_club(context, club),
          %Ecto.Changeset{valid?: true} = changeset <- Event.create_changeset(attrs),
@@ -40,6 +49,10 @@ defmodule MilosTraining.Community.Commands.Events do
       error -> error
     end
   end
+
+  # A member group's events are free and for the group only, whatever was asked.
+  defp group_terms(attrs, nil), do: attrs
+  defp group_terms(attrs, _channel_id), do: EventPolicy.group_terms(attrs)
 
   defp occurrences(changeset, opts) do
     starts_at = Ecto.Changeset.get_field(changeset, :starts_at)
@@ -70,7 +83,7 @@ defmodule MilosTraining.Community.Commands.Events do
   Returns `{:ok, [%{before: event, after: event, promoted: [attendee]}]}`.
   """
   def update(context, event, attrs, scope, opts) do
-    attrs = Map.take(attrs, Event.editable_fields())
+    attrs = attrs |> Map.take(Event.editable_fields()) |> group_terms(event.channel_id)
     zone = Keyword.fetch!(opts, :zone)
     now = Keyword.fetch!(opts, :now)
 

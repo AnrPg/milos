@@ -176,6 +176,20 @@ defmodule MilosTraining.Community do
   defdelegate event_open_for_rsvp(event, now), to: EventPolicy, as: :open_for_rsvp
   defdelegate event_guest_check(event, inviter_status, guests), to: EventPolicy, as: :guest_check
 
+  defdelegate event_group_channel_check(channel, club_id),
+    to: EventPolicy,
+    as: :group_channel_check
+
+  defdelegate event_group_admin?(channel, membership), to: EventPolicy, as: :group_admin?
+  defdelegate event_manage_check(actor, channel_id), to: EventPolicy, as: :manage_check
+  defdelegate event_belongs?(event, facts), to: EventPolicy, as: :belongs?
+  defdelegate event_visible?(event, facts), to: EventPolicy, as: :visible?
+  defdelegate event_can_rsvp?(event, belongs?, my_status, now), to: EventPolicy, as: :can_rsvp?
+  def event_late_cancel_window_days, do: EventPolicy.late_cancel_window_days()
+
+  @doc "Late cancels per person at the box since `since`: `%{user_id => count}`."
+  defdelegate late_cancel_counts(context, user_ids, since), to: EventStore
+
   # Posts (M7).
   defdelegate create_post(context, channel, role, joined?, attrs), to: Posts, as: :create
   defdelegate fetch_post(context, post_id), to: Posts, as: :fetch

@@ -58,6 +58,18 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
         id: @uuid,
         organization_id: @uuid,
         club_id: @uuid,
+        channel_id: %{
+          @nullable_uuid
+          | description: "The member group this event belongs to; null for a club event"
+        },
+        group: %Schema{
+          title: "CommunityEventGroup",
+          type: :object,
+          nullable: true,
+          description: "The member group of a group event (free, for its members only)",
+          properties: %{id: @uuid, name: string(nullable: true)},
+          required: [:id]
+        },
         series_id: %{@nullable_uuid | description: "Shared by every week of a weekly event"},
         post_id: %{@nullable_uuid | description: "Its card in the club feed"},
         title: string(),
@@ -187,6 +199,12 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
   def create_request(with_club? \\ false) do
     properties =
       Map.merge(editable(), %{
+        channel_id: %Schema{
+          type: :string,
+          format: :uuid,
+          description:
+            "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes"
+        },
         repeat_until: %Schema{
           type: :string,
           format: :date,
@@ -266,7 +284,7 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
         paid: integer(),
         came: integer(),
         no_shows: integer(description: "Going but not checked in, once the event ended"),
-        late_cancels: integer(),
+        late_cancels: integer(description: "«Ακύρωσε αργά»: places given up within 2 hours"),
         trial_requests: integer(description: "Trial requests from the event's trial offer"),
         converted: integer(description: "Came and joined the box within 30 days")
       },
@@ -301,12 +319,27 @@ defmodule MilosTrainingWeb.Schemas.CommunityEvents do
         receipt_issued: %Schema{type: :boolean, description: "Finance issued a receipt"},
         checked_in_at: @nullable_datetime,
         cancelled_at: @nullable_datetime,
-        late_cancel: boolean(),
+        late_cancel: %Schema{
+          type: :boolean,
+          description:
+            "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)"
+        },
+        late_cancels_90d:
+          integer(description: "This person's late cancels at the box over the last 90 days"),
         removed_by: %{author() | nullable: true},
         trial_offered_at: @nullable_datetime,
         converted_at: @nullable_datetime
       },
-      [:person, :status, :source, :member, :queued_at, :receipt_issued, :late_cancel]
+      [
+        :person,
+        :status,
+        :source,
+        :member,
+        :queued_at,
+        :receipt_issued,
+        :late_cancel,
+        :late_cancels_90d
+      ]
     )
   end
 

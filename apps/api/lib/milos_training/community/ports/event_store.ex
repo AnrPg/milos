@@ -70,6 +70,7 @@ defmodule MilosTraining.Community.Ports.EventStore do
 
   @doc "A person's own attendee rows at every box (their personal session)."
   @callback attendances_of(context(), id(), [String.t()]) :: [EventAttendee.t()]
+  @callback late_cancel_counts(context(), [id()], DateTime.t()) :: %{id() => non_neg_integer()}
 
   @doc """
   Marks as converted the person's check-ins at the box's events that ended

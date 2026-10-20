@@ -33,6 +33,7 @@ defmodule MilosTraining.Community.Event do
   schema "community_events" do
     field :organization_id, :binary_id, read_after_writes: true
     field :club_id, :binary_id
+    field :channel_id, :binary_id
     field :created_by_id, :binary_id
     field :title, :string
     field :description, :string
@@ -64,7 +65,13 @@ defmodule MilosTraining.Community.Event do
 
   def create_changeset(attrs) do
     %__MODULE__{}
-    |> cast(attrs, [:organization_id, :club_id, :created_by_id, :series_id | @editable])
+    |> cast(attrs, [
+      :organization_id,
+      :club_id,
+      :channel_id,
+      :created_by_id,
+      :series_id | @editable
+    ])
     |> validate_required([:club_id])
     |> validate()
   end
@@ -102,9 +109,12 @@ defmodule MilosTraining.Community.Event do
     |> validate_number(:longitude, greater_than_or_equal_to: -180, less_than_or_equal_to: 180)
     |> validate_place()
     |> validate_times()
+    |> validate_group()
     |> check_constraint(:starts_at, name: :community_events_time_check)
     |> check_constraint(:location_id, name: :community_events_place_check)
     |> check_constraint(:capacity, name: :community_events_limits_check)
+    |> check_constraint(:price_cents, name: :community_events_group_check)
+    |> foreign_key_constraint(:channel_id, name: :community_events_channel_id_fkey)
     |> foreign_key_constraint(:location_id)
     |> foreign_key_constraint(:club_id, name: :community_events_club_id_fkey)
   end
@@ -130,6 +140,20 @@ defmodule MilosTraining.Community.Event do
 
       true ->
         changeset
+    end
+  end
+
+  # A member group's event is free and for the group only (ADR-153 §13).
+  defp validate_group(changeset) do
+    if is_nil(get_field(changeset, :channel_id)) do
+      changeset
+    else
+      changeset
+      |> validate_number(:price_cents, equal_to: 0, message: "group events are free")
+      |> validate_inclusion(:open_to_non_members, [false],
+        message: "group events are for the group"
+      )
+      |> validate_inclusion(:guest_pass_allowed, [false], message: "group events take no guests")
     end
   end
 

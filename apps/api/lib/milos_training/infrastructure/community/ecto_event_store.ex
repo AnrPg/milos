@@ -195,6 +195,22 @@ defmodule MilosTraining.Infrastructure.Community.EctoEventStore do
   end
 
   @impl true
+  def late_cancel_counts(_context, [], _since), do: %{}
+
+  def late_cancel_counts(%{organization_id: organization_id}, user_ids, since) do
+    EventAttendee
+    |> where(
+      [a],
+      a.organization_id == ^organization_id and a.user_id in ^user_ids and a.late_cancel and
+        a.cancelled_at >= ^since
+    )
+    |> group_by([a], a.user_id)
+    |> select([a], {a.user_id, count(a.id)})
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  @impl true
   def mark_converted(%{organization_id: organization_id}, user_id, %{from: from, to: to}, at) do
     events =
       from e in Event,

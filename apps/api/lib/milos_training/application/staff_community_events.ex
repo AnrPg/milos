@@ -97,7 +97,16 @@ defmodule MilosTraining.Application.StaffCommunityEvents do
           Enum.flat_map(attendees, &[&1.user_id, &1.invited_by_id, &1.removed_by_id])
         )
 
-      rows = Enum.map(attendees, &attendee_row(&1, people, members))
+      since = DateTime.add(now, -Community.event_late_cancel_window_days(), :day)
+
+      late =
+        Community.late_cancel_counts(
+          context,
+          attendees |> Enum.map(& &1.user_id) |> Enum.uniq(),
+          since
+        )
+
+      rows = Enum.map(attendees, &attendee_row(&1, people, members, late))
       [shown] = present([event], context, clubs, now)
       offer_to = Community.event_trial_offer_recipients(attendees, MapSet.to_list(members))
 
@@ -233,7 +242,7 @@ defmodule MilosTraining.Application.StaffCommunityEvents do
     end)
   end
 
-  defp attendee_row(attendee, people, members) do
+  defp attendee_row(attendee, people, members, late) do
     %{
       person: CommunityPeople.person(people, attendee.user_id),
       status: attendee.status,
@@ -250,6 +259,7 @@ defmodule MilosTraining.Application.StaffCommunityEvents do
       checked_in_at: attendee.checked_in_at,
       cancelled_at: attendee.cancelled_at,
       late_cancel: attendee.late_cancel,
+      late_cancels_90d: Map.get(late, attendee.user_id, 0),
       removed_by:
         attendee.removed_by_id && CommunityPeople.person(people, attendee.removed_by_id),
       trial_offered_at: attendee.trial_offered_at,

@@ -61,6 +61,10 @@ defmodule MilosTraining.Community.EventStore do
     do: call(context, :attendances_of, [user_id, statuses])
 
   @impl true
+  def late_cancel_counts(context, user_ids, since),
+    do: call(context, :late_cancel_counts, [user_ids, since])
+
+  @impl true
   def mark_converted(context, user_id, window, at),
     do: call(context, :mark_converted, [user_id, window, at])
 end

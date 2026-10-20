@@ -11,6 +11,7 @@ defmodule MilosTraining.Community.EventRulesTest do
     Map.merge(
       %{
         capacity: 2,
+        channel_id: nil,
         guest_pass_allowed: true,
         guests_per_member: 1,
         open_to_non_members: false,
@@ -193,6 +194,86 @@ defmodule MilosTraining.Community.EventRulesTest do
 
       assert %{no_shows: 1, trial_requests: 3} =
                EventPolicy.stats(event(), rows, 3, ~U[2026-10-25 10:00:00.000000Z])
+    end
+  end
+
+  describe "member groups" do
+    @group %{
+      id: "group",
+      club_id: "club",
+      kind: "member_group",
+      status: "active",
+      archived_at: nil
+    }
+
+    test "a group event is free and for the group, whatever was asked" do
+      assert %{
+               price_cents: 0,
+               open_to_non_members: false,
+               guest_pass_allowed: false,
+               title: "Run"
+             } =
+               EventPolicy.group_terms(%{
+                 title: "Run",
+                 price_cents: 2000,
+                 open_to_non_members: true,
+                 guest_pass_allowed: true
+               })
+    end
+
+    test "only an active, live group of the same club takes events" do
+      assert :ok = EventPolicy.group_channel_check(@group, "club")
+      assert {:error, :not_found} = EventPolicy.group_channel_check(@group, "other club")
+
+      for changed <- [%{status: "pending"}, %{archived_at: @now}, %{kind: "custom"}] do
+        assert {:error, :not_found} =
+                 EventPolicy.group_channel_check(Map.merge(@group, changed), "club")
+      end
+    end
+
+    test "the group's admins run its events; staff with manage_events run every event" do
+      assert EventPolicy.group_admin?(@group, %{member?: true, role: "admin"})
+      refute EventPolicy.group_admin?(@group, %{member?: true, role: "member"})
+      refute EventPolicy.group_admin?(@group, %{member?: false, role: "admin"})
+
+      refute EventPolicy.group_admin?(%{@group | status: "pending"}, %{
+               member?: true,
+               role: "admin"
+             })
+
+      refute EventPolicy.group_admin?(@group, nil)
+
+      assert :ok = EventPolicy.manage_check(%{manage_events?: true, group_admin?: false}, nil)
+      assert :ok = EventPolicy.manage_check(%{manage_events?: true, group_admin?: false}, "group")
+      assert :ok = EventPolicy.manage_check(%{manage_events?: false, group_admin?: true}, "group")
+
+      # Running a group gives no say over club events.
+      assert {:error, :forbidden} =
+               EventPolicy.manage_check(%{manage_events?: false, group_admin?: true}, nil)
+
+      assert {:error, :forbidden} =
+               EventPolicy.manage_check(%{manage_events?: false, group_admin?: false}, "group")
+    end
+
+    test "only the group's members see a group event and say they come" do
+      group_event = event(%{channel_id: "group", price_cents: 0, guest_pass_allowed: false})
+      club_member = %{club_member?: true, group_member?: false}
+      group_member = %{club_member?: true, group_member?: true}
+
+      assert EventPolicy.belongs?(event(), club_member)
+      refute EventPolicy.belongs?(group_event, club_member)
+      assert EventPolicy.belongs?(group_event, group_member)
+
+      refute EventPolicy.visible?(group_event, %{belongs?: false})
+      refute EventPolicy.visible?(group_event, %{belongs?: false, invited?: true})
+      assert EventPolicy.visible?(group_event, %{belongs?: true})
+      assert EventPolicy.visible?(group_event, %{belongs?: false, manager?: true})
+      assert EventPolicy.visible?(event(%{open_to_non_members: true}), %{belongs?: false})
+
+      refute EventPolicy.can_rsvp?(group_event, false, nil, @now)
+      assert EventPolicy.can_rsvp?(group_event, true, nil, @now)
+      # Somebody already on it can still give up the place after leaving the group.
+      assert EventPolicy.can_rsvp?(group_event, false, "going", @now)
     end
   end
 

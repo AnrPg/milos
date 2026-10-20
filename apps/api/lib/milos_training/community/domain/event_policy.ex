@@ -11,6 +11,10 @@ defmodule MilosTraining.Community.Domain.EventPolicy do
     Lowering the capacity never removes anyone already going.
   * **Late cancels.** Giving up a place less than #{120} minutes before the
     start is a late cancel.
+  * **Member groups.** An admin of an active member group runs events for
+    the group: always free, never open to non-members, no guest passes. Only
+    the group's members see them and come; staff who run events manage
+    them like any other.
   * **After.** One trial offer, once the event ended, to the people who came
     and are not members of the box. Coming and then joining the box within
     #{30} days counts as a conversion.
@@ -20,14 +24,77 @@ defmodule MilosTraining.Community.Domain.EventPolicy do
   @reminder_minutes 120
   @conversion_days 30
   @scopes ~w(this following)
+  @late_cancel_window_days 90
+  @group_terms %{price_cents: 0, open_to_non_members: false, guest_pass_allowed: false}
 
   def late_cancel_minutes, do: @late_cancel_minutes
   def reminder_minutes, do: @reminder_minutes
   def conversion_days, do: @conversion_days
   def scopes, do: @scopes
+  def late_cancel_window_days, do: @late_cancel_window_days
 
   @doc "The capability that creates and runs events (owner, admin, coach)."
   def capability, do: :manage_events
+
+  # Member groups ---------------------------------------------------------------
+
+  @doc "A group event's terms win over whatever was asked: free, the group only."
+  def group_terms(attrs), do: Map.merge(attrs, @group_terms)
+
+  @doc "An event can go in an active, live member group of the same club."
+  def group_channel_check(
+        %{kind: "member_group", status: "active", archived_at: nil} = channel,
+        club_id
+      ) do
+    if channel.club_id == club_id, do: :ok, else: {:error, :not_found}
+  end
+
+  def group_channel_check(_channel, _club_id), do: {:error, :not_found}
+
+  @doc """
+  An admin of the group (`membership` is `%{member?: boolean, role: role}`
+  or nil) while the group is active and live.
+  """
+  def group_admin?(channel, %{member?: true, role: "admin"}),
+    do: group_channel_check(channel, Map.get(channel, :club_id)) == :ok
+
+  def group_admin?(_channel, _membership), do: false
+
+  @doc """
+  Who may create, edit and cancel: holders of `manage_events` any event at
+  their box; a group's admin the events of their group (`channel_id`).
+  """
+  def manage_check(%{manage_events?: true}, _channel_id), do: :ok
+
+  def manage_check(%{group_admin?: true}, channel_id) when is_binary(channel_id), do: :ok
+  def manage_check(_actor, _channel_id), do: {:error, :forbidden}
+
+  @doc """
+  Whether the person belongs to the event's audience: the club's members
+  for a club event, the group's members for a group event.
+  """
+  def belongs?(%{channel_id: nil}, %{club_member?: club_member?}), do: club_member? == true
+  def belongs?(_group_event, facts), do: Map.get(facts, :group_member?) == true
+
+  @doc """
+  Whether the person may see the event: they belong, it is open (or they
+  were invited) when it isn't a group's, they run it, or they are on it.
+  """
+  def visible?(event, %{belongs?: belongs?} = facts) do
+    belongs? or Map.get(facts, :manager?) == true or Map.get(facts, :attendee?) == true or
+      (is_nil(event.channel_id) and
+         (event.open_to_non_members or Map.get(facts, :invited?) == true))
+  end
+
+  @doc """
+  Whether «Θα έρθω» / «Δεν θα έρθω» shows: still open, and the person
+  belongs, it is open to everyone (not a group's), or they hold a row.
+  """
+  def can_rsvp?(event, belongs?, my_status, now) do
+    open_for_rsvp(event, now) == :ok and
+      (belongs? or (is_nil(event.channel_id) and event.open_to_non_members) or
+         my_status in ~w(going waitlisted))
+  end
 
   @doc """
   How the person may come: `{:ok, "member"}` when they can see the club,

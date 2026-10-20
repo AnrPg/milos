@@ -3,7 +3,8 @@ defmodule MilosTraining.Application.EventPresenter do
   Club events as the member app and «Κοινότητα» show them (ADR-153): when
   and where, places, price, the club and box it belongs to, and where the
   viewer stands («Θα έρθω», waitlist, guest, paid). Who's going shows by
-  name only to people who can see the club; everyone else gets the count.
+  name only to the event's audience (the club, or the member group for a
+  group's event); everyone else gets the count.
 
   `viewer` is `%{user_id, club_ids, manage_organization_ids, clubs}`:
   the clubs the viewer can see (ids and their `ClubScope` faces) and the
@@ -16,12 +17,50 @@ defmodule MilosTraining.Application.EventPresenter do
   @goers_preview 8
 
   def viewer(user_id, clubs, manage_organization_ids \\ []) do
+    groups =
+      clubs
+      |> Enum.flat_map(&Map.get(&1, :channels, []))
+      |> Enum.filter(&(&1.kind == "member_group"))
+
     %{
       user_id: user_id,
       club_ids: MapSet.new(clubs, & &1.id),
       clubs: Map.new(clubs, &{&1.id, &1}),
+      groups: Map.new(groups, &{&1.id, &1}),
+      group_ids: groups |> Enum.filter(& &1.participant) |> MapSet.new(& &1.id),
+      admin_group_ids: groups |> Enum.filter(& &1.admin) |> MapSet.new(& &1.id),
       manage_organization_ids: MapSet.new(manage_organization_ids)
     }
+  end
+
+  @doc "Whether the viewer is in the event's audience: its club, or its group."
+  def belongs?(event, viewer) do
+    Community.event_belongs?(event, %{
+      club_member?: MapSet.member?(viewer.club_ids, event.club_id),
+      group_member?: MapSet.member?(viewer.group_ids, event.channel_id)
+    })
+  end
+
+  @doc "Whether the viewer may see the event at all (EventPolicy.visible?/2)."
+  def visible?(event, viewer, facts \\ %{}) do
+    Community.event_visible?(
+      event,
+      Map.merge(
+        %{belongs?: belongs?(event, viewer), manager?: manages?(event, viewer)},
+        facts
+      )
+    )
+  end
+
+  @doc "Whether the viewer runs the event: manage_events at its box, or its group's admin."
+  def manages?(event, viewer) do
+    Community.event_manage_check(
+      %{
+        manage_events?: MapSet.member?(viewer.manage_organization_ids, event.organization_id),
+        group_admin?: MapSet.member?(viewer.admin_group_ids, event.channel_id)
+      },
+      event.channel_id
+    ) == :ok
   end
 
   @doc "Events for `viewer`; `goers: :all` lists everyone going (the event page)."
@@ -59,12 +98,14 @@ defmodule MilosTraining.Application.EventPresenter do
       count = Map.get(counts, event.id, %{})
       going = Map.get(count, "going", 0)
       my = Map.get(mine, event.id)
-      club_member? = MapSet.member?(viewer.club_ids, event.club_id)
+      belongs? = belongs?(event, viewer)
 
       %{
         id: event.id,
         organization_id: event.organization_id,
         club_id: event.club_id,
+        channel_id: event.channel_id,
+        group: group(event, viewer),
         series_id: event.series_id,
         post_id: event.post_id,
         title: event.title,
@@ -89,9 +130,9 @@ defmodule MilosTraining.Application.EventPresenter do
         club: Map.get(clubs, event.club_id, %{id: event.club_id, name: nil, kind: nil}),
         box: Map.get(boxes, event.organization_id, %{name: nil, slug: nil, logo_url: nil}),
         my: my && present_mine(my),
-        goers: if(Community.event_show_names?(club_member?), do: Map.get(goers, event.id, [])),
-        can_rsvp: can_rsvp?(event, club_member?, my, now),
-        can_manage: MapSet.member?(viewer.manage_organization_ids, event.organization_id)
+        goers: if(Community.event_show_names?(belongs?), do: Map.get(goers, event.id, [])),
+        can_rsvp: Community.event_can_rsvp?(event, belongs?, my && my.status, now),
+        can_manage: manages?(event, viewer)
       }
     end)
   end
@@ -106,12 +147,13 @@ defmodule MilosTraining.Application.EventPresenter do
     }
   end
 
-  # The person can say «Θα έρθω» or «Δεν θα έρθω» from the card: they belong,
-  # the event is open, or they already hold a row (a guest changing their mind).
-  defp can_rsvp?(event, club_member?, my, now) do
-    Community.event_open_for_rsvp(event, now) == :ok and
-      (club_member? or event.open_to_non_members or
-         (my != nil and my.status in ~w(going waitlisted)))
+  defp group(%{channel_id: nil}, _viewer), do: nil
+
+  defp group(%{channel_id: id}, viewer) do
+    case Map.get(viewer.groups, id) do
+      nil -> %{id: id, name: nil}
+      channel -> %{id: id, name: channel.name}
+    end
   end
 
   defp place(%{location_id: nil} = event, _locations) do
@@ -155,7 +197,7 @@ defmodule MilosTraining.Application.EventPresenter do
   defp goers(by_org, viewer, gym, mode) do
     by_org
     |> Enum.flat_map(fn {org, list} ->
-      visible = Enum.filter(list, &MapSet.member?(viewer.club_ids, &1.club_id))
+      visible = Enum.filter(list, &belongs?(&1, viewer))
       Community.list_attendees(gym.(org), Enum.map(visible, & &1.id), ["going"])
     end)
     |> Enum.group_by(& &1.event_id)

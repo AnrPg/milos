@@ -248,6 +248,18 @@ defmodule MilosTrainingWeb.CommunityEventsControllerTest do
 
       assert %{"event" => %{"stats" => %{"late_cancels" => 1, "going" => 0}}} =
                staff_show(ctx, event)
+
+      # Staff see «Ακύρωσε αργά» with when, and how often this person did it lately.
+      later = new_event(ctx, %{starts_at: at(100), ends_at: at(160)})
+      rsvp(ctx, ctx.member, later, true) |> event_json()
+      rsvp(ctx, ctx.member, later, false) |> event_json()
+
+      assert %{"event" => %{"attendees" => %{"cancelled" => [row]}}} = staff_show(ctx, later)
+
+      assert %{"late_cancel" => true, "cancelled_at" => cancelled_at, "late_cancels_90d" => 2} =
+               row
+
+      assert cancelled_at
     end
 
     test "staff free a place and the first on the waitlist gets it, without a late cancel", ctx do
@@ -534,6 +546,148 @@ defmodule MilosTrainingWeb.CommunityEventsControllerTest do
       assert referral_event_id == event["id"]
 
       assert %{"event" => %{"stats" => %{"trial_requests" => 1}}} = staff_show(ctx, event)
+    end
+  end
+
+  describe "member group events" do
+    defp group!(ctx) do
+      community = "/api/org/#{ctx.slug}/community"
+
+      %{"group" => %{"id" => group_id}} =
+        ctx.as.(ctx.member)
+        |> send_json(:post, "#{community}/groups", %{name: "Πρωινοί δρομείς", join_policy: "open"})
+        |> json_response(201)
+
+      ctx.as.(ctx.coach)
+      |> send_json(:put, "/api/org/#{ctx.slug}/admin/community/groups/#{group_id}/decision", %{
+        decision: "approve"
+      })
+      |> json_response(200)
+
+      ctx.as.(ctx.other)
+      |> post("#{community}/groups/#{group_id}/membership")
+      |> json_response(200)
+
+      group_id
+    end
+
+    defp club_member!(ctx) do
+      user = user_fixture()
+
+      {:ok, _} =
+        Organizations.add_membership(%{
+          organization_id: ctx.organization.id,
+          user_id: user.id,
+          role: :member,
+          status: :active,
+          joined_at: DateTime.utc_now()
+        })
+
+      user
+    end
+
+    test "a group's admin runs free, members-only events that only the group sees", ctx do
+      group_id = group!(ctx)
+      outside = club_member!(ctx)
+      path = "/api/me/community/clubs/#{ctx.club_id}/events"
+
+      body = %{
+        channel_id: group_id,
+        title: "Τρέξιμο της ομάδας",
+        starts_at: at(2 * 24 * 60),
+        ends_at: at(2 * 24 * 60 + 60),
+        place_name: "Λόφος Φιλοπάππου",
+        price_cents: 2000,
+        open_to_non_members: true,
+        guest_pass_allowed: true
+      }
+
+      assert %{"event" => event} =
+               ctx.as.(ctx.member) |> send_json(:post, path, body) |> json_response(201)
+
+      assert %{
+               "channel_id" => ^group_id,
+               "group" => %{"id" => ^group_id, "name" => "Πρωινοί δρομείς"},
+               "price_cents" => 0,
+               "open_to_non_members" => false,
+               "guest_pass_allowed" => false,
+               "can_manage" => true
+             } = event
+
+      # Its card goes in the group, not the announcements.
+      assert %Post{channel_id: ^group_id, attachment_type: "event"} =
+               Repo.get(Post, event["post_id"])
+
+      # The group's members see it and come.
+      assert %{"events" => [%{"id" => id, "can_rsvp" => true, "can_manage" => false}]} =
+               ctx.as.(ctx.other) |> get(path) |> json_response(200)
+
+      assert id == event["id"]
+
+      assert %{"my" => %{"status" => "going", "source" => "member"}, "goers" => [_]} =
+               rsvp(ctx, ctx.other, event, true) |> event_json()
+
+      # A club member outside the group, and someone outside the club, don't.
+      assert %{"events" => []} = ctx.as.(outside) |> get(path) |> json_response(200)
+
+      assert %{"events" => []} =
+               ctx.as.(outside) |> get("/api/me/community/events") |> json_response(200)
+
+      assert ctx.as.(outside) |> get("/api/me/events/#{id}") |> json_response(404)
+      assert rsvp(ctx, outside, event, true) |> json_response(404)
+      assert rsvp(ctx, ctx.visitor, event, true) |> json_response(404)
+
+      # The admin edits it; it stays free and closed.
+      assert %{"event" => %{"title" => "Τρέξιμο της ομάδας (8 χλμ.)", "price_cents" => 0}} =
+               ctx.as.(ctx.member)
+               |> send_json(:patch, "/api/me/events/#{id}", %{
+                 title: "Τρέξιμο της ομάδας (8 χλμ.)",
+                 price_cents: 500
+               })
+               |> json_response(200)
+
+      # A plain member of the group runs nothing; the admin runs no club events.
+      assert ctx.as.(ctx.other)
+             |> send_json(:patch, "/api/me/events/#{id}", %{title: "Δικό μου"})
+             |> json_response(403)
+
+      assert ctx.as.(ctx.other) |> send_json(:post, path, body) |> json_response(403)
+
+      assert ctx.as.(ctx.member)
+             |> send_json(:post, path, Map.delete(body, :channel_id))
+             |> json_response(403)
+
+      # Staff with manage_events see and manage it like any other event.
+      assert %{"events" => events} = ctx.as.(ctx.coach) |> get(ctx.staff) |> json_response(200)
+      assert Enum.any?(events, &(&1["id"] == id and &1["channel_id"] == group_id))
+
+      assert %{"event" => %{"cancelled" => true}} =
+               ctx.as.(ctx.coach)
+               |> send_json(:post, "#{ctx.staff}/#{id}/cancel", %{reason: "Βροχή"})
+               |> json_response(200)
+
+      drain()
+      assert "community_event_cancelled" in types(ctx.other)
+    end
+
+    test "events go only in an active group of the club", ctx do
+      %{"group" => %{"id" => pending_id}} =
+        ctx.as.(ctx.other)
+        |> send_json(:post, "/api/org/#{ctx.slug}/community/groups", %{
+          name: "Ακόμα σε αναμονή",
+          join_policy: "open"
+        })
+        |> json_response(201)
+
+      assert ctx.as.(ctx.other)
+             |> send_json(:post, "/api/me/community/clubs/#{ctx.club_id}/events", %{
+               channel_id: pending_id,
+               title: "Πρώτο τρέξιμο",
+               starts_at: at(24 * 60),
+               ends_at: at(25 * 60),
+               place_name: "Πάρκο"
+             })
+             |> json_response(404)
     end
   end
 

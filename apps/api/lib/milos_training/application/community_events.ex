@@ -43,7 +43,13 @@ defmodule MilosTraining.Application.CommunityEvents do
     with {:ok, clubs} <- ClubScope.call(context),
          {:ok, club} <- find_club(clubs, club_id) do
       filter = Map.merge(%{club_ids: [club.id]}, window(params[:scope], now))
-      events = Community.list_events(gym(club.organization_id, context), filter)
+
+      events =
+        context
+        |> gym_of(club.organization_id)
+        |> Community.list_events(filter)
+        |> visible_only(context, clubs)
+
       {:ok, %{events: present(context, events, clubs, now: now)}}
     end
   end
@@ -61,6 +67,7 @@ defmodule MilosTraining.Application.CommunityEvents do
             limit: @upcoming_limit
           })
         end)
+        |> visible_only(context, clubs)
         |> sort()
 
       {:ok, %{events: present(context, events, clubs, now: now)}}
@@ -139,7 +146,7 @@ defmodule MilosTraining.Application.CommunityEvents do
             event.id,
             user_id,
             %{
-              club_member?: club_member?(clubs, event),
+              club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
               invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
             },
             now
@@ -194,7 +201,7 @@ defmodule MilosTraining.Application.CommunityEvents do
   def create(context, club_id, params) do
     with {:ok, clubs} <- ClubScope.call(context),
          {:ok, club} <- find_club(clubs, club_id),
-         {:ok, manager} <- manager_context(context, club.organization_id),
+         {:ok, manager} <- event_manager(context, club.organization_id),
          {:ok, [first | _] = events} <- manage_create(manager, club, params) do
       [shown] = present(context, [first], clubs)
       {:ok, %{event: shown, occurrences: length(events)}}
@@ -203,7 +210,7 @@ defmodule MilosTraining.Application.CommunityEvents do
 
   def update(context, event_id, params) do
     with {:ok, event, clubs, _invite} <- locate(context, event_id, nil),
-         {:ok, manager} <- manager_context(context, event.organization_id),
+         {:ok, manager} <- event_manager(context, event.organization_id),
          {:ok, updated} <- manage_update(manager, event, params) do
       [shown] = present(context, [updated], clubs)
       {:ok, shown}
@@ -212,7 +219,7 @@ defmodule MilosTraining.Application.CommunityEvents do
 
   def cancel(context, event_id, params) do
     with {:ok, event, clubs, _invite} <- locate(context, event_id, nil),
-         {:ok, manager} <- manager_context(context, event.organization_id),
+         {:ok, manager} <- event_manager(context, event.organization_id),
          {:ok, cancelled} <- manage_cancel(manager, event, params) do
       [shown] = present(context, cancelled |> Enum.filter(&(&1.id == event.id)), clubs)
       {:ok, shown}
@@ -229,15 +236,17 @@ defmodule MilosTraining.Application.CommunityEvents do
     attrs = editable(params)
     zone = Organizations.organization_timezone(organization_id)
 
-    with :ok <- Organizations.authorize_capability(manager, Community.event_capability()),
+    with {:ok, channel} <- group_channel(manager, club, params[:channel_id]),
+         :ok <- authorize_event(manager, channel),
          :ok <- ClassLocation.check(manager, attrs),
          :ok <- BoxPhotoCovers.ready(manager, attrs[:cover_media_id]),
          {:ok, events} <-
            Community.create_event(manager, club, attrs,
              repeat_until: params[:repeat_until],
-             zone: zone
+             zone: zone,
+             channel_id: channel && channel.id
            ),
-         {:ok, events} <- publish_card(manager, club, events) do
+         {:ok, events} <- publish_card(manager, club, channel, events) do
       [first | _] = events
       BoxPhotoCovers.settle(manager, nil, first.cover_media_id)
       announce(first)
@@ -255,8 +264,8 @@ defmodule MilosTraining.Application.CommunityEvents do
     now = DateTime.utc_now()
     zone = Organizations.organization_timezone(organization_id)
 
-    with :ok <- Organizations.authorize_capability(manager, Community.event_capability()),
-         :ok <- own_event(manager, event),
+    with :ok <- own_event(manager, event),
+         :ok <- authorize_event(manager, event_channel(manager, event)),
          :ok <-
            if(Map.has_key?(attrs, :location_id),
              do: ClassLocation.check(manager, attrs),
@@ -289,8 +298,8 @@ defmodule MilosTraining.Application.CommunityEvents do
     now = DateTime.utc_now()
     reason = blank_to_nil(params[:reason])
 
-    with :ok <- Organizations.authorize_capability(manager, Community.event_capability()),
-         :ok <- own_event(manager, event),
+    with :ok <- own_event(manager, event),
+         :ok <- authorize_event(manager, event_channel(manager, event)),
          {:ok, cancelled} <-
            Community.cancel_event(manager, event, params[:scope] || "this", reason, now) do
       Enum.each(cancelled, fn cancelled_event ->
@@ -324,27 +333,36 @@ defmodule MilosTraining.Application.CommunityEvents do
 
   # ------------------------------------------------------------------ internals
 
-  defp publish_card(manager, club, [first | _] = events) do
+  # A club event's card goes in the club's announcements, a group event's in
+  # the group.
+  defp publish_card(manager, club, group, [first | _] = events) do
     channel =
-      case Community.get_club(manager, club.id) do
-        %{channels: channels} -> Enum.find(channels, &(&1.kind == "announcements"))
-        nil -> nil
-      end
+      group ||
+        case Community.get_club(manager, club.id) do
+          %{channels: channels} -> Enum.find(channels, &(&1.kind == "announcements"))
+          nil -> nil
+        end
 
     if channel do
       # The card is posted on behalf of whoever runs the event; holding
-      # manage_events is the right to write in the announcements.
+      # manage_events (or running the group) is the right to write there.
       with {:ok, post} <-
-             Community.create_post(manager, channel, "staff", true, %{
-               audience: "club_channel",
-               attachment_type: "event",
-               attachment_id: first.id,
-               attachment: %{
-                 "title" => first.title,
-                 "starts_at" => DateTime.to_iso8601(first.starts_at),
-                 "occurrences" => length(events)
+             Community.create_post(
+               manager,
+               channel,
+               if(group, do: "member", else: "staff"),
+               true,
+               %{
+                 audience: "club_channel",
+                 attachment_type: "event",
+                 attachment_id: first.id,
+                 attachment: %{
+                   "title" => first.title,
+                   "starts_at" => DateTime.to_iso8601(first.starts_at),
+                   "occurrences" => length(events)
+                 }
                }
-             }),
+             ),
            {:ok, linked} <- link_post(manager, events, post.id) do
         RealtimePublisher.broadcast("community:club:#{club.id}", "post_created", %{
           post_id: post.id,
@@ -417,11 +435,13 @@ defmodule MilosTraining.Application.CommunityEvents do
 
     with %{} <- event || {:error, :not_found},
          {:ok, clubs} <- ClubScope.call(context) do
+      viewer = viewer(context, clubs)
+
       visible? =
-        club_member?(clubs, event) or event.open_to_non_members or not is_nil(invite) or
-          not is_nil(
-            Community.get_attendee(gym(event.organization_id, context), event.id, user_id)
-          )
+        EventPresenter.visible?(event, viewer, %{invited?: not is_nil(invite)}) or
+          (not is_nil(
+             Community.get_attendee(gym(event.organization_id, context), event.id, user_id)
+           ) and EventPresenter.visible?(event, viewer, %{attendee?: true}))
 
       if visible?, do: {:ok, event, clubs, invite}, else: {:error, :not_found}
     end
@@ -483,7 +503,7 @@ defmodule MilosTraining.Application.CommunityEvents do
 
   @doc false
   def present(%{user_id: user_id}, events, clubs, opts \\ []) do
-    EventPresenter.present(events, EventPresenter.viewer(user_id, clubs, managed(user_id)), opts)
+    EventPresenter.present(events, viewer(%{user_id: user_id}, clubs), opts)
   end
 
   # Boxes where the person runs events (role defaults; manage_events is not grantable).
@@ -500,6 +520,52 @@ defmodule MilosTraining.Application.CommunityEvents do
     |> Enum.map(& &1.organization.id)
   end
 
+  # The member group an event goes in (`channel_id` given), which must be an
+  # active group of the club.
+  defp group_channel(_manager, _club, nil), do: {:ok, nil}
+
+  defp group_channel(manager, club, channel_id) do
+    with %{} = channel <- Community.get_channel(manager, channel_id) || {:error, :not_found},
+         :ok <- Community.event_group_channel_check(channel, club.id),
+         do: {:ok, channel}
+  end
+
+  defp event_channel(_manager, %{channel_id: nil}), do: nil
+  defp event_channel(manager, %{channel_id: id}), do: Community.get_channel(manager, id)
+
+  # Staff and coaches run every event of their box; a group's admin those of
+  # their group (EventPolicy.manage_check/2).
+  defp authorize_event(manager, channel) do
+    Community.event_manage_check(
+      %{
+        manage_events?:
+          Organizations.authorize_capability(manager, Community.event_capability()) == :ok,
+        group_admin?: not is_nil(channel) and group_admin?(manager, channel)
+      },
+      channel && channel.id
+    )
+  end
+
+  defp group_admin?(%{user_id: user_id} = manager, channel) do
+    membership =
+      manager |> Community.channel_memberships_of(user_id, [channel.id]) |> Map.get(channel.id)
+
+    Community.event_group_admin?(
+      channel,
+      membership && %{member?: Community.group_member?(membership), role: membership.role}
+    )
+  end
+
+  # Whoever runs an event from the member app: their staff context at the box
+  # when they hold manage_events, else their own session in the box's scope
+  # (a group's admin); the manage_* functions decide.
+  defp event_manager(context, organization_id) do
+    case manager_context(context, organization_id) do
+      {:ok, manager} -> {:ok, manager}
+      {:error, :forbidden} -> {:ok, gym(organization_id, context)}
+    end
+  end
+
   defp own_event(%{organization_id: organization_id}, %{organization_id: organization_id}),
     do: :ok
 
@@ -512,7 +578,15 @@ defmodule MilosTraining.Application.CommunityEvents do
     end
   end
 
-  defp club_member?(clubs, event), do: Enum.any?(clubs, &(&1.id == event.club_id))
+  defp viewer(%{user_id: user_id}, clubs),
+    do: EventPresenter.viewer(user_id, clubs, managed(user_id))
+
+  defp visible_only(events, context, clubs) do
+    viewer = viewer(context, clubs)
+    Enum.filter(events, &EventPresenter.visible?(&1, viewer))
+  end
+
+  defp gym_of(context, organization_id), do: gym(organization_id, context)
 
   defp gym(organization_id, %{user_id: user_id}),
     do: %{organization_id: organization_id, user_id: user_id}
