@@ -603,5 +603,5 @@ ANR picked the recommendation on every question except Q2, with the extras and n
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
 - [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
