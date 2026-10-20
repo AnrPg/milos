@@ -54297,6 +54297,10 @@
                             "going_count": {
                               "type": "integer"
                             },
+                            "good_for_friends": {
+                              "description": "Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο",
+                              "type": "boolean"
+                            },
                             "group": {
                               "description": "The member group of a group event (free, for its members only)",
                               "nullable": true,
@@ -54515,6 +54519,7 @@
                             "open_to_non_members",
                             "guest_pass_allowed",
                             "guests_per_member",
+                            "good_for_friends",
                             "cancelled",
                             "club",
                             "box",
