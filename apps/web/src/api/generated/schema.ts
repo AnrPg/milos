@@ -8319,6 +8319,11 @@ export interface components {
             cancelled_at?: string | null;
             /** @description Null: no limit */
             capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
             /** CommunityEventClub */
             club: {
                 /** Format: uuid */
@@ -8343,6 +8348,15 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
             guest_pass_allowed: boolean;
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
@@ -8428,7 +8442,10 @@ export interface components {
                 id: string;
                 nickname?: string | null;
             } | null;
+            /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
             late_cancel: boolean;
+            /** @description This person's late cancels at the box over the last 90 days */
+            late_cancels_90d: number;
             /** @description An active member of the box */
             member: boolean;
             /** Format: date-time */
@@ -8478,7 +8495,10 @@ export interface components {
                     id: string;
                     nickname?: string | null;
                 } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                 late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
                 /** @description An active member of the box */
                 member: boolean;
                 /** Format: date-time */
@@ -8526,7 +8546,10 @@ export interface components {
                     id: string;
                     nickname?: string | null;
                 } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                 late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
                 /** @description An active member of the box */
                 member: boolean;
                 /** Format: date-time */
@@ -8574,7 +8597,10 @@ export interface components {
                     id: string;
                     nickname?: string | null;
                 } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                 late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
                 /** @description An active member of the box */
                 member: boolean;
                 /** Format: date-time */
@@ -8653,6 +8679,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -8677,6 +8708,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -8749,6 +8789,15 @@ export interface components {
             /** @description Events made (weekly repeat) */
             occurrences: number;
         };
+        /**
+         * CommunityEventGroup
+         * @description The member group of a group event (free, for its members only)
+         */
+        CommunityEventGroup: {
+            /** Format: uuid */
+            id: string;
+            name?: string | null;
+        } | null;
         /** CommunityEventInviteResponse */
         CommunityEventInviteResponse: {
             /** Format: date-time */
@@ -8801,6 +8850,11 @@ export interface components {
             capacity?: number | null;
             /**
              * Format: uuid
+             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             */
+            channel_id?: string;
+            /**
+             * Format: uuid
              * @description A ready box photo upload
              */
             cover_media_id?: string | null;
@@ -8848,6 +8902,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -8872,6 +8931,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -8961,6 +9029,7 @@ export interface components {
             converted: number;
             going: number;
             guests: number;
+            /** @description «Ακύρωσε αργά»: places given up within 2 hours */
             late_cancels: number;
             /** @description Going but not checked in, once the event ended */
             no_shows: number;
@@ -9029,6 +9098,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -9053,6 +9127,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -9185,6 +9268,11 @@ export interface components {
                     cancelled_at?: string | null;
                     /** @description Null: no limit */
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
                     /** CommunityEventClub */
                     club: {
                         /** Format: uuid */
@@ -9209,6 +9297,15 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
                     guest_pass_allowed: boolean;
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
@@ -9348,6 +9445,11 @@ export interface components {
                     cancelled_at?: string | null;
                     /** @description Null: no limit */
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
                     /** CommunityEventClub */
                     club: {
                         /** Format: uuid */
@@ -9372,6 +9474,15 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
                     guest_pass_allowed: boolean;
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
@@ -10009,6 +10120,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -10033,6 +10149,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -10149,6 +10274,11 @@ export interface components {
             cancelled_at?: string | null;
             /** @description Null: no limit */
             capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
             /** CommunityEventClub */
             club: {
                 /** Format: uuid */
@@ -10173,6 +10303,15 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
             guest_pass_allowed: boolean;
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
@@ -10319,6 +10458,11 @@ export interface components {
                     cancelled_at?: string | null;
                     /** @description Null: no limit */
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
                     /** CommunityEventClub */
                     club: {
                         /** Format: uuid */
@@ -10343,6 +10487,15 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
                     guest_pass_allowed: boolean;
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
@@ -12542,6 +12695,11 @@ export interface components {
                     cancelled_at?: string | null;
                     /** @description Null: no limit */
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
                     /** CommunityEventClub */
                     club: {
                         /** Format: uuid */
@@ -12566,6 +12724,15 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
                     guest_pass_allowed: boolean;
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
@@ -12876,6 +13043,11 @@ export interface components {
                     cancelled_at?: string | null;
                     /** @description Null: no limit */
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
                     /** CommunityEventClub */
                     club: {
                         /** Format: uuid */
@@ -12900,6 +13072,15 @@ export interface components {
                         nickname?: string | null;
                     }[] | null;
                     going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
                     guest_pass_allowed: boolean;
                     /** @description Event page: guests you can still bring (going, guest passes on) */
                     guests_left?: number | null;
@@ -13296,7 +13477,10 @@ export interface components {
                         id: string;
                         nickname?: string | null;
                     } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                     late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
                     /** @description An active member of the box */
                     member: boolean;
                     /** Format: date-time */
@@ -13344,7 +13528,10 @@ export interface components {
                         id: string;
                         nickname?: string | null;
                     } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                     late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
                     /** @description An active member of the box */
                     member: boolean;
                     /** Format: date-time */
@@ -13392,7 +13579,10 @@ export interface components {
                         id: string;
                         nickname?: string | null;
                     } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                     late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
                     /** @description An active member of the box */
                     member: boolean;
                     /** Format: date-time */
@@ -13441,6 +13631,11 @@ export interface components {
             cancelled_at?: string | null;
             /** @description Null: no limit */
             capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
             /** CommunityEventClub */
             club: {
                 /** Format: uuid */
@@ -13465,6 +13660,15 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
             guest_pass_allowed: boolean;
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
@@ -13538,6 +13742,7 @@ export interface components {
                 converted: number;
                 going: number;
                 guests: number;
+                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                 late_cancels: number;
                 /** @description Going but not checked in, once the event ended */
                 no_shows: number;
@@ -13578,7 +13783,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -13626,7 +13834,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -13674,7 +13885,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -13723,6 +13937,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -13747,6 +13966,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -13820,6 +14048,7 @@ export interface components {
                     converted: number;
                     going: number;
                     guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                     late_cancels: number;
                     /** @description Going but not checked in, once the event ended */
                     no_shows: number;
@@ -13845,6 +14074,11 @@ export interface components {
         StaffCommunityEventRequest: {
             address?: string | null;
             capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             */
+            channel_id?: string;
             /** Format: uuid */
             club_id: string;
             /**
@@ -13898,7 +14132,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -13946,7 +14183,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -13994,7 +14234,10 @@ export interface components {
                             id: string;
                             nickname?: string | null;
                         } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                         late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
                         /** @description An active member of the box */
                         member: boolean;
                         /** Format: date-time */
@@ -14043,6 +14286,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -14067,6 +14315,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -14140,6 +14397,7 @@ export interface components {
                     converted: number;
                     going: number;
                     guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                     late_cancels: number;
                     /** @description Going but not checked in, once the event ended */
                     no_shows: number;
@@ -14177,6 +14435,11 @@ export interface components {
             cancelled_at?: string | null;
             /** @description Null: no limit */
             capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
             /** CommunityEventClub */
             club: {
                 /** Format: uuid */
@@ -14201,6 +14464,15 @@ export interface components {
                 nickname?: string | null;
             }[] | null;
             going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
             guest_pass_allowed: boolean;
             /** @description Event page: guests you can still bring (going, guest passes on) */
             guests_left?: number | null;
@@ -14274,6 +14546,7 @@ export interface components {
                 converted: number;
                 going: number;
                 guests: number;
+                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                 late_cancels: number;
                 /** @description Going but not checked in, once the event ended */
                 no_shows: number;
@@ -14303,6 +14576,11 @@ export interface components {
                 cancelled_at?: string | null;
                 /** @description Null: no limit */
                 capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
                 /** CommunityEventClub */
                 club: {
                     /** Format: uuid */
@@ -14327,6 +14605,15 @@ export interface components {
                     nickname?: string | null;
                 }[] | null;
                 going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
                 guest_pass_allowed: boolean;
                 /** @description Event page: guests you can still bring (going, guest passes on) */
                 guests_left?: number | null;
@@ -14400,6 +14687,7 @@ export interface components {
                     converted: number;
                     going: number;
                     guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                     late_cancels: number;
                     /** @description Going but not checked in, once the event ended */
                     no_shows: number;
@@ -16227,6 +16515,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -16251,6 +16544,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -16416,6 +16718,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -16440,6 +16747,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -17716,6 +18032,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -17740,6 +18061,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -17830,6 +18160,11 @@ export interface operations {
                     capacity?: number | null;
                     /**
                      * Format: uuid
+                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     */
+                    channel_id?: string;
+                    /**
+                     * Format: uuid
                      * @description A ready box photo upload
                      */
                     cover_media_id?: string | null;
@@ -17885,6 +18220,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -17909,6 +18249,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -18191,6 +18540,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -18215,6 +18569,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -18386,6 +18749,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -18410,6 +18778,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -18697,6 +19074,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -18721,6 +19103,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -18893,6 +19284,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -18917,6 +19313,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -19089,6 +19494,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -19113,6 +19523,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -19267,6 +19686,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -19291,6 +19715,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -19403,6 +19836,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -19427,6 +19865,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -19572,6 +20019,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -19596,6 +20048,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -19716,6 +20177,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -19740,6 +20206,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -19887,6 +20362,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -19911,6 +20391,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -20068,6 +20557,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -20092,6 +20586,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -20231,6 +20734,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -20255,6 +20763,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -24154,6 +24671,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -24178,6 +24700,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -24251,6 +24782,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -24279,6 +24811,11 @@ export interface operations {
                 "application/json": {
                     address?: string | null;
                     capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     */
+                    channel_id?: string;
                     /** Format: uuid */
                     club_id: string;
                     /**
@@ -24340,7 +24877,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24388,7 +24928,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24436,7 +24979,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24485,6 +25031,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -24509,6 +25060,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -24582,6 +25142,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -24644,7 +25205,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24692,7 +25256,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24740,7 +25307,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -24789,6 +25359,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -24813,6 +25388,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -24886,6 +25470,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -24983,7 +25568,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25031,7 +25619,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25079,7 +25670,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25128,6 +25722,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -25152,6 +25751,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -25225,6 +25833,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -25287,7 +25896,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25335,7 +25947,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25383,7 +25998,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25432,6 +26050,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -25456,6 +26079,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -25529,6 +26161,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -25597,7 +26230,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25645,7 +26281,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25693,7 +26332,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25742,6 +26384,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -25766,6 +26413,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -25839,6 +26495,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -25908,7 +26565,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -25956,7 +26616,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -26004,7 +26667,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -26053,6 +26719,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -26077,6 +26748,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -26150,6 +26830,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -26222,7 +26903,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -26270,7 +26954,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -26318,7 +27005,10 @@ export interface operations {
                                         id: string;
                                         nickname?: string | null;
                                     } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
                                     late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
                                     /** @description An active member of the box */
                                     member: boolean;
                                     /** Format: date-time */
@@ -26367,6 +27057,11 @@ export interface operations {
                             cancelled_at?: string | null;
                             /** @description Null: no limit */
                             capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
                             /** CommunityEventClub */
                             club: {
                                 /** Format: uuid */
@@ -26391,6 +27086,15 @@ export interface operations {
                                 nickname?: string | null;
                             }[] | null;
                             going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
                             guest_pass_allowed: boolean;
                             /** @description Event page: guests you can still bring (going, guest passes on) */
                             guests_left?: number | null;
@@ -26464,6 +27168,7 @@ export interface operations {
                                 converted: number;
                                 going: number;
                                 guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
                                 late_cancels: number;
                                 /** @description Going but not checked in, once the event ended */
                                 no_shows: number;
@@ -39379,6 +40084,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -39403,6 +40113,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -39690,6 +40409,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -39714,6 +40438,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -39886,6 +40619,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -39910,6 +40648,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -40082,6 +40829,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -40106,6 +40858,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -47057,6 +47818,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -47081,6 +47847,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -48629,6 +49404,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -48653,6 +49433,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;
@@ -48940,6 +49729,11 @@ export interface operations {
                                 cancelled_at?: string | null;
                                 /** @description Null: no limit */
                                 capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
                                 /** CommunityEventClub */
                                 club: {
                                     /** Format: uuid */
@@ -48964,6 +49758,15 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
                                 guest_pass_allowed: boolean;
                                 /** @description Event page: guests you can still bring (going, guest passes on) */
                                 guests_left?: number | null;

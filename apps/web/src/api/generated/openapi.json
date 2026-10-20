@@ -3779,6 +3779,12 @@
             "nullable": true,
             "type": "integer"
           },
+          "channel_id": {
+            "description": "The member group this event belongs to; null for a club event",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "club": {
             "properties": {
               "id": {
@@ -3852,6 +3858,25 @@
           },
           "going_count": {
             "type": "integer"
+          },
+          "group": {
+            "description": "The member group of a group event (free, for its members only)",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityEventGroup",
+            "type": "object"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -4105,7 +4130,12 @@
             "type": "object"
           },
           "late_cancel": {
+            "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
             "type": "boolean"
+          },
+          "late_cancels_90d": {
+            "description": "This person's late cancels at the box over the last 90 days",
+            "type": "integer"
           },
           "member": {
             "description": "An active member of the box",
@@ -4205,7 +4235,8 @@
           "member",
           "queued_at",
           "receipt_issued",
-          "late_cancel"
+          "late_cancel",
+          "late_cancels_90d"
         ],
         "title": "CommunityEventAttendee",
         "type": "object"
@@ -4257,7 +4288,12 @@
                   "type": "object"
                 },
                 "late_cancel": {
+                  "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                   "type": "boolean"
+                },
+                "late_cancels_90d": {
+                  "description": "This person's late cancels at the box over the last 90 days",
+                  "type": "integer"
                 },
                 "member": {
                   "description": "An active member of the box",
@@ -4357,7 +4393,8 @@
                 "member",
                 "queued_at",
                 "receipt_issued",
-                "late_cancel"
+                "late_cancel",
+                "late_cancels_90d"
               ],
               "title": "CommunityEventAttendee",
               "type": "object"
@@ -4409,7 +4446,12 @@
                   "type": "object"
                 },
                 "late_cancel": {
+                  "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                   "type": "boolean"
+                },
+                "late_cancels_90d": {
+                  "description": "This person's late cancels at the box over the last 90 days",
+                  "type": "integer"
                 },
                 "member": {
                   "description": "An active member of the box",
@@ -4509,7 +4551,8 @@
                 "member",
                 "queued_at",
                 "receipt_issued",
-                "late_cancel"
+                "late_cancel",
+                "late_cancels_90d"
               ],
               "title": "CommunityEventAttendee",
               "type": "object"
@@ -4561,7 +4604,12 @@
                   "type": "object"
                 },
                 "late_cancel": {
+                  "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                   "type": "boolean"
+                },
+                "late_cancels_90d": {
+                  "description": "This person's late cancels at the box over the last 90 days",
+                  "type": "integer"
                 },
                 "member": {
                   "description": "An active member of the box",
@@ -4661,7 +4709,8 @@
                 "member",
                 "queued_at",
                 "receipt_issued",
-                "late_cancel"
+                "late_cancel",
+                "late_cancels_90d"
               ],
               "title": "CommunityEventAttendee",
               "type": "object"
@@ -4793,6 +4842,12 @@
                 "nullable": true,
                 "type": "integer"
               },
+              "channel_id": {
+                "description": "The member group this event belongs to; null for a club event",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
               "club": {
                 "properties": {
                   "id": {
@@ -4866,6 +4921,25 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "group": {
+                "description": "The member group of a group event (free, for its members only)",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityEventGroup",
+                "type": "object"
               },
               "guest_pass_allowed": {
                 "type": "boolean"
@@ -5087,6 +5161,25 @@
         "title": "CommunityEventCreatedResponse",
         "type": "object"
       },
+      "CommunityEventGroup": {
+        "description": "The member group of a group event (free, for its members only)",
+        "nullable": true,
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "CommunityEventGroup",
+        "type": "object"
+      },
       "CommunityEventInviteResponse": {
         "properties": {
           "expires_at": {
@@ -5242,6 +5335,11 @@
             "nullable": true,
             "type": "integer"
           },
+          "channel_id": {
+            "description": "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes",
+            "format": "uuid",
+            "type": "string"
+          },
           "cover_media_id": {
             "description": "A ready box photo upload",
             "format": "uuid",
@@ -5369,6 +5467,12 @@
                 "nullable": true,
                 "type": "integer"
               },
+              "channel_id": {
+                "description": "The member group this event belongs to; null for a club event",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
               "club": {
                 "properties": {
                   "id": {
@@ -5442,6 +5546,25 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "group": {
+                "description": "The member group of a group event (free, for its members only)",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityEventGroup",
+                "type": "object"
               },
               "guest_pass_allowed": {
                 "type": "boolean"
@@ -5705,6 +5828,7 @@
             "type": "integer"
           },
           "late_cancels": {
+            "description": "«Ακύρωσε αργά»: places given up within 2 hours",
             "type": "integer"
           },
           "no_shows": {
@@ -5898,6 +6022,12 @@
                   "nullable": true,
                   "type": "integer"
                 },
+                "channel_id": {
+                  "description": "The member group this event belongs to; null for a club event",
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "club": {
                   "properties": {
                     "id": {
@@ -5971,6 +6101,25 @@
                 },
                 "going_count": {
                   "type": "integer"
+                },
+                "group": {
+                  "description": "The member group of a group event (free, for its members only)",
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityEventGroup",
+                  "type": "object"
                 },
                 "guest_pass_allowed": {
                   "type": "boolean"
@@ -6367,6 +6516,12 @@
                       "nullable": true,
                       "type": "integer"
                     },
+                    "channel_id": {
+                      "description": "The member group this event belongs to; null for a club event",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "club": {
                       "properties": {
                         "id": {
@@ -6440,6 +6595,25 @@
                     },
                     "going_count": {
                       "type": "integer"
+                    },
+                    "group": {
+                      "description": "The member group of a group event (free, for its members only)",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "CommunityEventGroup",
+                      "type": "object"
                     },
                     "guest_pass_allowed": {
                       "type": "boolean"
@@ -6871,6 +7045,12 @@
                       "nullable": true,
                       "type": "integer"
                     },
+                    "channel_id": {
+                      "description": "The member group this event belongs to; null for a club event",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "club": {
                       "properties": {
                         "id": {
@@ -6944,6 +7124,25 @@
                     },
                     "going_count": {
                       "type": "integer"
+                    },
+                    "group": {
+                      "description": "The member group of a group event (free, for its members only)",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "CommunityEventGroup",
+                      "type": "object"
                     },
                     "guest_pass_allowed": {
                       "type": "boolean"
@@ -9042,6 +9241,12 @@
                 "nullable": true,
                 "type": "integer"
               },
+              "channel_id": {
+                "description": "The member group this event belongs to; null for a club event",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
               "club": {
                 "properties": {
                   "id": {
@@ -9115,6 +9320,25 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "group": {
+                "description": "The member group of a group event (free, for its members only)",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityEventGroup",
+                "type": "object"
               },
               "guest_pass_allowed": {
                 "type": "boolean"
@@ -9459,6 +9683,12 @@
             "nullable": true,
             "type": "integer"
           },
+          "channel_id": {
+            "description": "The member group this event belongs to; null for a club event",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "club": {
             "properties": {
               "id": {
@@ -9532,6 +9762,25 @@
           },
           "going_count": {
             "type": "integer"
+          },
+          "group": {
+            "description": "The member group of a group event (free, for its members only)",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityEventGroup",
+            "type": "object"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -9950,6 +10199,12 @@
                     "nullable": true,
                     "type": "integer"
                   },
+                  "channel_id": {
+                    "description": "The member group this event belongs to; null for a club event",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "club": {
                     "properties": {
                       "id": {
@@ -10023,6 +10278,25 @@
                   },
                   "going_count": {
                     "type": "integer"
+                  },
+                  "group": {
+                    "description": "The member group of a group event (free, for its members only)",
+                    "nullable": true,
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "title": "CommunityEventGroup",
+                    "type": "object"
                   },
                   "guest_pass_allowed": {
                     "type": "boolean"
@@ -17404,6 +17678,12 @@
                       "nullable": true,
                       "type": "integer"
                     },
+                    "channel_id": {
+                      "description": "The member group this event belongs to; null for a club event",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "club": {
                       "properties": {
                         "id": {
@@ -17477,6 +17757,25 @@
                     },
                     "going_count": {
                       "type": "integer"
+                    },
+                    "group": {
+                      "description": "The member group of a group event (free, for its members only)",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "CommunityEventGroup",
+                      "type": "object"
                     },
                     "guest_pass_allowed": {
                       "type": "boolean"
@@ -18490,6 +18789,12 @@
                       "nullable": true,
                       "type": "integer"
                     },
+                    "channel_id": {
+                      "description": "The member group this event belongs to; null for a club event",
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "club": {
                       "properties": {
                         "id": {
@@ -18563,6 +18868,25 @@
                     },
                     "going_count": {
                       "type": "integer"
+                    },
+                    "group": {
+                      "description": "The member group of a group event (free, for its members only)",
+                      "nullable": true,
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "CommunityEventGroup",
+                      "type": "object"
                     },
                     "guest_pass_allowed": {
                       "type": "boolean"
@@ -19878,7 +20202,12 @@
                       "type": "object"
                     },
                     "late_cancel": {
+                      "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                       "type": "boolean"
+                    },
+                    "late_cancels_90d": {
+                      "description": "This person's late cancels at the box over the last 90 days",
+                      "type": "integer"
                     },
                     "member": {
                       "description": "An active member of the box",
@@ -19978,7 +20307,8 @@
                     "member",
                     "queued_at",
                     "receipt_issued",
-                    "late_cancel"
+                    "late_cancel",
+                    "late_cancels_90d"
                   ],
                   "title": "CommunityEventAttendee",
                   "type": "object"
@@ -20030,7 +20360,12 @@
                       "type": "object"
                     },
                     "late_cancel": {
+                      "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                       "type": "boolean"
+                    },
+                    "late_cancels_90d": {
+                      "description": "This person's late cancels at the box over the last 90 days",
+                      "type": "integer"
                     },
                     "member": {
                       "description": "An active member of the box",
@@ -20130,7 +20465,8 @@
                     "member",
                     "queued_at",
                     "receipt_issued",
-                    "late_cancel"
+                    "late_cancel",
+                    "late_cancels_90d"
                   ],
                   "title": "CommunityEventAttendee",
                   "type": "object"
@@ -20182,7 +20518,12 @@
                       "type": "object"
                     },
                     "late_cancel": {
+                      "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                       "type": "boolean"
+                    },
+                    "late_cancels_90d": {
+                      "description": "This person's late cancels at the box over the last 90 days",
+                      "type": "integer"
                     },
                     "member": {
                       "description": "An active member of the box",
@@ -20282,7 +20623,8 @@
                     "member",
                     "queued_at",
                     "receipt_issued",
-                    "late_cancel"
+                    "late_cancel",
+                    "late_cancels_90d"
                   ],
                   "title": "CommunityEventAttendee",
                   "type": "object"
@@ -20339,6 +20681,12 @@
             "description": "Null: no limit",
             "nullable": true,
             "type": "integer"
+          },
+          "channel_id": {
+            "description": "The member group this event belongs to; null for a club event",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
           },
           "club": {
             "properties": {
@@ -20413,6 +20761,25 @@
           },
           "going_count": {
             "type": "integer"
+          },
+          "group": {
+            "description": "The member group of a group event (free, for its members only)",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityEventGroup",
+            "type": "object"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -20607,6 +20974,7 @@
                 "type": "integer"
               },
               "late_cancels": {
+                "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                 "type": "integer"
               },
               "no_shows": {
@@ -20746,7 +21114,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -20846,7 +21219,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -20898,7 +21272,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -20998,7 +21377,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -21050,7 +21430,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -21150,7 +21535,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -21207,6 +21593,12 @@
                 "description": "Null: no limit",
                 "nullable": true,
                 "type": "integer"
+              },
+              "channel_id": {
+                "description": "The member group this event belongs to; null for a club event",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
               },
               "club": {
                 "properties": {
@@ -21281,6 +21673,25 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "group": {
+                "description": "The member group of a group event (free, for its members only)",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityEventGroup",
+                "type": "object"
               },
               "guest_pass_allowed": {
                 "type": "boolean"
@@ -21475,6 +21886,7 @@
                     "type": "integer"
                   },
                   "late_cancels": {
+                    "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                     "type": "integer"
                   },
                   "no_shows": {
@@ -21586,6 +21998,11 @@
             "minimum": 1,
             "nullable": true,
             "type": "integer"
+          },
+          "channel_id": {
+            "description": "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes",
+            "format": "uuid",
+            "type": "string"
           },
           "club_id": {
             "format": "uuid",
@@ -21724,7 +22141,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -21824,7 +22246,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -21876,7 +22299,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -21976,7 +22404,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -22028,7 +22457,12 @@
                           "type": "object"
                         },
                         "late_cancel": {
+                          "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                           "type": "boolean"
+                        },
+                        "late_cancels_90d": {
+                          "description": "This person's late cancels at the box over the last 90 days",
+                          "type": "integer"
                         },
                         "member": {
                           "description": "An active member of the box",
@@ -22128,7 +22562,8 @@
                         "member",
                         "queued_at",
                         "receipt_issued",
-                        "late_cancel"
+                        "late_cancel",
+                        "late_cancels_90d"
                       ],
                       "title": "CommunityEventAttendee",
                       "type": "object"
@@ -22185,6 +22620,12 @@
                 "description": "Null: no limit",
                 "nullable": true,
                 "type": "integer"
+              },
+              "channel_id": {
+                "description": "The member group this event belongs to; null for a club event",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
               },
               "club": {
                 "properties": {
@@ -22259,6 +22700,25 @@
               },
               "going_count": {
                 "type": "integer"
+              },
+              "group": {
+                "description": "The member group of a group event (free, for its members only)",
+                "nullable": true,
+                "properties": {
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityEventGroup",
+                "type": "object"
               },
               "guest_pass_allowed": {
                 "type": "boolean"
@@ -22453,6 +22913,7 @@
                     "type": "integer"
                   },
                   "late_cancels": {
+                    "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                     "type": "integer"
                   },
                   "no_shows": {
@@ -22592,6 +23053,12 @@
             "nullable": true,
             "type": "integer"
           },
+          "channel_id": {
+            "description": "The member group this event belongs to; null for a club event",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "club": {
             "properties": {
               "id": {
@@ -22665,6 +23132,25 @@
           },
           "going_count": {
             "type": "integer"
+          },
+          "group": {
+            "description": "The member group of a group event (free, for its members only)",
+            "nullable": true,
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityEventGroup",
+            "type": "object"
           },
           "guest_pass_allowed": {
             "type": "boolean"
@@ -22859,6 +23345,7 @@
                 "type": "integer"
               },
               "late_cancels": {
+                "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                 "type": "integer"
               },
               "no_shows": {
@@ -22969,6 +23456,12 @@
                   "nullable": true,
                   "type": "integer"
                 },
+                "channel_id": {
+                  "description": "The member group this event belongs to; null for a club event",
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "club": {
                   "properties": {
                     "id": {
@@ -23042,6 +23535,25 @@
                 },
                 "going_count": {
                   "type": "integer"
+                },
+                "group": {
+                  "description": "The member group of a group event (free, for its members only)",
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityEventGroup",
+                  "type": "object"
                 },
                 "guest_pass_allowed": {
                   "type": "boolean"
@@ -23236,6 +23748,7 @@
                       "type": "integer"
                     },
                     "late_cancels": {
+                      "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                       "type": "integer"
                     },
                     "no_shows": {
@@ -28462,6 +28975,12 @@
                             "nullable": true,
                             "type": "integer"
                           },
+                          "channel_id": {
+                            "description": "The member group this event belongs to; null for a club event",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "club": {
                             "properties": {
                               "id": {
@@ -28535,6 +29054,25 @@
                           },
                           "going_count": {
                             "type": "integer"
+                          },
+                          "group": {
+                            "description": "The member group of a group event (free, for its members only)",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityEventGroup",
+                            "type": "object"
                           },
                           "guest_pass_allowed": {
                             "type": "boolean"
@@ -29005,6 +29543,12 @@
                                 "nullable": true,
                                 "type": "integer"
                               },
+                              "channel_id": {
+                                "description": "The member group this event belongs to; null for a club event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "club": {
                                 "properties": {
                                   "id": {
@@ -29078,6 +29622,25 @@
                               },
                               "going_count": {
                                 "type": "integer"
+                              },
+                              "group": {
+                                "description": "The member group of a group event (free, for its members only)",
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventGroup",
+                                "type": "object"
                               },
                               "guest_pass_allowed": {
                                 "type": "boolean"
@@ -32054,6 +32617,12 @@
                             "nullable": true,
                             "type": "integer"
                           },
+                          "channel_id": {
+                            "description": "The member group this event belongs to; null for a club event",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "club": {
                             "properties": {
                               "id": {
@@ -32127,6 +32696,25 @@
                           },
                           "going_count": {
                             "type": "integer"
+                          },
+                          "group": {
+                            "description": "The member group of a group event (free, for its members only)",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityEventGroup",
+                            "type": "object"
                           },
                           "guest_pass_allowed": {
                             "type": "boolean"
@@ -32390,6 +32978,11 @@
                     "nullable": true,
                     "type": "integer"
                   },
+                  "channel_id": {
+                    "description": "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes",
+                    "format": "uuid",
+                    "type": "string"
+                  },
                   "cover_media_id": {
                     "description": "A ready box photo upload",
                     "format": "uuid",
@@ -32525,6 +33118,12 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "club": {
                           "properties": {
                             "id": {
@@ -32598,6 +33197,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -33382,6 +34000,12 @@
                             "nullable": true,
                             "type": "integer"
                           },
+                          "channel_id": {
+                            "description": "The member group this event belongs to; null for a club event",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "club": {
                             "properties": {
                               "id": {
@@ -33455,6 +34079,25 @@
                           },
                           "going_count": {
                             "type": "integer"
+                          },
+                          "group": {
+                            "description": "The member group of a group event (free, for its members only)",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityEventGroup",
+                            "type": "object"
                           },
                           "guest_pass_allowed": {
                             "type": "boolean"
@@ -33919,6 +34562,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -33992,6 +34641,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -34755,6 +35423,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -34828,6 +35502,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -35319,6 +36012,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -35392,6 +36091,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -35883,6 +36601,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -35956,6 +36680,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -36382,6 +37125,12 @@
                             "nullable": true,
                             "type": "integer"
                           },
+                          "channel_id": {
+                            "description": "The member group this event belongs to; null for a club event",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "club": {
                             "properties": {
                               "id": {
@@ -36455,6 +37204,25 @@
                           },
                           "going_count": {
                             "type": "integer"
+                          },
+                          "group": {
+                            "description": "The member group of a group event (free, for its members only)",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityEventGroup",
+                            "type": "object"
                           },
                           "guest_pass_allowed": {
                             "type": "boolean"
@@ -36764,6 +37532,12 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "club": {
                           "properties": {
                             "id": {
@@ -36837,6 +37611,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -37231,6 +38024,12 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "club": {
                           "properties": {
                             "id": {
@@ -37304,6 +38103,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -37627,6 +38445,12 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "club": {
                           "properties": {
                             "id": {
@@ -37700,6 +38524,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -38083,6 +38926,12 @@
                           "nullable": true,
                           "type": "integer"
                         },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
                         "club": {
                           "properties": {
                             "id": {
@@ -38156,6 +39005,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -38621,6 +39489,12 @@
                                 "nullable": true,
                                 "type": "integer"
                               },
+                              "channel_id": {
+                                "description": "The member group this event belongs to; null for a club event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "club": {
                                 "properties": {
                                   "id": {
@@ -38694,6 +39568,25 @@
                               },
                               "going_count": {
                                 "type": "integer"
+                              },
+                              "group": {
+                                "description": "The member group of a group event (free, for its members only)",
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventGroup",
+                                "type": "object"
                               },
                               "guest_pass_allowed": {
                                 "type": "boolean"
@@ -39125,6 +40018,12 @@
                                 "nullable": true,
                                 "type": "integer"
                               },
+                              "channel_id": {
+                                "description": "The member group this event belongs to; null for a club event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "club": {
                                 "properties": {
                                   "id": {
@@ -39198,6 +40097,25 @@
                               },
                               "going_count": {
                                 "type": "integer"
+                              },
+                              "group": {
+                                "description": "The member group of a group event (free, for its members only)",
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventGroup",
+                                "type": "object"
                               },
                               "guest_pass_allowed": {
                                 "type": "boolean"
@@ -49148,6 +50066,12 @@
                             "nullable": true,
                             "type": "integer"
                           },
+                          "channel_id": {
+                            "description": "The member group this event belongs to; null for a club event",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "club": {
                             "properties": {
                               "id": {
@@ -49221,6 +50145,25 @@
                           },
                           "going_count": {
                             "type": "integer"
+                          },
+                          "group": {
+                            "description": "The member group of a group event (free, for its members only)",
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityEventGroup",
+                            "type": "object"
                           },
                           "guest_pass_allowed": {
                             "type": "boolean"
@@ -49415,6 +50358,7 @@
                                 "type": "integer"
                               },
                               "late_cancels": {
+                                "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                                 "type": "integer"
                               },
                               "no_shows": {
@@ -49521,6 +50465,11 @@
                     "minimum": 1,
                     "nullable": true,
                     "type": "integer"
+                  },
+                  "channel_id": {
+                    "description": "An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes",
+                    "format": "uuid",
+                    "type": "string"
                   },
                   "club_id": {
                     "format": "uuid",
@@ -49667,7 +50616,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -49767,7 +50721,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -49819,7 +50774,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -49919,7 +50879,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -49971,7 +50932,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -50071,7 +51037,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -50128,6 +51095,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -50202,6 +51175,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -50396,6 +51388,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -50581,7 +51574,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -50681,7 +51679,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -50733,7 +51732,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -50833,7 +51837,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -50885,7 +51890,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -50985,7 +51995,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -51042,6 +52053,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -51116,6 +52133,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -51310,6 +52346,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -51588,7 +52625,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -51688,7 +52730,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -51740,7 +52783,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -51840,7 +52888,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -51892,7 +52941,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -51992,7 +53046,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -52049,6 +53104,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -52123,6 +53184,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -52317,6 +53397,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -52507,7 +53588,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -52607,7 +53693,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -52659,7 +53746,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -52759,7 +53851,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -52811,7 +53904,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -52911,7 +54009,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -52968,6 +54067,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -53042,6 +54147,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -53236,6 +54360,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -53445,7 +54570,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -53545,7 +54675,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -53597,7 +54728,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -53697,7 +54833,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -53749,7 +54886,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -53849,7 +54991,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -53906,6 +55049,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -53980,6 +55129,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -54174,6 +55342,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -54389,7 +55558,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -54489,7 +55663,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -54541,7 +55716,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -54641,7 +55821,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -54693,7 +55874,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -54793,7 +55979,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -54850,6 +56037,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -54924,6 +56117,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -55118,6 +56330,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -55325,7 +56538,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -55425,7 +56643,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -55477,7 +56696,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -55577,7 +56801,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -55629,7 +56854,12 @@
                                     "type": "object"
                                   },
                                   "late_cancel": {
+                                    "description": "«Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at)",
                                     "type": "boolean"
+                                  },
+                                  "late_cancels_90d": {
+                                    "description": "This person's late cancels at the box over the last 90 days",
+                                    "type": "integer"
                                   },
                                   "member": {
                                     "description": "An active member of the box",
@@ -55729,7 +56959,8 @@
                                   "member",
                                   "queued_at",
                                   "receipt_issued",
-                                  "late_cancel"
+                                  "late_cancel",
+                                  "late_cancels_90d"
                                 ],
                                 "title": "CommunityEventAttendee",
                                 "type": "object"
@@ -55786,6 +57017,12 @@
                           "description": "Null: no limit",
                           "nullable": true,
                           "type": "integer"
+                        },
+                        "channel_id": {
+                          "description": "The member group this event belongs to; null for a club event",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
                         },
                         "club": {
                           "properties": {
@@ -55860,6 +57097,25 @@
                         },
                         "going_count": {
                           "type": "integer"
+                        },
+                        "group": {
+                          "description": "The member group of a group event (free, for its members only)",
+                          "nullable": true,
+                          "properties": {
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "name": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityEventGroup",
+                          "type": "object"
                         },
                         "guest_pass_allowed": {
                           "type": "boolean"
@@ -56054,6 +57310,7 @@
                               "type": "integer"
                             },
                             "late_cancels": {
+                              "description": "«Ακύρωσε αργά»: places given up within 2 hours",
                               "type": "integer"
                             },
                             "no_shows": {
@@ -91387,6 +92644,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -91460,6 +92723,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -92223,6 +93505,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -92296,6 +93584,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -92787,6 +94094,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -92860,6 +94173,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -93351,6 +94683,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -93424,6 +94762,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -112600,6 +113957,12 @@
                                 "nullable": true,
                                 "type": "integer"
                               },
+                              "channel_id": {
+                                "description": "The member group this event belongs to; null for a club event",
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
                               "club": {
                                 "properties": {
                                   "id": {
@@ -112673,6 +114036,25 @@
                               },
                               "going_count": {
                                 "type": "integer"
+                              },
+                              "group": {
+                                "description": "The member group of a group event (free, for its members only)",
+                                "nullable": true,
+                                "properties": {
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityEventGroup",
+                                "type": "object"
                               },
                               "guest_pass_allowed": {
                                 "type": "boolean"
@@ -116332,6 +117714,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -116405,6 +117793,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
@@ -117168,6 +118575,12 @@
                               "nullable": true,
                               "type": "integer"
                             },
+                            "channel_id": {
+                              "description": "The member group this event belongs to; null for a club event",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "club": {
                               "properties": {
                                 "id": {
@@ -117241,6 +118654,25 @@
                             },
                             "going_count": {
                               "type": "integer"
+                            },
+                            "group": {
+                              "description": "The member group of a group event (free, for its members only)",
+                              "nullable": true,
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityEventGroup",
+                              "type": "object"
                             },
                             "guest_pass_allowed": {
                               "type": "boolean"
