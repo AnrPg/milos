@@ -5,7 +5,9 @@ defmodule MilosTraining.Community.Post do
   import Ecto.Changeset
 
   @audiences ~w(club_channel followers public)
-  @attachment_types ~w(training_log_entry workout_execution pr)
+  # Journal entries a member shares, and the card of a club event (ADR-153).
+  @shareable_attachment_types ~w(training_log_entry workout_execution pr)
+  @attachment_types @shareable_attachment_types ++ ["event"]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -60,6 +62,7 @@ defmodule MilosTraining.Community.Post do
     do: cast(post, attrs, [:hidden_at, :hidden_by_id, :deleted_at, :pinned_at])
 
   def attachment_types, do: @attachment_types
+  def shareable_attachment_types, do: @shareable_attachment_types
 
   defp trim(nil), do: nil
 

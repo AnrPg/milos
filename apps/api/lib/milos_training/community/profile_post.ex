@@ -41,7 +41,10 @@ defmodule MilosTraining.Community.ProfilePost do
     |> update_change(:body, &trim/1)
     |> validate_required([:user_id, :audience])
     |> validate_inclusion(:audience, @audiences)
-    |> validate_inclusion(:attachment_type, MilosTraining.Community.Post.attachment_types())
+    |> validate_inclusion(
+      :attachment_type,
+      MilosTraining.Community.Post.shareable_attachment_types()
+    )
     |> validate_length(:body, max: 5_000)
     |> validate_length(:client_operation_id, max: 120)
     |> validate_content()
