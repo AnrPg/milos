@@ -474,3 +474,15 @@ msgstr "Shall we go for a walk?"
 
 msgid "Call me"
 msgstr "Call me"
+
+msgid "How did it go?"
+msgstr "How did it go?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "A quick note on earlier helps you see what works for you."
+
+msgid "A glass of water?"
+msgstr "A glass of water?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "The afternoon is a good moment to catch up on water."

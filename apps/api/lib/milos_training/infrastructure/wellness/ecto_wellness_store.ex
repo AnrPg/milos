@@ -5,6 +5,7 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
   alias MilosTraining.Repo
   alias MilosTraining.Wellness.{Craving, Entry, Preferences}
 
@@ -59,6 +60,49 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
     |> Repo.all()
   end
 
+  # Ροή (board 14, Q8): one item per local day, placed at that day's latest
+  # entry, holding the day's entries the reader may see.
+  @impl true
+  def list_day_items(user_id, bound, limit, scope) do
+    latest =
+      Entry
+      |> where([e], is_nil(e.deleted_at))
+      |> FeedScope.apply(user_id, scope)
+      |> distinct([e], e.occurred_on)
+      |> order_by([e], asc: e.occurred_on, desc: e.occurred_at, desc: e.id)
+      |> select([e], %{occurred_on: e.occurred_on, at: e.occurred_at, id: e.id})
+
+    days =
+      from(d in subquery(latest))
+      |> FeedBound.apply(:at, bound)
+      |> order_by([d], desc: d.at, desc: d.id)
+      |> limit(^limit)
+      |> Repo.all()
+
+    on = Enum.map(days, & &1.occurred_on)
+
+    entries =
+      Entry
+      |> where([e], is_nil(e.deleted_at) and e.occurred_on in ^on)
+      |> FeedScope.apply(user_id, scope)
+      |> order_by([e], asc: e.occurred_at, asc: e.id)
+      |> Repo.all()
+      |> Enum.group_by(& &1.occurred_on)
+
+    Enum.map(days, &Map.put(&1, :entries, Map.get(entries, &1.occurred_on, [])))
+  end
+
+  @impl true
+  def list_craving_items(user_id, bound, limit, scope) do
+    Craving
+    |> where([c], is_nil(c.deleted_at))
+    |> FeedScope.apply(user_id, scope)
+    |> FeedBound.apply(:occurred_at, bound)
+    |> order_by([c], desc: c.occurred_at, desc: c.id)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
   @impl true
   def insert_craving(attrs), do: attrs |> Craving.create_changeset() |> Repo.insert()
 
@@ -96,13 +140,16 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
 
   # Runs in the platform session of the follow-up job.
   @impl true
-  def due_craving_follow_ups(%DateTime{} = now, limit) do
-    Craving
-    |> where([c], is_nil(c.deleted_at) and is_nil(c.followed_up_at))
-    |> where([c], not is_nil(c.follow_up_at) and c.follow_up_at <= ^now)
-    |> order_by([c], asc: c.follow_up_at)
-    |> limit(^limit)
-    |> Repo.all()
+  # Platform sweeps: definer lookups that answer ids only; each person is
+  # then handled in their own session.
+  def craving_follow_ups_due(%DateTime{} = now, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, craving_id FROM milos_craving_follow_ups_due($1, $2)", [
+        DateTime.to_naive(now),
+        limit
+      ])
+
+    Enum.map(rows, fn [user_id, id] -> {Ecto.UUID.load!(user_id), Ecto.UUID.load!(id)} end)
   end
 
   @impl true
@@ -113,10 +160,49 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
   def get_preferences(user_id), do: Repo.get_by(Preferences, user_id: user_id)
 
   @impl true
+  def water_reminders_due(%DateTime{} = now, limit) do
+    %{rows: rows} =
+      Repo.query!("SELECT user_id, local_day FROM milos_water_reminders_due($1, $2)", [
+        DateTime.to_naive(now),
+        limit
+      ])
+
+    Enum.map(rows, fn [user_id, day] -> {Ecto.UUID.load!(user_id), day} end)
+  end
+
+  @impl true
+  def mark_water_reminded(user_id, %Date{} = day) do
+    Preferences
+    |> where([p], p.user_id == ^user_id)
+    |> Repo.update_all(set: [water_reminded_on: day, updated_at: DateTime.utc_now()])
+
+    :ok
+  end
+
+  @impl true
   def put_preferences(user_id, attrs) do
     (get_preferences(user_id) || %Preferences{user_id: user_id})
     |> Preferences.changeset(Map.put(attrs, :user_id, user_id))
     |> Repo.insert_or_update()
+  end
+
+  @impl true
+  def export(user_id, sections) do
+    Map.new(sections, fn
+      "wellness" ->
+        {"wellness",
+         Entry
+         |> where([e], e.user_id == ^user_id and is_nil(e.deleted_at))
+         |> order_by([e], asc: e.occurred_at, asc: e.id)
+         |> Repo.all()}
+
+      "cravings" ->
+        {"cravings",
+         Craving
+         |> where([c], c.user_id == ^user_id and is_nil(c.deleted_at))
+         |> order_by([c], asc: c.occurred_at, asc: c.id)
+         |> Repo.all()}
+    end)
   end
 
   # «Διαγραφή όλων»: soft-deleted rows are gone for the member at once; the

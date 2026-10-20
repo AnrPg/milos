@@ -74,7 +74,7 @@ defmodule MilosTrainingWeb.JournalController do
         name: :kind,
         in: :path,
         required: true,
-        schema: %Schema{type: :string, enum: Schemas.kinds()}
+        schema: %Schema{type: :string, enum: Schemas.movable_kinds()}
       },
       @id_param
     ],

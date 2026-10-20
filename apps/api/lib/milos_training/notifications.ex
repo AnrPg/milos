@@ -319,6 +319,24 @@ defmodule MilosTraining.Notifications do
         url: "/me/buddies"
       })
 
+  # ADR-159 (board 14, Q6): «Πώς πήγε;» once for a craving left open. The
+  # push never names the craving; the page does, once unlocked.
+  def process_event("craving_follow_up", payload),
+    do:
+      enqueue_simple(:craving_follow_up, payload, %{
+        craving_id: field(payload, :craving_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
+      })
+
+  # ADR-159 (board 14, Q2): the opt-in afternoon water reminder.
+  def process_event("water_reminder", payload),
+    do:
+      enqueue_simple(:water_reminder, payload, %{
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/wellbeing"
+      })
+
   # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
   # Staff who check people in hear about it, so the desk can follow up and
   # sell a walk-in or a trial; the caller keeps it to once an hour per

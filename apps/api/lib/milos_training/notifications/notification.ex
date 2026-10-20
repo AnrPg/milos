@@ -75,7 +75,9 @@ defmodule MilosTraining.Notifications.Notification do
     :support_request,
     :support_reply,
     :support_no_reply_nudge,
-    :buddy_weekly_summary
+    :buddy_weekly_summary,
+    :craving_follow_up,
+    :water_reminder
   ]
 
   schema "notifications" do

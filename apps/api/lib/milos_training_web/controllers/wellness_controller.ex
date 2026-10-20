@@ -8,9 +8,11 @@ defmodule MilosTrainingWeb.WellnessController do
     ChangeCraving,
     ChangeWellnessEntry,
     EraseMyWellness,
+    ExportMyWellness,
     GetMyWellness,
     LogCraving,
     LogWellnessEntry,
+    MealPhotos,
     SetWellnessPreferences
   }
 
@@ -54,6 +56,17 @@ defmodule MilosTrainingWeb.WellnessController do
     with {:ok, payload} <- GetMyWellness.call(conn.assigns.user_context, params) do
       json(conn, WellnessJSON.overview(payload))
     end
+  end
+
+  operation(:upload_meal_photo,
+    summary: "Reserve an upload for a meal photo (needs your health-data consent)",
+    request_body: Schemas.body(MilosTrainingWeb.Schemas.Media.upload_request()),
+    responses: [ok: {"Upload", "application/json", MilosTrainingWeb.Schemas.Media.upload()}]
+  )
+
+  def upload_meal_photo(conn, _params) do
+    with {:ok, upload} <- MealPhotos.request_upload(conn.assigns.user_context, conn.body_params),
+         do: json(conn, upload)
   end
 
   operation(:create_entry,
@@ -173,6 +186,27 @@ defmodule MilosTrainingWeb.WellnessController do
   def erase(conn, params) do
     with {:ok, counts} <- EraseMyWellness.call(conn.assigns.user_context, params) do
       json(conn, %{erased: counts})
+    end
+  end
+
+  operation(:export,
+    summary: "Your wellness and/or cravings as JSON, meal photos as signed links",
+    parameters: [
+      %Parameter{
+        name: :sections,
+        in: :query,
+        required: true,
+        schema: %Schema{type: :string, example: "wellness,cravings"}
+      }
+    ],
+    responses: [ok: {"Export", "application/json", Schemas.export_response()}]
+  )
+
+  def export(conn, params) do
+    with {:ok, export} <- ExportMyWellness.call(conn.assigns.user_context, params) do
+      conn
+      |> put_resp_header("content-disposition", ~s(attachment; filename="milos-wellness.json"))
+      |> json(export)
     end
   end
 

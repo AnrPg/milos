@@ -5,7 +5,20 @@ defmodule MilosTrainingWeb.WellnessControllerTest do
 
   setup %{conn: conn} do
     user = user_fixture(%{role: :member})
-    %{user: user, conn: put_bearer_token(conn, user)}
+    conn = put_bearer_token(conn, user)
+
+    assert %{"code" => "health_data_consent_required"} =
+             conn
+             |> post("/api/me/wellness/entries", %{kind: "water", value: %{ml: 250}})
+             |> json_response(403)
+
+    conn
+    |> recycle()
+    |> put_bearer_token(user)
+    |> put("/api/me/body/consents/health_data")
+    |> json_response(200)
+
+    %{user: user, conn: conn |> recycle() |> put_bearer_token(user)}
   end
 
   test "log water, a night, a meal and a craving, read the day, undo and settle", %{
@@ -121,7 +134,37 @@ defmodule MilosTrainingWeb.WellnessControllerTest do
              })
              |> json_response(200)
 
-    assert %{"erased" => %{"cravings" => 0, "wellness" => 0}} =
+    assert %{"preferences" => %{"item_order" => ["mood", "water", "sleep", "meals", "plan"]}} =
+             conn
+             |> recycle()
+             |> put_bearer_token(user)
+             |> put("/api/me/wellness/preferences", %{item_order: ["mood", "water"]})
+             |> json_response(200)
+
+    conn
+    |> recycle()
+    |> put_bearer_token(user)
+    |> post("/api/me/wellness/cravings", %{intensity: 4, note: "after dinner"})
+    |> json_response(201)
+
+    export =
+      conn
+      |> recycle()
+      |> put_bearer_token(user)
+      |> get("/api/me/wellness/export?sections=wellness,cravings")
+
+    assert [~s(attachment; filename="milos-wellness.json")] =
+             get_resp_header(export, "content-disposition")
+
+    assert %{
+             "sections" => %{
+               "wellness" => %{"entries" => [], "preferences" => %{"water_goal_ml" => 2500}},
+               "cravings" => %{"cravings" => [%{"note" => "after dinner"}]}
+             },
+             "photos" => %{}
+           } = json_response(export, 200)
+
+    assert %{"erased" => %{"cravings" => 1, "wellness" => 0}} =
              conn
              |> recycle()
              |> put_bearer_token(user)

@@ -474,3 +474,15 @@ msgstr "Πάμε βόλτα;"
 
 msgid "Call me"
 msgstr "Πάρε με τηλέφωνο"
+
+msgid "How did it go?"
+msgstr "Πώς πήγε;"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Μια σύντομη σημείωση για πριν σε βοηθά να δεις τι σου ταιριάζει."
+
+msgid "A glass of water?"
+msgstr "Ένα ποτήρι νερό;"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."

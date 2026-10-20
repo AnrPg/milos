@@ -474,3 +474,15 @@ msgstr "Да се разходим?"
 
 msgid "Call me"
 msgstr "Обади ми се"
+
+msgid "How did it go?"
+msgstr "Как мина?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Кратка бележка за по-рано ти помага да видиш какво работи за теб."
+
+msgid "A glass of water?"
+msgstr "Чаша вода?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Следобедът е добър момент да наваксаш с водата."

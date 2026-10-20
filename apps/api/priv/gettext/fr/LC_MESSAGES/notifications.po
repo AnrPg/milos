@@ -474,3 +474,15 @@ msgstr "On va marcher ?"
 
 msgid "Call me"
 msgstr "Appelle-moi"
+
+msgid "How did it go?"
+msgstr "Comment ça s'est passé ?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Une petite note sur tout à l'heure t'aide à voir ce qui te réussit."
+
+msgid "A glass of water?"
+msgstr "Un verre d'eau ?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "L'après-midi est un bon moment pour rattraper ton eau."

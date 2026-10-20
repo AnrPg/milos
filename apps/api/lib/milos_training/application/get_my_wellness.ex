@@ -8,8 +8,8 @@ defmodule MilosTraining.Application.GetMyWellness do
   with anyone else.
   """
 
-  alias MilosTraining.Application.WellnessInput
-  alias MilosTraining.{Wellbeing, Wellness}
+  alias MilosTraining.Application.{MealPhotos, WellnessConsent, WellnessInput}
+  alias MilosTraining.{Nutrition, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, params) do
     with {:ok, from, to} <-
@@ -17,7 +17,8 @@ defmodule MilosTraining.Application.GetMyWellness do
              WellnessInput.param(params, "from"),
              WellnessInput.param(params, "to")
            ) do
-      Wellness.with_context(context, fn ->
+      context
+      |> Wellness.with_context(fn ->
         prefs = Wellness.preferences(user_id)
         entries = Wellness.list_entries(user_id, from, to)
         cravings = Wellness.list_cravings(user_id, from, to)
@@ -43,8 +44,47 @@ defmodule MilosTraining.Application.GetMyWellness do
            cravings: cravings
          }}
       end)
+      |> with_photos(context)
+      |> with_consent(context)
+      |> with_plans(context)
     end
   end
+
+  defp with_photos({:ok, payload}, context) do
+    ids = payload.entries |> Enum.map(&Wellness.meal_media_id(&1.value)) |> Enum.reject(&is_nil/1)
+
+    {:ok,
+     Map.merge(payload, %{
+       photos: MealPhotos.present(context, ids),
+       photo_capabilities: MealPhotos.capabilities()
+     })}
+  end
+
+  # The coaches' plans, as the member may see them (board 14, Q5): daily
+  # portions and meal slots, never calories. Hidden with the «plan» item.
+  defp with_plans({:ok, payload}, context) do
+    plans =
+      if "plan" in (payload.preferences.hidden_items || []),
+        do: [],
+        else: context |> Nutrition.list_own_plans() |> Enum.map(&plan/1)
+
+    {:ok, Map.put(payload, :plans, plans)}
+  end
+
+  defp plan(plan) do
+    %{
+      id: plan.id,
+      organization_id: plan.organization_id,
+      title: plan.title,
+      portions: Nutrition.effective_portions(plan),
+      meal_slots:
+        if(plan.meal_slots == [], do: Nutrition.default_meal_slots(), else: plan.meal_slots),
+      updated_at: plan.updated_at
+    }
+  end
+
+  defp with_consent({:ok, payload}, %{user_id: user_id} = context),
+    do: {:ok, Map.put(payload, :consented, WellnessConsent.active?(context, user_id))}
 
   # Check-ins are kept by instant; the day is where the member was. The UTC
   # window is padded by the widest zone offsets and narrowed per row.

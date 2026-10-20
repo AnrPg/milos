@@ -474,3 +474,15 @@ msgstr "נצא להליכה?"
 
 msgid "Call me"
 msgstr "תתקשר אליי"
+
+msgid "How did it go?"
+msgstr "איך זה הלך?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "הערה קצרה על מה שהיה קודם עוזרת לך לראות מה עובד בשבילך."
+
+msgid "A glass of water?"
+msgstr "כוס מים?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "אחר הצהריים הוא זמן טוב להשלים מים."

@@ -1945,6 +1945,15 @@ defmodule MilosTrainingWeb.FallbackController do
     unknown_wellness_section: "Use the sections wellness and cravings"
   }
 
+  def call(conn, {:error, :health_data_consent_required}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "health_data_consent_required",
+      error: "Agree to keep health data first; it stays private unless you share it"
+    })
+  end
+
   def call(conn, {:error, reason}) when is_map_key(@wellness_errors, reason) do
     conn
     |> put_status(:unprocessable_entity)
