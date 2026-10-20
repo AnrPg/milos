@@ -21,6 +21,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
       MilosTraining.DomainEvents.publish(:booking_cancelled, %{
         organization_id: booking.organization_id,
         booking_id: booking.id,
+        user_id: booking.user_id,
         kind: Map.get(booking, :kind, "member"),
         by: :member,
         at: DateTime.utc_now()

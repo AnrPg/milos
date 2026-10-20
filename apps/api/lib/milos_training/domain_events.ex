@@ -13,7 +13,8 @@ defmodule MilosTraining.DomainEvents do
 
     * `:membership_activated` - `%{organization_id, user_id, at}`
     * `:attendance_recorded` - `%{organization_id, scheduled_class_id, user_id, booking_id, status, at}`
-    * `:booking_cancelled` - `%{organization_id, booking_id, kind, by, at}`
+    * `:booking_made` - `%{organization_id, booking_id, user_id, at}` (ADR-155)
+    * `:booking_cancelled` - `%{organization_id, booking_id, user_id, kind, by, at}`
     * `:class_cancelled` - `%{organization_id, scheduled_class_id, at}` (the class is gone)
   """
 
