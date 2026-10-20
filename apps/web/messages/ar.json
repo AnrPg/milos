@@ -5088,7 +5088,6 @@
     "followClassTimer": "مؤقت الحصة المباشر",
     "classCheckIn": "تسجيل الحضور",
     "programmeManage": "تغيير اليوم أو الرفض",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "العافية",
       "today": "اليوم",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "تحقق من القيم وحاول مجددًا.",
         "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
       }
-    }
-=======
+    },
     "meReferrals": "أحضر صديقًا",
     "meReferralsHint": "رابطك ورمز QR والدعوات",
     "membershipReferral": "أحضر صديقًا"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "الكل",

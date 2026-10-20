@@ -5088,7 +5088,6 @@
     "followClassTimer": "Таймер на тренировката на живо",
     "classCheckIn": "Чекирай се",
     "programmeManage": "Смени деня или откажи",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Благосъстояние",
       "today": "Днес",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Провери стойностите и опитай отново.",
         "invalid_media": "Снимката не е готова. Избери я отново."
       }
-    }
-=======
+    },
     "meReferrals": "Доведи приятел",
     "meReferralsHint": "Твоят линк, QR и покани",
     "membershipReferral": "Доведи приятел"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Всички",

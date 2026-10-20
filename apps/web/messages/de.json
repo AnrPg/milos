@@ -5088,7 +5088,6 @@
     "followClassTimer": "Live-Kurstimer",
     "classCheckIn": "Einchecken",
     "programmeManage": "Tag ändern oder ablehnen",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Wohlbefinden",
       "today": "Heute",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Prüfe die Werte und versuch es noch einmal.",
         "invalid_media": "Das Foto ist nicht bereit. Wähle es noch einmal."
       }
-    }
-=======
+    },
     "meReferrals": "Freund mitbringen",
     "meReferralsHint": "Dein Link, QR und Einladungen",
     "membershipReferral": "Freund mitbringen"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Alle",

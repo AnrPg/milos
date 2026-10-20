@@ -5088,7 +5088,6 @@
     "followClassTimer": "Live lestimer",
     "classCheckIn": "Inchecken",
     "programmeManage": "Dag wijzigen of weigeren",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Welzijn",
       "today": "Vandaag",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Controleer de waarden en probeer het opnieuw.",
         "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
       }
-    }
-=======
+    },
     "meReferrals": "Neem een vriend mee",
     "meReferralsHint": "Je link, QR en uitnodigingen",
     "membershipReferral": "Neem een vriend mee"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Alles",

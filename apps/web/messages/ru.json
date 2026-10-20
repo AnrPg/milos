@@ -5088,7 +5088,6 @@
     "followClassTimer": "Таймер занятия онлайн",
     "classCheckIn": "Отметиться",
     "programmeManage": "Перенести или отказаться",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Самочувствие",
       "today": "Сегодня",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Проверь значения и попробуй ещё раз.",
         "invalid_media": "Фото не готово. Выбери его снова."
       }
-    }
-=======
+    },
     "meReferrals": "Приведи друга",
     "meReferralsHint": "Твоя ссылка, QR и приглашения",
     "membershipReferral": "Приведи друга"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Все",

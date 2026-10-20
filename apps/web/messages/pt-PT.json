@@ -5088,7 +5088,6 @@
     "followClassTimer": "Cronómetro da aula em direto",
     "classCheckIn": "Fazer check-in",
     "programmeManage": "Mudar o dia ou recusar",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Bem-estar",
       "today": "Hoje",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Verifica os valores e tenta de novo.",
         "invalid_media": "A foto não está pronta. Escolhe-a de novo."
       }
-    }
-=======
+    },
     "meReferrals": "Traz um amigo",
     "meReferralsHint": "O teu link, QR e convites",
     "membershipReferral": "Traz um amigo"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Tudo",

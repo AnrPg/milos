@@ -5088,7 +5088,6 @@
     "followClassTimer": "טיימר השיעור בשידור חי",
     "classCheckIn": "צ'ק-אין",
     "programmeManage": "שינוי יום או דחייה",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "רווחה",
       "today": "היום",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "בדוק/י את הערכים ונסה/י שוב.",
         "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
       }
-    }
-=======
+    },
     "meReferrals": "הבא חבר",
     "meReferralsHint": "הקישור שלך, QR והזמנות",
     "membershipReferral": "הבא חבר"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "הכול",

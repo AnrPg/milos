@@ -5088,7 +5088,6 @@
     "followClassTimer": "Ζωντανό χρονόμετρο",
     "classCheckIn": "Check-in",
     "programmeManage": "Αλλαγή ημέρας ή απόρριψη",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Ευεξία",
       "today": "Σήμερα",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Έλεγξε τις τιμές και δοκίμασε ξανά.",
         "invalid_media": "Η φωτογραφία δεν είναι έτοιμη. Διάλεξέ τη ξανά."
       }
-    }
-=======
+    },
     "meReferrals": "Φέρε φίλο",
     "meReferralsHint": "Ο σύνδεσμός σου, QR και προσκλήσεις",
     "membershipReferral": "Φέρε φίλο"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Όλα",

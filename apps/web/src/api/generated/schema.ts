@@ -26550,6 +26550,8 @@ export interface operations {
                                     nickname?: string | null;
                                 }[] | null;
                                 going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
                                 /**
                                  * CommunityEventGroup
                                  * @description The member group of a group event (free, for its members only)

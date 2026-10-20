@@ -5088,7 +5088,6 @@
     "followClassTimer": "Minuteur du cours en direct",
     "classCheckIn": "S'enregistrer",
     "programmeManage": "Changer le jour ou refuser",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Bien-être",
       "today": "Aujourd'hui",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Vérifie les valeurs et réessaie.",
         "invalid_media": "La photo n'est pas prête. Choisis-la à nouveau."
       }
-    }
-=======
+    },
     "meReferrals": "Amène un ami",
     "meReferralsHint": "Ton lien, ton QR et tes invitations",
     "membershipReferral": "Amène un ami"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Tout",

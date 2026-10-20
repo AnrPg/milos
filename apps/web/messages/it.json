@@ -5088,7 +5088,6 @@
     "followClassTimer": "Timer della classe dal vivo",
     "classCheckIn": "Check-in",
     "programmeManage": "Cambia giorno o rifiuta",
-<<<<<<< HEAD
     "wellness": {
       "eyebrow": "Benessere",
       "today": "Oggi",
@@ -5301,12 +5300,10 @@
         "invalid_wellness_value": "Controlla i valori e riprova.",
         "invalid_media": "La foto non è pronta. Sceglila di nuovo."
       }
-    }
-=======
+    },
     "meReferrals": "Porta un amico",
     "meReferralsHint": "Il tuo link, QR e inviti",
     "membershipReferral": "Porta un amico"
->>>>>>> origin/redesign/social-centered
   },
   "Community": {
     "all": "Tutti",
