@@ -51,7 +51,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
     manage_cleaning_areas: :all,
     manage_inventory: :all,
     moderate_community: :all,
-    manage_community: :all
+    manage_community: :all,
+    manage_events: :all
   }
 
   @owner Map.merge(@admin, %{
@@ -86,7 +87,8 @@ defmodule MilosTraining.Organizations.Domain.AccessPolicy do
            manage_content: :all,
            manage_challenges: :all,
            report_inventory: :all,
-           moderate_community: :all
+           moderate_community: :all,
+           manage_events: :all
          })
 
   @front_desk %{

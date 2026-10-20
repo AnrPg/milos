@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetCalendarFeed do
   alias MilosTraining.Application.{CalendarFeedToken, Trials}
-  alias MilosTraining.{Organizations, Scheduling}
+  alias MilosTraining.{Community, Organizations, Scheduling}
   alias MilosTraining.Workouts.WorkoutStore
   alias MilosTraining.Localization
 
@@ -32,7 +32,9 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       Enum.flat_map(contexts, fn context ->
         class_events(context, user, start_at, end_at, locale) ++
           assignment_events(context, user, start_date, end_date, locale)
-      end) ++ trial_events(user, Enum.map(contexts, & &1.organization_id), locale)
+      end) ++
+        trial_events(user, Enum.map(contexts, & &1.organization_id), locale) ++
+        club_events(user, start_at, end_at, locale)
 
     render_ics(events, now)
   end
@@ -132,6 +134,30 @@ defmodule MilosTraining.Application.GetCalendarFeed do
           translate(locale, "Trial status: %{status}.", %{
             status: translate(locale, trial_status_message(trial.status))
           })
+      }
+    end)
+  end
+
+  # ADR-153: club events the person is going to, at any box.
+  defp club_events(user, start_at, end_at, locale) do
+    %{user_id: user.id}
+    |> Community.attendances_of(user.id, ["going"])
+    |> Enum.group_by(& &1.organization_id, & &1.event_id)
+    |> Enum.flat_map(fn {organization_id, ids} ->
+      Community.list_events(%{organization_id: organization_id, user_id: user.id}, %{
+        organization_ids: [organization_id],
+        ids: ids,
+        from: start_at,
+        to: end_at
+      })
+    end)
+    |> Enum.map(fn event ->
+      %{
+        uid: "community-event-#{event.id}@trainingjournal",
+        title: translate(locale, "Event: %{title}", %{title: event.title}),
+        starts_at: event.starts_at,
+        ends_at: event.ends_at,
+        description: translate(locale, "You're going to this event.")
       }
     end)
   end

@@ -8,15 +8,14 @@ defmodule MilosTraining.Application.OpenClubs do
   """
 
   alias MilosTraining.Application.{
+    BoxPhotoCovers,
     ClubScope,
     CommunityGroups,
     CommunityPeople,
-    MediaUrls,
-    RealtimePublisher,
-    ReleaseMedia
+    RealtimePublisher
   }
 
-  alias MilosTraining.{Community, Media, Notifications, Organizations}
+  alias MilosTraining.{Community, Notifications, Organizations}
 
   # Member side (personal routes) --------------------------------------------
 
@@ -269,34 +268,11 @@ defmodule MilosTraining.Application.OpenClubs do
   end
 
   # Covers are the gym's public box photos (ADR-148), read in each gym's scope.
-  defp covers(_context, clubs) do
-    clubs
-    |> Enum.reject(&is_nil(&1.cover_media_id))
-    |> Enum.group_by(& &1.organization_id, & &1.cover_media_id)
-    |> Enum.flat_map(fn {organization_id, ids} ->
-      gym = %{organization_id: organization_id}
-      gym |> Media.list(:tenant, ids) |> then(&MediaUrls.present_all(gym, &1))
-    end)
-    |> Map.new(&{&1.id, &1.url})
-  end
+  defp covers(_context, clubs), do: BoxPhotoCovers.urls(clubs)
 
-  defp cover_ready(context, %{cover_media_id: id}) when is_binary(id) do
-    case Media.fetch_ready(context, "box_photo", [id]) do
-      {:ok, _media} -> :ok
-      error -> error
-    end
-  end
+  defp cover_ready(context, attrs), do: BoxPhotoCovers.ready(context, attrs[:cover_media_id])
 
-  defp cover_ready(_context, _attrs), do: :ok
-
-  # The new cover is in use; the one it replaced is released.
-  defp settle_cover(_context, same, same), do: :ok
-
-  defp settle_cover(context, before, now) do
-    if now, do: :ok = Media.set_attached(context, :tenant, [now], DateTime.utc_now())
-    if before, do: ReleaseMedia.call(context, :tenant, [before])
-    :ok
-  end
+  defp settle_cover(context, before, now), do: BoxPhotoCovers.settle(context, before, now)
 
   defp present_clubs(_context, [], _scope), do: []
 

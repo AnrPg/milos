@@ -42,7 +42,8 @@ config :milos_training, Oban,
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
        {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
        {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
-       {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob}
+       {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
+       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob}
      ]}
   ],
   queues: [
@@ -112,12 +113,23 @@ config :milos_training,
        :community_social_store,
        MilosTraining.Infrastructure.Community.EctoSocialStore
 
+config :milos_training,
+       :community_event_store,
+       MilosTraining.Infrastructure.Community.EctoEventStore
+
+config :milos_training,
+       :event_payments,
+       MilosTraining.Infrastructure.Finance.FinanceEventPayments
+
 config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
 config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
 
 # ADR-144: reactions to facts other contexts announce (MilosTraining.DomainEvents).
 config :milos_training, :domain_event_handlers, %{
-  membership_activated: [MilosTraining.Application.TrialReactions],
+  membership_activated: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.EventReactions
+  ],
   attendance_recorded: [MilosTraining.Application.TrialReactions],
   booking_cancelled: [MilosTraining.Application.TrialReactions],
   class_cancelled: [MilosTraining.Application.TrialReactions]
