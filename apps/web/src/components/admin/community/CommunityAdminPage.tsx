@@ -27,15 +27,16 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 
 import { MemberGroupsSetting } from "./CommunitySettings";
+import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
 
-type Tab = "groups" | "reports" | "clubs";
-const TABS: Tab[] = ["groups", "reports", "clubs"];
+type Tab = "groups" | "events" | "reports" | "clubs";
+const TABS: Tab[] = ["groups", "events", "reports", "clubs"];
 
 /**
  * Κοινότητα (board 7 Q3): Ομάδες (proposals to approve, live and archived
- * groups, the member-groups setting) · Αναφορές (the grouped queue, Q5) ·
- * Ανοιχτά clubs (Q6).
+ * groups, the member-groups setting) · Events (board 8 Q6, ADR-153) ·
+ * Αναφορές (the grouped queue, Q5) · Ανοιχτά clubs (Q6).
  */
 export function CommunityAdminPage() {
   const t = useTranslations("CommunityAdmin");
@@ -49,6 +50,7 @@ export function CommunityAdminPage() {
   const reports = useQuery({ queryKey: REPORTS_KEY, enabled: Boolean(token), queryFn: () => fetchReports(token) });
   const counts: Record<Tab, number | undefined> = {
     groups: groups.data?.pending.length,
+    events: undefined,
     reports: reports.data?.length,
     clubs: undefined,
   };
@@ -63,7 +65,7 @@ export function CommunityAdminPage() {
     <main className="min-h-screen px-4 py-8 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex max-w-3xl flex-col gap-5 pb-28">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("title")}</h1>
-        <div role="tablist" aria-label={t("title")} className="flex gap-2">
+        <div role="tablist" aria-label={t("title")} className="flex gap-2 overflow-x-auto">
           {TABS.map((value) => (
             <button
               key={value}
@@ -71,7 +73,7 @@ export function CommunityAdminPage() {
               role="tab"
               aria-selected={tab === value}
               onClick={() => select(value)}
-              className="min-h-11 flex-1 rounded-2xl px-2 text-sm font-semibold"
+              className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
               style={{
                 background: tab === value ? "var(--primary)" : "var(--panel)",
                 color: tab === value ? "var(--bg)" : "var(--text)",
@@ -83,7 +85,7 @@ export function CommunityAdminPage() {
             </button>
           ))}
         </div>
-        {tab === "groups" ? <GroupsTab /> : tab === "reports" ? <ReportsTab /> : <OpenClubsTab />}
+        {tab === "groups" ? <GroupsTab /> : tab === "events" ? <EventsTab /> : tab === "reports" ? <ReportsTab /> : <OpenClubsTab />}
       </div>
     </main>
   );
