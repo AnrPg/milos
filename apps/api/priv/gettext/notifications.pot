@@ -416,3 +416,9 @@ msgstr ""
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr ""
+
+msgid "Time for a new measurement"
+msgstr ""
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr ""

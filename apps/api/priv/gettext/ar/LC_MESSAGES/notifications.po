@@ -417,3 +417,9 @@ msgstr "قام %{nickname} بمسح رمز الباب في %{box} (%{when}) - ل
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "قام %{nickname} بمسح رمز الباب في %{box} (%{when}) - ليس عضوًا بعد. الحصص التجريبية متاحة."
+
+msgid "Time for a new measurement"
+msgstr "حان وقت قياس جديد"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "لقطة جديدة تساعدك على رؤية اتجاهك. يستغرق الأمر دقيقة."
