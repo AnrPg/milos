@@ -22,7 +22,8 @@ export function WellnessStrip() {
   const range = wellnessWindow(today, 0);
   const query = useWellness(range.from, range.to);
   const data = query.data;
-  const day = data?.days.find((entry) => entry.date === today);
+  // A secondary surface: an unexpected answer hides the strip rather than breaking Αρχική.
+  const day = data?.days?.find((entry) => entry.date === today);
 
   const add = useMutation({
     mutationFn: async () =>
@@ -30,7 +31,7 @@ export function WellnessStrip() {
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: WELLNESS_KEY }),
   });
 
-  if (!data?.consented || !day) return null;
+  if (!data?.consented || !day || !data.preferences) return null;
   const water = !data.preferences.hidden_items.includes("water");
   const { filled, goal } = glasses(day.water);
 

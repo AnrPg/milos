@@ -89,7 +89,7 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const [flow, setFlow] = useState<"menu" | "pr" | "note" | TrainingLogDialogState>("menu");
   const today = localDate(new Date());
   const range = wellnessWindow(today, 0);
-  const hidden = useWellness(range.from, range.to).data?.preferences.hidden_items ?? [];
+  const hidden = useWellness(range.from, range.to).data?.preferences?.hidden_items ?? [];
   const groups = newEntryGroups({
     canRequestFormReview: hasCapability(entitlement, "request_form_reviews"),
     showWellness: !(["water", "sleep", "meals"] as const).every((item) => hidden.includes(item)),
