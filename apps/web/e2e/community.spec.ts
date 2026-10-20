@@ -192,7 +192,7 @@ test.describe("community", () => {
     const tabs = page.getByRole("tablist", { name: "Box Kypseli" });
     await expect(tabs.getByRole("tab")).toHaveText(["Feed", "Channels", "Events", "Members"]);
     await tabs.getByRole("tab", { name: "Events" }).click();
-    await expect(page.getByText(/Coming soon/)).toBeVisible();
+    await expect(page.getByText("No upcoming events.")).toBeVisible();
 
     await tabs.getByRole("tab", { name: "Members" }).click();
     await expect(page.getByText("3 members")).toBeVisible();

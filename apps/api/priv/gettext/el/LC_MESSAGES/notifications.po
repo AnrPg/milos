@@ -354,3 +354,51 @@ msgstr "Νέα αναφορά"
 
 msgid "Someone reported something in the club."
 msgstr "Κάποιος ανέφερε κάτι στο club."
+
+msgid "A place opened up"
+msgstr "Άνοιξε θέση"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "Έρχεσαι στο «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Το event ακυρώθηκε"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "Το «%{event}» (%{when}) ακυρώθηκε."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "Το «%{event}» (%{when}) ακυρώθηκε: %{reason}"
+
+msgid "Event changed"
+msgstr "Το event άλλαξε"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "Το «%{event}» μεταφέρθηκε στις %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "Το «%{event}» έχει νέο μέρος."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "Το «%{event}» έχει νέα ώρα και μέρος: %{when}."
+
+msgid "Starting soon"
+msgstr "Ξεκινά σε λίγο"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "Το «%{event}» ξεκινά σε δύο ώρες (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Έρχεται ο καλεσμένος σου"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "Ο/Η %{nickname} έρχεται στο «%{event}» με την πρόσκλησή σου."
+
+msgid "Try a class"
+msgstr "Δοκίμασε ένα μάθημα"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δοκιμαστικό μάθημα."
+
+msgid "Message about «%{event}»"
+msgstr "Μήνυμα για το «%{event}»"

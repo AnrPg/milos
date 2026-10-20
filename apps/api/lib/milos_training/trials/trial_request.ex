@@ -33,6 +33,8 @@ defmodule MilosTraining.Trials.TrialRequest do
     field :cancelled_at, :utc_datetime_usec
     field :join_interest_at, :utc_datetime_usec
     field :follow_up_dismissed_at, :utc_datetime_usec
+    # The club event whose trial offer this came from (ADR-153), a plain id.
+    field :referral_event_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -53,7 +55,8 @@ defmodule MilosTraining.Trials.TrialRequest do
       :client_operation_id,
       :class_starts_at,
       :class_name,
-      :decided_at
+      :decided_at,
+      :referral_event_id
     ])
     |> validate_required([:organization_id, :user_id, :status, :class_starts_at, :source])
     |> validate_inclusion(:status, ["requested", "booked"])

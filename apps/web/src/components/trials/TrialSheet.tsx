@@ -28,12 +28,15 @@ export function TrialSheet({
   token,
   offer,
   initialSlot,
+  referralEventId = null,
   onClose,
 }: {
   page: PublicBoxPage;
   token: string;
   offer: TrialOffer;
   initialSlot?: Slot | null;
+  /** The club event whose trial offer opened the sheet (ADR-153). */
+  referralEventId?: string | null;
   onClose: () => void;
 }) {
   const t = useTranslations("Trials");
@@ -72,7 +75,8 @@ export function TrialSheet({
         scheduled_class_id: picked!.id,
         note: note.trim() || null,
         phone: phone.trim() || null,
-        source: initialSlot ? "schedule" : "box_page",
+        source: referralEventId ? "event" : initialSlot ? "schedule" : "box_page",
+        ...(referralEventId ? { referral_event_id: referralEventId } : {}),
         client_operation_id: operation.current,
       }),
     onSuccess: (trial) => {

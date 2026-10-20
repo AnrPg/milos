@@ -9,7 +9,7 @@ defmodule MilosTraining.Application.GetCommunityFeed do
   channel, `mine` to their own posts (Εγώ › Αναρτήσεις).
   """
 
-  alias MilosTraining.Application.{ClubScope, PostPresenter}
+  alias MilosTraining.Application.{ClubScope, EventCards, PostPresenter}
   alias MilosTraining.{Community, Organizations}
 
   @default_limit 20
@@ -48,8 +48,9 @@ defmodule MilosTraining.Application.GetCommunityFeed do
 
       {:ok,
        %{
-         pinned: PostPresenter.posts(pinned, clubs, user_id),
-         posts: present(shown, clubs, boxes, user_id),
+         pinned:
+           pinned |> PostPresenter.posts(clubs, user_id) |> EventCards.attach(context, clubs),
+         posts: shown |> present(clubs, boxes, user_id) |> EventCards.attach(context, clubs),
          next_cursor:
            if(more? and shown != [],
              do: shown |> List.last() |> elem(1) |> Community.encode_feed_cursor()

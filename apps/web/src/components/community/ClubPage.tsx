@@ -24,6 +24,7 @@ import { OpenClubLanding } from "@/components/community/OpenClubLanding";
 import { MoreMenu } from "@/components/community/PostCard";
 import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { WodCard } from "@/components/community/WodCard";
+import { ClubEventsTab } from "@/components/events/ClubEventsTab";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
@@ -37,7 +38,7 @@ const TAB_KEYS: Record<ClubTab, string> = { feed: "tabFeed", channels: "tabChann
  * A club's page (vision §7.1, mockup «club», board 7): Ροή (pinned
  * announcements, the #wod-σήμερα card, then every channel's posts; or one
  * channel's posts), Κανάλια (the box's channels, member groups, class groups
- * with the ones offered to the member first), Events (M5) and Μέλη. An open
+ * with the ones offered to the member first), Events (ADR-153) and Μέλη. An open
  * club the member hasn't joined shows its landing with «Μπες».
  */
 export function ClubPage({ clubId, channelId = null }: { clubId: string; channelId?: string | null }) {
@@ -111,9 +112,7 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
           {club.kind === "gym" ? <GroupsCard club={club} /> : null}
         </>
       ) : tab === "events" ? (
-        <HubCard eyebrow={tClubs("tabEvents")}>
-          <p className="text-sm" style={{ color: "var(--text-soft)" }}>{tClubs("eventsSoon")}</p>
-        </HubCard>
+        <ClubEventsTab club={club} />
       ) : tab === "members" ? (
         <MembersTab club={club} />
       ) : openChannel ? (

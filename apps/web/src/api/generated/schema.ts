@@ -260,6 +260,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/boxes/{slug}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A published box's upcoming events open to everyone (its page's Events tab) */
+        get: operations["MilosTrainingWeb.CommunityEventController.box_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/boxes/{slug}/posts": {
         parameters: {
             query?: never;
@@ -626,6 +643,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/community/clubs/{id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A club's events: upcoming (cancelled ones flagged) or past */
+        get: operations["MilosTrainingWeb.CommunityEventController.club_events"];
+        put?: never;
+        /** Create an event in a club (staff and coaches); weekly with repeat_until */
+        post: operations["MilosTrainingWeb.CommunityEventController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/community/comments/{id}": {
         parameters: {
             query?: never;
@@ -669,6 +704,23 @@ export interface paths {
         };
         /** «Βρες»: open clubs to join and your gyms' groups you are not in */
         get: operations["MilosTrainingWeb.OpenClubController.discover"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/community/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Upcoming events across every club you can see */
+        get: operations["MilosTrainingWeb.CommunityEventController.clubs_events"];
         put?: never;
         post?: never;
         delete?: never;
@@ -791,6 +843,92 @@ export interface paths {
         put?: never;
         /** Report a post, a comment or a group; it disappears for you and staff look at it */
         post: operations["MilosTrainingWeb.OpenClubController.report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your upcoming events at any box: going or on the waitlist */
+        get: operations["MilosTrainingWeb.CommunityEventController.mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An event; with ?invite= it also says who invited you and if a place is left */
+        get: operations["MilosTrainingWeb.CommunityEventController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit an event (staff and coaches): this one or this and following */
+        patch: operations["MilosTrainingWeb.CommunityEventController.update"];
+        trace?: never;
+    };
+    "/api/me/events/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel an event (staff and coaches): this one or this and following */
+        post: operations["MilosTrainingWeb.CommunityEventController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/events/{id}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Your guest pass link for an event you are going to */
+        post: operations["MilosTrainingWeb.CommunityEventController.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/events/{id}/rsvp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** «Θα έρθω» (a place, or the waitlist when full) or «Δεν θα έρθω» */
+        put: operations["MilosTrainingWeb.CommunityEventController.rsvp"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -1838,6 +1976,144 @@ export interface paths {
         /** Let someone into an open club, or turn them down */
         put: operations["MilosTrainingWeb.AdminCommunityController.answer_club_request"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's upcoming (default) or past events, with their numbers */
+        get: operations["MilosTrainingWeb.AdminCommunityEventController.index"];
+        put?: never;
+        /** Create an event in one of the box's clubs; weekly with repeat_until */
+        post: operations["MilosTrainingWeb.AdminCommunityEventController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An event with its attendees, numbers and trial offer */
+        get: operations["MilosTrainingWeb.AdminCommunityEventController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit an event: this one or this and following */
+        patch: operations["MilosTrainingWeb.AdminCommunityEventController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/attendees/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Free someone's place; the first on the waitlist moves up */
+        delete: operations["MilosTrainingWeb.AdminCommunityEventController.remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/attendees/{user_id}/check-in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** «Ήρθε» for someone holding a place, or undo it */
+        put: operations["MilosTrainingWeb.AdminCommunityEventController.check_in"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/attendees/{user_id}/paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** «Πλήρωσε»: record a payment at the box (a Finance receipt when possible) */
+        put: operations["MilosTrainingWeb.AdminCommunityEventController.mark_paid"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel an event: this one or this and following; people going hear why */
+        post: operations["MilosTrainingWeb.AdminCommunityEventController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Μήνυμα σε όλους»: a notification to everyone going */
+        post: operations["MilosTrainingWeb.AdminCommunityEventController.message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/community/events/{id}/trial-offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send the one trial offer to people who came and are not members */
+        post: operations["MilosTrainingWeb.AdminCommunityEventController.trial_offer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8026,6 +8302,910 @@ export interface components {
                 status: "pending" | "active" | "declined";
             }[];
         };
+        /** CommunityEvent */
+        CommunityEvent: {
+            /** CommunityEventBox */
+            box: {
+                logo_url?: string | null;
+                name?: string | null;
+                slug?: string | null;
+            };
+            /** @description You run events at this box */
+            can_manage: boolean;
+            can_rsvp: boolean;
+            cancel_reason?: string | null;
+            cancelled: boolean;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @description Null: no limit */
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
+            /** CommunityEventClub */
+            club: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            /** Format: uuid */
+            club_id: string;
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            cover_url?: string | null;
+            currency: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+            goers?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[] | null;
+            going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
+            guest_pass_allowed: boolean;
+            /** @description Event page: guests you can still bring (going, guest passes on) */
+            guests_left?: number | null;
+            guests_per_member: number;
+            /** Format: uuid */
+            id: string;
+            /** @description Event page opened with an invitation link */
+            invitation?: {
+                /** CommunityAuthor */
+                inviter: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** @enum {string|null} */
+                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                usable: boolean;
+            } | null;
+            /**
+             * CommunityEventMine
+             * @description Where you stand; null if not on it
+             */
+            my?: {
+                /** Format: uuid */
+                invited_by_id?: string | null;
+                late_cancel: boolean;
+                paid: boolean;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+            } | null;
+            open_to_non_members: boolean;
+            /** Format: uuid */
+            organization_id: string;
+            /** CommunityEventPlace */
+            place: {
+                address: string | null;
+                city?: string | null;
+                latitude: number | null;
+                /**
+                 * Format: uuid
+                 * @description One of the box's locations, or null
+                 */
+                location_id: string | null;
+                longitude: number | null;
+                name: string | null;
+                neighbourhood?: string | null;
+            };
+            /**
+             * Format: uuid
+             * @description Its card in the club feed
+             */
+            post_id?: string | null;
+            /** @description 0: free; otherwise paid at the box */
+            price_cents: number;
+            /**
+             * Format: uuid
+             * @description Shared by every week of a weekly event
+             */
+            series_id?: string | null;
+            /** @description Null: no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            title: string;
+            waitlist_count: number;
+        };
+        /** CommunityEventAttendee */
+        CommunityEventAttendee: {
+            amount_cents?: number | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** Format: date-time */
+            checked_in_at?: string | null;
+            /** Format: date-time */
+            converted_at?: string | null;
+            /** CommunityAuthor */
+            invited_by?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+            late_cancel: boolean;
+            /** @description This person's late cancels at the box over the last 90 days */
+            late_cancels_90d: number;
+            /** @description An active member of the box */
+            member: boolean;
+            /** Format: date-time */
+            paid_at?: string | null;
+            payment_method?: string | null;
+            /** CommunityAuthor */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** Format: date-time */
+            promoted_at?: string | null;
+            /** Format: date-time */
+            queued_at: string;
+            /** @description Finance issued a receipt */
+            receipt_issued: boolean;
+            /** CommunityAuthor */
+            removed_by?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            /** @enum {string} */
+            source: "member" | "open" | "guest";
+            /** @enum {string} */
+            status: "going" | "waitlisted" | "cancelled";
+            /** Format: date-time */
+            trial_offered_at?: string | null;
+        };
+        /** CommunityEventAttendees */
+        CommunityEventAttendees: {
+            cancelled: {
+                amount_cents?: number | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** Format: date-time */
+                checked_in_at?: string | null;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** CommunityAuthor */
+                invited_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
+                /** @description An active member of the box */
+                member: boolean;
+                /** Format: date-time */
+                paid_at?: string | null;
+                payment_method?: string | null;
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                promoted_at?: string | null;
+                /** Format: date-time */
+                queued_at: string;
+                /** @description Finance issued a receipt */
+                receipt_issued: boolean;
+                /** CommunityAuthor */
+                removed_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+                /** Format: date-time */
+                trial_offered_at?: string | null;
+            }[];
+            going: {
+                amount_cents?: number | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** Format: date-time */
+                checked_in_at?: string | null;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** CommunityAuthor */
+                invited_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
+                /** @description An active member of the box */
+                member: boolean;
+                /** Format: date-time */
+                paid_at?: string | null;
+                payment_method?: string | null;
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                promoted_at?: string | null;
+                /** Format: date-time */
+                queued_at: string;
+                /** @description Finance issued a receipt */
+                receipt_issued: boolean;
+                /** CommunityAuthor */
+                removed_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+                /** Format: date-time */
+                trial_offered_at?: string | null;
+            }[];
+            waitlisted: {
+                amount_cents?: number | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** Format: date-time */
+                checked_in_at?: string | null;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** CommunityAuthor */
+                invited_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                late_cancel: boolean;
+                /** @description This person's late cancels at the box over the last 90 days */
+                late_cancels_90d: number;
+                /** @description An active member of the box */
+                member: boolean;
+                /** Format: date-time */
+                paid_at?: string | null;
+                payment_method?: string | null;
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                promoted_at?: string | null;
+                /** Format: date-time */
+                queued_at: string;
+                /** @description Finance issued a receipt */
+                receipt_issued: boolean;
+                /** CommunityAuthor */
+                removed_by?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+                /** Format: date-time */
+                trial_offered_at?: string | null;
+            }[];
+        };
+        /** CommunityEventBox */
+        CommunityEventBox: {
+            logo_url?: string | null;
+            name?: string | null;
+            slug?: string | null;
+        };
+        /** CommunityEventCancelRequest */
+        CommunityEventCancelRequest: {
+            reason?: string | null;
+            /**
+             * @description This event (default) or this and following weeks
+             * @enum {string}
+             */
+            scope?: "this" | "following";
+        };
+        /** CommunityEventCheckInRequest */
+        CommunityEventCheckInRequest: {
+            checked_in: boolean;
+        };
+        /** CommunityEventClub */
+        CommunityEventClub: {
+            /** Format: uuid */
+            id: string;
+            kind?: string | null;
+            name?: string | null;
+        };
+        /** CommunityEventCreatedResponse */
+        CommunityEventCreatedResponse: {
+            /** CommunityEvent */
+            event: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            };
+            /** @description Events made (weekly repeat) */
+            occurrences: number;
+        };
+        /**
+         * CommunityEventGroup
+         * @description The member group of a group event (free, for its members only)
+         */
+        CommunityEventGroup: {
+            /** Format: uuid */
+            id: string;
+            name?: string | null;
+        } | null;
+        /** CommunityEventInviteResponse */
+        CommunityEventInviteResponse: {
+            /** Format: date-time */
+            expires_at: string;
+            guests_left: number;
+            /** @description Member-app path that opens the event with the invitation */
+            path: string;
+            token: string;
+        };
+        /** CommunityEventMessageRequest */
+        CommunityEventMessageRequest: {
+            body: string;
+        };
+        /**
+         * CommunityEventMine
+         * @description Where you stand; null if not on it
+         */
+        CommunityEventMine: {
+            /** Format: uuid */
+            invited_by_id?: string | null;
+            late_cancel: boolean;
+            paid: boolean;
+            /** @enum {string} */
+            source: "member" | "open" | "guest";
+            /** @enum {string} */
+            status: "going" | "waitlisted" | "cancelled";
+        } | null;
+        /** CommunityEventPaidRequest */
+        CommunityEventPaidRequest: {
+            /** @enum {string} */
+            payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+        };
+        /** CommunityEventPlace */
+        CommunityEventPlace: {
+            address: string | null;
+            city?: string | null;
+            latitude: number | null;
+            /**
+             * Format: uuid
+             * @description One of the box's locations, or null
+             */
+            location_id: string | null;
+            longitude: number | null;
+            name: string | null;
+            neighbourhood?: string | null;
+        };
+        /** CommunityEventRequest */
+        CommunityEventRequest: {
+            address?: string | null;
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             */
+            channel_id?: string;
+            /**
+             * Format: uuid
+             * @description A ready box photo upload
+             */
+            cover_media_id?: string | null;
+            currency?: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            guest_pass_allowed?: boolean;
+            guests_per_member?: number;
+            latitude?: number | null;
+            /**
+             * Format: uuid
+             * @description A location of the box; or give place_name
+             */
+            location_id?: string | null;
+            longitude?: number | null;
+            open_to_non_members?: boolean;
+            place_name?: string | null;
+            price_cents?: number;
+            /**
+             * Format: date
+             * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+             */
+            repeat_until?: string;
+            /** Format: date-time */
+            starts_at: string;
+            title: string;
+        };
+        /** CommunityEventResponse */
+        CommunityEventResponse: {
+            /** CommunityEvent */
+            event: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            };
+        };
+        /** CommunityEventRsvpRequest */
+        CommunityEventRsvpRequest: {
+            /** @description «Θα έρθω» (true) or «Δεν θα έρθω» (false) */
+            going: boolean;
+            /** @description From a member's guest pass link */
+            invite_token?: string;
+        };
+        /** CommunityEventSentResponse */
+        CommunityEventSentResponse: {
+            /** @description People notified */
+            sent: number;
+        };
+        /** CommunityEventStats */
+        CommunityEventStats: {
+            came: number;
+            /** @description Came and joined the box within 30 days */
+            converted: number;
+            going: number;
+            guests: number;
+            /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+            late_cancels: number;
+            /** @description Going but not checked in, once the event ended */
+            no_shows: number;
+            paid: number;
+            /** @description Trial requests from the event's trial offer */
+            trial_requests: number;
+            waitlisted: number;
+        };
+        /** CommunityEventTrialOffer */
+        CommunityEventTrialOffer: {
+            can_send: boolean;
+            /** @description People who came, not members, not offered yet */
+            recipients: number;
+            /** Format: date-time */
+            sent_at: string | null;
+        };
+        /** CommunityEventUpdateRequest */
+        CommunityEventUpdateRequest: {
+            address?: string | null;
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description A ready box photo upload
+             */
+            cover_media_id?: string | null;
+            currency?: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at?: string;
+            guest_pass_allowed?: boolean;
+            guests_per_member?: number;
+            latitude?: number | null;
+            /**
+             * Format: uuid
+             * @description A location of the box; or give place_name
+             */
+            location_id?: string | null;
+            longitude?: number | null;
+            open_to_non_members?: boolean;
+            place_name?: string | null;
+            price_cents?: number;
+            /**
+             * @description This event (default) or this and following weeks
+             * @enum {string}
+             */
+            scope?: "this" | "following";
+            /** Format: date-time */
+            starts_at?: string;
+            title?: string;
+        };
+        /** CommunityEventsResponse */
+        CommunityEventsResponse: {
+            events: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            }[];
+        };
         /** CommunityFeedPage */
         CommunityFeedPage: {
             next_cursor?: string | null;
@@ -8037,7 +9217,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -8068,6 +9248,133 @@ export interface components {
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
                 hidden: boolean;
                 /** Format: uuid */
                 id: string;
@@ -8087,7 +9394,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -8118,6 +9425,133 @@ export interface components {
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
                 hidden: boolean;
                 /** Format: uuid */
                 id: string;
@@ -8635,7 +10069,7 @@ export interface components {
             /** Format: uuid */
             attachment_id?: string | null;
             /** @enum {string|null} */
-            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
             /** @enum {string} */
             audience: "club_channel" | "followers" | "public";
             /** CommunityAuthor */
@@ -8666,6 +10100,133 @@ export interface components {
                 primary_color?: string | null;
             } | null;
             comment_count: number;
+            /**
+             * CommunityPostEvent
+             * @description The event as you see it now, when the post is an event card (attachment_type event)
+             */
+            event?: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            } | null;
             hidden: boolean;
             /** Format: uuid */
             id: string;
@@ -8693,6 +10254,133 @@ export interface components {
             channel_id: string;
             client_operation_id?: string;
         };
+        /**
+         * CommunityPostEvent
+         * @description The event as you see it now, when the post is an event card (attachment_type event)
+         */
+        CommunityPostEvent: {
+            /** CommunityEventBox */
+            box: {
+                logo_url?: string | null;
+                name?: string | null;
+                slug?: string | null;
+            };
+            /** @description You run events at this box */
+            can_manage: boolean;
+            can_rsvp: boolean;
+            cancel_reason?: string | null;
+            cancelled: boolean;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @description Null: no limit */
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
+            /** CommunityEventClub */
+            club: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            /** Format: uuid */
+            club_id: string;
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            cover_url?: string | null;
+            currency: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+            goers?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[] | null;
+            going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
+            guest_pass_allowed: boolean;
+            /** @description Event page: guests you can still bring (going, guest passes on) */
+            guests_left?: number | null;
+            guests_per_member: number;
+            /** Format: uuid */
+            id: string;
+            /** @description Event page opened with an invitation link */
+            invitation?: {
+                /** CommunityAuthor */
+                inviter: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** @enum {string|null} */
+                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                usable: boolean;
+            } | null;
+            /**
+             * CommunityEventMine
+             * @description Where you stand; null if not on it
+             */
+            my?: {
+                /** Format: uuid */
+                invited_by_id?: string | null;
+                late_cancel: boolean;
+                paid: boolean;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+            } | null;
+            open_to_non_members: boolean;
+            /** Format: uuid */
+            organization_id: string;
+            /** CommunityEventPlace */
+            place: {
+                address: string | null;
+                city?: string | null;
+                latitude: number | null;
+                /**
+                 * Format: uuid
+                 * @description One of the box's locations, or null
+                 */
+                location_id: string | null;
+                longitude: number | null;
+                name: string | null;
+                neighbourhood?: string | null;
+            };
+            /**
+             * Format: uuid
+             * @description Its card in the club feed
+             */
+            post_id?: string | null;
+            /** @description 0: free; otherwise paid at the box */
+            price_cents: number;
+            /**
+             * Format: uuid
+             * @description Shared by every week of a weekly event
+             */
+            series_id?: string | null;
+            /** @description Null: no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            title: string;
+            waitlist_count: number;
+        } | null;
         /** CommunityPostHiddenRequest */
         CommunityPostHiddenRequest: {
             hidden: boolean;
@@ -8719,7 +10407,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -8750,6 +10438,133 @@ export interface components {
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
                 hidden: boolean;
                 /** Format: uuid */
                 id: string;
@@ -10551,6 +12366,8 @@ export interface components {
             /** Format: uuid */
             organization_id?: string;
             /** Format: uuid */
+            referral_event_id?: string | null;
+            /** Format: uuid */
             scheduled_class_id?: string | null;
             /** @enum {string} */
             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
@@ -10621,6 +12438,8 @@ export interface components {
                 /** Format: uuid */
                 organization_id?: string;
                 /** Format: uuid */
+                referral_event_id?: string | null;
+                /** Format: uuid */
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
@@ -10690,6 +12509,8 @@ export interface components {
                 note?: string | null;
                 /** Format: uuid */
                 organization_id?: string;
+                /** Format: uuid */
+                referral_event_id?: string | null;
                 /** Format: uuid */
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
@@ -10823,7 +12644,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -10854,6 +12675,133 @@ export interface components {
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
                 hidden: boolean;
                 /** Format: uuid */
                 id: string;
@@ -11044,7 +12992,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -11075,6 +13023,133 @@ export interface components {
                     primary_color?: string | null;
                 } | null;
                 comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
                 hidden: boolean;
                 /** Format: uuid */
                 id: string;
@@ -11383,6 +13458,1248 @@ export interface components {
             posts_count: number;
             requests_count: number;
         };
+        /** StaffCommunityEvent */
+        StaffCommunityEvent: {
+            /** CommunityEventAttendees */
+            attendees: {
+                cancelled: {
+                    amount_cents?: number | null;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** Format: date-time */
+                    checked_in_at?: string | null;
+                    /** Format: date-time */
+                    converted_at?: string | null;
+                    /** CommunityAuthor */
+                    invited_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                    late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
+                    /** @description An active member of the box */
+                    member: boolean;
+                    /** Format: date-time */
+                    paid_at?: string | null;
+                    payment_method?: string | null;
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    promoted_at?: string | null;
+                    /** Format: date-time */
+                    queued_at: string;
+                    /** @description Finance issued a receipt */
+                    receipt_issued: boolean;
+                    /** CommunityAuthor */
+                    removed_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                    /** Format: date-time */
+                    trial_offered_at?: string | null;
+                }[];
+                going: {
+                    amount_cents?: number | null;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** Format: date-time */
+                    checked_in_at?: string | null;
+                    /** Format: date-time */
+                    converted_at?: string | null;
+                    /** CommunityAuthor */
+                    invited_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                    late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
+                    /** @description An active member of the box */
+                    member: boolean;
+                    /** Format: date-time */
+                    paid_at?: string | null;
+                    payment_method?: string | null;
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    promoted_at?: string | null;
+                    /** Format: date-time */
+                    queued_at: string;
+                    /** @description Finance issued a receipt */
+                    receipt_issued: boolean;
+                    /** CommunityAuthor */
+                    removed_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                    /** Format: date-time */
+                    trial_offered_at?: string | null;
+                }[];
+                waitlisted: {
+                    amount_cents?: number | null;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** Format: date-time */
+                    checked_in_at?: string | null;
+                    /** Format: date-time */
+                    converted_at?: string | null;
+                    /** CommunityAuthor */
+                    invited_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                    late_cancel: boolean;
+                    /** @description This person's late cancels at the box over the last 90 days */
+                    late_cancels_90d: number;
+                    /** @description An active member of the box */
+                    member: boolean;
+                    /** Format: date-time */
+                    paid_at?: string | null;
+                    payment_method?: string | null;
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    promoted_at?: string | null;
+                    /** Format: date-time */
+                    queued_at: string;
+                    /** @description Finance issued a receipt */
+                    receipt_issued: boolean;
+                    /** CommunityAuthor */
+                    removed_by?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    } | null;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                    /** Format: date-time */
+                    trial_offered_at?: string | null;
+                }[];
+            };
+            /** CommunityEventBox */
+            box: {
+                logo_url?: string | null;
+                name?: string | null;
+                slug?: string | null;
+            };
+            /** @description You run events at this box */
+            can_manage: boolean;
+            can_rsvp: boolean;
+            cancel_reason?: string | null;
+            cancelled: boolean;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @description Null: no limit */
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
+            /** CommunityEventClub */
+            club: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            /** Format: uuid */
+            club_id: string;
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            cover_url?: string | null;
+            currency: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+            goers?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[] | null;
+            going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
+            guest_pass_allowed: boolean;
+            /** @description Event page: guests you can still bring (going, guest passes on) */
+            guests_left?: number | null;
+            guests_per_member: number;
+            /** Format: uuid */
+            id: string;
+            /** @description Event page opened with an invitation link */
+            invitation?: {
+                /** CommunityAuthor */
+                inviter: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** @enum {string|null} */
+                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                usable: boolean;
+            } | null;
+            /**
+             * CommunityEventMine
+             * @description Where you stand; null if not on it
+             */
+            my?: {
+                /** Format: uuid */
+                invited_by_id?: string | null;
+                late_cancel: boolean;
+                paid: boolean;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+            } | null;
+            open_to_non_members: boolean;
+            /** Format: uuid */
+            organization_id: string;
+            /** CommunityEventPlace */
+            place: {
+                address: string | null;
+                city?: string | null;
+                latitude: number | null;
+                /**
+                 * Format: uuid
+                 * @description One of the box's locations, or null
+                 */
+                location_id: string | null;
+                longitude: number | null;
+                name: string | null;
+                neighbourhood?: string | null;
+            };
+            /**
+             * Format: uuid
+             * @description Its card in the club feed
+             */
+            post_id?: string | null;
+            /** @description 0: free; otherwise paid at the box */
+            price_cents: number;
+            /**
+             * Format: uuid
+             * @description Shared by every week of a weekly event
+             */
+            series_id?: string | null;
+            /** @description Null: no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** CommunityEventStats */
+            stats: {
+                came: number;
+                /** @description Came and joined the box within 30 days */
+                converted: number;
+                going: number;
+                guests: number;
+                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                late_cancels: number;
+                /** @description Going but not checked in, once the event ended */
+                no_shows: number;
+                paid: number;
+                /** @description Trial requests from the event's trial offer */
+                trial_requests: number;
+                waitlisted: number;
+            };
+            title: string;
+            /** CommunityEventTrialOffer */
+            trial_offer: {
+                can_send: boolean;
+                /** @description People who came, not members, not offered yet */
+                recipients: number;
+                /** Format: date-time */
+                sent_at: string | null;
+            };
+            waitlist_count: number;
+        };
+        /** StaffCommunityEventCreatedResponse */
+        StaffCommunityEventCreatedResponse: {
+            /** StaffCommunityEvent */
+            event: {
+                /** CommunityEventAttendees */
+                attendees: {
+                    cancelled: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                    going: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                    waitlisted: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                };
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** CommunityEventStats */
+                stats: {
+                    came: number;
+                    /** @description Came and joined the box within 30 days */
+                    converted: number;
+                    going: number;
+                    guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                    late_cancels: number;
+                    /** @description Going but not checked in, once the event ended */
+                    no_shows: number;
+                    paid: number;
+                    /** @description Trial requests from the event's trial offer */
+                    trial_requests: number;
+                    waitlisted: number;
+                };
+                title: string;
+                /** CommunityEventTrialOffer */
+                trial_offer: {
+                    can_send: boolean;
+                    /** @description People who came, not members, not offered yet */
+                    recipients: number;
+                    /** Format: date-time */
+                    sent_at: string | null;
+                };
+                waitlist_count: number;
+            };
+            occurrences: number;
+        };
+        /** StaffCommunityEventRequest */
+        StaffCommunityEventRequest: {
+            address?: string | null;
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+             */
+            channel_id?: string;
+            /** Format: uuid */
+            club_id: string;
+            /**
+             * Format: uuid
+             * @description A ready box photo upload
+             */
+            cover_media_id?: string | null;
+            currency?: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            guest_pass_allowed?: boolean;
+            guests_per_member?: number;
+            latitude?: number | null;
+            /**
+             * Format: uuid
+             * @description A location of the box; or give place_name
+             */
+            location_id?: string | null;
+            longitude?: number | null;
+            open_to_non_members?: boolean;
+            place_name?: string | null;
+            price_cents?: number;
+            /**
+             * Format: date
+             * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+             */
+            repeat_until?: string;
+            /** Format: date-time */
+            starts_at: string;
+            title: string;
+        };
+        /** StaffCommunityEventResponse */
+        StaffCommunityEventResponse: {
+            /** StaffCommunityEvent */
+            event: {
+                /** CommunityEventAttendees */
+                attendees: {
+                    cancelled: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                    going: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                    waitlisted: {
+                        amount_cents?: number | null;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** Format: date-time */
+                        checked_in_at?: string | null;
+                        /** Format: date-time */
+                        converted_at?: string | null;
+                        /** CommunityAuthor */
+                        invited_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                        late_cancel: boolean;
+                        /** @description This person's late cancels at the box over the last 90 days */
+                        late_cancels_90d: number;
+                        /** @description An active member of the box */
+                        member: boolean;
+                        /** Format: date-time */
+                        paid_at?: string | null;
+                        payment_method?: string | null;
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        promoted_at?: string | null;
+                        /** Format: date-time */
+                        queued_at: string;
+                        /** @description Finance issued a receipt */
+                        receipt_issued: boolean;
+                        /** CommunityAuthor */
+                        removed_by?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                        /** Format: date-time */
+                        trial_offered_at?: string | null;
+                    }[];
+                };
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** CommunityEventStats */
+                stats: {
+                    came: number;
+                    /** @description Came and joined the box within 30 days */
+                    converted: number;
+                    going: number;
+                    guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                    late_cancels: number;
+                    /** @description Going but not checked in, once the event ended */
+                    no_shows: number;
+                    paid: number;
+                    /** @description Trial requests from the event's trial offer */
+                    trial_requests: number;
+                    waitlisted: number;
+                };
+                title: string;
+                /** CommunityEventTrialOffer */
+                trial_offer: {
+                    can_send: boolean;
+                    /** @description People who came, not members, not offered yet */
+                    recipients: number;
+                    /** Format: date-time */
+                    sent_at: string | null;
+                };
+                waitlist_count: number;
+            };
+        };
+        /** StaffCommunityEventRow */
+        StaffCommunityEventRow: {
+            /** CommunityEventBox */
+            box: {
+                logo_url?: string | null;
+                name?: string | null;
+                slug?: string | null;
+            };
+            /** @description You run events at this box */
+            can_manage: boolean;
+            can_rsvp: boolean;
+            cancel_reason?: string | null;
+            cancelled: boolean;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @description Null: no limit */
+            capacity?: number | null;
+            /**
+             * Format: uuid
+             * @description The member group this event belongs to; null for a club event
+             */
+            channel_id?: string | null;
+            /** CommunityEventClub */
+            club: {
+                /** Format: uuid */
+                id: string;
+                kind?: string | null;
+                name?: string | null;
+            };
+            /** Format: uuid */
+            club_id: string;
+            /** Format: uuid */
+            cover_media_id?: string | null;
+            cover_url?: string | null;
+            currency: string;
+            description?: string | null;
+            /** Format: date-time */
+            ends_at: string;
+            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+            goers?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[] | null;
+            going_count: number;
+            /**
+             * CommunityEventGroup
+             * @description The member group of a group event (free, for its members only)
+             */
+            group?: {
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            } | null;
+            guest_pass_allowed: boolean;
+            /** @description Event page: guests you can still bring (going, guest passes on) */
+            guests_left?: number | null;
+            guests_per_member: number;
+            /** Format: uuid */
+            id: string;
+            /** @description Event page opened with an invitation link */
+            invitation?: {
+                /** CommunityAuthor */
+                inviter: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** @enum {string|null} */
+                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                usable: boolean;
+            } | null;
+            /**
+             * CommunityEventMine
+             * @description Where you stand; null if not on it
+             */
+            my?: {
+                /** Format: uuid */
+                invited_by_id?: string | null;
+                late_cancel: boolean;
+                paid: boolean;
+                /** @enum {string} */
+                source: "member" | "open" | "guest";
+                /** @enum {string} */
+                status: "going" | "waitlisted" | "cancelled";
+            } | null;
+            open_to_non_members: boolean;
+            /** Format: uuid */
+            organization_id: string;
+            /** CommunityEventPlace */
+            place: {
+                address: string | null;
+                city?: string | null;
+                latitude: number | null;
+                /**
+                 * Format: uuid
+                 * @description One of the box's locations, or null
+                 */
+                location_id: string | null;
+                longitude: number | null;
+                name: string | null;
+                neighbourhood?: string | null;
+            };
+            /**
+             * Format: uuid
+             * @description Its card in the club feed
+             */
+            post_id?: string | null;
+            /** @description 0: free; otherwise paid at the box */
+            price_cents: number;
+            /**
+             * Format: uuid
+             * @description Shared by every week of a weekly event
+             */
+            series_id?: string | null;
+            /** @description Null: no limit */
+            spots_left?: number | null;
+            /** Format: date-time */
+            starts_at: string;
+            /** CommunityEventStats */
+            stats: {
+                came: number;
+                /** @description Came and joined the box within 30 days */
+                converted: number;
+                going: number;
+                guests: number;
+                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                late_cancels: number;
+                /** @description Going but not checked in, once the event ended */
+                no_shows: number;
+                paid: number;
+                /** @description Trial requests from the event's trial offer */
+                trial_requests: number;
+                waitlisted: number;
+            };
+            title: string;
+            waitlist_count: number;
+        };
+        /** StaffCommunityEventsResponse */
+        StaffCommunityEventsResponse: {
+            events: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                /** CommunityEventStats */
+                stats: {
+                    came: number;
+                    /** @description Came and joined the box within 30 days */
+                    converted: number;
+                    going: number;
+                    guests: number;
+                    /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                    late_cancels: number;
+                    /** @description Going but not checked in, once the event ended */
+                    no_shows: number;
+                    paid: number;
+                    /** @description Trial requests from the event's trial offer */
+                    trial_requests: number;
+                    waitlisted: number;
+                };
+                title: string;
+                waitlist_count: number;
+            }[];
+        };
         /** StaffMember */
         StaffMember: {
             nickname?: string | null;
@@ -11440,6 +14757,8 @@ export interface components {
                 nickname?: string | null;
             } | null;
             phone?: string | null;
+            /** Format: uuid */
+            referral_event_id?: string | null;
             /** Format: uuid */
             scheduled_class_id?: string | null;
             source?: string;
@@ -11499,6 +14818,8 @@ export interface components {
                     nickname?: string | null;
                 } | null;
                 phone?: string | null;
+                /** Format: uuid */
+                referral_event_id?: string | null;
                 /** Format: uuid */
                 scheduled_class_id?: string | null;
                 source?: string;
@@ -11777,6 +15098,11 @@ export interface components {
             client_operation_id?: string;
             note?: string | null;
             phone?: string | null;
+            /**
+             * Format: uuid
+             * @description The club event whose trial offer led here (ADR-153); the source becomes event
+             */
+            referral_event_id?: string;
             /** Format: uuid */
             scheduled_class_id: string;
             /** @enum {string} */
@@ -11922,6 +15248,8 @@ export interface components {
                 note?: string | null;
                 /** Format: uuid */
                 organization_id?: string;
+                /** Format: uuid */
+                referral_event_id?: string | null;
                 /** Format: uuid */
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
@@ -12069,6 +15397,8 @@ export interface components {
                     nickname?: string | null;
                 } | null;
                 phone?: string | null;
+                /** Format: uuid */
+                referral_event_id?: string | null;
                 /** Format: uuid */
                 scheduled_class_id?: string | null;
                 source?: string;
@@ -13150,6 +16480,153 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityEventController.box_events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PublicBoxController.posts": {
         parameters: {
             query?: {
@@ -13190,7 +16667,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -13221,6 +16698,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -13346,6 +16950,11 @@ export interface operations {
                     client_operation_id?: string;
                     note?: string | null;
                     phone?: string | null;
+                    /**
+                     * Format: uuid
+                     * @description The club event whose trial offer led here (ADR-153); the source becomes event
+                     */
+                    referral_event_id?: string;
                     /** Format: uuid */
                     scheduled_class_id: string;
                     /** @enum {string} */
@@ -13422,6 +17031,8 @@ export interface operations {
                             note?: string | null;
                             /** Format: uuid */
                             organization_id?: string;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
@@ -14385,6 +17996,344 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityEventController.club_events": {
+        parameters: {
+            query?: {
+                scope?: "upcoming" | "past";
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     */
+                    channel_id?: string;
+                    /**
+                     * Format: uuid
+                     * @description A ready box photo upload
+                     */
+                    cover_media_id?: string | null;
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    guest_pass_allowed?: boolean;
+                    guests_per_member?: number;
+                    latitude?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A location of the box; or give place_name
+                     */
+                    location_id?: string | null;
+                    longitude?: number | null;
+                    open_to_non_members?: boolean;
+                    place_name?: string | null;
+                    price_cents?: number;
+                    /**
+                     * Format: date
+                     * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+                     */
+                    repeat_until?: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                        /** @description Events made (weekly repeat) */
+                        occurrences: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ClubPostController.delete_comment": {
         parameters: {
             query?: never;
@@ -14559,6 +18508,150 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityEventController.clubs_events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ClubPostController.create": {
         parameters: {
             query?: never;
@@ -14605,7 +18698,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -14636,6 +18729,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -14803,7 +19023,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -14834,6 +19054,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -14886,7 +19233,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -14917,6 +19264,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -14969,7 +19443,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -15000,6 +19474,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -15053,6 +19654,826 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CommunityEventController.mine": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.show": {
+        parameters: {
+            query?: {
+                /** @description The token of a guest pass link */
+                invite?: string;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A ready box photo upload
+                     */
+                    cover_media_id?: string | null;
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at?: string;
+                    guest_pass_allowed?: boolean;
+                    guests_per_member?: number;
+                    latitude?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A location of the box; or give place_name
+                     */
+                    location_id?: string | null;
+                    longitude?: number | null;
+                    open_to_non_members?: boolean;
+                    place_name?: string | null;
+                    price_cents?: number;
+                    /**
+                     * @description This event (default) or this and following weeks
+                     * @enum {string}
+                     */
+                    scope?: "this" | "following";
+                    /** Format: date-time */
+                    starts_at?: string;
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                    /**
+                     * @description This event (default) or this and following weeks
+                     * @enum {string}
+                     */
+                    scope?: "this" | "following";
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invitation */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        guests_left: number;
+                        /** @description Member-app path that opens the event with the invitation */
+                        path: string;
+                        token: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CommunityEventController.rsvp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description «Θα έρθω» (true) or «Δεν θα έρθω» (false) */
+                    going: boolean;
+                    /** @description From a member's guest pass link */
+                    invite_token?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CommunityPostController.feed": {
         parameters: {
             query?: {
@@ -15085,7 +20506,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -15116,6 +20537,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -15135,7 +20683,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -15166,6 +20714,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -16450,6 +22125,8 @@ export interface operations {
                             /** Format: uuid */
                             organization_id?: string;
                             /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** Format: uuid */
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
@@ -16540,6 +22217,8 @@ export interface operations {
                             note?: string | null;
                             /** Format: uuid */
                             organization_id?: string;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
@@ -16649,6 +22328,8 @@ export interface operations {
                             note?: string | null;
                             /** Format: uuid */
                             organization_id?: string;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
@@ -16812,6 +22493,8 @@ export interface operations {
                             note?: string | null;
                             /** Format: uuid */
                             organization_id?: string;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
@@ -18949,6 +24632,2618 @@ export interface operations {
                             /** @enum {string|null} */
                             role?: "member" | "staff" | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.index": {
+        parameters: {
+            query?: {
+                scope?: "upcoming" | "past";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Events */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        events: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            waitlist_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description An active member group of the club: its admin (or staff) makes a group event, always free, members-only and without guest passes
+                     */
+                    channel_id?: string;
+                    /** Format: uuid */
+                    club_id: string;
+                    /**
+                     * Format: uuid
+                     * @description A ready box photo upload
+                     */
+                    cover_media_id?: string | null;
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    guest_pass_allowed?: boolean;
+                    guests_per_member?: number;
+                    latitude?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A location of the box; or give place_name
+                     */
+                    location_id?: string | null;
+                    longitude?: number | null;
+                    open_to_non_members?: boolean;
+                    place_name?: string | null;
+                    price_cents?: number;
+                    /**
+                     * Format: date
+                     * @description «Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most 26 weeks
+                     */
+                    repeat_until?: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                        occurrences: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    address?: string | null;
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A ready box photo upload
+                     */
+                    cover_media_id?: string | null;
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at?: string;
+                    guest_pass_allowed?: boolean;
+                    guests_per_member?: number;
+                    latitude?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description A location of the box; or give place_name
+                     */
+                    location_id?: string | null;
+                    longitude?: number | null;
+                    open_to_non_members?: boolean;
+                    place_name?: string | null;
+                    price_cents?: number;
+                    /**
+                     * @description This event (default) or this and following weeks
+                     * @enum {string}
+                     */
+                    scope?: "this" | "following";
+                    /** Format: date-time */
+                    starts_at?: string;
+                    title?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.check_in": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    checked_in: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.mark_paid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    payment_method: "cash" | "bank_transfer" | "card_manual" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                    /**
+                     * @description This event (default) or this and following weeks
+                     * @enum {string}
+                     */
+                    scope?: "this" | "following";
+                };
+            };
+        };
+        responses: {
+            /** @description Event */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffCommunityEvent */
+                        event: {
+                            /** CommunityEventAttendees */
+                            attendees: {
+                                cancelled: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                going: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                                waitlisted: {
+                                    amount_cents?: number | null;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** Format: date-time */
+                                    checked_in_at?: string | null;
+                                    /** Format: date-time */
+                                    converted_at?: string | null;
+                                    /** CommunityAuthor */
+                                    invited_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description «Ακύρωσε αργά»: gave up the place within 2 hours of the start (see cancelled_at) */
+                                    late_cancel: boolean;
+                                    /** @description This person's late cancels at the box over the last 90 days */
+                                    late_cancels_90d: number;
+                                    /** @description An active member of the box */
+                                    member: boolean;
+                                    /** Format: date-time */
+                                    paid_at?: string | null;
+                                    payment_method?: string | null;
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    promoted_at?: string | null;
+                                    /** Format: date-time */
+                                    queued_at: string;
+                                    /** @description Finance issued a receipt */
+                                    receipt_issued: boolean;
+                                    /** CommunityAuthor */
+                                    removed_by?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                    /** Format: date-time */
+                                    trial_offered_at?: string | null;
+                                }[];
+                            };
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            /** CommunityEventStats */
+                            stats: {
+                                came: number;
+                                /** @description Came and joined the box within 30 days */
+                                converted: number;
+                                going: number;
+                                guests: number;
+                                /** @description «Ακύρωσε αργά»: places given up within 2 hours */
+                                late_cancels: number;
+                                /** @description Going but not checked in, once the event ended */
+                                no_shows: number;
+                                paid: number;
+                                /** @description Trial requests from the event's trial offer */
+                                trial_requests: number;
+                                waitlisted: number;
+                            };
+                            title: string;
+                            /** CommunityEventTrialOffer */
+                            trial_offer: {
+                                can_send: boolean;
+                                /** @description People who came, not members, not offered yet */
+                                recipients: number;
+                                /** Format: date-time */
+                                sent_at: string | null;
+                            };
+                            waitlist_count: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description People notified */
+                        sent: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCommunityEventController.trial_offer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sent */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description People notified */
+                        sent: number;
                     };
                 };
             };
@@ -24965,6 +33260,8 @@ export interface operations {
                             } | null;
                             phone?: string | null;
                             /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** Format: uuid */
                             scheduled_class_id?: string | null;
                             source?: string;
                             /** @enum {string} */
@@ -25044,6 +33341,8 @@ export interface operations {
                                 nickname?: string | null;
                             } | null;
                             phone?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             source?: string;
@@ -25150,6 +33449,8 @@ export interface operations {
                             } | null;
                             phone?: string | null;
                             /** Format: uuid */
+                            referral_event_id?: string | null;
+                            /** Format: uuid */
                             scheduled_class_id?: string | null;
                             source?: string;
                             /** @enum {string} */
@@ -25253,6 +33554,8 @@ export interface operations {
                                 nickname?: string | null;
                             } | null;
                             phone?: string | null;
+                            /** Format: uuid */
+                            referral_event_id?: string | null;
                             /** Format: uuid */
                             scheduled_class_id?: string | null;
                             source?: string;
@@ -31730,7 +40033,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -31761,6 +40064,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -31928,7 +40358,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -31959,6 +40389,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -32011,7 +40568,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -32042,6 +40599,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -32094,7 +40778,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -32125,6 +40809,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -38956,7 +47767,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -38987,6 +47798,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -40415,7 +49353,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -40446,6 +49384,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;
@@ -40613,7 +49678,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -40644,6 +49709,133 @@ export interface operations {
                                 primary_color?: string | null;
                             } | null;
                             comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
                             hidden: boolean;
                             /** Format: uuid */
                             id: string;

@@ -54,3 +54,9 @@ msgstr "En attente de la salle"
 
 msgid "Booked"
 msgstr "Réservée"
+
+msgid "Event: %{title}"
+msgstr "Événement : %{title}"
+
+msgid "You're going to this event."
+msgstr "Tu participes à cet événement."

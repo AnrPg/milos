@@ -54,3 +54,9 @@ msgstr "Ждёт ответа клуба"
 
 msgid "Booked"
 msgstr "Забронировано"
+
+msgid "Event: %{title}"
+msgstr "Событие: %{title}"
+
+msgid "You're going to this event."
+msgstr "Вы идёте на это событие."

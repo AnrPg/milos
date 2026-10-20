@@ -54,3 +54,9 @@ msgstr ""
 
 msgid "Booked"
 msgstr ""
+
+msgid "Event: %{title}"
+msgstr ""
+
+msgid "You're going to this event."
+msgstr ""

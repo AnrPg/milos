@@ -353,3 +353,51 @@ msgstr ""
 
 msgid "Someone reported something in the club."
 msgstr ""
+
+msgid "A place opened up"
+msgstr ""
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr ""
+
+msgid "Event cancelled"
+msgstr ""
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr ""
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr ""
+
+msgid "Event changed"
+msgstr ""
+
+msgid "«%{event}» moved to %{when}."
+msgstr ""
+
+msgid "«%{event}» has a new place."
+msgstr ""
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr ""
+
+msgid "Starting soon"
+msgstr ""
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr ""
+
+msgid "Your guest is coming"
+msgstr ""
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr ""
+
+msgid "Try a class"
+msgstr ""
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr ""
+
+msgid "Message about «%{event}»"
+msgstr ""

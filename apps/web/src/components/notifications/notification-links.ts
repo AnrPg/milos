@@ -16,6 +16,17 @@ function preferredUrl(notification: LinkableNotification) {
   if (notification.type === "booking_waitlist_promoted" && typeof slotId === "string" && slotId) {
     return `/box/schedule?open_slot=${encodeURIComponent(slotId)}`;
   }
+  // ADR-153: event notifications open the event page; the trial offer keeps
+  // its own link to the box's trial sheet.
+  const eventId = notification.payload.event_id;
+  if (
+    notification.type.startsWith("community_event_") &&
+    notification.type !== "community_event_trial_offer" &&
+    typeof eventId === "string" &&
+    eventId
+  ) {
+    return `/events/${encodeURIComponent(eventId)}`;
+  }
   return null;
 }
 

@@ -54,3 +54,9 @@ msgstr "ממתין לתשובת המכון"
 
 msgid "Booked"
 msgstr "הוזמן"
+
+msgid "Event: %{title}"
+msgstr "אירוע: %{title}"
+
+msgid "You're going to this event."
+msgstr "אתה מגיע לאירוע הזה."

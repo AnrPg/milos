@@ -9,6 +9,7 @@ defmodule MilosTraining.Community do
   alias MilosTraining.Community.Commands.{
     ChannelMembership,
     ClassGroups,
+    Events,
     Follows,
     Groups,
     OpenClubs,
@@ -20,12 +21,14 @@ defmodule MilosTraining.Community do
   }
 
   alias MilosTraining.Community.Queries.Feed
-  alias MilosTraining.Community.{ClubMembership, CommunityStore, SocialStore}
+  alias MilosTraining.Community.{ClubMembership, CommunityStore, EventStore, SocialStore}
 
   alias MilosTraining.Community.Domain.{
     AudiencePolicy,
     ChannelPolicy,
     ClubPolicy,
+    EventPolicy,
+    EventSeries,
     FeedCursor,
     FollowPolicy,
     GroupPolicy,
@@ -116,6 +119,77 @@ defmodule MilosTraining.Community do
   def report_reasons, do: ReportPolicy.reasons()
   def report_actions, do: ReportPolicy.actions()
 
+  # Events (ADR-153).
+  defdelegate create_event(context, club, attrs, opts), to: Events, as: :create
+  defdelegate update_event(context, event, attrs, scope, opts), to: Events, as: :update
+  defdelegate cancel_event(context, event, scope, reason, now), to: Events, as: :cancel
+  defdelegate rsvp_event(context, event_id, user_id, facts, now), to: Events, as: :rsvp
+
+  defdelegate withdraw_from_event(context, event_id, user_id, actor_id, now),
+    to: Events,
+    as: :withdraw
+
+  defdelegate check_in_attendee(context, event, user_id, on?, now), to: Events, as: :check_in
+
+  defdelegate record_event_payment(context, event_id, user_id, method, now, record),
+    to: Events,
+    as: :record_payment
+
+  defdelegate claim_event_step(context, event_id, field, now), to: Events, as: :claim
+  defdelegate mark_trial_offered(context, attendees, now), to: Events
+  defdelegate get_event(context, id), to: EventStore
+  defdelegate list_events(context, filter), to: EventStore
+  defdelegate list_attendees(context, event_ids, statuses \\ nil), to: EventStore
+  defdelegate get_attendee(context, event_id, user_id), to: EventStore
+  defdelegate attendee_counts(context, event_ids), to: EventStore
+  defdelegate count_guests(context, event_id, inviter_id), to: EventStore
+  defdelegate attendances_of(context, user_id, statuses), to: EventStore
+  defdelegate events_reminder_due(context, window), to: EventStore, as: :reminders_due
+
+  defdelegate mark_event_conversions(context, user_id, window, at),
+    to: EventStore,
+    as: :mark_converted
+
+  def link_event_post(context, event, post_id),
+    do: EventStore.update_event(context, event, %{post_id: post_id})
+
+  def event_capability, do: EventPolicy.capability()
+  def event_editable_fields, do: MilosTraining.Community.Event.editable_fields()
+  def event_scopes, do: EventPolicy.scopes()
+  def event_reminder_minutes, do: EventPolicy.reminder_minutes()
+  def event_conversion_days, do: EventPolicy.conversion_days()
+  def event_series_max, do: EventSeries.max_occurrences()
+  def attendee_statuses, do: MilosTraining.Community.EventAttendee.statuses()
+  def attendee_sources, do: MilosTraining.Community.EventAttendee.sources()
+  def event_payment_methods, do: MilosTraining.Community.EventAttendee.payment_methods()
+  defdelegate event_spots_left(event, going), to: EventPolicy, as: :spots_left
+  defdelegate event_show_names?(club_member?), to: EventPolicy, as: :show_names?
+  defdelegate event_notable_changes(earlier, later), to: EventPolicy, as: :notable_changes
+  defdelegate event_reminder_due?(event, now), to: EventPolicy, as: :reminder_due?
+  defdelegate event_trial_offer_check(event, now), to: EventPolicy, as: :trial_offer_check
+
+  defdelegate event_trial_offer_recipients(attendees, member_ids),
+    to: EventPolicy,
+    as: :trial_offer_recipients
+
+  defdelegate event_stats(event, attendees, trial_requests, now), to: EventPolicy, as: :stats
+  defdelegate event_open_for_rsvp(event, now), to: EventPolicy, as: :open_for_rsvp
+  defdelegate event_guest_check(event, inviter_status, guests), to: EventPolicy, as: :guest_check
+
+  defdelegate event_group_channel_check(channel, club_id),
+    to: EventPolicy,
+    as: :group_channel_check
+
+  defdelegate event_group_admin?(channel, membership), to: EventPolicy, as: :group_admin?
+  defdelegate event_manage_check(actor, channel_id), to: EventPolicy, as: :manage_check
+  defdelegate event_belongs?(event, facts), to: EventPolicy, as: :belongs?
+  defdelegate event_visible?(event, facts), to: EventPolicy, as: :visible?
+  defdelegate event_can_rsvp?(event, belongs?, my_status, now), to: EventPolicy, as: :can_rsvp?
+  def event_late_cancel_window_days, do: EventPolicy.late_cancel_window_days()
+
+  @doc "Late cancels per person at the box since `since`: `%{user_id => count}`."
+  defdelegate late_cancel_counts(context, user_ids, since), to: EventStore
+
   # Posts (M7).
   defdelegate create_post(context, channel, role, joined?, attrs), to: Posts, as: :create
   defdelegate fetch_post(context, post_id), to: Posts, as: :fetch
@@ -132,6 +206,7 @@ defmodule MilosTraining.Community do
   defdelegate feed_page(context, params), to: Feed, as: :page
   defdelegate pinned_posts(context, channel_ids, viewer_id), to: Feed, as: :pinned
   def attachment_types, do: MilosTraining.Community.Post.attachment_types()
+  def shareable_attachment_types, do: MilosTraining.Community.Post.shareable_attachment_types()
 
   defdelegate list_public_posts(context, organization_ids, viewer_id, page),
     to: CommunityStore

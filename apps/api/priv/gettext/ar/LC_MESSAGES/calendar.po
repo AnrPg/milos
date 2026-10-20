@@ -54,3 +54,9 @@ msgstr "بانتظار رد النادي"
 
 msgid "Booked"
 msgstr "محجوزة"
+
+msgid "Event: %{title}"
+msgstr "حدث: %{title}"
+
+msgid "You're going to this event."
+msgstr "أنت ذاهب إلى هذا الحدث."

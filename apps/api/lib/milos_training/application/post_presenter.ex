@@ -155,6 +155,8 @@ defmodule MilosTraining.Application.PostPresenter do
       attachment_type: post.attachment_type,
       attachment_id: post.attachment_id,
       attachment: public_snapshot(post.attachment),
+      # The live event card, filled by EventCards where the feed is read (ADR-153).
+      event: nil,
       kudos_count: post.kudos_count,
       comment_count: post.comment_count,
       kudos_by_me: post.kudos_by_me,

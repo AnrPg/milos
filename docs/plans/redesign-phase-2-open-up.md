@@ -480,6 +480,28 @@ Apostolos picked option A on every question, with the recommended extras below.
 8. **Quiet groups (Q8):** a warning at 50 days without a post, archived at 60; whoever started it
    can bring it back.
 
+### Events (2026-10-20, [board 8](https://claude.ai/artifact/5tDs9DQfSNAsUNXkwYLpBm))
+
+Apostolos picked option A on every question, with the extras below.
+
+1. **Creating (Q1):** staff and coaches create from the club's Events tab with a sheet (title, time,
+   place, capacity, price, «Μόνο μέλη» or «Ανοιχτό σε όλους», guest pass); the same list sits in
+   Κοινότητα › Events. Extras: weekly repeat with a list per date, a cover photo, and group admins
+   can make free, members-only events in their group.
+2. **«Θα έρθω» (Q2):** an event page with who's going; a waitlist that moves up with a
+   notification. Extras: a reminder 2 hours before and the event in the calendar feed; names only
+   for people who can see the club; cancelling inside 2 hours shows staff «Ακύρωσε αργά».
+3. **Paid events (Q3):** «Θα έρθω» holds the spot, you pay at the box, staff tick «Πλήρωσε», which
+   records it in Finance when the person has a Finance profile there.
+4. **Non-members and guests (Q4):** open events show on the public box page and anyone signed in
+   can come; on events with a guest pass a member shares a «Φέρε φίλο» link. Extra: the inviter is
+   kept for referrals (M8).
+5. **Where events show (Q5):** a feed card with «Θα έρθω», Club › Events (Επερχόμενα · Περασμένα),
+   «Τα events μου» on Αρχική and an Events page across your clubs.
+6. **After the event (Q6):** attendee list with Ήρθε, Πλήρωσε, Μήνυμα σε όλους, edit and cancel;
+   one trial offer to non-members who came. Extras: per-event numbers; QR self check-in when M7
+   lands.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -501,5 +523,5 @@ Apostolos picked option A on every question, with the recommended extras below.
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

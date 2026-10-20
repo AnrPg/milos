@@ -59,6 +59,12 @@ defmodule MilosTrainingWeb.Schemas.Trials do
         note: %Schema{type: :string, maxLength: 500, nullable: true},
         phone: %Schema{type: :string, maxLength: 24, nullable: true},
         source: %Schema{type: :string, enum: ~w(box_page schedule qr_door referral event)},
+        referral_event_id: %Schema{
+          type: :string,
+          format: :uuid,
+          description:
+            "The club event whose trial offer led here (ADR-153); the source becomes event"
+        },
         client_operation_id: @uuid
       },
       required: [:scheduled_class_id]
@@ -122,6 +128,7 @@ defmodule MilosTrainingWeb.Schemas.Trials do
       converted_at: @maybe_datetime,
       cancelled_at: @maybe_datetime,
       inserted_at: @datetime,
+      referral_event_id: %Schema{type: :string, format: :uuid, nullable: true},
       class: class()
     }
   end

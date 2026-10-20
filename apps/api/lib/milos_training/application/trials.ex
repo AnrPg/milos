@@ -28,6 +28,7 @@ defmodule MilosTraining.Application.Trials do
   }
 
   alias MilosTraining.{
+    Community,
     Facility,
     Finance,
     Identity,
@@ -356,6 +357,7 @@ defmodule MilosTraining.Application.Trials do
       policy = Trials.policy(context)
 
       with {:ok, slot_id} <- required(params[:scheduled_class_id]),
+           {:ok, referral_event_id} <- referral_event(context, params[:referral_event_id]),
            %{} = slot <- Scheduling.get_slot(context, slot_id) || {:error, :not_found},
            :ok <- Trials.check(policy, ask_facts(context, policy, slot, user.id, now)),
            status = Trials.initial_status(policy),
@@ -369,7 +371,8 @@ defmodule MilosTraining.Application.Trials do
                status: status,
                note: blank_to_nil(params[:note]),
                phone: blank_to_nil(params[:phone]),
-               source: params[:source] || "box_page",
+               source: if(referral_event_id, do: "event", else: params[:source] || "box_page"),
+               referral_event_id: referral_event_id,
                client_operation_id: params[:client_operation_id],
                class_starts_at: slot.scheduled_at,
                class_name: slot.name,
@@ -378,6 +381,16 @@ defmodule MilosTraining.Application.Trials do
         {:ok, request, booking, slot}
       end
     end)
+  end
+
+  # ADR-153: a trial asked from a club event's trial offer remembers the event.
+  defp referral_event(_context, nil), do: {:ok, nil}
+
+  defp referral_event(%{organization_id: organization_id} = context, event_id) do
+    case Community.get_event(context, event_id) do
+      %{organization_id: ^organization_id, id: id} -> {:ok, id}
+      _other -> {:error, :event_not_found}
+    end
   end
 
   defp maybe_book("booked", context, user_id, slot, params),
@@ -680,6 +693,7 @@ defmodule MilosTraining.Application.Trials do
       :attended_at,
       :converted_at,
       :cancelled_at,
+      :referral_event_id,
       :inserted_at
     ])
   end

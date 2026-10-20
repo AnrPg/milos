@@ -58,10 +58,11 @@ function NotificationCard({
   const i18n = useUiTranslations();
   const tTrials = useTranslations("Trials");
   const tClubs = useTranslations("Clubs");
-  // ADR-143: group, report and open-club notifications carry their names.
+  // ADR-143: group, report and open-club notifications carry their names (events: ADR-153).
   function communityText(notification: NotificationRecord, part: "title" | "body") {
     if (!(COMMUNITY_NOTICES as readonly string[]).includes(notification.type)) return null;
     const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    if (notification.type.startsWith("community_event_")) return eventText(notification.type, part, text);
     const reason = text("reason");
     const values = {
       person: text("person_nickname") || tTrials("someone"),
@@ -70,6 +71,27 @@ function NotificationCard({
       reason: reason ? tClubs(`reason_${reason}`) : "",
     };
     return tClubs(["notif", notification.type.replace(/^community_/, ""), part].join("_"), values);
+  }
+  // ADR-153: event notifications carry the event's title and its time in the
+  // box's zone; a cancel its reason, a move what changed, staff's message its text.
+  function eventText(type: string, part: "title" | "body", text: (key: string) => string) {
+    const notice = type.replace(/^community_/, "");
+    const values = {
+      event: text("event_title"),
+      when: text("event_when"),
+      person: text("person_nickname") || tTrials("someone"),
+      box: text("box_name"),
+      reason: text("reason"),
+    };
+    if (part === "title") return tClubs(["notif", notice, "title"].join("_"), values);
+    if (notice === "event_message") return text("message");
+    let variant = "body";
+    if (notice === "event_cancelled" && values.reason) variant = "reason_body";
+    if (notice === "event_changed") {
+      const changes = text("changes").split(",");
+      variant = changes.includes("place") ? (changes.includes("time") ? "both_body" : "place_body") : "body";
+    }
+    return tClubs(["notif", notice, variant].join("_"), values);
   }
   // ADR-144: trial notifications carry the box, the class and its time.
   function trialText(notification: NotificationRecord, part: "title" | "body") {
@@ -590,6 +612,13 @@ const COMMUNITY_NOTICES = [
   "community_report_created",
   "community_club_join_requested",
   "community_club_join_approved",
+  "community_event_waitlist_promoted",
+  "community_event_cancelled",
+  "community_event_changed",
+  "community_event_reminder",
+  "community_event_guest_joined",
+  "community_event_trial_offer",
+  "community_event_message",
 ] as const;
 
 export function NotificationBell({
