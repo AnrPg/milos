@@ -2094,7 +2094,7 @@ defmodule MilosTrainingWeb.FallbackController do
     member_code_revoked: {:unprocessable_entity, "This code was revoked"},
     invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"},
     # ADR-157: photos and videos in posts.
-    too_many_media: {:unprocessable_entity, "A post carries up to four photos or one video"},
+    too_many_media: {:unprocessable_entity, "A post carries up to ten photos or one video"},
     mixed_media: {:unprocessable_entity, "A post carries photos or a video, not both"},
     media_quota_exceeded:
       {:unprocessable_entity, "You have too many uploads waiting; post or remove some first"},

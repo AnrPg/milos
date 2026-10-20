@@ -539,6 +539,19 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, with the extras and n
 6. **Owner rules (Q6):** Ρυθμίσεις › Check-in: window, open gym, visitor offer, desk override,
    door rotation, member code mode.
 
+### Photos and video in posts (2026-10-20, [board 12](https://claude.ai/artifact/FasZr8B6vU1ULkXBXXQQzx))
+
+Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with these notes.
+
+1. **Adding (Q1):** up to **10** photos per post (his note), uploading while you write, reorder,
+   crop, resized on the phone first.
+2. **Video (Q2):** one video per post, up to **2 minutes** (his note), converted on the server.
+3. **Feed (Q3):** swipe through with dots, tap for a full-screen viewer with zoom.
+4. **Descriptions (Q4):** optional per photo, with an AI suggestion used only on tap.
+5. **Safety (Q5, B):** no automatic checks; reports only. Note: the report control is a subtle,
+   almost hidden line-icon button.
+6. **PR (Q6):** «Μοιράσου το» after a PR opens compose with the PR card and the media picker first.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -561,4 +574,4 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, with the extras and n
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
-- [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
