@@ -58,6 +58,7 @@ function NotificationCard({
   const i18n = useUiTranslations();
   const tTrials = useTranslations("Trials");
   const tClubs = useTranslations("Clubs");
+  const tReferrals = useTranslations("Referrals");
   // ADR-143: group, report and open-club notifications carry their names (events: ADR-153).
   function communityText(notification: NotificationRecord, part: "title" | "body") {
     if (!(COMMUNITY_NOTICES as readonly string[]).includes(notification.type)) return null;
@@ -110,9 +111,36 @@ function NotificationCard({
     return reason ? `${body} ${reason}` : body;
   }
 
+  // ADR-156: the inviter hears each step and the reward; staff a referral to approve.
+  function referralText(notification: NotificationRecord, part: "title" | "body") {
+    if (!notification.type.startsWith("referral_")) return null;
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      referrer: text("referrer_nickname") || tTrials("someone"),
+      box: text("box_name"),
+    };
+    if (notification.type === "referral_progress") {
+      if (part === "title") return tReferrals("notif.progressTitle");
+      const stage = ["event", "trial", "joined", "paid"].includes(text("stage")) ? text("stage") : "signed_up";
+      return tReferrals(`notif.progress.${stage}`, values);
+    }
+    if (notification.type === "referral_reward") {
+      if (part === "title") return tReferrals("notif.rewardTitle");
+      const status = ["given", "rejected"].includes(text("reward_status")) ? text("reward_status") : "approved";
+      return tReferrals(`notif.reward.${status}`, values);
+    }
+    if (notification.type === "referral_review") {
+      return part === "title" ? tReferrals("notif.reviewTitle") : tReferrals("notif.reviewBody", values);
+    }
+    return null;
+  }
+
   function notificationBody(notification: NotificationRecord) {
     const trial = trialText(notification, "body");
     if (trial !== null) return trial;
+    const referral = referralText(notification, "body");
+    if (referral !== null) return referral;
     const community = communityText(notification, "body");
     if (community !== null) return community;
     if (typeof notification.payload.body === "string") {
@@ -355,6 +383,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const trial = trialText(notification, "title");
     if (trial !== null) return trial;
+    const referral = referralText(notification, "title");
+    if (referral !== null) return referral;
     const community = communityText(notification, "title");
     if (community !== null) return community;
     // The nutrition plan's own title is the body, not the notification title.

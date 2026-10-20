@@ -27,6 +27,14 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { ReferralEventWizard } from "@/components/admin/finance/ReferralEventWizard";
+import { ProgramRulesFields } from "@/components/admin/finance/referrals/ProgramRulesFields";
+import { ReferralInvites } from "@/components/admin/finance/referrals/ReferralInvites";
+import {
+  BLANK_RULES,
+  programRulesBody,
+  rulesFromProgram,
+  type ProgramRules,
+} from "@/components/admin/finance/referrals/program-rules";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -149,15 +157,21 @@ export function ReferralsTab() {
   const [programEditForm, setProgramEditForm] = useState(BLANK_PROGRAM);
   const selectedProgramDefaults = selectedProgram ? programFormFromRecord(selectedProgram) : BLANK_PROGRAM;
   const activeProgramEditForm = programEditForm.name ? programEditForm : selectedProgramDefaults;
+  // ADR-156: the programme's two-sided rules, edited beside its reward.
+  const [programRules, setProgramRules] = useState<ProgramRules>(BLANK_RULES);
+  const [programEditRules, setProgramEditRules] = useState<ProgramRules | null>(null);
+  const activeProgramEditRules = programEditRules ?? rulesFromProgram(selectedProgram);
 
   const createProgramMutation = useMutation({
     mutationFn: () =>
       createReferralProgram(token, {
         ...programForm,
         reward_value: Number(programForm.reward_value || 0),
+        ...programRulesBody(programRules),
       }),
     onSuccess: async () => {
       setProgramForm(BLANK_PROGRAM);
+      setProgramRules(BLANK_RULES);
       setParam({ new: null });
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "referral-programs"] });
     },
@@ -168,6 +182,7 @@ export function ReferralsTab() {
       updateReferralProgram(token, field(selectedProgram, "id"), {
         ...activeProgramEditForm,
         reward_value: Number(activeProgramEditForm.reward_value || 0),
+        ...programRulesBody(activeProgramEditRules),
       }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "referral-programs"] });
@@ -207,6 +222,9 @@ export function ReferralsTab() {
   return (
     <div className="space-y-10">
 
+      {/* Invites members brought (ADR-156) */}
+      <ReferralInvites />
+
       {/* Programs */}
       <Section
         title={i18n("programsab14d0a")}
@@ -225,6 +243,7 @@ export function ReferralsTab() {
               last={i === programs.length - 1}
               onClick={() => {
                 setProgramEditForm(programFormFromRecord(p));
+                setProgramEditRules(rulesFromProgram(p));
                 setParam({ "referral-program": field(p, "id") });
               }}
             >
@@ -416,6 +435,7 @@ export function ReferralsTab() {
                 />
               </PanelField>
             </div>
+            <ProgramRulesFields rules={programRules} rewardType={programForm.reward_type} onChange={setProgramRules} />
             <label className="flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
               <input
                 type="checkbox"
@@ -455,7 +475,10 @@ export function ReferralsTab() {
               <StatusButton
                 label={i18n("reset44c57ab")}
                 pending={false}
-                onClick={() => setProgramEditForm(programFormFromRecord(selectedProgram))}
+                onClick={() => {
+                  setProgramEditForm(programFormFromRecord(selectedProgram));
+                  setProgramEditRules(rulesFromProgram(selectedProgram));
+                }}
               />
             </PanelActions>
           }
@@ -489,6 +512,11 @@ export function ReferralsTab() {
                 />
               </PanelField>
             </div>
+            <ProgramRulesFields
+              rules={activeProgramEditRules}
+              rewardType={activeProgramEditForm.reward_type}
+              onChange={setProgramEditRules}
+            />
             <label className="flex items-center gap-3 text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
               <input
                 type="checkbox"
