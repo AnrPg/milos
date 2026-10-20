@@ -57,6 +57,20 @@ function NotificationCard({
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const tTrials = useTranslations("Trials");
+  const tClubs = useTranslations("Clubs");
+  // ADR-143: group, report and open-club notifications carry their names.
+  function communityText(notification: NotificationRecord, part: "title" | "body") {
+    if (!(COMMUNITY_NOTICES as readonly string[]).includes(notification.type)) return null;
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const reason = text("reason");
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      group: text("group_name"),
+      club: text("club_name"),
+      reason: reason ? tClubs(`reason_${reason}`) : "",
+    };
+    return tClubs(["notif", notification.type.replace(/^community_/, ""), part].join("_"), values);
+  }
   // ADR-144: trial notifications carry the box, the class and its time.
   function trialText(notification: NotificationRecord, part: "title" | "body") {
     const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
@@ -77,6 +91,8 @@ function NotificationCard({
   function notificationBody(notification: NotificationRecord) {
     const trial = trialText(notification, "body");
     if (trial !== null) return trial;
+    const community = communityText(notification, "body");
+    if (community !== null) return community;
     if (typeof notification.payload.body === "string") {
       return notification.payload.body;
     }
@@ -317,6 +333,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const trial = trialText(notification, "title");
     if (trial !== null) return trial;
+    const community = communityText(notification, "title");
+    if (community !== null) return community;
     // The nutrition plan's own title is the body, not the notification title.
     if (notification.type === "nutrition_plan_updated") return notificationTitle(notification.type);
     if (typeof notification.payload.title === "string") return notification.payload.title;
@@ -561,6 +579,18 @@ const TRIAL_NOTICE_KEYS = {
   follow_up: ["notif_follow_up_title", "notif_follow_up_body"],
   class_cancelled: ["notif_class_cancelled_title", "notif_class_cancelled_body"],
 } as const satisfies Record<TrialNotice, readonly [string, string]>;
+
+const COMMUNITY_NOTICES = [
+  "community_group_proposed",
+  "community_group_approved",
+  "community_group_declined",
+  "community_group_join_requested",
+  "community_group_join_approved",
+  "community_group_archive_warning",
+  "community_report_created",
+  "community_club_join_requested",
+  "community_club_join_approved",
+] as const;
 
 export function NotificationBell({
   onUnreadChange,

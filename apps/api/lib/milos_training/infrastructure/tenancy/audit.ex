@@ -26,7 +26,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     journal_coach_reads
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
-    community_post_comments
+    community_post_comments community_reports community_settings
     media_tenant_objects organization_public_profiles profile_tag_suggestions
     housekeeping_areas
     housekeeping_entries

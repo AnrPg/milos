@@ -54,7 +54,7 @@ function ClubRow({ club }: { club: CommunityClub }) {
     if (!tokens?.access_token) return;
     setError(null);
     try {
-      await setNotifyLevel(tokens.access_token, club.organization_slug, club.id, level);
+      await setNotifyLevel(tokens.access_token, club, level);
       await queryClient.invalidateQueries({ queryKey: CLUBS_KEY });
     } catch (caught) {
       setError(clientErrorMessage(caught, tUi));

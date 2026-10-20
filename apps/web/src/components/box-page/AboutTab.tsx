@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -23,8 +24,9 @@ const ABOUT_PREVIEW = 320;
 
 /**
  * «Σχετικά» (plan §5a board 4 Q3): text, photo strip, disciplines, who it
- * welcomes, services, coaches, amenities, languages, then locations with the
- * map and opening hours. Only what the owner published.
+ * welcomes, services, coaches, the box's open clubs (board 7 Q6), amenities,
+ * languages, then locations with the map and opening hours. Only what the
+ * owner published.
  */
 export function AboutTab({ page, onOpenPhoto }: { page: PublicBoxPage; onOpenPhoto: (index: number) => void }) {
   const t = useTranslations("BoxPage");
@@ -144,6 +146,34 @@ export function AboutTab({ page, onOpenPhoto }: { page: PublicBoxPage; onOpenPho
                     <span className="line-clamp-2 text-xs" style={{ color: "var(--dim)" }}>{coach.class_types.join(" · ")}</span>
                   ) : null}
                 </span>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      ) : null}
+
+      {(page.open_clubs ?? []).length > 0 ? (
+        <Section title={t("openClubs")}>
+          <ul className="flex flex-col gap-2">
+            {page.open_clubs.map((club) => (
+              <li key={club.id}>
+                <Link
+                  href={`/clubs/${club.id}`}
+                  className="flex items-center gap-3 overflow-hidden rounded-2xl p-3"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+                >
+                  {club.cover_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- gym-uploaded media origin
+                    <img src={club.cover_url} alt="" className="h-12 w-16 shrink-0 rounded-xl object-cover" />
+                  ) : null}
+                  <span className="flex min-w-0 grow flex-col">
+                    <span className="truncate font-bold" style={{ color: "var(--text)" }}>{club.name}</span>
+                    <span className="line-clamp-1 text-xs" style={{ color: "var(--dim)" }}>
+                      {[t("openClubMembers", { count: club.member_count }), club.description].filter(Boolean).join(" · ")}
+                    </span>
+                  </span>
+                  <span aria-hidden="true" style={{ color: "var(--dim)" }}>›</span>
+                </Link>
               </li>
             ))}
           </ul>

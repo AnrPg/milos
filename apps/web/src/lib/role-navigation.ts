@@ -109,6 +109,11 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   if (has("manage_inventory") && !users) {
     items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
+  // ADR-143: coaches moderate the community from the bar ("More"); owners and
+  // admins reach Κοινότητα from a dashboard tile and from settings.
+  if (has("moderate_community") && !users) {
+    items.push({ id: "community", href: "/admin/community", labelKey: "community", match: ["/admin/community"], scoped: true });
+  }
   return items;
 }
 

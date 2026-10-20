@@ -11,6 +11,7 @@ import {
   deletePost,
   FEED_KEY,
   fetchComments,
+  setCommentHidden,
   setKudos,
   setPostHidden,
   setPostPinned,
@@ -20,6 +21,7 @@ import { SOCIAL_KEY } from "@/api/social";
 import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import { channelName, clubInitials } from "@/components/community/community";
+import { ReportSheet } from "@/components/community/ReportSheet";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -29,8 +31,9 @@ import type { PRRecord } from "@/api/gamification";
 
 /**
  * One post (vision §7.1): its origin (`Club › #channel`) on top, then the
- * author, text, the shared journal entry, kudos and comments. Staff hide,
- * delete and pin; authors delete their own (D8).
+ * author, text, the shared journal entry, kudos and comments. Staff (and a
+ * group's admins) hide, delete and pin; authors delete their own (D8); anyone
+ * else reports it from ⋯ (board 7 Q4).
  */
 export function PostCard({ post }: { post: CommunityPost }) {
   const t = useTranslations("Community");
@@ -42,6 +45,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
   const [showComments, setShowComments] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState(false);
   const author = post.author.nickname ?? "?";
 
   async function run(action: () => Promise<unknown>) {
@@ -87,7 +91,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
             {clubInitials(author)}
           </span>
         )}
-        <div className="min-w-0">
+        <div className="min-w-0 grow">
           <Link href={`/people/${post.author.id}`} className="block truncate font-bold" style={{ color: "var(--text)" }}>
             {author}
           </Link>
@@ -95,6 +99,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
             <time dateTime={post.inserted_at}>{formatDateTime(post.inserted_at, locale)}</time>
           </p>
         </div>
+        {post.can_report ? <MoreMenu label={t("more")} items={[{ label: t("report"), onSelect: () => setReporting(true) }]} /> : null}
       </header>
 
       {post.hidden ? (
@@ -155,6 +160,14 @@ export function PostCard({ post }: { post: CommunityPost }) {
       </div>
       {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
       {showComments ? <Comments post={post} /> : null}
+      {reporting ? (
+        <ReportSheet
+          target="post"
+          targetId={post.id}
+          onClose={() => setReporting(false)}
+          onReported={() => void queryClient.invalidateQueries({ queryKey: FEED_KEY })}
+        />
+      ) : null}
     </article>
   );
 }
@@ -165,6 +178,53 @@ function origin(post: CommunityPost, t: ReturnType<typeof useTranslations>) {
     return post.audience === "public" ? t("audiencePublic") : t("audienceFollowers");
   }
   return post.channel ? `${post.club.name} › #${channelName(post.channel, t)}` : post.club.name;
+}
+
+/** ⋯ on a post or comment: a short menu of what the reader may do with it. */
+export function MoreMenu({ label, items }: { label: string; items: { label: string; onSelect: () => void }[] }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative shrink-0">
+      <button
+        type="button"
+        aria-label={label}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((value) => !value)}
+        className="flex h-11 w-11 items-center justify-center rounded-full text-lg font-bold"
+        style={{ color: "var(--dim)" }}
+      >
+        ⋯
+      </button>
+      {open ? (
+        <>
+          <button type="button" aria-hidden="true" tabIndex={-1} className="fixed inset-0 z-10 cursor-default" onClick={() => setOpen(false)} />
+          <ul
+            role="menu"
+            className="absolute right-0 z-20 mt-1 min-w-40 overflow-hidden rounded-2xl py-1 shadow-lg"
+            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+          >
+            {items.map((item) => (
+              <li key={item.label} role="none">
+                <button
+                  type="button"
+                  role="menuitem"
+                  onClick={() => {
+                    setOpen(false);
+                    item.onSelect();
+                  }}
+                  className="block min-h-11 w-full px-4 text-left text-sm font-semibold"
+                  style={{ color: "var(--text)" }}
+                >
+                  {item.label}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </>
+      ) : null}
+    </div>
+  );
 }
 
 function SmallAction({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: string }) {
@@ -227,6 +287,7 @@ function Comments({ post }: { post: CommunityPost }) {
   const comments = useQuery({ queryKey: key, enabled: Boolean(token), queryFn: () => fetchComments(token!, post) });
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [reporting, setReporting] = useState<string | null>(null);
 
   async function refresh() {
     await Promise.all([
@@ -256,21 +317,43 @@ function Comments({ post }: { post: CommunityPost }) {
       ) : null}
       <ul className="flex flex-col gap-2">
         {(comments.data ?? []).map((comment) => (
-          <li key={comment.id} className="text-sm" style={{ color: "var(--text)" }}>
-            <b>{comment.author.nickname ?? "?"}</b> <span className="whitespace-pre-wrap">{comment.body}</span>
-            {comment.can_delete ? (
-              <button
-                type="button"
-                className="ml-2 text-xs underline"
-                style={{ color: "var(--dim)" }}
-                onClick={() =>
-                  void deleteComment(token!, post, comment.id)
-                    .then(refresh)
-                    .catch((caught) => setError(clientErrorMessage(caught, tUi)))
-                }
-              >
-                {t("delete")}
-              </button>
+          <li key={comment.id} className="flex items-start gap-1 text-sm" style={{ color: "var(--text)", opacity: comment.hidden ? 0.6 : 1 }}>
+            <p className="min-w-0 grow">
+              <b>{comment.author.nickname ?? "?"}</b> <span className="whitespace-pre-wrap">{comment.body}</span>
+              {comment.hidden ? (
+                <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("commentHidden")}</span>
+              ) : null}
+              {comment.can_moderate ? (
+                <button
+                  type="button"
+                  className="ml-2 text-xs underline"
+                  style={{ color: "var(--dim)" }}
+                  onClick={() =>
+                    void setCommentHidden(token!, comment.id, !comment.hidden)
+                      .then(refresh)
+                      .catch((caught) => setError(clientErrorMessage(caught, tUi)))
+                  }
+                >
+                  {comment.hidden ? t("unhide") : t("hide")}
+                </button>
+              ) : null}
+              {comment.can_delete ? (
+                <button
+                  type="button"
+                  className="ml-2 text-xs underline"
+                  style={{ color: "var(--dim)" }}
+                  onClick={() =>
+                    void deleteComment(token!, post, comment.id)
+                      .then(refresh)
+                      .catch((caught) => setError(clientErrorMessage(caught, tUi)))
+                  }
+                >
+                  {t("delete")}
+                </button>
+              ) : null}
+            </p>
+            {comment.can_report ? (
+              <MoreMenu label={t("more")} items={[{ label: t("report"), onSelect: () => setReporting(comment.id) }]} />
             ) : null}
           </li>
         ))}
@@ -296,6 +379,9 @@ function Comments({ post }: { post: CommunityPost }) {
         </button>
       </form>
       {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {reporting ? (
+        <ReportSheet target="comment" targetId={reporting} onClose={() => setReporting(null)} onReported={() => void refresh()} />
+      ) : null}
     </div>
   );
 }

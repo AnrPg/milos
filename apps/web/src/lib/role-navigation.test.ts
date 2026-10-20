@@ -34,6 +34,11 @@ describe("staffNavItems", () => {
     expect(ids(ACCOUNTANT, ["accountant"])).toEqual(["home", "finance", "clients", "reports"]);
   });
 
+  it("puts Κοινότητα in a coach's bar; owners and admins reach it from the dashboard (ADR-143)", () => {
+    expect(ids({ ...COACH, moderate_community: "all" }, ["coach"])).toEqual(["home", "coaching", "community"]);
+    expect(ids({ ...ADMIN, moderate_community: "all", manage_community: "all" })).toEqual(["home", "coaching", "finance", "users"]);
+  });
+
   it("gives janitors only the cleaning log", () => {
     expect(ids(JANITOR, ["janitor"])).toEqual(["cleaning"]);
   });
