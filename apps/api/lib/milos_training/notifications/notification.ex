@@ -42,7 +42,15 @@ defmodule MilosTraining.Notifications.Notification do
     :subscription_grace,
     :access_ended,
     :follow_requested,
-    :follow_accepted
+    :follow_accepted,
+    :trial_requested,
+    :trial_booked,
+    :trial_cancelled,
+    :trial_accepted,
+    :trial_declined,
+    :trial_reminder,
+    :trial_follow_up,
+    :trial_class_cancelled
   ]
 
   schema "notifications" do

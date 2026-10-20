@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.PublicBox do
   every row of that gym, so each function projects only public fields.
   """
 
-  alias MilosTraining.Application.{MediaUrls, PostPresenter}
+  alias MilosTraining.Application.{MediaUrls, PostPresenter, Trials}
   alias MilosTraining.{Community, Facility, Identity, Media, Organizations, Scheduling}
 
   @max_window_days 31
@@ -43,7 +43,7 @@ defmodule MilosTraining.Application.PublicBox do
   Classes between `start_at` and `end_at` (ISO 8601, at most #{@max_window_days}
   days; default the next 7 days), without bookings or member data.
   """
-  def schedule(slug, params) do
+  def schedule(slug, viewer_id \\ nil, params) do
     with {:ok, box, context} <- resolve(slug),
          {:ok, start_at, end_at} <- window(params) do
       slots =
@@ -61,12 +61,21 @@ defmodule MilosTraining.Application.PublicBox do
         |> Identity.list_by_ids()
         |> Map.new(&{&1.id, %{id: &1.id, nickname: &1.nickname, avatar_url: &1.avatar_url}})
 
+      # ADR-144: what a visitor may ask for (nil for members and when the
+      # owner hasn't opened trials).
+      offer = Trials.offer(box.organization_id, viewer_id, slots)
+      seats = (offer && offer.seats) || %{}
+
       {:ok,
        %{
          box: box,
          start_at: start_at,
          end_at: end_at,
-         slots: Enum.map(slots, &present_slot(&1, coaches))
+         trial_offer: offer && Map.delete(offer, :seats),
+         slots:
+           Enum.map(slots, fn slot ->
+             slot |> present_slot(coaches) |> Map.put(:trial_seats, Map.get(seats, slot.id))
+           end)
        }}
     end
   end
@@ -98,7 +107,8 @@ defmodule MilosTraining.Application.PublicBox do
   @doc "The public face of published gyms by id (followed boxes, feed origins)."
   def boxes(organization_ids), do: Organizations.public_boxes(organization_ids)
 
-  defp resolve(slug) do
+  @doc "A published box by slug or alias: `{:ok, public_box, %{organization_id: ...}}`."
+  def resolve(slug) do
     with %{organization_id: id} <- Organizations.public_box_by_slug(slug),
          [box] <- Organizations.public_boxes([id]) do
       {:ok, box, %{organization_id: id}}

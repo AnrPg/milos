@@ -42,3 +42,15 @@ msgstr "المقرر"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "حالة حجز فصل تدريب ميلوس: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "حصة تجريبية في %{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "حالة الحصة التجريبية: %{status}."
+
+msgid "Waiting for the box"
+msgstr "بانتظار رد النادي"
+
+msgid "Booked"
+msgstr "محجوزة"

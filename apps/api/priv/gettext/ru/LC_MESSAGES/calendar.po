@@ -42,3 +42,15 @@ msgstr "Запланировано"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "Статус бронирования занятий TrainingJournal: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "Пробное занятие в %{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "Статус пробного занятия: %{status}."
+
+msgid "Waiting for the box"
+msgstr "Ждёт ответа клуба"
+
+msgid "Booked"
+msgstr "Забронировано"

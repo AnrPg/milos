@@ -106,6 +106,9 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def list_slots_window(_start_at, _end_at), do: missing_tenant()
 
   @impl true
+  def list_slots_by_ids(context, ids), do: tenant_call(context, :list_slots_by_ids, [ids])
+
+  @impl true
   def list_member_slots(context, user_id, start_at, end_at),
     do: tenant_call(context, :list_member_slots, [user_id, start_at, end_at])
 

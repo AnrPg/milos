@@ -91,6 +91,14 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminScaleLevelController, :index} => [:manage_workouts, :manage_settings],
     {W.AdminScaleLevelController, :update} => [:manage_settings],
 
+    # Trials (ADR-144)
+    {W.AdminTrialController, :policy} => [:manage_settings],
+    {W.AdminTrialController, :update_policy} => [:manage_settings],
+    {W.AdminTrialController, :queue} => [:run_classes, :manage_memberships, :manage_settings],
+    {W.AdminTrialController, :accept} => [:run_classes, :manage_memberships],
+    {W.AdminTrialController, :decline} => [:run_classes, :manage_memberships],
+    {W.AdminTrialController, :attendance} => [:run_classes],
+
     # Schedule
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
     {W.AdminScheduleController, :create_series} => [:manage_schedule],

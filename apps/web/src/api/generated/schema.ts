@@ -208,6 +208,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/boxes/{slug}/conversation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your conversation with a box and a page of its messages, newest first */
+        get: operations["MilosTrainingWeb.BoxConversationController.show"];
+        put?: never;
+        /** Start (or return) your conversation with a box */
+        post: operations["MilosTrainingWeb.BoxConversationController.open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/boxes/{slug}/conversation/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Write to the box */
+        post: operations["MilosTrainingWeb.BoxConversationController.send_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/boxes/{slug}/conversation/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the conversation read up to a message */
+        post: operations["MilosTrainingWeb.BoxConversationController.mark_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/boxes/{slug}/posts": {
         parameters: {
             query?: never;
@@ -236,6 +288,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.PublicBoxController.schedule"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/boxes/{slug}/trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask for (or book) a trial in a class of a published box */
+        post: operations["MilosTrainingWeb.TrialController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -500,6 +569,23 @@ export interface paths {
         put?: never;
         /** Create a constrained presigned avatar upload */
         post: operations["MilosTrainingWeb.MeController.avatar_upload_url"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/box-conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The boxes you talk to without being a member, latest first */
+        get: operations["MilosTrainingWeb.BoxConversationController.index"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -897,6 +983,74 @@ export interface paths {
         put?: never;
         /** Record that the current account finished a product tour */
         post: operations["MilosTrainingWeb.MeController.complete_tour"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your trials at every box: upcoming, and recent ones with something to show */
+        get: operations["MilosTrainingWeb.TrialController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/trials/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of your trials */
+        get: operations["MilosTrainingWeb.TrialController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/trials/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel your trial (frees the seat, or withdraws the ask) */
+        post: operations["MilosTrainingWeb.TrialController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/trials/{id}/follow-up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** After the trial: «Θέλω να γραφτώ» opens a chat with the box, «Όχι τώρα» hides the card */
+        post: operations["MilosTrainingWeb.TrialController.follow_up"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2840,6 +2994,92 @@ export interface paths {
         head?: never;
         /** Update global admin settings */
         patch: operations["MilosTrainingWeb.AdminSettingsController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/trial-policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's trial rules and this week's trial count */
+        get: operations["MilosTrainingWeb.AdminTrialController.policy"];
+        /** Change the box's trial rules */
+        put: operations["MilosTrainingWeb.AdminTrialController.update_policy"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/trials": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Trials in one stage of the funnel, with the count per stage and the last 30 days */
+        get: operations["MilosTrainingWeb.AdminTrialController.queue"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/trials/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept a trial request: the seat is booked */
+        post: operations["MilosTrainingWeb.AdminTrialController.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/trials/{id}/attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ήρθε / Δεν ήρθε (recorded on the class roster) */
+        post: operations["MilosTrainingWeb.AdminTrialController.attendance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/trials/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a trial request, with an optional reason the person sees */
+        post: operations["MilosTrainingWeb.AdminTrialController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/users": {
@@ -6337,6 +6577,181 @@ export interface components {
         BookingSharingRequest: {
             enabled: boolean;
         };
+        /** BoxConversation */
+        BoxConversation: {
+            /** PublicBox */
+            box: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            };
+            /** @description Board 6 Q6: the package the box offers people who join after a trial */
+            conversion_package?: {
+                base_price_cents: number;
+                billing_period?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            /** Format: uuid */
+            last_read_message_id?: string | null;
+            member: boolean;
+            messages?: {
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                message_type?: string;
+                /** Format: uuid */
+                sender_id: string;
+                /** Format: uuid */
+                thread_id?: string;
+            }[];
+            staff: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            /** Format: uuid */
+            thread_id: string;
+        };
+        /** BoxConversationMessage */
+        BoxConversationMessage: {
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at: string;
+            message_type?: string;
+            /** Format: uuid */
+            sender_id: string;
+            /** Format: uuid */
+            thread_id?: string;
+        };
+        /** BoxConversationMessageResponse */
+        BoxConversationMessageResponse: {
+            /** BoxConversationMessage */
+            message: {
+                body: string;
+                /** Format: uuid */
+                client_operation_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                message_type?: string;
+                /** Format: uuid */
+                sender_id: string;
+                /** Format: uuid */
+                thread_id?: string;
+            };
+        };
+        /** BoxConversationRead */
+        BoxConversationRead: {
+            /** Format: uuid */
+            message_id: string;
+        };
+        /** BoxConversationResponse */
+        BoxConversationResponse: {
+            /** BoxConversation */
+            conversation: {
+                /** PublicBox */
+                box: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                };
+                /** @description Board 6 Q6: the package the box offers people who join after a trial */
+                conversion_package?: {
+                    base_price_cents: number;
+                    billing_period?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: uuid */
+                last_read_message_id?: string | null;
+                member: boolean;
+                messages?: {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    message_type?: string;
+                    /** Format: uuid */
+                    sender_id: string;
+                    /** Format: uuid */
+                    thread_id?: string;
+                }[];
+                staff: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                /** Format: uuid */
+                thread_id: string;
+            };
+        };
+        /** BoxConversationSend */
+        BoxConversationSend: {
+            body: string;
+            /** Format: uuid */
+            client_operation_id?: string;
+        };
+        /** BoxConversationsResponse */
+        BoxConversationsResponse: {
+            conversations: {
+                /** PublicBox */
+                box: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                };
+                last_message?: {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    message_type?: string;
+                    /** Format: uuid */
+                    sender_id: string;
+                    /** Format: uuid */
+                    thread_id?: string;
+                } | null;
+                /** Format: uuid */
+                thread_id: string;
+                unread: boolean;
+            }[];
+        };
         /** BoxPublicProfile */
         BoxPublicProfile: {
             about: string | null;
@@ -8525,6 +8940,215 @@ export interface components {
             /** @enum {string|null} */
             surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
         };
+        /** MyTrial */
+        MyTrial: {
+            /** Format: date-time */
+            attended_at?: string | null;
+            /** Format: uuid */
+            booking_id?: string | null;
+            box?: {
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                /** @description Canonical slug; redirect when it differs */
+                slug: string;
+            } | null;
+            bring_note?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** TrialClass */
+            class: {
+                class_type?: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+            };
+            /** Format: date-time */
+            class_starts_at: string;
+            /** Format: date-time */
+            converted_at?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            decline_reason?: string | null;
+            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+            follow_up: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            /** TrialLocation */
+            location?: {
+                address?: string | null;
+                city?: string | null;
+                /** Format: uuid */
+                id: string;
+                latitude?: number | null;
+                longitude?: number | null;
+                name: string;
+                neighbourhood?: string | null;
+            } | null;
+            note?: string | null;
+            /** Format: uuid */
+            organization_id?: string;
+            /** Format: uuid */
+            scheduled_class_id?: string | null;
+            /** @enum {string} */
+            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+            /** Format: uuid */
+            user_id?: string;
+        };
+        /** MyTrialResponse */
+        MyTrialResponse: {
+            /** MyTrial */
+            trial: {
+                /** Format: date-time */
+                attended_at?: string | null;
+                /** Format: uuid */
+                booking_id?: string | null;
+                box?: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                } | null;
+                bring_note?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** TrialClass */
+                class: {
+                    class_type?: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    } | null;
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                };
+                /** Format: date-time */
+                class_starts_at: string;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** Format: date-time */
+                decided_at?: string | null;
+                decline_reason?: string | null;
+                /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                follow_up: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** TrialLocation */
+                location?: {
+                    address?: string | null;
+                    city?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    latitude?: number | null;
+                    longitude?: number | null;
+                    name: string;
+                    neighbourhood?: string | null;
+                } | null;
+                note?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                /** Format: uuid */
+                scheduled_class_id?: string | null;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** Format: uuid */
+                user_id?: string;
+            };
+        };
+        /** MyTrialsResponse */
+        MyTrialsResponse: {
+            trials: {
+                /** Format: date-time */
+                attended_at?: string | null;
+                /** Format: uuid */
+                booking_id?: string | null;
+                box?: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                } | null;
+                bring_note?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** TrialClass */
+                class: {
+                    class_type?: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    } | null;
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                };
+                /** Format: date-time */
+                class_starts_at: string;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** Format: date-time */
+                decided_at?: string | null;
+                decline_reason?: string | null;
+                /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                follow_up: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** TrialLocation */
+                location?: {
+                    address?: string | null;
+                    city?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    latitude?: number | null;
+                    longitude?: number | null;
+                    name: string;
+                    neighbourhood?: string | null;
+                } | null;
+                note?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                /** Format: uuid */
+                scheduled_class_id?: string | null;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** Format: uuid */
+                user_id?: string;
+            }[];
+        };
         /** MyWorkoutInjuryWarnings */
         MyWorkoutInjuryWarnings: {
             /** @enum {string} */
@@ -8809,6 +9433,8 @@ export interface components {
             /** Format: date-time */
             scheduled_at: string;
             spots_remaining?: number | null;
+            /** @description Trial seats left (ADR-144); null when the class takes no trials */
+            trial_seats?: number | null;
         };
         /**
          * PublicBoxCoach
@@ -9044,9 +9670,35 @@ export interface components {
                 /** Format: date-time */
                 scheduled_at: string;
                 spots_remaining?: number | null;
+                /** @description Trial seats left (ADR-144); null when the class takes no trials */
+                trial_seats?: number | null;
             }[];
             /** Format: date-time */
             start_at: string;
+            /**
+             * TrialOffer
+             * @description What the box offers a visitor; null for members and when trials are off
+             */
+            trial_offer?: {
+                /** @enum {string} */
+                approval: "auto" | "manual";
+                /**
+                 * @description Why this person can't ask for a trial here; null when they can
+                 * @enum {string|null}
+                 */
+                blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                bring_note?: string | null;
+                enabled: boolean;
+                horizon_days?: number | null;
+                mine?: {
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    scheduled_class_id?: string;
+                    /** @enum {string} */
+                    status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                } | null;
+            } | null;
         };
         /** RememberFilterRequest */
         RememberFilterRequest: {
@@ -9125,6 +9777,123 @@ export interface components {
             role: "owner" | "admin" | "coach";
             /** Format: uuid */
             user_id: string;
+        };
+        /** StaffTrial */
+        StaffTrial: {
+            /** Format: date-time */
+            attended_at?: string | null;
+            /** Format: uuid */
+            booking_id?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** TrialClass */
+            class: {
+                class_type?: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                duration_minutes?: number | null;
+                /** Format: uuid */
+                id?: string | null;
+                /** Format: uuid */
+                location_id?: string | null;
+                name?: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+            };
+            /** Format: date-time */
+            class_starts_at: string;
+            /** Format: date-time */
+            converted_at?: string | null;
+            /** Format: date-time */
+            decided_at?: string | null;
+            /** Format: uuid */
+            decided_by_id?: string | null;
+            decline_reason?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string;
+            /** Format: date-time */
+            join_interest_at?: string | null;
+            note?: string | null;
+            /** Format: uuid */
+            organization_id?: string;
+            person?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            } | null;
+            phone?: string | null;
+            /** Format: uuid */
+            scheduled_class_id?: string | null;
+            source?: string;
+            /** @enum {string} */
+            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+            /** Format: uuid */
+            user_id?: string;
+        };
+        /** StaffTrialResponse */
+        StaffTrialResponse: {
+            /** StaffTrial */
+            trial: {
+                /** Format: date-time */
+                attended_at?: string | null;
+                /** Format: uuid */
+                booking_id?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** TrialClass */
+                class: {
+                    class_type?: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    } | null;
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                };
+                /** Format: date-time */
+                class_starts_at: string;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** Format: date-time */
+                decided_at?: string | null;
+                /** Format: uuid */
+                decided_by_id?: string | null;
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: date-time */
+                join_interest_at?: string | null;
+                note?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                phone?: string | null;
+                /** Format: uuid */
+                scheduled_class_id?: string | null;
+                source?: string;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** Format: uuid */
+                user_id?: string;
+            };
         };
         /** SubscriptionBeneficiary */
         SubscriptionBeneficiary: {
@@ -9388,6 +10157,313 @@ export interface components {
         TrainingLogVoidRequest: {
             expected_version?: number;
             reason?: string | null;
+        };
+        /** TrialAsk */
+        TrialAsk: {
+            /** Format: uuid */
+            client_operation_id?: string;
+            note?: string | null;
+            phone?: string | null;
+            /** Format: uuid */
+            scheduled_class_id: string;
+            /** @enum {string} */
+            source?: "box_page" | "schedule" | "qr_door" | "referral" | "event";
+        };
+        /** TrialAttendance */
+        TrialAttendance: {
+            /** @enum {string} */
+            status: "attended" | "no_show";
+        };
+        /** TrialClass */
+        TrialClass: {
+            class_type?: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            } | null;
+            duration_minutes?: number | null;
+            /** Format: uuid */
+            id?: string | null;
+            /** Format: uuid */
+            location_id?: string | null;
+            name?: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+        };
+        /** TrialDecline */
+        TrialDecline: {
+            reason?: string | null;
+        };
+        /** TrialFollowUp */
+        TrialFollowUp: {
+            /** @enum {string} */
+            action: "join" | "dismiss";
+        };
+        /** TrialFollowUpResponse */
+        TrialFollowUpResponse: {
+            conversation?: {
+                /** PublicBox */
+                box: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                };
+                /** @description Board 6 Q6: the package the box offers people who join after a trial */
+                conversion_package?: {
+                    base_price_cents: number;
+                    billing_period?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                } | null;
+                /** Format: uuid */
+                last_read_message_id?: string | null;
+                member: boolean;
+                messages?: {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    message_type?: string;
+                    /** Format: uuid */
+                    sender_id: string;
+                    /** Format: uuid */
+                    thread_id?: string;
+                }[];
+                staff: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                /** Format: uuid */
+                thread_id: string;
+            } | null;
+            /** MyTrial */
+            trial: {
+                /** Format: date-time */
+                attended_at?: string | null;
+                /** Format: uuid */
+                booking_id?: string | null;
+                box?: {
+                    logo_url?: string | null;
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    /** @description Canonical slug; redirect when it differs */
+                    slug: string;
+                } | null;
+                bring_note?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** TrialClass */
+                class: {
+                    class_type?: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    } | null;
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                };
+                /** Format: date-time */
+                class_starts_at: string;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** Format: date-time */
+                decided_at?: string | null;
+                decline_reason?: string | null;
+                /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                follow_up: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** TrialLocation */
+                location?: {
+                    address?: string | null;
+                    city?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    latitude?: number | null;
+                    longitude?: number | null;
+                    name: string;
+                    neighbourhood?: string | null;
+                } | null;
+                note?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                /** Format: uuid */
+                scheduled_class_id?: string | null;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** Format: uuid */
+                user_id?: string;
+            };
+        };
+        /** TrialLocation */
+        TrialLocation: {
+            address?: string | null;
+            city?: string | null;
+            /** Format: uuid */
+            id: string;
+            latitude?: number | null;
+            longitude?: number | null;
+            name: string;
+            neighbourhood?: string | null;
+        } | null;
+        /**
+         * TrialOffer
+         * @description What the box offers a visitor; null for members and when trials are off
+         */
+        TrialOffer: {
+            /** @enum {string} */
+            approval: "auto" | "manual";
+            /**
+             * @description Why this person can't ask for a trial here; null when they can
+             * @enum {string|null}
+             */
+            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+            bring_note?: string | null;
+            enabled: boolean;
+            horizon_days?: number | null;
+            mine?: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                scheduled_class_id?: string;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+            } | null;
+        } | null;
+        /** TrialPolicy */
+        TrialPolicy: {
+            /** @enum {string} */
+            approval?: "auto" | "manual";
+            bring_note?: string | null;
+            class_type_ids?: string[];
+            /** Format: uuid */
+            conversion_package_id?: string | null;
+            enabled?: boolean;
+            first_timers_only?: boolean;
+            horizon_days?: number | null;
+            no_show_consumes?: boolean;
+            per_person_limit?: number;
+            seats_per_class?: number;
+            weekly_limit?: number | null;
+        };
+        /** TrialPolicyResponse */
+        TrialPolicyResponse: {
+            /** TrialPolicy */
+            policy: {
+                /** @enum {string} */
+                approval?: "auto" | "manual";
+                bring_note?: string | null;
+                class_type_ids?: string[];
+                /** Format: uuid */
+                conversion_package_id?: string | null;
+                enabled?: boolean;
+                first_timers_only?: boolean;
+                horizon_days?: number | null;
+                no_show_consumes?: boolean;
+                per_person_limit?: number;
+                seats_per_class?: number;
+                weekly_limit?: number | null;
+            };
+            this_week: number;
+        };
+        /** TrialQueueResponse */
+        TrialQueueResponse: {
+            counts: {
+                joined: number;
+                requests: number;
+                upcoming: number;
+                visited: number;
+            };
+            /** @enum {string} */
+            stage: "requests" | "upcoming" | "visited" | "joined";
+            stats: {
+                attended: number;
+                booked: number;
+                cancelled?: number;
+                converted: number;
+                days: number;
+                declined?: number;
+                no_show: number;
+                requested: number;
+            };
+            trials: {
+                /** Format: date-time */
+                attended_at?: string | null;
+                /** Format: uuid */
+                booking_id?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** TrialClass */
+                class: {
+                    class_type?: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                    } | null;
+                    duration_minutes?: number | null;
+                    /** Format: uuid */
+                    id?: string | null;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    name?: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                };
+                /** Format: date-time */
+                class_starts_at: string;
+                /** Format: date-time */
+                converted_at?: string | null;
+                /** Format: date-time */
+                decided_at?: string | null;
+                /** Format: uuid */
+                decided_by_id?: string | null;
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at?: string;
+                /** Format: date-time */
+                join_interest_at?: string | null;
+                note?: string | null;
+                /** Format: uuid */
+                organization_id?: string;
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                } | null;
+                phone?: string | null;
+                /** Format: uuid */
+                scheduled_class_id?: string | null;
+                source?: string;
+                /** @enum {string} */
+                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** Format: uuid */
+                user_id?: string;
+            }[];
         };
         ValidationError: {
             /** @enum {string} */
@@ -10192,6 +11268,275 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.BoxConversationController.show": {
+        parameters: {
+            query?: {
+                before_id?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxConversation */
+                        conversation: {
+                            /** PublicBox */
+                            box: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            };
+                            /** @description Board 6 Q6: the package the box offers people who join after a trial */
+                            conversion_package?: {
+                                base_price_cents: number;
+                                billing_period?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            last_read_message_id?: string | null;
+                            member: boolean;
+                            messages?: {
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type?: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                /** Format: uuid */
+                                thread_id?: string;
+                            }[];
+                            staff: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            thread_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box or conversation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BoxConversationController.open": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxConversation */
+                        conversation: {
+                            /** PublicBox */
+                            box: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            };
+                            /** @description Board 6 Q6: the package the box offers people who join after a trial */
+                            conversion_package?: {
+                                base_price_cents: number;
+                                billing_period?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            last_read_message_id?: string | null;
+                            member: boolean;
+                            messages?: {
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type?: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                /** Format: uuid */
+                                thread_id?: string;
+                            }[];
+                            staff: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            thread_id: string;
+                        };
+                    };
+                };
+            };
+            /** @description Only members and people who tried a class */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description No such box or conversation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BoxConversationController.send_message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                    /** Format: uuid */
+                    client_operation_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BoxConversationMessage */
+                        message: {
+                            body: string;
+                            /** Format: uuid */
+                            client_operation_id?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            message_type?: string;
+                            /** Format: uuid */
+                            sender_id: string;
+                            /** Format: uuid */
+                            thread_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box or conversation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BoxConversationController.mark_read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    message_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description No such box or conversation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PublicBoxController.posts": {
         parameters: {
             query?: {
@@ -10335,10 +11680,159 @@ export interface operations {
                             /** Format: date-time */
                             scheduled_at: string;
                             spots_remaining?: number | null;
+                            /** @description Trial seats left (ADR-144); null when the class takes no trials */
+                            trial_seats?: number | null;
                         }[];
                         /** Format: date-time */
                         start_at: string;
+                        /**
+                         * TrialOffer
+                         * @description What the box offers a visitor; null for members and when trials are off
+                         */
+                        trial_offer?: {
+                            /** @enum {string} */
+                            approval: "auto" | "manual";
+                            /**
+                             * @description Why this person can't ask for a trial here; null when they can
+                             * @enum {string|null}
+                             */
+                            blocked_reason?: null | "already_member" | "trial_for_first_timers_only" | "trial_already_used";
+                            bring_note?: string | null;
+                            enabled: boolean;
+                            horizon_days?: number | null;
+                            mine?: {
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                scheduled_class_id?: string;
+                                /** @enum {string} */
+                                status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            } | null;
+                        } | null;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrialController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The box's slug or one of its former slugs */
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    client_operation_id?: string;
+                    note?: string | null;
+                    phone?: string | null;
+                    /** Format: uuid */
+                    scheduled_class_id: string;
+                    /** @enum {string} */
+                    source?: "box_page" | "schedule" | "qr_door" | "referral" | "event";
+                };
+            };
+        };
+        responses: {
+            /** @description Trial */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MyTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            bring_note?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            decline_reason?: string | null;
+                            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                            follow_up: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** TrialLocation */
+                            location?: {
+                                address?: string | null;
+                                city?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                latitude?: number | null;
+                                longitude?: number | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                            } | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box, class or trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The box can't take this trial */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -11106,6 +12600,56 @@ export interface operations {
                         max_bytes?: number;
                         required_headers?: Record<string, never>;
                         upload_url?: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BoxConversationController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Conversations */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        conversations: {
+                            /** PublicBox */
+                            box: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            };
+                            last_message?: {
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type?: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                /** Format: uuid */
+                                thread_id?: string;
+                            } | null;
+                            /** Format: uuid */
+                            thread_id: string;
+                            unread: boolean;
+                        }[];
                     };
                 };
             };
@@ -12185,6 +13729,475 @@ export interface operations {
                     "application/json": {
                         completed_tours: string[];
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrialController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trials */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        trials: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            bring_note?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            decline_reason?: string | null;
+                            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                            follow_up: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** TrialLocation */
+                            location?: {
+                                address?: string | null;
+                                city?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                latitude?: number | null;
+                                longitude?: number | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                            } | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrialController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MyTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            bring_note?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            decline_reason?: string | null;
+                            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                            follow_up: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** TrialLocation */
+                            location?: {
+                                address?: string | null;
+                                city?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                latitude?: number | null;
+                                longitude?: number | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                            } | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box, class or trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The box can't take this trial */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrialController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MyTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            bring_note?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            decline_reason?: string | null;
+                            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                            follow_up: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** TrialLocation */
+                            location?: {
+                                address?: string | null;
+                                city?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                latitude?: number | null;
+                                longitude?: number | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                            } | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box, class or trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The box can't take this trial */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrialController.follow_up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    action: "join" | "dismiss";
+                };
+            };
+        };
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        conversation?: {
+                            /** PublicBox */
+                            box: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            };
+                            /** @description Board 6 Q6: the package the box offers people who join after a trial */
+                            conversion_package?: {
+                                base_price_cents: number;
+                                billing_period?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                name: string;
+                            } | null;
+                            /** Format: uuid */
+                            last_read_message_id?: string | null;
+                            member: boolean;
+                            messages?: {
+                                body: string;
+                                /** Format: uuid */
+                                client_operation_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                message_type?: string;
+                                /** Format: uuid */
+                                sender_id: string;
+                                /** Format: uuid */
+                                thread_id?: string;
+                            }[];
+                            staff: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            thread_id: string;
+                        } | null;
+                        /** MyTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            box?: {
+                                logo_url?: string | null;
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                /** @description Canonical slug; redirect when it differs */
+                                slug: string;
+                            } | null;
+                            bring_note?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            decline_reason?: string | null;
+                            /** @description Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» */
+                            follow_up: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** TrialLocation */
+                            location?: {
+                                address?: string | null;
+                                city?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                latitude?: number | null;
+                                longitude?: number | null;
+                                name: string;
+                                neighbourhood?: string | null;
+                            } | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such box, class or trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The box can't take this trial */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -19278,6 +21291,513 @@ export interface operations {
                             updated_at?: string | null;
                         };
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Policy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrialPolicy */
+                        policy: {
+                            /** @enum {string} */
+                            approval?: "auto" | "manual";
+                            bring_note?: string | null;
+                            class_type_ids?: string[];
+                            /** Format: uuid */
+                            conversion_package_id?: string | null;
+                            enabled?: boolean;
+                            first_timers_only?: boolean;
+                            horizon_days?: number | null;
+                            no_show_consumes?: boolean;
+                            per_person_limit?: number;
+                            seats_per_class?: number;
+                            weekly_limit?: number | null;
+                        };
+                        this_week: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.update_policy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    approval?: "auto" | "manual";
+                    bring_note?: string | null;
+                    class_type_ids?: string[];
+                    /** Format: uuid */
+                    conversion_package_id?: string | null;
+                    enabled?: boolean;
+                    first_timers_only?: boolean;
+                    horizon_days?: number | null;
+                    no_show_consumes?: boolean;
+                    per_person_limit?: number;
+                    seats_per_class?: number;
+                    weekly_limit?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Policy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** TrialPolicy */
+                        policy: {
+                            /** @enum {string} */
+                            approval?: "auto" | "manual";
+                            bring_note?: string | null;
+                            class_type_ids?: string[];
+                            /** Format: uuid */
+                            conversion_package_id?: string | null;
+                            enabled?: boolean;
+                            first_timers_only?: boolean;
+                            horizon_days?: number | null;
+                            no_show_consumes?: boolean;
+                            per_person_limit?: number;
+                            seats_per_class?: number;
+                            weekly_limit?: number | null;
+                        };
+                        this_week: number;
+                    };
+                };
+            };
+            /** @description Invalid rules */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.queue": {
+        parameters: {
+            query?: {
+                stage?: "requests" | "upcoming" | "visited" | "joined";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Queue */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        counts: {
+                            joined: number;
+                            requests: number;
+                            upcoming: number;
+                            visited: number;
+                        };
+                        /** @enum {string} */
+                        stage: "requests" | "upcoming" | "visited" | "joined";
+                        stats: {
+                            attended: number;
+                            booked: number;
+                            cancelled?: number;
+                            converted: number;
+                            days: number;
+                            declined?: number;
+                            no_show: number;
+                            requested: number;
+                        };
+                        trials: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            /** Format: uuid */
+                            decided_by_id?: string | null;
+                            decline_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            join_interest_at?: string | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            phone?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            source?: string;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            /** Format: uuid */
+                            decided_by_id?: string | null;
+                            decline_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            join_interest_at?: string | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            phone?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            source?: string;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The trial can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.attendance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "attended" | "no_show";
+                };
+            };
+        };
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            /** Format: uuid */
+                            decided_by_id?: string | null;
+                            decline_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            join_interest_at?: string | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            phone?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            source?: string;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The trial can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminTrialController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Trial */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffTrial */
+                        trial: {
+                            /** Format: date-time */
+                            attended_at?: string | null;
+                            /** Format: uuid */
+                            booking_id?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** TrialClass */
+                            class: {
+                                class_type?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name: string;
+                                } | null;
+                                duration_minutes?: number | null;
+                                /** Format: uuid */
+                                id?: string | null;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                name?: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            };
+                            /** Format: date-time */
+                            class_starts_at: string;
+                            /** Format: date-time */
+                            converted_at?: string | null;
+                            /** Format: date-time */
+                            decided_at?: string | null;
+                            /** Format: uuid */
+                            decided_by_id?: string | null;
+                            decline_reason?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            /** Format: date-time */
+                            join_interest_at?: string | null;
+                            note?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string;
+                            person?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            } | null;
+                            phone?: string | null;
+                            /** Format: uuid */
+                            scheduled_class_id?: string | null;
+                            source?: string;
+                            /** @enum {string} */
+                            status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** Format: uuid */
+                            user_id?: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such trial */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The trial can't take this step */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

@@ -264,3 +264,51 @@ msgstr "Volgverzoek geaccepteerd"
 
 msgid "You now follow %{nickname}."
 msgstr "Je volgt nu %{nickname}."
+
+msgid "Trial request"
+msgstr "Aanvraag proefles"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} wil %{class} proberen (%{when})."
+
+msgid "New trial"
+msgstr "Nieuwe proefles"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} heeft een proefles in %{class} geboekt (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Proefles geannuleerd"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} heeft de proefles in %{class} geannuleerd."
+
+msgid "Your trial is booked"
+msgstr "Je proefles is geboekt"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Proefles niet geaccepteerd"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} kan je niet ontvangen in %{class}."
+
+msgid "Your trial is soon"
+msgstr "Je proefles is binnenkort"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} bij %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Hoe was je proefles?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Wil je blijven trainen bij %{box}? Stuur ze een bericht."
+
+msgid "Trial class cancelled"
+msgstr "Les van je proefles geannuleerd"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} heeft %{class} (%{when}) geannuleerd. Kies een andere les."

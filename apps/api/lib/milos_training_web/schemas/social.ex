@@ -130,6 +130,11 @@ defmodule MilosTrainingWeb.Schemas.Social do
         capacity: %Schema{type: :integer, nullable: true},
         spots_remaining: %Schema{type: :integer, nullable: true},
         location_id: %Schema{type: :string, format: :uuid, nullable: true},
+        trial_seats: %Schema{
+          type: :integer,
+          nullable: true,
+          description: "Trial seats left (ADR-144); null when the class takes no trials"
+        },
         coach: %Schema{allOf: [person_ref()], nullable: true},
         class_type: %Schema{
           type: :object,
@@ -153,6 +158,7 @@ defmodule MilosTrainingWeb.Schemas.Social do
         box: box(),
         start_at: @datetime,
         end_at: @datetime,
+        trial_offer: MilosTrainingWeb.Schemas.Trials.offer(),
         slots: %Schema{type: :array, items: slot}
       },
       required: [:box, :start_at, :end_at, :slots]

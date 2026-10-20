@@ -166,6 +166,35 @@ defmodule MilosTraining.Notifications do
         url: "/people/#{field(payload, :person_id)}"
       })
 
+  # ADR-144: trials. Staff hear about new and cancelled trials; the person
+  # hears the box's answer, a reminder before the class and a follow-up after.
+  def process_event(type, payload)
+      when type in ~w(trial_requested trial_booked trial_cancelled) do
+    organization_id = field(payload, :organization_id)
+
+    organization_id
+    |> Organizations.list_staff_user_ids()
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(
+             String.to_existing_atom(type),
+             %{user_id: staff_id},
+             trial_payload(type, payload, "staff:#{staff_id}", "/admin/trials")
+           ) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
+  def process_event(type, payload)
+      when type in ~w(trial_accepted trial_declined trial_reminder trial_follow_up trial_class_cancelled),
+      do:
+        enqueue_simple(
+          String.to_existing_atom(type),
+          payload,
+          trial_payload(type, payload, "person", "/trials/#{field(payload, :trial_id)}")
+        )
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)
@@ -659,6 +688,23 @@ defmodule MilosTraining.Notifications do
 
         error
     end
+  end
+
+  defp trial_payload(type, payload, audience, default_url) do
+    trial_id = field(payload, :trial_id)
+
+    %{
+      organization_id: field(payload, :organization_id),
+      trial_id: trial_id,
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      class_name: field(payload, :class_name),
+      class_starts_at: field(payload, :class_starts_at),
+      class_when: field(payload, :class_when),
+      decline_reason: field(payload, :decline_reason),
+      dedupe_key: "#{type}:#{trial_id}:#{audience}",
+      url: field(payload, :url) || default_url
+    }
   end
 
   # ADR-097 notifications with a fixed payload shape.

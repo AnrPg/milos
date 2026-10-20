@@ -7,7 +7,9 @@ defmodule MilosTraining.Scheduling.Booking do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
   @statuses [:pending, :approved, :rejected, :cancelled, :waitlisted]
-  @allowances ["class_visits", "event_visits", "guest_passes"]
+  @allowances ["class_visits", "event_visits", "guest_passes", "none"]
+  # ADR-144: what a booking is. A trial seat draws no allowance ("none").
+  @kinds ["member", "guest", "trial"]
 
   schema "bookings" do
     field :organization_id, :binary_id
@@ -22,6 +24,7 @@ defmodule MilosTraining.Scheduling.Booking do
     field :waitlisted_at, :utc_datetime_usec
     field :guest_name, :string
     field :entitlement_allowance, :string, default: "class_visits"
+    field :kind, :string, default: "member"
 
     timestamps()
   end
@@ -37,10 +40,14 @@ defmodule MilosTraining.Scheduling.Booking do
       :waitlist_priority,
       :waitlisted_at,
       :guest_name,
-      :entitlement_allowance
+      :entitlement_allowance,
+      :kind
     ])
-    |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status])
+    |> put_guest_kind()
+    |> validate_required([:organization_id, :scheduled_class_id, :user_id, :status, :kind])
     |> validate_inclusion(:entitlement_allowance, @allowances)
+    |> validate_inclusion(:kind, @kinds)
+    |> validate_trial_allowance()
     |> validate_length(:guest_name, min: 2, max: 80)
     |> foreign_key_constraint(:scheduled_class_id)
     |> foreign_key_constraint(:user_id)
@@ -73,4 +80,23 @@ defmodule MilosTraining.Scheduling.Booking do
   end
 
   def statuses, do: @statuses
+  def kinds, do: @kinds
+
+  defp put_guest_kind(changeset) do
+    if get_field(changeset, :guest_name) not in [nil, ""] and
+         get_field(changeset, :kind) == "member",
+       do: put_change(changeset, :kind, "guest"),
+       else: changeset
+  end
+
+  # Mirrors bookings_trial_allowance_check: trials, and only trials, skip the ledger.
+  defp validate_trial_allowance(changeset) do
+    trial? = get_field(changeset, :kind) == "trial"
+    none? = get_field(changeset, :entitlement_allowance) == "none"
+
+    if trial? == none?,
+      do: changeset,
+      else:
+        add_error(changeset, :entitlement_allowance, "must be none exactly for trial bookings")
+  end
 end

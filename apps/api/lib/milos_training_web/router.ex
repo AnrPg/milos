@@ -608,6 +608,12 @@ defmodule MilosTrainingWeb.Router do
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     get("/branding", AdminBrandingController, :show)
+    get("/trial-policy", AdminTrialController, :policy)
+    put("/trial-policy", AdminTrialController, :update_policy)
+    get("/trials", AdminTrialController, :queue)
+    post("/trials/:id/accept", AdminTrialController, :accept)
+    post("/trials/:id/decline", AdminTrialController, :decline)
+    post("/trials/:id/attendance", AdminTrialController, :attendance)
     get("/public-profile", AdminPublicProfileController, :show)
     put("/public-profile", AdminPublicProfileController, :update)
     post("/public-profile/publish", AdminPublicProfileController, :publish)
@@ -963,6 +969,29 @@ defmodule MilosTrainingWeb.Router do
     # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
     get("/boxes/:slug/schedule", PublicBoxController, :schedule)
     get("/boxes/:slug/posts", PublicBoxController, :posts)
+    # ADR-144: trials.
+    post("/boxes/:slug/trials", TrialController, :create)
+    get("/me/trials", TrialController, :index)
+    get("/me/trials/:id", TrialController, :show)
+    post("/me/trials/:id/cancel", TrialController, :cancel)
+    post("/me/trials/:id/follow-up", TrialController, :follow_up)
+  end
+
+  # ADR-144, board 6 Q6: talking to a box from its page.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :messaging_rate_limited
+    ])
+
+    get("/me/box-conversations", BoxConversationController, :index)
+    get("/boxes/:slug/conversation", BoxConversationController, :show)
+    post("/boxes/:slug/conversation", BoxConversationController, :open)
+    post("/boxes/:slug/conversation/messages", BoxConversationController, :send_message)
+    post("/boxes/:slug/conversation/read", BoxConversationController, :mark_read)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

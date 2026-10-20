@@ -5,7 +5,7 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
     unique: [period: 86_400, fields: [:worker, :args], keys: [:booking_id]]
 
   alias MilosTraining.Application.{BookingEntitlement, OwnershipKeys}
-  alias MilosTraining.{Finance, Notifications}
+  alias MilosTraining.Notifications
 
   @impl Oban.Worker
   def perform(%Oban.Job{args: args}) do
@@ -22,10 +22,9 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
   # retry silently did nothing).
   defp transition(%{"finalize" => true} = args),
     do:
-      Finance.finalize_entitlement_source(
+      BookingEntitlement.finalize(
         tenant(args),
         args["user_id"],
-        "scheduling",
         args["scheduled_class_id"],
         allowance(args),
         %{reason: args["reason"], idempotency_key: args["idempotency_key"]}
@@ -33,10 +32,9 @@ defmodule MilosTraining.Workers.ReconcileBookingReleaseJob do
 
   defp transition(args),
     do:
-      Finance.release_entitlement_source(
+      BookingEntitlement.release(
         tenant(args),
         args["user_id"],
-        "scheduling",
         args["scheduled_class_id"],
         allowance(args),
         %{reason: args["reason"], idempotency_key: args["idempotency_key"]}

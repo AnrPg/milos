@@ -78,13 +78,28 @@ defmodule MilosTraining.Application.DispatchMessageDelivery do
              message_id: message.id,
              sender_id: message.sender_id,
              body: String.slice(message.body, 0, 100),
-             url: "/account/activity/chats?thread=#{thread.id}"
+             url: thread_url(thread, participant.user_id)
            }) do
         :ok -> {:cont, :ok}
         {:error, reason} -> {:halt, {:error, reason}}
       end
     end)
   end
+
+  # ADR-144: someone who is not a member (yet) talks to the box from its
+  # page, so their link opens that conversation there, not the gym's inbox.
+  defp thread_url(%{context_type: :box, context_id: user_id} = thread, user_id) do
+    if Organizations.membership_standing(thread.organization_id, user_id) == :member do
+      "/account/activity/chats?thread=#{thread.id}"
+    else
+      case Organizations.public_boxes([thread.organization_id]) do
+        [%{slug: slug}] -> "/b/#{slug}/chat"
+        _unpublished -> "/account/activity/chats?thread=#{thread.id}"
+      end
+    end
+  end
+
+  defp thread_url(thread, _user_id), do: "/account/activity/chats?thread=#{thread.id}"
 
   # Coaching messages and messages from the box reach the inbox; chat stays
   # in the chat.

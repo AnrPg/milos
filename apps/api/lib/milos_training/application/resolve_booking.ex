@@ -6,7 +6,7 @@ defmodule MilosTraining.Application.ResolveBooking do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Finance, Scheduling}
+  alias MilosTraining.Scheduling
   alias MilosTraining.Scheduling.Domain.BookingOperationPolicy
 
   @doc """
@@ -100,10 +100,9 @@ defmodule MilosTraining.Application.ResolveBooking do
   # reservation and the visit was silently never returned.
   defp maybe_reconcile_now(context, :rejected, booking) do
     _result =
-      Finance.release_entitlement_source(
+      BookingEntitlement.release(
         context,
         booking.user_id,
-        "scheduling",
         booking.scheduled_class_id,
         BookingEntitlement.allowance(booking),
         %{

@@ -5,6 +5,7 @@ defmodule MilosTraining.Application.CheckInToClass do
   class's check-in window. Idempotent: a second check-in returns the first.
   """
 
+  alias MilosTraining.Application.AdminRecordAttendance
   alias MilosTraining.Scheduling
 
   def call(%{organization_id: _} = context, %{id: user_id}, booking_id, now \\ DateTime.utc_now()) do
@@ -18,7 +19,8 @@ defmodule MilosTraining.Application.CheckInToClass do
           {:ok, existing}
 
         :ok ->
-          Scheduling.record_attendance(context, %{
+          context
+          |> Scheduling.record_attendance(%{
             scheduled_class_id: slot.id,
             booking_id: booking.id,
             user_id: user_id,
@@ -27,6 +29,10 @@ defmodule MilosTraining.Application.CheckInToClass do
             marked_at: now,
             params: %{"source" => "self"}
           })
+          |> tap(fn
+            {:ok, attendance} -> AdminRecordAttendance.announce_attendance(attendance)
+            _error -> :ok
+          end)
 
         error ->
           error

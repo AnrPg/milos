@@ -264,3 +264,51 @@ msgstr "Запрос на подписку принят"
 
 msgid "You now follow %{nickname}."
 msgstr "Теперь вы подписаны на %{nickname}."
+
+msgid "Trial request"
+msgstr "Запрос на пробное занятие"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} хочет попробовать %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Новое пробное занятие"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} записался(-ась) на пробное занятие %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Пробное занятие отменено"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} отменил(а) пробное занятие %{class}."
+
+msgid "Your trial is booked"
+msgstr "Пробное занятие забронировано"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Пробное занятие не принято"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} не может принять вас на %{class}."
+
+msgid "Your trial is soon"
+msgstr "Скоро ваше пробное занятие"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} в %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Как прошло пробное занятие?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Хотите продолжить в %{box}? Напишите им."
+
+msgid "Trial class cancelled"
+msgstr "Занятие отменено"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} отменил %{class} (%{when}). Выберите другое занятие."

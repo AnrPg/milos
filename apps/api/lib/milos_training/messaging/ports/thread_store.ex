@@ -14,4 +14,6 @@ defmodule MilosTraining.Messaging.Ports.ThreadStore do
   @callback mark_read(Ecto.UUID.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               {:ok, Ecto.UUID.t()} | {:error, :not_found | :invalid_message}
   @callback count_unread_threads(Ecto.UUID.t()) :: non_neg_integer()
+  @doc "Boxes where the signed-in person (the session's user) has their own conversation."
+  @callback list_box_conversation_organization_ids() :: [Ecto.UUID.t()]
 end

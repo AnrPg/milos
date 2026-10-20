@@ -42,3 +42,15 @@ msgstr "Προγραμματισμένος"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "Κατάσταση κράτησης για το προπονητικό μάθημα Milos: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "Δοκιμαστικό στο %{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "Κατάσταση δοκιμαστικού: %{status}."
+
+msgid "Waiting for the box"
+msgstr "Περιμένει απάντηση από το box"
+
+msgid "Booked"
+msgstr "Κλεισμένο"

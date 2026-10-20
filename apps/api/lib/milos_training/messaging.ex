@@ -50,6 +50,16 @@ defmodule MilosTraining.Messaging do
 
   def message_topics, do: MilosTraining.Messaging.Message.topics()
 
+  @doc "Boxes where the person in `context` (a user scope) has their own conversation."
+  def list_box_conversation_organization_ids(%{user_id: _} = context),
+    do:
+      with_tenant_context(context, fn ->
+        MilosTraining.Messaging.ThreadStore.list_box_conversation_organization_ids()
+      end)
+
+  def find_context_thread(context_type, context_id),
+    do: MilosTraining.Messaging.ThreadStore.find_context_thread(context_type, context_id)
+
   def count_unread_threads(user_id),
     do: MilosTraining.Messaging.ThreadStore.count_unread_threads(user_id)
 

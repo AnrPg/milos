@@ -30,6 +30,7 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback list_slot_ids_for_workout(TenantContext.t(), Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_slot(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
   @callback list_slots_window(TenantContext.t(), DateTime.t(), DateTime.t(), keyword()) :: [map()]
+  @callback list_slots_by_ids(TenantContext.t(), [Ecto.UUID.t()]) :: [map()]
   @callback list_member_slots(TenantContext.t(), Ecto.UUID.t(), DateTime.t(), DateTime.t()) :: [
               map()
             ]
