@@ -417,3 +417,9 @@ msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) 
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) - все още не е член. Пробните тренировки са отворени."
+
+msgid "Time for a new measurement"
+msgstr "Време е за ново измерване"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Нов запис ти помага да видиш тенденцията си. Отнема минута."

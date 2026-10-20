@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.SweepOrphanMedia do
   that failed when the post was deleted).
   """
 
-  alias MilosTraining.Application.{PostMedia, ReleaseMedia}
+  alias MilosTraining.Application.{MediaConsumers, ReleaseMedia}
   alias MilosTraining.{Media, Organizations}
 
   @batch 500
@@ -48,7 +48,7 @@ defmodule MilosTraining.Application.SweepOrphanMedia do
 
       case Media.mark_rejected(context, :account, media_id, :media_processing_timeout) do
         {:ok, media} ->
-          _refreshed = media |> PostMedia.ref_of() |> PostMedia.refresh()
+          MediaConsumers.refresh(context, media)
           true
 
         {:error, _changed} ->

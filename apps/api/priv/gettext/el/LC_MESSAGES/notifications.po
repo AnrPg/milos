@@ -417,3 +417,9 @@ msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος. Οι δοκιμαστικές είναι ανοιχτές."
+
+msgid "Time for a new measurement"
+msgstr "Ώρα για νέα μέτρηση"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Ένα νέο στιγμιότυπο σε βοηθά να δεις την τάση σου. Παίρνει ένα λεπτό."

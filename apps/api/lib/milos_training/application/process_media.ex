@@ -1,6 +1,7 @@
 defmodule MilosTraining.Application.ProcessMedia do
   @moduledoc """
-  ADR-157: turns a verified post upload into what readers get, in the
+  ADR-157: turns a verified post upload (and, since ADR-158, a body photo)
+  into what readers get, in the
   background (`ProcessMediaJob`), in its owner's session.
 
   - Photo: probed (a decompression-bomb guard), decoded, turned upright,
@@ -14,12 +15,12 @@ defmodule MilosTraining.Application.ProcessMedia do
   camera wrote stays anywhere. An upload that cannot be processed is
   `rejected` (with its reason); a failure that may pass (storage briefly
   unavailable) is retried, and rejected on the last attempt. Either way the
-  post it belongs to is refreshed.
+  post (or body snapshot) it belongs to is refreshed.
   """
 
   require Logger
 
-  alias MilosTraining.Application.{MediaStorage, MediaTools, PostMedia}
+  alias MilosTraining.Application.{MediaConsumers, MediaStorage, MediaTools}
   alias MilosTraining.Media
   alias MilosTraining.Workers.ProcessMediaJob
 
@@ -210,7 +211,6 @@ defmodule MilosTraining.Application.ProcessMedia do
   # The upload may have been attached while it was processing.
   defp after_change(context, media) do
     current = Media.get(context, :account, media.id) || media
-    _refreshed = current |> PostMedia.ref_of() |> PostMedia.refresh()
-    :ok
+    MediaConsumers.refresh(context, current)
   end
 end

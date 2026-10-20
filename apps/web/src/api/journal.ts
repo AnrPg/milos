@@ -31,6 +31,8 @@ export type JournalEntryOf = {
   review: ReviewRecord;
   note: JournalNote;
   check_in: CheckInRecord;
+  /** ADR-158: only ever in your own feed. */
+  body: components["schemas"]["BodySnapshot"];
 };
 
 export type TypedJournalItem = {

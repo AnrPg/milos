@@ -19,8 +19,16 @@ defmodule MilosTraining.Media.Domain.MediaPolicyTest do
     assert {:ok, %{scope: :account, relative_key: "media/posts/abc/original.mov"}} =
              MediaPolicy.allocate("post_video", "video/quicktime", 1_000, "abc")
 
-    assert {:ok, %{scope: :account, bucket: :media_private, relative_key: "media/body/abc.jpg"}} =
-             MediaPolicy.allocate("body_photo", "image/jpeg", 1_000, "abc")
+    assert {:ok,
+            %{
+              scope: :account,
+              bucket: :media_private,
+              relative_key: "media/body/abc/original.heic"
+            }} = MediaPolicy.allocate("body_photo", "image/heic", 1_000, "abc")
+
+    # ADR-158: body photos are processed like post photos but never posted.
+    assert MediaPolicy.processing("body_photo") == :server
+    refute "body_photo" in MediaPolicy.post_purposes()
   end
 
   test "rejects unknown purposes, types and sizes" do

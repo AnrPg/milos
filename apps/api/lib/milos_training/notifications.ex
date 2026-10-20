@@ -238,6 +238,15 @@ defmodule MilosTraining.Notifications do
         url: "/around?filter=#{field(payload, :filter_id)}"
       })
 
+  # ADR-158: the opt-in reminder to take a new body measurement.
+  def process_event("body_measure_reminder", payload),
+    do:
+      enqueue_simple(:body_measure_reminder, payload, %{
+        weeks: field(payload, :weeks),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/body/new"
+      })
+
   # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
   # Staff who check people in hear about it, so the desk can follow up and
   # sell a walk-in or a trial; the caller keeps it to once an hour per

@@ -18,12 +18,19 @@ defmodule MilosTraining.Application.RequestMediaUpload do
   @expires_in 900
 
   def call(context, purpose, params, now \\ DateTime.utc_now()) when is_map(params) do
+    with :ok <- authorize(context, purpose), do: reserve(context, purpose, params, now)
+  end
+
+  @doc """
+  Reserves an upload the caller has already authorized (ADR-158: a body
+  photo, once the person's consent is checked by `BodyPhotos`).
+  """
+  def reserve(context, purpose, params, now \\ DateTime.utc_now()) when is_map(params) do
     content_type = params[:content_type] || params["content_type"]
     byte_size = params[:byte_size] || params["byte_size"]
     id = Ecto.UUID.generate()
 
-    with :ok <- authorize(context, purpose),
-         :ok <- guard(context, purpose, now),
+    with :ok <- guard(context, purpose, now),
          {:ok, allocation} <- Media.allocate(purpose, content_type, byte_size, id),
          owner = MediaStorage.owner(context, allocation.scope),
          key = MediaStorage.object_key(owner, allocation.relative_key),
@@ -53,7 +60,7 @@ defmodule MilosTraining.Application.RequestMediaUpload do
       else: {:error, :video_unavailable}
   end
 
-  defp guard(context, "post_photo", now) do
+  defp guard(context, purpose, now) when purpose in ["post_photo", "body_photo"] do
     since = DateTime.add(now, -Media.orphan_after_seconds())
     context |> Media.usage(:account, since) |> Media.check_quota()
   end

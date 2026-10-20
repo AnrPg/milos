@@ -4856,7 +4856,8 @@
         "injury": "Verletzung",
         "review": "Bewertung",
         "note": "Notiz",
-        "check_in": "Wie ich mich fühle"
+        "check_in": "Wie ich mich fühle",
+        "body": "Körper"
       },
       "loadMore": "Ältere Einträge",
       "loadingMore": "Wird geladen…",

@@ -2128,7 +2128,27 @@ defmodule MilosTrainingWeb.FallbackController do
     media_in_post: {:conflict, "This upload is in a post; delete the post instead"},
     media_not_ready: {:conflict, "The photo is still processing"},
     invalid_alt_text: {:unprocessable_entity, "Alternative text is at most 500 characters"},
-    alt_text_unavailable: {:service_unavailable, "Suggestions aren't available right now"}
+    alt_text_unavailable: {:service_unavailable, "Suggestions aren't available right now"},
+    # ADR-158: Σώμα.
+    invalid_metric: {:unprocessable_entity, "Check this measurement"},
+    snapshot_empty: {:unprocessable_entity, "Add at least one measurement or photo"},
+    invalid_body_visibility: {:unprocessable_entity, "Choose who sees this snapshot"},
+    body_notes_too_long: {:unprocessable_entity, "Notes are at most 2000 characters"},
+    invalid_pose: {:unprocessable_entity, "Choose front, side, back or other"},
+    too_many_body_photos: {:unprocessable_entity, "A snapshot holds up to four photos"},
+    pose_taken: {:conflict, "This snapshot already has a photo of that pose"},
+    body_photo_consent_required:
+      {:forbidden, "Agree to keep body photos first; they stay private unless you share them"},
+    invalid_consent_scope: {:unprocessable_entity, "Unknown consent"},
+    invalid_units: {:unprocessable_entity, "Choose metric or imperial units"},
+    invalid_taken_at: {:unprocessable_entity, "Check the date of the measurement"},
+    unknown_metric: {:unprocessable_entity, "Unknown measurement"},
+    invalid_range: {:unprocessable_entity, "Choose 1m, 3m, 1y or all"},
+    invalid_body_settings: {:unprocessable_entity, "Check your body settings"},
+    share_confirmation_required:
+      {:unprocessable_entity, "Confirm that you want to post these photos"},
+    share_needs_two_snapshots: {:unprocessable_entity, "Choose two different snapshots"},
+    share_photo_missing: {:unprocessable_entity, "Both snapshots need a ready photo of that pose"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

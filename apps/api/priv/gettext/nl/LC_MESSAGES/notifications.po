@@ -417,3 +417,9 @@ msgstr "%{nickname} scande de deur bij %{box} (%{when}) - nog geen lid."
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "%{nickname} scande de deur bij %{box} (%{when}) - nog geen lid. Proeflessen zijn open."
+
+msgid "Time for a new measurement"
+msgstr "Tijd voor een nieuwe meting"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Een nieuwe momentopname laat je je trend zien. Het kost een minuut."
