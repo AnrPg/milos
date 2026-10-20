@@ -157,3 +157,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-154 | Γύρω μου: nearby discovery, home areas and saved-filter alerts | Accepted |
 | ADR-155 | QR check-in, the printed poster, static member codes and Wallet | Accepted |
 | ADR-157 | Photos and video in posts | Accepted |
+| ADR-158 | Body snapshots, private photos and coach access | Accepted |
