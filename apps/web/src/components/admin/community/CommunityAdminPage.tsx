@@ -245,6 +245,7 @@ function ReportItem({ row }: { row: ReportRow }) {
         {row.preview?.name ?? row.preview?.body ?? t("previewGone")}
         {row.preview?.hidden ? <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("alreadyHidden")}</span> : null}
       </p>
+      {row.preview?.media?.length ? <ReportMedia media={row.preview.media} status={row.preview.media_status} /> : null}
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{reasons.join(" · ")}</p>
       {row.notes.length > 0 ? (
         <ul className="flex flex-col gap-1">
@@ -266,5 +267,56 @@ function ReportItem({ row }: { row: ReportRow }) {
       )}
       <ErrorLine message={act.error ? clientErrorMessage(act.error, tUi) : null} />
     </li>
+  );
+}
+
+/** The reported post's photos or video as thumbnails (ADR-157 §7), with its processing state. */
+function ReportMedia({
+  media,
+  status,
+}: {
+  media: NonNullable<NonNullable<ReportRow["preview"]>["media"]>;
+  status?: "ready" | "processing" | "failed";
+}) {
+  const t = useTranslations("Media");
+  const shown = media.slice(0, 6);
+  return (
+    <div className="flex flex-col gap-1">
+      <ul className="flex flex-wrap gap-2" aria-label={t("staffMedia", { count: media.length })}>
+        {shown.map((item, index) => (
+          <li key={item.id} className="relative h-16 w-16 overflow-hidden rounded-xl" style={{ background: "var(--panel-raised)" }}>
+            {item.thumb_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- presigned, short-lived URLs on the media origin
+              <img
+                src={item.thumb_url}
+                alt={item.alt_text || (item.kind === "video" ? t("videoLabel") : t("photoN", { index: index + 1, count: media.length }))}
+                loading="lazy"
+                decoding="async"
+                width={64}
+                height={64}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <span className="flex h-full w-full items-center justify-center px-1 text-center text-[10px]" style={{ color: "var(--dim)" }}>
+                {t("itemProcessing")}
+              </span>
+            )}
+            {item.kind === "video" ? (
+              <span className="absolute bottom-1 start-1 rounded-full px-1 text-[10px] font-bold" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }} aria-hidden="true">
+                ▶
+              </span>
+            ) : null}
+          </li>
+        ))}
+        {media.length > shown.length ? (
+          <li className="flex h-16 w-16 items-center justify-center rounded-xl text-sm font-bold" style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}>
+            {t("staffMore", { count: media.length - shown.length })}
+          </li>
+        ) : null}
+      </ul>
+      {status && status !== "ready" ? (
+        <p className="text-xs" style={{ color: "var(--dim)" }}>{status === "processing" ? t("processing") : t("staffFailed")}</p>
+      ) : null}
+    </div>
   );
 }
