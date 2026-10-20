@@ -4,6 +4,60 @@
  */
 
 export interface paths {
+    "/api/around/pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Map pins inside a viewport («Ψάξε εδώ»), same filter, capped */
+        post: operations["MilosTrainingWeb.AroundController.pins"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/around/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Γύρω μου: each kind's nearest or soonest cards, totals and wider counts
+         * @description Events (soonest first), boxes with a published page (trial-takers first, then nearest), open clubs (nearest) and, when asked for, public posts (newest). Remembers the filter as your last-used Γύρω μου filter unless `remember` is false.
+         */
+        post: operations["MilosTrainingWeb.AroundController.search"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/around/search/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** One Γύρω μου kind, cursor-paged («Δες όλα») */
+        post: operations["MilosTrainingWeb.AroundController.kind"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/invitations/inspect": {
         parameters: {
             query?: never;
@@ -558,6 +612,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/around/area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your «Η περιοχή μου» */
+        get: operations["MilosTrainingWeb.PlacesController.area"];
+        /** Set «Η περιοχή μου» (up to 5 neighbourhoods; the first is the main one) */
+        put: operations["MilosTrainingWeb.PlacesController.update_area"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/avatar": {
         parameters: {
             query?: never;
@@ -1004,6 +1076,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/filters/{surface}/{id}/alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Turn a saved Γύρω μου filter's daily alert on or off (ADR-154)
+         * @description At most one notification a day, only when something new matches. Turning it on counts only what appears from now on. Only the `around_me` surface has alerts.
+         */
+        put: operations["MilosTrainingWeb.SavedFilterController.alert"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/follow-requests": {
         parameters: {
             query?: never;
@@ -1326,6 +1418,23 @@ export interface paths {
         /** Your counts for Εγώ: posts, followers, following, waiting requests */
         get: operations["MilosTrainingWeb.FollowController.summary"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/social/around-visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Show your public posts in Γύρω μου at your neighbourhood, or stop (ADR-154) */
+        put: operations["MilosTrainingWeb.FollowController.around_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -6531,6 +6640,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/places/neighbourhoods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Neighbourhoods and cities matching a name (case and accents ignored) */
+        get: operations["MilosTrainingWeb.PlacesController.neighbourhoods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organization-purges": {
         parameters: {
             query?: never;
@@ -7390,6 +7516,2453 @@ export interface components {
             spots_remaining?: number | null;
             /** Format: date-time */
             starts_at: string;
+        };
+        /** AroundAreaRequest */
+        AroundAreaRequest: {
+            neighbourhood_ids: string[];
+        };
+        /**
+         * AroundAreaResponse
+         * @description «Η περιοχή μου»; the first neighbourhood is the main one
+         */
+        AroundAreaResponse: {
+            neighbourhoods: {
+                city_slug: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "neighbourhood" | "city";
+                latitude: number;
+                longitude: number;
+                name: string;
+                name_en: string;
+                slug: string;
+            }[];
+        };
+        /** AroundBox */
+        AroundBox: {
+            amenities: string[];
+            audiences: string[];
+            city?: string | null;
+            cover_url?: string | null;
+            disciplines: string[];
+            languages: string[];
+            latitude: number;
+            logo_url?: string | null;
+            longitude: number;
+            name: string;
+            neighbourhood?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            primary_color?: string | null;
+            slug: string;
+            takes_trials: boolean;
+        };
+        /** AroundBoxItem */
+        AroundBoxItem: {
+            /** AroundBox */
+            box: {
+                amenities: string[];
+                audiences: string[];
+                city?: string | null;
+                cover_url?: string | null;
+                disciplines: string[];
+                languages: string[];
+                latitude: number;
+                logo_url?: string | null;
+                longitude: number;
+                name: string;
+                neighbourhood?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                slug: string;
+                takes_trials: boolean;
+            };
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+        };
+        /** AroundBoxesSection */
+        AroundBoxesSection: {
+            items: {
+                /** AroundBox */
+                box: {
+                    amenities: string[];
+                    audiences: string[];
+                    city?: string | null;
+                    cover_url?: string | null;
+                    disciplines: string[];
+                    languages: string[];
+                    latitude: number;
+                    logo_url?: string | null;
+                    longitude: number;
+                    name: string;
+                    neighbourhood?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    slug: string;
+                    takes_trials: boolean;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            }[];
+            next_cursor: string | null;
+            /**
+             * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+             * @enum {string}
+             */
+            placement: "category" | "collapsed";
+            total: number;
+        } | null;
+        /** AroundClubItem */
+        AroundClubItem: {
+            /** CommunityOpenClub */
+            club: {
+                box?: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                channels?: {
+                    /** Format: uuid */
+                    id: string;
+                    kind: string;
+                    name?: string | null;
+                }[];
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                join_policy: "open" | "approval";
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string} */
+                membership?: "none" | "requested" | "member";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                request_count?: number;
+                requests?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                }[];
+                /** @enum {string|null} */
+                role?: "member" | "staff" | null;
+            };
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+        };
+        /** AroundClubsSection */
+        AroundClubsSection: {
+            items: {
+                /** CommunityOpenClub */
+                club: {
+                    box?: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    channels?: {
+                        /** Format: uuid */
+                        id: string;
+                        kind: string;
+                        name?: string | null;
+                    }[];
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    join_policy: "open" | "approval";
+                    member_count: number;
+                    members?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string} */
+                    membership?: "none" | "requested" | "member";
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    request_count?: number;
+                    requests?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string|null} */
+                    role?: "member" | "staff" | null;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /** AroundEventItem */
+        AroundEventItem: {
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+            /** CommunityEvent */
+            event: {
+                /** CommunityEventBox */
+                box: {
+                    logo_url?: string | null;
+                    name?: string | null;
+                    slug?: string | null;
+                };
+                /** @description You run events at this box */
+                can_manage: boolean;
+                can_rsvp: boolean;
+                cancel_reason?: string | null;
+                cancelled: boolean;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @description Null: no limit */
+                capacity?: number | null;
+                /**
+                 * Format: uuid
+                 * @description The member group this event belongs to; null for a club event
+                 */
+                channel_id?: string | null;
+                /** CommunityEventClub */
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                };
+                /** Format: uuid */
+                club_id: string;
+                /** Format: uuid */
+                cover_media_id?: string | null;
+                cover_url?: string | null;
+                currency: string;
+                description?: string | null;
+                /** Format: date-time */
+                ends_at: string;
+                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                goers?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[] | null;
+                going_count: number;
+                /**
+                 * CommunityEventGroup
+                 * @description The member group of a group event (free, for its members only)
+                 */
+                group?: {
+                    /** Format: uuid */
+                    id: string;
+                    name?: string | null;
+                } | null;
+                guest_pass_allowed: boolean;
+                /** @description Event page: guests you can still bring (going, guest passes on) */
+                guests_left?: number | null;
+                guests_per_member: number;
+                /** Format: uuid */
+                id: string;
+                /** @description Event page opened with an invitation link */
+                invitation?: {
+                    /** CommunityAuthor */
+                    inviter: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** @enum {string|null} */
+                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                    usable: boolean;
+                } | null;
+                /**
+                 * CommunityEventMine
+                 * @description Where you stand; null if not on it
+                 */
+                my?: {
+                    /** Format: uuid */
+                    invited_by_id?: string | null;
+                    late_cancel: boolean;
+                    paid: boolean;
+                    /** @enum {string} */
+                    source: "member" | "open" | "guest";
+                    /** @enum {string} */
+                    status: "going" | "waitlisted" | "cancelled";
+                } | null;
+                open_to_non_members: boolean;
+                /** Format: uuid */
+                organization_id: string;
+                /** CommunityEventPlace */
+                place: {
+                    address: string | null;
+                    city?: string | null;
+                    latitude: number | null;
+                    /**
+                     * Format: uuid
+                     * @description One of the box's locations, or null
+                     */
+                    location_id: string | null;
+                    longitude: number | null;
+                    name: string | null;
+                    neighbourhood?: string | null;
+                };
+                /**
+                 * Format: uuid
+                 * @description Its card in the club feed
+                 */
+                post_id?: string | null;
+                /** @description 0: free; otherwise paid at the box */
+                price_cents: number;
+                /**
+                 * Format: uuid
+                 * @description Shared by every week of a weekly event
+                 */
+                series_id?: string | null;
+                /** @description Null: no limit */
+                spots_left?: number | null;
+                /** Format: date-time */
+                starts_at: string;
+                title: string;
+                waitlist_count: number;
+            };
+        };
+        /** AroundEventsSection */
+        AroundEventsSection: {
+            items: {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /** CommunityEvent */
+                event: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                };
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /**
+         * AroundFilter
+         * @description Every field is optional; the response echoes the normalised filter.
+         */
+        AroundFilter: {
+            amenities?: string[];
+            audiences?: string[];
+            cost?: ("free" | "trial")[];
+            /** Format: date */
+            date_from?: string | null;
+            /** Format: date */
+            date_to?: string | null;
+            disciplines?: string[];
+            /** @description Default events, boxes, clubs */
+            kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+            languages?: string[];
+            max_price_cents?: number | null;
+            /** @description Gazetteer places to search from, at most 5 */
+            neighbourhood_ids?: string[];
+            /** @description Default 3 */
+            radius_km?: number;
+            times?: ("morning" | "midday" | "evening")[];
+            /** @description Filter version; 1 today */
+            v?: number;
+            /** @enum {string|null} */
+            when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+        };
+        /** AroundKindRequest */
+        AroundKindRequest: {
+            cursor?: string | null;
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** @description Default 20 */
+            limit?: number;
+            /**
+             * AroundOriginRequest
+             * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+             */
+            origin?: {
+                /** @description point: the device position; rounded to 3 decimals */
+                latitude?: number;
+                longitude?: number;
+                /**
+                 * Format: uuid
+                 * @description place: a gazetteer place
+                 */
+                neighbourhood_id?: string;
+                /** @description place: a place name for the geocoder */
+                query?: string;
+                /** @enum {string} */
+                type: "area" | "point" | "place";
+            };
+        };
+        /** AroundKindResponse */
+        AroundKindResponse: {
+            items: ({
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /** CommunityEvent */
+                event: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                };
+            } | {
+                /** AroundBox */
+                box: {
+                    amenities: string[];
+                    audiences: string[];
+                    city?: string | null;
+                    cover_url?: string | null;
+                    disciplines: string[];
+                    languages: string[];
+                    latitude: number;
+                    logo_url?: string | null;
+                    longitude: number;
+                    name: string;
+                    neighbourhood?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    primary_color?: string | null;
+                    slug: string;
+                    takes_trials: boolean;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            } | {
+                /** CommunityOpenClub */
+                club: {
+                    box?: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    channels?: {
+                        /** Format: uuid */
+                        id: string;
+                        kind: string;
+                        name?: string | null;
+                    }[];
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    join_policy: "open" | "approval";
+                    member_count: number;
+                    members?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string} */
+                    membership?: "none" | "requested" | "member";
+                    name: string;
+                    /** Format: uuid */
+                    organization_id: string;
+                    request_count?: number;
+                    requests?: {
+                        /** CommunityAuthor */
+                        person: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** Format: date-time */
+                        since: string;
+                    }[];
+                    /** @enum {string|null} */
+                    role?: "member" | "staff" | null;
+                };
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+            } | {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /**
+                 * CommunityPost
+                 * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                 */
+                post: {
+                    /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                    attachment?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    attachment_id?: string | null;
+                    /** @enum {string|null} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    /** @enum {string} */
+                    audience: "club_channel" | "followers" | "public";
+                    /** CommunityAuthor */
+                    author: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    body?: string | null;
+                    can_delete: boolean;
+                    can_moderate: boolean;
+                    can_pin: boolean;
+                    can_report?: boolean;
+                    channel: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    } | null;
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string;
+                        logo_url?: string | null;
+                        name: string;
+                        organization_slug?: string | null;
+                        primary_color?: string | null;
+                    } | null;
+                    comment_count: number;
+                    /**
+                     * CommunityPostEvent
+                     * @description The event as you see it now, when the post is an event card (attachment_type event)
+                     */
+                    event?: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    } | null;
+                    hidden: boolean;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    kudos_by_me: boolean;
+                    kudos_count: number;
+                    /** @enum {string} */
+                    origin: "club" | "profile";
+                    pinned: boolean;
+                };
+            })[];
+            /** @enum {string} */
+            kind: "events" | "boxes" | "clubs" | "posts";
+            next_cursor: string | null;
+            /** AroundOrigin */
+            origin: {
+                label: string | null;
+                latitude: number;
+                longitude: number;
+                neighbourhood_ids: string[];
+                /** @enum {string} */
+                type: "neighbourhoods" | "area" | "point" | "place" | "box";
+            };
+            /**
+             * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+             * @enum {string}
+             */
+            placement?: "category" | "collapsed";
+            total: number;
+        };
+        /**
+         * AroundNormalizedFilter
+         * @description Every field is optional; the response echoes the normalised filter.
+         */
+        AroundNormalizedFilter: {
+            amenities: string[];
+            audiences: string[];
+            cost: ("free" | "trial")[];
+            /** Format: date */
+            date_from: string | null;
+            /** Format: date */
+            date_to: string | null;
+            disciplines: string[];
+            /** @description Default events, boxes, clubs */
+            kinds: ("events" | "boxes" | "clubs" | "posts")[];
+            languages: string[];
+            max_price_cents: number | null;
+            /** @description Gazetteer places to search from, at most 5 */
+            neighbourhood_ids: string[];
+            /** @description Default 3 */
+            radius_km: number;
+            times: ("morning" | "midday" | "evening")[];
+            /** @description Filter version; 1 today */
+            v: number;
+            /** @enum {string|null} */
+            when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+        };
+        /** AroundOrigin */
+        AroundOrigin: {
+            label: string | null;
+            latitude: number;
+            longitude: number;
+            neighbourhood_ids: string[];
+            /** @enum {string} */
+            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+        };
+        /**
+         * AroundOriginRequest
+         * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+         */
+        AroundOriginRequest: {
+            /** @description point: the device position; rounded to 3 decimals */
+            latitude?: number;
+            longitude?: number;
+            /**
+             * Format: uuid
+             * @description place: a gazetteer place
+             */
+            neighbourhood_id?: string;
+            /** @description place: a place name for the geocoder */
+            query?: string;
+            /** @enum {string} */
+            type: "area" | "point" | "place";
+        };
+        /** AroundPin */
+        AroundPin: {
+            /**
+             * Format: uuid
+             * @description Event, club or post id; the gym's id for a box
+             */
+            id: string;
+            /** @enum {string} */
+            kind: "events" | "boxes" | "clubs" | "posts";
+            latitude: number;
+            longitude: number;
+            /** @description Boxes: the public page's slug */
+            slug: string | null;
+            title: string | null;
+        };
+        /** AroundPinsRequest */
+        AroundPinsRequest: {
+            /** AroundViewport */
+            bbox: {
+                east: number;
+                north: number;
+                south: number;
+                west: number;
+            };
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+        };
+        /** AroundPinsResponse */
+        AroundPinsResponse: {
+            pins: {
+                /**
+                 * Format: uuid
+                 * @description Event, club or post id; the gym's id for a box
+                 */
+                id: string;
+                /** @enum {string} */
+                kind: "events" | "boxes" | "clubs" | "posts";
+                latitude: number;
+                longitude: number;
+                /** @description Boxes: the public page's slug */
+                slug: string | null;
+                title: string | null;
+            }[];
+            /** @description More than the cap matched; zoom in */
+            truncated: boolean;
+        };
+        /** AroundPostItem */
+        AroundPostItem: {
+            /** @description Kilometres, one decimal */
+            distance_km: number | null;
+            /**
+             * CommunityPost
+             * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+             */
+            post: {
+                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                attachment?: {
+                    [key: string]: unknown;
+                } | null;
+                /** Format: uuid */
+                attachment_id?: string | null;
+                /** @enum {string|null} */
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                /** @enum {string} */
+                audience: "club_channel" | "followers" | "public";
+                /** CommunityAuthor */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                body?: string | null;
+                can_delete: boolean;
+                can_moderate: boolean;
+                can_pin: boolean;
+                can_report?: boolean;
+                channel: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string | null;
+                    name?: string | null;
+                } | null;
+                club: {
+                    /** Format: uuid */
+                    id: string;
+                    kind?: string;
+                    logo_url?: string | null;
+                    name: string;
+                    organization_slug?: string | null;
+                    primary_color?: string | null;
+                } | null;
+                comment_count: number;
+                /**
+                 * CommunityPostEvent
+                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                 */
+                event?: {
+                    /** CommunityEventBox */
+                    box: {
+                        logo_url?: string | null;
+                        name?: string | null;
+                        slug?: string | null;
+                    };
+                    /** @description You run events at this box */
+                    can_manage: boolean;
+                    can_rsvp: boolean;
+                    cancel_reason?: string | null;
+                    cancelled: boolean;
+                    /** Format: date-time */
+                    cancelled_at?: string | null;
+                    /** @description Null: no limit */
+                    capacity?: number | null;
+                    /**
+                     * Format: uuid
+                     * @description The member group this event belongs to; null for a club event
+                     */
+                    channel_id?: string | null;
+                    /** CommunityEventClub */
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    };
+                    /** Format: uuid */
+                    club_id: string;
+                    /** Format: uuid */
+                    cover_media_id?: string | null;
+                    cover_url?: string | null;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                    goers?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    }[] | null;
+                    going_count: number;
+                    /**
+                     * CommunityEventGroup
+                     * @description The member group of a group event (free, for its members only)
+                     */
+                    group?: {
+                        /** Format: uuid */
+                        id: string;
+                        name?: string | null;
+                    } | null;
+                    guest_pass_allowed: boolean;
+                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                    guests_left?: number | null;
+                    guests_per_member: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @description Event page opened with an invitation link */
+                    invitation?: {
+                        /** CommunityAuthor */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        /** @enum {string|null} */
+                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                        usable: boolean;
+                    } | null;
+                    /**
+                     * CommunityEventMine
+                     * @description Where you stand; null if not on it
+                     */
+                    my?: {
+                        /** Format: uuid */
+                        invited_by_id?: string | null;
+                        late_cancel: boolean;
+                        paid: boolean;
+                        /** @enum {string} */
+                        source: "member" | "open" | "guest";
+                        /** @enum {string} */
+                        status: "going" | "waitlisted" | "cancelled";
+                    } | null;
+                    open_to_non_members: boolean;
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** CommunityEventPlace */
+                    place: {
+                        address: string | null;
+                        city?: string | null;
+                        latitude: number | null;
+                        /**
+                         * Format: uuid
+                         * @description One of the box's locations, or null
+                         */
+                        location_id: string | null;
+                        longitude: number | null;
+                        name: string | null;
+                        neighbourhood?: string | null;
+                    };
+                    /**
+                     * Format: uuid
+                     * @description Its card in the club feed
+                     */
+                    post_id?: string | null;
+                    /** @description 0: free; otherwise paid at the box */
+                    price_cents: number;
+                    /**
+                     * Format: uuid
+                     * @description Shared by every week of a weekly event
+                     */
+                    series_id?: string | null;
+                    /** @description Null: no limit */
+                    spots_left?: number | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title: string;
+                    waitlist_count: number;
+                } | null;
+                hidden: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                inserted_at: string;
+                kudos_by_me: boolean;
+                kudos_count: number;
+                /** @enum {string} */
+                origin: "club" | "profile";
+                pinned: boolean;
+            };
+        };
+        /** AroundPostsSection */
+        AroundPostsSection: {
+            items: {
+                /** @description Kilometres, one decimal */
+                distance_km: number | null;
+                /**
+                 * CommunityPost
+                 * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                 */
+                post: {
+                    /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                    attachment?: {
+                        [key: string]: unknown;
+                    } | null;
+                    /** Format: uuid */
+                    attachment_id?: string | null;
+                    /** @enum {string|null} */
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    /** @enum {string} */
+                    audience: "club_channel" | "followers" | "public";
+                    /** CommunityAuthor */
+                    author: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    body?: string | null;
+                    can_delete: boolean;
+                    can_moderate: boolean;
+                    can_pin: boolean;
+                    can_report?: boolean;
+                    channel: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string | null;
+                        name?: string | null;
+                    } | null;
+                    club: {
+                        /** Format: uuid */
+                        id: string;
+                        kind?: string;
+                        logo_url?: string | null;
+                        name: string;
+                        organization_slug?: string | null;
+                        primary_color?: string | null;
+                    } | null;
+                    comment_count: number;
+                    /**
+                     * CommunityPostEvent
+                     * @description The event as you see it now, when the post is an event card (attachment_type event)
+                     */
+                    event?: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    } | null;
+                    hidden: boolean;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    inserted_at: string;
+                    kudos_by_me: boolean;
+                    kudos_count: number;
+                    /** @enum {string} */
+                    origin: "club" | "profile";
+                    pinned: boolean;
+                };
+            }[];
+            next_cursor: string | null;
+            total: number;
+        } | null;
+        /** AroundSearchRequest */
+        AroundSearchRequest: {
+            /**
+             * AroundFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter?: {
+                amenities?: string[];
+                audiences?: string[];
+                cost?: ("free" | "trial")[];
+                /** Format: date */
+                date_from?: string | null;
+                /** Format: date */
+                date_to?: string | null;
+                disciplines?: string[];
+                /** @description Default events, boxes, clubs */
+                kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                languages?: string[];
+                max_price_cents?: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids?: string[];
+                /** @description Default 3 */
+                radius_km?: number;
+                times?: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v?: number;
+                /** @enum {string|null} */
+                when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** @description Cards per section, default 5 */
+            limit?: number;
+            /**
+             * AroundOriginRequest
+             * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+             */
+            origin?: {
+                /** @description point: the device position; rounded to 3 decimals */
+                latitude?: number;
+                longitude?: number;
+                /**
+                 * Format: uuid
+                 * @description place: a gazetteer place
+                 */
+                neighbourhood_id?: string;
+                /** @description place: a place name for the geocoder */
+                query?: string;
+                /** @enum {string} */
+                type: "area" | "point" | "place";
+            };
+            /** @description Remember the filter as last used (default true) */
+            remember?: boolean;
+        };
+        /** AroundSearchResponse */
+        AroundSearchResponse: {
+            /** @description For «Φίλτρα (n)» */
+            active_filters: number;
+            /**
+             * AroundNormalizedFilter
+             * @description Every field is optional; the response echoes the normalised filter.
+             */
+            filter: {
+                amenities: string[];
+                audiences: string[];
+                cost: ("free" | "trial")[];
+                /** Format: date */
+                date_from: string | null;
+                /** Format: date */
+                date_to: string | null;
+                disciplines: string[];
+                /** @description Default events, boxes, clubs */
+                kinds: ("events" | "boxes" | "clubs" | "posts")[];
+                languages: string[];
+                max_price_cents: number | null;
+                /** @description Gazetteer places to search from, at most 5 */
+                neighbourhood_ids: string[];
+                /** @description Default 3 */
+                radius_km: number;
+                times: ("morning" | "midday" | "evening")[];
+                /** @description Filter version; 1 today */
+                v: number;
+                /** @enum {string|null} */
+                when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+            };
+            /** AroundOrigin */
+            origin: {
+                label: string | null;
+                latitude: number;
+                longitude: number;
+                neighbourhood_ids: string[];
+                /** @enum {string} */
+                type: "neighbourhoods" | "area" | "point" | "place" | "box";
+            };
+            /**
+             * AroundSections
+             * @description A kind not asked for (or ruled out by cost) is null
+             */
+            sections: {
+                /** AroundBoxesSection */
+                boxes: {
+                    items: {
+                        /** AroundBox */
+                        box: {
+                            amenities: string[];
+                            audiences: string[];
+                            city?: string | null;
+                            cover_url?: string | null;
+                            disciplines: string[];
+                            languages: string[];
+                            latitude: number;
+                            logo_url?: string | null;
+                            longitude: number;
+                            name: string;
+                            neighbourhood?: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug: string;
+                            takes_trials: boolean;
+                        };
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                    }[];
+                    next_cursor: string | null;
+                    /**
+                     * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                     * @enum {string}
+                     */
+                    placement: "category" | "collapsed";
+                    total: number;
+                } | null;
+                /** AroundClubsSection */
+                clubs: {
+                    items: {
+                        /** CommunityOpenClub */
+                        club: {
+                            box?: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            channels?: {
+                                /** Format: uuid */
+                                id: string;
+                                kind: string;
+                                name?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            join_policy: "open" | "approval";
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string} */
+                            membership?: "none" | "requested" | "member";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            request_count?: number;
+                            requests?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                            }[];
+                            /** @enum {string|null} */
+                            role?: "member" | "staff" | null;
+                        };
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+                /** AroundEventsSection */
+                events: {
+                    items: {
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                        /** CommunityEvent */
+                        event: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        };
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+                /** AroundPostsSection */
+                posts: {
+                    items: {
+                        /** @description Kilometres, one decimal */
+                        distance_km: number | null;
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                        };
+                    }[];
+                    next_cursor: string | null;
+                    total: number;
+                } | null;
+            };
+            /** @description Only when the search found few: how many at wider radii */
+            wider: {
+                by_kind: {
+                    [key: string]: number;
+                };
+                radius_km: number;
+                total: number;
+            }[];
+        };
+        /**
+         * AroundSections
+         * @description A kind not asked for (or ruled out by cost) is null
+         */
+        AroundSections: {
+            /** AroundBoxesSection */
+            boxes: {
+                items: {
+                    /** AroundBox */
+                    box: {
+                        amenities: string[];
+                        audiences: string[];
+                        city?: string | null;
+                        cover_url?: string | null;
+                        disciplines: string[];
+                        languages: string[];
+                        latitude: number;
+                        logo_url?: string | null;
+                        longitude: number;
+                        name: string;
+                        neighbourhood?: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        primary_color?: string | null;
+                        slug: string;
+                        takes_trials: boolean;
+                    };
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                }[];
+                next_cursor: string | null;
+                /**
+                 * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                 * @enum {string}
+                 */
+                placement: "category" | "collapsed";
+                total: number;
+            } | null;
+            /** AroundClubsSection */
+            clubs: {
+                items: {
+                    /** CommunityOpenClub */
+                    club: {
+                        box?: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        channels?: {
+                            /** Format: uuid */
+                            id: string;
+                            kind: string;
+                            name?: string | null;
+                        }[];
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        description?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        join_policy: "open" | "approval";
+                        member_count: number;
+                        members?: {
+                            /** CommunityAuthor */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** Format: date-time */
+                            since: string;
+                        }[];
+                        /** @enum {string} */
+                        membership?: "none" | "requested" | "member";
+                        name: string;
+                        /** Format: uuid */
+                        organization_id: string;
+                        request_count?: number;
+                        requests?: {
+                            /** CommunityAuthor */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** Format: date-time */
+                            since: string;
+                        }[];
+                        /** @enum {string|null} */
+                        role?: "member" | "staff" | null;
+                    };
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+            /** AroundEventsSection */
+            events: {
+                items: {
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                    /** CommunityEvent */
+                    event: {
+                        /** CommunityEventBox */
+                        box: {
+                            logo_url?: string | null;
+                            name?: string | null;
+                            slug?: string | null;
+                        };
+                        /** @description You run events at this box */
+                        can_manage: boolean;
+                        can_rsvp: boolean;
+                        cancel_reason?: string | null;
+                        cancelled: boolean;
+                        /** Format: date-time */
+                        cancelled_at?: string | null;
+                        /** @description Null: no limit */
+                        capacity?: number | null;
+                        /**
+                         * Format: uuid
+                         * @description The member group this event belongs to; null for a club event
+                         */
+                        channel_id?: string | null;
+                        /** CommunityEventClub */
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        };
+                        /** Format: uuid */
+                        club_id: string;
+                        /** Format: uuid */
+                        cover_media_id?: string | null;
+                        cover_url?: string | null;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                        goers?: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[] | null;
+                        going_count: number;
+                        /**
+                         * CommunityEventGroup
+                         * @description The member group of a group event (free, for its members only)
+                         */
+                        group?: {
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        } | null;
+                        guest_pass_allowed: boolean;
+                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                        guests_left?: number | null;
+                        guests_per_member: number;
+                        /** Format: uuid */
+                        id: string;
+                        /** @description Event page opened with an invitation link */
+                        invitation?: {
+                            /** CommunityAuthor */
+                            inviter: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            /** @enum {string|null} */
+                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                            usable: boolean;
+                        } | null;
+                        /**
+                         * CommunityEventMine
+                         * @description Where you stand; null if not on it
+                         */
+                        my?: {
+                            /** Format: uuid */
+                            invited_by_id?: string | null;
+                            late_cancel: boolean;
+                            paid: boolean;
+                            /** @enum {string} */
+                            source: "member" | "open" | "guest";
+                            /** @enum {string} */
+                            status: "going" | "waitlisted" | "cancelled";
+                        } | null;
+                        open_to_non_members: boolean;
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** CommunityEventPlace */
+                        place: {
+                            address: string | null;
+                            city?: string | null;
+                            latitude: number | null;
+                            /**
+                             * Format: uuid
+                             * @description One of the box's locations, or null
+                             */
+                            location_id: string | null;
+                            longitude: number | null;
+                            name: string | null;
+                            neighbourhood?: string | null;
+                        };
+                        /**
+                         * Format: uuid
+                         * @description Its card in the club feed
+                         */
+                        post_id?: string | null;
+                        /** @description 0: free; otherwise paid at the box */
+                        price_cents: number;
+                        /**
+                         * Format: uuid
+                         * @description Shared by every week of a weekly event
+                         */
+                        series_id?: string | null;
+                        /** @description Null: no limit */
+                        spots_left?: number | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title: string;
+                        waitlist_count: number;
+                    };
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+            /** AroundPostsSection */
+            posts: {
+                items: {
+                    /** @description Kilometres, one decimal */
+                    distance_km: number | null;
+                    /**
+                     * CommunityPost
+                     * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                     */
+                    post: {
+                        /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                        attachment?: {
+                            [key: string]: unknown;
+                        } | null;
+                        /** Format: uuid */
+                        attachment_id?: string | null;
+                        /** @enum {string|null} */
+                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                        /** @enum {string} */
+                        audience: "club_channel" | "followers" | "public";
+                        /** CommunityAuthor */
+                        author: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        };
+                        body?: string | null;
+                        can_delete: boolean;
+                        can_moderate: boolean;
+                        can_pin: boolean;
+                        can_report?: boolean;
+                        channel: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string | null;
+                            name?: string | null;
+                        } | null;
+                        club: {
+                            /** Format: uuid */
+                            id: string;
+                            kind?: string;
+                            logo_url?: string | null;
+                            name: string;
+                            organization_slug?: string | null;
+                            primary_color?: string | null;
+                        } | null;
+                        comment_count: number;
+                        /**
+                         * CommunityPostEvent
+                         * @description The event as you see it now, when the post is an event card (attachment_type event)
+                         */
+                        event?: {
+                            /** CommunityEventBox */
+                            box: {
+                                logo_url?: string | null;
+                                name?: string | null;
+                                slug?: string | null;
+                            };
+                            /** @description You run events at this box */
+                            can_manage: boolean;
+                            can_rsvp: boolean;
+                            cancel_reason?: string | null;
+                            cancelled: boolean;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @description Null: no limit */
+                            capacity?: number | null;
+                            /**
+                             * Format: uuid
+                             * @description The member group this event belongs to; null for a club event
+                             */
+                            channel_id?: string | null;
+                            /** CommunityEventClub */
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            };
+                            /** Format: uuid */
+                            club_id: string;
+                            /** Format: uuid */
+                            cover_media_id?: string | null;
+                            cover_url?: string | null;
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date-time */
+                            ends_at: string;
+                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                            goers?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[] | null;
+                            going_count: number;
+                            /**
+                             * CommunityEventGroup
+                             * @description The member group of a group event (free, for its members only)
+                             */
+                            group?: {
+                                /** Format: uuid */
+                                id: string;
+                                name?: string | null;
+                            } | null;
+                            guest_pass_allowed: boolean;
+                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                            guests_left?: number | null;
+                            guests_per_member: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Event page opened with an invitation link */
+                            invitation?: {
+                                /** CommunityAuthor */
+                                inviter: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** @enum {string|null} */
+                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                usable: boolean;
+                            } | null;
+                            /**
+                             * CommunityEventMine
+                             * @description Where you stand; null if not on it
+                             */
+                            my?: {
+                                /** Format: uuid */
+                                invited_by_id?: string | null;
+                                late_cancel: boolean;
+                                paid: boolean;
+                                /** @enum {string} */
+                                source: "member" | "open" | "guest";
+                                /** @enum {string} */
+                                status: "going" | "waitlisted" | "cancelled";
+                            } | null;
+                            open_to_non_members: boolean;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** CommunityEventPlace */
+                            place: {
+                                address: string | null;
+                                city?: string | null;
+                                latitude: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description One of the box's locations, or null
+                                 */
+                                location_id: string | null;
+                                longitude: number | null;
+                                name: string | null;
+                                neighbourhood?: string | null;
+                            };
+                            /**
+                             * Format: uuid
+                             * @description Its card in the club feed
+                             */
+                            post_id?: string | null;
+                            /** @description 0: free; otherwise paid at the box */
+                            price_cents: number;
+                            /**
+                             * Format: uuid
+                             * @description Shared by every week of a weekly event
+                             */
+                            series_id?: string | null;
+                            /** @description Null: no limit */
+                            spots_left?: number | null;
+                            /** Format: date-time */
+                            starts_at: string;
+                            title: string;
+                            waitlist_count: number;
+                        } | null;
+                        hidden: boolean;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date-time */
+                        inserted_at: string;
+                        kudos_by_me: boolean;
+                        kudos_count: number;
+                        /** @enum {string} */
+                        origin: "club" | "profile";
+                        pinned: boolean;
+                    };
+                }[];
+                next_cursor: string | null;
+                total: number;
+            } | null;
+        };
+        /** AroundViewport */
+        AroundViewport: {
+            east: number;
+            north: number;
+            south: number;
+            west: number;
+        };
+        /**
+         * AroundVisibility
+         * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+         */
+        AroundVisibility: {
+            /** @description Public posts show only once «Η περιοχή μου» is set */
+            has_area: boolean;
+            visible: boolean;
+        };
+        /** AroundVisibilityRequest */
+        AroundVisibilityRequest: {
+            visible: boolean;
+        };
+        /** AroundWiderCount */
+        AroundWiderCount: {
+            by_kind: {
+                [key: string]: number;
+            };
+            radius_km: number;
+            total: number;
         };
         /** AthleteInjuryWarnings */
         AthleteInjuryWarnings: {
@@ -12553,6 +15126,34 @@ export interface components {
             /** Format: uuid */
             workout_id: string;
         };
+        /** Neighbourhood */
+        Neighbourhood: {
+            city_slug: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "neighbourhood" | "city";
+            latitude: number;
+            longitude: number;
+            name: string;
+            name_en: string;
+            slug: string;
+        };
+        /** NeighbourhoodsResponse */
+        NeighbourhoodsResponse: {
+            neighbourhoods: {
+                city_slug: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "neighbourhood" | "city";
+                latitude: number;
+                longitude: number;
+                name: string;
+                name_en: string;
+                slug: string;
+            }[];
+        };
         /** NutritionPlan */
         NutritionPlan: {
             body: string;
@@ -13383,7 +15984,7 @@ export interface components {
         };
         /** RememberFilterRequest */
         RememberFilterRequest: {
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
@@ -13391,36 +15992,44 @@ export interface components {
         /** SaveFilterRequest */
         SaveFilterRequest: {
             name: string;
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
         };
         /** SavedFilter */
         SavedFilter: {
+            /** @description Γύρω μου only: a daily notification when something new matches */
+            alert: boolean;
             /** Format: uuid */
             id: string;
             /** Format: date-time */
             last_used_at: string;
             name: string;
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             params: {
                 [key: string]: unknown;
             };
         };
+        /** SavedFilterAlertRequest */
+        SavedFilterAlertRequest: {
+            enabled: boolean;
+        };
         /** SavedFilters */
         SavedFilters: {
-            /** @description The surface's filter values; the surface's query validates them. */
+            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
             last_used: {
                 [key: string]: unknown;
             } | null;
             saved: {
+                /** @description Γύρω μου only: a daily notification when something new matches */
+                alert: boolean;
                 /** Format: uuid */
                 id: string;
                 /** Format: date-time */
                 last_used_at: string;
                 name: string;
-                /** @description The surface's filter values; the surface's query validates them. */
+                /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                 params: {
                     [key: string]: unknown;
                 };
@@ -13438,6 +16047,15 @@ export interface components {
         };
         /** SocialSummary */
         SocialSummary: {
+            /**
+             * AroundVisibility
+             * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+             */
+            around_visibility: {
+                /** @description Public posts show only once «Η περιοχή μου» is set */
+                has_area: boolean;
+                visible: boolean;
+            };
             /**
              * BookingSharing
              * @description Whether followers see the classes you book, and whether the one-time offer was answered
@@ -15669,6 +18287,1111 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "MilosTrainingWeb.AroundController.pins": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** AroundViewport */
+                    bbox: {
+                        east: number;
+                        north: number;
+                        south: number;
+                        west: number;
+                    };
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Pins */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        pins: {
+                            /**
+                             * Format: uuid
+                             * @description Event, club or post id; the gym's id for a box
+                             */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "events" | "boxes" | "clubs" | "posts";
+                            latitude: number;
+                            longitude: number;
+                            /** @description Boxes: the public page's slug */
+                            slug: string | null;
+                            title: string | null;
+                        }[];
+                        /** @description More than the cap matched; zoom in */
+                        truncated: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AroundController.search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                    /** @description Cards per section, default 5 */
+                    limit?: number;
+                    /**
+                     * AroundOriginRequest
+                     * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+                     */
+                    origin?: {
+                        /** @description point: the device position; rounded to 3 decimals */
+                        latitude?: number;
+                        longitude?: number;
+                        /**
+                         * Format: uuid
+                         * @description place: a gazetteer place
+                         */
+                        neighbourhood_id?: string;
+                        /** @description place: a place name for the geocoder */
+                        query?: string;
+                        /** @enum {string} */
+                        type: "area" | "point" | "place";
+                    };
+                    /** @description Remember the filter as last used (default true) */
+                    remember?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Sections */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description For «Φίλτρα (n)» */
+                        active_filters: number;
+                        /**
+                         * AroundNormalizedFilter
+                         * @description Every field is optional; the response echoes the normalised filter.
+                         */
+                        filter: {
+                            amenities: string[];
+                            audiences: string[];
+                            cost: ("free" | "trial")[];
+                            /** Format: date */
+                            date_from: string | null;
+                            /** Format: date */
+                            date_to: string | null;
+                            disciplines: string[];
+                            /** @description Default events, boxes, clubs */
+                            kinds: ("events" | "boxes" | "clubs" | "posts")[];
+                            languages: string[];
+                            max_price_cents: number | null;
+                            /** @description Gazetteer places to search from, at most 5 */
+                            neighbourhood_ids: string[];
+                            /** @description Default 3 */
+                            radius_km: number;
+                            times: ("morning" | "midday" | "evening")[];
+                            /** @description Filter version; 1 today */
+                            v: number;
+                            /** @enum {string|null} */
+                            when: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                        };
+                        /** AroundOrigin */
+                        origin: {
+                            label: string | null;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood_ids: string[];
+                            /** @enum {string} */
+                            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+                        };
+                        /**
+                         * AroundSections
+                         * @description A kind not asked for (or ruled out by cost) is null
+                         */
+                        sections: {
+                            /** AroundBoxesSection */
+                            boxes: {
+                                items: {
+                                    /** AroundBox */
+                                    box: {
+                                        amenities: string[];
+                                        audiences: string[];
+                                        city?: string | null;
+                                        cover_url?: string | null;
+                                        disciplines: string[];
+                                        languages: string[];
+                                        latitude: number;
+                                        logo_url?: string | null;
+                                        longitude: number;
+                                        name: string;
+                                        neighbourhood?: string | null;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        primary_color?: string | null;
+                                        slug: string;
+                                        takes_trials: boolean;
+                                    };
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                }[];
+                                next_cursor: string | null;
+                                /**
+                                 * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                                 * @enum {string}
+                                 */
+                                placement: "category" | "collapsed";
+                                total: number;
+                            } | null;
+                            /** AroundClubsSection */
+                            clubs: {
+                                items: {
+                                    /** CommunityOpenClub */
+                                    club: {
+                                        box?: {
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            slug?: string | null;
+                                        };
+                                        channels?: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind: string;
+                                            name?: string | null;
+                                        }[];
+                                        /** Format: uuid */
+                                        cover_media_id?: string | null;
+                                        cover_url?: string | null;
+                                        description?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** @enum {string} */
+                                        join_policy: "open" | "approval";
+                                        member_count: number;
+                                        members?: {
+                                            /** CommunityAuthor */
+                                            person: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** Format: date-time */
+                                            since: string;
+                                        }[];
+                                        /** @enum {string} */
+                                        membership?: "none" | "requested" | "member";
+                                        name: string;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        request_count?: number;
+                                        requests?: {
+                                            /** CommunityAuthor */
+                                            person: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** Format: date-time */
+                                            since: string;
+                                        }[];
+                                        /** @enum {string|null} */
+                                        role?: "member" | "staff" | null;
+                                    };
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                            /** AroundEventsSection */
+                            events: {
+                                items: {
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                    /** CommunityEvent */
+                                    event: {
+                                        /** CommunityEventBox */
+                                        box: {
+                                            logo_url?: string | null;
+                                            name?: string | null;
+                                            slug?: string | null;
+                                        };
+                                        /** @description You run events at this box */
+                                        can_manage: boolean;
+                                        can_rsvp: boolean;
+                                        cancel_reason?: string | null;
+                                        cancelled: boolean;
+                                        /** Format: date-time */
+                                        cancelled_at?: string | null;
+                                        /** @description Null: no limit */
+                                        capacity?: number | null;
+                                        /**
+                                         * Format: uuid
+                                         * @description The member group this event belongs to; null for a club event
+                                         */
+                                        channel_id?: string | null;
+                                        /** CommunityEventClub */
+                                        club: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string | null;
+                                            name?: string | null;
+                                        };
+                                        /** Format: uuid */
+                                        club_id: string;
+                                        /** Format: uuid */
+                                        cover_media_id?: string | null;
+                                        cover_url?: string | null;
+                                        currency: string;
+                                        description?: string | null;
+                                        /** Format: date-time */
+                                        ends_at: string;
+                                        /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                        goers?: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        }[] | null;
+                                        going_count: number;
+                                        /**
+                                         * CommunityEventGroup
+                                         * @description The member group of a group event (free, for its members only)
+                                         */
+                                        group?: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            name?: string | null;
+                                        } | null;
+                                        guest_pass_allowed: boolean;
+                                        /** @description Event page: guests you can still bring (going, guest passes on) */
+                                        guests_left?: number | null;
+                                        guests_per_member: number;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** @description Event page opened with an invitation link */
+                                        invitation?: {
+                                            /** CommunityAuthor */
+                                            inviter: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            };
+                                            /** @enum {string|null} */
+                                            reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                            usable: boolean;
+                                        } | null;
+                                        /**
+                                         * CommunityEventMine
+                                         * @description Where you stand; null if not on it
+                                         */
+                                        my?: {
+                                            /** Format: uuid */
+                                            invited_by_id?: string | null;
+                                            late_cancel: boolean;
+                                            paid: boolean;
+                                            /** @enum {string} */
+                                            source: "member" | "open" | "guest";
+                                            /** @enum {string} */
+                                            status: "going" | "waitlisted" | "cancelled";
+                                        } | null;
+                                        open_to_non_members: boolean;
+                                        /** Format: uuid */
+                                        organization_id: string;
+                                        /** CommunityEventPlace */
+                                        place: {
+                                            address: string | null;
+                                            city?: string | null;
+                                            latitude: number | null;
+                                            /**
+                                             * Format: uuid
+                                             * @description One of the box's locations, or null
+                                             */
+                                            location_id: string | null;
+                                            longitude: number | null;
+                                            name: string | null;
+                                            neighbourhood?: string | null;
+                                        };
+                                        /**
+                                         * Format: uuid
+                                         * @description Its card in the club feed
+                                         */
+                                        post_id?: string | null;
+                                        /** @description 0: free; otherwise paid at the box */
+                                        price_cents: number;
+                                        /**
+                                         * Format: uuid
+                                         * @description Shared by every week of a weekly event
+                                         */
+                                        series_id?: string | null;
+                                        /** @description Null: no limit */
+                                        spots_left?: number | null;
+                                        /** Format: date-time */
+                                        starts_at: string;
+                                        title: string;
+                                        waitlist_count: number;
+                                    };
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                            /** AroundPostsSection */
+                            posts: {
+                                items: {
+                                    /** @description Kilometres, one decimal */
+                                    distance_km: number | null;
+                                    /**
+                                     * CommunityPost
+                                     * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                                     */
+                                    post: {
+                                        /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                                        attachment?: {
+                                            [key: string]: unknown;
+                                        } | null;
+                                        /** Format: uuid */
+                                        attachment_id?: string | null;
+                                        /** @enum {string|null} */
+                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                        /** @enum {string} */
+                                        audience: "club_channel" | "followers" | "public";
+                                        /** CommunityAuthor */
+                                        author: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        };
+                                        body?: string | null;
+                                        can_delete: boolean;
+                                        can_moderate: boolean;
+                                        can_pin: boolean;
+                                        can_report?: boolean;
+                                        channel: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string | null;
+                                            name?: string | null;
+                                        } | null;
+                                        club: {
+                                            /** Format: uuid */
+                                            id: string;
+                                            kind?: string;
+                                            logo_url?: string | null;
+                                            name: string;
+                                            organization_slug?: string | null;
+                                            primary_color?: string | null;
+                                        } | null;
+                                        comment_count: number;
+                                        /**
+                                         * CommunityPostEvent
+                                         * @description The event as you see it now, when the post is an event card (attachment_type event)
+                                         */
+                                        event?: {
+                                            /** CommunityEventBox */
+                                            box: {
+                                                logo_url?: string | null;
+                                                name?: string | null;
+                                                slug?: string | null;
+                                            };
+                                            /** @description You run events at this box */
+                                            can_manage: boolean;
+                                            can_rsvp: boolean;
+                                            cancel_reason?: string | null;
+                                            cancelled: boolean;
+                                            /** Format: date-time */
+                                            cancelled_at?: string | null;
+                                            /** @description Null: no limit */
+                                            capacity?: number | null;
+                                            /**
+                                             * Format: uuid
+                                             * @description The member group this event belongs to; null for a club event
+                                             */
+                                            channel_id?: string | null;
+                                            /** CommunityEventClub */
+                                            club: {
+                                                /** Format: uuid */
+                                                id: string;
+                                                kind?: string | null;
+                                                name?: string | null;
+                                            };
+                                            /** Format: uuid */
+                                            club_id: string;
+                                            /** Format: uuid */
+                                            cover_media_id?: string | null;
+                                            cover_url?: string | null;
+                                            currency: string;
+                                            description?: string | null;
+                                            /** Format: date-time */
+                                            ends_at: string;
+                                            /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                            goers?: {
+                                                avatar_url?: string | null;
+                                                /** Format: uuid */
+                                                id: string;
+                                                nickname?: string | null;
+                                            }[] | null;
+                                            going_count: number;
+                                            /**
+                                             * CommunityEventGroup
+                                             * @description The member group of a group event (free, for its members only)
+                                             */
+                                            group?: {
+                                                /** Format: uuid */
+                                                id: string;
+                                                name?: string | null;
+                                            } | null;
+                                            guest_pass_allowed: boolean;
+                                            /** @description Event page: guests you can still bring (going, guest passes on) */
+                                            guests_left?: number | null;
+                                            guests_per_member: number;
+                                            /** Format: uuid */
+                                            id: string;
+                                            /** @description Event page opened with an invitation link */
+                                            invitation?: {
+                                                /** CommunityAuthor */
+                                                inviter: {
+                                                    avatar_url?: string | null;
+                                                    /** Format: uuid */
+                                                    id: string;
+                                                    nickname?: string | null;
+                                                };
+                                                /** @enum {string|null} */
+                                                reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                                usable: boolean;
+                                            } | null;
+                                            /**
+                                             * CommunityEventMine
+                                             * @description Where you stand; null if not on it
+                                             */
+                                            my?: {
+                                                /** Format: uuid */
+                                                invited_by_id?: string | null;
+                                                late_cancel: boolean;
+                                                paid: boolean;
+                                                /** @enum {string} */
+                                                source: "member" | "open" | "guest";
+                                                /** @enum {string} */
+                                                status: "going" | "waitlisted" | "cancelled";
+                                            } | null;
+                                            open_to_non_members: boolean;
+                                            /** Format: uuid */
+                                            organization_id: string;
+                                            /** CommunityEventPlace */
+                                            place: {
+                                                address: string | null;
+                                                city?: string | null;
+                                                latitude: number | null;
+                                                /**
+                                                 * Format: uuid
+                                                 * @description One of the box's locations, or null
+                                                 */
+                                                location_id: string | null;
+                                                longitude: number | null;
+                                                name: string | null;
+                                                neighbourhood?: string | null;
+                                            };
+                                            /**
+                                             * Format: uuid
+                                             * @description Its card in the club feed
+                                             */
+                                            post_id?: string | null;
+                                            /** @description 0: free; otherwise paid at the box */
+                                            price_cents: number;
+                                            /**
+                                             * Format: uuid
+                                             * @description Shared by every week of a weekly event
+                                             */
+                                            series_id?: string | null;
+                                            /** @description Null: no limit */
+                                            spots_left?: number | null;
+                                            /** Format: date-time */
+                                            starts_at: string;
+                                            title: string;
+                                            waitlist_count: number;
+                                        } | null;
+                                        hidden: boolean;
+                                        /** Format: uuid */
+                                        id: string;
+                                        /** Format: date-time */
+                                        inserted_at: string;
+                                        kudos_by_me: boolean;
+                                        kudos_count: number;
+                                        /** @enum {string} */
+                                        origin: "club" | "profile";
+                                        pinned: boolean;
+                                    };
+                                }[];
+                                next_cursor: string | null;
+                                total: number;
+                            } | null;
+                        };
+                        /** @description Only when the search found few: how many at wider radii */
+                        wider: {
+                            by_kind: {
+                                [key: string]: number;
+                            };
+                            radius_km: number;
+                            total: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AroundController.kind": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "events" | "boxes" | "clubs" | "posts";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cursor?: string | null;
+                    /**
+                     * AroundFilter
+                     * @description Every field is optional; the response echoes the normalised filter.
+                     */
+                    filter?: {
+                        amenities?: string[];
+                        audiences?: string[];
+                        cost?: ("free" | "trial")[];
+                        /** Format: date */
+                        date_from?: string | null;
+                        /** Format: date */
+                        date_to?: string | null;
+                        disciplines?: string[];
+                        /** @description Default events, boxes, clubs */
+                        kinds?: ("events" | "boxes" | "clubs" | "posts")[];
+                        languages?: string[];
+                        max_price_cents?: number | null;
+                        /** @description Gazetteer places to search from, at most 5 */
+                        neighbourhood_ids?: string[];
+                        /** @description Default 3 */
+                        radius_km?: number;
+                        times?: ("morning" | "midday" | "evening")[];
+                        /** @description Filter version; 1 today */
+                        v?: number;
+                        /** @enum {string|null} */
+                        when?: "today" | "tomorrow" | "weekend" | "week" | "range" | null;
+                    };
+                    /** @description Default 20 */
+                    limit?: number;
+                    /**
+                     * AroundOriginRequest
+                     * @description Where to start; left out, the filter's neighbourhoods, the saved area, then the member's box.
+                     */
+                    origin?: {
+                        /** @description point: the device position; rounded to 3 decimals */
+                        latitude?: number;
+                        longitude?: number;
+                        /**
+                         * Format: uuid
+                         * @description place: a gazetteer place
+                         */
+                        neighbourhood_id?: string;
+                        /** @description place: a place name for the geocoder */
+                        query?: string;
+                        /** @enum {string} */
+                        type: "area" | "point" | "place";
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: ({
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                            /** CommunityEvent */
+                            event: {
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title: string;
+                                waitlist_count: number;
+                            };
+                        } | {
+                            /** AroundBox */
+                            box: {
+                                amenities: string[];
+                                audiences: string[];
+                                city?: string | null;
+                                cover_url?: string | null;
+                                disciplines: string[];
+                                languages: string[];
+                                latitude: number;
+                                logo_url?: string | null;
+                                longitude: number;
+                                name: string;
+                                neighbourhood?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                primary_color?: string | null;
+                                slug: string;
+                                takes_trials: boolean;
+                            };
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                        } | {
+                            /** CommunityOpenClub */
+                            club: {
+                                box?: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                channels?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind: string;
+                                    name?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                description?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                join_policy: "open" | "approval";
+                                member_count: number;
+                                members?: {
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    since: string;
+                                }[];
+                                /** @enum {string} */
+                                membership?: "none" | "requested" | "member";
+                                name: string;
+                                /** Format: uuid */
+                                organization_id: string;
+                                request_count?: number;
+                                requests?: {
+                                    /** CommunityAuthor */
+                                    person: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** Format: date-time */
+                                    since: string;
+                                }[];
+                                /** @enum {string|null} */
+                                role?: "member" | "staff" | null;
+                            };
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                        } | {
+                            /** @description Kilometres, one decimal */
+                            distance_km: number | null;
+                            /**
+                             * CommunityPost
+                             * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                             */
+                            post: {
+                                /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                                attachment?: {
+                                    [key: string]: unknown;
+                                } | null;
+                                /** Format: uuid */
+                                attachment_id?: string | null;
+                                /** @enum {string|null} */
+                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                /** @enum {string} */
+                                audience: "club_channel" | "followers" | "public";
+                                /** CommunityAuthor */
+                                author: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                body?: string | null;
+                                can_delete: boolean;
+                                can_moderate: boolean;
+                                can_pin: boolean;
+                                can_report?: boolean;
+                                channel: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                } | null;
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string;
+                                    logo_url?: string | null;
+                                    name: string;
+                                    organization_slug?: string | null;
+                                    primary_color?: string | null;
+                                } | null;
+                                comment_count: number;
+                                /**
+                                 * CommunityPostEvent
+                                 * @description The event as you see it now, when the post is an event card (attachment_type event)
+                                 */
+                                event?: {
+                                    /** CommunityEventBox */
+                                    box: {
+                                        logo_url?: string | null;
+                                        name?: string | null;
+                                        slug?: string | null;
+                                    };
+                                    /** @description You run events at this box */
+                                    can_manage: boolean;
+                                    can_rsvp: boolean;
+                                    cancel_reason?: string | null;
+                                    cancelled: boolean;
+                                    /** Format: date-time */
+                                    cancelled_at?: string | null;
+                                    /** @description Null: no limit */
+                                    capacity?: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description The member group this event belongs to; null for a club event
+                                     */
+                                    channel_id?: string | null;
+                                    /** CommunityEventClub */
+                                    club: {
+                                        /** Format: uuid */
+                                        id: string;
+                                        kind?: string | null;
+                                        name?: string | null;
+                                    };
+                                    /** Format: uuid */
+                                    club_id: string;
+                                    /** Format: uuid */
+                                    cover_media_id?: string | null;
+                                    cover_url?: string | null;
+                                    currency: string;
+                                    description?: string | null;
+                                    /** Format: date-time */
+                                    ends_at: string;
+                                    /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                    goers?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    }[] | null;
+                                    going_count: number;
+                                    /**
+                                     * CommunityEventGroup
+                                     * @description The member group of a group event (free, for its members only)
+                                     */
+                                    group?: {
+                                        /** Format: uuid */
+                                        id: string;
+                                        name?: string | null;
+                                    } | null;
+                                    guest_pass_allowed: boolean;
+                                    /** @description Event page: guests you can still bring (going, guest passes on) */
+                                    guests_left?: number | null;
+                                    guests_per_member: number;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @description Event page opened with an invitation link */
+                                    invitation?: {
+                                        /** CommunityAuthor */
+                                        inviter: {
+                                            avatar_url?: string | null;
+                                            /** Format: uuid */
+                                            id: string;
+                                            nickname?: string | null;
+                                        };
+                                        /** @enum {string|null} */
+                                        reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                        usable: boolean;
+                                    } | null;
+                                    /**
+                                     * CommunityEventMine
+                                     * @description Where you stand; null if not on it
+                                     */
+                                    my?: {
+                                        /** Format: uuid */
+                                        invited_by_id?: string | null;
+                                        late_cancel: boolean;
+                                        paid: boolean;
+                                        /** @enum {string} */
+                                        source: "member" | "open" | "guest";
+                                        /** @enum {string} */
+                                        status: "going" | "waitlisted" | "cancelled";
+                                    } | null;
+                                    open_to_non_members: boolean;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /** CommunityEventPlace */
+                                    place: {
+                                        address: string | null;
+                                        city?: string | null;
+                                        latitude: number | null;
+                                        /**
+                                         * Format: uuid
+                                         * @description One of the box's locations, or null
+                                         */
+                                        location_id: string | null;
+                                        longitude: number | null;
+                                        name: string | null;
+                                        neighbourhood?: string | null;
+                                    };
+                                    /**
+                                     * Format: uuid
+                                     * @description Its card in the club feed
+                                     */
+                                    post_id?: string | null;
+                                    /** @description 0: free; otherwise paid at the box */
+                                    price_cents: number;
+                                    /**
+                                     * Format: uuid
+                                     * @description Shared by every week of a weekly event
+                                     */
+                                    series_id?: string | null;
+                                    /** @description Null: no limit */
+                                    spots_left?: number | null;
+                                    /** Format: date-time */
+                                    starts_at: string;
+                                    title: string;
+                                    waitlist_count: number;
+                                } | null;
+                                hidden: boolean;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                inserted_at: string;
+                                kudos_by_me: boolean;
+                                kudos_count: number;
+                                /** @enum {string} */
+                                origin: "club" | "profile";
+                                pinned: boolean;
+                            };
+                        })[];
+                        /** @enum {string} */
+                        kind: "events" | "boxes" | "clubs" | "posts";
+                        next_cursor: string | null;
+                        /** AroundOrigin */
+                        origin: {
+                            label: string | null;
+                            latitude: number;
+                            longitude: number;
+                            neighbourhood_ids: string[];
+                            /** @enum {string} */
+                            type: "neighbourhoods" | "area" | "point" | "place" | "box";
+                        };
+                        /**
+                         * @description collapsed: the viewer already has a gym; show one quiet «Άλλα box στην περιοχή (n)» line
+                         * @enum {string}
+                         */
+                        placement?: "category" | "collapsed";
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.inspect": {
         parameters: {
             query?: never;
@@ -17753,6 +21476,78 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Area */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.update_area": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    neighbourhood_ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Area */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
+                        }[];
+                    };
+                };
             };
         };
     };
@@ -20875,17 +24670,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -20910,7 +24707,7 @@ export interface operations {
             content: {
                 "application/json": {
                     name: string;
-                    /** @description The surface's filter values; the surface's query validates them. */
+                    /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                     params: {
                         [key: string]: unknown;
                     };
@@ -20925,17 +24722,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -20959,7 +24758,7 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description The surface's filter values; the surface's query validates them. */
+                    /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                     params: {
                         [key: string]: unknown;
                     };
@@ -20974,17 +24773,19 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -21015,17 +24816,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description The surface's filter values; the surface's query validates them. */
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                         last_used: {
                             [key: string]: unknown;
                         } | null;
                         saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
                             /** Format: uuid */
                             id: string;
                             /** Format: date-time */
                             last_used_at: string;
                             name: string;
-                            /** @description The surface's filter values; the surface's query validates them. */
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
+                            params: {
+                                [key: string]: unknown;
+                            };
+                        }[];
+                        /** @enum {string} */
+                        surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SavedFilterController.alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Filters */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
+                        last_used: {
+                            [key: string]: unknown;
+                        } | null;
+                        saved: {
+                            /** @description Γύρω μου only: a daily notification when something new matches */
+                            alert: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_used_at: string;
+                            name: string;
+                            /** @description The surface's filter values; the surface's query validates them. Γύρω μου (`around_me`) stores them normalised as an AroundFilter. */
                             params: {
                                 [key: string]: unknown;
                             };
@@ -21944,6 +25796,15 @@ export interface operations {
                 content: {
                     "application/json": {
                         /**
+                         * AroundVisibility
+                         * @description «Φαίνομαι στο Γύρω μου»: your public posts show in Γύρω μου at your main neighbourhood
+                         */
+                        around_visibility: {
+                            /** @description Public posts show only once «Η περιοχή μου» is set */
+                            has_area: boolean;
+                            visible: boolean;
+                        };
+                        /**
                          * BookingSharing
                          * @description Whether followers see the classes you book, and whether the one-time offer was answered
                          */
@@ -21962,6 +25823,36 @@ export interface operations {
                         };
                         posts_count: number;
                         requests_count: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.FollowController.around_visibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    visible: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Setting */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Public posts show only once «Η περιοχή μου» is set */
+                        has_area: boolean;
+                        visible: boolean;
                     };
                 };
             };
@@ -47935,6 +51826,41 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlacesController.neighbourhoods": {
+        parameters: {
+            query: {
+                q: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        neighbourhoods: {
+                            city_slug: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            slug: string;
                         }[];
                     };
                 };
