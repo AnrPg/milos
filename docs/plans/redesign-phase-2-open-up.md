@@ -593,7 +593,7 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
    days can be filled in or corrected up to 7 days back; tiles can be reordered and hidden.
 2. **Water (Q2, A):** glasses of your own size (250 ml default), goal in glasses, stored in ml;
    undo in the toast, tap a drop to remove a glass. Extras: the goal is yours (a coach only
-   suggests); an opt-in afternoon reminder when under half; no automatic extra on training days.
+   suggests); an afternoon reminder when under half, on by default once a goal is set (ANR's note), switchable off; no automatic extra on training days.
 3. **Sleep (Q3, built as A):** «Έπεσα» and «Ξύπνησα» prefilled from usual times, hours worked
    out, quality 1–5. Extras: «από Garmin» with «διορθώθηκε» after an edit; naps as separate short
    entries; Πώς νιώθω stops asking about sleep on a day sleep is logged.

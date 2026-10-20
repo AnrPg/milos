@@ -15,7 +15,7 @@ defmodule MilosTraining.Wellness.Domain.PreferencesPolicy do
     sleep_goal_minutes: 420,
     hidden_items: [],
     item_order: [],
-    water_reminder: false
+    water_reminder: true
   }
 
   def items, do: @items

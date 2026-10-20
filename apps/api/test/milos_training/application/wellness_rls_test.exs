@@ -167,7 +167,7 @@ defmodule MilosTraining.Application.WellnessRLSTest do
              GetJournalFeed.call(ctx.member_ctx, %{"kinds" => "wellness,craving"})
   end
 
-  test "a craving left open hears «Πώς πήγε;» once; the water reminder is opt-in and afternoon only",
+  test "a craving left open hears «Πώς πήγε;» once; the water reminder starts with a goal and is afternoon only",
        ctx do
     {:ok, open} = LogCraving.call(ctx.member_ctx, %{"intensity" => 6}, @now)
 
@@ -181,7 +181,7 @@ defmodule MilosTraining.Application.WellnessRLSTest do
         @now
       )
 
-    # 16:00 in Athens: the follow-up is due; the water reminder is not on yet.
+    # 16:00 in Athens: the follow-up is due; without a goal there is no reminder yet.
     assert :ok = WellnessNudges.call(~U[2026-10-20 13:00:00Z])
     assert notified(ctx.member, :craving_follow_up) == 1
     assert notified(ctx.member, :water_reminder) == 0
@@ -190,7 +190,9 @@ defmodule MilosTraining.Application.WellnessRLSTest do
              Wellness.get_craving(open.id, ctx.member.id).followed_up_at
            end)
 
-    {:ok, _prefs} = SetWellnessPreferences.call(ctx.member_ctx, %{"water_reminder" => true})
+    # Setting a goal turns the reminder on by default (board 14 note).
+    {:ok, prefs} = SetWellnessPreferences.call(ctx.member_ctx, %{"water_goal_ml" => 2_000})
+    assert prefs.water_reminder
 
     # 13:00 Athens is still the morning side of the reminder window.
     assert :ok = WellnessNudges.call(~U[2026-10-20 10:00:00Z])
@@ -201,6 +203,11 @@ defmodule MilosTraining.Application.WellnessRLSTest do
     assert :ok = WellnessNudges.call(DateTime.add(afternoon, 1, :hour))
     assert notified(ctx.member, :water_reminder) == 1
     assert notified(ctx.member, :craving_follow_up) == 1
+
+    # Switched off, the next afternoon stays quiet.
+    {:ok, _prefs} = SetWellnessPreferences.call(ctx.member_ctx, %{"water_reminder" => false})
+    assert :ok = WellnessNudges.call(DateTime.add(afternoon, 1, :day))
+    assert notified(ctx.member, :water_reminder) == 1
   end
 
   test "entries land on the member's local day, privately; nobody else sees them", ctx do

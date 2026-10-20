@@ -74,8 +74,10 @@ already records mood and stress; the coach's plan is Nutrition (ADR-098).
     «Προσαρμογή» (Q9 A). A hidden item leaves the card, the week, Νέα
     καταχώρηση and the coach summary; its data stays until deleted.
 12. **Nudges (Q2, Q6).** A craving left open hears «Πώς πήγε;» once, 20
-    minutes later. The opt-in water reminder (`water_reminder`) comes at
-    most once a local day between 15:00 and 21:00 while the day is under
+    minutes later. The water reminder (`water_reminder`) is on by default
+    once the member has a water goal, that is once they start using Ευεξία
+    (ANR's board 14 note), and can be switched off; it comes at most once
+    a local day between 15:00 and 21:00 while the day is under
     half the goal. Definer lookups name who is due; each person is handled
     in their own session; dedupe keys hold each nudge to one. Lock-screen
     text never names a craving or a number. No streaks and no «you missed»
