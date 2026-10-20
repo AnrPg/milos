@@ -356,7 +356,10 @@ defmodule MilosTrainingWeb.Schemas.Social do
       properties: %{
         audience: %Schema{type: :string, enum: ~w(followers public)},
         body: %Schema{type: :string, maxLength: 5000},
-        attachment_type: %Schema{type: :string, enum: Community.attachment_types()},
+        attachment_type: %Schema{
+          type: :string,
+          enum: MilosTraining.Community.shareable_attachment_types()
+        },
         attachment_id: @uuid,
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },

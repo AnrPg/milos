@@ -114,6 +114,18 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminCommunityController, :answer_club_request} => [:moderate_community],
     {W.AdminCommunityController, :remove_club_member} => [:moderate_community],
 
+    # Club events (ADR-153): the desk works the door of an event.
+    {W.AdminCommunityEventController, :index} => [:manage_events, :check_in, :take_payments],
+    {W.AdminCommunityEventController, :show} => [:manage_events, :check_in, :take_payments],
+    {W.AdminCommunityEventController, :create} => [:manage_events],
+    {W.AdminCommunityEventController, :update} => [:manage_events],
+    {W.AdminCommunityEventController, :cancel} => [:manage_events],
+    {W.AdminCommunityEventController, :check_in} => [:manage_events, :check_in],
+    {W.AdminCommunityEventController, :mark_paid} => [:manage_events, :take_payments],
+    {W.AdminCommunityEventController, :remove} => [:manage_events],
+    {W.AdminCommunityEventController, :message} => [:manage_events],
+    {W.AdminCommunityEventController, :trial_offer} => [:manage_events],
+
     # Schedule
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
     {W.AdminScheduleController, :create_series} => [:manage_schedule],

@@ -641,6 +641,28 @@ defmodule MilosTrainingWeb.Router do
     post("/community/clubs/:id/archive", AdminCommunityController, :archive_club)
     put("/community/clubs/:id/requests/:user_id", AdminCommunityController, :answer_club_request)
     delete("/community/clubs/:id/members/:user_id", AdminCommunityController, :remove_club_member)
+    # ADR-153: club events.
+    get("/community/events", AdminCommunityEventController, :index)
+    post("/community/events", AdminCommunityEventController, :create)
+    get("/community/events/:id", AdminCommunityEventController, :show)
+    patch("/community/events/:id", AdminCommunityEventController, :update)
+    post("/community/events/:id/cancel", AdminCommunityEventController, :cancel)
+    post("/community/events/:id/message", AdminCommunityEventController, :message)
+    post("/community/events/:id/trial-offer", AdminCommunityEventController, :trial_offer)
+
+    put(
+      "/community/events/:id/attendees/:user_id/check-in",
+      AdminCommunityEventController,
+      :check_in
+    )
+
+    put(
+      "/community/events/:id/attendees/:user_id/paid",
+      AdminCommunityEventController,
+      :mark_paid
+    )
+
+    delete("/community/events/:id/attendees/:user_id", AdminCommunityEventController, :remove)
     get("/public-profile", AdminPublicProfileController, :show)
     put("/public-profile", AdminPublicProfileController, :update)
     post("/public-profile/publish", AdminPublicProfileController, :publish)
@@ -990,6 +1012,16 @@ defmodule MilosTrainingWeb.Router do
     post("/me/community/posts/:id/comments", ClubPostController, :comment)
     delete("/me/community/comments/:id", ClubPostController, :delete_comment)
     put("/me/community/comments/:id/hidden", ClubPostController, :hide_comment)
+    # ADR-153: club events.
+    get("/me/community/clubs/:id/events", CommunityEventController, :club_events)
+    post("/me/community/clubs/:id/events", CommunityEventController, :create)
+    get("/me/community/events", CommunityEventController, :clubs_events)
+    get("/me/events", CommunityEventController, :mine)
+    get("/me/events/:id", CommunityEventController, :show)
+    patch("/me/events/:id", CommunityEventController, :update)
+    post("/me/events/:id/cancel", CommunityEventController, :cancel)
+    put("/me/events/:id/rsvp", CommunityEventController, :rsvp)
+    post("/me/events/:id/invites", CommunityEventController, :invite)
     # ADR-142: follows, profile posts and people.
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
@@ -1014,6 +1046,7 @@ defmodule MilosTrainingWeb.Router do
     # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
     get("/boxes/:slug/schedule", PublicBoxController, :schedule)
     get("/boxes/:slug/posts", PublicBoxController, :posts)
+    get("/boxes/:slug/events", CommunityEventController, :box_events)
     # ADR-144: trials.
     post("/boxes/:slug/trials", TrialController, :create)
     get("/me/trials", TrialController, :index)

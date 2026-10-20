@@ -173,6 +173,12 @@ defmodule MilosTrainingWeb.Schemas.Community do
           description:
             "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on"
         },
+        event: %{
+          MilosTrainingWeb.Schemas.CommunityEvents.event()
+          | nullable: true,
+            description:
+              "The event as you see it now, when the post is an event card (attachment_type event)"
+        },
         pinned: %Schema{type: :boolean},
         hidden: %Schema{type: :boolean},
         kudos_count: %Schema{type: :integer},
@@ -252,7 +258,10 @@ defmodule MilosTrainingWeb.Schemas.Community do
             "public (staff only) also shows the post on the box page and to its followers"
         },
         body: %Schema{type: :string, maxLength: 5000},
-        attachment_type: %Schema{type: :string, enum: attachment_types()},
+        attachment_type: %Schema{
+          type: :string,
+          enum: MilosTraining.Community.shareable_attachment_types()
+        },
         attachment_id: @uuid,
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },
