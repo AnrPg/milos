@@ -51,7 +51,7 @@ defmodule MilosTraining.Organizations do
   def legacy_organization_slug, do: @legacy_organization.slug
 
   defdelegate create_organization(params), to: CreateOrganization, as: :call
-  defdelegate add_membership(params), to: AddMembership, as: :call
+  def add_membership(params), do: params |> AddMembership.call() |> announce_activation()
   defdelegate get_by_id(id), to: FindOrganization, as: :by_id
   defdelegate get_by_slug(slug), to: FindOrganization, as: :by_slug
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
@@ -78,10 +78,12 @@ defmodule MilosTraining.Organizations do
 
   @doc "IANA timezone the organization operates in (defaults to UTC)."
   def organization_timezone(organization_id) when is_binary(organization_id) do
-    case OrganizationStore.get_organization_settings(organization_id) do
-      %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
-      _missing -> "Etc/UTC"
-    end
+    RepoContext.run(%{organization_id: organization_id}, fn ->
+      case OrganizationStore.get_organization_settings(organization_id) do
+        %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
+        _missing -> "Etc/UTC"
+      end
+    end)
   end
 
   @doc "Whether the tenant context holds any of `roles` (ADR-099)."
@@ -119,6 +121,23 @@ defmodule MilosTraining.Organizations do
   end
 
   def member_roles(_organization_id, _user_id), do: []
+
+  @doc """
+  Where a person stands with a gym (ADR-144): `:member` (active), `:former`
+  (suspended or revoked), or `:none` (never joined, or only invited).
+  """
+  def membership_standing(organization_id, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    # The person's own scope: the membership policies let anyone read their
+    # own membership row, whoever is asking.
+    RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        %{status: :active} -> :member
+        %{status: status} when status in [:suspended, :revoked] -> :former
+        _none -> :none
+      end
+    end)
+  end
 
   @doc "A member's roles and coach scope in the gym, or nil (ADR-099, ADR-100)."
   def membership_summary(organization_id, user_id) do
@@ -252,13 +271,16 @@ defmodule MilosTraining.Organizations do
   def inspect_join_link(slug), do: MilosTraining.Organizations.Queries.InspectJoinLink.call(slug)
 
   def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
-    do: MilosTraining.Organizations.Commands.JoinByLink.call(slug, user_id, joined_at)
+    do:
+      slug
+      |> MilosTraining.Organizations.Commands.JoinByLink.call(user_id, joined_at)
+      |> announce_activation()
 
   def inspect_invitation(token, now \\ DateTime.utc_now()),
     do: InspectInvitation.call(token, now)
 
   def redeem_invitation(token, user_id, redeemed_at \\ DateTime.utc_now()),
-    do: RedeemInvitation.call(token, user_id, redeemed_at)
+    do: token |> RedeemInvitation.call(user_id, redeemed_at) |> announce_activation()
 
   def resolve_tenant_context(account, slug, request_metadata \\ %{}),
     do: ResolveTenantContext.call(account, slug, request_metadata)
@@ -302,7 +324,36 @@ defmodule MilosTraining.Organizations do
     do: UpdateMembershipRole.call(context, organization_id, membership_id, params)
 
   def set_membership_status(context, membership_id, status),
-    do: SetMembershipStatus.call(context, membership_id, status)
+    do: context |> SetMembershipStatus.call(membership_id, status) |> announce_activation()
+
+  # ADR-144: every way a person becomes an active member announces it, so
+  # other contexts (trials conversion, later referrals) can react.
+  defp announce_activation({:ok, result} = outcome) do
+    case activated_membership(result) do
+      %{organization_id: organization_id, user_id: user_id} ->
+        MilosTraining.DomainEvents.publish(:membership_activated, %{
+          organization_id: organization_id,
+          user_id: user_id,
+          at: DateTime.utc_now()
+        })
+
+      nil ->
+        :ok
+    end
+
+    outcome
+  end
+
+  defp announce_activation(outcome), do: outcome
+
+  defp activated_membership(%{created: false}), do: nil
+  defp activated_membership(%{membership: membership}), do: activated_membership(membership)
+
+  defp activated_membership(%{status: :active, organization_id: org, user_id: user} = membership)
+       when is_binary(org) and is_binary(user),
+       do: membership
+
+  defp activated_membership(_result), do: nil
 
   def set_membership_role(context, user_id, role),
     do: SetMembershipRole.call(context, user_id, role)

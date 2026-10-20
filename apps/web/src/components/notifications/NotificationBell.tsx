@@ -13,6 +13,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import {
   fetchNotifications,
@@ -55,7 +56,27 @@ function NotificationCard({
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const tTrials = useTranslations("Trials");
+  // ADR-144: trial notifications carry the box, the class and its time.
+  function trialText(notification: NotificationRecord, part: "title" | "body") {
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const type = notification.type.replace(/^trial_/, "") as TrialNotice;
+    if (!TRIAL_NOTICES.includes(type)) return null;
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      box: text("box_name"),
+      class: text("class_name"),
+      when: text("class_when"),
+    };
+    if (part === "title") return tTrials(TRIAL_NOTICE_KEYS[type][0], values);
+    const body = tTrials(TRIAL_NOTICE_KEYS[type][1], values);
+    const reason = type === "declined" ? text("decline_reason") : "";
+    return reason ? `${body} ${reason}` : body;
+  }
+
   function notificationBody(notification: NotificationRecord) {
+    const trial = trialText(notification, "body");
+    if (trial !== null) return trial;
     if (typeof notification.payload.body === "string") {
       return notification.payload.body;
     }
@@ -294,6 +315,8 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const trial = trialText(notification, "title");
+    if (trial !== null) return trial;
     // The nutrition plan's own title is the body, not the notification title.
     if (notification.type === "nutrition_plan_updated") return notificationTitle(notification.type);
     if (typeof notification.payload.title === "string") return notification.payload.title;
@@ -525,6 +548,19 @@ export function useUnreadNotifications() {
     () => 0,
   );
 }
+
+const TRIAL_NOTICES = ["requested", "booked", "cancelled", "accepted", "declined", "reminder", "follow_up", "class_cancelled"] as const;
+type TrialNotice = (typeof TRIAL_NOTICES)[number];
+const TRIAL_NOTICE_KEYS = {
+  requested: ["notif_requested_title", "notif_requested_body"],
+  booked: ["notif_booked_title", "notif_booked_body"],
+  cancelled: ["notif_cancelled_title", "notif_cancelled_body"],
+  accepted: ["notif_accepted_title", "notif_accepted_body"],
+  declined: ["notif_declined_title", "notif_declined_body"],
+  reminder: ["notif_reminder_title", "notif_reminder_body"],
+  follow_up: ["notif_follow_up_title", "notif_follow_up_body"],
+  class_cancelled: ["notif_class_cancelled_title", "notif_class_cancelled_body"],
+} as const satisfies Record<TrialNotice, readonly [string, string]>;
 
 export function NotificationBell({
   onUnreadChange,

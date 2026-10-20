@@ -122,6 +122,8 @@ export type ScheduleBooking = {
   inserted_at: string;
   /** Set on a guest booking made on the member's guest passes (ADR-097). */
   guest_name?: string | null;
+  /** "trial" for a visitor's trial class (ADR-144); otherwise a regular booking. */
+  kind?: string | null;
   entitlement_allowance?: string | null;
   waitlist_priority?: number | null;
   /** 1-based place in the queue, only while waitlisted. */

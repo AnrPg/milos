@@ -188,6 +188,107 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-144: trials.
+  def build("trial_requested", payload, localize) do
+    %{
+      title: localize.("Trial request", %{}),
+      body:
+        localize.("%{nickname} asks to try %{class} (%{when}).", %{
+          nickname: payload["person_nickname"],
+          class: payload["class_name"],
+          when: payload["class_when"] || payload["class_starts_at"]
+        }),
+      url: payload["url"] || "/admin/trials"
+    }
+  end
+
+  def build("trial_booked", payload, localize) do
+    %{
+      title: localize.("New trial", %{}),
+      body:
+        localize.("%{nickname} booked a trial in %{class} (%{when}).", %{
+          nickname: payload["person_nickname"],
+          class: payload["class_name"],
+          when: payload["class_when"] || payload["class_starts_at"]
+        }),
+      url: payload["url"] || "/admin/trials"
+    }
+  end
+
+  def build("trial_cancelled", payload, localize) do
+    %{
+      title: localize.("Trial cancelled", %{}),
+      body:
+        localize.("%{nickname} cancelled their trial in %{class}.", %{
+          nickname: payload["person_nickname"],
+          class: payload["class_name"]
+        }),
+      url: payload["url"] || "/admin/trials"
+    }
+  end
+
+  def build("trial_accepted", payload, localize) do
+    %{
+      title: localize.("Your trial is booked", %{}),
+      body:
+        localize.("%{box}: %{class} (%{when}).", %{
+          box: payload["box_name"],
+          class: payload["class_name"],
+          when: payload["class_when"] || payload["class_starts_at"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("trial_declined", payload, localize) do
+    %{
+      title: localize.("Trial not accepted", %{}),
+      body:
+        localize.("%{box} couldn't take you in %{class}.", %{
+          box: payload["box_name"],
+          class: payload["class_name"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("trial_reminder", payload, localize) do
+    %{
+      title: localize.("Your trial is soon", %{}),
+      body:
+        localize.("%{class} at %{box} (%{when}).", %{
+          box: payload["box_name"],
+          class: payload["class_name"],
+          when: payload["class_when"] || payload["class_starts_at"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("trial_follow_up", payload, localize) do
+    %{
+      title: localize.("How was your trial?", %{}),
+      body:
+        localize.("Want to keep training at %{box}? Send them a message.", %{
+          box: payload["box_name"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("trial_class_cancelled", payload, localize) do
+    %{
+      title: localize.("Trial class cancelled", %{}),
+      body:
+        localize.("%{box} cancelled %{class} (%{when}). Pick another class.", %{
+          box: payload["box_name"],
+          class: payload["class_name"],
+          when: payload["class_when"] || payload["class_starts_at"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
   def build("challenge_completed", payload, localize) do
     %{
       title: localize.("Challenge completed", %{}),

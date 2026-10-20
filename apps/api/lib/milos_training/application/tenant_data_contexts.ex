@@ -29,6 +29,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Nutrition,
     Pantheon,
     Scheduling,
+    Trials,
     Wellbeing,
     Workouts
   }
@@ -48,6 +49,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Wellbeing,
     Messaging,
     Gamification,
+    Trials,
     Finance,
     Scheduling,
     Workouts,

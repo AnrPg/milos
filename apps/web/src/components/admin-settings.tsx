@@ -31,6 +31,7 @@ import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/l
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
 import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
+import { TrialsLink } from "@/components/admin/trials/TrialsLink";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -1376,6 +1377,9 @@ export function AdminSettingsHub() {
 
             <CollapsibleSection id="public-page" title={i18n("admPublicPageTitle")} description={i18n("admPublicPageDescription")}>
               <PublicPageLink />
+              <div className="mt-3">
+                <TrialsLink />
+              </div>
             </CollapsibleSection>
 
             <CollapsibleSection

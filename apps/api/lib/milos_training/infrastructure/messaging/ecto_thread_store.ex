@@ -181,6 +181,14 @@ defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
     |> Kernel.||(0)
   end
 
+  @impl true
+  def list_box_conversation_organization_ids do
+    %{rows: rows} =
+      Repo.query!("SELECT id FROM milos_my_box_conversation_organization_ids() AS id")
+
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
   defp maybe_filter_context(query, nil), do: query
 
   defp maybe_filter_context(query, context_type) do

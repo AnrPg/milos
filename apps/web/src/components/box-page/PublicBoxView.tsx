@@ -11,6 +11,8 @@ import { useMyClubs } from "@/components/community/use-community";
 import { BOTTOM_TAB_BAR_HEIGHT, useBottomTabBarVisible } from "@/components/nav/BottomTabBar";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
+import { TrialButton } from "@/components/trials/TrialButton";
+import { mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 
 import { AboutTab, OpeningHours } from "./AboutTab";
 import { BoxPosts, EmptyTab } from "./BoxPosts";
@@ -35,18 +37,6 @@ function subscribeHash(onChange: () => void) {
 }
 const readHash = () => window.location.hash.slice(1);
 const serverHash = () => "";
-
-// Apple devices open the map in Apple Maps, everyone else in Google Maps.
-const noSubscribe = () => () => undefined;
-const readApple = () => /Mac|iPhone|iPad|iPod/.test(navigator.userAgent);
-const serverApple = () => false;
-
-function mapsUrl(location: { latitude: number; longitude: number }, name: string, apple: boolean) {
-  const at = `${location.latitude},${location.longitude}`;
-  return apple
-    ? `https://maps.apple.com/?ll=${at}&q=${encodeURIComponent(name)}`
-    : `https://www.google.com/maps/search/?api=1&query=${at}`;
-}
 
 /**
  * The public box page (ADR-142; plan §5a board 4, board 5 Q1–Q2). Phones:
@@ -74,7 +64,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   const line = place?.neighbourhood ?? place?.city ?? null;
   const brand = page.box.primary_color ?? "var(--primary)";
   const firstHours = page.locations.find((location) => (location.opening_hours ?? []).length > 0);
-  const apple = useSyncExternalStore(noSubscribe, readApple, serverApple);
+  const apple = useSyncExternalStore(subscribeNever, readApple, serverApple);
   const pinned = page.locations.find((location) => location.latitude != null && location.longitude != null);
 
   function select(next: Tab) {
@@ -109,7 +99,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   }
 
   const actions = (
-    <Actions page={page} signedIn={signedIn} loading={status === "loading" || (signedIn && clubs.isPending)} clubId={club?.id ?? null} />
+    <Actions page={page} token={signedIn ? tokens!.access_token : null} loading={status === "loading" || (signedIn && clubs.isPending)} clubId={club?.id ?? null} />
   );
   const roundButtonClass = "grid h-10 w-10 place-items-center rounded-full";
 
@@ -278,8 +268,19 @@ function Logo({ page, size = 80, className = "" }: { page: PublicBoxPage; size?:
   );
 }
 
-/** Follow and trial (board 4 Q9); members open their club instead. */
-function Actions({ page, signedIn, loading, clubId }: { page: PublicBoxPage; signedIn: boolean; loading: boolean; clubId: string | null }) {
+/** Follow and trial (board 4 Q9, board 6 Q1); members open their club instead. */
+function Actions({
+  page,
+  token,
+  loading,
+  clubId,
+}: {
+  page: PublicBoxPage;
+  token: string | null;
+  loading: boolean;
+  clubId: string | null;
+}) {
+  const signedIn = Boolean(token);
   const t = useTranslations("BoxPage");
   const tSocial = useTranslations("Social");
   if (loading) return <div className="h-11 animate-pulse rounded-2xl" style={{ background: "var(--panel-raised)" }} />;
@@ -290,17 +291,6 @@ function Actions({ page, signedIn, loading, clubId }: { page: PublicBoxPage; sig
         {t("memberOpenClub")}
       </Link>
     );
-  const trial = (
-    <button
-      type="button"
-      disabled
-      className="flex min-h-11 flex-1 flex-col items-center justify-center rounded-2xl px-3 text-sm font-bold leading-tight"
-      style={{ border: "1px solid var(--border)", color: "var(--dim)" }}
-    >
-      {t("trial")}
-      <span className="text-[11px] font-semibold">{t("soon")}</span>
-    </button>
-  );
   return (
     <div className="flex items-start gap-2">
       <div className="flex-1">
@@ -316,7 +306,7 @@ function Actions({ page, signedIn, loading, clubId }: { page: PublicBoxPage; sig
           </Link>
         )}
       </div>
-      {trial}
+      <TrialButton page={page} token={token} />
     </div>
   );
 }

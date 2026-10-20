@@ -264,3 +264,51 @@ msgstr "Richiesta di follow accettata"
 
 msgid "You now follow %{nickname}."
 msgstr "Ora segui %{nickname}."
+
+msgid "Trial request"
+msgstr "Richiesta di lezione di prova"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} chiede di provare %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Nuova lezione di prova"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} ha prenotato una lezione di prova in %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Lezione di prova annullata"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} ha annullato la lezione di prova in %{class}."
+
+msgid "Your trial is booked"
+msgstr "La tua lezione di prova è prenotata"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Lezione di prova non accettata"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} non può accoglierti in %{class}."
+
+msgid "Your trial is soon"
+msgstr "La tua lezione di prova è vicina"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} da %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Com'è andata la lezione di prova?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Vuoi continuare ad allenarti da %{box}? Scrivi loro un messaggio."
+
+msgid "Trial class cancelled"
+msgstr "Lezione di prova annullata dal box"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} ha annullato %{class} (%{when}). Scegli un'altra lezione."

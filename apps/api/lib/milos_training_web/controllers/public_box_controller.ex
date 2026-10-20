@@ -49,7 +49,10 @@ defmodule MilosTrainingWeb.PublicBoxController do
   )
 
   def schedule(conn, %{slug: slug} = params) do
-    with {:ok, schedule} <- PublicBox.schedule(slug, params), do: json(conn, schedule)
+    viewer_id = conn.assigns.user_context.user_id
+
+    with {:ok, schedule} <- PublicBox.schedule(slug, viewer_id, params),
+         do: json(conn, schedule)
   end
 
   operation(:posts,

@@ -15,12 +15,14 @@ import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
 import { HeartButton } from "@/components/social/HeartButton";
+import { MyTrialsCard } from "@/components/trials/MyTrialsCard";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Αρχική (brief §6.1, §7.1): what is happening at my gym. Fixed slots, each
  * with an empty state: greeting, the gym's WOD of the day, challenges,
- * leaderboard, then the feed of the member's clubs (ADR-138) under the club
+ * leaderboard (trials at other boxes and their follow-up after the greeting,
+ * board 6), then the feed of the member's clubs (ADR-138) under the club
  * bar, with ⊕ to post and ♡ for notifications and follow requests. The WOD slot is the selected gym club's #wod-σήμερα
  * card with its leaderboard (ADR-138 D6).
  */
@@ -46,6 +48,7 @@ export function HomeHub() {
     >
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
+      <MyTrialsCard />
       {gymClub ? (
         <WodCard club={gymClub} />
       ) : (

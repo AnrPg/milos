@@ -264,3 +264,51 @@ msgstr "Το αίτημα ακολούθησης έγινε δεκτό"
 
 msgid "You now follow %{nickname}."
 msgstr "Τώρα ακολουθείς τον/την %{nickname}."
+
+msgid "Trial request"
+msgstr "Αίτημα δοκιμαστικού"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "Ο/Η %{nickname} ζητά δοκιμαστικό στο %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Νέο δοκιμαστικό"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "Ο/Η %{nickname} έκλεισε δοκιμαστικό στο %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Ακυρώθηκε δοκιμαστικό"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "Ο/Η %{nickname} ακύρωσε το δοκιμαστικό στο %{class}."
+
+msgid "Your trial is booked"
+msgstr "Το δοκιμαστικό σου κλείστηκε"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Το δοκιμαστικό δεν έγινε δεκτό"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "Το %{box} δεν μπορεί να σε δεχτεί στο %{class}."
+
+msgid "Your trial is soon"
+msgstr "Το δοκιμαστικό σου πλησιάζει"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} στο %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Πώς σου φάνηκε το δοκιμαστικό;"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Θες να συνεχίσεις στο %{box}; Στείλε τους μήνυμα."
+
+msgid "Trial class cancelled"
+msgstr "Ακυρώθηκε το μάθημα του δοκιμαστικού"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "Το %{box} ακύρωσε το %{class} (%{when}). Διάλεξε άλλο μάθημα."

@@ -172,6 +172,7 @@ export function AdminDashboard({
       label: i18n("operationsa1fdaa6"),
       items: [
         { label: i18n("users57f2b18"), href: "/admin/users", icon: "users", show: has("view_directory", "view_billing_contacts") },
+        { label: nav("trials"), href: "/admin/trials", icon: "users", show: has("run_classes", "manage_memberships", "manage_settings") },
         { label: i18n("finance1b48d3f"), href: "/admin/finance", icon: "wallet", show: canFinancePage },
         { label: i18n("classesed1846a"), href: "/admin/class-schedule", icon: "calendar", show: has("run_classes", "manage_schedule", "manage_coaching") },
         { label: i18n("admCheckInTitle"), href: "/admin/check-in", icon: "check", show: has("check_in") },

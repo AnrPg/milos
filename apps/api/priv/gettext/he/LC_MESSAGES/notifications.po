@@ -264,3 +264,51 @@ msgstr "בקשת המעקב התקבלה"
 
 msgid "You now follow %{nickname}."
 msgstr "עכשיו אתה עוקב אחרי %{nickname}."
+
+msgid "Trial request"
+msgstr "בקשה לאימון ניסיון"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} מבקש/ת לנסות את %{class} (%{when})."
+
+msgid "New trial"
+msgstr "אימון ניסיון חדש"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} הזמין/ה אימון ניסיון ב-%{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "אימון ניסיון בוטל"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} ביטל/ה את אימון הניסיון ב-%{class}."
+
+msgid "Your trial is booked"
+msgstr "אימון הניסיון שלך הוזמן"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "אימון הניסיון לא אושר"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} לא יכול לקבל אותך ב-%{class}."
+
+msgid "Your trial is soon"
+msgstr "אימון הניסיון שלך מתקרב"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} ב-%{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "איך היה אימון הניסיון?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "רוצה להמשיך להתאמן ב-%{box}? שלח/י להם הודעה."
+
+msgid "Trial class cancelled"
+msgstr "השיעור של אימון הניסיון בוטל"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} ביטל את %{class} (%{when}). בחר/י שיעור אחר."

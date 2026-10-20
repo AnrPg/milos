@@ -42,3 +42,15 @@ msgstr ""
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr ""
+
+msgid "Trial at %{box}: %{name}"
+msgstr ""
+
+msgid "Trial status: %{status}."
+msgstr ""
+
+msgid "Waiting for the box"
+msgstr ""
+
+msgid "Booked"
+msgstr ""

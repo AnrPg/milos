@@ -263,3 +263,51 @@ msgstr ""
 
 msgid "You now follow %{nickname}."
 msgstr ""
+
+msgid "Trial request"
+msgstr ""
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr ""
+
+msgid "New trial"
+msgstr ""
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr ""
+
+msgid "Trial cancelled"
+msgstr ""
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr ""
+
+msgid "Your trial is booked"
+msgstr ""
+
+msgid "%{box}: %{class} (%{when})."
+msgstr ""
+
+msgid "Trial not accepted"
+msgstr ""
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr ""
+
+msgid "Your trial is soon"
+msgstr ""
+
+msgid "%{class} at %{box} (%{when})."
+msgstr ""
+
+msgid "How was your trial?"
+msgstr ""
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr ""
+
+msgid "Trial class cancelled"
+msgstr ""
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr ""

@@ -264,3 +264,51 @@ msgstr "Demande d’abonnement acceptée"
 
 msgid "You now follow %{nickname}."
 msgstr "Vous suivez maintenant %{nickname}."
+
+msgid "Trial request"
+msgstr "Demande de séance d'essai"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} souhaite essayer %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Nouvelle séance d'essai"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} a réservé une séance d'essai en %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Séance d'essai annulée"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} a annulé sa séance d'essai en %{class}."
+
+msgid "Your trial is booked"
+msgstr "Ta séance d'essai est réservée"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box} : %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Séance d'essai refusée"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} ne peut pas t'accueillir en %{class}."
+
+msgid "Your trial is soon"
+msgstr "Ta séance d'essai approche"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} chez %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Comment s'est passée ta séance d'essai ?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Envie de continuer chez %{box} ? Envoie-leur un message."
+
+msgid "Trial class cancelled"
+msgstr "Cours de la séance d'essai annulé"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} a annulé %{class} (%{when}). Choisis un autre cours."

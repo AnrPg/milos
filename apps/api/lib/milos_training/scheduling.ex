@@ -246,6 +246,10 @@ defmodule MilosTraining.Scheduling do
   def list_member_slots(user_id, start_at, end_at),
     do: MilosTraining.Scheduling.SchedulingStore.list_member_slots(user_id, start_at, end_at)
 
+  @doc "Classes of the box in scope among `ids` (any order; missing ids are skipped)."
+  def list_slots_by_ids(%{organization_id: _} = context, ids),
+    do: MilosTraining.Scheduling.SchedulingStore.list_slots_by_ids(context, ids)
+
   def get_settings(context), do: MilosTraining.Scheduling.SchedulingStore.get_settings(context)
   def get_settings, do: MilosTraining.Scheduling.SchedulingStore.get_settings()
 

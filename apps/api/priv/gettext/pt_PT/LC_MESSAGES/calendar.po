@@ -42,3 +42,15 @@ msgstr "Agendado"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "Status de reserva da aula do TrainingJournal: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "Aula experimental em %{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "Estado da aula experimental: %{status}."
+
+msgid "Waiting for the box"
+msgstr "À espera da box"
+
+msgid "Booked"
+msgstr "Marcada"

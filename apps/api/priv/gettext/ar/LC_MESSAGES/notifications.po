@@ -264,3 +264,51 @@ msgstr "تم قبول طلب المتابعة"
 
 msgid "You now follow %{nickname}."
 msgstr "أنت تتابع %{nickname} الآن."
+
+msgid "Trial request"
+msgstr "طلب حصة تجريبية"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} يطلب تجربة %{class} (%{when})."
+
+msgid "New trial"
+msgstr "حصة تجريبية جديدة"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "حجز %{nickname} حصة تجريبية في %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "أُلغيت حصة تجريبية"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "ألغى %{nickname} حصته التجريبية في %{class}."
+
+msgid "Your trial is booked"
+msgstr "تم حجز حصتك التجريبية"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "لم تُقبل الحصة التجريبية"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "لا يستطيع %{box} استقبالك في %{class}."
+
+msgid "Your trial is soon"
+msgstr "حصتك التجريبية قريبة"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} في %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "كيف كانت حصتك التجريبية؟"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "هل تريد مواصلة التدريب في %{box}؟ أرسل لهم رسالة."
+
+msgid "Trial class cancelled"
+msgstr "أُلغيت حصة التجربة"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "ألغى %{box} حصة %{class} (%{when}). اختر حصة أخرى."

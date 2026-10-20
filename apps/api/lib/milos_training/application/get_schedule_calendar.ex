@@ -321,6 +321,8 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       user_nickname: Map.get(nickname_cache, booking.user_id),
       status: to_string(booking.status),
       guest_name: Map.get(booking, :guest_name),
+      # ADR-144: the roster tags trial seats (board 6 Q4).
+      kind: Map.get(booking, :kind, "member"),
       entitlement_allowance: Map.get(booking, :entitlement_allowance),
       waitlist_priority: Map.get(booking, :waitlist_priority),
       admin_message: booking.admin_message,

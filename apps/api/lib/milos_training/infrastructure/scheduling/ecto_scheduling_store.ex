@@ -416,6 +416,18 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def list_slots_by_ids(_context, []), do: []
+
+  def list_slots_by_ids(%{organization_id: organization_id}, ids) do
+    ScheduledClass
+    |> where([slot], slot.id in ^Enum.uniq(ids))
+    |> for_organization(organization_id)
+    |> Repo.all()
+    |> Repo.preload(@slot_preloads)
+    |> Enum.map(&normalize_slot/1)
+  end
+
+  @impl true
   def list_member_slots(%{organization_id: organization_id}, user_id, start_at, end_at) do
     Booking
     |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
@@ -1010,6 +1022,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Map.take([
       "guest_name",
       "entitlement_allowance",
+      "kind",
       "waitlist_priority",
       "client_operation_id"
     ])
@@ -1350,6 +1363,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       waitlisted_at: booking.waitlisted_at,
       guest_name: booking.guest_name,
       entitlement_allowance: booking.entitlement_allowance,
+      kind: booking.kind,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }
@@ -1367,6 +1381,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       waitlisted_at: booking.waitlisted_at,
       guest_name: booking.guest_name,
       entitlement_allowance: booking.entitlement_allowance,
+      kind: booking.kind,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }

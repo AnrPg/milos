@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.TimeoutBooking do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Finance, Notifications, Scheduling}
+  alias MilosTraining.{Notifications, Scheduling}
 
   def call(organization_id, booking_id) do
     with {:ok, context} <-
@@ -36,10 +36,9 @@ defmodule MilosTraining.Application.TimeoutBooking do
 
   defp reconcile_entitlement(context, booking) do
     _result =
-      Finance.release_entitlement_source(
+      BookingEntitlement.release(
         context,
         booking.user_id,
-        "scheduling",
         booking.scheduled_class_id,
         BookingEntitlement.allowance(booking),
         %{

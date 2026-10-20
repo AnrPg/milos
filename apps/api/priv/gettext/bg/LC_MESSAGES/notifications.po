@@ -264,3 +264,51 @@ msgstr "Заявката за следване е приета"
 
 msgid "You now follow %{nickname}."
 msgstr "Вече следваш %{nickname}."
+
+msgid "Trial request"
+msgstr "Заявка за пробна тренировка"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} иска да пробва %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Нова пробна тренировка"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} запази пробна тренировка в %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Пробната тренировка е отменена"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} отмени пробната тренировка в %{class}."
+
+msgid "Your trial is booked"
+msgstr "Пробната ти тренировка е запазена"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Пробната тренировка не е приета"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} не може да те приеме в %{class}."
+
+msgid "Your trial is soon"
+msgstr "Пробната ти тренировка наближава"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} в %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Как мина пробната тренировка?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Искаш ли да продължиш в %{box}? Пиши им."
+
+msgid "Trial class cancelled"
+msgstr "Тренировката е отменена"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} отмени %{class} (%{when}). Избери друга тренировка."

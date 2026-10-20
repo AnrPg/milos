@@ -264,3 +264,51 @@ msgstr "Follow request accepted"
 
 msgid "You now follow %{nickname}."
 msgstr "You now follow %{nickname}."
+
+msgid "Trial request"
+msgstr "Trial request"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} asks to try %{class} (%{when})."
+
+msgid "New trial"
+msgstr "New trial"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} booked a trial in %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Trial cancelled"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} cancelled their trial in %{class}."
+
+msgid "Your trial is booked"
+msgstr "Your trial is booked"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Trial not accepted"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} couldn't take you in %{class}."
+
+msgid "Your trial is soon"
+msgstr "Your trial is soon"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} at %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "How was your trial?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Want to keep training at %{box}? Send them a message."
+
+msgid "Trial class cancelled"
+msgstr "Trial class cancelled"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} cancelled %{class} (%{when}). Pick another class."

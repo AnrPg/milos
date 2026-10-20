@@ -111,6 +111,17 @@ config :milos_training,
        :community_social_store,
        MilosTraining.Infrastructure.Community.EctoSocialStore
 
+config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
+config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
+
+# ADR-144: reactions to facts other contexts announce (MilosTraining.DomainEvents).
+config :milos_training, :domain_event_handlers, %{
+  membership_activated: [MilosTraining.Application.TrialReactions],
+  attendance_recorded: [MilosTraining.Application.TrialReactions],
+  booking_cancelled: [MilosTraining.Application.TrialReactions],
+  class_cancelled: [MilosTraining.Application.TrialReactions]
+}
+
 config :milos_training,
        :saved_filter_store,
        MilosTraining.Infrastructure.Identity.EctoSavedFilterStore

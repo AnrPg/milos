@@ -206,7 +206,8 @@ test.describe("public box page", () => {
     await expect(page.getByRole("button", { name: /CrossFit.*Stelios/ })).toBeHidden();
     await page.getByRole("button", { name: /Yoga 40\+/ }).click();
     const sheet = page.getByRole("dialog", { name: "Yoga 40+" });
-    await expect(sheet.getByText("Trials are coming soon.")).toBeVisible();
+    // Trials are off at this box: no trial action on the class.
+    await expect(sheet.getByRole("button", { name: "Book as a trial" })).toBeHidden();
     await sheet.getByRole("button", { name: "Close" }).click();
 
     await page.getByRole("button", { name: "Follow" }).first().click();

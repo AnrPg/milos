@@ -433,6 +433,31 @@ Apostolos picked every recommended option and every extra on 2026-10-19.
    follower; you can change it any time in Κοινοποίηση. When on, the people who follow you see
    which classes you booked, so «Φίλοι» in Πρόγραμμα shows classes where people you follow are going.
 
+### Trials (2026-10-20, [board 6](https://claude.ai/artifact/L29TVoNBT4vj48eMXmFSpi))
+
+Apostolos picked option A on every question, with the extras below.
+
+1. **Asking (Q1):** «Ζήτα δοκιμαστικό» on the box page opens a sheet with the next two weeks'
+   classes that take trial guests, by day. Pick one, add an optional note for the coach and an
+   optional phone, confirm. It's booked at once («Κλείστηκε») or sent for approval («Στάλθηκε,
+   θα σου απαντήσουν»), then shows the box's «Τι να φέρεις».
+2. **From Πρόγραμμα (Q2):** classes that take trial guests carry a «Δοκιμαστικό» tag and a
+   «Με δοκιμαστικό» chip; their sheet has «Κλείσε με δοκιμαστικό», which opens the same sheet
+   with the class picked.
+3. **Owner rules (Q3):** off until turned on; auto or manual approval, trial spots per class,
+   trials per week (with this week's count), trials per person, how far ahead, which class types,
+   new people only, whether a no-show uses up the trial, «Τι να φέρεις», and a package offered to
+   people who join. Under Ρυθμίσεις, next to Δημόσια σελίδα.
+4. **Staff queue (Q4):** Δοκιμαστικά with Αιτήματα · Επερχόμενα · Ήρθαν · Έγιναν μέλη and the
+   last 30 days in numbers; Αποδοχή/Απόρριψη (with an optional reason), Ήρθε/Δεν ήρθε, «Στείλε
+   μήνυμα». Staff get notified, and the roster tags trial guests.
+5. **The person's trial (Q5):** a page with status, class, box, place with directions, «Τι να
+   φέρεις», cancel, and add to calendar; also in notifications (reminder two hours before) and in
+   the calendar feed. Upcoming trials show on Αρχική.
+6. **After the visit (Q6):** the next morning, «Πώς σου φάνηκε;» with «Θέλω να γραφτώ» (opens a
+   chat with the box, prefilled, showing the box's join offer) or «Όχι τώρα». Joining the box
+   within 30 days marks the trial as converted.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [ ] Weight as trend only option
@@ -445,7 +470,7 @@ Apostolos picked every recommended option and every extra on 2026-10-19.
 ## 7. Open questions
 1. Brief §10 Q5 (GDPR for photos and health-like data): defaults in D8/D11; a legal review should
    confirm consent copy before release.
-2. Who pays for trial no-shows (count against `per_person`?). Default: a no-show counts.
+2. ~~Who pays for trial no-shows?~~ Decided on board 6: the owner chooses (`no_show_consumes`, off by default).
 3. Garmin Health API access requires an approved developer account (owner action).
 
 ## 8. Environment notes
@@ -454,5 +479,5 @@ Apostolos picked every recommended option and every extra on 2026-10-19.
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [ ] P2-M3 · [ ] P2-M4 · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [ ] P2-M4 · [ ] P2-M5 · [ ] P2-M6 · [ ] P2-M7 · [ ] P2-M8
 - [ ] P2-M9 · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

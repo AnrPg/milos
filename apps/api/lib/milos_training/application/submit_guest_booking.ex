@@ -19,7 +19,7 @@ defmodule MilosTraining.Application.SubmitGuestBooking do
            BookingPolicy.booking_window_open?(slot.scheduled_at, now, terms.booking_window_days),
          request = BookingPolicy.guest_request(slot),
          {:ok, reservation} <- SubmitBooking.reserve_visit(context, actor, slot, request) do
-      attrs = %{guest_name: guest_name, entitlement_allowance: "guest_passes"}
+      attrs = %{guest_name: guest_name, entitlement_allowance: "guest_passes", kind: "guest"}
 
       case SubmitBooking.create_booking(context, slot, user_id, attrs) do
         {:ok, booking} ->
