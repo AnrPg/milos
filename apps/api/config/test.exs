@@ -57,3 +57,12 @@ config :milos_training, :meilisearch,
 # ADR-117: tenant export/purge object operations run against an in-memory store.
 config :milos_training, :tenant_object_store, MilosTraining.TestSupport.MemoryObjectStore
 config :milos_training, :workout_text_analyzer, MilosTraining.Test.FakeWorkoutTextAnalyzer
+
+# ADR-155: Wallet platforms are told about changes through recording fakes;
+# a box logo is never fetched.
+config :milos_training, :wallet_pass_updaters, %{
+  apple: MilosTraining.FakeWalletUpdater,
+  google: MilosTraining.FakeWalletUpdater
+}
+
+config :milos_training, :wallet_image_source, MilosTraining.FakeWalletImageSource

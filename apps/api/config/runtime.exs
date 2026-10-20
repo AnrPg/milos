@@ -104,6 +104,29 @@ present_env = fn name ->
   end
 end
 
+# ADR-155: Wallet cards. Each platform works only with all of its values set;
+# otherwise adding a card answers wallet_not_configured and the rest of
+# check-in works. PEM values may be the PEM text or a path to a PEM file.
+config :milos_training, :wallet,
+  apple: [
+    pass_type_identifier: present_env.("WALLET_APPLE_PASS_TYPE_ID"),
+    team_identifier: present_env.("WALLET_APPLE_TEAM_ID"),
+    certificate: present_env.("WALLET_APPLE_CERTIFICATE"),
+    private_key: present_env.("WALLET_APPLE_PRIVATE_KEY"),
+    private_key_password: present_env.("WALLET_APPLE_PRIVATE_KEY_PASSWORD"),
+    wwdr_certificate: present_env.("WALLET_APPLE_WWDR_CERTIFICATE"),
+    apns_host: present_env.("WALLET_APPLE_APNS_HOST")
+  ],
+  google: [
+    issuer_id: present_env.("WALLET_GOOGLE_ISSUER_ID"),
+    service_account_email: present_env.("WALLET_GOOGLE_SERVICE_ACCOUNT_EMAIL"),
+    private_key: present_env.("WALLET_GOOGLE_PRIVATE_KEY"),
+    origins:
+      (present_env.("WALLET_GOOGLE_ORIGINS") || "")
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+  ]
+
 otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_base_endpoint = present_env.("OTEL_EXPORTER_OTLP_ENDPOINT")
 otel_endpoint = otel_traces_endpoint || otel_base_endpoint
