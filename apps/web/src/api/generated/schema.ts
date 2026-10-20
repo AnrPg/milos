@@ -1113,6 +1113,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/buddies/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The link's conversation, newest first (cursor paging) */
+        get: operations["MilosTrainingWeb.BuddyMessagesController.index"];
+        put?: never;
+        /** Write to your buddy (the link must be active) */
+        post: operations["MilosTrainingWeb.BuddyMessagesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/messages/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the other person's messages read */
+        post: operations["MilosTrainingWeb.BuddyMessagesController.read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/buddy-invites/{token}/claim": {
         parameters: {
             query?: never;
@@ -2246,6 +2281,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.WellnessSummarySharingController.show"];
         /** Turn the coach's weekly wellness summary, or cravings in it, on or off */
         put: operations["MilosTrainingWeb.WellnessSummarySharingController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness-summary-sharing/access-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which coaches read your weekly wellness summary, newest first */
+        get: operations["MilosTrainingWeb.WellnessSummarySharingController.access_log"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -12338,6 +12390,8 @@ export interface components {
                 started_at?: string | null;
                 /** @enum {string} */
                 status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
                 via_link: boolean;
             };
             path: string;
@@ -12391,6 +12445,8 @@ export interface components {
             started_at?: string | null;
             /** @enum {string} */
             status: "pending" | "active" | "declined" | "ended" | "expired";
+            /** @description Unread messages from the other person in this link's conversation */
+            unread_messages?: number;
             via_link: boolean;
         };
         /** BuddyLinkResponse */
@@ -12423,12 +12479,93 @@ export interface components {
                 started_at?: string | null;
                 /** @enum {string} */
                 status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
                 via_link: boolean;
             };
         };
         /** BuddyLinkUpdateRequest */
         BuddyLinkUpdateRequest: {
             receives_weekly_summary: boolean;
+        };
+        /** BuddyMessage */
+        BuddyMessage: {
+            /** BuddyPerson */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            link_id: string;
+            mine: boolean;
+            /** Format: date-time */
+            read_at?: string | null;
+        };
+        /**
+         * BuddyMessagePage
+         * @description A page of the link's conversation, newest first. `read_only` once the link ended: the thread stays readable, nobody can write.
+         */
+        BuddyMessagePage: {
+            messages: {
+                /** BuddyPerson */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                body: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                link_id: string;
+                mine: boolean;
+                /** Format: date-time */
+                read_at?: string | null;
+            }[];
+            next_cursor: string | null;
+            read_only: boolean;
+            unread: number;
+        };
+        /** BuddyMessageRequest */
+        BuddyMessageRequest: {
+            body: string;
+        };
+        /** BuddyMessageResponse */
+        BuddyMessageResponse: {
+            /** BuddyMessage */
+            message: {
+                /** BuddyPerson */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                body: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                link_id: string;
+                mine: boolean;
+                /** Format: date-time */
+                read_at?: string | null;
+            };
+        };
+        /** BuddyMessagesReadResponse */
+        BuddyMessagesReadResponse: {
+            read: number;
         };
         /** BuddyOverview */
         BuddyOverview: {
@@ -12456,6 +12593,8 @@ export interface components {
                 started_at?: string | null;
                 /** @enum {string} */
                 status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
                 via_link: boolean;
             }[];
             invitations: {
@@ -12482,6 +12621,8 @@ export interface components {
                 started_at?: string | null;
                 /** @enum {string} */
                 status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
                 via_link: boolean;
             }[];
             invite_days: number;
@@ -12521,6 +12662,8 @@ export interface components {
                 started_at?: string | null;
                 /** @enum {string} */
                 status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
                 via_link: boolean;
             }[];
         };
@@ -20648,12 +20791,12 @@ export interface components {
         };
         /** SupportReply */
         SupportReply: {
-            /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+            /** @description Where the reply was posted in the pair's buddy conversation */
             conversation?: {
                 /** Format: uuid */
-                organization_id?: string;
+                link_id?: string;
                 /** Format: uuid */
-                thread_id?: string;
+                message_id?: string;
             } | null;
             /** Format: date-time */
             created_at: string;
@@ -20680,12 +20823,12 @@ export interface components {
         SupportReplyResponse: {
             /** SupportReply */
             reply: {
-                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                /** @description Where the reply was posted in the pair's buddy conversation */
                 conversation?: {
                     /** Format: uuid */
-                    organization_id?: string;
+                    link_id?: string;
                     /** Format: uuid */
-                    thread_id?: string;
+                    message_id?: string;
                 } | null;
                 /** Format: date-time */
                 created_at: string;
@@ -20753,12 +20896,12 @@ export interface components {
                 replied_at?: string | null;
             }[];
             replies?: {
-                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                /** @description Where the reply was posted in the pair's buddy conversation */
                 conversation?: {
                     /** Format: uuid */
-                    organization_id?: string;
+                    link_id?: string;
                     /** Format: uuid */
-                    thread_id?: string;
+                    message_id?: string;
                 } | null;
                 /** Format: date-time */
                 created_at: string;
@@ -20841,12 +20984,12 @@ export interface components {
                     replied_at?: string | null;
                 }[];
                 replies?: {
-                    /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                    /** @description Where the reply was posted in the pair's buddy conversation */
                     conversation?: {
                         /** Format: uuid */
-                        organization_id?: string;
+                        link_id?: string;
                         /** Format: uuid */
-                        thread_id?: string;
+                        message_id?: string;
                     } | null;
                     /** Format: date-time */
                     created_at: string;
@@ -20930,12 +21073,12 @@ export interface components {
                     replied_at?: string | null;
                 }[];
                 replies?: {
-                    /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                    /** @description Where the reply was posted in the pair's buddy conversation */
                     conversation?: {
                         /** Format: uuid */
-                        organization_id?: string;
+                        link_id?: string;
                         /** Format: uuid */
-                        thread_id?: string;
+                        message_id?: string;
                     } | null;
                     /** Format: date-time */
                     created_at: string;
@@ -21598,6 +21741,29 @@ export interface components {
                 /** Format: date-time */
                 revoked_at?: string | null;
             };
+        };
+        /** WellnessAccessLog */
+        WellnessAccessLog: {
+            entries: {
+                cravings_shown: boolean;
+                /** Format: uuid */
+                id: string;
+                organization?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string | null;
+                };
+                /** Format: date-time */
+                read_at: string;
+                reader: {
+                    /** Format: uuid */
+                    id?: string;
+                    nickname?: string | null;
+                };
+                shared: boolean;
+                /** Format: date */
+                week_start: string;
+            }[];
         };
         /** WellnessEntryChangeRequest */
         WellnessEntryChangeRequest: {
@@ -27398,6 +27564,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         }[];
                         invitations: {
@@ -27424,6 +27592,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         }[];
                         invite_days: number;
@@ -27463,6 +27633,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         }[];
                     };
@@ -27521,6 +27693,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                     };
@@ -27610,6 +27784,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                         path: string;
@@ -27748,6 +27924,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                     };
@@ -27801,6 +27979,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                     };
@@ -27854,6 +28034,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                     };
@@ -27907,8 +28089,131 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.index": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Messages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            /** BuddyPerson */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            body: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            link_id: string;
+                            mine: boolean;
+                            /** Format: date-time */
+                            read_at?: string | null;
+                        }[];
+                        next_cursor: string | null;
+                        read_only: boolean;
+                        unread: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BuddyMessage */
+                        message: {
+                            /** BuddyPerson */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            body: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            link_id: string;
+                            mine: boolean;
+                            /** Format: date-time */
+                            read_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        read: number;
                     };
                 };
             };
@@ -27960,6 +28265,8 @@ export interface operations {
                             started_at?: string | null;
                             /** @enum {string} */
                             status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
                             via_link: boolean;
                         };
                     };
@@ -32785,12 +33092,12 @@ export interface operations {
                                 replied_at?: string | null;
                             }[];
                             replies?: {
-                                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                                /** @description Where the reply was posted in the pair's buddy conversation */
                                 conversation?: {
                                     /** Format: uuid */
-                                    organization_id?: string;
+                                    link_id?: string;
                                     /** Format: uuid */
-                                    thread_id?: string;
+                                    message_id?: string;
                                 } | null;
                                 /** Format: date-time */
                                 created_at: string;
@@ -32898,12 +33205,12 @@ export interface operations {
                                 replied_at?: string | null;
                             }[];
                             replies?: {
-                                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                                /** @description Where the reply was posted in the pair's buddy conversation */
                                 conversation?: {
                                     /** Format: uuid */
-                                    organization_id?: string;
+                                    link_id?: string;
                                     /** Format: uuid */
-                                    thread_id?: string;
+                                    message_id?: string;
                                 } | null;
                                 /** Format: date-time */
                                 created_at: string;
@@ -33007,12 +33314,12 @@ export interface operations {
                                 replied_at?: string | null;
                             }[];
                             replies?: {
-                                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                                /** @description Where the reply was posted in the pair's buddy conversation */
                                 conversation?: {
                                     /** Format: uuid */
-                                    organization_id?: string;
+                                    link_id?: string;
                                     /** Format: uuid */
-                                    thread_id?: string;
+                                    message_id?: string;
                                 } | null;
                                 /** Format: date-time */
                                 created_at: string;
@@ -33078,12 +33385,12 @@ export interface operations {
                     "application/json": {
                         /** SupportReply */
                         reply: {
-                            /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                            /** @description Where the reply was posted in the pair's buddy conversation */
                             conversation?: {
                                 /** Format: uuid */
-                                organization_id?: string;
+                                link_id?: string;
                                 /** Format: uuid */
-                                thread_id?: string;
+                                message_id?: string;
                             } | null;
                             /** Format: date-time */
                             created_at: string;
@@ -33173,12 +33480,12 @@ export interface operations {
                                 replied_at?: string | null;
                             }[];
                             replies?: {
-                                /** @description The pair's private conversation in Μηνύματα, when they share a gym */
+                                /** @description Where the reply was posted in the pair's buddy conversation */
                                 conversation?: {
                                     /** Format: uuid */
-                                    organization_id?: string;
+                                    link_id?: string;
                                     /** Format: uuid */
-                                    thread_id?: string;
+                                    message_id?: string;
                                 } | null;
                                 /** Format: date-time */
                                 created_at: string;
@@ -34055,6 +34362,47 @@ export interface operations {
                             /** Format: date-time */
                             wellness_since?: string | null;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessSummarySharingController.access_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access log */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            cravings_shown: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            organization?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string | null;
+                            };
+                            /** Format: date-time */
+                            read_at: string;
+                            reader: {
+                                /** Format: uuid */
+                                id?: string;
+                                nickname?: string | null;
+                            };
+                            shared: boolean;
+                            /** Format: date */
+                            week_start: string;
+                        }[];
                     };
                 };
             };

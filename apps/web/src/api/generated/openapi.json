@@ -12666,6 +12666,10 @@
                 ],
                 "type": "string"
               },
+              "unread_messages": {
+                "description": "Unread messages from the other person in this link's conversation",
+                "type": "integer"
+              },
               "via_link": {
                 "type": "boolean"
               }
@@ -12833,6 +12837,10 @@
             ],
             "type": "string"
           },
+          "unread_messages": {
+            "description": "Unread messages from the other person in this link's conversation",
+            "type": "integer"
+          },
           "via_link": {
             "type": "boolean"
           }
@@ -12923,6 +12931,10 @@
                 ],
                 "type": "string"
               },
+              "unread_messages": {
+                "description": "Unread messages from the other person in this link's conversation",
+                "type": "integer"
+              },
               "via_link": {
                 "type": "boolean"
               }
@@ -12956,6 +12968,250 @@
           "receives_weekly_summary"
         ],
         "title": "BuddyLinkUpdateRequest",
+        "type": "object"
+      },
+      "BuddyMessage": {
+        "properties": {
+          "author": {
+            "nullable": true,
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname"
+            ],
+            "title": "BuddyPerson",
+            "type": "object"
+          },
+          "body": {
+            "maxLength": 2000,
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "link_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mine": {
+            "type": "boolean"
+          },
+          "read_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "link_id",
+          "body",
+          "mine",
+          "author",
+          "created_at"
+        ],
+        "title": "BuddyMessage",
+        "type": "object"
+      },
+      "BuddyMessagePage": {
+        "description": "A page of the link's conversation, newest first. `read_only` once the link ended: the thread stays readable, nobody can write.",
+        "properties": {
+          "messages": {
+            "items": {
+              "properties": {
+                "author": {
+                  "nullable": true,
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname"
+                  ],
+                  "title": "BuddyPerson",
+                  "type": "object"
+                },
+                "body": {
+                  "maxLength": 2000,
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "link_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "mine": {
+                  "type": "boolean"
+                },
+                "read_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "link_id",
+                "body",
+                "mine",
+                "author",
+                "created_at"
+              ],
+              "title": "BuddyMessage",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "unread": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "messages",
+          "next_cursor",
+          "read_only",
+          "unread"
+        ],
+        "title": "BuddyMessagePage",
+        "type": "object"
+      },
+      "BuddyMessageRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "BuddyMessageRequest",
+        "type": "object"
+      },
+      "BuddyMessageResponse": {
+        "properties": {
+          "message": {
+            "properties": {
+              "author": {
+                "nullable": true,
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname"
+                ],
+                "title": "BuddyPerson",
+                "type": "object"
+              },
+              "body": {
+                "maxLength": 2000,
+                "type": "string"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "link_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "mine": {
+                "type": "boolean"
+              },
+              "read_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "link_id",
+              "body",
+              "mine",
+              "author",
+              "created_at"
+            ],
+            "title": "BuddyMessage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "BuddyMessageResponse",
+        "type": "object"
+      },
+      "BuddyMessagesReadResponse": {
+        "properties": {
+          "read": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "read"
+        ],
+        "title": "BuddyMessagesReadResponse",
         "type": "object"
       },
       "BuddyOverview": {
@@ -13032,6 +13288,10 @@
                     "expired"
                   ],
                   "type": "string"
+                },
+                "unread_messages": {
+                  "description": "Unread messages from the other person in this link's conversation",
+                  "type": "integer"
                 },
                 "via_link": {
                   "type": "boolean"
@@ -13123,6 +13383,10 @@
                     "expired"
                   ],
                   "type": "string"
+                },
+                "unread_messages": {
+                  "description": "Unread messages from the other person in this link's conversation",
+                  "type": "integer"
                 },
                 "via_link": {
                   "type": "boolean"
@@ -13261,6 +13525,10 @@
                     "expired"
                   ],
                   "type": "string"
+                },
+                "unread_messages": {
+                  "description": "Unread messages from the other person in this link's conversation",
+                  "type": "integer"
                 },
                 "via_link": {
                   "type": "boolean"
@@ -38938,14 +39206,14 @@
       "SupportReply": {
         "properties": {
           "conversation": {
-            "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+            "description": "Where the reply was posted in the pair's buddy conversation",
             "nullable": true,
             "properties": {
-              "organization_id": {
+              "link_id": {
                 "format": "uuid",
                 "type": "string"
               },
-              "thread_id": {
+              "message_id": {
                 "format": "uuid",
                 "type": "string"
               }
@@ -39034,14 +39302,14 @@
           "reply": {
             "properties": {
               "conversation": {
-                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                "description": "Where the reply was posted in the pair's buddy conversation",
                 "nullable": true,
                 "properties": {
-                  "organization_id": {
+                  "link_id": {
                     "format": "uuid",
                     "type": "string"
                   },
-                  "thread_id": {
+                  "message_id": {
                     "format": "uuid",
                     "type": "string"
                   }
@@ -39258,14 +39526,14 @@
             "items": {
               "properties": {
                 "conversation": {
-                  "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                  "description": "Where the reply was posted in the pair's buddy conversation",
                   "nullable": true,
                   "properties": {
-                    "organization_id": {
+                    "link_id": {
                       "format": "uuid",
                       "type": "string"
                     },
-                    "thread_id": {
+                    "message_id": {
                       "format": "uuid",
                       "type": "string"
                     }
@@ -39545,14 +39813,14 @@
                   "items": {
                     "properties": {
                       "conversation": {
-                        "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                        "description": "Where the reply was posted in the pair's buddy conversation",
                         "nullable": true,
                         "properties": {
-                          "organization_id": {
+                          "link_id": {
                             "format": "uuid",
                             "type": "string"
                           },
-                          "thread_id": {
+                          "message_id": {
                             "format": "uuid",
                             "type": "string"
                           }
@@ -39829,14 +40097,14 @@
                 "items": {
                   "properties": {
                     "conversation": {
-                      "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                      "description": "Where the reply was posted in the pair's buddy conversation",
                       "nullable": true,
                       "properties": {
-                        "organization_id": {
+                        "link_id": {
                           "format": "uuid",
                           "type": "string"
                         },
-                        "thread_id": {
+                        "message_id": {
                           "format": "uuid",
                           "type": "string"
                         }
@@ -42139,6 +42407,75 @@
           "pass"
         ],
         "title": "WalletPassResponse",
+        "type": "object"
+      },
+      "WellnessAccessLog": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "cravings_shown": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "organization": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "read_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "reader": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "shared": {
+                  "type": "boolean"
+                },
+                "week_start": {
+                  "format": "date",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "read_at",
+                "week_start",
+                "shared",
+                "cravings_shown",
+                "reader"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "entries"
+        ],
+        "title": "WellnessAccessLog",
         "type": "object"
       },
       "WellnessEntryChangeRequest": {
@@ -57899,6 +58236,10 @@
                             ],
                             "type": "string"
                           },
+                          "unread_messages": {
+                            "description": "Unread messages from the other person in this link's conversation",
+                            "type": "integer"
+                          },
                           "via_link": {
                             "type": "boolean"
                           }
@@ -57989,6 +58330,10 @@
                               "expired"
                             ],
                             "type": "string"
+                          },
+                          "unread_messages": {
+                            "description": "Unread messages from the other person in this link's conversation",
+                            "type": "integer"
                           },
                           "via_link": {
                             "type": "boolean"
@@ -58127,6 +58472,10 @@
                               "expired"
                             ],
                             "type": "string"
+                          },
+                          "unread_messages": {
+                            "description": "Unread messages from the other person in this link's conversation",
+                            "type": "integer"
                           },
                           "via_link": {
                             "type": "boolean"
@@ -58274,6 +58623,10 @@
                             "expired"
                           ],
                           "type": "string"
+                        },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
                         },
                         "via_link": {
                           "type": "boolean"
@@ -58495,6 +58848,10 @@
                             "expired"
                           ],
                           "type": "string"
+                        },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
                         },
                         "via_link": {
                           "type": "boolean"
@@ -58843,6 +59200,10 @@
                           ],
                           "type": "string"
                         },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
+                        },
                         "via_link": {
                           "type": "boolean"
                         }
@@ -58974,6 +59335,10 @@
                             "expired"
                           ],
                           "type": "string"
+                        },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
                         },
                         "via_link": {
                           "type": "boolean"
@@ -59107,6 +59472,10 @@
                           ],
                           "type": "string"
                         },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
+                        },
                         "via_link": {
                           "type": "boolean"
                         }
@@ -59239,6 +59608,10 @@
                           ],
                           "type": "string"
                         },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
+                        },
                         "via_link": {
                           "type": "boolean"
                         }
@@ -59273,6 +59646,317 @@
           }
         ],
         "summary": "Stop, from either side, at any time (no push; the other sees it on their page)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}/messages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.BuddyMessagesController.index",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "A page of the link's conversation, newest first. `read_only` once the link ended: the thread stays readable, nobody can write.",
+                  "properties": {
+                    "messages": {
+                      "items": {
+                        "properties": {
+                          "author": {
+                            "nullable": true,
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname"
+                            ],
+                            "title": "BuddyPerson",
+                            "type": "object"
+                          },
+                          "body": {
+                            "maxLength": 2000,
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "link_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "mine": {
+                            "type": "boolean"
+                          },
+                          "read_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "link_id",
+                          "body",
+                          "mine",
+                          "author",
+                          "created_at"
+                        ],
+                        "title": "BuddyMessage",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "read_only": {
+                      "type": "boolean"
+                    },
+                    "unread": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "messages",
+                    "next_cursor",
+                    "read_only",
+                    "unread"
+                  ],
+                  "title": "BuddyMessagePage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Messages"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The link's conversation, newest first (cursor paging)",
+        "tags": [
+          "Buddies"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.BuddyMessagesController.create",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "BuddyMessageRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "properties": {
+                        "author": {
+                          "nullable": true,
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname"
+                          ],
+                          "title": "BuddyPerson",
+                          "type": "object"
+                        },
+                        "body": {
+                          "maxLength": 2000,
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "link_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        },
+                        "read_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "link_id",
+                        "body",
+                        "mine",
+                        "author",
+                        "created_at"
+                      ],
+                      "title": "BuddyMessage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "BuddyMessageResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Message"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write to your buddy (the link must be active)",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/buddies/{id}/messages/read": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.BuddyMessagesController.read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "read": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "read"
+                  ],
+                  "title": "BuddyMessagesReadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Read"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark the other person's messages read",
         "tags": [
           "Buddies"
         ]
@@ -59369,6 +60053,10 @@
                             "expired"
                           ],
                           "type": "string"
+                        },
+                        "unread_messages": {
+                          "description": "Unread messages from the other person in this link's conversation",
+                          "type": "integer"
                         },
                         "via_link": {
                           "type": "boolean"
@@ -72491,14 +73179,14 @@
                             "items": {
                               "properties": {
                                 "conversation": {
-                                  "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                  "description": "Where the reply was posted in the pair's buddy conversation",
                                   "nullable": true,
                                   "properties": {
-                                    "organization_id": {
+                                    "link_id": {
                                       "format": "uuid",
                                       "type": "string"
                                     },
-                                    "thread_id": {
+                                    "message_id": {
                                       "format": "uuid",
                                       "type": "string"
                                     }
@@ -72816,14 +73504,14 @@
                           "items": {
                             "properties": {
                               "conversation": {
-                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "description": "Where the reply was posted in the pair's buddy conversation",
                                 "nullable": true,
                                 "properties": {
-                                  "organization_id": {
+                                  "link_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   },
-                                  "thread_id": {
+                                  "message_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   }
@@ -73133,14 +73821,14 @@
                           "items": {
                             "properties": {
                               "conversation": {
-                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "description": "Where the reply was posted in the pair's buddy conversation",
                                 "nullable": true,
                                 "properties": {
-                                  "organization_id": {
+                                  "link_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   },
-                                  "thread_id": {
+                                  "message_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   }
@@ -73340,14 +74028,14 @@
                     "reply": {
                       "properties": {
                         "conversation": {
-                          "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                          "description": "Where the reply was posted in the pair's buddy conversation",
                           "nullable": true,
                           "properties": {
-                            "organization_id": {
+                            "link_id": {
                               "format": "uuid",
                               "type": "string"
                             },
-                            "thread_id": {
+                            "message_id": {
                               "format": "uuid",
                               "type": "string"
                             }
@@ -73601,14 +74289,14 @@
                           "items": {
                             "properties": {
                               "conversation": {
-                                "description": "The pair's private conversation in Μηνύματα, when they share a gym",
+                                "description": "Where the reply was posted in the pair's buddy conversation",
                                 "nullable": true,
                                 "properties": {
-                                  "organization_id": {
+                                  "link_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   },
-                                  "thread_id": {
+                                  "message_id": {
                                     "format": "uuid",
                                     "type": "string"
                                   }
@@ -76042,6 +76730,100 @@
           }
         ],
         "summary": "Turn the coach's weekly wellness summary, or cravings in it, on or off",
+        "tags": [
+          "Buddies"
+        ]
+      }
+    },
+    "/api/me/wellness-summary-sharing/access-log": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WellnessSummarySharingController.access_log",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "cravings_shown": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "organization": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "read_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "reader": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "shared": {
+                            "type": "boolean"
+                          },
+                          "week_start": {
+                            "format": "date",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "read_at",
+                          "week_start",
+                          "shared",
+                          "cravings_shown",
+                          "reader"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "entries"
+                  ],
+                  "title": "WellnessAccessLog",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Access log"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Which coaches read your weekly wellness summary, newest first",
         "tags": [
           "Buddies"
         ]

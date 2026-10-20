@@ -82,12 +82,23 @@ so this is ADR-160.
    the push) and the sender sees «έχει ώρες ησυχίας». Nothing about a
    craving travels: the buddy sees the message and who sent it, not even
    the source.
-6. **Replies** are a quick kind or words. A reply notifies the sender and,
-   when the two share a gym, opens or reuses their direct thread in
-   Μηνύματα with the reply as a chat message, so they keep talking there
-   (Messaging is tenant-scoped; with no gym in common the reply lives on
-   the request page and in the push). «Πάρε με τηλέφωνο» returns the
-   sender's phone to the buddy only if the sender shares it.
+6. **Replies and the buddy conversation.** Every buddy link has its own
+   conversation (`buddy_messages`), owned by Buddies and account-scoped, so
+   two buddies can always talk whether or not they share a gym; nothing
+   depends on gym-scoped Messaging. Only the link's two people read it
+   (row security); a message is written only by one of them, as
+   themselves, into an active link, so an ended link's thread stays
+   readable but read-only; only the recipient marks a message read, and a
+   trigger keeps everything else of a message immutable. Bodies are at
+   most 2000 characters. `GET/POST /api/me/buddies/:id/messages` (newest
+   first, opaque cursor, `read_only`, `unread`) and
+   `POST /api/me/buddies/:id/messages/read`; the overview carries
+   `unread_messages` per link. A support reply is a quick kind or words; it
+   posts into the conversation (the quick reply's text, then the buddy's
+   own words) and notifies the sender once (`support_reply`); a plain
+   message notifies once (`buddy_message`, naming who wrote, never what),
+   so nothing is notified twice. «Πάρε με τηλέφωνο» returns the sender's
+   phone to the buddy only if the sender shares it.
 7. **The no-reply card** is computed (due ten minutes after a delivered
    request with no reply) and also pushed once by the `nudge` step:
    breathing for two minutes, a glass of water, a short walk, «Στείλε
@@ -109,7 +120,21 @@ so this is ADR-160.
    and `Wellness.week_line/1`; cravings as a count and local times only
    with the second grant. The coach session never reads the member's rows:
    after the seam and the grant pass, the counts are computed in the
-   member's own session and only they leave.
+   member's own session and only they leave. Every staff read, shared or
+   not, is written to `wellness_access_log` (gym-scoped like
+   `body_access_log`: who, which gym, which week, whether craving moments
+   were shown); the member reads it at
+   `GET /api/me/wellness-summary-sharing/access-log`, and the gym's rows go
+   with the gym (Buddies' tenant data policy). A separate table mirrors the
+   body log instead of generalising it, so body's data and routes stay as
+   they are.
+   **Sunday push** (`CoachWellnessSummaries`, run by `BuddyWeeklySummaryJob`):
+   with the wellness toggle on, on Sunday at 19:00 in the member's zone,
+   each coach with an active coaching relationship in a gym where the
+   member is active, and `view_health` over them, gets
+   `coach_wellness_summary` linking to the client page: the three counts
+   only, never craving times; one per coach, gym, member and week. Definer
+   lookups name the members and their coaches (ids only).
 10. **M11 seam.** `MilosTraining.Application.Ports.SupportRequests.request/2`
     (config `:support_requests`) is implemented by
     `MilosTraining.Application.SupportRequests`, which also exposes
@@ -117,7 +142,8 @@ so this is ADR-160.
     source_ref}`). Only the craving's id crosses, as an opaque reference.
 11. **Notifications** in 12 locales: `buddy_invite`, `buddy_accepted`,
     `support_request` (with the quick replies), `support_reply`,
-    `support_no_reply_nudge`, `buddy_weekly_summary`.
+    `support_no_reply_nudge`, `buddy_weekly_summary`, `buddy_message`,
+    `coach_wellness_summary`.
 
 ## Rationale
 The asking member owns every row, so the account is the natural scope and
@@ -133,8 +159,8 @@ in SQL.
 ## Alternatives Considered
 - **Messaging for everything.** Messaging is tenant-scoped (threads need a
   gym), and a partner may share no gym with the member; support requests,
-  quiet hours and the no-reply card are not chat concepts. Rejected; a
-  reply opens a thread where the two share a gym.
+  quiet hours and the no-reply card are not chat concepts. Rejected: the
+  pair's conversation belongs to Buddies.
 - **Push immediately, undo hides it.** A push cannot be recalled.
   Rejected.
 - **Coach grants per gym or per coach.** The M11 answer is one member
@@ -146,14 +172,14 @@ in SQL.
 ## Consequences
 - Buddies get exactly what the member sends and an optional weekly count;
   coaches get counts only with a grant.
-- A pair with no gym in common has no Μηνύματα thread yet; their exchange
-  lives on the request page. An account-level direct conversation would
-  lift that.
+- Buddy conversations live outside Μηνύματα; the inbox can list them
+  beside gym threads later.
 - There is no block feature yet; `end_for_block/3` is ready for it.
-- The notification type check gains six types.
+- The notification type check gains eight types.
 
 ## Implementation Notes
-- Migration `20261030100000_buddy_support.exs`; context `MilosTraining.Buddies`
+- Migrations `20261030100000_buddy_support.exs` and
+  `20261030110000_buddy_messages_and_wellness_access.exs`; context `MilosTraining.Buddies`
   (domain `LinkPolicy`, `Eligibility`, `SupportPolicy`, `QuietHours`,
   `SettingsPolicy`, `WeeklySummary`, `SummarySharingPolicy`,
   `InviteToken`), store port and `EctoBuddyStore`, scheduler port and
@@ -166,7 +192,8 @@ in SQL.
   `/invite-links`, `/:id/accept|decline|leave`, `PATCH /:id`),
   `POST /api/me/buddy-invites/:token/claim`, public
   `GET /api/buddy-invites/:token`, `/api/me/support-requests` (+ `/:id`,
-  `/:id/undo`, `/:id/replies`), `/api/me/wellness-summary-sharing`, staff
+  `/:id/undo`, `/:id/replies`), `/api/me/buddies/:id/messages` (+ `/read`),
+  `/api/me/wellness-summary-sharing` (+ `/access-log`), staff
   `/clients/:user_id/wellness-summary`.
 - Tables are registered as personal tables in the tenancy audit; the store
   is in the architecture task's RepoContext list.
