@@ -5074,7 +5074,10 @@
     "checkedIn": "Check-in feito ✓",
     "followClassTimer": "Cronómetro da aula em direto",
     "classCheckIn": "Fazer check-in",
-    "programmeManage": "Mudar o dia ou recusar"
+    "programmeManage": "Mudar o dia ou recusar",
+    "meReferrals": "Traz um amigo",
+    "meReferralsHint": "O teu link, QR e convites",
+    "membershipReferral": "Traz um amigo"
   },
   "Community": {
     "all": "Tudo",
@@ -6261,5 +6264,194 @@
     "messageSent": "{count, plural, one {A mensagem chegou a # pessoa.} other {A mensagem chegou a # pessoas.}}",
     "send": "Enviar",
     "ok": "OK"
+  },
+  "Referrals": {
+    "title": "Traz um amigo",
+    "pickBox": "Qual box",
+    "noBox": "Junta-te a uma box para convidar amigos para lá.",
+    "loading": "A carregar…",
+    "loadFailed": "Não foi possível carregar os teus convites. Tenta de novo daqui a pouco.",
+    "shareLink": "Partilhar link",
+    "showQr": "Mostrar QR",
+    "copied": "Link copiado",
+    "shareText": "Vem treinar comigo na {box}",
+    "offer": {
+      "friend": "O teu amigo: {gift}",
+      "friendNothing": "Convida um amigo para treinar contigo",
+      "you": "Tu: {reward}, {when}",
+      "cap": "{count, plural, one {Até # amigo por ano} other {Até # amigos por ano}}",
+      "staff": "Partilha o link com quem quiseres. As recompensas são para os membros.",
+      "noProgram": "A tua box não tem programa de recomendações neste momento. O teu link continua a funcionar e os teus amigos aparecem aqui."
+    },
+    "events": {
+      "title": "Convidar para um evento",
+      "shareText": "Vem comigo a {title}",
+      "free": "grátis",
+      "invite": "Convidar"
+    },
+    "list": {
+      "title": "Os teus convites",
+      "empty": "Ninguém ainda. Partilha o teu link ou convida um amigo para um evento: é o começo mais fácil.",
+      "totals": "{invited} convidados · {trials} aulas experimentais · {paid} subscrições",
+      "someone": "Alguém",
+      "earned": "Recebeste {reward}"
+    },
+    "newLink": {
+      "action": "Novo link",
+      "confirm": "O teu link e QR atuais deixam de funcionar. Os amigos que já convidaste continuam a ser teus.",
+      "yes": "Criar novo link",
+      "no": "Manter este"
+    },
+    "qr": {
+      "title": "O teu QR de convite",
+      "close": "Fechar",
+      "alt": "Código QR do teu link de convite",
+      "hint": "O teu amigo lê-o com a câmara do telemóvel."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# dia grátis} other {# dias grátis}}",
+      "credit": "{amount} de crédito"
+    },
+    "reward": {
+      "credit": "{amount} de crédito",
+      "discount": "−{percent}% na renovação",
+      "freePeriod": "{days, plural, one {# dia grátis} other {# dias grátis}}",
+      "manual": "uma oferta da box"
+    },
+    "when": {
+      "trial": "quando vier a uma aula experimental",
+      "paid": "quando subscrever"
+    },
+    "stage": {
+      "signed_up": "Registou-se",
+      "event": "Veio a um evento",
+      "trial": "Veio a uma aula experimental",
+      "joined": "Entrou na box",
+      "paid": "Subscreveu"
+    },
+    "status": {
+      "open": "Em curso",
+      "qualified": "Conta",
+      "capped": "Acima do limite anual",
+      "expired": "Expirado",
+      "void": "Não conta"
+    },
+    "rewardStatus": {
+      "upcoming": "Ainda não",
+      "pending": "A aguardar aprovação",
+      "approved": "Aprovada",
+      "given": "Entregue",
+      "rejected": "Não aprovada",
+      "capped": "Acima do limite",
+      "none": "Sem recompensa"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Evento",
+      "guest_pass": "Passe de convidado",
+      "staff": "Equipa"
+    },
+    "invite": {
+      "heading": "Convite",
+      "title": "{name} convida-te para a {box}",
+      "titleNoName": "Foste convidado para a {box}",
+      "preview": "Treina com um amigo na {box} no Milos.",
+      "from": "{name} convida-te para treinar na {box}",
+      "fromMember": "Um membro convida-te para treinar na {box}",
+      "toEvent": "…e para um evento lá.",
+      "gift": "Para ti: {gift}",
+      "giftWhen": "A box dá-to com o teu primeiro pacote.",
+      "signUp": "Criar conta",
+      "signIn": "Já tenho conta",
+      "seeBox": "Ver a box",
+      "consent": "{name} vai ver o teu primeiro nome e até onde chegaste (registo, aula experimental, subscrição). Mais nada.",
+      "consentNoName": "O membro que te convidou vai ver o teu primeiro nome e até onde chegaste (registo, aula experimental, subscrição). Mais nada.",
+      "claiming": "A guardar o teu convite…",
+      "failed": "Não foi possível guardar o teu convite agora. Tentamos de novo da próxima vez que abrires o Milos.",
+      "alreadyMember": "Já estás na {box}, por isso este convite não se aplica.",
+      "alreadyInvited": "Outro membro convidou-te primeiro. O convite dele é o que conta.",
+      "self": "Este é o teu próprio link de convite.",
+      "claimed": "Pronto. O teu convite para a {box} está guardado.",
+      "openMine": "Abrir Traz um amigo",
+      "openEvent": "Ver o evento",
+      "bookTrial": "Marcar aula experimental",
+      "gone": "Este convite já não está ativo",
+      "goneHint": "O link pode ter sido substituído. Pede o novo ao teu amigo.",
+      "home": "Ir para o Milos"
+    },
+    "notif": {
+      "progressTitle": "O teu convite",
+      "progress": {
+        "signed_up": "{person} registou-se com o teu convite.",
+        "event": "{person} veio ao evento para que o convidaste.",
+        "trial": "{person} veio a uma aula experimental.",
+        "joined": "{person} juntou-se à box.",
+        "paid": "{person} subscreveu."
+      },
+      "rewardTitle": "Recompensa de recomendação",
+      "reward": {
+        "approved": "A tua recompensa de recomendação foi aprovada.",
+        "given": "A tua recompensa de recomendação foi entregue.",
+        "rejected": "A tua recomendação não foi aprovada."
+      },
+      "reviewTitle": "Recomendação para aprovar",
+      "reviewBody": "{person} subscreveu, convidado por {referrer}."
+    },
+    "staff": {
+      "title": "Convites de membros",
+      "filter": "Que convites",
+      "filter_review": "Para aprovar",
+      "filter_all": "Todos",
+      "stats": "Últimos 90 dias: {open} em curso · {qualified} contam · {expired} expirados",
+      "emptyReview": "Nada para aprovar.",
+      "empty": "Ainda não há convites. Os membros partilham o link em Eu › Traz um amigo.",
+      "noReferrer": "um antigo membro",
+      "row": "{friend} ← {referrer}",
+      "panel": "Convite",
+      "approve": "Aprovar",
+      "reject": "Rejeitar",
+      "given": "Entregue",
+      "applyGift": "Aplicar a oferta do amigo",
+      "reassign": "Dar a outro membro",
+      "status": "Estado",
+      "void_staff": "a equipa não recebe recompensas",
+      "void_other": "não conta",
+      "channel": "Como",
+      "newAccount": "conta nova",
+      "window": "Válido",
+      "until": "até {date}",
+      "program": "Programa",
+      "reward": "Recompensa do membro",
+      "gift": "Oferta do amigo",
+      "giftApplied": "aplicada a {date}",
+      "previous": "Antes",
+      "notes": "Notas",
+      "newReferrer": "Novo membro",
+      "reassignSave": "Guardar",
+      "cancel": "Cancelar",
+      "note": "Nota (opcional)"
+    },
+    "rules": {
+      "rewardNote": "O que o membro recebe (por palavras)",
+      "friendGift": "Oferta do amigo",
+      "gift_free_days": "Dias grátis no primeiro pacote",
+      "gift_credit": "Crédito",
+      "gift_custom": "Outra coisa",
+      "gift_none": "Nada",
+      "giftDays": "Dias",
+      "giftEuros": "Valor (€)",
+      "giftNote": "O que o amigo recebe",
+      "counts": "O convite conta",
+      "counts_paid": "No primeiro pagamento",
+      "counts_trial": "Na primeira aula experimental",
+      "approval": "Recompensas",
+      "approval_manual": "Aprovadas pela equipa",
+      "approval_auto": "Aprovadas automaticamente",
+      "window": "O convite vale (dias)",
+      "cap": "Amigos recompensados por membro por ano",
+      "capNone": "Sem limite",
+      "hint": "Há um programa ativo por box: ativar este retira o outro. Os convites mantêm as condições com que foram feitos."
+    }
   }
 }

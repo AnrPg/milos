@@ -5074,7 +5074,10 @@
     "checkedIn": "בוצע צ'ק-אין ✓",
     "followClassTimer": "טיימר השיעור בשידור חי",
     "classCheckIn": "צ'ק-אין",
-    "programmeManage": "שינוי יום או דחייה"
+    "programmeManage": "שינוי יום או דחייה",
+    "meReferrals": "הבא חבר",
+    "meReferralsHint": "הקישור שלך, QR והזמנות",
+    "membershipReferral": "הבא חבר"
   },
   "Community": {
     "all": "הכול",
@@ -6261,5 +6264,194 @@
     "messageSent": "{count, plural, one {ההודעה נשלחה לאדם #.} other {ההודעה נשלחה ל-# אנשים.}}",
     "send": "שליחה",
     "ok": "אישור"
+  },
+  "Referrals": {
+    "title": "הבא חבר",
+    "pickBox": "איזה בוקס",
+    "noBox": "הצטרף לבוקס כדי להזמין לשם חברים.",
+    "loading": "טוען…",
+    "loadFailed": "לא הצלחנו לטעון את ההזמנות שלך. נסה שוב עוד רגע.",
+    "shareLink": "שתף קישור",
+    "showQr": "הצג QR",
+    "copied": "הקישור הועתק",
+    "shareText": "בוא להתאמן איתי ב-{box}",
+    "offer": {
+      "friend": "לחבר שלך: {gift}",
+      "friendNothing": "הזמן חבר להתאמן איתך",
+      "you": "לך: {reward}, {when}",
+      "cap": "{count, plural, one {עד חבר # בשנה} other {עד # חברים בשנה}}",
+      "staff": "שתף את הקישור עם מי שתרצה. התגמולים הם לחברי הבוקס.",
+      "noProgram": "לבוקס שלך אין כרגע תוכנית הפניות. הקישור שלך עדיין עובד והחברים שלך יופיעו כאן."
+    },
+    "events": {
+      "title": "הזמן לאירוע",
+      "shareText": "בוא איתי ל-{title}",
+      "free": "חינם",
+      "invite": "הזמן"
+    },
+    "list": {
+      "title": "ההזמנות שלך",
+      "empty": "עדיין אף אחד. שתף את הקישור שלך או הזמן חבר לאירוע: זו ההתחלה הכי קלה.",
+      "totals": "{invited} הוזמנו · {trials} אימוני ניסיון · {paid} מנויים",
+      "someone": "מישהו",
+      "earned": "קיבלת {reward}"
+    },
+    "newLink": {
+      "action": "קישור חדש",
+      "confirm": "הקישור וה-QR הנוכחיים יפסיקו לעבוד. חברים שכבר הזמנת נשארים שלך.",
+      "yes": "צור קישור חדש",
+      "no": "השאר את זה"
+    },
+    "qr": {
+      "title": "ה-QR של ההזמנה שלך",
+      "close": "סגור",
+      "alt": "קוד QR של קישור ההזמנה שלך",
+      "hint": "החבר שלך סורק אותו עם מצלמת הטלפון."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {יום # חינם} other {# ימים חינם}}",
+      "credit": "זיכוי של {amount}"
+    },
+    "reward": {
+      "credit": "זיכוי של {amount}",
+      "discount": "‎−{percent}% בחידוש",
+      "freePeriod": "{days, plural, one {יום # חינם} other {# ימים חינם}}",
+      "manual": "מתנה מהבוקס"
+    },
+    "when": {
+      "trial": "כשיגיע לאימון ניסיון",
+      "paid": "כשירשם למנוי"
+    },
+    "stage": {
+      "signed_up": "נרשם",
+      "event": "הגיע לאירוע",
+      "trial": "הגיע לאימון ניסיון",
+      "joined": "הצטרף לבוקס",
+      "paid": "נרשם למנוי"
+    },
+    "status": {
+      "open": "בדרך",
+      "qualified": "נספרת",
+      "capped": "מעל המגבלה השנתית",
+      "expired": "פגה",
+      "void": "לא נספרת"
+    },
+    "rewardStatus": {
+      "upcoming": "עדיין לא",
+      "pending": "ממתין לאישור",
+      "approved": "אושר",
+      "given": "ניתן",
+      "rejected": "לא אושר",
+      "capped": "מעל המגבלה",
+      "none": "ללא תגמול"
+    },
+    "channel": {
+      "link": "קישור",
+      "qr": "QR",
+      "event": "אירוע",
+      "guest_pass": "כרטיס אורח",
+      "staff": "צוות"
+    },
+    "invite": {
+      "heading": "הזמנה",
+      "title": "{name} מזמין אותך ל-{box}",
+      "titleNoName": "הוזמנת ל-{box}",
+      "preview": "התאמן עם חבר ב-{box} ב-Milos.",
+      "from": "{name} מזמין אותך להתאמן ב-{box}",
+      "fromMember": "חבר בבוקס מזמין אותך להתאמן ב-{box}",
+      "toEvent": "…ולאירוע שם.",
+      "gift": "בשבילך: {gift}",
+      "giftWhen": "הבוקס נותן את זה עם החבילה הראשונה שלך.",
+      "signUp": "צור חשבון",
+      "signIn": "יש לי כבר חשבון",
+      "seeBox": "ראה את הבוקס",
+      "consent": "{name} יראה את שמך הפרטי ועד כמה התקדמת (הרשמה, אימון ניסיון, מנוי). שום דבר אחר.",
+      "consentNoName": "מי שהזמין אותך יראה את שמך הפרטי ועד כמה התקדמת (הרשמה, אימון ניסיון, מנוי). שום דבר אחר.",
+      "claiming": "שומרים את ההזמנה…",
+      "failed": "לא הצלחנו לשמור את ההזמנה עכשיו. ננסה שוב בפעם הבאה שתפתח את Milos.",
+      "alreadyMember": "אתה כבר ב-{box}, לכן ההזמנה לא חלה.",
+      "alreadyInvited": "חבר אחר הזמין אותך קודם. ההזמנה שלו בתוקף.",
+      "self": "זה קישור ההזמנה שלך.",
+      "claimed": "בוצע. ההזמנה שלך ל-{box} נשמרה.",
+      "openMine": "פתח את הבא חבר",
+      "openEvent": "ראה את האירוע",
+      "bookTrial": "קבע אימון ניסיון",
+      "gone": "ההזמנה הזו כבר לא פעילה",
+      "goneHint": "ייתכן שהקישור הוחלף. בקש מהחבר שלך את החדש.",
+      "home": "עבור ל-Milos"
+    },
+    "notif": {
+      "progressTitle": "ההזמנה שלך",
+      "progress": {
+        "signed_up": "{person} נרשם עם ההזמנה שלך.",
+        "event": "{person} הגיע לאירוע שהזמנת אותו אליו.",
+        "trial": "{person} הגיע לאימון ניסיון.",
+        "joined": "{person} הצטרף לבוקס.",
+        "paid": "{person} נרשם למנוי."
+      },
+      "rewardTitle": "תגמול הפניה",
+      "reward": {
+        "approved": "תגמול ההפניה שלך אושר.",
+        "given": "תגמול ההפניה שלך ניתן.",
+        "rejected": "ההפניה שלך לא אושרה."
+      },
+      "reviewTitle": "הפניה לאישור",
+      "reviewBody": "{person} נרשם למנוי, בהזמנת {referrer}."
+    },
+    "staff": {
+      "title": "הזמנות מחברי הבוקס",
+      "filter": "אילו הזמנות",
+      "filter_review": "לאישור",
+      "filter_all": "הכול",
+      "stats": "90 הימים האחרונים: {open} בדרך · {qualified} נספרות · {expired} פגו",
+      "emptyReview": "אין מה לאשר.",
+      "empty": "עדיין אין הזמנות. חברי הבוקס משתפים את הקישור שלהם מ-אני › הבא חבר.",
+      "noReferrer": "חבר לשעבר",
+      "row": "{friend} ← {referrer}",
+      "panel": "הזמנה",
+      "approve": "אשר",
+      "reject": "דחה",
+      "given": "ניתן",
+      "applyGift": "החל את המתנה לחבר",
+      "reassign": "העבר לחבר אחר",
+      "status": "סטטוס",
+      "void_staff": "הצוות לא מקבל תגמולים",
+      "void_other": "לא נספרת",
+      "channel": "איך",
+      "newAccount": "חשבון חדש",
+      "window": "בתוקף",
+      "until": "עד {date}",
+      "program": "תוכנית",
+      "reward": "התגמול של החבר המזמין",
+      "gift": "המתנה לחבר",
+      "giftApplied": "הוחלה ב-{date}",
+      "previous": "קודם",
+      "notes": "הערות",
+      "newReferrer": "חבר חדש",
+      "reassignSave": "שמור",
+      "cancel": "ביטול",
+      "note": "הערה (לא חובה)"
+    },
+    "rules": {
+      "rewardNote": "מה החבר המזמין מקבל (במילים)",
+      "friendGift": "המתנה לחבר",
+      "gift_free_days": "ימים חינם בחבילה הראשונה",
+      "gift_credit": "זיכוי",
+      "gift_custom": "משהו אחר",
+      "gift_none": "כלום",
+      "giftDays": "ימים",
+      "giftEuros": "סכום (€)",
+      "giftNote": "מה החבר מקבל",
+      "counts": "ההזמנה נספרת",
+      "counts_paid": "בתשלום הראשון",
+      "counts_trial": "באימון הניסיון הראשון",
+      "approval": "תגמולים",
+      "approval_manual": "מאושרים על ידי הצוות",
+      "approval_auto": "מאושרים אוטומטית",
+      "window": "ההזמנה בתוקף (ימים)",
+      "cap": "חברים מתוגמלים לכל חבר בשנה",
+      "capNone": "ללא מגבלה",
+      "hint": "תוכנית אחת פעילה לכל בוקס: הפעלת זו מפסיקה את האחרת. ההזמנות שומרות את התנאים שבהם נעשו."
+    }
   }
 }
