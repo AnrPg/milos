@@ -552,14 +552,32 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with the
    almost hidden line-icon button.
 6. **PR (Q6):** «Μοιράσου το» after a PR opens compose with the PR card and the media picker first.
 
+### Σώμα (2026-10-20, [board 13](https://claude.ai/artifact/3CTeEJNf5ytAjToMSA8fTS))
+
+ANR picked the recommended option on every question, with these extras and notes.
+
+1. **Σώμα page (Q1):** chart with metric chips and range, compare card, snapshots with the change
+   since the previous one, «Νέα μέτρηση».
+2. **Weight display (Q2):** «Αριθμός», «Μόνο τάση» (a normalized trend line and words, never a
+   number) or «Κρυφό»; body fat follows the same choice, for the coach too.
+3. **Form (Q3):** every field optional, last fields first with faded hints, «+ Άλλη μέτρηση».
+   Extras: opt-in measure reminder; weight from a connected device (Garmin, M13).
+4. **Photos (Q4):** in-app camera with the previous photo as a ghost; picking from the gallery too.
+5. **Compare (Q5):** slider by default and side by side, remembered per member.
+6. **Privacy (Q6):** consent on the first body photo, visibility per snapshot, an access log of
+   coach reads, delete all photos. Extras: photos blurred until tapped; share a before/after as a
+   post from a subtle icon button with no text, with a second separate confirmation and no numbers
+   unless the member adds them.
+7. **Coach (Q7):** a «Σώμα» tab on the client page with shared snapshots only, logged.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
-- [ ] Weight as trend only option
+- [x] Weight as trend only option
 - [ ] Neutral copy: «εκτός πλάνου», «λιγούρα»
-- [ ] No leaderboard or public comparison for weight, body or diet
+- [x] No leaderboard or public comparison for weight, body or diet
 - [ ] Body, wellness and cravings sections can each be switched off
 - [ ] Insights labelled as indicators, never medical advice
-- [ ] Photos never posted without a separate confirmation
+- [x] Photos never posted without a separate confirmation
 
 ## 7. Open questions
 1. Brief §10 Q5 (GDPR for photos and health-like data): defaults in D8/D11; a legal review should
@@ -574,4 +592,4 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with the
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
-- [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
