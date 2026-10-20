@@ -175,7 +175,8 @@ defmodule MilosTrainingWeb.Schemas.Community do
         },
         event: %{
           MilosTrainingWeb.Schemas.CommunityEvents.event()
-          | nullable: true,
+          | title: "CommunityPostEvent",
+            nullable: true,
             description:
               "The event as you see it now, when the post is an event card (attachment_type event)"
         },
