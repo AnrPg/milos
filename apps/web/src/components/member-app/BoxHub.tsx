@@ -14,8 +14,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
- * Fixed order: today's workout · next booking · actions · membership ·
- * announcements (the gym club's #ανακοινώσεις, ADR-138).
+ * Fixed order: today's workout · next booking · actions · membership (with
+ * «Φέρε φίλο», ADR-156) · announcements (the gym club's #ανακοινώσεις, ADR-138).
  */
 export function BoxHub() {
   const t = useTranslations("MemberApp");
@@ -51,7 +51,12 @@ export function BoxHub() {
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("membershipNone")}</p>
           )}
         </div>
-        <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>
+        <div className="flex gap-2">
+          <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>
+          {membership ? (
+            <HubButton href={`/me/referrals?box=${encodeURIComponent(membership.organization.slug)}`}>{t("membershipReferral")}</HubButton>
+          ) : null}
+        </div>
       </HubCard>
 
       {gymClub ? <AnnouncementsCard club={gymClub} /> : null}

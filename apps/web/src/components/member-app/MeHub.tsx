@@ -19,8 +19,8 @@ import { setView } from "@/lib/view-mode";
  * everything secondary, so the app needs no "More" drawer (brief §4.8).
  * Under the name, «ακόλουθοι · ακολουθείς» opens the connections screen
  * (plan §5a Q12).
- * Rows for Phase 2 features (Φέρε φίλο, Buddy, Συνδεδεμένες συσκευές) join
- * the list when they exist.
+ * «Φέρε φίλο» (ADR-156) leads the list as in the mockup; Buddy and
+ * Συνδεδεμένες συσκευές join it when they exist.
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");
@@ -70,6 +70,7 @@ export function MeHub() {
       </HubCard>
 
       <HubList>
+        <HubListRow href="/me/referrals" label={t("meReferrals")} detail={t("meReferralsHint")} />
         <HubListRow href="/me/posts" label={t("mePosts")} detail={t("mePostsHint")} />
         <HubListRow href="/me/clubs" label={t("meClubs")} detail={t("meClubsHint")} />
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
