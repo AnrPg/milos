@@ -31,6 +31,8 @@ export async function proxy(request: NextRequest) {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${mediaOrigins} ${mapOrigins}`,
+    // ADR-157: post videos play from the media origin; compose previews a picked file from a blob.
+    `media-src 'self' blob: ${mediaOrigins}`,
     "font-src 'self' data:",
     `connect-src 'self' ${mediaOrigins} ${mapOrigins} ws: wss:`,
     "worker-src 'self' blob:",
