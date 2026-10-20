@@ -15,6 +15,11 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
   4. Otherwise (not a member, no booking) → `:visitor`, the door offers a
      trial.
 
+  A scan of the printed poster (`source: :poster`, board 10 Q1 extra) is
+  weaker proof - the code never changes - so it only does step 1: with no
+  booking in the window it is `{:poster_no_booking, :member | :visitor}`,
+  never open gym, suggestions or a trial offer.
+
   Facts:
 
     * `bookings`: the person's approved bookings around now, each
@@ -23,7 +28,8 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
     * `location_id`: where the door is;
     * `member?`: an active member of the box;
     * `open_gym`: `%{existing: check_in | nil, covered?: boolean}`;
-    * `classes`: upcoming classes `%{id, starts_at, location_id, spots_remaining}`.
+    * `classes`: upcoming classes `%{id, starts_at, location_id, spots_remaining}`;
+    * `source`: `:door` (default, the rotating code) or `:poster`.
   """
 
   alias MilosTraining.Facility.Domain.CheckInRules
@@ -38,6 +44,7 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
           | :open_gym
           | {:nothing, %{classes: [map()], next_booking: map() | nil}}
           | :visitor
+          | {:poster_no_booking, :member | :visitor}
           | {:error, :booking_not_in_window}
 
   @doc "The decision for a scan, optionally for a booking the person picked."
@@ -74,11 +81,23 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
     open = Enum.filter(candidates, &is_nil(&1.attendance))
 
     cond do
-      attended != [] -> {:already_checked_in, {:class, hd(attended)}}
-      length(open) == 1 -> {:check_in_class, hd(open)}
-      open != [] -> {:choose, open}
-      facts[:member?] == true -> member_without_booking(facts, settings, now)
-      true -> :visitor
+      attended != [] ->
+        {:already_checked_in, {:class, hd(attended)}}
+
+      length(open) == 1 ->
+        {:check_in_class, hd(open)}
+
+      open != [] ->
+        {:choose, open}
+
+      facts[:source] == :poster ->
+        {:poster_no_booking, if(facts[:member?], do: :member, else: :visitor)}
+
+      facts[:member?] == true ->
+        member_without_booking(facts, settings, now)
+
+      true ->
+        :visitor
     end
   end
 

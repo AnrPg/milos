@@ -18,14 +18,11 @@ defmodule MilosTraining.Wallet do
   def get_pass_by_serial(context, serial), do: WalletStore.get_pass_by_serial(context, serial)
   def get_pass(context, id), do: WalletStore.get_pass(context, id)
 
-  @doc "A pass that may still scan: `{:ok, pass}`, or `:pass_revoked` / `:invalid_pass`."
-  def active_pass_by_serial(context, serial) do
-    case get_pass_by_serial(context, serial) do
-      %{revoked_at: nil} = pass -> {:ok, pass}
-      %{} -> {:error, :pass_revoked}
-      nil -> {:error, :invalid_pass}
-    end
-  end
+  @doc "Revokes the active cards that carry any of these member codes; returns them."
+  def revoke_code_passes(_context, [], _at), do: []
+
+  def revoke_code_passes(context, code_ids, at),
+    do: WalletStore.revoke_code_passes(context, code_ids, at)
 
   def revoke_pass(context, id, at), do: WalletStore.revoke_pass(context, id, at)
 

@@ -4,8 +4,9 @@ defmodule MilosTraining.Application.CheckInKeys do
   application secret through `Ports.KeyDerivation`:
 
     * a door key per location, from its seed (rotating the seed changes it);
-    * a member-code key per box;
-    * one Wallet barcode key.
+    * a poster key per location, from its poster seed;
+    * a member-code key per box (rotating and static personal codes);
+    * one Wallet key (the PassKit authentication tokens).
   """
 
   alias MilosTraining.Application.KeyDerivation
@@ -15,6 +16,16 @@ defmodule MilosTraining.Application.CheckInKeys do
     case Facility.get_door_secret(context, location_id) do
       secret when is_binary(secret) ->
         {:ok, KeyDerivation.derive("door-code", location_id <> "|" <> secret)}
+
+      nil ->
+        {:error, :location_not_found}
+    end
+  end
+
+  def poster_key(context, location_id) do
+    case Facility.get_poster(context, location_id) do
+      %{secret: secret} = poster when is_binary(secret) ->
+        {:ok, KeyDerivation.derive("door-poster", location_id <> "|" <> secret), poster}
 
       nil ->
         {:error, :location_not_found}

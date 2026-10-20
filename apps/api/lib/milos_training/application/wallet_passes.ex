@@ -19,15 +19,20 @@ defmodule MilosTraining.Application.WalletPasses do
       pass's `authenticationToken`, derived from the Wallet key and the
       serial and checked against its stored SHA-256.
 
-  The barcode is `PassToken.sign(wallet_key, serial)`; the desk scans it like
-  a personal QR (method `wallet`).
+  Wallet cards exist only when the owner keeps static personal codes
+  (board 10, Q5): in `rotating` mode `add/3` answers
+  `wallet_requires_static_code`. A card carries the member's static code
+  (`MemberCodes.wallet_barcode/2`, the `W1` form), and belongs to that code:
+  resetting or revoking the code voids the card. The desk scans it like the
+  in-app QR (method `wallet`).
   """
 
   require Logger
 
-  alias MilosTraining.Application.{CheckInFacts, CheckInKeys, PublicURL, SignedToken}
+  alias MilosTraining.Application.{CheckInFacts, CheckInKeys, MemberCodes, PublicURL, SignedToken}
   alias MilosTraining.{Facility, Identity, Organizations, Scheduling, Wallet}
-  alias MilosTraining.Wallet.Domain.{PassContent, PassImage, PassToken}
+  alias MilosTraining.Facility.Domain.MemberCodePolicy
+  alias MilosTraining.Wallet.Domain.{PassContent, PassImage}
   alias MilosTraining.Workers.WalletPushJob
 
   @download_salt "wallet-download-v1"
@@ -38,8 +43,10 @@ defmodule MilosTraining.Application.WalletPasses do
 
   def add(%{organization_id: _, user_id: user_id} = context, platform, now \\ DateTime.utc_now()) do
     with :ok <- valid_platform(platform),
+         :ok <- MemberCodePolicy.wallet_allowed(Facility.check_in_rules(context)),
          true <- Wallet.configured?(platform) || {:error, :wallet_not_configured},
-         {:ok, pass} <- active_or_new(context, user_id, platform, now) do
+         {:ok, code} <- MemberCodes.ensure(context, user_id),
+         {:ok, pass} <- active_or_new(context, user_id, code, platform, now) do
       case platform do
         "apple" ->
           {:ok, %{pass: present(pass), download_url: download_url(pass), save_url: nil}}
@@ -212,16 +219,24 @@ defmodule MilosTraining.Application.WalletPasses do
 
   # ---------------------------------------------------------------- building
 
-  defp active_or_new(context, user_id, platform, now) do
+  defp active_or_new(context, user_id, code, platform, now) do
     case Wallet.get_active_pass(context, user_id, platform) do
-      %{} = pass ->
+      %{member_code_id: code_id} = pass when code_id == code.id ->
         {:ok, pass}
+
+      # A card of an older code (revocation reaches cards too, so this is
+      # only a safety net): replace it.
+      %{} = stale ->
+        {:ok, _revoked} = Wallet.revoke_pass(context, stale.id, now)
+        WalletPushJob.schedule(context.organization_id, stale.id)
+        active_or_new(context, user_id, code, platform, now)
 
       nil ->
         serial = Ecto.UUID.generate()
 
         case Wallet.create_pass(context, %{
                user_id: user_id,
+               member_code_id: code.id,
                platform: platform,
                serial: serial,
                auth_token_hash: :crypto.hash(:sha256, auth_token(serial)),
@@ -262,18 +277,19 @@ defmodule MilosTraining.Application.WalletPasses do
   defp content(context, pass, now) do
     person = Identity.find_by_id(pass.user_id)
     box = box(context)
+    code = Facility.get_member_code(context, pass.member_code_id)
 
     {:ok,
      %PassContent{
        serial: pass.serial,
        box: box,
        member: %{name: (person && (person.display_nickname || person.nickname)) || ""},
-       barcode: PassToken.sign(CheckInKeys.wallet_key(), pass.serial),
+       barcode: if(code, do: MemberCodes.wallet_barcode(context, code), else: ""),
        next_booking: next_booking(context, pass.user_id, now),
        updated_at: pass.last_updated_at,
        locale: (person && person.preferred_locale) || "el",
        locations: locations(context),
-       revoked?: not is_nil(pass.revoked_at)
+       revoked?: not is_nil(pass.revoked_at) or is_nil(code) or not is_nil(code.revoked_at)
      }}
   end
 

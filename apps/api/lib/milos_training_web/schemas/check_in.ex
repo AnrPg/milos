@@ -11,7 +11,7 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
   @maybe_date %Schema{type: :string, format: :date, nullable: true}
   @maybe_string %Schema{type: :string, nullable: true}
   @maybe_integer %Schema{type: :integer, nullable: true}
-  @methods ~w(door_qr member_qr wallet desk_search self)
+  @methods ~w(door_qr door_poster member_qr wallet desk_search self)
 
   def body(schema), do: Community.body(schema)
   def error, do: %Schema{type: :object, additionalProperties: true}
@@ -129,10 +129,15 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
       title: "CheckInScanRequest",
       type: :object,
       description:
-        "Either `location_id` + `code` (the door), or `scan_token` from a `choose` answer",
+        "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
       properties: %{
         location_id: @uuid,
         code: %Schema{type: :string, maxLength: 64},
+        poster_code: %Schema{
+          type: :string,
+          maxLength: 64,
+          description: "The printed poster's static code: checks in a booking in its window only"
+        },
         scan_token: %Schema{type: :string, maxLength: 1024},
         booking_id: @uuid
       }
@@ -166,7 +171,7 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
       properties: %{
         outcome: %Schema{
           type: :string,
-          enum: ~w(checked_in choose already_checked_in nothing visitor)
+          enum: ~w(checked_in choose already_checked_in nothing visitor no_booking)
         },
         box: box(),
         location: location(),
@@ -213,13 +218,59 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
     %Schema{
       title: "CheckInMemberCode",
       type: :object,
+      description:
+        "`rotating`: changes every 30 s, no Wallet. `static`: one persistent code (resettable) that can go on a Wallet card.",
       properties: %{
+        mode: %Schema{type: :string, enum: ~w(rotating static)},
         code: %Schema{type: :string},
-        rotation_seconds: %Schema{type: :integer},
-        seconds_until_rotation: %Schema{type: :integer},
-        expires_at: @datetime
+        rotation_seconds: %Schema{type: :integer, nullable: true},
+        seconds_until_rotation: %Schema{type: :integer, nullable: true},
+        expires_at: %Schema{type: :string, format: :"date-time", nullable: true},
+        issued_at: %Schema{type: :string, format: :"date-time", nullable: true},
+        wallet_available: %Schema{type: :boolean}
       },
-      required: [:code, :rotation_seconds, :seconds_until_rotation, :expires_at]
+      required: [:mode, :code, :wallet_available]
+    }
+  end
+
+  def member_code_revoked_response do
+    %Schema{
+      title: "CheckInMemberCodeRevoked",
+      type: :object,
+      properties: %{
+        user_id: @uuid,
+        revoked_codes: %Schema{type: :integer},
+        revoked_passes: %Schema{type: :integer}
+      },
+      required: [:user_id, :revoked_codes, :revoked_passes]
+    }
+  end
+
+  def poster_response do
+    %Schema{
+      title: "CheckInPoster",
+      type: :object,
+      description: "The printed poster of a location: a static QR that only checks in bookings",
+      properties: %{
+        location: location(),
+        enabled: %Schema{type: :boolean},
+        code: %Schema{type: :string},
+        deep_link: %Schema{
+          type: :string,
+          description: "`/c/<location>/p/<code>`, what the QR holds"
+        },
+        rotated_at: %Schema{type: :string, format: :"date-time", nullable: true}
+      },
+      required: [:location, :enabled, :code, :deep_link]
+    }
+  end
+
+  def poster_request do
+    %Schema{
+      title: "CheckInPosterRequest",
+      type: :object,
+      properties: %{enabled: %Schema{type: :boolean}},
+      required: [:enabled]
     }
   end
 
@@ -389,7 +440,13 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
         open_gym_requires_package: %Schema{type: :boolean},
         visitor_trial_offer: %Schema{type: :boolean},
         desk_override: %Schema{type: :boolean},
-        door_rotation_seconds: %Schema{type: :integer, enum: [15, 30, 60]}
+        door_rotation_seconds: %Schema{type: :integer, enum: [15, 30, 60]},
+        member_code_mode: %Schema{
+          type: :string,
+          enum: ~w(rotating static),
+          description:
+            "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards."
+        }
       }
     }
   end

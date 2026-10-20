@@ -5,7 +5,7 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
 
   import Ecto.Query
 
-  alias MilosTraining.Facility.{CheckIn, CheckInSettings, Location, VisitorScan}
+  alias MilosTraining.Facility.{CheckIn, CheckInSettings, Location, MemberCodeRecord, VisitorScan}
   alias MilosTraining.Repo
 
   @impl true
@@ -240,6 +240,101 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
     |> Repo.all()
   end
 
+  @impl true
+  def get_poster(%{organization_id: organization_id}, location_id) do
+    case fetch_location(organization_id, location_id) do
+      %Location{} = location ->
+        %{
+          location_id: location.id,
+          enabled: location.poster_enabled,
+          secret: location.poster_secret,
+          rotated_at: location.poster_secret_rotated_at,
+          archived_at: location.archived_at
+        }
+
+      nil ->
+        nil
+    end
+  end
+
+  @impl true
+  def rotate_poster_secret(%{organization_id: organization_id}, location_id, secret, at) do
+    update_location_with(
+      organization_id,
+      location_id,
+      &Location.rotate_poster_changeset(&1, secret, at)
+    )
+  end
+
+  @impl true
+  def set_poster_enabled(%{organization_id: organization_id}, location_id, enabled) do
+    update_location_with(organization_id, location_id, &Location.poster_changeset(&1, enabled))
+  end
+
+  defp update_location_with(organization_id, location_id, changeset) do
+    case fetch_location(organization_id, location_id) do
+      nil ->
+        {:error, :location_not_found}
+
+      location ->
+        location
+        |> changeset.()
+        |> Repo.update()
+        |> normalize_result(&normalize_location/1)
+    end
+  end
+
+  @impl true
+  def get_active_member_code(%{organization_id: organization_id}, user_id) do
+    MemberCodeRecord
+    |> where([code], code.organization_id == ^organization_id and code.user_id == ^user_id)
+    |> where([code], is_nil(code.revoked_at))
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_member_code(%{organization_id: organization_id}, id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} -> Repo.get_by(MemberCodeRecord, id: id, organization_id: organization_id)
+      :error -> nil
+    end
+  end
+
+  @impl true
+  def get_member_code_by_serial(%{organization_id: organization_id}, serial) do
+    case Ecto.UUID.cast(serial) do
+      {:ok, serial} ->
+        Repo.get_by(MemberCodeRecord, serial: serial, organization_id: organization_id)
+
+      :error ->
+        nil
+    end
+  end
+
+  @impl true
+  def create_member_code(_context, attrs),
+    do: attrs |> MemberCodeRecord.create_changeset() |> Repo.insert()
+
+  @impl true
+  def revoke_member_codes(%{organization_id: organization_id}, filters, reason, at) do
+    query =
+      MemberCodeRecord
+      |> where([code], code.organization_id == ^organization_id and is_nil(code.revoked_at))
+      |> then(fn query ->
+        case filters[:user_id] do
+          nil -> query
+          user_id -> where(query, [code], code.user_id == ^user_id)
+        end
+      end)
+      |> select([code], code)
+
+    {_count, codes} =
+      Repo.update_all(query, set: [revoked_at: at, revoked_reason: reason, updated_at: at])
+
+    codes
+  end
+
   defp scan_filter(query, _key, nil), do: query
   defp scan_filter(query, :from, from), do: where(query, [scan], scan.scanned_at >= ^from)
   defp scan_filter(query, :to, to), do: where(query, [scan], scan.scanned_at < ^to)
@@ -305,6 +400,8 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
       accessibility: location.accessibility,
       archived_at: location.archived_at,
       door_secret_rotated_at: location.door_secret_rotated_at,
+      poster_enabled: location.poster_enabled,
+      poster_secret_rotated_at: location.poster_secret_rotated_at,
       inserted_at: location.inserted_at,
       updated_at: location.updated_at
     }

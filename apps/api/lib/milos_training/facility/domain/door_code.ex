@@ -83,6 +83,27 @@ defmodule MilosTraining.Facility.Domain.DoorCode do
     end)
   end
 
+  @doc """
+  The printed poster's static code (board 10, Q1 extra): HMAC(key,
+  "poster:v1" ‖ location_id) truncated to 96 bits, where `key` is derived
+  from the location's poster seed. It does not change by itself; replacing
+  the seed («Νέος κωδικός αφίσας») kills every printed copy.
+  """
+  def poster_code(key, location_id) when is_binary(key) and is_binary(location_id) do
+    :crypto.mac(:hmac, :sha256, key, "poster:v1|" <> String.downcase(location_id))
+    |> binary_part(0, @mac_bytes)
+    |> Base.url_encode64(padding: false)
+  end
+
+  @doc "Whether `code` is this location's poster code (constant-time)."
+  def verify_poster(key, location_id, code) when is_binary(code) do
+    if Plug.Crypto.secure_compare(poster_code(key, location_id), code),
+      do: :ok,
+      else: {:error, :invalid_door_code}
+  end
+
+  def verify_poster(_key, _location_id, _code), do: {:error, :invalid_door_code}
+
   def offline_horizon_seconds, do: @offline_horizon_seconds
   def grace_windows, do: @grace_windows
 

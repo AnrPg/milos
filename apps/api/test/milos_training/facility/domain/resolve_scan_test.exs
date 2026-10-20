@@ -155,6 +155,37 @@ defmodule MilosTraining.Facility.Domain.ResolveScanTest do
     end
   end
 
+  describe "poster scan" do
+    test "checks in a booking in the window, and picks among several" do
+      b = booking("b", 10)
+
+      assert {:check_in_class, ^b} =
+               ResolveScan.decide(facts(source: :poster, bookings: [b]), %{}, @now)
+
+      assert {:choose, [_, _]} =
+               ResolveScan.decide(
+                 facts(source: :poster, bookings: [b, booking("c", 20)]),
+                 %{},
+                 @now
+               )
+    end
+
+    test "never open gym, suggestions or trials" do
+      f =
+        facts(
+          source: :poster,
+          open_gym: %{existing: nil, covered?: true},
+          classes: [class("soon", 40, 3)],
+          bookings: [booking("late", 60)]
+        )
+
+      assert {:poster_no_booking, :member} =
+               ResolveScan.decide(f, %{open_gym_requires_package: false}, @now)
+
+      assert {:poster_no_booking, :visitor} = ResolveScan.decide(%{f | member?: false}, %{}, @now)
+    end
+  end
+
   describe "desk assessment" do
     @active %{status: "active", frozen_until: nil}
 

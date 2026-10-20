@@ -20,6 +20,7 @@ defmodule MilosTraining.Facility.CheckInSettings do
     field :visitor_trial_offer, :boolean, default: true
     field :desk_override, :boolean, default: false
     field :door_rotation_seconds, :integer, default: 30
+    field :member_code_mode, :string, default: "rotating"
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -37,6 +38,7 @@ defmodule MilosTraining.Facility.CheckInSettings do
       less_than_or_equal_to: 120
     )
     |> validate_inclusion(:door_rotation_seconds, CheckInRules.rotations())
+    |> validate_inclusion(:member_code_mode, CheckInRules.member_code_modes())
     |> unique_constraint(:organization_id)
   end
 end

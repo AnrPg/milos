@@ -18,7 +18,7 @@ defmodule MilosTraining.Application.CheckInActions do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Facility, Finance, Identity, Scheduling}
+  alias MilosTraining.{Facility, Finance, Identity, Notifications, Organizations, Scheduling}
 
   @undo_seconds 60
 
@@ -131,6 +131,42 @@ defmodule MilosTraining.Application.CheckInActions do
       avatar_url: person && Map.get(person, :avatar_url),
       at: scan.scanned_at
     })
+  end
+
+  @visitor_notice_seconds 3600
+
+  @doc """
+  Board 10 Q3: staff with `check_in` hear about a person who is not a member
+  at the door, so the desk can follow up and sell a walk-in or a trial. At
+  most once an hour per person and box (the visitor scans are the record).
+  """
+  def notify_visitor(context, scan, person, door, trial_available?) do
+    since = DateTime.add(scan.scanned_at, -@visitor_notice_seconds, :second)
+
+    earlier? =
+      context
+      |> Facility.list_visitor_scans(%{from: since, to: scan.scanned_at, limit: 500})
+      |> Enum.any?(&(&1.user_id == scan.user_id and &1.id != scan.id))
+
+    if earlier? do
+      :ok
+    else
+      zone = Organizations.organization_timezone(context.organization_id)
+
+      Notifications.dispatch_event(:check_in_visitor, %{
+        organization_id: context.organization_id,
+        scan_id: scan.id,
+        visitor_id: scan.user_id,
+        person_nickname: display_name(person),
+        box_name: door.name,
+        location_name: door.location_name,
+        scanned_at: scan.scanned_at,
+        scanned_when: scan.scanned_at |> DateTime.shift_zone!(zone) |> Calendar.strftime("%H:%M"),
+        trial_available: trial_available?,
+        hour: div(DateTime.to_unix(scan.scanned_at), @visitor_notice_seconds),
+        url: "/admin/check-in?visitor=" <> scan.id
+      })
+    end
   end
 
   defp broadcast(%{organization_id: organization_id}, event, payload) do

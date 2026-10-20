@@ -16,7 +16,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_accounting_exports
     finance_entitlement_usage_entries finance_settings finance_subscription_freezes
     facility_locations facility_check_ins facility_check_in_settings
-    facility_visitor_scans wallet_passes content_videos
+    facility_visitor_scans facility_member_codes wallet_passes content_videos
     coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
     appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
     finance_corporate_invoices

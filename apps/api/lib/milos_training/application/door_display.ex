@@ -55,6 +55,49 @@ defmodule MilosTraining.Application.DoorDisplay do
     end
   end
 
+  @doc """
+  The printed poster of a location (board 10, Q1 extra): whether it is on,
+  its static code and the deep link `/c/<location>/p/<code>` to print. The
+  code is shown even while the poster is off, so the owner can print first
+  and switch it on after.
+  """
+  def poster(context, location_id) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, key, poster} <- CheckInKeys.poster_key(context, location.id) do
+      code = DoorCode.poster_code(key, location.id)
+
+      {:ok,
+       %{
+         location: %{id: location.id, name: location.name},
+         enabled: poster.enabled,
+         code: code,
+         deep_link: poster_link(location.id, code),
+         rotated_at: poster.rotated_at
+       }}
+    end
+  end
+
+  @doc "The owner turns the poster on or off."
+  def set_poster(context, location_id, enabled) when is_boolean(enabled) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, _location} <- Facility.set_poster_enabled(context, location.id, enabled) do
+      poster(context, location.id)
+    end
+  end
+
+  def set_poster(_context, _location_id, _enabled), do: {:error, :invalid_poster_setting}
+
+  @doc "«Νέος κωδικός αφίσας»: every printed copy stops working."
+  def rotate_poster(context, location_id, now \\ DateTime.utc_now()) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, _rotated} <- Facility.rotate_poster_secret(context, location.id, now) do
+      poster(context, location.id)
+    end
+  end
+
+  @doc "The path the poster's QR opens: `/c/<location>/p/<code>`."
+  def poster_link(location_id, code), do: PublicURL.base_url() <> "/c/#{location_id}/p/#{code}"
+
   @doc "The path the phone camera opens: `/c/<location>/<code>`."
   def deep_link(location_id, code), do: PublicURL.base_url() <> "/c/#{location_id}/#{code}"
 

@@ -2,8 +2,10 @@ defmodule MilosTraining.Application.DeskCheckIn do
   @moduledoc """
   The check-in desk (ADR-155, decision 4) and the member's personal QR.
 
-    * `member_code/2` - Box › Check-in: the member's rotating code for this
-      box (30 s, ±1 window).
+    * `member_code/2` - Box › Check-in: the member's personal code for this
+      box, rotating (30 s, ±1 window) or static per the owner's
+      `member_code_mode` (`MemberCodes`); `revoke_member_code/3` - staff end
+      a static code.
     * `scan_member/4` - the desk scans a personal QR or a Wallet card: who it
       is (photo, name), their bookings in the window, the package and its
       problems, whether «auto» may check in on its own. With `auto: true`
@@ -16,20 +18,21 @@ defmodule MilosTraining.Application.DeskCheckIn do
   Every check-in records its method: `member_qr`, `wallet` or `desk_search`.
   """
 
-  alias MilosTraining.Application.{CheckInActions, CheckInFacts, CheckInKeys, ScanCheckIn}
-  alias MilosTraining.{Facility, Identity, Organizations, Wallet}
-  alias MilosTraining.Facility.Domain.{CheckInPolicy, DeskAssessment, MemberCode, ResolveScan}
-  alias MilosTraining.Wallet.Domain.PassToken
+  alias MilosTraining.Application.{CheckInActions, CheckInFacts, MemberCodes, ScanCheckIn}
+  alias MilosTraining.{Facility, Identity, Organizations}
+  alias MilosTraining.Facility.Domain.{CheckInPolicy, DeskAssessment, ResolveScan}
 
   @methods ~w(member_qr wallet desk_search)
 
-  def member_code(
-        %{organization_id: organization_id, user_id: user_id},
-        now \\ DateTime.utc_now()
-      ) do
-    organization_id
-    |> CheckInKeys.member_key()
-    |> MemberCode.current(user_id, now)
+  @doc "The member's personal QR at this box, in the box's code mode."
+  def member_code(context, now \\ DateTime.utc_now()), do: MemberCodes.current(context, now)
+
+  @doc "Staff revoke a member's static code; its Wallet cards stop scanning."
+  def revoke_member_code(context, user_id, now \\ DateTime.utc_now()) do
+    with {:ok, user_id} <- uuid(user_id),
+         {:ok, counts} <- MemberCodes.revoke(context, user_id, "staff", now) do
+      {:ok, Map.put(counts, :user_id, user_id)}
+    end
   end
 
   @doc "`params`: `code`, optional `location_id`, `auto`."
@@ -104,28 +107,7 @@ defmodule MilosTraining.Application.DeskCheckIn do
 
   # -- who
 
-  defp identify(context, code, now) when is_binary(code) do
-    cond do
-      MemberCode.member_code?(code) ->
-        case context.organization_id
-             |> CheckInKeys.member_key()
-             |> MemberCode.verify(code, now) do
-          {:ok, user_id} -> {:ok, user_id, "member_qr"}
-          error -> error
-        end
-
-      PassToken.pass_token?(code) ->
-        with {:ok, serial} <- PassToken.verify(CheckInKeys.wallet_key(), code),
-             {:ok, pass} <- Wallet.active_pass_by_serial(context, serial) do
-          {:ok, pass.user_id, "wallet"}
-        end
-
-      true ->
-        {:error, :invalid_member_code}
-    end
-  end
-
-  defp identify(_context, _code, _now), do: {:error, :invalid_member_code}
+  defp identify(context, code, now), do: MemberCodes.resolve(context, code, now)
 
   defp member_of_box(context, user_id) do
     if Organizations.membership_standing(context.organization_id, user_id) == :member,

@@ -26,6 +26,10 @@ defmodule MilosTraining.Wallet.WalletStore do
   def revoke_pass(context, id, at), do: scoped(context, :revoke_pass, [id, at])
 
   @impl true
+  def revoke_code_passes(context, code_ids, at),
+    do: scoped(context, :revoke_code_passes, [code_ids, at])
+
+  @impl true
   def touch_user_passes(context, user_id, at),
     do: scoped(context, :touch_user_passes, [user_id, at])
 

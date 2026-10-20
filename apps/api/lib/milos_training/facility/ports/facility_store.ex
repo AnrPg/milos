@@ -22,6 +22,16 @@ defmodule MilosTraining.Facility.Ports.FacilityStore do
   @callback put_check_in_settings(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback record_visitor_scan(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_visitor_scans(context(), map()) :: [map()]
+  # Board 10: the printed poster and static member codes.
+  @callback get_poster(context(), binary()) :: map() | nil
+  @callback rotate_poster_secret(context(), binary(), binary(), DateTime.t()) ::
+              {:ok, map()} | {:error, term()}
+  @callback set_poster_enabled(context(), binary(), boolean()) :: {:ok, map()} | {:error, term()}
+  @callback get_active_member_code(context(), binary()) :: map() | nil
+  @callback get_member_code(context(), binary()) :: map() | nil
+  @callback get_member_code_by_serial(context(), binary()) :: map() | nil
+  @callback create_member_code(context(), map()) :: {:ok, map()} | {:error, term()}
+  @callback revoke_member_codes(context(), map(), String.t(), DateTime.t()) :: [map()]
   @doc "The box behind a door, before any tenant is known (a narrow definer lookup)."
   @callback door_location(binary()) :: map() | nil
 end

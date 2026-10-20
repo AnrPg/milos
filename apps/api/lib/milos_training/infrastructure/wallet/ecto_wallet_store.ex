@@ -66,6 +66,21 @@ defmodule MilosTraining.Infrastructure.Wallet.EctoWalletStore do
   end
 
   @impl true
+  def revoke_code_passes(%{organization_id: organization_id}, code_ids, at) do
+    {_count, passes} =
+      WalletPass
+      |> where(
+        [pass],
+        pass.organization_id == ^organization_id and pass.member_code_id in ^code_ids and
+          is_nil(pass.revoked_at)
+      )
+      |> select([pass], pass)
+      |> Repo.update_all(set: [revoked_at: at, last_updated_at: at, updated_at: at])
+
+    Enum.map(passes, &normalize/1)
+  end
+
+  @impl true
   def touch_user_passes(%{organization_id: organization_id}, user_id, at) do
     {_count, passes} =
       WalletPass
@@ -187,6 +202,7 @@ defmodule MilosTraining.Infrastructure.Wallet.EctoWalletStore do
       :id,
       :organization_id,
       :user_id,
+      :member_code_id,
       :platform,
       :serial,
       :auth_token_hash,

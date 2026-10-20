@@ -10,7 +10,7 @@ defmodule MilosTrainingWeb.AdminCheckInController do
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.{DeskCheckIn, DoorDisplay}
+  alias MilosTraining.Application.{DeskCheckIn, DoorDisplay, UpdateCheckInRules}
   alias MilosTraining.Facility
   alias MilosTrainingWeb.Schemas.CheckIn, as: S
   alias OpenApiSpex.{Parameter, Schema}
@@ -55,6 +55,74 @@ defmodule MilosTrainingWeb.AdminCheckInController do
   def rotate_door(conn, %{location_id: location_id}) do
     with {:ok, display} <- DoorDisplay.rotate(conn.assigns.tenant_context, location_id),
          do: json(conn, display)
+  end
+
+  operation(:poster,
+    summary: "The printed poster of a location: its static QR and whether it is on",
+    parameters: [@location],
+    responses: [
+      ok: {"Poster", "application/json", S.poster_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def poster(conn, %{location_id: location_id}) do
+    with {:ok, poster} <- DoorDisplay.poster(conn.assigns.tenant_context, location_id),
+         do: json(conn, poster)
+  end
+
+  operation(:update_poster,
+    summary: "Turn the printed poster of a location on or off",
+    parameters: [@location],
+    request_body: S.body(S.poster_request()),
+    responses: [
+      ok: {"Poster", "application/json", S.poster_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def update_poster(conn, %{location_id: location_id}) do
+    with {:ok, poster} <-
+           DoorDisplay.set_poster(
+             conn.assigns.tenant_context,
+             location_id,
+             conn.body_params.enabled
+           ),
+         do: json(conn, poster)
+  end
+
+  operation(:rotate_poster,
+    summary: "«Νέος κωδικός αφίσας»: every printed copy stops working",
+    parameters: [@location],
+    responses: [
+      ok: {"Poster", "application/json", S.poster_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def rotate_poster(conn, %{location_id: location_id}) do
+    with {:ok, poster} <- DoorDisplay.rotate_poster(conn.assigns.tenant_context, location_id),
+         do: json(conn, poster)
+  end
+
+  operation(:revoke_member_code,
+    summary: "Revoke a member's static personal code; their Wallet cards stop scanning",
+    parameters: [
+      %Parameter{
+        name: :user_id,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, format: :uuid}
+      }
+    ],
+    responses: [
+      ok: {"Revoked", "application/json", S.member_code_revoked_response()}
+    ]
+  )
+
+  def revoke_member_code(conn, %{user_id: user_id}) do
+    with {:ok, result} <- DeskCheckIn.revoke_member_code(conn.assigns.tenant_context, user_id),
+         do: json(conn, result)
   end
 
   operation(:scan_member,
@@ -144,7 +212,7 @@ defmodule MilosTrainingWeb.AdminCheckInController do
 
   def update_settings(conn, _params) do
     with {:ok, settings} <-
-           Facility.update_check_in_rules(conn.assigns.tenant_context, conn.body_params),
+           UpdateCheckInRules.call(conn.assigns.tenant_context, conn.body_params),
          do: json(conn, %{settings: settings})
   end
 

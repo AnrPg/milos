@@ -8,6 +8,7 @@ defmodule MilosTrainingWeb.QrCheckInTest do
 
   use MilosTrainingWeb.ConnCase, async: false
 
+  import Ecto.Query
   import MilosTraining.TestFixtures
   require Phoenix.ChannelTest
 
@@ -564,6 +565,249 @@ defmodule MilosTrainingWeb.QrCheckInTest do
       assert length(codes) == 2
 
       build_conn() |> put_bearer_token(member(ctx)) |> get(path) |> json_response(403)
+    end
+  end
+
+  # ------------------------------------------------------------------ poster
+
+  describe "printed poster" do
+    defp poster(ctx) do
+      build_conn()
+      |> put_bearer_token(ctx.owner)
+      |> get("#{ctx.admin}/door/#{ctx.location.id}/poster")
+      |> json_response(200)
+    end
+
+    defp set_poster(ctx, enabled) do
+      build_conn()
+      |> put_bearer_token(ctx.owner)
+      |> put("#{ctx.admin}/door/#{ctx.location.id}/poster", %{enabled: enabled})
+      |> json_response(200)
+    end
+
+    defp scan_poster(ctx, user, code),
+      do: scan(user, %{location_id: ctx.location.id, poster_code: code})
+
+    test "works only while on, checks in bookings only, and dies when rotated", ctx do
+      %{"enabled" => false, "code" => code, "deep_link" => link} = poster(ctx)
+      assert link =~ "/c/#{ctx.location.id}/p/#{code}"
+      assert code == poster(ctx)["code"]
+
+      user = member(ctx, @open_gym)
+      class = slot(ctx, 10)
+      book(ctx, user, class)
+
+      assert %{"code" => "invalid_door_code"} = scan_poster(ctx, user, code) |> json_response(422)
+
+      assert %{"enabled" => true} = set_poster(ctx, true)
+
+      assert %{
+               "outcome" => "checked_in",
+               "check_in" => %{"kind" => "class", "method" => "door_poster"}
+             } =
+               scan_poster(ctx, user, code) |> json_response(200)
+
+      assert %{check_in_method: "door_poster"} =
+               Scheduling.get_attendance_for_user_class(ctx.context, user.id, class.id)
+
+      # No booking: never open gym, even with a package that covers it.
+      other = member(ctx, @open_gym)
+
+      assert %{"outcome" => "no_booking", "membership" => "member"} =
+               scan_poster(ctx, other, code) |> json_response(200)
+
+      assert [] = Facility.list_check_ins(ctx.context, %{user_id: other.id})
+
+      # A visitor sees «not a member» and no trial offer.
+      {:ok, _policy} = Trials.update_policy(ctx.context, %{enabled: true})
+
+      assert %{"outcome" => "visitor", "membership" => "none", "trial" => nil} =
+               scan_poster(ctx, user_fixture(), code) |> json_response(200)
+
+      rotated =
+        build_conn()
+        |> put_bearer_token(ctx.owner)
+        |> post("#{ctx.admin}/door/#{ctx.location.id}/poster/rotate")
+        |> json_response(200)
+
+      refute rotated["code"] == code
+
+      assert %{"code" => "invalid_door_code"} =
+               scan_poster(ctx, other, code) |> json_response(422)
+
+      # The poster code is not a door code and vice versa.
+      assert %{"code" => "invalid_door_code"} =
+               scan(other, %{location_id: ctx.location.id, code: rotated["code"]})
+               |> json_response(422)
+
+      set_poster(ctx, false)
+
+      assert %{"code" => "invalid_door_code"} =
+               scan_poster(ctx, other, rotated["code"]) |> json_response(422)
+
+      build_conn()
+      |> put_bearer_token(user)
+      |> put("#{ctx.admin}/door/#{ctx.location.id}/poster", %{enabled: true})
+      |> json_response(403)
+    end
+
+    test "several bookings from the poster: the pick stays a poster check-in", ctx do
+      user = member(ctx)
+      set_poster(ctx, true)
+      _early = book(ctx, user, slot(ctx, 5))
+      late = book(ctx, user, slot(ctx, 25))
+
+      assert %{"outcome" => "choose", "scan_token" => token} =
+               scan_poster(ctx, user, poster(ctx)["code"]) |> json_response(200)
+
+      assert %{"check_in" => %{"method" => "door_poster"}} =
+               scan(user, %{scan_token: token, booking_id: late.id}) |> json_response(200)
+    end
+  end
+
+  # ------------------------------------------------------------------ staff notice
+
+  describe "visitor notification" do
+    defp visitor_notices(user_id) do
+      Repo.all(
+        from n in MilosTraining.Notifications.Notification,
+          where: n.user_id == ^user_id and n.type == :check_in_visitor
+      )
+    end
+
+    test "staff who check people in hear about a visitor, once an hour", ctx do
+      coach = add_member(ctx.organization, user_fixture(), :coach)
+      plain = member(ctx)
+      visitor = user_fixture()
+
+      scan_door(ctx, visitor) |> json_response(200)
+      scan_door(ctx, visitor) |> json_response(200)
+
+      assert [notice] = visitor_notices(ctx.owner.id)
+      assert notice.payload["visitor_id"] == visitor.id
+      assert notice.payload["box_name"]
+      assert notice.payload["trial_available"] in [false, "false"]
+      assert notice.payload["url"] =~ "/admin/check-in?visitor="
+      assert [] = visitor_notices(plain.id)
+
+      # A coach is notified only when their role carries check-in.
+      coach_can? =
+        ctx.organization.id
+        |> Organizations.list_user_ids_with_capability(:check_in)
+        |> Enum.member?(coach.id)
+
+      assert length(visitor_notices(coach.id)) == if(coach_can?, do: 1, else: 0)
+
+      # Another visitor is a new notice.
+      scan_door(ctx, user_fixture()) |> json_response(200)
+      assert length(visitor_notices(ctx.owner.id)) == 2
+    end
+
+    test "the notice says when trials are open", ctx do
+      {:ok, _policy} = Trials.update_policy(ctx.context, %{enabled: true})
+      scan_door(ctx, user_fixture()) |> json_response(200)
+
+      assert [%{payload: %{"trial_available" => available}}] = visitor_notices(ctx.owner.id)
+      assert available in [true, "true"]
+    end
+  end
+
+  # ------------------------------------------------------------------ code modes
+
+  describe "personal code mode" do
+    defp code_of(ctx, user) do
+      build_conn()
+      |> put_bearer_token(user)
+      |> get("/api/org/#{ctx.organization.slug}/me/check-in/code")
+      |> json_response(200)
+    end
+
+    defp desk(ctx, code) do
+      build_conn()
+      |> put_bearer_token(ctx.owner)
+      |> post("#{ctx.admin}/scan-member", %{code: code, location_id: ctx.location.id})
+    end
+
+    defp reset_code(ctx, user) do
+      build_conn()
+      |> put_bearer_token(user)
+      |> post("/api/org/#{ctx.organization.slug}/me/check-in/code/reset")
+    end
+
+    test "rotating by default: no Wallet, nothing to reset", ctx do
+      user = member(ctx)
+
+      assert %{
+               "mode" => "rotating",
+               "code" => "M1" <> _,
+               "wallet_available" => false,
+               "rotation_seconds" => 30
+             } =
+               code_of(ctx, user)
+
+      assert %{"code" => "wallet_requires_static_code"} =
+               build_conn()
+               |> put_bearer_token(user)
+               |> post("/api/org/#{ctx.organization.slug}/me/wallet-passes", %{platform: "apple"})
+               |> json_response(409)
+
+      assert %{"code" => "member_code_not_static"} = reset_code(ctx, user) |> json_response(409)
+    end
+
+    test "static codes persist, scan at the desk, reset, revoke and end with the mode", ctx do
+      user = member(ctx, @open_gym)
+      put_rules(ctx, %{member_code_mode: "static"})
+
+      assert %{
+               "mode" => "static",
+               "code" => "S1" <> _ = code,
+               "wallet_available" => true,
+               "rotation_seconds" => nil
+             } =
+               code_of(ctx, user)
+
+      assert code_of(ctx, user)["code"] == code
+
+      assert %{"method" => "member_qr", "member" => %{"id" => id}} =
+               desk(ctx, code) |> json_response(200)
+
+      assert id == user.id
+
+      # A rotating code still works at the desk in static mode.
+      key = MilosTraining.Application.CheckInKeys.member_key(ctx.organization.id)
+
+      rotating =
+        MilosTraining.Facility.Domain.MemberCode.current(key, user.id, DateTime.utc_now()).code
+
+      assert %{"method" => "member_qr"} = desk(ctx, rotating) |> json_response(200)
+
+      # The member resets: the old code stops, a new one works.
+      assert %{"code" => new_code} = reset_code(ctx, user) |> json_response(200)
+      refute new_code == code
+      assert %{"code" => "member_code_revoked"} = desk(ctx, code) |> json_response(422)
+      assert %{"method" => "member_qr"} = desk(ctx, new_code) |> json_response(200)
+
+      # Staff revoke it.
+      assert %{"revoked_codes" => 1} =
+               build_conn()
+               |> put_bearer_token(ctx.owner)
+               |> delete("#{ctx.admin}/members/#{user.id}/code")
+               |> json_response(200)
+
+      assert %{"code" => "member_code_revoked"} = desk(ctx, new_code) |> json_response(422)
+
+      # A fresh code is issued lazily; going back to rotating ends it.
+      third = code_of(ctx, user)["code"]
+      assert %{"method" => "member_qr"} = desk(ctx, third) |> json_response(200)
+
+      put_rules(ctx, %{member_code_mode: "rotating"})
+      assert %{"code" => "invalid_member_code"} = desk(ctx, third) |> json_response(422)
+      assert %{"mode" => "rotating"} = code_of(ctx, user)
+
+      # Back to static: the old code stays dead, a new one is issued.
+      put_rules(ctx, %{member_code_mode: "static"})
+      assert %{"code" => "member_code_revoked"} = desk(ctx, third) |> json_response(422)
+      refute code_of(ctx, user)["code"] == third
     end
   end
 

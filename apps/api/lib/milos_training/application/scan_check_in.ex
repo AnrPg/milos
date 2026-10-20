@@ -17,7 +17,15 @@ defmodule MilosTraining.Application.ScanCheckIn do
     * `visitor` - not a member: the box, the trial classes of today and
       tomorrow at this location (when the owner offers them at the door and
       trials are on), and whether they follow the box. The scan is kept for
-      the desk («Επισκέπτης»).
+      the desk («Επισκέπτης») and staff with `check_in` are notified (at most
+      once an hour per person) so the desk can follow up;
+    * `no_booking` - a scan of the printed poster by a member with no
+      booking in its window.
+
+  The printed poster (`poster_code`, board 10 Q1 extra) is a static code, so
+  it only checks in a booking already in its window (method `door_poster`);
+  never open gym, suggestions or a trial offer. It works only while the
+  owner has it on for the location.
   """
 
   alias MilosTraining.Application.{
@@ -34,17 +42,21 @@ defmodule MilosTraining.Application.ScanCheckIn do
   @scan_salt "check-in-scan-v1"
   @undo_salt "check-in-undo-v1"
   @scan_token_seconds 180
-  @method "door_qr"
 
   @doc """
-  `params`: `location_id` + `code` (the door), or `scan_token` (from a
-  `choose` answer); optional `booking_id`.
+  `params`: `location_id` + `code` (the door) or `poster_code` (the printed
+  poster), or `scan_token` (from a `choose` answer); optional `booking_id`.
   """
   def scan(%{id: user_id} = user, params, now \\ DateTime.utc_now()) do
     with {:ok, door} <- door(user_id, params, now) do
       context = %{organization_id: door.organization_id, user_id: user_id}
       rules = Facility.check_in_rules(context)
-      facts = CheckInFacts.gather(context, user_id, door.location_id, now)
+
+      facts =
+        context
+        |> CheckInFacts.gather(user_id, door.location_id, now)
+        |> Map.put(:source, door.source)
+
       booking_id = blank_to_nil(param(params, :booking_id))
 
       facts
@@ -77,11 +89,31 @@ defmodule MilosTraining.Application.ScanCheckIn do
   # -- the door
 
   defp door(user_id, params, now) do
-    case blank_to_nil(param(params, :scan_token)) do
-      nil -> verify_door(param(params, :location_id), param(params, :code), now)
-      token -> verify_scan_token(token, user_id)
+    cond do
+      token = blank_to_nil(param(params, :scan_token)) ->
+        verify_scan_token(token, user_id)
+
+      poster = blank_to_nil(param(params, :poster_code)) ->
+        verify_poster(param(params, :location_id), poster)
+
+      true ->
+        verify_door(param(params, :location_id), param(params, :code), now)
     end
   end
+
+  defp verify_poster(location_id, code) when is_binary(location_id) and is_binary(code) do
+    with {:ok, location_id} <- Ecto.UUID.cast(location_id),
+         %{} = door <- Facility.door_location(location_id),
+         context = %{organization_id: door.organization_id},
+         {:ok, key, %{enabled: true}} <- CheckInKeys.poster_key(context, location_id),
+         :ok <- DoorCode.verify_poster(key, location_id, code) do
+      {:ok, Map.put(door, :source, :poster)}
+    else
+      _invalid -> {:error, :invalid_door_code}
+    end
+  end
+
+  defp verify_poster(_location_id, _code), do: {:error, :invalid_door_code}
 
   defp verify_door(location_id, code, now) when is_binary(location_id) and is_binary(code) do
     with {:ok, location_id} <- Ecto.UUID.cast(location_id),
@@ -90,7 +122,7 @@ defmodule MilosTraining.Application.ScanCheckIn do
          rules = Facility.check_in_rules(context),
          {:ok, key} <- CheckInKeys.door_key(context, location_id),
          :ok <- DoorCode.verify(key, location_id, code, now, rules.door_rotation_seconds) do
-      {:ok, door}
+      {:ok, Map.put(door, :source, :door)}
     else
       _invalid -> {:error, :invalid_door_code}
     end
@@ -99,29 +131,43 @@ defmodule MilosTraining.Application.ScanCheckIn do
   defp verify_door(_location_id, _code, _now), do: {:error, :invalid_door_code}
 
   defp verify_scan_token(token, user_id) do
-    with {:ok, %{"l" => location_id, "u" => ^user_id}} <-
+    with {:ok, %{"l" => location_id, "u" => ^user_id} = claims} <-
            SignedToken.verify(@scan_salt, token, max_age: @scan_token_seconds),
          %{} = door <- Facility.door_location(location_id) do
-      {:ok, door}
+      {:ok, Map.put(door, :source, if(claims["s"] == "poster", do: :poster, else: :door))}
     else
       _invalid -> {:error, :invalid_scan_token}
     end
   end
 
   defp scan_token(door, user_id),
-    do: SignedToken.sign(@scan_salt, %{"l" => door.location_id, "u" => user_id})
+    do:
+      SignedToken.sign(@scan_salt, %{
+        "l" => door.location_id,
+        "u" => user_id,
+        "s" => Atom.to_string(door.source)
+      })
+
+  defp method(%{source: :poster}), do: "door_poster"
+  defp method(_door), do: "door_qr"
 
   # -- the decision
 
   defp carry_out({:check_in_class, booking}, context, user, door, _facts, now) do
     with {:ok, attendance} <-
-           CheckInActions.check_in_class(context, booking, user.id, user.id, @method, now) do
+           CheckInActions.check_in_class(context, booking, user.id, user.id, method(door), now) do
       checked_in(context, user, door, class_check_in(attendance, booking), now)
     end
   end
 
   defp carry_out(:open_gym, context, user, door, facts, now) do
-    case CheckInActions.check_in_open_gym(context, user, user.id, door.location_id, @method, now,
+    case CheckInActions.check_in_open_gym(
+           context,
+           user,
+           user.id,
+           door.location_id,
+           method(door),
+           now,
            defer_finalize: true
          ) do
       {:ok, %{already_checked_in: true} = check_in} ->
@@ -168,6 +214,20 @@ defmodule MilosTraining.Application.ScanCheckIn do
 
   defp carry_out(:visitor, context, user, door, _facts, now),
     do: visitor(context, user, door, now)
+
+  defp carry_out({:poster_no_booking, :visitor}, context, user, door, _facts, now),
+    do: visitor(context, user, door, now)
+
+  defp carry_out({:poster_no_booking, :member}, context, user, door, _facts, _now) do
+    {:ok,
+     %{
+       outcome: "no_booking",
+       box: present_box(door),
+       location: present_location(door),
+       membership: "member",
+       package: CheckInActions.package_summary(context, user.id)
+     }}
+  end
 
   defp carry_out({:error, reason}, _context, _user, _door, _facts, _now), do: {:error, reason}
 
@@ -222,7 +282,11 @@ defmodule MilosTraining.Application.ScanCheckIn do
 
   defp visitor(context, user, door, now) do
     rules = Facility.check_in_rules(context)
-    trial = if rules.visitor_trial_offer, do: trial_offer(context, user, door, now)
+
+    # The poster offers nothing beyond «not a member».
+    trial =
+      if rules.visitor_trial_offer and door.source == :door,
+        do: trial_offer(context, user, door, now)
 
     {:ok, scan} =
       Facility.record_visitor_scan(context, %{
@@ -232,7 +296,16 @@ defmodule MilosTraining.Application.ScanCheckIn do
         trial_offered: trial != nil and trial.enabled
       })
 
-    CheckInActions.announce_visitor(context, scan, Identity.find_by_id(user.id))
+    person = Identity.find_by_id(user.id)
+    CheckInActions.announce_visitor(context, scan, person)
+
+    CheckInActions.notify_visitor(
+      context,
+      scan,
+      person,
+      door,
+      trial_available?(trial) or trials_open?(context)
+    )
 
     {:ok,
      %{
@@ -271,6 +344,13 @@ defmodule MilosTraining.Application.ScanCheckIn do
       _no_offer -> nil
     end
   end
+
+  defp trial_available?(%{enabled: true, classes: [_ | _]}), do: true
+  defp trial_available?(_trial), do: false
+
+  # Whether the box takes trials at all, for the staff notice: the desk can
+  # offer one even when the door didn't show any.
+  defp trials_open?(context), do: MilosTraining.Trials.policy(context).enabled == true
 
   defp today_and_tomorrow(now, zone) do
     local = DateTime.shift_zone!(now, zone)

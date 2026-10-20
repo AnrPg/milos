@@ -309,6 +309,7 @@ defmodule MilosTrainingWeb.Router do
     get("/finance", MyFinanceController, :index)
     # ADR-155: Box › Check-in.
     get("/check-in/code", MyCheckInController, :code)
+    post("/check-in/code/reset", MyCheckInController, :reset_code)
     post("/wallet-passes", MyCheckInController, :add_wallet_pass)
     get("/entitlement", MyFinanceController, :entitlement)
     get("/videos", MyContentController, :videos)
@@ -632,6 +633,10 @@ defmodule MilosTrainingWeb.Router do
     # ADR-155: QR check-in desk, door display and rules.
     get("/check-in/door/:location_id", AdminCheckInController, :door)
     post("/check-in/door/:location_id/rotate", AdminCheckInController, :rotate_door)
+    get("/check-in/door/:location_id/poster", AdminCheckInController, :poster)
+    put("/check-in/door/:location_id/poster", AdminCheckInController, :update_poster)
+    post("/check-in/door/:location_id/poster/rotate", AdminCheckInController, :rotate_poster)
+    delete("/check-in/members/:user_id/code", AdminCheckInController, :revoke_member_code)
     post("/check-in/scan-member", AdminCheckInController, :scan_member)
     post("/check-in/members/:user_id", AdminCheckInController, :check_in_member)
     get("/check-in/visitors", AdminCheckInController, :visitors)

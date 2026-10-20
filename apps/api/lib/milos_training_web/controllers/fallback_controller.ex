@@ -2086,7 +2086,13 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_wallet_platform: {:unprocessable_entity, "Choose Apple or Google Wallet"},
     wallet_not_configured: {:service_unavailable, "Wallet cards aren't available on this server"},
     invalid_download_link: {:unprocessable_entity, "This download link has expired"},
-    wallet_pass_conflict: {:conflict, "The card is being created; try again"}
+    wallet_pass_conflict: {:conflict, "The card is being created; try again"},
+    wallet_requires_static_code:
+      {:conflict, "This box uses rotating codes, so its check-in card can't go in a Wallet"},
+    member_code_not_static:
+      {:conflict, "This box uses rotating codes; there is nothing to reset"},
+    member_code_revoked: {:unprocessable_entity, "This code was revoked"},
+    invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

@@ -8,6 +8,7 @@ defmodule MilosTraining.Wallet.Ports.WalletStore do
   @callback get_pass_by_serial(context(), String.t()) :: map() | nil
   @callback get_pass(context(), binary()) :: map() | nil
   @callback revoke_pass(context(), binary(), DateTime.t()) :: {:ok, map()} | {:error, term()}
+  @callback revoke_code_passes(context(), [binary()], DateTime.t()) :: [map()]
   @callback touch_user_passes(context(), binary(), DateTime.t()) :: [map()]
   @doc "The person's cards at every box (the owner-read policy)."
   @callback list_user_passes(context(), binary()) :: [map()]

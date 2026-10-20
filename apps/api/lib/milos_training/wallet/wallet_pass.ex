@@ -1,7 +1,9 @@
 defmodule MilosTraining.Wallet.WalletPass do
   @moduledoc """
-  A member's Wallet card at one box (ADR-155): Apple or Google, with the
-  serial its barcode is signed with. Revoking it stops it scanning at once.
+  A member's Wallet card at one box (ADR-155): Apple or Google. Its barcode
+  is the member's static code (`member_code_id`, board 10 Q5); revoking the
+  code or the card stops it scanning at once. `serial` names the card to
+  the platform (PassKit, the Google object id).
   """
 
   use Ecto.Schema
@@ -14,6 +16,7 @@ defmodule MilosTraining.Wallet.WalletPass do
   schema "wallet_passes" do
     field :organization_id, :binary_id
     field :user_id, :binary_id
+    field :member_code_id, :binary_id
     field :platform, :string
     field :serial, :string
     field :auth_token_hash, :binary, redact: true
@@ -30,6 +33,7 @@ defmodule MilosTraining.Wallet.WalletPass do
     |> cast(attrs, [
       :organization_id,
       :user_id,
+      :member_code_id,
       :platform,
       :serial,
       :auth_token_hash,
@@ -38,6 +42,7 @@ defmodule MilosTraining.Wallet.WalletPass do
     |> validate_required([
       :organization_id,
       :user_id,
+      :member_code_id,
       :platform,
       :serial,
       :auth_token_hash,
@@ -45,6 +50,7 @@ defmodule MilosTraining.Wallet.WalletPass do
     ])
     |> validate_inclusion(:platform, @platforms)
     |> unique_constraint(:serial)
+    |> foreign_key_constraint(:member_code_id)
     |> unique_constraint([:organization_id, :user_id, :platform],
       name: :wallet_passes_one_active_index
     )

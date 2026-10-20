@@ -1,7 +1,8 @@
 defmodule MilosTraining.Wallet.Domain.WalletPassTest do
   use ExUnit.Case, async: true
 
-  alias MilosTraining.Wallet.Domain.{ApplePass, GooglePass, PassContent, PassImage, PassToken}
+  alias MilosTraining.Facility.Domain.StaticMemberCode
+  alias MilosTraining.Wallet.Domain.{ApplePass, GooglePass, PassContent, PassImage}
 
   @key :crypto.strong_rand_bytes(32)
   @serial "3f2b1c4d-5e6f-4a7b-8c9d-0e1f2a3b4c5d"
@@ -14,7 +15,7 @@ defmodule MilosTraining.Wallet.Domain.WalletPassTest do
           serial: @serial,
           box: %{name: "Iron Box", slug: "iron", primary_color: "#FF6600"},
           member: %{name: "Μαρία Π."},
-          barcode: PassToken.sign(@key, @serial),
+          barcode: StaticMemberCode.sign(@key, @serial, :wallet),
           next_booking: %{
             name: "WOD",
             starts_at: ~U[2026-10-21 07:00:00Z],
@@ -35,19 +36,6 @@ defmodule MilosTraining.Wallet.Domain.WalletPassTest do
     web_service_url: "https://api.example.test/api/wallet/apple",
     authentication_token: String.duplicate("a", 32)
   }
-
-  describe "pass token" do
-    test "round-trips the serial and rejects forgeries" do
-      token = PassToken.sign(@key, @serial)
-
-      assert PassToken.pass_token?(token)
-      assert {:ok, @serial} = PassToken.verify(@key, token)
-      assert {:error, :invalid_pass} = PassToken.verify(:crypto.strong_rand_bytes(32), token)
-      assert {:error, :invalid_pass} = PassToken.verify(@key, "W1" <> "AAAA")
-      assert {:error, :invalid_pass} = PassToken.verify(@key, "M1abc")
-      refute PassToken.pass_token?("M1abc")
-    end
-  end
 
   describe "Apple pass.json" do
     test "is a generic pass with the barcode, the next booking and the web service" do

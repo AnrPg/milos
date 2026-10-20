@@ -408,3 +408,12 @@ msgstr "Du nouveau près de chez vous"
 
 msgid "New for «%{name}»: %{count}"
 msgstr "Nouveau pour «%{name}» : %{count}"
+
+msgid "Visitor at the door"
+msgstr "Visiteur à la porte"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} a scanné la porte de %{box} (%{when}) - pas encore membre."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} a scanné la porte de %{box} (%{when}) - pas encore membre. Les essais sont ouverts."

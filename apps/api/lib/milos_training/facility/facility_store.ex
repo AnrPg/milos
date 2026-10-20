@@ -64,6 +64,35 @@ defmodule MilosTraining.Facility.FacilityStore do
   def list_visitor_scans(context, filters),
     do: tenant_call(context, :list_visitor_scans, [filters])
 
+  @impl true
+  def get_poster(context, location_id), do: tenant_call(context, :get_poster, [location_id])
+
+  @impl true
+  def rotate_poster_secret(context, location_id, secret, at),
+    do: tenant_call(context, :rotate_poster_secret, [location_id, secret, at])
+
+  @impl true
+  def set_poster_enabled(context, location_id, enabled),
+    do: tenant_call(context, :set_poster_enabled, [location_id, enabled])
+
+  @impl true
+  def get_active_member_code(context, user_id),
+    do: tenant_call(context, :get_active_member_code, [user_id])
+
+  @impl true
+  def get_member_code(context, id), do: tenant_call(context, :get_member_code, [id])
+
+  @impl true
+  def get_member_code_by_serial(context, serial),
+    do: tenant_call(context, :get_member_code_by_serial, [serial])
+
+  @impl true
+  def create_member_code(context, attrs), do: tenant_call(context, :create_member_code, [attrs])
+
+  @impl true
+  def revoke_member_codes(context, filters, reason, at),
+    do: tenant_call(context, :revoke_member_codes, [filters, reason, at])
+
   # No tenant yet: the definer function answers only for active boxes and
   # open locations, and returns what the door itself shows.
   @impl true

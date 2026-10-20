@@ -14,7 +14,11 @@ defmodule MilosTraining.Facility.Domain.CheckInRules do
     * `desk_override`: the desk may check a member in despite a problem with
       their package («Check-in παρ' όλα αυτά», default off);
     * `door_rotation_seconds`: how often the door code changes (15, 30 or 60;
-      default 30).
+      default 30);
+    * `member_code_mode`: the member's personal QR is `rotating` (changes
+      every 30 s; no Wallet card) or `static` (one persistent, revocable code
+      that can also go on a Wallet card); default `rotating`. See
+      `MemberCodePolicy`.
   """
 
   @defaults %{
@@ -23,15 +27,18 @@ defmodule MilosTraining.Facility.Domain.CheckInRules do
     open_gym_requires_package: true,
     visitor_trial_offer: true,
     desk_override: false,
-    door_rotation_seconds: 30
+    door_rotation_seconds: 30,
+    member_code_mode: "rotating"
   }
 
   @rotations [15, 30, 60]
+  @member_code_modes ~w(rotating static)
   @max_window_minutes 120
 
   def defaults, do: @defaults
   def fields, do: Map.keys(@defaults)
   def rotations, do: @rotations
+  def member_code_modes, do: @member_code_modes
 
   @doc "Settings with every field present, defaults filled in."
   def effective(nil), do: @defaults
@@ -85,6 +92,12 @@ defmodule MilosTraining.Facility.Domain.CheckInRules do
     if value in @rotations,
       do: [],
       else: [door_rotation_seconds: "must be one of #{Enum.join(@rotations, ", ")}"]
+  end
+
+  defp check(:member_code_mode, value) do
+    if value in @member_code_modes,
+      do: [],
+      else: [member_code_mode: "must be one of #{Enum.join(@member_code_modes, ", ")}"]
   end
 
   defp check(key, value) do

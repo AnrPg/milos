@@ -87,6 +87,10 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     # ADR-155: QR check-in desk, door display and rules.
     {W.AdminCheckInController, :door} => [:check_in],
     {W.AdminCheckInController, :rotate_door} => [:check_in, :manage_settings],
+    {W.AdminCheckInController, :poster} => [:check_in, :manage_settings],
+    {W.AdminCheckInController, :update_poster} => [:manage_settings],
+    {W.AdminCheckInController, :rotate_poster} => [:manage_settings],
+    {W.AdminCheckInController, :revoke_member_code} => [:check_in],
     {W.AdminCheckInController, :scan_member} => [:check_in],
     {W.AdminCheckInController, :check_in_member} => [:check_in],
     {W.AdminCheckInController, :visitors} => [:check_in],

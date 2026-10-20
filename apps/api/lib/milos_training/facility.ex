@@ -92,6 +92,53 @@ defmodule MilosTraining.Facility do
   def rotate_door_secret(context, location_id, now),
     do: FacilityStore.rotate_door_secret(context, location_id, :crypto.strong_rand_bytes(32), now)
 
+  @doc "The printed poster of a location: `%{enabled, secret, rotated_at}` or nil."
+  def get_poster(context, location_id), do: FacilityStore.get_poster(context, location_id)
+
+  @doc "«Νέος κωδικός αφίσας»: a fresh poster seed; every printed copy stops working."
+  def rotate_poster_secret(context, location_id, now),
+    do:
+      FacilityStore.rotate_poster_secret(
+        context,
+        location_id,
+        :crypto.strong_rand_bytes(32),
+        now
+      )
+
+  def set_poster_enabled(context, location_id, enabled) when is_boolean(enabled),
+    do: FacilityStore.set_poster_enabled(context, location_id, enabled)
+
+  # Static member codes (board 10, Q5).
+  def get_active_member_code(context, user_id),
+    do: FacilityStore.get_active_member_code(context, user_id)
+
+  def get_member_code(context, id), do: FacilityStore.get_member_code(context, id)
+
+  def get_member_code_by_serial(context, serial),
+    do: FacilityStore.get_member_code_by_serial(context, serial)
+
+  @doc "A new code for a member; a concurrent issue wins and is returned instead."
+  def issue_member_code(%{organization_id: organization_id} = context, user_id) do
+    case FacilityStore.create_member_code(context, %{
+           organization_id: organization_id,
+           user_id: user_id,
+           serial: Ecto.UUID.generate()
+         }) do
+      {:ok, code} ->
+        {:ok, code}
+
+      {:error, _changeset} = error ->
+        case get_active_member_code(context, user_id) do
+          nil -> error
+          code -> {:ok, code}
+        end
+    end
+  end
+
+  @doc "Revokes active codes (`%{user_id: id}` or every code of the box); returns them."
+  def revoke_member_codes(context, filters, reason, now),
+    do: FacilityStore.revoke_member_codes(context, filters, reason, now)
+
   @doc "The box's check-in rules with defaults filled in."
   def check_in_rules(context),
     do: context |> FacilityStore.get_check_in_settings() |> CheckInRules.effective()
