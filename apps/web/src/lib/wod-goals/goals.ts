@@ -152,8 +152,20 @@ export function goalPanelReducer(state: GoalPanelState, action: GoalPanelAction)
         };
         return following && goals.saved ? follow(loaded, target) : loaded;
       }
-      // Later reads (after a draft autosave) only refresh the suggestion,
-      // and the goals too while they still follow it.
+      // Later reads (after a draft autosave or a save) refresh the suggestion.
+      // Stored goals replace the local ones only while nothing local is
+      // waiting to be saved; otherwise the coach's edits stay.
+      if (goals.saved && !hasUnsavedChanges(state)) {
+        const following = goals.source === "suggested" && state.following;
+        const adopted: GoalPanelState = {
+          ...state,
+          saved: true,
+          following,
+          suggestion: target,
+          draft: { muscles: goals.muscles, qualities: goals.qualities, stimulus: goals.stimulus ?? "", visible: goals.visible_to_members },
+        };
+        return following ? follow(adopted, target) : adopted;
+      }
       const next = { ...state, suggestion: target, saved: state.saved || goals.saved };
       return state.following ? follow(next, target) : next;
     }

@@ -65,10 +65,18 @@ function GoalsPanel({ workoutId, refreshKey, timeDomainSeconds = null }: { worko
   }, [refreshKey, refetch]);
 
   const pending = state.loaded && hasUnsavedChanges(state);
-  const latest = useRef({ draft: state.draft, revision: state.revision, mutate: save.mutateAsync });
+  const latest = useRef({ draft: state.draft, revision: state.revision, mutate: save.mutateAsync, pending });
   useEffect(() => {
-    latest.current = { draft: state.draft, revision: state.revision, mutate: save.mutateAsync };
+    latest.current = { draft: state.draft, revision: state.revision, mutate: save.mutateAsync, pending };
   });
+  // Leaving (ribbon collapsed, editor closed) saves what the debounce still holds.
+  useEffect(
+    () => () => {
+      const { draft, mutate, pending: unsaved } = latest.current;
+      if (unsaved) void mutate(savePayload(draft)).catch(() => undefined);
+    },
+    [],
+  );
   useEffect(() => {
     if (!pending) return;
     const timer = window.setTimeout(() => {

@@ -136,6 +136,20 @@ describe("coach panel state", () => {
     });
   });
 
+  it("adopts goals saved elsewhere while nothing local is pending", () => {
+    let state = goalPanelReducer(initialGoalPanelState, { type: "loaded", response: response() });
+    const stored = response({ goals: { saved: true, source: "edited", visible_to_members: true, muscles: [{ id: "glutes", role: "primary" }] } });
+    state = goalPanelReducer(state, { type: "loaded", response: stored });
+    expect(state.saved).toBe(true);
+    expect(state.following).toBe(false);
+    expect(state.draft).toMatchObject({ visible: true, muscles: [{ id: "glutes", role: "primary" }] });
+
+    // With an edit waiting, a read keeps the edit.
+    state = goalPanelReducer(state, { type: "setVisible", visible: false });
+    state = goalPanelReducer(state, { type: "loaded", response: stored });
+    expect(state.draft.visible).toBe(false);
+  });
+
   it("re-saves stored suggested goals when the suggestion moves", () => {
     let state = goalPanelReducer(initialGoalPanelState, { type: "loaded", response: response({ goals: { saved: true } }) });
     expect(hasUnsavedChanges(state)).toBe(false);
