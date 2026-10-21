@@ -104,6 +104,16 @@ test("coach shows goals to members and edits them on the chips and in the picker
       }
       return json(route, puts.length ? staffGoals(true, puts.at(-1)) : staffGoals(false));
     }
+    if (path === `/api/admin/workouts/${draftId}/goal-feedback-summary`) {
+      return json(route, {
+        workout_id: draftId,
+        entries: 12,
+        shown: true,
+        felt_muscles: [{ id: "latissimus-dorsi", count: 9 }, { id: "quadriceps", count: 7 }],
+        felt_qualities: [{ id: "stamina", count: 5 }],
+        goals_not_felt: ["glutes"],
+      });
+    }
     if (path === "/api/admin/scale-levels") return json(route, { scale_levels: [] });
     if (path === "/api/admin/workout-folders") return json(route, { folders: [] });
     return json(route, {});
@@ -114,6 +124,10 @@ test("coach shows goals to members and edits them on the chips and in the picker
   const panel = page.getByTestId("wod-goals-panel");
   await expect(panel.getByText("Suggested from 2 exercises")).toBeVisible();
   await expect(panel.getByText("Suggestion · not saved yet")).toBeVisible();
+  const totals = panel.getByRole("region", { name: "What they felt" });
+  await expect(totals).toContainText("12 entries");
+  await expect(totals).toContainText("Latissimus dorsi9");
+  await expect(totals).toContainText("Goals nobody felt: Glutes");
 
   await panel.getByRole("checkbox", { name: "Show goals to members" }).check();
   await panel.getByRole("button", { name: "Quadriceps, Primary. Tap to change the role." }).click();
