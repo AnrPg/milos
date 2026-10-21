@@ -8199,14 +8199,12 @@
       "resetZoom": "Whole body",
       "roleFor": "Role: {muscle}",
       "felt": "Felt it",
-      "close": "Close",
       "selectedNone": "Pick a muscle on the body or in the list.",
       "add": "Add"
     },
     "strip": {
       "summary": "Goals: {muscles}",
-      "open": "See the goals",
-      "qualities": "Qualities: {qualities}"
+      "open": "See the goals"
     },
     "sheet": {
       "title": "Workout goals",
@@ -8221,9 +8219,7 @@
       "save": "Save",
       "saving": "Saving…",
       "error": "Not saved. Try again or skip.",
-      "loading": "Loading…",
-      "feltMark": "{muscle}: felt it",
-      "extra": "Other muscles"
+      "loading": "Loading…"
     }
   }
 }

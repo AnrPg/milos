@@ -8199,14 +8199,12 @@
       "resetZoom": "Corps entier",
       "roleFor": "Rôle : {muscle}",
       "felt": "Ressenti",
-      "close": "Fermer",
       "selectedNone": "Choisissez un muscle sur le corps ou dans la liste.",
       "add": "Ajouter"
     },
     "strip": {
       "summary": "Objectifs : {muscles}",
-      "open": "Voir les objectifs",
-      "qualities": "Qualités : {qualities}"
+      "open": "Voir les objectifs"
     },
     "sheet": {
       "title": "Objectifs de la séance",
@@ -8221,9 +8219,7 @@
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "error": "Non enregistré. Réessayez ou passez.",
-      "loading": "Chargement…",
-      "feltMark": "{muscle} : ressenti",
-      "extra": "Autres muscles"
+      "loading": "Chargement…"
     }
   }
 }

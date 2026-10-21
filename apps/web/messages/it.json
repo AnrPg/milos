@@ -8199,14 +8199,12 @@
       "resetZoom": "Corpo intero",
       "roleFor": "Ruolo: {muscle}",
       "felt": "Sentito",
-      "close": "Chiudi",
       "selectedNone": "Scegli un muscolo sul corpo o nell’elenco.",
       "add": "Aggiungi"
     },
     "strip": {
       "summary": "Obiettivi: {muscles}",
-      "open": "Vedi gli obiettivi",
-      "qualities": "Capacità: {qualities}"
+      "open": "Vedi gli obiettivi"
     },
     "sheet": {
       "title": "Obiettivi dell’allenamento",
@@ -8221,9 +8219,7 @@
       "save": "Salva",
       "saving": "Salvataggio…",
       "error": "Non salvato. Riprova o salta.",
-      "loading": "Caricamento…",
-      "feltMark": "{muscle}: sentito",
-      "extra": "Altri muscoli"
+      "loading": "Caricamento…"
     }
   }
 }

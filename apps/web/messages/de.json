@@ -8199,14 +8199,12 @@
       "resetZoom": "Ganzer Körper",
       "roleFor": "Rolle: {muscle}",
       "felt": "Gespürt",
-      "close": "Schließen",
       "selectedNone": "Wähle einen Muskel am Körper oder in der Liste.",
       "add": "Hinzufügen"
     },
     "strip": {
       "summary": "Ziele: {muscles}",
-      "open": "Ziele ansehen",
-      "qualities": "Fähigkeiten: {qualities}"
+      "open": "Ziele ansehen"
     },
     "sheet": {
       "title": "Trainingsziele",
@@ -8221,9 +8219,7 @@
       "save": "Speichern",
       "saving": "Wird gespeichert…",
       "error": "Nicht gespeichert. Versuche es erneut oder überspringe.",
-      "loading": "Wird geladen…",
-      "feltMark": "{muscle}: gespürt",
-      "extra": "Weitere Muskeln"
+      "loading": "Wird geladen…"
     }
   }
 }

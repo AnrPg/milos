@@ -8199,14 +8199,12 @@
       "resetZoom": "Hele lichaam",
       "roleFor": "Rol: {muscle}",
       "felt": "Gevoeld",
-      "close": "Sluiten",
       "selectedNone": "Kies een spier op het lichaam of in de lijst.",
       "add": "Toevoegen"
     },
     "strip": {
       "summary": "Doelen: {muscles}",
-      "open": "Doelen bekijken",
-      "qualities": "Vaardigheden: {qualities}"
+      "open": "Doelen bekijken"
     },
     "sheet": {
       "title": "Trainingsdoelen",
@@ -8221,9 +8219,7 @@
       "save": "Opslaan",
       "saving": "Opslaan…",
       "error": "Niet opgeslagen. Probeer opnieuw of sla over.",
-      "loading": "Laden…",
-      "feltMark": "{muscle}: gevoeld",
-      "extra": "Andere spieren"
+      "loading": "Laden…"
     }
   }
 }

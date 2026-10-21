@@ -8199,14 +8199,12 @@
       "resetZoom": "כל הגוף",
       "roleFor": "תפקיד: {muscle}",
       "felt": "הרגשתי",
-      "close": "סגירה",
       "selectedNone": "בחרו שריר על הגוף או ברשימה.",
       "add": "הוספה"
     },
     "strip": {
       "summary": "יעדים: {muscles}",
-      "open": "לצפייה ביעדים",
-      "qualities": "יכולות: {qualities}"
+      "open": "לצפייה ביעדים"
     },
     "sheet": {
       "title": "יעדי האימון",
@@ -8221,9 +8219,7 @@
       "save": "שמירה",
       "saving": "שומר…",
       "error": "לא נשמר. נסו שוב או דלגו.",
-      "loading": "טוען…",
-      "feltMark": "{muscle}: הרגשתי",
-      "extra": "שרירים אחרים"
+      "loading": "טוען…"
     }
   }
 }
