@@ -18,6 +18,8 @@ vi.mock("@/api/client", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/client")>()),
   apiRequest: (...args: unknown[]) => apiRequest(...args),
 }));
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push, replace: vi.fn() }) }));
 vi.mock("@/components/session-provider", () => ({ useSession: () => ({ tokens: { access_token: "token" } }) }));
 vi.mock("@/lib/anatomy/renderer/figure-controller", () => ({ createFigure: () => new Promise(() => undefined) }));
 vi.mock("@/lib/anatomy/renderer/thumbs", () => ({ renderThumb: () => new Promise(() => undefined) }));
@@ -129,6 +131,10 @@ describe("WodGoalsStripView", () => {
     const sheet = screen.getByRole("dialog", { name: "Workout goals" });
     expect(sheet).toHaveTextContent("Erector spinae");
     expect(sheet).toHaveTextContent("Stabilizing");
+    // The atlas opens on the main muscle, or on the muscle tapped (ADR-164).
+    expect(screen.getByTestId("wod-goals-atlas-link")).toHaveAttribute("href", "/journal/atlas?node=quadriceps");
+    fireEvent.click(screen.getByRole("button", { name: "Open Glutes in the atlas" }));
+    expect(push).toHaveBeenCalledWith("/journal/atlas?node=glutes");
   });
 });
 

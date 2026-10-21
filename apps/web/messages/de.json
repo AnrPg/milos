@@ -8062,7 +8062,10 @@
       "primary": "Primär",
       "secondary": "Sekundär",
       "stabilizer": "Stabilisator",
-      "felt": "Gespürt"
+      "felt": "Gespürt",
+      "heat-low": "Niedrige Abdeckung",
+      "heat-medium": "Mittlere Abdeckung",
+      "heat-high": "Hohe Abdeckung"
     },
     "quality": {
       "cardiorespiratory-endurance": "Herz-Kreislauf-Ausdauer",
@@ -8168,6 +8171,43 @@
       "soleus": "Schollenmuskel",
       "tibialis-anterior": "Vorderer Schienbeinmuskel",
       "fibularis": "Wadenbeinmuskeln"
+    },
+    "about": {
+      "sternocleidomastoid": "Dreht und neigt den Kopf und hilft bei schwerer Atmung.",
+      "scalenes": "Neigen den Hals zur Seite und heben beim Einatmen die oberen Rippen.",
+      "splenius": "Streckt und dreht den Kopf und hält ihn aufrecht.",
+      "deltoid": "Hebt den Arm nach vorne, zur Seite und nach hinten; formt die Schulter.",
+      "rotator-cuff": "Vier kleine Muskeln, die die Schulter zentrieren und den Arm drehen.",
+      "pectoralis-major": "Führt den Arm vor den Körper und drückt nach vorne, wie beim Liegestütz.",
+      "pectoralis-minor": "Zieht das Schulterblatt nach vorne und unten.",
+      "serratus-anterior": "Hält das Schulterblatt an den Rippen und dreht es über Kopf nach oben.",
+      "trapezius": "Hebt, zieht zusammen und senkt die Schulterblätter und stützt den Nacken.",
+      "rhomboids": "Ziehen die Schulterblätter zusammen, wie beim Rudern.",
+      "levator-scapulae": "Hebt das Schulterblatt und neigt den Hals.",
+      "latissimus-dorsi": "Zieht den Arm nach unten und hinten, wie beim Klimmzug; der breiteste Rückenmuskel.",
+      "teres-major": "Hilft dem Latissimus, den Arm nach unten und innen zu ziehen.",
+      "erector-spinae": "Streckt die Wirbelsäule und hält sie beim Heben aufrecht.",
+      "multifidus": "Kleine tiefe Muskeln, die jeden Wirbel stabilisieren.",
+      "quadratus-lumborum": "Neigt den Rumpf zur Seite und stabilisiert Becken und unteren Rücken.",
+      "biceps-brachii": "Beugt den Ellbogen und dreht die Handfläche nach oben.",
+      "brachialis": "Der wichtigste Ellbogenbeuger, egal wie die Hand steht.",
+      "triceps-brachii": "Streckt den Ellbogen, wie beim Drücken oder Liegestütz.",
+      "brachioradialis": "Beugt den Ellbogen mit dem Daumen oben, wie beim Hammer Curl.",
+      "forearm-flexors": "Beugen Handgelenk und Finger und geben dir Griffkraft.",
+      "forearm-extensors": "Strecken Handgelenk und Finger und gleichen den Griff aus.",
+      "rectus-abdominis": "Beugt den Rumpf nach vorne und spannt die Vorderseite der Körpermitte.",
+      "obliques": "Drehen und neigen den Rumpf und widerstehen der Rotation.",
+      "transversus-abdominis": "Der tiefste Bauchmuskel; er spannt die Taille wie ein Gürtel.",
+      "diaphragm": "Der wichtigste Atemmuskel; er hilft auch, den Rumpf unter Last zu stabilisieren.",
+      "glutes": "Strecken und öffnen die Hüfte und halten das Becken gerade; zentral bei Kniebeugen und Sprüngen.",
+      "hip-flexors": "Heben das Knie zur Brust und beugen den Rumpf in der Hüfte.",
+      "hip-rotators": "Drehen den Oberschenkel nach außen und stabilisieren die Hüfte.",
+      "quadriceps": "Strecken das Knie; sie treiben Kniebeugen, Ausfallschritte und Sprünge an.",
+      "hamstrings": "Beugen das Knie und strecken die Hüfte, wie beim Kreuzheben.",
+      "adductors": "Führen die Beine zusammen und helfen der Hüfte in tiefen Kniebeugen.",
+      "calves": "Heben die Ferse; sie drücken beim Laufen und Springen ab.",
+      "tibialis-anterior": "Hebt die Zehen und kontrolliert den Fuß bei der Landung.",
+      "fibularis": "Dreht die Sohle nach außen und stabilisiert das Sprunggelenk."
     }
   },
   "WodGoals": {
@@ -8239,7 +8279,9 @@
     },
     "sheet": {
       "title": "Trainingsziele",
-      "close": "Schließen"
+      "close": "Schließen",
+      "atlas": "Atlas ›",
+      "openInAtlas": "{muscle} im Atlas öffnen"
     },
     "felt": {
       "title": "Wie hat es sich angefühlt?",
@@ -8267,6 +8309,60 @@
       "entries": "{count, plural, one {# Eintrag} other {# Einträge}}",
       "notShown": "Wird ab 3 Einträgen angezeigt.",
       "notFelt": "Ziele, die niemand gespürt hat: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Anatomie-Atlas",
+    "back": "Fortschritt",
+    "mode": {
+      "label": "Ansicht",
+      "explore": "Erkunden",
+      "heat": "Meine Abdeckung"
+    },
+    "range": {
+      "label": "Zeitraum",
+      "1w": "1 Wo.",
+      "4w": "4 Wo.",
+      "12w": "12 Wo."
+    },
+    "crumbs": {
+      "label": "Ebene",
+      "body": "Körper"
+    },
+    "body": {
+      "title": "Ganzer Körper",
+      "hint": "Tippe auf eine Region oder direkt auf einen Muskel der Figur. Tippe erneut für seinen Kopf."
+    },
+    "regions": "Regionen",
+    "groups": "Muskelgruppen",
+    "heads": "Köpfe",
+    "level": {
+      "none": "Keine",
+      "low": "Niedrig",
+      "medium": "Mittel",
+      "high": "Hoch"
+    },
+    "levelLine": "Abdeckung: {level}",
+    "sets": "{sets} Sätze",
+    "perWeek": "{perWeek} Sätze/Wo.",
+    "yours": "Deine · {range}",
+    "from": "Vor allem durch: {exercises}",
+    "felt": "{count, plural, one {In # Training gespürt} other {In # Trainings gespürt}}",
+    "noData": "In diesem Zeitraum gibt es noch keine Trainings.",
+    "noneHere": "In diesem Zeitraum keine Sätze hier.",
+    "legendNote": "Ein Hinweis auf dein Trainingsvolumen, kein Ziel.",
+    "unrecognized": "{count, plural, one {# Übung wurde nicht erkannt und zählt nicht.} other {# Übungen wurden nicht erkannt und zählen nicht.}}",
+    "exercises": {
+      "title": "Übungen aus der Box-Bibliothek",
+      "empty": "Keine Übungen für diesen Muskel.",
+      "unavailable": "Übungen erscheinen, sobald eine Box gewählt ist.",
+      "more": "Alle ({count})",
+      "less": "Weniger",
+      "video": "Video: {title}",
+      "role": {
+        "primary": "Haupt",
+        "secondary": "Unterstützend"
+      }
     }
   }
 }

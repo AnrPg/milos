@@ -1,12 +1,15 @@
 "use client";
 
 import { useId, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useFormatter, useTranslations } from "next-intl";
 
 import type { MemberWorkoutGoals } from "@/api/wod-goals";
 import { AnatomyFigure } from "@/components/anatomy/AnatomyFigure";
 import { AnatomyThumb } from "@/components/anatomy/AnatomyThumb";
 import { Sheet, SheetButton } from "@/components/community/Sheet";
+import { atlasHref } from "@/lib/anatomy/atlas";
 import { goalHighlights, musclesByRole, summaryMuscleIds } from "@/lib/wod-goals/goals";
 
 import { MuscleChip, RoleLegend, ToggleChip } from "./GoalChips";
@@ -69,10 +72,14 @@ export function WodGoalsStripView({ goals, className = "" }: { goals: MemberWork
   );
 }
 
-/** All the goals, stabilizers included, on the interactive figure. */
+/**
+ * All the goals, stabilizers included, on the interactive figure. A muscle
+ * opens the anatomy atlas on it (ADR-164); «Άτλαντας» opens it on the main one.
+ */
 export function WodGoalsSheet({ goals, onClose }: { goals: MemberWorkoutGoals; onClose: () => void }) {
   const t = useTranslations("WodGoals");
   const anatomy = useTranslations("Anatomy");
+  const router = useRouter();
   const labelId = useId();
   return (
     <Sheet title={t("sheet.title")} labelId={labelId} onClose={onClose} footer={<SheetButton onClick={onClose}>{t("sheet.close")}</SheetButton>}>
@@ -80,13 +87,24 @@ export function WodGoalsSheet({ goals, onClose }: { goals: MemberWorkoutGoals; o
         {goals.muscles.length > 0 ? (
           <>
             <AnatomyFigure highlights={goalHighlights(goals.muscles)} view="both" interactive size="card" />
-            <RoleLegend />
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <RoleLegend />
+              <Link href={atlasHref(goals.muscles[0]?.id)} className="text-xs font-semibold" style={{ color: "var(--primary)" }} data-testid="wod-goals-atlas-link">
+                {t("sheet.atlas")}
+              </Link>
+            </div>
             {musclesByRole(goals.muscles).map(([role, muscles]) => (
               <div key={role} className="flex flex-col gap-1">
                 <p className="text-xs font-semibold" style={{ color: "var(--text-soft)" }}>{t(`legend.${role}`)}</p>
                 <div className="flex flex-wrap gap-1.5">
                   {muscles.map((muscle) => (
-                    <MuscleChip key={muscle.id} label={anatomy(`muscle.${muscle.id}`)} role={muscle.role} />
+                    <MuscleChip
+                      key={muscle.id}
+                      label={anatomy(`muscle.${muscle.id}`)}
+                      role={muscle.role}
+                      onPress={() => router.push(atlasHref(muscle.id))}
+                      pressLabel={t("sheet.openInAtlas", { muscle: anatomy(`muscle.${muscle.id}`) })}
+                    />
                   ))}
                 </div>
               </div>
