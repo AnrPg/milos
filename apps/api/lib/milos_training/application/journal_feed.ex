@@ -86,6 +86,15 @@ defmodule MilosTraining.Application.JournalFeed do
   defp rows("body", user_id, bound, limit, :owner),
     do: BodySnapshots.feed_entries(%{user_id: user_id}, bound, limit)
 
+  # The Ροή filter (ADR-162): a snapshot is a freeform entry without text;
+  # its rung is `coach_can_view` when shared, `private` otherwise.
+  defp rows("body", user_id, bound, limit, {:owner, query}) do
+    case body_options(query) do
+      :none -> []
+      opts -> BodySnapshots.feed_entries(%{user_id: user_id}, bound, limit, opts)
+    end
+  end
+
   defp rows("body", _user_id, _bound, _limit, _coach), do: []
 
   defp rows("wellness", user_id, bound, limit, scope),
@@ -93,6 +102,23 @@ defmodule MilosTraining.Application.JournalFeed do
 
   defp rows("craving", user_id, bound, limit, scope),
     do: WellnessFeed.craving_items(user_id, bound, limit, scope)
+
+  defp body_options(%{q: q}) when is_binary(q), do: :none
+  defp body_options(%{sources?: true, freeform?: false}), do: :none
+
+  defp body_options(query) do
+    shared? = query.visibilities == [] or "coach_can_view" in query.visibilities
+    private? = query.visibilities == [] or "private" in query.visibilities
+
+    if shared? or private?,
+      do: [
+        shared_only: not private?,
+        private_only: not shared?,
+        since: query.from,
+        before: query.to
+      ],
+      else: :none
+  end
 
   defp items(executions, "execution") do
     executions
